@@ -7,8 +7,9 @@ Created on Mar 2, 2014
 
 import argparse
 import logging
+import Galaxy
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('PyRoute')
 
 def read_sectors(sectors):
     logger.info(sectors)
@@ -20,10 +21,11 @@ def process():
     
     logger.info("starting processing")
     
-    galaxy = Galaxy();
+    galaxy = Galaxy.Galaxy();
     
     galaxy.read_sectors (args.sectors)
     
+    logger.info ("sectors read")
     
     
     logger.info("process complete")
