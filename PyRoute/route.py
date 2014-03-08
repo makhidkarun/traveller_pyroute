@@ -21,12 +21,17 @@ def process():
     
     logger.info("starting processing")
     
-    galaxy = Galaxy.Galaxy();
+    galaxy = Galaxy.Galaxy(20,20);
     
     galaxy.read_sectors (args.sectors)
     
     logger.info ("sectors read")
     
+    galaxy.set_edges()
+#    galaxy.set_borders()
+    galaxy.calculate_routes()
+
+    galaxy.write_routes()
     
     logger.info("process complete")
 

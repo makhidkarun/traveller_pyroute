@@ -5,29 +5,12 @@ Created on Mar 2, 2014
 '''
 import logging
 import re
+import bisect
+import codecs
+import networkx as nx
+from Star import Star
+from operator import attrgetter
 
-class Star (object):
-    def __init__ (self, line, starline):
-        self.logger = logging.getLogger('PyRoute.Star')
-
-        popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
-        
-        self.logger.debug("processing %s" % line)
-        data = starline.match(line).groups()
-        self.position = data[0]
-        self.name = data[1]
-        self.uwp = data[2]
-        self.tradeCode = data[3].strip()
-        self.baseCode = data[8]
-        self.zone = data[9]
-        self.ggCount = int(data[10][2])
-        self.alg = data[12]
-        
-        self.population = pow (10, int(data[2][4],16)) * popCodeM[int(data[10][0])] 
-        self.wtn = 0
-    
-    
-    
 class Sector (object):
     def __init__ (self, name, position):
         self.name = name[1:].strip()
@@ -43,7 +26,7 @@ class Galaxy(object):
     '''
 
 
-    def __init__(self):
+    def __init__(self, x, y):
         '''
         Constructor
         '''
@@ -67,12 +50,17 @@ class Galaxy(object):
         star_regex = ''.join([line.rstrip('\n') for line in regex])
         self.logger.debug("Pattern: %s" % star_regex)
         self.starline = re.compile(star_regex)
-
+        self.stars = nx.Graph()
+        self.sectors = {}
+        self.dx = x * 32
+        self.dy = y * 40
+        self.starpos = [[None for x in xrange(self.dx)] for x in xrange(self.dy)]
+        self.starwtn = []
         
     def read_sectors (self, sectors):
         for sector in sectors:
             try:
-                lines = [line.strip() for line in open(sector)]
+                lines = [line.strip() for line in open(sector,'r')]
             except (OSError, IOError):
                 self.logger.error("sector file %s not found" % sector)
                 continue
@@ -95,6 +83,127 @@ class Galaxy(object):
             for line in lines[lineno:]:
                 star = Star (line, self.starline)
                 sec.worlds[star.position] = star
+            
+            self.sectors[sec.name] = sec
+            
+            self.logger.info("processed %s worlds for %s" % (len(sec.worlds), sec.name))
+
+    def set_positions(self):
+        for sector in self.sectors.values():
+            for star in sector.worlds.values():
+                x = (sector.x + 10) * 32 + star.x
+                y = (sector.y + 10) * 40 + star.y
+                self.starpos[x][y] = star
+                star.x = x
+                star.y = y
+                self.stars.add_node(star)
+                self.starwtn.append(star);
+        self.logger.info("graph node count: %s" % self.stars.number_of_nodes())
+        sorted(self.starwtn, key=attrgetter('wtn'), reverse=True)
+    
+    def set_edges(self):
+        self.set_positions()
+        for star in self.stars.nodes_iter():
+            for x in xrange(star.x-4, star.x+4):
+                if x < 0 or x > self.dx:
+                    continue
+                for y in xrange(star.y-4, star.y+4):
+                    if y < 0 or y > self.dy:
+                        continue
+                    if self.starpos[x][y] is None:
+                        continue
+                    neighbor = self.starpos[x][y]
+                    if star.distance(neighbor) > 4:
+                        continue
+                    if neighbor.zone == 'R' or neighbor.zone == 'F':
+                        continue
+                    if self.stars.has_edge(neighbor, star):
+                        continue
+                    
+                    self.stars.add_edge(star, neighbor, {'distance': star.distance(neighbor), 
+                                                         'weight': star.weight(neighbor),
+                                                         'trade': 0})
+                    
+        self.logger.info("Jump routes: %s" % self.stars.number_of_edges())
+    
+    def get_btn (self, star1, star2):
+        btn = star1.wtn + star2.wtn
+        if (star1.agricultural and star2.nonAgricultural) or \
+            (star1.nonAgricultural and star2.agricultrual): 
+            btn += 1
+        if (star1.resources and star2.industrial) or \
+            (star2.resources and star1.industrial): 
+            btn += 1
+        distance = star1.distance(star2)
+        jump_range = [(1, -1), (2, -2), (5, -3), (9, -4), (19, -5), (29, -6), (59, -7), (99, -8), (199, -9)]
+        jump_mod = bisect.bisect_left(jump_range, distance)
+        
+        btn += jump_range[jump_mod][1]
+
+
+            
+        return btn
+    
+    def get_trade_to (self, star, trade):
+
+        max_distance = [2, 9, 29, 59, 99, 299]
+        
+        max_jumps = max_distance[min(max(0, star.wtn - trade), 5)]
+        
+        max_jumps = 99 if star.wtn < 14 and max_jumps > 99 else max_jumps
+        max_jumps = 29 if star.wtn < 13 and max_jumps > 29 else max_jumps
+        max_jumps = 19 if star.wtn < 12 and max_jumps > 19 else max_jumps
+        
+        for target in self.stars.nodes_iter():
+            if star.distance(target) > max_jumps:
+                continue
+            route = nx.astar_path(self.stars,star,target)
+            
+            #self.logger.debug(u'Route from %s to %s: %s' % (star.name, target.name,route))
+            start = star
+            for end in route:
+                if end == start:
+                    continue
+                self.stars[start][end]['trade'] += self.get_btn(star, target);
+                start = end
+    
+    def calculate_routes(self):
+        for trade in xrange(15, 8, -1): 
+            for star in self.starwtn:
+                if star.wtn < trade -1:
+                    break
+                self.get_trade_to(star, trade)
                 
-            self.logger.info("processes %s worlds" % len(sec.worlds))
-                
+        
+    def write_routes(self):
+        with open("./routes.txt", 'wb') as f:
+            nx.write_edgelist(self.stars, f, data=True)
+        
+    def get_alg(self, new, old):
+        if new == 'Na' or new == 'Ba' or new == 'Cs':
+            return old
+        if old is None:
+            return new
+        if new is None:
+            return old
+        if new == old:
+            return new
+        return new;
+    
+                    
+    def set_borders(self):
+        self.align = [[None for x in xrange(self.dx)] for x in xrange(self.dy)]
+        for star in self.stars.nodes_iter():
+            self.align[star.x][star.y] = star.alg
+
+        for w in xrange(2):
+            for x in xrange(self.dx):
+                for y in xrange(self.dy):
+                    if self.align[x][y] is not None: continue
+                    al = None
+                    al = get_alg(self.align[x-1][y], al)
+                    al = get_alg() 
+                    
+    
+        
+        
