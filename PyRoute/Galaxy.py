@@ -6,7 +6,6 @@ Created on Mar 2, 2014
 import logging
 import re
 import bisect
-import codecs
 import networkx as nx
 from Star import Star
 from operator import attrgetter
@@ -16,6 +15,8 @@ class Sector (object):
         self.name = name[1:].strip()
         self.x = int(position[1:].split(',')[0])
         self.y = int(position[1:].split(',')[1])
+        self.dx = self.x + 10 * 32
+        self.dy = self.y + 10 * 40
         self.subsectors = {}
         self.alg = {}
         self.worlds = {}
@@ -24,8 +25,6 @@ class Galaxy(object):
     '''
     classdocs
     '''
-
-
     def __init__(self, x, y):
         '''
         Constructor
@@ -54,7 +53,7 @@ class Galaxy(object):
         self.sectors = {}
         self.dx = x * 32
         self.dy = y * 40
-        self.starpos = [[None for x in xrange(self.dx)] for x in xrange(self.dy)]
+        #self.starpos = [[None for x in xrange(self.dx)] for x in xrange(self.dy)]
         self.starwtn = []
         
     def read_sectors (self, sectors):
@@ -81,7 +80,7 @@ class Galaxy(object):
                     sec.alg[line[8:].split(':',1)[0]] = line[8:].split(':',1)[1].strip().strip('"')
                 
             for line in lines[lineno:]:
-                star = Star (line, self.starline)
+                star = Star (line, self.starline,sec.dx, sec.dy)
                 sec.worlds[star.position] = star
             
             self.sectors[sec.name] = sec
@@ -91,57 +90,42 @@ class Galaxy(object):
     def set_positions(self):
         for sector in self.sectors.values():
             for star in sector.worlds.values():
-                x = (sector.x + 10) * 32 + star.x
-                y = (sector.y + 10) * 40 + star.y
-                self.starpos[x][y] = star
-                star.x = x
-                star.y = y
                 self.stars.add_node(star)
                 self.starwtn.append(star);
         self.logger.info("graph node count: %s" % self.stars.number_of_nodes())
-        sorted(self.starwtn, key=attrgetter('wtn'), reverse=True)
+        self.starwtn = sorted(self.starwtn, key=attrgetter('wtn'), reverse=True)
+        self.logger.info("wtn array size: %s" % len (self.starwtn))
     
     def set_edges(self):
         self.set_positions()
         for star in self.stars.nodes_iter():
-            for x in xrange(star.x-4, star.x+4):
-                if x < 0 or x > self.dx:
+            for neighbor in self.stars.nodes_iter():
+                dist = star.hex_distance (neighbor)
+                if star == neighbor or\
+                    dist > 4 or \
+                    neighbor.zone in ['R','F'] or \
+                    self.stars.has_edge(neighbor, star):
                     continue
-                for y in xrange(star.y-4, star.y+4):
-                    if y < 0 or y > self.dy:
-                        continue
-                    if self.starpos[x][y] is None:
-                        continue
-                    neighbor = self.starpos[x][y]
-                    if star.distance(neighbor) > 4:
-                        continue
-                    if neighbor.zone == 'R' or neighbor.zone == 'F':
-                        continue
-                    if self.stars.has_edge(neighbor, star):
-                        continue
-                    
-                    self.stars.add_edge(star, neighbor, {'distance': star.distance(neighbor), 
-                                                         'weight': star.weight(neighbor),
-                                                         'trade': 0})
-                    
+               
+                self.stars.add_edge (star, neighbor, {'distance': dist,
+                                                      'weight': star.weight(neighbor),
+                                                      'trade': 0,
+                                                      'btn': self.get_btn(star, neighbor)})
         self.logger.info("Jump routes: %s" % self.stars.number_of_edges())
     
     def get_btn (self, star1, star2):
         btn = star1.wtn + star2.wtn
         if (star1.agricultural and star2.nonAgricultural) or \
-            (star1.nonAgricultural and star2.agricultrual): 
+            (star1.nonAgricultural and star2.agricultural): 
             btn += 1
         if (star1.resources and star2.industrial) or \
             (star2.resources and star1.industrial): 
             btn += 1
-        distance = star1.distance(star2)
+        distance = star1.hex_distance(star2)
         jump_range = [(1, -1), (2, -2), (5, -3), (9, -4), (19, -5), (29, -6), (59, -7), (99, -8), (199, -9)]
         jump_mod = bisect.bisect_left(jump_range, distance)
         
         btn += jump_range[jump_mod][1]
-
-
-            
         return btn
     
     def get_trade_to (self, star, trade):
@@ -150,16 +134,16 @@ class Galaxy(object):
         
         max_jumps = max_distance[min(max(0, star.wtn - trade), 5)]
         
+        
         max_jumps = 99 if star.wtn < 14 and max_jumps > 99 else max_jumps
         max_jumps = 29 if star.wtn < 13 and max_jumps > 29 else max_jumps
         max_jumps = 19 if star.wtn < 12 and max_jumps > 19 else max_jumps
         
         for target in self.stars.nodes_iter():
-            if star.distance(target) > max_jumps:
+            if star.hex_distance(target) > max_jumps:
                 continue
             route = nx.astar_path(self.stars,star,target)
             
-            #self.logger.debug(u'Route from %s to %s: %s' % (star.name, target.name,route))
             start = star
             for end in route:
                 if end == start:
@@ -168,12 +152,14 @@ class Galaxy(object):
                 start = end
     
     def calculate_routes(self):
-        for trade in xrange(15, 8, -1): 
+        for trade in xrange(15, 7, -1): 
+            counter = 0;
             for star in self.starwtn:
-                if star.wtn < trade -1:
+                if star.wtn < trade:
                     break
                 self.get_trade_to(star, trade)
-                
+                counter += 1
+            self.logger.info('Processes %s routes at trade %s' % (counter, trade))
         
     def write_routes(self):
         with open("./routes.txt", 'wb') as f:

@@ -7,7 +7,7 @@ Created on Mar 5, 2014
 import logging
 
 class Star (object):
-    def __init__ (self, line, starline):
+    def __init__ (self, line, starline, dx, dy):
         self.logger = logging.getLogger('PyRoute.Star')
 
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
@@ -15,26 +15,29 @@ class Star (object):
         self.logger.debug("processing %s" % line)
         data = starline.match(line).groups()
         self.position = data[0].strip().decode('utf-8')
-        self.set_location(data[0])
+        self.set_location(dx, dy)
         self.name = data[1].strip().decode('utf-8')
             
         self.uwp = data[2].strip()
         self.port = self.uwp[0]
-        self.tradeCode = data[3].strip()
+        self.tradeCode = data[3].strip().split()
         self.baseCode = data[8].strip()
         self.zone = data[9].strip()
         self.ggCount = int(data[10][2])
         self.alg = data[12].strip()
         
-        self.population =int (pow (10, int(data[2][4],16)) * popCodeM[int(data[10][0])] / 1000000) 
+        self.population =int (pow (10, int(data[2][4],16)) * popCodeM[int(data[10][0])] / 10000000) 
         
-        self.rich = self.tradeCode.count("Ri ") != 0
-        self.industrial = self.tradeCode.count("In ") != 0
-        self.agricultural = self.tradeCode.count("Ag ") != 0
-        self.poor = self.tradeCode.count("Po ") != 0
-        self.nonIndustrial = self.tradeCode.count("Ni ") != 0
-        self.nonAgricultural = False
-        self.resources = False
+        self.rich = 'Ri' in self.tradeCode 
+        self.industrial = 'In' in self.tradeCode 
+        self.agricultural = 'Ag' in self.tradeCode 
+        self.poor = 'Po' in self.tradeCode 
+        self.nonIndustrial = 'Ni' in self.tradeCode 
+        self.resources = 'As' in self.tradeCode or 'Ba' in self.tradeCode or \
+                'Fl' in self.tradeCode or 'Ic' in self.tradeCode or 'De' in self.tradeCode or \
+                'Na' in self.tradeCode or 'Va' in self.tradeCode or 'Wa' in self.tradeCode
+        self.nonAgricultural = 'Na' in self.tradeCode
+
         self.calculate_wtn()
 
     def __unicode(self):
@@ -47,9 +50,20 @@ class Star (object):
     def __repr__(self):
         return u"%s (%s)" % (self.name, self.position)
     
-    def set_location (self, loc):
-        self.x = int(loc[0:1])
-        self.y = int(loc[2:3])
+    def set_location (self, dx, dy):
+        # convert odd-q offset to cube
+        q = int (self.position[0:2]) + dx
+        r = int (self.position[2:4]) + dy
+        self.x = q
+        self.z = r - (q - (q & 1)) / 2
+        self.y = -self.x - self.z
+        
+        # convert cube to axial
+        self.q = self.x
+        self.r = self.z
+        
+    def hex_distance(self, star):
+        return max(abs(self.x - star.x), abs(self.y - star.y), abs(self.z -star.z))
         
     def distance (self, star):
         y1 = self.y * 2
@@ -72,7 +86,7 @@ class Star (object):
     def weight (self, star):
         distance_weight = [0, 30, 50, 80, 0, 0, 150 ]
         
-        dist = self.distance(star)
+        dist = self.hex_distance(star)
         if dist == 4 or dist == 5:
             dist = 6
         weight = distance_weight[dist]
@@ -86,13 +100,14 @@ class Star (object):
     
     def calculate_wtn(self):
         self.wtn = int(self.uwp[4], 16)
-        tl = int(self.uwp[8],20)
-        self.wtn -= 1 if tl == 0 else 0
-        self.wtn += 1 if tl >= 5 else 0
-        self.wtn += 1 if tl >= 9 else 0
-        self.wtn += 1 if tl >= 15 else 0
+        self.tl = int(self.uwp[8],20)
+        self.wtn -= 1 if self.tl == 0 else 0
+        self.wtn += 1 if self.tl >= 5 else 0
+        self.wtn += 1 if self.tl >= 9 else 0
+        self.wtn += 1 if self.tl >= 15 else 0
         
-        port = self.uwp[0]       
+        port = self.uwp[0]
+             
         if port == 'A':
             self.wtn = (self.wtn * 3 + 13) / 4
         if port == 'B':
@@ -116,4 +131,3 @@ class Star (object):
             self.wtn = (self.wtn - 5) / 2
             
         self.wtn = int(round(max(0, self.wtn)))
-
