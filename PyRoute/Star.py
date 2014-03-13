@@ -14,9 +14,9 @@ class Star (object):
         
         self.logger.debug("processing %s" % line)
         data = starline.match(line).groups()
-        self.position = data[0].strip().decode('utf-8')
+        self.position = data[0].strip()
         self.set_location(dx, dy)
-        self.name = data[1].strip().decode('utf-8')
+        self.name = data[1].strip()
             
         self.uwp = data[2].strip()
         self.port = self.uwp[0]
@@ -61,6 +61,8 @@ class Star (object):
         # convert cube to axial
         self.q = self.x
         self.r = self.z
+        self.col = q - dx
+        self.row = r - dy
         
     def hex_distance(self, star):
         return max(abs(self.x - star.x), abs(self.y - star.y), abs(self.z -star.z))

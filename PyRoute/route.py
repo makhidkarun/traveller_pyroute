@@ -7,7 +7,8 @@ Created on Mar 2, 2014
 
 import argparse
 import logging
-import Galaxy
+from Galaxy import Galaxy
+from HexMap import HexMap
 
 logger = logging.getLogger('PyRoute')
 
@@ -21,7 +22,7 @@ def process():
     
     logger.info("starting processing")
     
-    galaxy = Galaxy.Galaxy(20,20);
+    galaxy = Galaxy(20,20);
     
     galaxy.read_sectors (args.sectors)
     
@@ -29,9 +30,12 @@ def process():
     
     galaxy.set_edges()
 #    galaxy.set_borders()
-    galaxy.calculate_routes()
+    #galaxy.calculate_routes()
 
     galaxy.write_routes()
+    
+    map = HexMap(galaxy)
+    map.write_maps()
     
     logger.info("process complete")
 

@@ -6,6 +6,7 @@ Created on Mar 2, 2014
 import logging
 import re
 import bisect
+import codecs
 import networkx as nx
 from Star import Star
 from operator import attrgetter
@@ -19,7 +20,7 @@ class Sector (object):
         self.dy = self.y + 10 * 40
         self.subsectors = {}
         self.alg = {}
-        self.worlds = {}
+        self.worlds = []
 
 class Galaxy(object):
     '''
@@ -50,6 +51,7 @@ class Galaxy(object):
         self.logger.debug("Pattern: %s" % star_regex)
         self.starline = re.compile(star_regex)
         self.stars = nx.Graph()
+        self.ranges = nx.Graph()
         self.sectors = {}
         self.dx = x * 32
         self.dy = y * 40
@@ -59,7 +61,7 @@ class Galaxy(object):
     def read_sectors (self, sectors):
         for sector in sectors:
             try:
-                lines = [line.strip() for line in open(sector,'r')]
+                lines = [line.strip() for line in codecs.open(sector,'r', 'utf-8')]
             except (OSError, IOError):
                 self.logger.error("sector file %s not found" % sector)
                 continue
@@ -72,7 +74,7 @@ class Galaxy(object):
             for line in lines:
                 lineno += 1
                 if line.startswith ('Hex'):
-                    lineno += 2
+                    lineno += 1
                     break
                 if line.startswith ('# Subsector'):
                     sec.subsectors[line[11:].split(':',1)[0].strip()] = line[11:].split(':',1)[1].strip()
@@ -81,7 +83,7 @@ class Galaxy(object):
                 
             for line in lines[lineno:]:
                 star = Star (line, self.starline,sec.dx, sec.dy)
-                sec.worlds[star.position] = star
+                sec.worlds.append(star)
             
             self.sectors[sec.name] = sec
             
@@ -89,8 +91,9 @@ class Galaxy(object):
 
     def set_positions(self):
         for sector in self.sectors.values():
-            for star in sector.worlds.values():
+            for star in sector.worlds:
                 self.stars.add_node(star)
+                self.ranges.add_node(star)
                 self.starwtn.append(star);
         self.logger.info("graph node count: %s" % self.stars.number_of_nodes())
         self.starwtn = sorted(self.starwtn, key=attrgetter('wtn'), reverse=True)
@@ -102,12 +105,13 @@ class Galaxy(object):
             for neighbor in self.stars.nodes_iter():
                 dist = star.hex_distance (neighbor)
                 if star == neighbor or\
-                    dist > 4 or \
                     neighbor.zone in ['R','F'] or \
                     self.stars.has_edge(neighbor, star):
                     continue
-               
-                self.stars.add_edge (star, neighbor, {'distance': dist,
+
+                
+                if dist <= 4 :               
+                    self.stars.add_edge (star, neighbor, {'distance': dist,
                                                       'weight': star.weight(neighbor),
                                                       'trade': 0,
                                                       'btn': self.get_btn(star, neighbor)})
