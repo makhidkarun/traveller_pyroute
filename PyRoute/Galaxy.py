@@ -5,11 +5,12 @@ Created on Mar 2, 2014
 '''
 import logging
 import re
-import bisect
 import codecs
 import networkx as nx
-from Star import Star
 from operator import attrgetter
+
+from Star import Star
+from TradeCalculation import TradeCalculation
 
 class Sector (object):
     def __init__ (self, name, position):
@@ -51,14 +52,14 @@ class Galaxy(object):
         self.logger.debug("Pattern: %s" % star_regex)
         self.starline = re.compile(star_regex)
         self.stars = nx.DiGraph()
-        self.ranges = nx.Graph()
+        self.ranges = nx.DiGraph()
         self.sectors = {}
         self.dx = x * 32
         self.dy = y * 40
         #self.starpos = [[None for x in xrange(self.dx)] for x in xrange(self.dy)]
         self.starwtn = []
-        self.btn_range = [2, 9, 29, 59, 99, 299]
-        
+        self.trade = TradeCalculation(self)
+
         
     def read_sectors (self, sectors):
         for sector in sectors:
@@ -111,74 +112,23 @@ class Galaxy(object):
                 if star == neighbor or\
                     neighbor.zone in ['R','F']:
                     continue
-                max_dist = self.btn_range[ min(max (0, star.wtn-8), 5)]
-                if dist <= max_dist and not self.ranges.has_edge(neighbor, star):
+                max_dist = self.trade.btn_range[ min(max (0, star.wtn-8), 5)]
+                if dist <= max_dist:
                     self.ranges.add_edge(star, neighbor, {'distance': dist})
                 if dist <= 4 :               
                     self.stars.add_edge (star, neighbor, {'distance': dist,
                                                       'weight': star.weight(neighbor),
                                                       'trade': 0,
-                                                      'btn': self.get_btn(star, neighbor)})
+                                                      'btn': self.trade.get_btn(star, neighbor)})
         self.logger.info("Jump routes: %s - Distances: %s" % 
                          (self.stars.number_of_edges(), self.ranges.number_of_edges()))
     
-    def get_btn (self, star1, star2):
-        btn = star1.wtn + star2.wtn
-        if (star1.agricultural and star2.nonAgricultural) or \
-            (star1.nonAgricultural and star2.agricultural): 
-            btn += 1
-        if (star1.resources and star2.industrial) or \
-            (star2.resources and star1.industrial): 
-            btn += 1
-        distance = star1.hex_distance(star2)
-        #jump_range = [(1, -1), (2, -2), (5, -3), (9, -4), (19, -5), (29, -6), (59, -7), (99, -8), (199, -9)]
-        jump_range = [ 1,  2,  5,  9, 19, 29, 59, 99,199]
-        jump_mod   = [-1, -2, -3, -4, -5, -6, -7, -8, -9]
-        jump_index = bisect.bisect_left(jump_range, distance)
-        
-        btn += jump_mod[jump_index]
-        return btn
-    
-    def get_trade_to (self, star, trade):
-
-        max_distance = [2, 9, 29, 59, 99, 299]
-        
-        max_jumps = max_distance[min(max(0, star.wtn - trade), 5)]
-        
-        
-        max_jumps = 99 if star.wtn < 14 and max_jumps > 99 else max_jumps
-        max_jumps = 29 if star.wtn < 13 and max_jumps > 29 else max_jumps
-        max_jumps = 19 if star.wtn < 12 and max_jumps > 19 else max_jumps
-        
-        for (newstar, target, data) in self.ranges.edges_iter(star, True):
-            if newstar != star:
-                self.logger.error("edges_iter found newstar %s != star %s" % (newstar, star))
-                continue
-            if star.hex_distance(target) > max_jumps:
-                continue
-            route = nx.astar_path(self.stars, star, target)
-            tradeBTN = self.get_btn(star, target)
-            start = star
-            for end in route:
-                if end == start:
-                    continue
-                self.stars[start][end]['trade'] = max(self.stars[start][end]['trade'],tradeBTN);
-                self.stars[start][end]['weight'] -= 0.1
-                start = end
-    
-    def calculate_routes(self):
-        for trade in xrange(15, 7, -1): 
-            counter = 0;
-            for star in self.starwtn:
-                if star.wtn < trade:
-                    break
-                self.get_trade_to(star, trade)
-                counter += 1
-            self.logger.info('Processes %s routes at trade %s' % (counter, trade))
         
     def write_routes(self):
         with open("./routes.txt", 'wb') as f:
             nx.write_edgelist(self.stars, f, data=True)
+        with open("./ranges.txt", "wb") as f:
+            nx.write_edgelist(self.ranges, f, data=True)
         
     def get_alg(self, new, old):
         if new == 'Na' or new == 'Ba' or new == 'Cs':

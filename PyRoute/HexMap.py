@@ -34,15 +34,16 @@ class HexMap(object):
             self.write_base_map(pdf, sector)
             
             for (star, neighbor, data) in self.galaxy.stars.edges_iter(sector.worlds, True):
-                
                 if self.galaxy.stars[neighbor][star]['trade'] > 0:
                     if self.galaxy.stars[neighbor][star]['trade'] > data['trade']:
+                        self.galaxy.stars[neighbor][star]['trade'] += data['trade']
                         data['trade'] = 0
                     else:
+                        data['trade'] += self.galaxy.stars[neighbor][star]['trade']
                         self.galaxy.stars[neighbor][star]['trade'] = 0
                     
-                if data['trade'] > 14:
-                    self.logger.info("trade line %s - %s : %s" % (star, neighbor, data))
+                if data['trade'] > 0 and self.trade_to_btn(data['trade']) > 7:
+                    self.logger.debug("trade line %s - %s : %s" % (star, neighbor, data))
                     self.trade_line(pdf, [star, neighbor], data)
 
             for star in sector.worlds:
@@ -184,7 +185,10 @@ class HexMap(object):
             added += '*'
         else:
             added += ' '
-        added += "{0}{1:d}{2:X}{3:d}".format(star.baseCode, star.ggCount, star.wtn, 0)
+            
+        tradeIn = self.trade_to_btn(star.tradeIn)
+        tradeOver = self.trade_to_btn(star.tradeOver)
+        added += "{0}{1:d}{2:X}{3:X}{4:X}".format(star.baseCode, star.ggCount, star.wtn, tradeIn, tradeOver)
 
         width = pdf.get_font()._string_width(added)
         point.y_plus(6)
@@ -196,7 +200,7 @@ class HexMap(object):
         
     def trade_line(self, pdf, edge, data):
         
-        tradeColors = ['red','yellow', 'green', 'cyan', 'blue' ]
+        tradeColors = ['red','yellow', 'green', 'cyan', 'blue', 'darkgray' ]
         start = edge[0]
         end = edge[1]
         
@@ -205,7 +209,9 @@ class HexMap(object):
         lineStart = PDFCursor ((self.xm * 3 * (start.col)) + self.ym, starty)
         lineEnd = PDFCursor ((self.xm * 3 * (end.col)) + self.ym, endy)
         color = pdf.get_color()
-        color.set_color_by_name(tradeColors[min(max(0, int((data['trade'] - 16)/2)), 4)])
+        
+        
+        color.set_color_by_name(tradeColors[min(max(0, self.trade_to_btn(data['trade']) - 8), 5)])
 
         line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, style='solid', color=color, size=1)
         line._draw()
@@ -224,6 +230,11 @@ class HexMap(object):
             w += font.character_widths[i] if i in font.character_widths else 600
         return w * font.font_size / 1000.0
       
+    def trade_to_btn(self, trade):
+        if trade == 0:
+            return 0
+        return int(math.log(trade,10))
+    
         
 if __name__ == '__main__':
     sector = Sector('# Core', '# 0,0')

@@ -9,6 +9,7 @@ import argparse
 import logging
 from Galaxy import Galaxy
 from HexMap import HexMap
+from TradeCalculation import TradeCalculation
 
 logger = logging.getLogger('PyRoute')
 
@@ -30,7 +31,9 @@ def process():
     
     galaxy.set_edges()
 #    galaxy.set_borders()
-    galaxy.calculate_routes()
+
+    trade = TradeCalculation(galaxy)
+    trade.calculate_routes()
 
     galaxy.write_routes()
     

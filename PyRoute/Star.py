@@ -39,7 +39,9 @@ class Star (object):
         self.nonAgricultural = 'Na' in self.tradeCode
 
         self.calculate_wtn()
-
+        self.tradeIn  = 0
+        self.tradeOver = 0
+        self.tradeMatched = []
     def __unicode(self):
         return u"%s (%s)" % (self.name, self.position)
         
