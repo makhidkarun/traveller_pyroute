@@ -4,6 +4,7 @@ Created on Mar 8, 2014
 @author: tjoneslo
 '''
 import logging
+import math
 from pypdflite import PDFLite
 from pypdflite import PDFCursor
 from pypdflite.pdfobjects.pdfline import PDFLine
@@ -25,11 +26,25 @@ class HexMap(object):
         self.galaxy = galaxy
         self.ym = 9     # half a hex height
         self.xm = 6     # half the length of one side
+        self.colorStart = 0
 
     def write_maps(self):
         for sector in self.galaxy.sectors.itervalues():
             pdf = self.document(sector.name)
             self.write_base_map(pdf, sector)
+            
+            for (star, neighbor, data) in self.galaxy.stars.edges_iter(sector.worlds, True):
+                
+                if self.galaxy.stars[neighbor][star]['trade'] > 0:
+                    if self.galaxy.stars[neighbor][star]['trade'] > data['trade']:
+                        data['trade'] = 0
+                    else:
+                        self.galaxy.stars[neighbor][star]['trade'] = 0
+                    
+                if data['trade'] > 14:
+                    self.logger.info("trade line %s - %s : %s" % (star, neighbor, data))
+                    self.trade_line(pdf, [star, neighbor], data)
+
             for star in sector.worlds:
                 self.system(pdf, star)
             self.writer.close()
@@ -38,7 +53,6 @@ class HexMap(object):
         self.sector_name(pdf, sector.name)
         self.subsector_grid(pdf)
         self.hex_grid(pdf)
-        
         
     def sector_name(self,pdf,name):
         cursor = PDFCursor(5, 25, True)
@@ -180,8 +194,22 @@ class HexMap(object):
         
         pdf.set_font(def_font)
         
-    def trade_line(self, edge):
-        pass
+    def trade_line(self, pdf, edge, data):
+        
+        tradeColors = ['red','yellow', 'green', 'cyan', 'blue' ]
+        start = edge[0]
+        end = edge[1]
+        
+        starty = 53 + ( self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
+        endy   = 53 + ( self.ym * 2 * (end.row)) - (self.ym * (1 if end.col & 1 else 0))
+        lineStart = PDFCursor ((self.xm * 3 * (start.col)) + self.ym, starty)
+        lineEnd = PDFCursor ((self.xm * 3 * (end.col)) + self.ym, endy)
+        color = pdf.get_color()
+        color.set_color_by_name(tradeColors[min(max(0, int((data['trade'] - 16)/2)), 4)])
+
+        line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, style='solid', color=color, size=1)
+        line._draw()
+        self.colorStart += 30
                         
     def document(self, name):
         self.writer = PDFLite(name + ".pdf")
@@ -205,10 +233,13 @@ if __name__ == '__main__':
     
     galaxy = Galaxy (0,0)
     
-    star1 = Star("0101 Shana Ma             E551112-7 Lo Po                { -3 } (300-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-             galaxy.starline, 0, 0)
-
+    star1 = Star("0102 Shana Ma             E551112-7 Lo Po                { -3 } (300-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                 galaxy.starline, 0, 0)
+    star2 = Star("0405 Azimuth              B847427-B Ni Pa                { 1 }  (634+1) [455B] Bc    N - 200 13 Im M2 V M7 V      ",
+                 galaxy.starline, 0, 0)
+    hexMap.trade_line(pdf, [star1,star2])
     hexMap.system(pdf, star1)
+    hexMap.system(pdf, star2)
     
     hexMap.writer.close()
         

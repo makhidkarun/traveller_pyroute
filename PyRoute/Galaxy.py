@@ -50,13 +50,15 @@ class Galaxy(object):
         star_regex = ''.join([line.rstrip('\n') for line in regex])
         self.logger.debug("Pattern: %s" % star_regex)
         self.starline = re.compile(star_regex)
-        self.stars = nx.Graph()
+        self.stars = nx.DiGraph()
         self.ranges = nx.Graph()
         self.sectors = {}
         self.dx = x * 32
         self.dy = y * 40
         #self.starpos = [[None for x in xrange(self.dx)] for x in xrange(self.dy)]
         self.starwtn = []
+        self.btn_range = [2, 9, 29, 59, 99, 299]
+        
         
     def read_sectors (self, sectors):
         for sector in sectors:
@@ -82,6 +84,8 @@ class Galaxy(object):
                     sec.alg[line[8:].split(':',1)[0]] = line[8:].split(':',1)[1].strip().strip('"')
                 
             for line in lines[lineno:]:
+                if line.startswith('#') or len(line) < 20: 
+                    continue
                 star = Star (line, self.starline,sec.dx, sec.dy)
                 sec.worlds.append(star)
             
@@ -97,7 +101,7 @@ class Galaxy(object):
                 self.starwtn.append(star);
         self.logger.info("graph node count: %s" % self.stars.number_of_nodes())
         self.starwtn = sorted(self.starwtn, key=attrgetter('wtn'), reverse=True)
-        self.logger.info("wtn array size: %s" % len (self.starwtn))
+        self.logger.debug("wtn array size: %s" % len (self.starwtn))
     
     def set_edges(self):
         self.set_positions()
@@ -105,17 +109,18 @@ class Galaxy(object):
             for neighbor in self.stars.nodes_iter():
                 dist = star.hex_distance (neighbor)
                 if star == neighbor or\
-                    neighbor.zone in ['R','F'] or \
-                    self.stars.has_edge(neighbor, star):
+                    neighbor.zone in ['R','F']:
                     continue
-
-                
+                max_dist = self.btn_range[ min(max (0, star.wtn-8), 5)]
+                if dist <= max_dist and not self.ranges.has_edge(neighbor, star):
+                    self.ranges.add_edge(star, neighbor, {'distance': dist})
                 if dist <= 4 :               
                     self.stars.add_edge (star, neighbor, {'distance': dist,
                                                       'weight': star.weight(neighbor),
                                                       'trade': 0,
                                                       'btn': self.get_btn(star, neighbor)})
-        self.logger.info("Jump routes: %s" % self.stars.number_of_edges())
+        self.logger.info("Jump routes: %s - Distances: %s" % 
+                         (self.stars.number_of_edges(), self.ranges.number_of_edges()))
     
     def get_btn (self, star1, star2):
         btn = star1.wtn + star2.wtn
@@ -126,10 +131,12 @@ class Galaxy(object):
             (star2.resources and star1.industrial): 
             btn += 1
         distance = star1.hex_distance(star2)
-        jump_range = [(1, -1), (2, -2), (5, -3), (9, -4), (19, -5), (29, -6), (59, -7), (99, -8), (199, -9)]
-        jump_mod = bisect.bisect_left(jump_range, distance)
+        #jump_range = [(1, -1), (2, -2), (5, -3), (9, -4), (19, -5), (29, -6), (59, -7), (99, -8), (199, -9)]
+        jump_range = [ 1,  2,  5,  9, 19, 29, 59, 99,199]
+        jump_mod   = [-1, -2, -3, -4, -5, -6, -7, -8, -9]
+        jump_index = bisect.bisect_left(jump_range, distance)
         
-        btn += jump_range[jump_mod][1]
+        btn += jump_mod[jump_index]
         return btn
     
     def get_trade_to (self, star, trade):
@@ -143,16 +150,20 @@ class Galaxy(object):
         max_jumps = 29 if star.wtn < 13 and max_jumps > 29 else max_jumps
         max_jumps = 19 if star.wtn < 12 and max_jumps > 19 else max_jumps
         
-        for target in self.stars.nodes_iter():
+        for (newstar, target, data) in self.ranges.edges_iter(star, True):
+            if newstar != star:
+                self.logger.error("edges_iter found newstar %s != star %s" % (newstar, star))
+                continue
             if star.hex_distance(target) > max_jumps:
                 continue
-            route = nx.astar_path(self.stars,star,target)
-            
+            route = nx.astar_path(self.stars, star, target)
+            tradeBTN = self.get_btn(star, target)
             start = star
             for end in route:
                 if end == start:
                     continue
-                self.stars[start][end]['trade'] += self.get_btn(star, target);
+                self.stars[start][end]['trade'] = max(self.stars[start][end]['trade'],tradeBTN);
+                self.stars[start][end]['weight'] -= 0.1
                 start = end
     
     def calculate_routes(self):

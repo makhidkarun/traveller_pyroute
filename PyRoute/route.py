@@ -30,12 +30,12 @@ def process():
     
     galaxy.set_edges()
 #    galaxy.set_borders()
-    #galaxy.calculate_routes()
+    galaxy.calculate_routes()
 
     galaxy.write_routes()
     
-    map = HexMap(galaxy)
-    map.write_maps()
+    pdfmap = HexMap(galaxy)
+    pdfmap.write_maps()
     
     logger.info("process complete")
 

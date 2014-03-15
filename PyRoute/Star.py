@@ -52,8 +52,8 @@ class Star (object):
     
     def set_location (self, dx, dy):
         # convert odd-q offset to cube
-        q = int (self.position[0:2]) + dx
-        r = int (self.position[2:4]) + dy
+        q = int (self.position[0:2]) + dx -1
+        r = int (self.position[2:4]) + dy -1
         self.x = q
         self.z = r - (q - (q & 1)) / 2
         self.y = -self.x - self.z
@@ -61,8 +61,8 @@ class Star (object):
         # convert cube to axial
         self.q = self.x
         self.r = self.z
-        self.col = q - dx
-        self.row = r - dy
+        self.col = q - dx + 1
+        self.row = r - dy + 1
         
     def hex_distance(self, star):
         return max(abs(self.x - star.x), abs(self.y - star.y), abs(self.z -star.z))
