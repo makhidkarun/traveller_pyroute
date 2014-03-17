@@ -7,15 +7,16 @@ Created on Mar 5, 2014
 import logging
 
 class Star (object):
-    def __init__ (self, line, starline, dx, dy):
+    def __init__ (self, line, starline, sector):
         self.logger = logging.getLogger('PyRoute.Star')
 
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
         
+        self.sector = sector
         self.logger.debug("processing %s" % line)
         data = starline.match(line).groups()
         self.position = data[0].strip()
-        self.set_location(dx, dy)
+        self.set_location(sector.dx, sector.dy)
         self.name = data[1].strip()
             
         self.uwp = data[2].strip()
@@ -42,15 +43,16 @@ class Star (object):
         self.tradeIn  = 0
         self.tradeOver = 0
         self.tradeMatched = []
-    def __unicode(self):
-        return u"%s (%s)" % (self.name, self.position)
+        
+    def __unicode__(self):
+        return u"%s (%s %s)" % (self.name, self.sector.name, self.position)
         
     def __str__(self):
-        name = u"%s (%s)" % (self.name, self.position)
+        name = u"%s (%s %s)" % (self.name,self.sector.name, self.position)
         return name.encode('utf-8')
 
     def __repr__(self):
-        return u"%s (%s)" % (self.name, self.position)
+        return u"%s (%s %s)" % (self.name, self.sector.name, self.position)
     
     def set_location (self, dx, dy):
         # convert odd-q offset to cube

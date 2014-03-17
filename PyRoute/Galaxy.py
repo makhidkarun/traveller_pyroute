@@ -17,8 +17,8 @@ class Sector (object):
         self.name = name[1:].strip()
         self.x = int(position[1:].split(',')[0])
         self.y = int(position[1:].split(',')[1])
-        self.dx = self.x + 10 * 32
-        self.dy = self.y + 10 * 40
+        self.dx = (self.x + 10) * 32
+        self.dy = (self.y + 10) * 40
         self.subsectors = {}
         self.alg = {}
         self.worlds = []
@@ -87,7 +87,7 @@ class Galaxy(object):
             for line in lines[lineno:]:
                 if line.startswith('#') or len(line) < 20: 
                     continue
-                star = Star (line, self.starline,sec.dx, sec.dy)
+                star = Star (line, self.starline, sec)
                 sec.worlds.append(star)
             
             self.sectors[sec.name] = sec

@@ -8,6 +8,7 @@ import math
 from pypdflite import PDFLite
 from pypdflite import PDFCursor
 from pypdflite.pdfobjects.pdfline import PDFLine
+from pypdflite.pdfobjects.pdfellipse import PDFEllipse
 from Galaxy import Sector
 from Galaxy import Galaxy
 from Star import Star
@@ -34,7 +35,11 @@ class HexMap(object):
             self.write_base_map(pdf, sector)
             
             for (star, neighbor, data) in self.galaxy.stars.edges_iter(sector.worlds, True):
-                if self.galaxy.stars[neighbor][star]['trade'] > 0:
+                if star.sector != sector:
+                    continue
+                
+                if self.galaxy.stars.has_edge(neighbor, star) and\
+                    self.galaxy.stars[neighbor][star]['trade'] > 0:
                     if self.galaxy.stars[neighbor][star]['trade'] > data['trade']:
                         self.galaxy.stars[neighbor][star]['trade'] += data['trade']
                         data['trade'] = 0
@@ -87,9 +92,9 @@ class HexMap(object):
         hlineEnd   = PDFCursor(0,0)
         
         llineStart = PDFCursor(-10,0)
-        llineEnd    = PDFCursor(-10,0)
+        llineEnd   = PDFCursor(-10,0)
         
-        rlineStart   = PDFCursor(0,0)
+        rlineStart  = PDFCursor(0,0)
         rlineEnd    = PDFCursor(0,0)
         
         color = pdf.get_color()
@@ -167,6 +172,8 @@ class HexMap(object):
             row = (53 - self.ym) +  (star.row * self.ym * 2)
              
         point = PDFCursor(col, row)
+        self.zone(pdf, star, point.copy())
+        
         width = self.string_width(pdf.get_font(), star.uwp)
         point.y_plus(4)
         point.x_plus(self.ym -(width/2))
@@ -203,20 +210,38 @@ class HexMap(object):
         tradeColors = ['red','yellow', 'green', 'cyan', 'blue', 'darkgray' ]
         start = edge[0]
         end = edge[1]
-        
+
         starty = 53 + ( self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
-        endy   = 53 + ( self.ym * 2 * (end.row)) - (self.ym * (1 if end.col & 1 else 0))
         lineStart = PDFCursor ((self.xm * 3 * (start.col)) + self.ym, starty)
-        lineEnd = PDFCursor ((self.xm * 3 * (end.col)) + self.ym, endy)
+        
+        if (end.sector != start.sector):
+            pass
+        else:
+            endy   = 53 + ( self.ym * 2 * (end.row)) - (self.ym * (1 if end.col & 1 else 0))
+            lineEnd = PDFCursor ((self.xm * 3 * (end.col)) + self.ym, endy)
         color = pdf.get_color()
-        
-        
         color.set_color_by_name(tradeColors[min(max(0, self.trade_to_btn(data['trade']) - 8), 5)])
 
         line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, style='solid', color=color, size=1)
         line._draw()
-        self.colorStart += 30
                         
+    def zone(self,pdf, star, point):
+        point.x_plus(self.ym)
+        point.y_plus(self.ym)
+        color = pdf.get_color()
+        if star.zone in ['R', 'F']:
+            color.set_color_by_name('crimson')
+        elif star.zone in ['A', 'U'] :
+            color.set_color_by_name('goldenrod')
+        else: # no zone -> do nothing
+            return
+        
+        radius = PDFCursor(self.xm, self.xm)
+        
+        circle = PDFEllipse(pdf.session, pdf.page, point, radius, color, size=2)
+        circle._draw()
+        
+    
     def document(self, name):
         self.writer = PDFLite(name + ".pdf")
         document = self.writer.get_document()
@@ -253,4 +278,3 @@ if __name__ == '__main__':
     hexMap.system(pdf, star2)
     
     hexMap.writer.close()
-        
