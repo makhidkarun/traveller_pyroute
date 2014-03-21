@@ -27,6 +27,11 @@ class TradeCalculation(object):
         # in a single jump.         
         self.distance_weight = [0, 30, 50, 80, 150, 240, 450 ]
         
+        # Set an initial range for influence for worlds based upon their
+        # wtn. For a given world look up the range given by (wtn-8) (min 0), 
+        # and the system checks every other world in that range for trade 
+        # opportunity. See the btn_jump_mod and min btn to see how  
+        # worlds are excluded from this list. 
         self.btn_range = [2, 9, 29, 59, 99, 299]
 
         # BTN modifier for range. If the hex distance between two worlds 
@@ -34,10 +39,18 @@ class TradeCalculation(object):
         # to the right. E.g distance 4 would be a btn modifer of -3.  
         self.btn_jump_range = [ 1,  2,  5,  9, 19, 29, 59, 99,199]
         self.btn_jump_mod   = [-1, -2, -3, -4, -5, -6, -7, -8, -9]
+        
         # How aggressive should the route finder be about reusing existing routes?
         # Set higher to make the route less likely to be reused, Set lower to make
         # reuse more likely.
-        self.route_reuse = 5
+        # This works by reducing the weight of the route (see distance_weight) 
+        # each time a route is selected (making it more likely to be selected
+        # next time). Setting this to below 10 results in a lot of main routes
+        # with a few spiky connectors. Setting it above 20 results in a lot of
+        # nearby routes. This is also (if left as an integer) the lower limit on 
+        # distance_weight settings. 
+        self.route_reuse = 10
+
         # Minimum BTN to calculate routes for. BTN between two worlds less than
         # this value are ignored. Set lower to have more routes calculated, but
         # may not have have an impact on the overall trade flows.

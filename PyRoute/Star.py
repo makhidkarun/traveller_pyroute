@@ -20,11 +20,24 @@ class Star (object):
             
         self.uwp = data[2].strip()
         self.port = self.uwp[0]
-        self.popCode = int(self.uwp[4],16)
+        self.size = self.uwp[1]
+        self.atmo = self.uwp[2]
+        self.hydro = self.uwp[3]
+        self.pop   = self.uwp[4]
+        self.gov   = self.uwp[5]
+        self.law   = self.uwp[6]
+        self.popCode = int(self.pop,16)
         self.tl = int(self.uwp[8],20)
 
+        self.uwpCodes = {'starport': self.port,
+                           'size': self.size,
+                           'atmosphere': self.atmo,
+                           'hydrographics': self.hydro,
+                           'population': self.pop,
+                           'government': self.gov,
+                           'lawlevel': self.law,
+                           'techlevel': self.tl}
 
-        self.port = self.uwp[0]
         self.tradeCode = data[3].strip().split()
         self.baseCode = data[8].strip()
         self.zone = data[9].strip()

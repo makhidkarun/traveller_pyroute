@@ -28,31 +28,43 @@ class StatCalculation(object):
 
         self.galaxy = galaxy
         self.aleg   = {}
+        self.uwp    = {'starport': {},
+                       'size': {},
+                       'atmosphere': {},
+                       'hydrographics': {},
+                       'population': {},
+                       'government': {},
+                       'lawlevel': {},
+                       'techlevel': {}}
         
     def calculate_statistics(self):
         for sector in self.galaxy.sectors.itervalues():
             stats = sector.stats
             for star in sector.worlds:
-                stats.population += star.population
-                stats.economy += star.gwp
-                stats.trade += star.tradeIn
-                stats.number += 1
-                
-                self.galaxy.stats.population += star.population
-                self.galaxy.stats.economy += star.gwp
-                self.galaxy.stats.trade += star.tradeIn
-                self.galaxy.stats.number += 1
+                self.add_stats(stats, star)
+                self.add_stats(self.galaxy.stats, star)
                 
                 algStats = self.aleg.setdefault(star.alg, ObjectStatistics())
-                algStats.population += star.population
-                algStats.economy += star.gwp
-                algStats.trade += star.tradeIn
-                algStats.number += 1
+                self.add_stats(algStats, star)
                 
-            self.per_capita(stats)
+                for uwpCode, uwpValue in star.uwpCodes.iteritems():
+                    stats = self.uwp[uwpCode].setdefault(uwpCode, ObjectStatistics())
+                    self.add_stats(stats, star)
+                    
+                
+            self.per_capita(stats) # Per capital sector stats
             
         self.per_capita(self.galaxy.stats)
+        
+        for stats in self.aleg.itervalues():
+            self.per_captia(stats)
 
+    def add_stats(self, stats, star):
+        stats.population += star.population
+        stats.economy += star.gwp
+        stats.trade += star.tradeIn
+        stats.number += 1
+        
     def per_capita(self, stats):
         stats.percapita = stats.economy
         if stats.population > 100000:

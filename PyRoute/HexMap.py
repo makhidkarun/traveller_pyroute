@@ -213,7 +213,7 @@ class HexMap(object):
         
     def trade_line(self, pdf, edge, data):
         
-        tradeColors = ['red','yellow', 'green', 'cyan', 'blue', 'darkgray' ]
+        tradeColors = ['red','yellow', 'green', 'cyan', 'blue', 'purple', 'violet' ]
         start = edge[0]
         end = edge[1]
 
@@ -236,7 +236,7 @@ class HexMap(object):
         endy   = 53 + ( self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
         lineEnd = PDFCursor ((self.xm * 3 * (endCol)) + self.ym, endy)
         color = pdf.get_color()
-        color.set_color_by_name(tradeColors[min(max(0, self.trade_to_btn(data['trade']) - 8), 5)])
+        color.set_color_by_name(tradeColors[min(max(0, self.trade_to_btn(data['trade']) - 8), 6)])
 
         line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, style='solid', color=color, size=1)
         line._draw()
