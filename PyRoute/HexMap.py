@@ -50,6 +50,12 @@ class HexMap(object):
                 if data['trade'] > 0 and self.trade_to_btn(data['trade']) > 7:
                     self.logger.debug("trade line %s - %s : %s" % (star, neighbor, data))
                     self.trade_line(pdf, [star, neighbor], data)
+                elif star.sector != neighbor.sector:
+                    data = self.galaxy.stars.get_edge_data(neighbor, star)
+                    if data is not None and \
+                        data['trade'] > 0 and \
+                        self.trade_to_btn(data['trade']) > 7:
+                        self.trade_line(pdf, [star, neighbor], data)
 
             for star in sector.worlds:
                 self.system(pdf, star)
@@ -213,12 +219,22 @@ class HexMap(object):
 
         starty = 53 + ( self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
         lineStart = PDFCursor ((self.xm * 3 * (start.col)) + self.ym, starty)
+
+        endRow = end.row
+        endCol = end.col
         
         if (end.sector != start.sector):
-            pass
-        else:
-            endy   = 53 + ( self.ym * 2 * (end.row)) - (self.ym * (1 if end.col & 1 else 0))
-            lineEnd = PDFCursor ((self.xm * 3 * (end.col)) + self.ym, endy)
+            if end.sector.x < start.sector.x:
+                endCol -= 32
+            if end.sector.x > start.sector.x:
+                endCol += 32
+            if end.sector.y < start.sector.y:
+                endRow -= 40
+            if end.sector.y > start.sector.y:
+                endRow += 40
+            
+        endy   = 53 + ( self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
+        lineEnd = PDFCursor ((self.xm * 3 * (endCol)) + self.ym, endy)
         color = pdf.get_color()
         color.set_color_by_name(tradeColors[min(max(0, self.trade_to_btn(data['trade']) - 8), 5)])
 

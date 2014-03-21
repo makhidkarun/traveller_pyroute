@@ -11,6 +11,7 @@ from operator import attrgetter
 
 from Star import Star
 from TradeCalculation import TradeCalculation
+from StatCalculation import ObjectStatistics
 
 class Sector (object):
     def __init__ (self, name, position):
@@ -22,6 +23,9 @@ class Sector (object):
         self.subsectors = {}
         self.alg = {}
         self.worlds = []
+        self.stats = ObjectStatistics()
+        
+        
 
 class Galaxy(object):
     '''
@@ -56,10 +60,9 @@ class Galaxy(object):
         self.sectors = {}
         self.dx = x * 32
         self.dy = y * 40
-        #self.starpos = [[None for x in xrange(self.dx)] for x in xrange(self.dy)]
         self.starwtn = []
         self.trade = TradeCalculation(self)
-
+        self.stats = ObjectStatistics()
         
     def read_sectors (self, sectors):
         for sector in sectors:
@@ -70,8 +73,6 @@ class Galaxy(object):
                 continue
             
             sec = Sector (lines[3], lines[4])
-            
-            self.logger.info("Sector: {} ({}, {})".format(sec.name, str(sec.x), str(sec.y)) )
             
             lineno = 0
             for line in lines:
@@ -92,7 +93,9 @@ class Galaxy(object):
             
             self.sectors[sec.name] = sec
             
-            self.logger.info("processed %s worlds for %s" % (len(sec.worlds), sec.name))
+            self.logger.info("Sector {} ({},{}) process {} worlds".format(sec.name, 
+                                                                          str(sec.x),str(sec.y),
+                                                                          len(sec.worlds) ) )
 
     def set_positions(self):
         for sector in self.sectors.values():
@@ -114,10 +117,11 @@ class Galaxy(object):
                     continue
                 max_dist = self.trade.btn_range[ min(max (0, star.wtn-8), 5)]
                 if dist <= max_dist:
-                    self.ranges.add_edge(star, neighbor, {'distance': dist})
+                    self.ranges.add_edge(star, neighbor, {'distance': dist,
+                                                          'btn': self.trade.get_btn(star, neighbor)})
                 if dist <= 4 :               
                     self.stars.add_edge (star, neighbor, {'distance': dist,
-                                                      'weight': star.weight(neighbor),
+                                                      'weight': self.trade.route_weight(star,neighbor),
                                                       'trade': 0,
                                                       'btn': self.trade.get_btn(star, neighbor)})
         self.logger.info("Jump routes: %s - Distances: %s" % 

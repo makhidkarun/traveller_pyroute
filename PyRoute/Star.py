@@ -10,7 +10,6 @@ class Star (object):
     def __init__ (self, line, starline, sector):
         self.logger = logging.getLogger('PyRoute.Star')
 
-        popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
         
         self.sector = sector
         self.logger.debug("processing %s" % line)
@@ -21,13 +20,18 @@ class Star (object):
             
         self.uwp = data[2].strip()
         self.port = self.uwp[0]
+        self.popCode = int(self.uwp[4],16)
+        self.tl = int(self.uwp[8],20)
+
+
+        self.port = self.uwp[0]
         self.tradeCode = data[3].strip().split()
         self.baseCode = data[8].strip()
         self.zone = data[9].strip()
         self.ggCount = int(data[10][2])
+        self.popM = int(data[10][0])
         self.alg = data[12].strip()
         
-        self.population =int (pow (10, int(data[2][4],16)) * popCodeM[int(data[10][0])] / 10000000) 
         
         self.rich = 'Ri' in self.tradeCode 
         self.industrial = 'In' in self.tradeCode 
@@ -40,6 +44,7 @@ class Star (object):
         self.nonAgricultural = 'Na' in self.tradeCode
 
         self.calculate_wtn()
+        self.calculate_gwp()
         self.tradeIn  = 0
         self.tradeOver = 0
         self.tradeMatched = []
@@ -87,32 +92,22 @@ class Star (object):
         if dx > dy:
             return dx
         return dx + dy / 2
+     
+    def calculate_gwp(self):
+        calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400,2440, 39000, 39000]
+        popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
 
-
-    def weight (self, star):
-        distance_weight = [0, 30, 50, 80, 0, 0, 150 ]
+        self.population =int (pow (10, self.popCode) * popCodeM[self.popM] / 10000000) 
+        self.gwp = int (pow(10,self.popCode) * popCodeM[self.popM] * calcGWP[self.tl] / 1e10 )
         
-        dist = self.hex_distance(star)
-        if dist == 4 or dist == 5:
-            dist = 6
-        weight = distance_weight[dist]
-        if self.alg != star.alg:
-            weight += 25
-        if self.port in ['C', 'D', 'E', 'X']:
-            weight += 25
-        if self.port in ['D', 'E', 'X']:
-            weight += 25
-        return weight
-    
     def calculate_wtn(self):
-        self.wtn = int(self.uwp[4], 16)
-        self.tl = int(self.uwp[8],20)
+        self.wtn = self.popCode
         self.wtn -= 1 if self.tl == 0 else 0
         self.wtn += 1 if self.tl >= 5 else 0
         self.wtn += 1 if self.tl >= 9 else 0
         self.wtn += 1 if self.tl >= 15 else 0
         
-        port = self.uwp[0]
+        port = self.port
              
         if port == 'A':
             self.wtn = (self.wtn * 3 + 13) / 4

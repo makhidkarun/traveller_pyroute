@@ -10,6 +10,7 @@ import logging
 from Galaxy import Galaxy
 from HexMap import HexMap
 from TradeCalculation import TradeCalculation
+from StatCalculation import StatCalculation
 
 logger = logging.getLogger('PyRoute')
 
@@ -39,6 +40,10 @@ def process():
     
     pdfmap = HexMap(galaxy)
     pdfmap.write_maps()
+    
+    stats = StatCalculation(galaxy)
+    stats.calculate_statistics()
+    stats.write_statistics()
     
     logger.info("process complete")
 

@@ -21,9 +21,27 @@ class TradeCalculation(object):
         '''
         self.logger = logging.getLogger('PyRoute.TradeCalculation')
         self.galaxy = galaxy
+
+        # Weight for route over a distance. The relative cost for
+        # moving freight between two worlds a given distance apart
+        # in a single jump.         
+        self.distance_weight = [0, 30, 50, 80, 150, 240, 450 ]
+        
+        self.btn_range = [2, 9, 29, 59, 99, 299]
+
+        # BTN modifier for range. If the hex distance between two worlds 
+        # or between two numbers in the jump range array, take jump modifier
+        # to the right. E.g distance 4 would be a btn modifer of -3.  
         self.btn_jump_range = [ 1,  2,  5,  9, 19, 29, 59, 99,199]
         self.btn_jump_mod   = [-1, -2, -3, -4, -5, -6, -7, -8, -9]
-        self.btn_range = [2, 9, 29, 59, 99, 299]
+        # How aggressive should the route finder be about reusing existing routes?
+        # Set higher to make the route less likely to be reused, Set lower to make
+        # reuse more likely.
+        self.route_reuse = 5
+        # Minimum BTN to calculate routes for. BTN between two worlds less than
+        # this value are ignored. Set lower to have more routes calculated, but
+        # may not have have an impact on the overall trade flows.
+        self.min_btn = 14
 
     def calculate_routes(self):
         '''
@@ -62,6 +80,7 @@ class TradeCalculation(object):
         return btn
     
     def get_trade_to (self, star, trade):
+        ''' Calculate the trade route between starting star and all potential target'''
         
         # Loop through all the stars in the ranges list, i.e. all potential stars
         # within the range of the BTN route. 
@@ -78,7 +97,7 @@ class TradeCalculation(object):
             # skip this pair if there's no trade 
             # Or rather if there isn't enough trade to warrant a trade check
             tradeBTN = self.get_btn(star, target)
-            if tradeBTN < 14:
+            if tradeBTN < self.min_btn:
                 continue
             
             # Calculate the route between the stars
@@ -99,7 +118,8 @@ class TradeCalculation(object):
                 # Reduce the weight of this route. 
                 # As the higher trade routes make established routes 
                 # which are more likely to be followed 
-                self.galaxy.stars[start][end]['weight'] -= self.galaxy.stars[start][end]['weight'] / 5
+                self.galaxy.stars[start][end]['weight'] -= \
+                    self.galaxy.stars[start][end]['weight'] / self.route_reuse
                 start.tradeOver += tradeCr
                 start = end
 
@@ -114,3 +134,17 @@ class TradeCalculation(object):
             trade = 10 ** (btn/2)
             
         return trade
+
+    def route_weight (self, star, target):
+        dist = star.hex_distance(target)
+        if dist in [4,5,6]:
+            dist = 4
+        weight = self.distance_weight[dist]
+        if target.alg != star.alg:
+            weight += 25
+        if star.port in ['C', 'D', 'E', 'X']:
+            weight += 25
+        if star.port in ['D', 'E', 'X']:
+            weight += 25
+        return weight
+    
