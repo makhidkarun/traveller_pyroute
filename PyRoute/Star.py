@@ -110,7 +110,7 @@ class Star (object):
         calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400,2440, 39000, 39000]
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
 
-        self.population =int (pow (10, self.popCode) * popCodeM[self.popM] / 10000000) 
+        self.population =int (pow (10, self.popCode) * popCodeM[self.popM] / 1e7) 
         self.gwp = int (pow(10,self.popCode) * popCodeM[self.popM] * calcGWP[self.tl] / 1e10 )
         
     def calculate_wtn(self):

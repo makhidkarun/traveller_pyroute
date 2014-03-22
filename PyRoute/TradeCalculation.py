@@ -54,7 +54,13 @@ class TradeCalculation(object):
         # Minimum BTN to calculate routes for. BTN between two worlds less than
         # this value are ignored. Set lower to have more routes calculated, but
         # may not have have an impact on the overall trade flows.
-        self.min_btn = 14
+        self.min_btn = 13
+        
+        # Maximum WTN to process routes for
+        self.max_wtn = 15
+        
+        # Minimum WTN to process routes for
+        self.min_wtn = 8
 
     def calculate_routes(self):
         '''
@@ -64,7 +70,7 @@ class TradeCalculation(object):
         '''
         
         counter = 0;
-        for trade in xrange(15, 7, -1): 
+        for trade in xrange(self.max_wtn, self.min_wtn-1, -1): 
             checked = 0
             for star in self.galaxy.starwtn[counter:]:
                 if star.wtn < trade:
@@ -134,11 +140,11 @@ class TradeCalculation(object):
                     continue
                 self.galaxy.stars[start][end]['trade'] += tradeCr
                 # Reduce the weight of this route. 
-                # As the higher trade routes make established routes 
-                # which are more likely to be followed 
+                # As the higher trade routes create established routes 
+                # which are more likely to be followed by lower trade routes
                 self.galaxy.stars[start][end]['weight'] -= \
                     self.galaxy.stars[start][end]['weight'] / self.route_reuse
-                start.tradeOver += tradeCr
+                end.tradeOver += tradeCr if end != target else 0
                 start = end
 
     

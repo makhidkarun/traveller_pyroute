@@ -21,10 +21,12 @@ class Sector (object):
         self.dx = (self.x + 10) * 32
         self.dy = (self.y + 10) * 40
         self.subsectors = {}
-        self.alg = {}
         self.worlds = []
         self.stats = ObjectStatistics()
         
+    def __str__(self):
+        return "{} ({},{})".format(self.name, str(self.x), str(self.y))
+
         
 
 class Galaxy(object):
@@ -57,7 +59,8 @@ class Galaxy(object):
         self.starline = re.compile(star_regex)
         self.stars = nx.DiGraph()
         self.ranges = nx.DiGraph()
-        self.sectors = {}
+        self.sectors = []
+        self.alg = {}
         self.dx = x * 32
         self.dy = y * 40
         self.starwtn = []
@@ -83,7 +86,9 @@ class Galaxy(object):
                 if line.startswith ('# Subsector'):
                     sec.subsectors[line[11:].split(':',1)[0].strip()] = line[11:].split(':',1)[1].strip()
                 if line.startswith ('# Alleg:'):
-                    sec.alg[line[8:].split(':',1)[0]] = line[8:].split(':',1)[1].strip().strip('"')
+                    algCode = line[8:].split(':',1)[0].strip()
+                    algName = line[8:].split(':',1)[1].strip().strip('"')
+                    self.alg[algCode] = (algName, ObjectStatistics())
                 
             for line in lines[lineno:]:
                 if line.startswith('#') or len(line) < 20: 
@@ -91,19 +96,18 @@ class Galaxy(object):
                 star = Star (line, self.starline, sec)
                 sec.worlds.append(star)
             
-            self.sectors[sec.name] = sec
+            self.sectors.append(sec)
             
-            self.logger.info("Sector {} ({},{}) process {} worlds".format(sec.name, 
-                                                                          str(sec.x),str(sec.y),
-                                                                          len(sec.worlds) ) )
+            self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds) ) )
 
     def set_positions(self):
-        for sector in self.sectors.values():
+        for sector in self.sectors:
+            if sector is None: continue
             for star in sector.worlds:
                 self.stars.add_node(star)
                 self.ranges.add_node(star)
                 self.starwtn.append(star);
-        self.logger.info("graph node count: %s" % self.stars.number_of_nodes())
+        self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
         self.starwtn = sorted(self.starwtn, key=attrgetter('wtn'), reverse=True)
         self.logger.debug("wtn array size: %s" % len (self.starwtn))
     
