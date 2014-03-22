@@ -63,17 +63,19 @@ class TradeCalculation(object):
         for the lower routes to follow.
         '''
         
+        counter = 0;
         for trade in xrange(15, 7, -1): 
-            counter = 0;
+            checked = 0
             for star in self.galaxy.starwtn[counter:]:
                 if star.wtn < trade:
                     break
                 self.get_trade_to(star, trade)
                 counter += 1
+                checked += 1
                 sys.stdout.write(".")
                 sys.stdout.flush()
             sys.stdout.write("\n")
-            self.logger.info('Processes %s routes at trade %s' % (counter, trade))
+            self.logger.info('Processed %s routes at trade %s' % (checked, trade))
 
     def get_btn (self, star1, star2):
         btn = star1.wtn + star2.wtn
@@ -102,20 +104,23 @@ class TradeCalculation(object):
                 self.logger.error("edges_iter found newstar %s != star %s" % (newstar, star))
                 continue
             
-            #Skip this pair if we've already done the trade
-            # usually from the other star first. 
-            if target in star.tradeMatched: 
-                continue
-            
             # skip this pair if there's no trade 
             # Or rather if there isn't enough trade to warrant a trade check
             tradeBTN = self.get_btn(star, target)
             if tradeBTN < self.min_btn:
                 continue
+
+            #Skip this pair if we've already done the trade
+            # usually from the other star first. 
+            if target in star.tradeMatched: 
+                continue
             
             # Calculate the route between the stars
-            route = nx.astar_path(self.galaxy.stars, star, target)
-            
+            # If we can't find a route (no jump 4 path) skip this pair
+            try:
+                route = nx.astar_path(self.galaxy.stars, star, target)
+            except  nx.NetworkXNoPath:
+                continue
             # Gather basic statistics. 
             tradeCr = self.calc_trade(tradeBTN)
             star.tradeIn += tradeCr

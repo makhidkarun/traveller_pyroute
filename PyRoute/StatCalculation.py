@@ -48,16 +48,15 @@ class StatCalculation(object):
                 self.add_stats(algStats, star)
                 
                 for uwpCode, uwpValue in star.uwpCodes.iteritems():
-                    stats = self.uwp[uwpCode].setdefault(uwpCode, ObjectStatistics())
+                    stats = self.uwp[uwpCode].setdefault(uwpValue, ObjectStatistics())
                     self.add_stats(stats, star)
-                    
                 
             self.per_capita(stats) # Per capital sector stats
             
         self.per_capita(self.galaxy.stats)
         
         for stats in self.aleg.itervalues():
-            self.per_captia(stats)
+            self.per_capita(stats)
 
     def add_stats(self, stats, star):
         stats.population += star.population
