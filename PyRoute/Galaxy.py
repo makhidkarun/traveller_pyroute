@@ -58,7 +58,7 @@ class Galaxy(object):
         self.logger.debug("Pattern: %s" % star_regex)
         self.starline = re.compile(star_regex)
         self.stars = nx.DiGraph()
-        self.ranges = nx.DiGraph()
+        self.ranges = nx.Graph()
         self.sectors = []
         self.alg = {}
         self.dx = x * 32
@@ -112,22 +112,28 @@ class Galaxy(object):
         self.logger.debug("wtn array size: %s" % len (self.starwtn))
     
     def set_edges(self):
+        
         self.set_positions()
         for star in self.stars.nodes_iter():
             for neighbor in self.stars.nodes_iter():
-                dist = star.hex_distance (neighbor)
                 if star == neighbor or\
                     neighbor.zone in ['R','F']:
                     continue
+
+                dist = star.hex_distance (neighbor)
                 max_dist = self.trade.btn_range[ min(max (0, star.wtn-8), 5)]
-                if dist <= max_dist:
+                btn = self.trade.get_btn(star, neighbor)
+                # add all the stars in the BTN range, but  skip this pair
+                # if there there isn't enough trade to warrant a trade check
+                if dist <= max_dist and btn >= self.trade.min_btn and\
+                    not self.ranges.has_edge(star, neighbor):
                     self.ranges.add_edge(star, neighbor, {'distance': dist,
-                                                          'btn': self.trade.get_btn(star, neighbor)})
+                                                          'btn': btn})
                 if dist <= 4 :               
                     self.stars.add_edge (star, neighbor, {'distance': dist,
                                                       'weight': self.trade.route_weight(star,neighbor),
                                                       'trade': 0,
-                                                      'btn': self.trade.get_btn(star, neighbor)})
+                                                      'btn': btn})
         self.logger.info("Jump routes: %s - Distances: %s" % 
                          (self.stars.number_of_edges(), self.ranges.number_of_edges()))
     

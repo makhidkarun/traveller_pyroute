@@ -26,17 +26,18 @@ class Star (object):
         self.pop   = self.uwp[4]
         self.gov   = self.uwp[5]
         self.law   = self.uwp[6]
-        self.popCode = int(self.pop,16)
         self.tl = int(self.uwp[8],20)
+        self.popCode = int(self.pop,16)
 
-        self.uwpCodes = {'starport': self.port,
-                           'size': self.size,
-                           'atmosphere': self.atmo,
-                           'hydrographics': self.hydro,
-                           'population': self.pop,
-                           'government': self.gov,
-                           'lawlevel': self.law,
-                           'techlevel': self.tl}
+        self.uwpCodes = {'Starport': self.port,
+                           'Size': self.size,
+                           'Atmosphere': self.atmo,
+                           'Hydrographics': self.hydro,
+                           'Population': self.pop,
+                           'Government': self.gov,
+                           'Law Level': self.law,
+                           'Tech Level': self.uwp[8],
+                           'Pop Code': str(self.popCode)}
 
         self.tradeCode = data[3].strip().split()
         self.baseCode = data[8].strip()
@@ -51,7 +52,7 @@ class Star (object):
         self.agricultural = 'Ag' in self.tradeCode 
         self.poor = 'Po' in self.tradeCode 
         self.nonIndustrial = 'Ni' in self.tradeCode 
-        self.resources = 'As' in self.tradeCode or 'Ba' in self.tradeCode or \
+        self.extreme = 'As' in self.tradeCode or 'Ba' in self.tradeCode or \
                 'Fl' in self.tradeCode or 'Ic' in self.tradeCode or 'De' in self.tradeCode or \
                 'Na' in self.tradeCode or 'Va' in self.tradeCode or 'Wa' in self.tradeCode
         self.nonAgricultural = 'Na' in self.tradeCode
@@ -107,11 +108,23 @@ class Star (object):
         return dx + dy / 2
      
     def calculate_gwp(self):
-        calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400,2440, 39000, 39000]
+        calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400, 24400, 39000, 39000]
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
 
         self.population =int (pow (10, self.popCode) * popCodeM[self.popM] / 1e7) 
         self.gwp = int (pow(10,self.popCode) * popCodeM[self.popM] * calcGWP[self.tl] / 1e10 )
+        if self.rich:
+            self.gwp = self.gwp * 16 / 10
+        if self.industrial:
+            self.gwp = self.gwp * 14 / 10
+        if self.agricultural:
+            self.gwp = self.gwp * 12 / 10
+        if self.poor:
+            self.gwp = self.gwp * 8 / 10
+        if self.nonIndustrial:
+            self.gwp = self.gwp * 8 / 10
+        if self.extreme:
+            self.gwp = self.gwp * 8 / 10    
         
     def calculate_wtn(self):
         self.wtn = self.popCode

@@ -47,8 +47,6 @@ def process():
     
     logger.info("process complete")
 
-
-
 def set_logging():
     logger.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
