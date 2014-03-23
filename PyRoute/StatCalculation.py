@@ -5,6 +5,7 @@ Created on Mar 17, 2014
 '''
 import logging
 from wikistats import WikiStats
+from collections import OrderedDict
 
 class ObjectStatistics(object):
     def __init__(self):
@@ -28,14 +29,16 @@ class StatCalculation(object):
         self.logger = logging.getLogger('PyRoute.StatCalculation')
 
         self.galaxy = galaxy
-        self.uwp    = {'starport': {},
-                       'size': {},
-                       'atmosphere': {},
-                       'hydrographics': {},
-                       'population': {},
-                       'government': {},
-                       'lawlevel': {},
-                       'techlevel': {}}
+        self.uwp    = OrderedDict()
+        self.uwp['Starport'] = {}
+        self.uwp['Size'] = {}
+        self.uwp['Atmosphere'] = {}
+        self.uwp['Hydrographics'] = {}
+        self.uwp['Population'] = {}
+        self.uwp['Government'] = {}
+        self.uwp['Law Level'] = {}
+        self.uwp['Tech Level'] = {}
+        self.uwp['Pop Code'] = {}
         
     def calculate_statistics(self):
         for sector in self.galaxy.sectors:
@@ -85,6 +88,6 @@ class StatCalculation(object):
             s = 'Allegiance {0} ({1}) star count: {2:,d}'.format(stats[0], aleg, stats[1].number)
             self.logger.info(s)
             
-        wiki = WikiStats(self.galaxy)
+        wiki = WikiStats(self.galaxy, self.uwp)
         wiki.write_statistics()
         
