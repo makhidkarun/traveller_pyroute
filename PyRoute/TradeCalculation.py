@@ -49,7 +49,7 @@ class TradeCalculation(object):
         # with a few spiky connectors. Setting it above 20 results in a lot of
         # nearby routes. This is also (if left as an integer) the lower limit on 
         # distance_weight settings. 
-        self.route_reuse = 10
+        self.route_reuse = 5
 
         # Minimum BTN to calculate routes for. BTN between two worlds less than
         # this value are ignored. Set lower to have more routes calculated, but
@@ -75,14 +75,20 @@ class TradeCalculation(object):
         self.logger.info('sort complete')
         base_btn = 0
         counter = 0
+        processed = 0
+        total = len(btn_array)
         for (star,neighbor,data) in btn_array:
             if base_btn != data['btn']:
+                if counter > 0:
+                    self.logger.info('processed {} routes at BTN {}'.format(counter,base_btn))
                 base_btn = data['btn']
-                self.logger.info('adjusting to BTN: {}, processed {}'.format(base_btn, counter))
                 counter = 0
+            if processed % (total/10) == 0:
+                self.logger.info('processed {} at {}%'.format(processed, processed/(total/100)))
             self.get_trade_between(star, neighbor)
             counter += 1
-        self.logger.info('processed {}'.format(counter))
+            processed += 1
+        self.logger.info('processed {} routes at BTN {}'.format(counter,base_btn))
         
     def get_btn (self, star1, star2):
         btn = star1.wtn + star2.wtn
@@ -108,7 +114,7 @@ class TradeCalculation(object):
         # Calculate the route between the stars
         # If we can't find a route (no jump 4 path) skip this pair
         try:
-            route = nx.astar_path(self.galaxy.stars, star, target)
+            route = nx.astar_path(self.galaxy.stars, star, target, heuristic)
         except  nx.NetworkXNoPath:
             return
 
@@ -182,7 +188,7 @@ class TradeCalculation(object):
         Convert the BTN trade number to a credit value. 
         '''
         if btn & 1:
-            trade = (10 ** ((btn - 1)/2)) * 3
+            trade = (10 ** ((btn - 1)/2)) * 5
         else:
             trade = 10 ** (btn/2)
             
@@ -200,4 +206,7 @@ class TradeCalculation(object):
         if star.port in ['D', 'E', 'X']:
             weight += 25
         return weight
+    
+def heuristic(u, v):
+    return u.hex_distance(v)
     
