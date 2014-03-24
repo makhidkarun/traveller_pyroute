@@ -77,8 +77,8 @@ class StatCalculation(object):
             stats.percapita = 0
             
     def write_statistics(self):
-        self.logger.info('Galaxy star count: ' + str(self.galaxy.stats.number))
-        self.logger.info('Galaxy population {:,d}'.format(self.galaxy.stats.population))
+        self.logger.info('Charted star count: ' + str(self.galaxy.stats.number))
+        self.logger.info('Charted population {:,d}'.format(self.galaxy.stats.population))
         
         for sector in self.galaxy.sectors:
             if sector is None: continue

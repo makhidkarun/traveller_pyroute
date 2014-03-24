@@ -4,7 +4,6 @@ Created on Mar 22, 2014
 @author: tjoneslo
 '''
 import os
-from StatCalculation import ObjectStatistics
 
 class WikiStats(object):
     '''
@@ -24,7 +23,7 @@ class WikiStats(object):
         self.top_summary()
         
     def summary_statistics(self):
-        path = os.path.join(self.galaxy.output_dir, 'summary.wiki')
+        path = os.path.join(self.galaxy.output_path, 'summary.wiki')
         with open (path, 'w+') as f:
             f.write('==Economic Summary==\n')
             f.write('===Statistical Analysis===\n')
@@ -56,7 +55,7 @@ class WikiStats(object):
         f.write('|align="right"|{:,d}\n'.format(0))
 
     def top_summary(self):
-        path = os.path.join(self.galaxy.output_dir, 'top_summary.wiki')
+        path = os.path.join(self.galaxy.output_path, 'top_summary.wiki')
         with open (path, 'w+') as f:
             f.write('==Top level Summary==\n')
             f.write('{|\n')
@@ -74,6 +73,7 @@ class WikiStats(object):
             self.write_allegiances(f,self.galaxy.alg)
             f.write('===Summary Report===\n')
             self.write_uwp_counts(f)
+            f.write('|-\n|colspan=20 align=center|Percent by Population\n')
             self.write_uwp_populations(f)
         
     def write_allegiances (self,f,alg):
@@ -88,6 +88,7 @@ class WikiStats(object):
             
     
     def write_uwp_counts(self,f):
+        from StatCalculation import ObjectStatistics
         default_stats = ObjectStatistics()
         f.write('{|\n!Component')
         for x in range(18):
@@ -107,28 +108,25 @@ class WikiStats(object):
                 f.write ('||{}'.format(value))
             else:
                 f.write('||0')
-        f.write('\n|}')
+        f.write('\n')
         
     def write_uwp_populations(self,f):
+        from StatCalculation import ObjectStatistics
         population = self.galaxy.stats.population
         default_stats = ObjectStatistics()
 
-        f.write('{|\n!Component')
-        for x in range(18):
-            f.write('||{}'.format(baseN(x,18)))
-        f.write('||I-Z')
         for name in self.uwp.iterkeys():
             f.write('\n|- \n| {}'.format(name))
             for x in range(18):
                 index = baseN(x,18)
                 stats = self.uwp.get(name, {}).get(index, default_stats)
                 value = int(stats.population / (population / 100))
-                f.write('||{:d}'.format(value))
+                f.write('||{:d}%'.format(value))
             if self.uwp[name].keys() in ['X']:
                 index = 'X'
                 stats = self.uwp.get(name, {}).get(index, default_stats)
                 value = int(stats.population / (population / 100))
-                f.write ('||{:d}'.format(value))
+                f.write ('||{:d}%'.format(value))
             else:
                 f.write('||0')
         f.write('\n|}')

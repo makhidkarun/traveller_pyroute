@@ -52,7 +52,7 @@ class Galaxy(object):
 (\w|-) +
 ([0-9][0-9A-F][0-9A-F]) +
 (\d{1,}| )+
-(\w\w) +
+([-A-Z][-A-Za-z0-9_]) +
 (.*)
 """
         star_regex = ''.join([line.rstrip('\n') for line in regex])
@@ -64,7 +64,6 @@ class Galaxy(object):
         self.alg = {}
         self.dx = x * 32
         self.dy = y * 40
-        self.starwtn = []
         self.trade = TradeCalculation(self)
         self.stats = ObjectStatistics()
         self.output_path = 'maps'
@@ -108,13 +107,10 @@ class Galaxy(object):
             for star in sector.worlds:
                 self.stars.add_node(star)
                 self.ranges.add_node(star)
-                self.starwtn.append(star);
         self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
-        self.starwtn = sorted(self.starwtn, key=attrgetter('wtn'), reverse=True)
-        self.logger.debug("wtn array size: %s" % len (self.starwtn))
     
     def set_edges(self):
-        
+        self.logger.info('generating routes...')
         self.set_positions()
         for star in self.stars.nodes_iter():
             for neighbor in self.stars.nodes_iter():
@@ -141,10 +137,10 @@ class Galaxy(object):
     
         
     def write_routes(self):
-        path = os.path.join(self.output_dir, 'routes.txt')
+        path = os.path.join(self.output_path, 'routes.txt')
         with open(path, 'wb') as f:
             nx.write_edgelist(self.stars, f, data=True)
-        path = os.path.join(self.output_dir, 'ranges.txt')
+        path = os.path.join(self.output_path, 'ranges.txt')
         with open(path, "wb") as f:
             nx.write_edgelist(self.ranges, f, data=True)
         

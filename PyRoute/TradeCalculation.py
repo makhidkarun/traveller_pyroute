@@ -5,7 +5,7 @@ Created on Mar 15, 2014
 '''
 import bisect
 import logging
-import sys
+
 
 import networkx as nx
 
@@ -72,7 +72,6 @@ class TradeCalculation(object):
         btn = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges_iter(data=True)]
         btn_array = sorted(btn, key=lambda tn: tn[2]['btn'], reverse=True)
         
-        self.logger.info('sort complete')
         base_btn = 0
         counter = 0
         processed = 0
@@ -83,8 +82,8 @@ class TradeCalculation(object):
                     self.logger.info('processed {} routes at BTN {}'.format(counter,base_btn))
                 base_btn = data['btn']
                 counter = 0
-            if processed % (total/10) == 0:
-                self.logger.info('processed {} at {}%'.format(processed, processed/(total/100)))
+            if processed % (total/20) == 0:
+                self.logger.info('processed {} routes, at {}%'.format(processed, processed/(total/100)))
             self.get_trade_between(star, neighbor)
             counter += 1
             processed += 1

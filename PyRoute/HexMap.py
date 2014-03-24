@@ -263,7 +263,7 @@ class HexMap(object):
         
     
     def document(self, sector):
-        path = os.path.join(self.galaxy.output_dir, sector.name+".pdf")
+        path = os.path.join(self.galaxy.output_path, sector.name+".pdf")
         self.writer = PDFLite(path)
         
         title = "Sector %s" % sector
