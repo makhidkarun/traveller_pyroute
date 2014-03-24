@@ -46,6 +46,16 @@ class Star (object):
         self.popM = int(data[10][0])
         self.alg = data[12].strip()
         
+
+        self.uwpCodes = {'Starport': self.port,
+                           'Size': self.size,
+                           'Atmosphere': self.atmo,
+                           'Hydrographics': self.hydro,
+                           'Population': self.pop,
+                           'Government': self.gov,
+                           'Law Level': self.law,
+                           'Tech Level': self.uwp[8],
+                           'Pop Code': str(self.popM)}
         
         self.rich = 'Ri' in self.tradeCode 
         self.industrial = 'In' in self.tradeCode 

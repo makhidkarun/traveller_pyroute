@@ -6,6 +6,7 @@ Created on Mar 2, 2014
 import logging
 import re
 import codecs
+import os
 import networkx as nx
 from operator import attrgetter
 
@@ -66,6 +67,7 @@ class Galaxy(object):
         self.starwtn = []
         self.trade = TradeCalculation(self)
         self.stats = ObjectStatistics()
+        self.output_path = 'maps'
         
     def read_sectors (self, sectors):
         for sector in sectors:
@@ -139,9 +141,11 @@ class Galaxy(object):
     
         
     def write_routes(self):
-        with open("./routes.txt", 'wb') as f:
+        path = os.path.join(self.output_dir, 'routes.txt')
+        with open(path, 'wb') as f:
             nx.write_edgelist(self.stars, f, data=True)
-        with open("./ranges.txt", "wb") as f:
+        path = os.path.join(self.output_dir, 'ranges.txt')
+        with open(path, "wb") as f:
             nx.write_edgelist(self.ranges, f, data=True)
         
     def get_alg(self, new, old):
