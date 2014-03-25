@@ -40,15 +40,6 @@ class HexMap(object):
             for (star, neighbor, data) in self.galaxy.stars.edges_iter(sector.worlds, True):
                 if star.sector != sector:
                     continue
-                
-                if self.galaxy.stars.has_edge(neighbor, star) and\
-                    self.galaxy.stars[neighbor][star]['trade'] > 0:
-                    if self.galaxy.stars[neighbor][star]['trade'] > data['trade']:
-                        self.galaxy.stars[neighbor][star]['trade'] += data['trade']
-                        data['trade'] = 0
-                    else:
-                        data['trade'] += self.galaxy.stars[neighbor][star]['trade']
-                        self.galaxy.stars[neighbor][star]['trade'] = 0
                     
                 if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:
                     self.logger.debug("trade line %s - %s : %s" % (star, neighbor, data))

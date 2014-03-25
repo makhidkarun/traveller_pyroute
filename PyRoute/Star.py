@@ -12,7 +12,7 @@ class Star (object):
 
         
         self.sector = sector
-        self.logger.debug("processing %s" % line)
+        self.logger.debug("processing [%s]" % line)
         data = starline.match(line).groups()
         self.position = data[0].strip()
         self.set_location(sector.dx, sector.dy)
@@ -42,7 +42,7 @@ class Star (object):
         self.tradeCode = data[3].strip().split()
         self.baseCode = data[8].strip()
         self.zone = data[9].strip()
-        self.ggCount = int(data[10][2])
+        self.ggCount = int(data[10][2],16)
         self.popM = int(data[10][0])
         self.alg = data[12].strip()
         

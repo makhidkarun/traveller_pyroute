@@ -49,7 +49,7 @@ class TradeCalculation(object):
         # with a few spiky connectors. Setting it above 20 results in a lot of
         # nearby routes. This is also (if left as an integer) the lower limit on 
         # distance_weight settings. 
-        self.route_reuse = 5
+        self.route_reuse = 10
 
         # Minimum BTN to calculate routes for. BTN between two worlds less than
         # this value are ignored. Set lower to have more routes calculated, but
