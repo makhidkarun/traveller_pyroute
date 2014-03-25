@@ -9,7 +9,6 @@ import codecs
 import os
 import itertools
 import networkx as nx
-from operator import attrgetter
 
 from Star import Star
 from TradeCalculation import TradeCalculation
@@ -25,6 +24,10 @@ class Sector (object):
         self.subsectors = {}
         self.worlds = []
         self.stats = ObjectStatistics()
+        self.spinward = None
+        self.trailing = None
+        self.coreward = None
+        self.rimward = None
         
     def __str__(self):
         return "{} ({},{})".format(self.name, str(self.x), str(self.y))
@@ -109,9 +112,26 @@ class Galaxy(object):
                 self.stars.add_node(star)
                 self.ranges.add_node(star)
         self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
+        
+    def set_bounding_sectors(self):
+        for sector, neighbor in itertools.combinations(self.sectors,2):
+            if sector.x - 1 == neighbor.x and sector.y == neighbor.y:
+                sector.spinward = neighbor
+                neighbor.trailing = sector
+            elif sector.x + 1 == neighbor.x and sector.y == neighbor.y:
+                sector.trailing = neighbor
+                neighbor.spinward = sector
+            elif sector.x == neighbor.x and sector.y - 1 == neighbor.y:
+                sector.coreward = neighbor
+                neighbor.rimward = sector
+            elif sector.x == neighbor.x and sector.y + 1 == neighbor.y:
+                sector.rimward = neighbor
+                neighbor.coreward = sector
+        pass
     
     def set_edges(self):
         self.logger.info('generating routes...')
+        self.set_bounding_sectors()
         self.set_positions()
         
         for star,neighbor in itertools.combinations(self.ranges.nodes_iter(), 2):

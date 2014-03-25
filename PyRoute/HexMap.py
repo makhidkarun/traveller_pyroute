@@ -10,6 +10,8 @@ from pypdflite import PDFLite
 from pypdflite import PDFCursor
 from pypdflite.pdfobjects.pdfline import PDFLine
 from pypdflite.pdfobjects.pdfellipse import PDFEllipse
+from pypdflite.pdfobjects.pdftext import PDFText
+from pypdflite.pdfobjects.pdffont import PDFFont
 from Galaxy import Sector
 from Galaxy import Galaxy
 from Star import Star
@@ -30,6 +32,8 @@ class HexMap(object):
         self.xm = 6     # half the length of one side
         self.colorStart = 0
         self.min_btn = self.galaxy.trade.min_wtn
+        self.y_start = 43
+        self.x_start = 15
 
     def write_maps(self):
         for sector in self.galaxy.sectors:
@@ -57,6 +61,14 @@ class HexMap(object):
     
     def write_base_map(self, pdf, sector):
         self.sector_name(pdf, sector.name)
+        if sector.coreward:
+            self.coreward_sector(pdf, sector.coreward.name)
+        if sector.rimward:
+            self.rimward_sector(pdf, sector.rimward.name)
+        if sector.spinward:
+            self.spinward_sector(pdf, sector.spinward.name)
+        if sector.trailing:
+            self.trailing_sector(pdf, sector.trailing.name)
         self.subsector_grid(pdf)
         self.hex_grid(pdf)
         
@@ -69,20 +81,58 @@ class HexMap(object):
         pdf.add_text (name, cursor)
         pdf.set_font(font=def_font)
 
+
+    def coreward_sector(self, pdf, name):
+        cursor = PDFCursor(5, self.y_start - self.xm, True)
+        def_font = pdf.get_font()
+        pdf.set_font('times', size=10)
+        cursor.x = 306 - (pdf.get_font()._string_width(name)/2)
+        pdf.add_text(name, cursor)
+        pdf.set_font (font=def_font)
+
+    def rimward_sector(self, pdf, name):
+        cursor = PDFCursor(5 ,779, True)
+        def_font = pdf.get_font()
+        pdf.set_font('times', size=10)
+        cursor.x = 306 (pdf.get_font()._string_width(name)/2)
+        pdf.add_text(name, cursor)
+        pdf.set_font (font=def_font)
+        
+    def spinward_sector(self, pdf, name):
+        cursor = PDFCursor(self.x_start - 5, 390, True)
+        def_font = pdf.get_font()
+        pdf.set_font('times', size=10)
+        cursor.y_plus(pdf.get_font()._string_width(name)/2)
+        text = PDFText (pdf.session, pdf.page, None, cursor=cursor)
+        text.text_rotate(90)
+        text._text(name)
+        pdf.set_font (font=def_font)
+        
+    def trailing_sector(self, pdf, name):
+        cursor = PDFCursor(596, 390, True)
+        def_font = pdf.get_font()
+        pdf.set_font('times', size=10)
+        cursor.y_plus(-(pdf.get_font()._string_width(name)/2))
+        text = PDFText (pdf.session, pdf.page, None, cursor=cursor)
+        text.text_rotate(-90)
+        text._text(name)
+        pdf.set_font (font=def_font)
+        
+
     def subsector_grid(self, pdf):
         color = pdf.get_color()
         color.set_color_by_name('lightgray')
         pdf.set_draw_color(color)
-        vlineStart = PDFCursor (0,59)
-        vlineEnd = PDFCursor (0,778)
-        for x in [15, 159, 303, 447, 591]:
+        vlineStart = PDFCursor (0, self.y_start + self.xm)
+        vlineEnd = PDFCursor (0, self.y_start + self.xm + (180 * 4))
+        for x in xrange(self.x_start, 595, 144):
             vlineStart.x = x
             vlineEnd.x = x
             pdf.add_line(cursor1=vlineStart, cursor2=vlineEnd)
             
-        hlineStart = PDFCursor(15,0)
+        hlineStart = PDFCursor(self.x_start,0)
         hlineEnd   = PDFCursor(591,0)
-        for y in [59, 238, 418, 598, 778]:
+        for y in xrange(self.y_start + self.xm, 780, 180):
             hlineStart.y = y
             hlineEnd.y = y
             pdf.add_line(cursor1=hlineStart, cursor2=hlineEnd)
@@ -111,17 +161,17 @@ class HexMap(object):
         hlineEnd.dx = self.xm * 3
         hlineEnd.dy = self.ym * 2
         
-        llineStart.x = 15
+        llineStart.x = self.x_start
         llineStart.dx = self.xm * 3
         llineStart.dy = self.ym * 2
-        llineEnd.x  = 21
+        llineEnd.x  = self.x_start + self.xm
         llineEnd.dx = self.xm * 3
         llineEnd.dy = self.ym * 2
         
-        rlineStart.x = 21
+        rlineStart.x = self.x_start + self.xm
         rlineStart.dx = self.xm * 3
         rlineStart.dy = self.ym * 2
-        rlineEnd.x=15
+        rlineEnd.x=self.x_start
         rlineEnd.dx = self.xm * 3
         rlineEnd.dy = self.ym * 2
         
@@ -130,19 +180,19 @@ class HexMap(object):
             hlineEnd.x_plus()
             
             if (x & 1) :
-                hlineStart.y = 53 - self.ym
-                hlineEnd.y = 53 - self.ym
-                llineStart.y = 53 - 2 * self.ym
-                llineEnd.y = 53 - self.ym
-                rlineStart.y = 53 - 3 *self.ym
-                rlineEnd.y = 53 - 2 * self.ym
+                hlineStart.y = self.y_start - self.ym
+                hlineEnd.y = self.y_start - self.ym
+                llineStart.y = self.y_start - 2 * self.ym
+                llineEnd.y = self.y_start - self.ym
+                rlineStart.y = self.y_start - 3 *self.ym
+                rlineEnd.y = self.y_start - 2 * self.ym
             else:
-                hlineStart.y = 53 - 2 * self.ym
-                hlineEnd.y = 53 - 2 * self.ym
-                llineStart.y = 53 - self.ym
-                llineEnd.y = 53 - 2 * self.ym
-                rlineStart.y = 53 - 2 * self.ym
-                rlineEnd.y = 53 - 3 * self.ym
+                hlineStart.y = self.y_start - 2 * self.ym
+                hlineEnd.y = self.y_start - 2 * self.ym
+                llineStart.y = self.y_start - self.ym
+                llineEnd.y = self.y_start - 2 * self.ym
+                rlineStart.y = self.y_start - 2 * self.ym
+                rlineEnd.y = self.y_start - 3 * self.ym
                 
             for y in xrange(41):
                 hlineStart.y_plus()
@@ -167,9 +217,9 @@ class HexMap(object):
         
         col = (self.xm * 3 * (star.col))
         if (star.col & 1):
-            row = (53 - self.ym * 2) + (star.row * self.ym * 2) 
+            row = (self.y_start - self.ym * 2) + (star.row * self.ym * 2) 
         else:
-            row = (53 - self.ym) +  (star.row * self.ym * 2)
+            row = (self.y_start - self.ym) +  (star.row * self.ym * 2)
              
         point = PDFCursor(col, row)
         self.zone(pdf, star, point.copy())
@@ -211,7 +261,7 @@ class HexMap(object):
         start = edge[0]
         end = edge[1]
 
-        starty = 53 + ( self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
+        starty = self.y_start + ( self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
         lineStart = PDFCursor ((self.xm * 3 * (start.col)) + self.ym, starty)
 
         endRow = end.row
@@ -227,7 +277,7 @@ class HexMap(object):
             if end.sector.y > start.sector.y:
                 endRow += 40
             
-        endy   = 53 + ( self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
+        endy   = self.y_start + ( self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
         lineEnd = PDFCursor ((self.xm * 3 * (endCol)) + self.ym, endy)
         color = pdf.get_color()
         
@@ -264,7 +314,7 @@ class HexMap(object):
         creator = "PyPDFLite"
         self.writer.set_information(title, subject, author, keywords, creator)
         document = self.writer.get_document()
-        document.set_margins(5)
+        document.set_margins(4)
         return document
         
     def string_width(self, font, string):
