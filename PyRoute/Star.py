@@ -94,6 +94,7 @@ class Star (object):
         # convert cube to axial
         self.q = self.x
         self.r = self.z
+
         self.col = q - dx + 1
         self.row = r - dy + 1
         

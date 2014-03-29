@@ -11,7 +11,6 @@ from pypdflite import PDFCursor
 from pypdflite.pdfobjects.pdfline import PDFLine
 from pypdflite.pdfobjects.pdfellipse import PDFEllipse
 from pypdflite.pdfobjects.pdftext import PDFText
-from pypdflite.pdfobjects.pdffont import PDFFont
 from Galaxy import Sector
 from Galaxy import Galaxy
 from Star import Star
@@ -40,6 +39,8 @@ class HexMap(object):
             if sector is None: continue
             pdf = self.document(sector)
             self.write_base_map(pdf, sector)
+            
+            self.draw_borders(pdf, sector)
             
             for (star, neighbor, data) in self.galaxy.stars.edges_iter(sector.worlds, True):
                 if star.sector != sector:
@@ -70,7 +71,7 @@ class HexMap(object):
         if sector.trailing:
             self.trailing_sector(pdf, sector.trailing.name)
         self.subsector_grid(pdf)
-        self.hex_grid(pdf)
+        self.hex_grid(pdf, self._draw_all, 0.5)
         
     def sector_name(self,pdf,name):
         cursor = PDFCursor(5, 25, True)
@@ -137,63 +138,98 @@ class HexMap(object):
             hlineEnd.y = y
             pdf.add_line(cursor1=hlineStart, cursor2=hlineEnd)
 
-    def hex_grid(self, pdf):
+
+    def _hline(self, pdf, width, colorname):
         hlineStart = PDFCursor(0,0)
-        hlineEnd   = PDFCursor(0,0)
-        
-        llineStart = PDFCursor(-10,0)
-        llineEnd   = PDFCursor(-10,0)
-        
-        rlineStart  = PDFCursor(0,0)
-        rlineEnd    = PDFCursor(0,0)
-        
-        color = pdf.get_color()
-        color.set_color_by_name('lightgray')
-        
-        hline = PDFLine(pdf.session, pdf.page, hlineStart, hlineEnd, style='solid', color=color, size=0.5)
-        lline = PDFLine(pdf.session, pdf.page, llineStart, llineEnd, style='solid', color=color, size=0.5)
-        rline = PDFLine(pdf.session, pdf.page, rlineStart, rlineEnd, style='solid', color=color, size=0.5)
-        
         hlineStart.x = 3
+        hlineStart.y = self.y_start - self.ym
         hlineStart.dx = self.xm * 3
         hlineStart.dy = self.ym * 2
+
+        hlineEnd   = PDFCursor(0,0)
         hlineEnd.x = self.xm * 2.5
+        hlineEnd.y = self.y_start - self.ym
         hlineEnd.dx = self.xm * 3
         hlineEnd.dy = self.ym * 2
+
+        color = pdf.get_color()
+        color.set_color_by_name(colorname)
         
+        hline = PDFLine(pdf.session, pdf.page, hlineStart, hlineEnd, style='solid', color=color, size=width)
+
+        return (hlineStart, hlineEnd, hline)
+    
+    def _hline_restart_y(self, x,  hlineStart, hlineEnd):
+        if (x & 1) :
+            hlineStart.y = self.y_start - self.ym
+            hlineEnd.y = self.y_start - self.ym
+        else:
+            hlineStart.y = self.y_start - 2 * self.ym
+            hlineEnd.y = self.y_start - 2 * self.ym
+            
+    def _lline(self, pdf, width, colorname):
+        llineStart = PDFCursor(-10,0)
         llineStart.x = self.x_start
         llineStart.dx = self.xm * 3
         llineStart.dy = self.ym * 2
+
+        llineEnd   = PDFCursor(-10,0)
         llineEnd.x  = self.x_start + self.xm
         llineEnd.dx = self.xm * 3
         llineEnd.dy = self.ym * 2
+
+        color = pdf.get_color()
+        color.set_color_by_name(colorname)
         
+        lline = PDFLine(pdf.session, pdf.page, llineStart, llineEnd, style='solid', color=color, size=width)
+       
+        return (llineStart, llineEnd, lline)
+
+    def _lline_restart_y (self, x, llineStart, llineEnd):
+        if (x & 1) :
+            llineStart.y = self.y_start - 2 * self.ym
+            llineEnd.y = self.y_start - self.ym
+        else:
+            llineStart.y = self.y_start - self.ym
+            llineEnd.y = self.y_start - 2 * self.ym
+
+    def _rline(self, pdf, width, colorname):
+        rlineStart  = PDFCursor(0,0)
         rlineStart.x = self.x_start + self.xm
         rlineStart.dx = self.xm * 3
         rlineStart.dy = self.ym * 2
+        rlineEnd    = PDFCursor(0,0)
         rlineEnd.x=self.x_start
         rlineEnd.dx = self.xm * 3
         rlineEnd.dy = self.ym * 2
         
+        color = pdf.get_color()
+        color.set_color_by_name(colorname)
+        rline = PDFLine(pdf.session, pdf.page, rlineStart, rlineEnd, style='solid', color=color, size=width)
+
+        return (rlineStart, rlineEnd, rline)
+
+    def _rline_restart_y (self, x, rlineStart, rlineEnd):
+        if (x & 1) :
+            rlineStart.y = self.y_start - 3 *self.ym
+            rlineEnd.y = self.y_start - 2 * self.ym
+        else:
+            rlineStart.y = self.y_start - 2 * self.ym
+            rlineEnd.y = self.y_start - 3 * self.ym
+    
+    def hex_grid(self, pdf, draw, width, colorname = 'lightgray'):
+        
+        hlineStart, hlineEnd, hline = self._hline(pdf, width, colorname)
+        llineStart, llineEnd, lline = self._lline(pdf, width, colorname)
+        rlineStart, rlineEnd, rline = self._rline(pdf, width, colorname)
+        
         for x in xrange (33):
             hlineStart.x_plus()
             hlineEnd.x_plus()
+            self._hline_restart_y(x, hlineStart, hlineEnd)
+            self._lline_restart_y(x, llineStart, llineEnd)
+            self._rline_restart_y(x, rlineStart, rlineEnd)
             
-            if (x & 1) :
-                hlineStart.y = self.y_start - self.ym
-                hlineEnd.y = self.y_start - self.ym
-                llineStart.y = self.y_start - 2 * self.ym
-                llineEnd.y = self.y_start - self.ym
-                rlineStart.y = self.y_start - 3 *self.ym
-                rlineEnd.y = self.y_start - 2 * self.ym
-            else:
-                hlineStart.y = self.y_start - 2 * self.ym
-                hlineEnd.y = self.y_start - 2 * self.ym
-                llineStart.y = self.y_start - self.ym
-                llineEnd.y = self.y_start - 2 * self.ym
-                rlineStart.y = self.y_start - 2 * self.ym
-                rlineEnd.y = self.y_start - 3 * self.ym
-                
             for y in xrange(41):
                 hlineStart.y_plus()
                 hlineEnd.y_plus()
@@ -201,16 +237,45 @@ class HexMap(object):
                 llineEnd.y_plus()
                 rlineStart.y_plus()
                 rlineEnd.y_plus()
-                if (x < 32):
-                    hline._draw()
-                lline._draw()
-                if (y > 0):
-                    rline._draw()
+                
+                draw(x, y, hline, lline, rline)
+                
             llineStart.x_plus()
             llineEnd.x_plus ()
             rlineStart.x_plus()
             rlineEnd.x_plus()
+            
+    def _draw_all(self, x, y, hline, lline, rline):
+        if (x < 32):
+            hline._draw()
+        lline._draw()
+        if (y > 0):
+            rline._draw()
 
+    def _draw_borders(self, x, y, hline, lline, rline):
+        q, r = self.convert_hex_to_axial(x + self.sector.dx, y + self.sector.dy - 1)
+        
+        #self.logger.info ("({},{}) -> ({},{})".format(x, y, q, r))
+        
+        if self.galaxy.borders.borders.get((q,r), False):
+            if self.galaxy.borders.borders[(q,r)] & 1:
+                hline._draw()
+                
+            if self.galaxy.borders.borders[(q,r)] & 2 and y > 0:
+                rline._draw()
+                
+            if self.galaxy.borders.borders[(q,r)] & 4:
+                lline._draw()
+           
+    def draw_borders(self, pdf, sector):
+        self.sector = sector
+        self.hex_grid(pdf, self._draw_borders, 1.5, 'pink')
+        
+    def convert_hex_to_axial(self, row, col):
+        x = row
+        z = col - (row - (row & 1)) / 2
+        return (x, z)
+                
     def system(self, pdf, star):
         def_font = pdf.get_font()
         pdf.set_font('times', size=4)

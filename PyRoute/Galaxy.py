@@ -13,6 +13,7 @@ import networkx as nx
 from Star import Star
 from TradeCalculation import TradeCalculation
 from StatCalculation import ObjectStatistics
+from AllyGen import AllyGen
 
 class Sector (object):
     def __init__ (self, name, position):
@@ -70,6 +71,7 @@ class Galaxy(object):
         self.dy = y * 40
         self.trade = TradeCalculation(self)
         self.stats = ObjectStatistics()
+        self.borders = AllyGen(self)
         self.output_path = 'maps'
         
     def read_sectors (self, sectors):
@@ -133,6 +135,7 @@ class Galaxy(object):
         self.logger.info('generating routes...')
         self.set_bounding_sectors()
         self.set_positions()
+        self.borders.create_borders()
         
         for star,neighbor in itertools.combinations(self.ranges.nodes_iter(), 2):
             if star.zone in ['R', 'F'] or neighbor.zone in ['R','F']:
@@ -161,32 +164,8 @@ class Galaxy(object):
         path = os.path.join(self.output_path, 'ranges.txt')
         with open(path, "wb") as f:
             nx.write_edgelist(self.ranges, f, data=True)
-        
-    def get_alg(self, new, old):
-        if new == 'Na' or new == 'Ba' or new == 'Cs':
-            return old
-        if old is None:
-            return new
-        if new is None:
-            return old
-        if new == old:
-            return new
-        return new;
-    
-                    
-    def set_borders(self):
-        self.align = [[None for x in xrange(self.dx)] for x in xrange(self.dy)]
-        for star in self.stars.nodes_iter():
-            self.align[star.x][star.y] = star.alg
-
-        for w in xrange(2):
-            for x in xrange(self.dx):
-                for y in xrange(self.dy):
-                    if self.align[x][y] is not None: continue
-                    al = None
-                    al = get_alg(self.align[x-1][y], al)
-                    al = get_alg() 
-                    
-    
-        
+        path = os.path.join (self.output_path, 'borders.txt')
+        with open(path, "wb") as f:
+            for key, value in self.borders.borders.iteritems():
+                f.write("{}-{}: border: {}\n".format(key[0],key[1], value))
         

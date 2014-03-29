@@ -82,7 +82,7 @@ class TradeCalculation(object):
                     self.logger.info('processed {} routes at BTN {}'.format(counter,base_btn))
                 base_btn = data['btn']
                 counter = 0
-            if processed % (total/20) == 0:
+            if total > 100 and processed % (total/20) == 0:
                 self.logger.info('processed {} routes, at {}%'.format(processed, processed/(total/100)))
             self.get_trade_between(star, neighbor)
             counter += 1
@@ -97,8 +97,8 @@ class TradeCalculation(object):
         if (star1.nonIndustrial and star2.industrial) or \
             (star2.nonIndustrial and star1.industrial): 
             btn += 1
-            
-        if (star1.alg != star2.alg) :
+        
+        if not self.galaxy.borders.are_allies(star1.alg, star2.alg):
             btn -= 1
                         
         distance = star1.hex_distance(star2)
