@@ -14,24 +14,23 @@ from StatCalculation import StatCalculation
 
 logger = logging.getLogger('PyRoute')
 
-def read_sectors(sectors):
-    logger.info(sectors)
-
 def process():
     parser = argparse.ArgumentParser(description='Traveller trade route generator.')
-    parser.add_argument('sectors', nargs='+')
+    parser.add_argument('--borders', choices=['none', 'range', 'allygen'], default='range',
+                        help='Allegiance border generation')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.1')
+    parser.add_argument('sector', nargs='+', help='T5SS sector file(s) to process')
     args = parser.parse_args()
     
     logger.info("starting processing")
     
     galaxy = Galaxy(20,20);
-    
-    galaxy.read_sectors (args.sectors)
+    galaxy.read_sectors (args.sector)
     
     logger.info ("sectors read")
     
     galaxy.set_edges()
-#    galaxy.set_borders()
+    galaxy.set_borders(args.borders)
 
     trade = TradeCalculation(galaxy)
     trade.calculate_routes()
@@ -46,6 +45,7 @@ def process():
     stats.write_statistics()
     
     logger.info("process complete")
+
 
 def set_logging():
     logger.setLevel(logging.INFO)

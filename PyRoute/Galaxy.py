@@ -131,11 +131,19 @@ class Galaxy(object):
                 neighbor.coreward = sector
         pass
     
+    def set_borders(self, border_gen):
+        self.logger.info('setting borders...')
+        if border_gen == 'range':
+            self.borders.create_borders()
+        elif border_gen == 'allygen':
+            self.borders.create_ally_map()
+        else:
+            pass
+
     def set_edges(self):
         self.logger.info('generating routes...')
         self.set_bounding_sectors()
         self.set_positions()
-        self.borders.create_borders()
         
         for star,neighbor in itertools.combinations(self.ranges.nodes_iter(), 2):
             if star.zone in ['R', 'F'] or neighbor.zone in ['R','F']:
@@ -168,4 +176,4 @@ class Galaxy(object):
         with open(path, "wb") as f:
             for key, value in self.borders.borders.iteritems():
                 f.write("{}-{}: border: {}\n".format(key[0],key[1], value))
-        
+    
