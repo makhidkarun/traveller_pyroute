@@ -84,18 +84,18 @@ class HexMap(object):
 
 
     def coreward_sector(self, pdf, name):
-        cursor = PDFCursor(5, self.y_start - self.xm, True)
+        cursor = PDFCursor(306, self.y_start - self.xm, True)
         def_font = pdf.get_font()
         pdf.set_font('times', size=10)
-        cursor.x = 306 - (pdf.get_font()._string_width(name)/2)
+        cursor.x_plus(-pdf.get_font()._string_width(name)/2)
         pdf.add_text(name, cursor)
         pdf.set_font (font=def_font)
 
     def rimward_sector(self, pdf, name):
-        cursor = PDFCursor(5 ,779, True)
+        cursor = PDFCursor(306 ,779, True)
         def_font = pdf.get_font()
         pdf.set_font('times', size=10)
-        cursor.x = 306 (pdf.get_font()._string_width(name)/2)
+        cursor.x_plus(-pdf.get_font()._string_width(name)/2)
         pdf.add_text(name, cursor)
         pdf.set_font (font=def_font)
         
