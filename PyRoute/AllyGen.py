@@ -108,9 +108,9 @@ class AllyGen(object):
         # and the neighbor has no setting ,
         # or the neighbor is aligned 
         # Then no border . 
-        if allyMap[Hex] == self.nonAligned[0] and \
+        if allyMap[Hex] in self.nonAligned and \
             (allyMap.get(neighbor, True) or \
-            allyMap.get(neighbor, None) != self.nonAligned[0]):
+            allyMap.get(neighbor, None) not in self.nonAligned):
             return False
         # If not matched allegiance, need a border.
         elif allyMap[Hex] != allyMap.get(neighbor, None):
@@ -167,15 +167,10 @@ class AllyGen(object):
     
               
     def create_ally_map(self):
-        # Sort stars by:
-        # Better Port, Higher TL, Higher Population
+        # Create list of stars
         stars = [star for star in self.galaxy.stars.nodes_iter()]
-        stars = sorted(stars, key=attrgetter('popCode'), reverse=True)
-        stars = sorted(stars, key=attrgetter('tl'), reverse=True)
-        stars = sorted(stars, key=attrgetter('port'))
-
         allyMap = defaultdict(set)
-        allyCount = defaultdict(int)
+        starMap = {}
         # Mark the map with all the stars        
         for star in stars:
             alg = star.alg
@@ -187,7 +182,7 @@ class AllyGen(object):
                 if alg in sameAlg:
                     alg = sameAlg[0]
             allyMap[(star.q, star.r)].add((alg,0))
-            allyCount[alg] += 1
+            starMap[(star.q, star.r)] = alg
 
         self._output_map(allyMap, 0)
         
@@ -195,27 +190,31 @@ class AllyGen(object):
         # with overlapping maps
         for star in stars:
             # skip the E/X ports 
-            if star.port in ['E', 'X']: continue
             Hex = (star.q, star.r)
             alg = star.alg
             
-            maxRange = ['D','C','B','A'].index(star.port) + 1
+            if star.port in ['E', 'X']: 
+                maxRange = 1
+            else:
+                maxRange = ['D','C','B','A'].index(star.port) + 1
             if alg in self.nonAligned:
                 maxRange = 2
             for dist in xrange (maxRange):
                 neighbor = self._get_neighbor(Hex, 4, dist)
                 for direction in xrange(6):
-                    for scale in xrange(dist):
-                        allyMap[neighbor].add((alg,dist))
-                        allyCount[alg] += 1 if alg != self.nonAligned[0] else 0
+                    for _ in xrange(dist):
+                        allyMap[neighbor].add((alg,star.axial_distance(Hex,neighbor)))
                         neighbor = self._get_neighbor(neighbor, direction)
 
         self._output_map(allyMap, 1)
 
         # Pass 2: find overlapping areas and reduce
-        # 1. Non-aligned remain unchanged, 
-        # 2. Select neighboring world if any
-        # 3. Select largest empire
+        # 0: hexes with only one claimant, give it to them
+        # 1: hexes with the world (dist 0) get selected
+        # 2: non-aligned worlds at dist 1 get selected
+        # 3: hexes claimed by two (or more) allies are pushed to the closest world
+        # 4: hexes claimed by two (or more) allies at the same distance
+        #    are claimed by the larger empire. 
         for Hex in allyMap.iterkeys():
             if len (allyMap[Hex]) == 1:
                 allyMap[Hex] = allyMap[Hex].pop()[0]
@@ -224,10 +223,36 @@ class AllyGen(object):
                 if allyList[0][1] == 0:
                     allyMap[Hex] = allyList[0][0]
                 else:
-                    for alg,scope in allyList:
-                        pass
+                    minDistance = allyList[0][1]
+                    allyDist = [algs for algs in allyList if algs[1] == minDistance]
+                    if len(allyDist) == 1: 
+                        allyMap[Hex] = allyDist[0][0]
+                    else:
+                        maxCount = -1
+                        maxAlly = None
+                        for alg, dist in allyDist:
+                            if alg in self.nonAligned:
+                                maxAlly = alg
+                                break 
+                            if self.galaxy.alg[alg][1].number > maxCount:
+                                maxAlly = alg
+                                maxCount =  self.galaxy.alg[alg][1].number
+                        allyMap[Hex] = maxAlly
                 
         self._output_map(allyMap, 2)
-        
+
+        # Pass 3: find lonely claimed hexes and remove them
+        # Do two passes through the data
+        for _ in xrange(2):
+            for Hex in allyMap.iterkeys():
+                if starMap.get(Hex, False): continue
+                neighborCount = 0
+                for direction in xrange(6):
+                    if not self._set_border (allyMap, Hex, direction):
+                        neighborCount += 1
+                if neighborCount < 2 :
+                    allyMap[Hex] = self.nonAligned[0]
+                    
+        self._output_map(allyMap, 3)
         self._generate_borders(allyMap)
         

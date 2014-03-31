@@ -129,7 +129,6 @@ class Galaxy(object):
             elif sector.x == neighbor.x and sector.y + 1 == neighbor.y:
                 sector.rimward = neighbor
                 neighbor.coreward = sector
-        pass
     
     def set_borders(self, border_gen):
         self.logger.info('setting borders...')

@@ -101,6 +101,10 @@ class Star (object):
     def hex_distance(self, star):
         return max(abs(self.x - star.x), abs(self.y - star.y), abs(self.z -star.z))
         
+    def axial_distance(self, Hex1, Hex2):
+        return (abs(Hex1[0] - Hex2[0]) + abs(Hex1[1] - Hex2[1])
+            + abs(Hex1[0] + Hex1[1] - Hex2[0] - Hex2[1])) / 2
+
     def distance (self, star):
         y1 = self.y * 2
         if not self.x % 2:
