@@ -45,7 +45,10 @@ class HexMap(object):
             for (star, neighbor, data) in self.galaxy.stars.edges_iter(sector.worlds, True):
                 if star.sector != sector:
                     continue
-                    
+                # skip the longer routed edges added to speed up the A* Route
+                if data.get('route', False): 
+                    continue
+
                 if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:
                     self.logger.debug("trade line %s - %s : %s" % (star, neighbor, data))
                     self.trade_line(pdf, [star, neighbor], data)
@@ -217,7 +220,7 @@ class HexMap(object):
             rlineStart.y = self.y_start - 2 * self.ym
             rlineEnd.y = self.y_start - 3 * self.ym
     
-    def hex_grid(self, pdf, draw, width, colorname = 'lightgray'):
+    def hex_grid(self, pdf, draw, width, colorname = 'gray'):
         
         hlineStart, hlineEnd, hline = self._hline(pdf, width, colorname)
         llineStart, llineEnd, lline = self._lline(pdf, width, colorname)
@@ -269,7 +272,7 @@ class HexMap(object):
            
     def draw_borders(self, pdf, sector):
         self.sector = sector
-        self.hex_grid(pdf, self._draw_borders, 1.5, 'pink')
+        self.hex_grid(pdf, self._draw_borders, 1.5, 'salmon')
         
     def convert_hex_to_axial(self, row, col):
         x = row
