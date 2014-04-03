@@ -62,13 +62,14 @@ class TradeCalculation(object):
         # Minimum WTN to process routes for
         self.min_wtn = 8
 
-    def calculate_routes(self):
+    def calculate_routes(self, min_btn):
         '''
         The base calculate routes. Read through all the stars in WTN order.
         Do this order to allow the higher trade routes establish the basic routes
         for the lower routes to follow.
         '''
         self.logger.info('sorting routes...')
+        self.min_btn = min_btn
         btn = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges_iter(data=True)]
         btn_array = sorted(btn, key=lambda tn: tn[2]['btn'], reverse=True)
         
@@ -113,7 +114,7 @@ class TradeCalculation(object):
         # Calculate the route between the stars
         # If we can't find a route (no jump 4 path) skip this pair
         try:
-            route = nx.astar_path(self.galaxy.stars, star, target, heuristic)
+            route = nx.astar_path(self.galaxy.routes, star, target, heuristic)
         except  nx.NetworkXNoPath:
             return
 
@@ -122,24 +123,49 @@ class TradeCalculation(object):
         tradeCr = self.calc_trade(tradeBTN)
         star.tradeIn += tradeCr
         target.tradeIn += tradeCr
-        target.tradeMatched.append(star)
-        
+
         # Update the trade route (edges)
-        start = star
-        for end in route:
-            if end == start:
-                continue
-            self.galaxy.stars[start][end]['trade'] += tradeCr
-            # Reduce the weight of this route. 
-            # As the higher trade routes create established routes 
-            # which are more likely to be followed by lower trade routes
-            self.galaxy.stars[start][end]['weight'] -= \
-                self.galaxy.stars[start][end]['weight'] / self.route_reuse
-            end.tradeOver += tradeCr if end != target else 0
+        self.route_update (route, tradeCr)
+    
+    def route_update (self, route, tradeCr):
+        dist = 0
+        weight = 0
+        start = route[0]
+        for end in route[1:]:
+            end.tradeOver += tradeCr if end != route[-1] else 0
+            if self.galaxy.routes.has_edge(start,end) and self.galaxy.routes[start][end].get('route', False):
+                routeDist, routeWeight = self.route_update (self.galaxy.routes[start][end]['route'], tradeCr)
+                dist += routeDist
+                weight += routeWeight
+                # Reduce the weight of this route. 
+                # As the higher trade routes create established routes 
+                # which are more likely to be followed by lower trade routes
+                self.galaxy.routes[start][end]['weight'] -= \
+                    self.galaxy.routes[start][end]['weight'] / self.route_reuse
+            elif self.galaxy.stars.has_edge(start, end):
+                self.galaxy.stars[start][end]['trade'] += tradeCr
+                dist += self.galaxy.stars[start][end]['distance']
+                weight += self.galaxy.stars[start][end]['weight']
+            else:
+                print start, end, self.galaxy.routes.has_edge(start, end)
             start = end
+            
+        if len(route) > 4 and not self.galaxy.routes.has_edge(route[0], route[-1]):
+            weight -= weight / self.route_reuse
+            self.galaxy.routes.add_edge (route[0], route[-1], {'distance': dist,
+                                                 'weight': weight,
+                                                  'trade': 0, 'route': route,
+                                                  'btn': 0})
+            start = route[0]
+            for end in route[1:]:
+                #self.galaxy.routes.remove_edge(start, end)
+                start = end
+        return dist, weight
     
     def get_trade_to (self, star, trade):
-        ''' Calculate the trade route between starting star and all potential target'''
+        ''' Calculate the trade route between starting star and all potential target
+            No longer used
+        '''
         
         # Loop through all the stars in the ranges list, i.e. all potential stars
         # within the range of the BTN route. 

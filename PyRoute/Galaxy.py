@@ -53,11 +53,11 @@ class Galaxy(object):
 (\([0-9A-Z]{3}[+-]\d\)| ) +
 (\[[0-9A-Z]{4}\]| ) +
 (\w{1,5}|-) +
-(\w|-) +
+(\w|-|\*) +
 (\w|-) +
 ([0-9][0-9A-F][0-9A-F]) +
 (\d{1,}| )+
-([A-Z-][A-Za-z0-9-]) 
+([A-Z0-9-][A-Za-z0-9-]) 
 (.*)
 """
         star_regex = ''.join([line.rstrip('\n') for line in regex])
@@ -65,6 +65,7 @@ class Galaxy(object):
         self.starline = re.compile(star_regex)
         self.stars = nx.Graph()
         self.ranges = nx.Graph()
+        self.routes = nx.Graph()
         self.sectors = []
         self.alg = {}
         self.dx = x * 32
@@ -112,6 +113,7 @@ class Galaxy(object):
             if sector is None: continue
             for star in sector.worlds:
                 self.stars.add_node(star)
+                self.routes.add_node(star)
                 self.ranges.add_node(star)
         self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
         
@@ -139,10 +141,13 @@ class Galaxy(object):
         else:
             pass
 
-    def set_edges(self):
-        self.logger.info('generating routes...')
+    def set_edges(self, routes):
         self.set_bounding_sectors()
         self.set_positions()
+
+        if not routes: return
+        
+        self.logger.info('generating routes...')
         
         for star,neighbor in itertools.combinations(self.ranges.nodes_iter(), 2):
             if star.zone in ['R', 'F'] or neighbor.zone in ['R','F']:
@@ -160,16 +165,20 @@ class Galaxy(object):
                                                   'weight': self.trade.route_weight(star,neighbor),
                                                   'trade': 0,
                                                   'btn': btn})
+                self.routes.add_edge(star, neighbor, {'distance': dist,
+                                                  'weight': self.trade.route_weight(star,neighbor),
+                                                  'trade': 0,
+                                                  'btn': btn})
         self.logger.info("Jump routes: %s - Distances: %s" % 
                          (self.stars.number_of_edges(), self.ranges.number_of_edges()))
     
         
     def write_routes(self):
         path = os.path.join(self.output_path, 'routes.txt')
-        with open(path, 'wb') as f:
+        with codecs.open(path, 'wb') as f:
             nx.write_edgelist(self.stars, f, data=True)
         path = os.path.join(self.output_path, 'ranges.txt')
-        with open(path, "wb") as f:
+        with codecs.open(path, "wb") as f:
             nx.write_edgelist(self.ranges, f, data=True)
         path = os.path.join (self.output_path, 'borders.txt')
         with open(path, "wb") as f:
