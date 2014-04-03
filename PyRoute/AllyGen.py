@@ -18,9 +18,9 @@ class AllyGen(object):
         Constructor
         '''
         self.galaxy = galaxy
-        self.noOne = ['Ba']
-        self.nonAligned = ['Na', 'Va']
-        self.sameAligned = [ ('Im', 'Cs')]
+        self.noOne = [u'--']
+        self.nonAligned = [u'Na', u'Va']
+        self.sameAligned = [ (u'Im', u'Cs')]
         self.borders = {} # 2D array using (q,r) as key, with flags for data
         
     def create_borders (self):
@@ -108,9 +108,9 @@ class AllyGen(object):
         # and the neighbor has no setting ,
         # or the neighbor is aligned 
         # Then no border . 
-        if allyMap[Hex] in self.nonAligned and \
+        if (allyMap[Hex] in self.nonAligned or allyMap[Hex] is None) and \
             (allyMap.get(neighbor, True) or \
-            allyMap.get(neighbor, None) not in self.nonAligned):
+             allyMap.get(neighbor, None) not in self.nonAligned):
             return False
         # If not matched allegiance, need a border.
         elif allyMap[Hex] != allyMap.get(neighbor, None):
@@ -191,12 +191,12 @@ class AllyGen(object):
         for star in stars:
             # skip the E/X ports 
             Hex = (star.q, star.r)
-            alg = star.alg
+            alg = starMap[Hex]
             
             if star.port in ['E', 'X']: 
                 maxRange = 1
             else:
-                maxRange = ['D','C','B','A'].index(star.port) + 1
+                maxRange = ['D','C','B','A'].index(star.port) + 2
             if alg in self.nonAligned:
                 maxRange = 2
             for dist in xrange (maxRange):
@@ -246,12 +246,19 @@ class AllyGen(object):
         for _ in xrange(2):
             for Hex in allyMap.iterkeys():
                 if starMap.get(Hex, False): continue
-                neighborCount = 0
+                neighborAlgs = defaultdict(int)
                 for direction in xrange(6):
-                    if not self._set_border (allyMap, Hex, direction):
-                        neighborCount += 1
-                if neighborCount < 2 :
+                    neighborAlg = allyMap.get(self._get_neighbor(Hex, direction), None)
+                    neighborAlgs [neighborAlg] += 1 
+                    
+                algList = sorted(neighborAlgs.iteritems(), key=itemgetter(1), reverse=True)
+                if len(algList) == 0:
+                    allyMap[Hex] = None
+                elif algList[0][1] >= 1:
+                    allyMap[Hex] = algList[0][0]
+                else:
                     allyMap[Hex] = self.nonAligned[0]
+                    
                     
         self._output_map(allyMap, 3)
         self._generate_borders(allyMap)
