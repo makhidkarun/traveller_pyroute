@@ -18,7 +18,9 @@ def process():
     parser = argparse.ArgumentParser(description='Traveller trade route generator.')
     parser.add_argument('--borders', choices=['none', 'range', 'allygen'], default='range',
                         help='Allegiance border generation')
+    parser.add_argument('--no-routes', dest='routes', default=True, action='store_false')
     parser.add_argument('--version', action='version', version='%(prog)s 0.1')
+    parser.add_argument('--min-btn', dest='btn', default=13, type=int)
     parser.add_argument('sector', nargs='+', help='T5SS sector file(s) to process')
     args = parser.parse_args()
     
@@ -29,13 +31,14 @@ def process():
     
     logger.info ("sectors read")
     
-    galaxy.set_edges()
+    galaxy.set_edges(args.routes)
     galaxy.set_borders(args.borders)
 
-    trade = TradeCalculation(galaxy)
-    trade.calculate_routes()
 
-    galaxy.write_routes()
+    if args.routes:
+        trade = TradeCalculation(galaxy)
+        trade.calculate_routes(args.btn)
+        galaxy.write_routes()
     
     pdfmap = HexMap(galaxy)
     pdfmap.write_maps()

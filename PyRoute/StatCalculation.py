@@ -85,7 +85,7 @@ class StatCalculation(object):
             self.logger.info('Sector ' + sector.name + ' star count: ' + str(sector.stats.number))
             
         for aleg, stats in self.galaxy.alg.iteritems():
-            s = 'Allegiance {0} ({1}) star count: {2:,d}'.format(stats[0], aleg, stats[1].number)
+            s = u'Allegiance {0} ({1}) star count: {2:,d}'.format(stats[0], aleg, stats[1].number)
             self.logger.info(s)
             
         wiki = WikiStats(self.galaxy, self.uwp)
