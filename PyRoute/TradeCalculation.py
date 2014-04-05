@@ -89,6 +89,7 @@ class TradeCalculation(object):
             counter += 1
             processed += 1
         self.logger.info('processed {} routes at BTN {}'.format(counter,base_btn))
+        self.logger.info('Routes: %s' % self.galaxy.routes.number_of_edges())
         
     def get_btn (self, star1, star2):
         btn = star1.wtn + star2.wtn
@@ -125,18 +126,35 @@ class TradeCalculation(object):
         target.tradeIn += tradeCr
 
         # Update the trade route (edges)
-        self.route_update (route, tradeCr)
+        self.route_update_simple (route, tradeCr)
     
-    def route_update (self, route, tradeCr):
+    
+    def route_update_simple (self, route, tradeCr):
+        start = route[0]
+        for end in route[1:]:
+            end.tradeOver += tradeCr if end != route[-1] else 0
+            self.galaxy.stars[start][end]['trade'] += tradeCr
+            # Reduce the weight of this route. 
+            # As the higher trade routes create established routes 
+            # which are more likely to be followed by lower trade routes
+            self.galaxy.routes[start][end]['weight'] -= \
+                self.galaxy.routes[start][end]['weight'] / self.route_reuse
+            self.galaxy.stars[start][end]['weight'] -= \
+                self.galaxy.stars[start][end]['weight'] / self.route_reuse
+            start = end
+    
+    def route_update_skip (self, route, tradeCr):
         dist = 0
         weight = 0
         start = route[0]
+        usesJumpRoute=False
         for end in route[1:]:
             end.tradeOver += tradeCr if end != route[-1] else 0
             if self.galaxy.routes.has_edge(start,end) and self.galaxy.routes[start][end].get('route', False):
                 routeDist, routeWeight = self.route_update (self.galaxy.routes[start][end]['route'], tradeCr)
                 dist += routeDist
                 weight += routeWeight
+                usesJumpRoute=True
                 # Reduce the weight of this route. 
                 # As the higher trade routes create established routes 
                 # which are more likely to be followed by lower trade routes
@@ -146,11 +164,13 @@ class TradeCalculation(object):
                 self.galaxy.stars[start][end]['trade'] += tradeCr
                 dist += self.galaxy.stars[start][end]['distance']
                 weight += self.galaxy.stars[start][end]['weight']
+                self.galaxy.routes[start][end]['weight'] -= \
+                    self.galaxy.routes[start][end]['weight'] / self.route_reuse
             else:
                 print start, end, self.galaxy.routes.has_edge(start, end)
             start = end
             
-        if len(route) > 4 and not self.galaxy.routes.has_edge(route[0], route[-1]):
+        if len(route) > 6 and not usesJumpRoute:
             weight -= weight / self.route_reuse
             self.galaxy.routes.add_edge (route[0], route[-1], {'distance': dist,
                                                  'weight': weight,

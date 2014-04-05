@@ -71,7 +71,6 @@ class Star (object):
         self.calculate_gwp()
         self.tradeIn  = 0
         self.tradeOver = 0
-        self.tradeMatched = []
         
     def __unicode__(self):
         return u"%s (%s %s)" % (self.name, self.sector.name, self.position)

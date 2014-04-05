@@ -19,6 +19,7 @@ def process():
     parser.add_argument('--borders', choices=['none', 'range', 'allygen'], default='range',
                         help='Allegiance border generation')
     parser.add_argument('--no-routes', dest='routes', default=True, action='store_false')
+    parser.add_argument('--no-trade', dest='trade', default=True, action='store_false')
     parser.add_argument('--version', action='version', version='%(prog)s 0.1')
     parser.add_argument('--min-btn', dest='btn', default=13, type=int)
     parser.add_argument('sector', nargs='+', help='T5SS sector file(s) to process')
@@ -35,9 +36,11 @@ def process():
     galaxy.set_borders(args.borders)
 
 
-    if args.routes:
+    if args.routes and args.trade:
         trade = TradeCalculation(galaxy)
         trade.calculate_routes(args.btn)
+        
+    if args.routes:
         galaxy.write_routes()
     
     pdfmap = HexMap(galaxy)
