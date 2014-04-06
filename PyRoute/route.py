@@ -27,7 +27,7 @@ def process():
     
     logger.info("starting processing")
     
-    galaxy = Galaxy(20,20);
+    galaxy = Galaxy(args.btn);
     galaxy.read_sectors (args.sector)
     
     logger.info ("sectors read")
@@ -37,8 +37,7 @@ def process():
 
 
     if args.routes and args.trade:
-        trade = TradeCalculation(galaxy)
-        trade.calculate_routes(args.btn)
+        galaxy.trade.calculate_routes()
         
     if args.routes:
         galaxy.write_routes()

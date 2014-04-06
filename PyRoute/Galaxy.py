@@ -20,8 +20,8 @@ class Sector (object):
         self.name = name[1:].strip()
         self.x = int(position[1:].split(',')[0])
         self.y = int(position[1:].split(',')[1])
-        self.dx = (self.x + 10) * 32
-        self.dy = (self.y + 10) * 40
+        self.dx = self.x * 32
+        self.dy = self.y * 40
         self.subsectors = {}
         self.worlds = []
         self.stats = ObjectStatistics()
@@ -39,7 +39,7 @@ class Galaxy(object):
     '''
     classdocs
     '''
-    def __init__(self, x, y):
+    def __init__(self, min_btn):
         '''
         Constructor
         '''
@@ -68,9 +68,7 @@ class Galaxy(object):
         self.routes = nx.Graph()
         self.sectors = []
         self.alg = {}
-        self.dx = x * 32
-        self.dy = y * 40
-        self.trade = TradeCalculation(self)
+        self.trade = TradeCalculation(self, min_btn)
         self.stats = ObjectStatistics()
         self.borders = AllyGen(self)
         self.output_path = 'maps'
@@ -173,15 +171,25 @@ class Galaxy(object):
                                                   'btn': btn})
 
         self.logger.info('calculating routes...')
-        for star,neighbor,data in self.stars.edges_iter(data=True):
-            if len(self.stars.neighbors(star)) < 11 or len(self.stars.neighbors(neighbor)) < 11:
+        for star in self.stars.nodes_iter():
+            if len(self.stars.neighbors(star)) < 11:
                 continue
-            if not self.routes.has_edge(star, neighbor):
-                continue
-            if data['weight'] >= 200:
-                self.routes.remove_edge(star, neighbor)
-            elif data['distance'] == 4 and data['btn'] < 10:
-                self.routes.remove_edge(star, neighbor)
+            neighbor_routes = [(s,n,d) for (s,n,d) in self.stars.edges_iter([star], True)]
+            neighbor_routes = sorted (neighbor_routes, key=lambda tn: tn[2]['btn'])
+            neighbor_routes = sorted (neighbor_routes, key=lambda tn: tn[2]['distance'])
+            neighbor_routes = sorted (neighbor_routes, key=lambda tn: tn[2]['weight'], reverse=True)
+            
+            length = len(neighbor_routes)
+            
+            for (s,n,d) in neighbor_routes:
+                if len(self.stars.neighbors(n)) < 15: 
+                    continue
+                if length <= 15:
+                    break
+                if self.routes.has_edge(s, n):
+                    self.routes.remove_edge(s, n)
+                length -= 1
+            
         self.logger.info("Routes: %s  - jumps: %s - traders: %s" % 
                          (self.routes.number_of_edges(), 
                           self.stars.number_of_edges(), 
@@ -191,10 +199,13 @@ class Galaxy(object):
     def write_routes(self):
         path = os.path.join(self.output_path, 'routes.txt')
         with codecs.open(path, 'wb') as f:
-            nx.write_edgelist(self.stars, f, data=True)
+            nx.write_edgelist(self.routes, f, data=True)
         path = os.path.join(self.output_path, 'ranges.txt')
         with codecs.open(path, "wb") as f:
             nx.write_edgelist(self.ranges, f, data=True)
+        path = os.path.join(self.output_path, 'stars.txt')
+        with codecs.open(path, "wb") as f:
+            nx.write_edgelist(self.stars, f, data=True)
         path = os.path.join (self.output_path, 'borders.txt')
         with open(path, "wb") as f:
             for key, value in self.borders.borders.iteritems():

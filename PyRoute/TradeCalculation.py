@@ -15,7 +15,7 @@ class TradeCalculation(object):
     '''
 
 
-    def __init__(self, galaxy):
+    def __init__(self, galaxy, min_btn=13):
         '''
         Constructor
         '''
@@ -54,7 +54,7 @@ class TradeCalculation(object):
         # Minimum BTN to calculate routes for. BTN between two worlds less than
         # this value are ignored. Set lower to have more routes calculated, but
         # may not have have an impact on the overall trade flows.
-        self.min_btn = 13
+        self.min_btn = min_btn
         
         # Maximum WTN to process routes for
         self.max_wtn = 15
@@ -62,14 +62,13 @@ class TradeCalculation(object):
         # Minimum WTN to process routes for
         self.min_wtn = 8
 
-    def calculate_routes(self, min_btn):
+    def calculate_routes(self):
         '''
         The base calculate routes. Read through all the stars in WTN order.
         Do this order to allow the higher trade routes establish the basic routes
         for the lower routes to follow.
         '''
         self.logger.info('sorting routes...')
-        self.min_btn = min_btn
         btn = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges_iter(data=True)]
         btn_array = sorted(btn, key=lambda tn: tn[2]['btn'], reverse=True)
         
@@ -134,6 +133,7 @@ class TradeCalculation(object):
         for end in route[1:]:
             end.tradeOver += tradeCr if end != route[-1] else 0
             self.galaxy.stars[start][end]['trade'] += tradeCr
+            self.galaxy.routes[start][end]['trade'] += tradeCr
             # Reduce the weight of this route. 
             # As the higher trade routes create established routes 
             # which are more likely to be followed by lower trade routes
