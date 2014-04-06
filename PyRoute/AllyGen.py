@@ -20,7 +20,8 @@ class AllyGen(object):
         self.galaxy = galaxy
         self.noOne = [u'--']
         self.nonAligned = [u'Na', u'Va']
-        self.sameAligned = [ (u'Im', u'Cs')]
+        self.sameAligned = [(u'Im', u'Cs'),
+                            (u'As',u'A0', u'A1', u'A2', u'A3', u'A4', u'A5', u'A6', u'A7', u'A8', u'A9', u'TE', u'Of', u'If')]
         self.borders = {} # 2D array using (q,r) as key, with flags for data
         
     def create_borders (self):
