@@ -4,15 +4,9 @@ Created on Mar 5, 2014
 @author: tjoneslo
 '''
 
-import logging
-
 class Star (object):
     def __init__ (self, line, starline, sector):
-        self.logger = logging.getLogger('PyRoute.Star')
-
-        
         self.sector = sector
-        self.logger.debug("processing [%s]" % line)
         data = starline.match(line).groups()
         self.position = data[0].strip()
         self.set_location(sector.dx, sector.dy)

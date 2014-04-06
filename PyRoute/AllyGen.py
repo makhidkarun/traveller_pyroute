@@ -3,7 +3,7 @@ Created on Mar 26, 2014
 
 @author: tjoneslo
 '''
-from operator import attrgetter,itemgetter
+from operator import itemgetter
 from collections import defaultdict
 import os
 

@@ -3,7 +3,6 @@ Created on Mar 8, 2014
 
 @author: tjoneslo
 '''
-import logging
 import math
 import os
 from pypdflite import PDFLite
@@ -25,7 +24,6 @@ class HexMap(object):
         '''
         Constructor
         '''
-        self.logger = logging.getLogger('PyRoute.HexMap')
         self.galaxy = galaxy
         self.ym = 9     # half a hex height
         self.xm = 6     # half the length of one side
@@ -257,8 +255,6 @@ class HexMap(object):
 
     def _draw_borders(self, x, y, hline, lline, rline):
         q, r = self.convert_hex_to_axial(x + self.sector.dx, y + self.sector.dy - 1)
-        
-        #self.logger.info ("({},{}) -> ({},{})".format(x, y, q, r))
         
         if self.galaxy.borders.borders.get((q,r), False):
             if self.galaxy.borders.borders[(q,r)] & 1:

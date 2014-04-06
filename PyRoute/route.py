@@ -9,7 +9,6 @@ import argparse
 import logging
 from Galaxy import Galaxy
 from HexMap import HexMap
-from TradeCalculation import TradeCalculation
 from StatCalculation import StatCalculation
 
 logger = logging.getLogger('PyRoute')
