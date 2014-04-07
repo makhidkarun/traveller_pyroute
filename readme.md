@@ -15,3 +15,26 @@ The final output of the generation is created by [PyPDFLite](https://github.com/
 For the math and layout of hex maps, I recommend the [Hexagonal Grids](http://www.redblobgames.com/grids/hexagons/) page, which contains every item you will need to draw and manage hexagon maps.I recommend all the articles on the Red Blob Games site.
 
 The original version of this program, [nroute.c](http://wiki.travellerrpg.com/Nroute.c), was written by Anthony Jackson. 
+
+Running the program
+===================
+
+    $ python route.py --help
+    usage: route.py [-h] [--borders {none,range,allygen}] [--no-routes]
+                [--no-trade] [--version] [--min-btn BTN]
+                sector [sector ...]
+
+    Traveller trade route generator.
+
+    positional arguments:
+      sector                T5SS sector file(s) to process
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      --borders {none,range,allygen}
+                        Allegiance border generation
+      --no-routes
+      --no-trade
+      --version             show program's version number and exit
+      --min-btn BTN
+
