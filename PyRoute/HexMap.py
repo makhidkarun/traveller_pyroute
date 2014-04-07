@@ -20,7 +20,7 @@ class HexMap(object):
     classdocs
     '''
 
-    def __init__(self, galaxy):
+    def __init__(self, galaxy, min_btn = 8):
         '''
         Constructor
         '''
@@ -28,7 +28,7 @@ class HexMap(object):
         self.ym = 9     # half a hex height
         self.xm = 6     # half the length of one side
         self.colorStart = 0
-        self.min_btn = self.galaxy.trade.min_wtn
+        self.min_btn = min_btn
         self.y_start = 43
         self.x_start = 15
 
@@ -48,7 +48,7 @@ class HexMap(object):
                     continue
 
                 if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:
-                    self.logger.debug("trade line %s - %s : %s" % (star, neighbor, data))
+                    self.galaxy.stars[star][neighbor]['trade btn'] = self.trade_to_btn(data['trade'])
                     self.trade_line(pdf, [star, neighbor], data)
                 elif star.sector != neighbor.sector:
                     data = self.galaxy.stars.get_edge_data(neighbor, star)

@@ -15,7 +15,7 @@ class TradeCalculation(object):
     '''
 
 
-    def __init__(self, galaxy, min_btn=13):
+    def __init__(self, galaxy, min_btn=13, route_btn = 8):
         '''
         Constructor
         '''
@@ -60,7 +60,7 @@ class TradeCalculation(object):
         self.max_wtn = 15
         
         # Minimum WTN to process routes for
-        self.min_wtn = 8
+        self.min_wtn = route_btn
 
     def calculate_routes(self):
         '''

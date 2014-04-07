@@ -39,7 +39,7 @@ class Galaxy(object):
     '''
     classdocs
     '''
-    def __init__(self, min_btn):
+    def __init__(self, min_btn, max_jump=4, route_btn=8):
         '''
         Constructor
         '''
@@ -68,10 +68,11 @@ class Galaxy(object):
         self.routes = nx.Graph()
         self.sectors = []
         self.alg = {}
-        self.trade = TradeCalculation(self, min_btn)
+        self.trade = TradeCalculation(self, min_btn, route_btn)
         self.stats = ObjectStatistics()
         self.borders = AllyGen(self)
         self.output_path = 'maps'
+        self.max_jump_range = max_jump
         
     def read_sectors (self, sectors):
         for sector in sectors:
@@ -151,14 +152,14 @@ class Galaxy(object):
             if star.zone in ['R', 'F'] or neighbor.zone in ['R','F']:
                 continue
             dist = star.hex_distance (neighbor)
-            max_dist = self.trade.btn_range[ min(max (0, max(star.wtn, neighbor.wtn) - 8), 5)]
+            max_dist = self.trade.btn_range[ min(max (0, max(star.wtn, neighbor.wtn) - self.trade.min_wtn), 5)]
             btn = self.trade.get_btn(star, neighbor)
             # add all the stars in the BTN range, but  skip this pair
             # if there there isn't enough trade to warrant a trade check
             if dist <= max_dist and btn >= self.trade.min_btn:
                 self.ranges.add_edge(star, neighbor, {'distance': dist,
                                                       'btn': btn})
-            if dist <= 4:               
+            if dist <= self.max_jump_range: 
                 weight = self.trade.route_weight(star, neighbor)
                 
                 self.stars.add_edge (star, neighbor, {'distance': dist,

@@ -11,12 +11,13 @@ class WikiStats(object):
     '''
 
 
-    def __init__(self, galaxy, uwp):
+    def __init__(self, galaxy, uwp, min_alg_count=10):
         '''
         Constructor
         '''
         self.galaxy = galaxy
         self.uwp  = uwp
+        self.min_alg_count = min_alg_count
 
     def write_statistics(self):
         self.summary_statistics()
@@ -77,9 +78,10 @@ class WikiStats(object):
             self.write_uwp_populations(f)
         
     def write_allegiances (self,f,alg):
+        alg_sort = sorted(alg.iterkeys())
         f.write('{| class=\"wikitable sortable\"\n!Code ||Name||Worlds||Population||GNP\n')
-        for code in alg.iterkeys():
-            if alg[code][1].number < 10:
+        for code in alg_sort:
+            if alg[code][1].number < self.min_alg_count:
                 continue
             f.write('|-\n| {} || [[{}]] '.format(code, alg[code][0]))
             stats = alg[code][1]

@@ -76,18 +76,18 @@ class StatCalculation(object):
         else:
             stats.percapita = 0
             
-    def write_statistics(self):
+    def write_statistics(self, ally_count):
         self.logger.info('Charted star count: ' + str(self.galaxy.stats.number))
         self.logger.info('Charted population {:,d}'.format(self.galaxy.stats.population))
         
         for sector in self.galaxy.sectors:
             if sector is None: continue
-            self.logger.info('Sector ' + sector.name + ' star count: ' + str(sector.stats.number))
+            self.logger.debug('Sector ' + sector.name + ' star count: ' + str(sector.stats.number))
             
         for aleg, stats in self.galaxy.alg.iteritems():
             s = u'Allegiance {0} ({1}) star count: {2:,d}'.format(stats[0], aleg, stats[1].number)
-            self.logger.info(s)
+            self.logger.debug(s)
             
-        wiki = WikiStats(self.galaxy, self.uwp)
+        wiki = WikiStats(self.galaxy, self.uwp, ally_count)
         wiki.write_statistics()
         
