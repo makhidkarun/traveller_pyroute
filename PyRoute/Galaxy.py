@@ -167,11 +167,13 @@ class Galaxy(object):
                 self.stars.add_edge (star, neighbor, {'distance': dist,
                                                   'weight': weight,
                                                   'trade': 0,
-                                                  'btn': btn})
+                                                  'btn': btn,
+                                                  'count': 0})
                 self.routes.add_edge (star, neighbor, {'distance': dist,
                                                   'weight': weight,
                                                   'trade': 0,
-                                                  'btn': btn})
+                                                  'btn': btn,
+                                                  'count': 0})
 
         self.logger.info('calculating routes...')
         for star in self.stars.nodes_iter():

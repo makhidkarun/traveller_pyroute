@@ -11,14 +11,12 @@ import networkx as nx
 
 class TradeCalculation(object):
     '''
-    classdocs
+    Perform the trade calcuations by generating the routes
+    between all the trade pairs
     '''
 
 
     def __init__(self, galaxy, min_btn=13, route_btn = 8):
-        '''
-        Constructor
-        '''
         self.logger = logging.getLogger('PyRoute.TradeCalculation')
         self.galaxy = galaxy
 
@@ -91,6 +89,10 @@ class TradeCalculation(object):
         self.logger.info('Routes: %s' % self.galaxy.routes.number_of_edges())
         
     def get_btn (self, star1, star2):
+        '''
+        Calculate the BTN between two stars, which is the sum of the worlds
+        WTNs plus a modifier for types, minus a modifier for distance. 
+        '''
         btn = star1.wtn + star2.wtn
         if (star1.agricultural and (star2.nonAgricultural or star2.extreme)) or \
             ((star1.nonAgricultural or star1.extreme) and star2.agricultural): 
@@ -111,8 +113,11 @@ class TradeCalculation(object):
         return btn
     
     def get_trade_between(self, star, target):
-        # Calculate the route between the stars
-        # If we can't find a route (no jump 4 path) skip this pair
+        '''
+        Calculate the route between star and target
+        If we can't find a route (no Jump 4 (or N) path), skip this pair
+        otherwise update the trade information. 
+        '''
         try:
             route = nx.astar_path(self.galaxy.routes, star, target, heuristic)
         except  nx.NetworkXNoPath:
@@ -129,11 +134,22 @@ class TradeCalculation(object):
     
     
     def route_update_simple (self, route, tradeCr):
+        '''
+        Update the trade calculations based upon the route selected.
+        - add the trade values for the worlds, and edges 
+        - add a count for the worlds and edges
+        - reduce the weight of routes used to allow more trade to flow
+        '''
         start = route[0]
         for end in route[1:]:
             end.tradeOver += tradeCr if end != route[-1] else 0
+            end.tradeCount += 1 if end != route[-1] else 0
+            
             self.galaxy.stars[start][end]['trade'] += tradeCr
+            self.galaxy.stars[start][end]['count'] += 1
+            
             self.galaxy.routes[start][end]['trade'] += tradeCr
+            self.galaxy.routes[start][end]['count'] += 1
             # Reduce the weight of this route. 
             # As the higher trade routes create established routes 
             # which are more likely to be followed by lower trade routes
@@ -144,6 +160,13 @@ class TradeCalculation(object):
             start = end
     
     def route_update_skip (self, route, tradeCr):
+        '''
+        Unused: This was an experiment in adding skip-routes, 
+        i.e. longer, already calculated routes, to allow the 
+        A* route finder to work faster. This needs better system 
+        for selecting these routes as too many got added and it
+        would slow the system down. 
+        '''
         dist = 0
         weight = 0
         start = route[0]
@@ -183,13 +206,17 @@ class TradeCalculation(object):
         return dist, weight
     
     def get_trade_to (self, star, trade):
-        ''' Calculate the trade route between starting star and all potential target
-            No longer used
+        ''' 
+        Unused: 
+        Calculate the trade route between starting star and all potential target.
+        This was the direct copy algorthim from nroute for doing route calculation
+        It was replaced by the process above which works better with the 
+        pythonic data structures. It remains for historical purposes.  
         '''
         
         # Loop through all the stars in the ranges list, i.e. all potential stars
         # within the range of the BTN route. 
-        for (newstar, target, data) in self.galaxy.ranges.edges_iter(star, True):
+        for (newstar, target, _) in self.galaxy.ranges.edges_iter(star, True):
             if newstar != star:
                 self.logger.error("edges_iter found newstar %s != star %s" % (newstar, star))
                 continue
