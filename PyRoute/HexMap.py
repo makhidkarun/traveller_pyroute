@@ -5,6 +5,7 @@ Created on Mar 8, 2014
 '''
 import math
 import os
+import logging
 from pypdflite import PDFLite
 from pypdflite import PDFCursor
 from pypdflite.pdfobjects.pdfline import PDFLine
@@ -325,6 +326,15 @@ class HexMap(object):
         start = edge[0]
         end = edge[1]
 
+        trade = self.trade_to_btn(data['trade']) - self.min_btn
+        if trade < 0: 
+            continue
+        if trade > 6:
+            logging.getLogger('PyRoute.HexMap').warn("trade calculated over %d" % self.min_btn + 6)
+            trade = 6
+            
+        tradeColor = tradeColors[trade]
+
         starty = self.y_start + ( self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
         lineStart = PDFCursor ((self.xm * 3 * (start.col)) + self.ym, starty)
 
@@ -344,9 +354,7 @@ class HexMap(object):
         endy   = self.y_start + ( self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
         lineEnd = PDFCursor ((self.xm * 3 * (endCol)) + self.ym, endy)
         color = pdf.get_color()
-        
-        color.set_color_by_name(tradeColors[min(max(0, self.trade_to_btn(data['trade']) - self.min_btn), 6)])
-
+        color.set_color_by_name(tradeColor)
         line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, style='solid', color=color, size=1)
         line._draw()
                         
