@@ -74,7 +74,7 @@ class Galaxy(object):
         self.output_path = 'maps'
         self.max_jump_range = max_jump
         
-    def read_sectors (self, sectors):
+    def read_sectors (self, sectors, pop_code):
         for sector in sectors:
             try:
                 lines = [line for line in codecs.open(sector,'r', 'utf-8')]
@@ -100,7 +100,7 @@ class Galaxy(object):
             for line in lines[lineno:]:
                 if line.startswith('#') or len(line) < 20: 
                     continue
-                star = Star (line, self.starline, sec)
+                star = Star (line, self.starline, sec, pop_code)
                 sec.worlds.append(star)
             
             self.sectors.append(sec)
@@ -130,6 +130,8 @@ class Galaxy(object):
             elif sector.x == neighbor.x and sector.y + 1 == neighbor.y:
                 sector.rimward = neighbor
                 neighbor.coreward = sector
+            elif sector.x == neighbor.x and sector.y == neighbor.y:
+                self.logger.error("Duplicate sector %s and %s" % (sector.name, neighbor.name))
     
     def set_borders(self, border_gen):
         self.logger.info('setting borders...')

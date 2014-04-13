@@ -5,7 +5,7 @@ Created on Mar 5, 2014
 '''
 
 class Star (object):
-    def __init__ (self, line, starline, sector):
+    def __init__ (self, line, starline, sector, pop_code):
         self.sector = sector
         data = starline.match(line).groups()
         self.position = data[0].strip()
@@ -62,7 +62,7 @@ class Star (object):
         self.nonAgricultural = 'Na' in self.tradeCode
 
         self.calculate_wtn()
-        self.calculate_gwp()
+        self.calculate_gwp(pop_code)
         self.tradeIn  = 0
         self.tradeOver = 0
         
@@ -115,12 +115,17 @@ class Star (object):
             return dx
         return dx + dy / 2
      
-    def calculate_gwp(self):
+    def calculate_gwp(self, pop_code):
         calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400, 24400, 39000, 39000]
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
 
-        self.population =int (pow (10, self.popCode) * popCodeM[self.popM] / 1e7) 
-        self.gwp = int (pow(10,self.popCode) * popCodeM[self.popM] * calcGWP[self.tl] / 1e10 )
+        if pop_code == 'scaled':
+            self.population =int (pow (10, self.popCode) * popCodeM[self.popM] / 1e7) 
+        elif pop_code == 'fixed':
+            self.population = int (pow (10, self.popCode) * self.popM / 1e6)
+
+        self.gwp = int (self.population * calcGWP[self.tl] / 1000)    
+        #self.gwp = int (pow(10,self.popCode) * popCodeM[self.popM] * calcGWP[self.tl] / 1e10 )
         if self.rich:
             self.gwp = self.gwp * 16 / 10
         if self.industrial:

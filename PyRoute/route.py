@@ -25,6 +25,8 @@ def process():
                         help='Minimum btn for drawing on the map, default [8]' )
     parser.add_argument('--max-jump', dest='max_jump', default=4, type=int,
                         help='Maximum jump distance for trade routes, default [4]')
+    parser.add_argument('--pop-code', choices=['fixed', 'scaled'], default='scaled',
+                        help='Interpretation of the population modifier code')
     parser.add_argument('--no-routes', dest='routes', default=True, action='store_false')
     parser.add_argument('--no-trade', dest='trade', default=True, action='store_false')
     parser.add_argument('--version', action='version', version='%(prog)s 0.1')
@@ -34,7 +36,7 @@ def process():
     logger.info("starting processing")
     
     galaxy = Galaxy(args.btn, args.max_jump, args.route_btn);
-    galaxy.read_sectors (args.sector)
+    galaxy.read_sectors (args.sector, args.pop_code)
     
     logger.info ("%s sectors read" % len(galaxy.sectors))
     
@@ -44,12 +46,12 @@ def process():
 
     if args.routes and args.trade:
         galaxy.trade.calculate_routes()
-        
-    if args.routes:
-        galaxy.write_routes()
     
     pdfmap = HexMap(galaxy, args.route_btn)
     pdfmap.write_maps()
+        
+    if args.routes:
+        galaxy.write_routes()
     
     stats = StatCalculation(galaxy)
     stats.calculate_statistics()
