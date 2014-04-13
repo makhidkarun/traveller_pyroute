@@ -18,13 +18,11 @@ from Star import Star
 
 class HexMap(object):
     '''
-    classdocs
+    Draw the trade routes as calulated, sector by sector onto PDF files.
+    Used pypdflite to directly generate the PDF files. 
     '''
 
     def __init__(self, galaxy, min_btn = 8):
-        '''
-        Constructor
-        '''
         self.galaxy = galaxy
         self.ym = 9     # half a hex height
         self.xm = 6     # half the length of one side
@@ -34,6 +32,10 @@ class HexMap(object):
         self.x_start = 15
 
     def write_maps(self):
+        '''
+        Starting point for writing PDF files. 
+        Call this to output the trade maps
+        '''
         for sector in self.galaxy.sectors:
             if sector is None: continue
             pdf = self.document(sector)
@@ -41,11 +43,9 @@ class HexMap(object):
             
             self.draw_borders(pdf, sector)
             
+            # Get all the worlds in this sector
             for (star, neighbor, data) in self.galaxy.stars.edges_iter(sector.worlds, True):
                 if star.sector != sector:
-                    continue
-                # skip the longer routed edges added to speed up the A* Route
-                if data.get('route', False): 
                     continue
 
                 if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:

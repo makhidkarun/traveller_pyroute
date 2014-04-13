@@ -18,14 +18,11 @@ class ObjectStatistics(object):
 
 class StatCalculation(object):
     '''
-    classdocs
+    Statistics calculations and output.
     '''
 
 
     def __init__(self, galaxy):
-        '''
-        Constructor
-        '''
         self.logger = logging.getLogger('PyRoute.StatCalculation')
 
         self.galaxy = galaxy
