@@ -4,6 +4,7 @@ Created on Mar 22, 2014
 @author: tjoneslo
 '''
 import os
+import numpy
 
 class WikiStats(object):
     '''
@@ -22,6 +23,7 @@ class WikiStats(object):
     def write_statistics(self):
         self.summary_statistics()
         self.top_summary()
+        self.ru_statistics()
         
     def summary_statistics(self):
         path = os.path.join(self.galaxy.output_path, 'summary.wiki')
@@ -122,17 +124,41 @@ class WikiStats(object):
             for x in range(18):
                 index = baseN(x,18)
                 stats = self.uwp.get(name, {}).get(index, default_stats)
-                value = int(stats.population / (population / 100))
+                value = int(stats.population / (population / 100)) if population > 0 else 0
                 f.write('||{:d}%'.format(value))
             if self.uwp[name].keys() in ['X']:
                 index = 'X'
                 stats = self.uwp.get(name, {}).get(index, default_stats)
-                value = int(stats.population / (population / 100))
+                value = int(stats.population / (population / 100)) if population > 0 else 0
                 f.write ('||{:d}%'.format(value))
             else:
                 f.write('||0')
         f.write('\n|}')
         
+    def ru_statistics (self):
+        path = os.path.join(self.galaxy.output_path, 'ru_summary.wiki')
+        with open (path, 'w+') as f:
+            f.write('=== Resource Units statistics by sector ===\n')
+            f.write('{| class=\"wikitable sortable\"\n!Sector!!X,Y!!Worlds !! negative RUs !! positive RUs !! sum(RU) !! avg(RU) !! min(RU) !! max(RU) \n')
+            for sector in self.galaxy.sectors:
+                star_ru = [star.ru for star in sector.worlds]
+                neg_ru = [star.ru for star in sector.worlds if star.ru <= 0]
+                pos_ru = [star.ru for star in sector.worlds if star.ru >0]
+                ru_sum = sum(star_ru)
+                if ru_sum != 0 :
+                    f.write('|-\n')
+                    f.write('|[[{0} Sector|{0}]]\n'.format(sector.name))
+                    f.write('| {:d},{:d}\n'.format(sector.x, sector.y))
+                    f.write('|align="right"|{:d}\n'.format(sector.stats.number))
+                    f.write('|align="right"|{:d}\n'.format(len(neg_ru)))
+                    f.write('|align="right"|{:d}\n'.format(len(pos_ru)))
+                    f.write('|align="right"|{:,d}\n'.format(ru_sum))
+                    f.write('|align="right"|{:10.4f}\n'.format(numpy.average(star_ru)))
+                    f.write('|align="right"|{:10.0f}\n'.format(numpy.amin(star_ru)))
+                    f.write('|align="right"|{:10.0f}\n'.format(numpy.amax(star_ru)))
+            f.write('\n|}\n')
+        
+                                            
         
 def baseN(num,b,numerals="0123456789ABCDEFGHijklmnopqrstuvwxyz"):
     return ((num == 0) and numerals[0]) or (baseN(num // b, b, numerals).lstrip(numerals[0]) + numerals[num % b])        

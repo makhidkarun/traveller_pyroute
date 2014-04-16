@@ -39,6 +39,7 @@ class Star (object):
         self.ggCount = int(data[10][2],16)
         self.popM = int(data[10][0])
         self.alg = data[12].strip()
+        self.economics = data[5].strip()
         
 
         self.uwpCodes = {'Starport': self.port,
@@ -63,6 +64,7 @@ class Star (object):
 
         self.calculate_wtn()
         self.calculate_gwp(pop_code)
+        self.calculate_ru()
         self.tradeIn  = 0
         self.tradeOver = 0
         self.tradeCount = 0
@@ -172,3 +174,21 @@ class Star (object):
             self.wtn = (self.wtn - 5) / 2
             
         self.wtn = int(round(max(0, self.wtn)))
+
+    def calculate_ru(self):
+        if len(self.economics) < 7: 
+            self.ru = 0
+            return
+        
+        resources = int(self.economics[1:2],20)
+        labor = int(self.economics[2:3], 20)
+        infrastructure = int(self.economics[3:4], 20)
+        efficency = int(self.economics[4:6])
+        
+        resources = resources if resources != 0 else 1
+        labor = labor if labor != 0 else 1
+        infrastructure = infrastructure if infrastructure != 0 else 1
+        efficency = efficency if efficency != 0 else 1
+        
+        self.ru = resources * labor * infrastructure * efficency
+        

@@ -61,7 +61,7 @@ class HexMap(object):
             for star in sector.worlds:
                 self.system(pdf, star)
             self.writer.close()
-    
+
     def write_base_map(self, pdf, sector):
         self.sector_name(pdf, sector.name)
         if sector.coreward:
@@ -328,7 +328,7 @@ class HexMap(object):
 
         trade = self.trade_to_btn(data['trade']) - self.min_btn
         if trade < 0: 
-            continue
+            return
         if trade > 6:
             logging.getLogger('PyRoute.HexMap').warn("trade calculated over %d" % self.min_btn + 6)
             trade = 6
