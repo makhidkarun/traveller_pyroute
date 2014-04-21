@@ -11,6 +11,11 @@ class AllyGen(object):
     '''
     classdocs
     '''
+    noOne = [u'--']
+    nonAligned = [u'Na', u'Va']
+    sameAligned = [(u'Im', u'Cs'),
+                    (u'As',u'A0', u'A1', u'A2', u'A3', u'A4', u'A5', u'A6', u'A7', u'A8', u'A9', u'TE', u'Of', u'If'),
+                    (u'Hv',u'H1', u'H2', u'Hc')]
 
 
     def __init__(self, galaxy):
@@ -18,11 +23,6 @@ class AllyGen(object):
         Constructor
         '''
         self.galaxy = galaxy
-        self.noOne = [u'--']
-        self.nonAligned = [u'Na', u'Va']
-        self.sameAligned = [(u'Im', u'Cs'),
-                            (u'As',u'A0', u'A1', u'A2', u'A3', u'A4', u'A5', u'A6', u'A7', u'A8', u'A9', u'TE', u'Of', u'If'),
-                            (u'Hv',u'H1', u'H2', u'Hc')]
         self.borders = {} # 2D array using (q,r) as key, with flags for data
         
     def create_borders (self):
@@ -151,18 +151,19 @@ class AllyGen(object):
             for key, value in allyMap.iteritems():
                 f.write("{}-{}: border: {}\n".format(key[0],key[1], value))
         
-    def are_allies(self, alg1, alg2):
+    @staticmethod
+    def are_allies(alg1, alg2):
         '''
         Public function to determine if the Allegiance of two 
         worlds are considered allied for trade purposes or not.
         '''
-        if alg1 in self.noOne or alg2 in self.noOne:
+        if alg1 in AllyGen.noOne or alg2 in AllyGen.noOne:
             return False
-        if alg1 in self.nonAligned or alg2 in self.nonAligned:
+        if alg1 in AllyGen.nonAligned or alg2 in AllyGen.nonAligned:
             return False
         if alg1 == alg2:
             return True
-        for sameAlg in self.sameAligned:
+        for sameAlg in AllyGen.sameAligned:
             if alg1 in sameAlg and alg2 in sameAlg:
                 return True
         return False

@@ -14,6 +14,10 @@ class ObjectStatistics(object):
         self.trade      = 0
         self.percapita  = 0
         self.number     = 0
+        self.milBudget  = 0
+        self.maxTL      = 0
+        self.maxPort    = 'X'
+        self.sum_ru     = 0
         
 
 class StatCalculation(object):
@@ -43,16 +47,19 @@ class StatCalculation(object):
             for star in sector.worlds:
                 self.add_stats(sector.stats, star)
                 self.add_stats(self.galaxy.stats, star)
-                
+                self.add_stats(sector.subsectors[star.subsector()].stats, star)
                 algStats = self.galaxy.alg.setdefault(star.alg, ("Unknown", ObjectStatistics()))[1]
                 self.add_stats(algStats, star)
+                self.max_tl (algStats, star)
                 
                 for uwpCode, uwpValue in star.uwpCodes.iteritems():
                     stats = self.uwp[uwpCode].setdefault(uwpValue, ObjectStatistics())
                     self.add_stats(stats, star)
                 
             self.per_capita(sector.stats) # Per capital sector stats
-            
+            for subsector in sector.subsectors.itervalues():
+                self.per_capita(subsector.stats)
+                
         self.per_capita(self.galaxy.stats)
         
         for stats in self.galaxy.alg.itervalues():
@@ -63,7 +70,12 @@ class StatCalculation(object):
         stats.economy += star.gwp
         stats.trade += star.tradeIn
         stats.number += 1
+        stats.sum_ru += star.ru
         
+    def max_tl (self, stats, star):
+        stats.maxTL = max(stats.maxTL, star.tl)
+        stats.maxPort = 'ABCDEX'[min('ABCDEX'.index(star.uwpCodes['Starport']), 'ABCDEX'.index(stats.maxPort))]
+    
     def per_capita(self, stats):
         stats.percapita = stats.economy
         if stats.population > 100000:

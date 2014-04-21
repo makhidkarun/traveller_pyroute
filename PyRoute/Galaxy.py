@@ -15,6 +15,17 @@ from TradeCalculation import TradeCalculation
 from StatCalculation import ObjectStatistics
 from AllyGen import AllyGen
 
+class Subsector(object):
+    def __init__(self, name, position, sector):
+        self.sector = sector
+        self.name = name
+        self.position = position
+        self.stats = ObjectStatistics()
+        self.worlds = []
+
+    def wiki_name(self):
+        return '[[{0} Subsector|{0}]]'.format(self.name)
+
 class Sector (object):
     def __init__ (self, name, position):
         self.name = name[1:].strip()
@@ -33,6 +44,12 @@ class Sector (object):
     def __str__(self):
         return "{} ({},{})".format(self.name, str(self.x), str(self.y))
 
+    def wiki_name(self):
+        if self.name.endswith('Sector'):
+            name = self.name[:-7]
+        else:
+            name = self.name
+        return '|[[{0} Sector|{0}]]'.format(name)
         
 
 class Galaxy(object):
@@ -53,11 +70,11 @@ class Galaxy(object):
 (\([0-9A-Z]{3}[+-]\d\)| ) +
 (\[[0-9A-Z]{4}\]| ) +
 (\w{1,5}|-) +
-(\w|-|\*) +
+(\w\w?|-|\*) +
 (\w|-) +
 ([0-9][0-9A-F][0-9A-F]) +
 (\d{1,}| )+
-([A-Z0-9-][A-Za-z0-9-]) 
+([A-Z0-9-][A-Za-z0-9-]{1,3}) 
 (.*)
 """
         star_regex = ''.join([line.rstrip('\n') for line in regex])
@@ -91,7 +108,10 @@ class Galaxy(object):
                     lineno += 1
                     break
                 if line.startswith ('# Subsector'):
-                    sec.subsectors[line[11:].split(':',1)[0].strip()] = line[11:].split(':',1)[1].strip()
+                    data = line[11:].split(':',1)
+                    pos  = data[0].strip()
+                    name = data[1].strip()
+                    sec.subsectors[pos] = Subsector(name, pos, sec)
                 if line.startswith ('# Alleg:'):
                     algCode = line[8:].split(':',1)[0].strip()
                     algName = line[8:].split(':',1)[1].strip().strip('"')
@@ -102,6 +122,7 @@ class Galaxy(object):
                     continue
                 star = Star (line, self.starline, sec, pop_code)
                 sec.worlds.append(star)
+                sec.subsectors[star.subsector()].worlds.append(star)
             
             self.sectors.append(sec)
             

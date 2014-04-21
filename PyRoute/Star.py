@@ -4,9 +4,12 @@ Created on Mar 5, 2014
 @author: tjoneslo
 '''
 
+import logging
+
 class Star (object):
     def __init__ (self, line, starline, sector, pop_code):
         self.sector = sector
+        logging.getLogger('PyRoute.Star').info(line)
         data = starline.match(line).groups()
         self.position = data[0].strip()
         self.set_location(sector.dx, sector.dy)
@@ -65,6 +68,8 @@ class Star (object):
         self.calculate_wtn()
         self.calculate_gwp(pop_code)
         self.calculate_ru()
+        self.calculate_TCS()
+        
         self.tradeIn  = 0
         self.tradeOver = 0
         self.tradeCount = 0
@@ -117,7 +122,15 @@ class Star (object):
         if dx > dy:
             return dx
         return dx + dy / 2
-     
+    
+    def subsector(self):
+        subsector = ["ABCD","EFGH","IJKL","MNOP"]
+        indexy = (self.col - 1) / 8
+        indexx = (self.row - 1) / 10
+        
+        return subsector[indexx][indexy]
+        pass
+    
     def calculate_gwp(self, pop_code):
         calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400, 24400, 39000, 39000]
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
@@ -180,15 +193,72 @@ class Star (object):
             self.ru = 0
             return
         
-        resources = int(self.economics[1:2],20)
-        labor = int(self.economics[2:3], 20)
-        infrastructure = int(self.economics[3:4], 20)
+        resources = int(self.economics[1],20)
+        labor = int(self.economics[2], 20)
+        infrastructure = int(self.economics[3], 20)
         efficency = int(self.economics[4:6])
         
         resources = resources if resources != 0 else 1
+        resources += 0 if resources < 18 else -1
+        
         labor = labor if labor != 0 else 1
+        
         infrastructure = infrastructure if infrastructure != 0 else 1
+        infrastructure += 0 if infrastructure < 18 else -1
+        
         efficency = efficency if efficency != 0 else 1
         
         self.ru = resources * labor * infrastructure * efficency
+        
+    def calculate_TCS(self):
+        tax_rate = {'0': 0.50, '1': 0.8, '2': 1.0, '3': 0.9, '4': 0.85, 
+                 '5': 0.95, '6': 1.0, '7': 1.0, '8': 1.1, '9': 1.15, 
+                 'A': 1.20, 'B': 1.1, 'C': 1.2, 'D': 0.75,'E': 0.75,
+                 'F': 0.75,
+                 # Aslan Government codes
+                 'G': 1.0, 'H': 1.0, 'J': 1.2, 'K': 1.1, 'L': 1.0,
+                 'M': 1.1, 'N': 1.2
+                 }
+        self.ship_capacity = long (self.population * tax_rate[self.uwpCodes['Government']] * 1000)
+        gwp_base = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 28]
+        if self.tl >= 5:
+            self.tcs_gwp = self.population * gwp_base[self.tl - 5] * 1000
+        else:
+            self.tcs_gwp = 0
+            
+        if self.rich:
+            self.tcs_gwp = self.tcs_gwp * 16 / 10
+        if self.industrial:
+            self.tcs_gwp = self.tcs_gwp * 14 / 10
+        if self.agricultural:
+            self.tcs_gwp = self.tcs_gwp * 12 / 10
+        if self.poor:
+            self.tcs_gwp = self.tcs_gwp * 8 / 10
+        if self.nonIndustrial:
+            self.tcs_gwp = self.tcs_gwp * 8 / 10
+        if self.nonAgricultural:
+            self.tcs_gwp = self.tcs_gwp * 8 / 10
+            
+        budget = long (self.tcs_gwp * 0.03 * tax_rate[self.uwpCodes['Government']])
+        
+        #if AllyGen.sameAligned('Im', self.alg):
+        #    budget = budget * 0.3
+        
+        transfer_rate = {'A': 1.0, 'B': 0.95, 'C': 0.9, 'D': 0.85, 'E': 0.8}
+        
+        if self.uwpCodes['Starport'] in 'ABCDE':
+            access = transfer_rate[self.uwpCodes['Starport']]
+            access -= (15-self.tl)*0.05
+            if self.tl <= 4:
+                access -= 0.05
+            if self.tl <= 3:
+                access -= 0.05
+        else:
+            access = 0
+            
+        if access <= 0:
+            access = 0
+        
+        self.budget = long(budget * access)
+        
         

@@ -29,6 +29,7 @@ def process():
                         help='Interpretation of the population modifier code')
     parser.add_argument('--no-routes', dest='routes', default=True, action='store_false')
     parser.add_argument('--no-trade', dest='trade', default=True, action='store_false')
+    parser.add_argument('--no-maps', dest='maps', default=True, action='store_false')
     parser.add_argument('--version', action='version', version='%(prog)s 0.1')
     parser.add_argument('sector', nargs='+', help='T5SS sector file(s) to process')
     args = parser.parse_args()
@@ -47,8 +48,9 @@ def process():
     if args.routes and args.trade:
         galaxy.trade.calculate_routes()
     
-    pdfmap = HexMap(galaxy, args.route_btn)
-    pdfmap.write_maps()
+    if args.maps:
+        pdfmap = HexMap(galaxy, args.route_btn)
+        pdfmap.write_maps()
         
     if args.routes:
         galaxy.write_routes()
