@@ -9,7 +9,7 @@ import logging
 class Star (object):
     def __init__ (self, line, starline, sector, pop_code):
         self.sector = sector
-        logging.getLogger('PyRoute.Star').info(line)
+        logging.getLogger('PyRoute.Star').debug(line)
         data = starline.match(line).groups()
         self.position = data[0].strip()
         self.set_location(sector.dx, sector.dy)
@@ -37,14 +37,24 @@ class Star (object):
                            'Pop Code': str(self.popCode)}
 
         self.tradeCode = data[3].strip().split()
-        self.baseCode = data[8].strip()
-        self.zone = data[9].strip()
-        self.ggCount = int(data[10][2],16)
-        self.popM = int(data[10][0])
-        self.alg = data[12].strip()
-        self.economics = data[5].strip()
         
-
+        if (data[5]):
+            self.importance = int(data[5][1:-1].strip())
+        else:
+            self.importance = 0
+            
+        if (data[6]):
+            self.economics = data[6].strip()
+        else:
+            self.economics = None
+            
+        self.baseCode = data[12].strip()
+        self.zone = data[13].strip()
+        self.ggCount = int(data[14][2],16)
+        self.popM = int(data[14][0])
+        
+        self.alg = data[16].strip()
+        
         self.uwpCodes = {'Starport': self.port,
                            'Size': self.size,
                            'Atmosphere': self.atmo,
@@ -69,6 +79,7 @@ class Star (object):
         self.calculate_gwp(pop_code)
         self.calculate_ru()
         self.calculate_TCS()
+        self.owned_by()
         
         self.tradeIn  = 0
         self.tradeOver = 0
@@ -189,13 +200,13 @@ class Star (object):
         self.wtn = int(round(max(0, self.wtn)))
 
     def calculate_ru(self):
-        if len(self.economics) < 7: 
+        if not self.economics: 
             self.ru = 0
             return
         
-        resources = int(self.economics[1],20)
+        resources = int(self.economics[1],30)
         labor = int(self.economics[2], 20)
-        infrastructure = int(self.economics[3], 20)
+        infrastructure = int(self.economics[3], 30)
         efficency = int(self.economics[4:6])
         
         resources = resources if resources != 0 else 1
@@ -260,5 +271,9 @@ class Star (object):
             access = 0
         
         self.budget = long(budget * access)
-        
-        
+
+    def owned_by(self):
+        self.ownedBy = self
+        for code in self.tradeCode:
+            if code.startswith(u'O:'):
+                self.ownedBy = code[2:]

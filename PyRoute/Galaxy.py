@@ -50,7 +50,13 @@ class Sector (object):
         else:
             name = self.name
         return '|[[{0} Sector|{0}]]'.format(name)
-        
+
+    def find_world_by_pos(self, pos):
+        for world in self.worlds:
+            if world.position == pos:
+                return world
+        return None
+    
 
 class Galaxy(object):
     '''
@@ -66,9 +72,7 @@ class Galaxy(object):
 (.{15,}) +
 (\w\w\w\w\w\w\w-\w) +
 (.{15,}) +
-(\{ [-]?\d \}| ) +
-(\([0-9A-Z]{3}[+-]\d\)| ) +
-(\[[0-9A-Z]{4}\]| ) +
+((\{ [+-]?[0-5] \}) +(\([0-9A-Z]{3}[+-]\d\)) +(\[[0-9A-Z]{4}\])|( ) ( ) ( )) +
 (\w{1,5}|-) +
 (\w\w?|-|\*) +
 (\w|-) +
@@ -77,6 +81,8 @@ class Galaxy(object):
 ([A-Z0-9-][A-Za-z0-9-]{1,3}) 
 (.*)
 """
+#(\{ [0-9] \}|\{ -[1-3] \}| ) +
+
         star_regex = ''.join([line.rstrip('\n') for line in regex])
         self.logger.debug("Pattern: %s" % star_regex)
         self.starline = re.compile(star_regex)
@@ -237,3 +243,29 @@ class Galaxy(object):
             for key, value in self.borders.borders.iteritems():
                 f.write("{}-{}: border: {}\n".format(key[0],key[1], value))
     
+
+    def process_owned_worlds(self):
+        path = os.path.join(self.output_path, 'owned-worlds.txt')
+        with codecs.open(path,'w+', 'utf-8') as f:
+
+            for world in self.stars.nodes_iter():
+                if world.ownedBy == world:
+                    continue
+                ownedBy = [star for star in self.stars.neighbors_iter(world) \
+                            if star.tl >= 9 and star.popCode >= 6 and \
+                               star.port in 'ABC' and star.ownedBy == star]
+                
+                ownedBy = [star for star in ownedBy if star.alg[0:2] == world.alg[0:2]]
+                ownedBy.sort(reverse=True, 
+                             key=lambda star: star.importance - (star.hex_distance(world) - 1))
+                
+                owner = None
+                if len(world.ownedBy) > 4:
+                    pass
+                elif len(world.ownedBy) == 4:
+                    owner = world.sector.find_world_by_pos(world.ownedBy)
+                #self.logger.info(u"Worlds {} is owned by {}".format(world,owner))
+                f.write (u'"{}" : "{}", {}\n'.format(world, owner,
+                                            (', '.join('"' + repr(item) + '"' for item in ownedBy[0:4]))))
+                world.ownedBy = (owner, ownedBy[0:4])
+

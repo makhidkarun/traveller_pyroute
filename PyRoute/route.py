@@ -27,6 +27,9 @@ def process():
                         help='Maximum jump distance for trade routes, default [4]')
     parser.add_argument('--pop-code', choices=['fixed', 'scaled'], default='scaled',
                         help='Interpretation of the population modifier code')
+
+    parser.add_argument('--owned-worlds', dest='owned', default=False, action='store_true')
+    
     parser.add_argument('--no-routes', dest='routes', default=True, action='store_false')
     parser.add_argument('--no-trade', dest='trade', default=True, action='store_false')
     parser.add_argument('--no-maps', dest='maps', default=True, action='store_false')
@@ -44,6 +47,9 @@ def process():
     galaxy.set_edges(args.routes)
     galaxy.set_borders(args.borders)
 
+
+    if args.owned:
+        galaxy.process_owned_worlds()
 
     if args.routes and args.trade:
         galaxy.trade.calculate_routes()
