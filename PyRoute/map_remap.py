@@ -22,7 +22,7 @@ def sort_key(aString):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='r.')
+    parser = argparse.ArgumentParser(description='route remap for trade routes')
     parser.add_argument('route_file', help='PyRoute route (stars.txt) to process')
     args = parser.parse_args()
 

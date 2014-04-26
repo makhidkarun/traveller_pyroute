@@ -18,7 +18,7 @@ from Star import Star
 
 class HexMap(object):
     '''
-    Draw the trade routes as calulated, sector by sector onto PDF files.
+    Draw the trade routes as calculated, sector by sector onto PDF files.
     Used pypdflite to directly generate the PDF files. 
     '''
 

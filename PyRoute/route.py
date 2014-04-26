@@ -44,7 +44,10 @@ def process():
     
     logger.info ("%s sectors read" % len(galaxy.sectors))
     
-    galaxy.set_edges(args.routes)
+    #galaxy.set_edges(args.routes)
+
+    galaxy.trade.generate_routes(args.routes)
+    
     galaxy.set_borders(args.borders)
 
 

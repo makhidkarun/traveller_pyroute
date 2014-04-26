@@ -99,27 +99,29 @@ class AllyGen(object):
                 else:
                     self.borders[Hex] = self.borders.setdefault(Hex, 0) | 2
 
-    def _set_border (self, allyMap, Hex, direction):
+    @staticmethod
+    def _set_border (allyMap, Hex, direction):
         '''
         Determine if the allegiance is different in the direction,
         hence requiring adding a border to the map.
         returns True if border needed, False if not
         '''
-        neighbor = self._get_neighbor(Hex, direction)
+        neighbor = AllyGen._get_neighbor(Hex, direction)
         # if this is a non-aligned controlled hex, 
         # and the neighbor has no setting ,
         # or the neighbor is aligned 
         # Then no border . 
-        if (allyMap[Hex] in self.nonAligned or allyMap[Hex] is None) and \
+        if (allyMap[Hex] in AllyGen.nonAligned or allyMap[Hex] is None) and \
             (allyMap.get(neighbor, True) or \
-             allyMap.get(neighbor, None) not in self.nonAligned):
+             allyMap.get(neighbor, None) not in AllyGen.nonAligned):
             return False
         # If not matched allegiance, need a border.
         elif allyMap[Hex] != allyMap.get(neighbor, None):
             return True
         return False
 
-    def _get_neighbor (self, Hex, direction, distance = 1):
+    @staticmethod
+    def _get_neighbor (Hex, direction, distance = 1):
         '''
         determine neighboring hex from the q,r position and direction
         '''
@@ -132,16 +134,18 @@ class AllyGen(object):
         rn = Hex[1] + (d[1] * distance)
         return (int(qn), int(rn))
     
-    def step_map(self, allyMap):
+    @staticmethod
+    def step_map(allyMap):
         newMap = {}
         for Hex in allyMap.iterkeys():
-            self._check_direction(allyMap, Hex, newMap)
+            AllyGen._check_direction(allyMap, Hex, newMap)
         return newMap
 
-    def _check_direction(self, allyMap, Hex, newMap):
+    @staticmethod
+    def _check_direction( allyMap, Hex, newMap):
         newMap[Hex] = allyMap[Hex]
         for direction in xrange(6):
-            neighbor = self._get_neighbor(Hex, direction)
+            neighbor = AllyGen._get_neighbor(Hex, direction)
             if not allyMap.get(neighbor, False):
                 newMap[neighbor] = allyMap[Hex]
                 

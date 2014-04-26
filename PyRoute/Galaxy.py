@@ -131,9 +131,11 @@ class Galaxy(object):
                 sec.subsectors[star.subsector()].worlds.append(star)
             
             self.sectors.append(sec)
-            
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds) ) )
 
+        self.set_bounding_sectors()
+        self.set_positions()
+        
     def set_positions(self):
         for sector in self.sectors:
             if sector is None: continue
@@ -169,65 +171,6 @@ class Galaxy(object):
         else:
             pass
 
-    def set_edges(self, routes=True):
-        self.set_bounding_sectors()
-        self.set_positions()
-
-        if not routes: return
-        
-        self.logger.info('generating jumps...')
-        
-        for star,neighbor in itertools.combinations(self.ranges.nodes_iter(), 2):
-            if star.zone in ['R', 'F'] or neighbor.zone in ['R','F']:
-                continue
-            dist = star.hex_distance (neighbor)
-            max_dist = self.trade.btn_range[ min(max (0, max(star.wtn, neighbor.wtn) - self.trade.min_wtn), 5)]
-            btn = self.trade.get_btn(star, neighbor)
-            # add all the stars in the BTN range, but  skip this pair
-            # if there there isn't enough trade to warrant a trade check
-            if dist <= max_dist and btn >= self.trade.min_btn:
-                self.ranges.add_edge(star, neighbor, {'distance': dist,
-                                                      'btn': btn})
-            if dist <= self.max_jump_range: 
-                weight = self.trade.route_weight(star, neighbor)
-                
-                self.stars.add_edge (star, neighbor, {'distance': dist,
-                                                  'weight': weight,
-                                                  'trade': 0,
-                                                  'btn': btn,
-                                                  'count': 0})
-                self.routes.add_edge (star, neighbor, {'distance': dist,
-                                                  'weight': weight,
-                                                  'trade': 0,
-                                                  'btn': btn,
-                                                  'count': 0})
-
-        self.logger.info('calculating routes...')
-        for star in self.stars.nodes_iter():
-            if len(self.stars.neighbors(star)) < 11:
-                continue
-            neighbor_routes = [(s,n,d) for (s,n,d) in self.stars.edges_iter([star], True)]
-            neighbor_routes = sorted (neighbor_routes, key=lambda tn: tn[2]['btn'])
-            neighbor_routes = sorted (neighbor_routes, key=lambda tn: tn[2]['distance'])
-            neighbor_routes = sorted (neighbor_routes, key=lambda tn: tn[2]['weight'], reverse=True)
-            
-            length = len(neighbor_routes)
-            
-            for (s,n,d) in neighbor_routes:
-                if len(self.stars.neighbors(n)) < 15: 
-                    continue
-                if length <= 15:
-                    break
-                if self.routes.has_edge(s, n):
-                    self.routes.remove_edge(s, n)
-                length -= 1
-            
-        self.logger.info("Routes: %s  - jumps: %s - traders: %s" % 
-                         (self.routes.number_of_edges(), 
-                          self.stars.number_of_edges(), 
-                          self.ranges.number_of_edges()))
-    
-        
     def write_routes(self):
         path = os.path.join(self.output_path, 'routes.txt')
         with codecs.open(path, 'wb') as f:
