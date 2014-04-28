@@ -30,10 +30,12 @@ def process():
 
     parser.add_argument('--owned-worlds', dest='owned', default=False, action='store_true')
     
-    parser.add_argument('--no-routes', dest='routes', default=True, action='store_false')
+    parser.add_argument('--routes', dest='routes', choices=['trade', 'comm', 'none'], default='trade',
+                        help='Route type to be generated')
+    
     parser.add_argument('--no-trade', dest='trade', default=True, action='store_false')
     parser.add_argument('--no-maps', dest='maps', default=True, action='store_false')
-    parser.add_argument('--version', action='version', version='%(prog)s 0.1')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.2')
     parser.add_argument('sector', nargs='+', help='T5SS sector file(s) to process')
     args = parser.parse_args()
     
@@ -44,9 +46,8 @@ def process():
     
     logger.info ("%s sectors read" % len(galaxy.sectors))
     
-    #galaxy.set_edges(args.routes)
-
-    galaxy.trade.generate_routes(args.routes)
+    
+    galaxy.generate_routes(args.routes)
     
     galaxy.set_borders(args.borders)
 
@@ -54,7 +55,7 @@ def process():
     if args.owned:
         galaxy.process_owned_worlds()
 
-    if args.routes and args.trade:
+    if args.trade:
         galaxy.trade.calculate_routes()
     
     if args.maps:

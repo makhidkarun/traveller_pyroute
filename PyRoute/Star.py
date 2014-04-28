@@ -37,11 +37,6 @@ class Star (object):
                            'Pop Code': str(self.popCode)}
 
         self.tradeCode = data[3].strip().split()
-        
-        if (data[5]):
-            self.importance = int(data[5][1:-1].strip())
-        else:
-            self.importance = 0
             
         if (data[6]):
             self.economics = data[6].strip()
@@ -72,8 +67,17 @@ class Star (object):
         self.nonIndustrial = 'Ni' in self.tradeCode 
         self.extreme = 'As' in self.tradeCode or 'Ba' in self.tradeCode or \
                 'Fl' in self.tradeCode or 'Ic' in self.tradeCode or 'De' in self.tradeCode or \
-                'Na' in self.tradeCode or 'Va' in self.tradeCode or 'Wa' in self.tradeCode
+                'Na' in self.tradeCode or 'Va' in self.tradeCode or 'Wa' in self.tradeCode or \
+                'He' in self.tradeCode
         self.nonAgricultural = 'Na' in self.tradeCode
+
+        if (data[5]):
+            imp = int(data[5][1:-1].strip())
+            self.calculate_importance()
+            if imp != self.importance:
+                logging.getLogger('PyRoute.Star').error(u'{}-{} Calculated importance {} does not match generated importance {}'.format(self, self.baseCode, self.importance, imp))
+        else:
+            self.calculate_importance()
 
         self.calculate_wtn()
         self.calculate_gwp(pop_code)
@@ -273,6 +277,20 @@ class Star (object):
         
         self.budget = long(budget * access)
 
+    def calculate_importance(self):
+        imp = 0
+        imp += 1 if self.port in 'AB' else 0
+        imp -= 1 if self.port in 'DEX' else 0
+        imp += 1 if self.tl >= 10 else 0
+        imp -= 1 if self.tl <= 8 else 0
+        imp -= 1 if self.popCode <= 6 else 0
+        imp += 1 if self.popCode >= 9 else 0
+        imp += 1 if self.agricultural else 0
+        imp += 1 if self.rich else 0
+        imp += 1 if self.industrial else 0
+        imp += 1 if self.baseCode in [u'NS', u'NW', u'W', u'D', u'X', u'RT', u'CK', u'KM'] else 0 
+        self.importance = imp
+        
     def owned_by(self):
         self.ownedBy = self
         for code in self.tradeCode:

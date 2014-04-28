@@ -301,9 +301,9 @@ class HexMap(object):
         pdf.add_text(star.name.encode('ascii', 'replace'), point)
         
         added = star.alg
-        if ('Cp' in star.tradeCode):
+        if 'Cp' in star.tradeCode:
             added += '+'
-        elif ('Cx' in star.tradeCode):
+        elif 'Cx' in star.tradeCode or 'Cs' in star.tradeCode:
             added += '*'
         else:
             added += ' '
@@ -357,8 +357,16 @@ class HexMap(object):
         color.set_color_by_name(tradeColor)
         line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, style='solid', color=color, size=1)
         line._draw()
+
+        radius = PDFCursor(2, 2)
+        circle = PDFEllipse(pdf.session, pdf.page, lineStart, radius, color, size=3)
+        circle._draw()
+        circle = PDFEllipse(pdf.session, pdf.page, lineEnd, radius, color, size=3)
+        circle._draw()
+        
+
                         
-    def zone(self,pdf, star, point):
+    def zone(self, pdf, star, point):
         point.x_plus(self.ym)
         point.y_plus(self.ym)
         color = pdf.get_color()
@@ -389,14 +397,16 @@ class HexMap(object):
         document.set_margins(4)
         return document
         
-    def string_width(self, font, string):
+    @staticmethod
+    def string_width(font, string):
         #pdf.get_font()._string_width(star.uwp)
         w = 0
         for i in string:
             w += font.character_widths[i] if i in font.character_widths else 600
         return w * font.font_size / 1000.0
       
-    def trade_to_btn(self, trade):
+    @staticmethod
+    def trade_to_btn(trade):
         if trade == 0:
             return 0
         return int(math.log(trade,10))

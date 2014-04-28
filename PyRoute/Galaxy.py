@@ -11,7 +11,7 @@ import itertools
 import networkx as nx
 
 from Star import Star
-from TradeCalculation import TradeCalculation
+from TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation
 from StatCalculation import ObjectStatistics
 from AllyGen import AllyGen
 
@@ -91,11 +91,12 @@ class Galaxy(object):
         self.routes = nx.Graph()
         self.sectors = []
         self.alg = {}
-        self.trade = TradeCalculation(self, min_btn, route_btn)
         self.stats = ObjectStatistics()
         self.borders = AllyGen(self)
         self.output_path = 'maps'
         self.max_jump_range = max_jump
+        self.min_btn = min_btn
+        self.route_btn = route_btn
         
     def read_sectors (self, sectors, pop_code):
         for sector in sectors:
@@ -121,6 +122,7 @@ class Galaxy(object):
                 if line.startswith ('# Alleg:'):
                     algCode = line[8:].split(':',1)[0].strip()
                     algName = line[8:].split(':',1)[1].strip().strip('"')
+                    algCode = AllyGen.same_align(algCode)
                     self.alg[algCode] = (algName, ObjectStatistics())
                 
             for line in lines[lineno:]:
@@ -162,6 +164,16 @@ class Galaxy(object):
             elif sector.x == neighbor.x and sector.y == neighbor.y:
                 self.logger.error("Duplicate sector %s and %s" % (sector.name, neighbor.name))
     
+    def generate_routes(self, routes):
+        if routes == 'trade':
+            self.trade = TradeCalculation(self, self.min_btn, self.route_btn)
+        elif routes == 'comm':
+            self.trade = CommCalculation(self)
+        elif routes == 'none':
+            self.trade = NoneCalculation(self)
+
+        self.trade.generate_routes()
+        
     def set_borders(self, border_gen):
         self.logger.info('setting borders...')
         if border_gen == 'range':
@@ -196,9 +208,11 @@ class Galaxy(object):
                     continue
                 ownedBy = [star for star in self.stars.neighbors_iter(world) \
                             if star.tl >= 9 and star.popCode >= 6 and \
-                               star.port in 'ABC' and star.ownedBy == star]
+                               star.port in 'ABC' and star.ownedBy == star and \
+                               star.alg[0:2] == world.alg[0:2]]
                 
-                ownedBy = [star for star in ownedBy if star.alg[0:2] == world.alg[0:2]]
+                ownedBy.sort(reverse=True,
+                             key=lambda star: star.popCode)
                 ownedBy.sort(reverse=True, 
                              key=lambda star: star.importance - (star.hex_distance(world) - 1))
                 
