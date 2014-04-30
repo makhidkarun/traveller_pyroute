@@ -67,7 +67,7 @@ if __name__ == '__main__':
                 offset += ' EndOffsetX="1" '
             if starty < 4 and endy > 36:
                 offset += ' EndOffsetY="-1" '
-            elif starty > 36 and endy < 4:
+            elif starty > 36 and endy < 5:
                 offset += ' EndOffsetY="1" '
             #EndOffsetX="-1" EndOffsetY="+1"
             pass

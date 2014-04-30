@@ -90,14 +90,14 @@ class Star (object):
         self.tradeCount = 0
         
     def __unicode__(self):
-        return u"%s (%s %s)" % (self.name, self.sector.name, self.position)
+        return u"{} ({} {})".format(self.name, self.sector.name, self.position)
         
     def __str__(self):
         name = u"%s (%s %s)" % (self.name,self.sector.name, self.position)
         return name.encode('utf-8')
 
     def __repr__(self):
-        return u"%s (%s %s)" % (self.name, self.sector.name, self.position)
+        return u"{} ({} {})".format(self.name, self.sector.name, self.position)
     
     def set_location (self, dx, dy):
         # convert odd-q offset to cube

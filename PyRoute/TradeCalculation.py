@@ -8,7 +8,6 @@ import logging
 import itertools
 import networkx as nx
 from AllyGen import AllyGen
-from collections import OrderedDict
 
 class RouteCalculation (object):
     # How aggressive should the route finder be about reusing existing routes?
@@ -380,7 +379,7 @@ class CommCalculation(RouteCalculation):
     # Weight for route over a distance. The relative cost for
     # moving between two worlds a given distance apart
     # in a single jump.         
-    distance_weight = [0, 60, 50, 40, 30, 50, 450 ]
+    distance_weight = [0, 70, 60, 50, 40, 50, 450 ]
     
     def __init__(self, galaxy):
         super(CommCalculation, self).__init__(galaxy)
@@ -391,7 +390,8 @@ class CommCalculation(RouteCalculation):
         
         worlds = [star for star in self.galaxy.ranges.nodes_iter() if \
                   len(set(['Cp', 'Cx', 'Cs']) & set(star.tradeCode)) > 0 or \
-                  'D' in star.baseCode or star.importance == 4 ]
+                  len(set(['D', 'W', 'X']) & set(star.baseCode)) > 0 or \
+                  star.importance == 4 ]
         
         for star, neighbor in itertools.combinations(worlds, 2):
             if AllyGen.are_allies(star.alg, neighbor.alg):
@@ -442,6 +442,8 @@ class CommCalculation(RouteCalculation):
         if star.zone in 'RF' or target.zone in 'RF':
             weight += 50
         weight -= 3 * (star.importance + target.importance)
+        weight -= 5 if 'S' in star.baseCode or 'S' in target.baseCode else 0
+        
         return weight
     
     def get_route_between (self, star, target):

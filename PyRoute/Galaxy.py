@@ -218,11 +218,25 @@ class Galaxy(object):
                 
                 owner = None
                 if len(world.ownedBy) > 4:
-                    pass
+                    ownedSec = world.ownedBy[0:4]
+                    ownedHex = world.ownedBy[5:]
+                    owner = None
+                    self.logger.debug(u"World {}@({},{}) owned by {} - {}".format(world, world.col, world.row, ownedSec, ownedHex))
+                    if world.col < 4 and world.sector.spinward:
+                        owner = world.sector.spinward.find_world_by_pos(ownedHex)
+                    elif world.col > 28 and world.sector.trailing:
+                        owner = world.sector.trailing.find_world_by_pos(ownedHex)
+
+                    if world.row < 4 and owner is None and world.sector.coreward:
+                        owner = world.sector.coreward.find_world_by_pos(ownedHex)
+                    elif world.row > 36 and owner is None and world.sector.rimward:
+                        owner = world.sector.rimward.find_world_by_pos(ownedHex)
+                    
+                    
                 elif len(world.ownedBy) == 4:
                     owner = world.sector.find_world_by_pos(world.ownedBy)
-                #self.logger.info(u"Worlds {} is owned by {}".format(world,owner))
+                self.logger.debug(u"Worlds {} is owned by {}".format(world,owner))
                 f.write (u'"{}" : "{}", {}\n'.format(world, owner,
-                                            (', '.join('"' + repr(item) + '"' for item in ownedBy[0:4]))))
+                                            (u', '.join(u'"' + repr(item) + u'"' for item in ownedBy[0:4]))))
                 world.ownedBy = (owner, ownedBy[0:4])
 
