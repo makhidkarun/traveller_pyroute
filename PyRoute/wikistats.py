@@ -4,6 +4,7 @@ Created on Mar 22, 2014
 @author: tjoneslo
 '''
 import os
+import numpypy
 import numpy
 
 class WikiStats(object):
@@ -23,8 +24,8 @@ class WikiStats(object):
     def write_statistics(self):
         self.summary_statistics()
         self.top_summary()
-        self.ru_statistics()
         self.tcs_statistics()
+        #self.ru_statistics()
         self.subsector_statistics()
         
     def summary_statistics(self):
@@ -33,7 +34,7 @@ class WikiStats(object):
             f.write('==Economic Summary==\n')
             f.write('===Statistical Analysis===\n')
             f.write('Ppoulations are in millions, economy and trade in billions.\n')
-            f.write('{| class=\"wikitable sortable\"\n!Sector!! X,Y !! Worlds !! Population !! Economy !! Per Capita !! Trade Volume !! Int. Trade !! Ext. Trade !! RUs\n')
+            f.write('{| class=\"wikitable sortable\"\n!Sector!! X,Y !! Worlds !! Population (millions) !! Economy (Bcr) !! Per Capita (Cr) !! Trade Volume (BCr) !! Int. Trade (BCr) !! Ext. Trade (BCr) !! RU !! Shipyard Capacity (MTons)\n')
             for sector in self.galaxy.sectors:
                 f.write('|-\n')
                 f.write('|{0}\n'.format(sector.wiki_name()))
@@ -56,9 +57,11 @@ class WikiStats(object):
         f.write('|align="right"|{:,d}\n'.format(stats.population))
         f.write('|align="right"|{:,d}\n'.format(stats.economy))
         f.write('|align="right"|{:,d}\n'.format(stats.percapita))
+        f.write('|align="right"|{:,d}\n'.format(int(stats.tradeVol/1e9)))
         f.write('|align="right"|{:,d}\n'.format(int(stats.trade/1e9)))
-        f.write('|align="right"|{:,d}\n'.format(0))
+        f.write('|align="right"|{:,d}\n'.format(int(stats.tradeExt/1e9)))
         f.write('|align="right"|{:,d}\n'.format(stats.sum_ru))
+        f.write('|align="right"|{:,d}\n'.format(stats.shipyards))
 
     def top_summary(self):
         path = os.path.join(self.galaxy.output_path, 'top_summary.wiki')
@@ -84,13 +87,13 @@ class WikiStats(object):
         
     def write_allegiances (self,f,alg):
         alg_sort = sorted(alg.iterkeys())
-        f.write('{| class=\"wikitable sortable\"\n!Code ||Name||Worlds||Population||GNP\n')
+        f.write('{| class=\"wikitable sortable\"\n!Code ||Name||Worlds||Population (millions)||GNP (BCr)||Shipyard Capacity (MTons)\n')
         for code in alg_sort:
             if alg[code][1].number < self.min_alg_count:
                 continue
             f.write('|-\n| {} || [[{}]] '.format(code, alg[code][0]))
             stats = alg[code][1]
-            f.write('|| {:,d} || {:,d} || {:,d}\n'.format(stats.number, stats.population, stats.economy))
+            f.write('|| {:,d} || {:,d} || {:,d} || {:,d}\n'.format(stats.number, stats.population, stats.economy, stats.shipyards))
         f.write('|}\n')
             
     
@@ -166,7 +169,7 @@ class WikiStats(object):
         with open (path, 'w+') as f:
             f.write('=== TCS Military budgets by sector ===\n')
             f.write('budgets in BCr, capacity in MegaTons\n')
-            f.write('{| class=\"wikitable sortable\"\n!Sector!!X,Y!!Worlds !! Budget !! Shipyard Capacity\n')
+            f.write('{| class=\"wikitable sortable\"\n!Sector!!X,Y!!Worlds !! Budget (BCr) !! Shipyard Capacity (MTons)\n')
             for sector in self.galaxy.sectors:
                 budget = [star.budget/1000 for star in sector.worlds]
                 capacity = [star.ship_capacity/1000000 for star in sector.worlds]
@@ -187,13 +190,14 @@ class WikiStats(object):
         with open (path, 'w+') as f:
             f.write('=== Economic Summary by Subsector ===\n')
             f.write('Ppoulations are in millions, economy and trade in billions.\n')
-            f.write('{| class=\"wikitable sortable\"\n!Sector!!X,Y!!Worlds !!Pop!!Economy !!Per Capita!!Trade Volume!! Int. Trade !! Ext. Trade !! RUs\n')
+            f.write('{| class=\"wikitable sortable\"\n!Sector!!X,Y!!Worlds !!Population (Millions) !!Economy (BCr) !!Per Capita (Cr) !!Trade Volume (BCr)!! Int. Trade (BCr) !! Ext. Trade (BCr) !! RU !! Shipyard Capacity (MTons)\n')
             for sector in self.galaxy.sectors:
                 for subsector in sector.subsectors.itervalues():
                     f.write('|-\n')
                     f.write('|{0} - {1}\n'.format(sector.wiki_name(), subsector.wiki_name()))
                     f.write('|| {:d},{:d}: {}\n'.format(sector.x, sector.y, subsector.position))
                     self.write_stats(f, subsector.stats)
-        
+            f.write('|}\n')
+            
 def baseN(num,b,numerals="0123456789ABCDEFGHijklmnopqrstuvwxyz"):
     return ((num == 0) and numerals[0]) or (baseN(num // b, b, numerals).lstrip(numerals[0]) + numerals[num % b])        

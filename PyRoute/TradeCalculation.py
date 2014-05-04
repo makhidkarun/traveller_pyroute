@@ -206,9 +206,30 @@ class TradeCalculation(RouteCalculation):
         # Gather basic statistics. 
         tradeBTN = self.get_btn(star, target)
         tradeCr = self.calc_trade(tradeBTN)
-        star.tradeIn += tradeCr
-        target.tradeIn += tradeCr
+        star.tradeIn += tradeCr / 2
+        target.tradeIn += tradeCr / 2
 
+        if star.sector != target.sector :
+            star.sector.stats.tradeExt += tradeCr / 2
+            target.sector.stats.tradeExt += tradeCr / 2
+            star.sector.subsectors[star.subsector()].stats.tradeExt += tradeCr / 2
+            target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr / 2
+        else:
+            star.sector.stats.trade += tradeCr
+            if star.subsector() == target.subsector():
+                star.sector.subsectors[star.subsector()].stats.trade += tradeCr
+            else:
+                star.sector.subsectors[star.subsector()].stats.tradeExt += tradeCr / 2
+                target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr / 2
+                
+        if AllyGen.are_allies(star.alg, target.alg):
+            self.galaxy.alg[AllyGen.same_align(star.alg)][1].trade += tradeCr
+        else:
+            self.galaxy.alg[AllyGen.same_align(star.alg)][1].tradeExt += tradeCr / 2
+            self.galaxy.alg[AllyGen.same_align(target.alg)][1].tradeExt += tradeCr / 2
+            
+        self.galaxy.stats.trade += tradeCr
+        
         # Update the trade route (edges)
         self.route_update_simple (route, tradeCr)
     
