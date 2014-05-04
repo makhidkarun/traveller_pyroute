@@ -36,6 +36,7 @@ class HexMap(object):
         Starting point for writing PDF files. 
         Call this to output the trade maps
         '''
+        logging.getLogger("PyRoute.HexMap").info("writing {:d} sector maps...".format(len(self.galaxy.sectors)))
         for sector in self.galaxy.sectors:
             if sector is None: continue
             pdf = self.document(sector)
@@ -43,20 +44,30 @@ class HexMap(object):
             
             self.draw_borders(pdf, sector)
             
-            # Get all the worlds in this sector
-            for (star, neighbor, data) in self.galaxy.stars.edges_iter(sector.worlds, True):
-                if star.sector != sector:
-                    continue
+            sector_trade = [x for x in self.galaxy.stars.edges_iter(sector.worlds, True) \
+              if x[2]['trade'] > 0 and self.trade_to_btn(x[2]['trade']) >= self.min_btn ]
 
-                if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:
-                    self.galaxy.stars[star][neighbor]['trade btn'] = self.trade_to_btn(data['trade'])
-                    self.trade_line(pdf, [star, neighbor], data)
-                elif star.sector != neighbor.sector:
-                    data = self.galaxy.stars.get_edge_data(neighbor, star)
-                    if data is not None and \
-                        data['trade'] > 0 and \
-                        self.trade_to_btn(data['trade']) >= self.min_btn:
-                        self.trade_line(pdf, [star, neighbor], data)
+            logging.getLogger('PyRoute.HexMap').debug("Worlds with trade: {}".format(len(sector_trade)))                
+
+            sector_trade.sort(key=lambda line : line[2]['trade'])
+            
+            for (star,neighbor,data) in sector_trade:
+                self.galaxy.stars[star][neighbor]['trade btn'] = self.trade_to_btn(data['trade'])
+                self.trade_line(pdf, [star, neighbor], data)
+
+            # Get all the worlds in this sector
+            #for (star, neighbor, data) in self.galaxy.stars.edges_iter(sector.worlds, True):
+            #    if star.sector != sector:
+            #        continue#
+            #    if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:
+            #        self.galaxy.stars[star][neighbor]['trade btn'] = self.trade_to_btn(data['trade'])
+            #        self.trade_line(pdf, [star, neighbor], data)
+            #    elif star.sector != neighbor.sector:
+            #        data = self.galaxy.stars.get_edge_data(neighbor, star)
+            #        if data is not None and \
+            #            data['trade'] > 0 and \
+            #            self.trade_to_btn(data['trade']) >= self.min_btn:
+            #            self.trade_line(pdf, [star, neighbor], data)
 
             for star in sector.worlds:
                 self.system(pdf, star)
