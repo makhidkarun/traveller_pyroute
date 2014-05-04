@@ -12,17 +12,17 @@ class AllyGen(object):
     classdocs
     '''
     noOne = [u'--']
-    nonAligned = [u'Na', u'Va', u'NaHu', u'NaVa']
-    sameAligned = [(u'Im', u'CsIm', u'ImDa', u'ImDc', u'ImDd', u'ImDg', u'ImDi', u'ImDs', u'ImDv', 
+    nonAligned = [u'Na', u'Va', u'NaHu', u'NaVa', u'CsIm', u'CsZh']
+    sameAligned = [(u'Im', u'ImAp', u'ImDa', u'ImDc', u'ImDd', u'ImDg', u'ImDi', u'ImDs', u'ImDv', 
                         u'ImLa', u'ImLu', u'ImSy', u'ImVd'),
                     (u'As',u'A0', u'A1', u'A2', u'A3', u'A4', u'A5', u'A6', u'A7', u'A8', 
-                        u'A9', u'TE', u'Of', u'If',
+                        u'A9', u'TE', u'Of', u'If', u'AsGl',
                         u'AsMw', u'AsSc', u'AsSF', u'AsT0', u'AsT1', u'AsT2', u'AsT3', u'AsT4', 
                         u'AsT5', u'AsT6', u'AsT7', u'AsT8', u'AsT9', u'AsTv', u'AsUh', u'AsVc',
                         u'AsWc', u'AsXx'),
                     (u'Hv',u'H1', u'H2', u'Hc'),
                     (u'So', u'SoCf'),
-                    (u'Zh', u'ZhCo', u'CsZh')]
+                    (u'Zh', u'ZhCo')]
 
     def __init__(self, galaxy):
         '''
