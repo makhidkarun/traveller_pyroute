@@ -25,7 +25,7 @@ def process():
                         help='Minimum btn for drawing on the map, default [8]' )
     parser.add_argument('--max-jump', dest='max_jump', default=4, type=int,
                         help='Maximum jump distance for trade routes, default [4]')
-    parser.add_argument('--pop-code', choices=['fixed', 'scaled'], default='scaled',
+    parser.add_argument('--pop-code', choices=['fixed', 'scaled', 'benford'], default='scaled',
                         help='Interpretation of the population modifier code')
 
     parser.add_argument('--owned-worlds', dest='owned', default=False, action='store_true')

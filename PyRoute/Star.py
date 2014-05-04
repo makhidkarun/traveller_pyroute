@@ -5,6 +5,8 @@ Created on Mar 5, 2014
 '''
 
 import logging
+import bisect
+import random
 
 class Star (object):
     def __init__ (self, line, starline, sector, pop_code):
@@ -25,16 +27,6 @@ class Star (object):
         self.law   = self.uwp[6]
         self.tl = int(self.uwp[8],20)
         self.popCode = int(self.pop,16)
-
-        self.uwpCodes = {'Starport': self.port,
-                           'Size': self.size,
-                           'Atmosphere': self.atmo,
-                           'Hydrographics': self.hydro,
-                           'Population': self.pop,
-                           'Government': self.gov,
-                           'Law Level': self.law,
-                           'Tech Level': self.uwp[8],
-                           'Pop Code': str(self.popCode)}
 
         self.tradeCode = data[3].strip().split()
             
@@ -153,8 +145,21 @@ class Star (object):
 
         if pop_code == 'scaled':
             self.population =int (pow (10, self.popCode) * popCodeM[self.popM] / 1e7) 
+            self.uwpCodes['Pop Code'] = str(popCodeM[self.popM]/10)
+            
         elif pop_code == 'fixed':
             self.population = int (pow (10, self.popCode) * self.popM / 1e6)
+            
+        elif pop_code == 'benford':
+            popCodeRange=[0.243529203, 0.442507049, 0.610740422, 0.756470797, 0.885014099, 1]
+
+            if self.popM >= 1 and self.popM <= 6:
+                popM = popCodeM[self.popM]
+            else:            
+                popM = (bisect.bisect(popCodeRange, random.random()) + 4) * 10
+            self.population = int (pow (10, self.popCode) * popM / 1e7)
+            self.uwpCodes['Pop Code'] = str(popM/10)
+
 
         self.gwp = int (self.population * calcGWP[self.tl] / 1000)    
         #self.gwp = int (pow(10,self.popCode) * popCodeM[self.popM] * calcGWP[self.tl] / 1e10 )
