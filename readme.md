@@ -3,7 +3,7 @@ PyRoute for Traveller
 
 PyRoute is a trade route generation program for Traveller.
 
-The data for the maps comes from [Traveller Map](http://www.travellermap.com/), based upon the Traveller 5th edition second survey data, plus many of the fan created sectors from aound the internet and across the years.
+The data for the maps comes from [Traveller Map](http://www.travellermap.com/), based upon the Traveller 5th edition second survey data, plus many of the fan created sectors from around the Internet and across the years.
 
 The trade rules are from [GURPS Traveller: Far trader](http://www.sjgames.com/traveller/fartrader/). These rules are based on a gravity trade model. Each world is given a weight called the World Trade Number (WTN) calculated from population, starport, and other factors. For each pair of worlds a Bilateral Trade (BTN) number is generated based upon the two WTNs, and adjusted for distance and other factors. 
 
@@ -23,10 +23,13 @@ The original version of this program, [nroute.c](http://wiki.travellerrpg.com/Nr
 Running the program
 ===================
 
-    $ python PyRoute/route.py --helpusage: route.py [-h] [--borders {none,range,allygen}] [--min-btn BTN]
-    [--min-ally-count ALLY_COUNT] [--min-route-btn ROUTE_BTN]
-    [--max-jump MAX_JUMP] [--no-routes] [--no-trade] [--version]
-    sector [sector ...]
+    $ python PyRoute/route.py --help 
+    usage: route.py [-h] [--borders {none,range,allygen}] [--min-btn BTN]
+                    [--min-ally-count ALLY_COUNT] [--min-route-btn ROUTE_BTN]
+                    [--max-jump MAX_JUMP] [--pop-code {fixed,scaled,benford}]
+                    [--owned-worlds] [--routes {trade,comm,none}] [--no-trade]
+                    [--no-maps] [--version]
+                    sector [sector ...]
 
     Traveller trade route generator.
 
@@ -44,17 +47,20 @@ Running the program
       --min-route-btn ROUTE_BTN
                         Minimum btn for drawing on the map, default [8]
       --max-jump MAX_JUMP   Maximum jump distance for trade routes, default [4]
-      --pop-code {fixed,scaled}
+      --pop-code {fixed,scaled,benford}
                         Interpretation of the population modifier code
-      --no-routes
+      --owned-worlds
+      --routes {trade,comm,none}
+                        Route type to be generated
       --no-trade
+      --no-maps
       --version             show program's version number and exit
 
-The default values used for the program are scaled for the standards set by the Traveller world generation used in the T5 Second Survery, and by extension, the values used by most of the Traveller world generation systems. The parameters are present to allow generating routes in areas where the worlds don't conform to Imperial standards. 
+The default values used for the program are scaled for the standards set by the Traveller world generation used in the T5 Second Survey, and by extension, the values used by most of the Traveller world generation systems. The parameters are present to allow generating routes in areas where the worlds don't conform to Imperial standards. 
 
-The ``borders`` argument defines how borders between various alleginaces are drawn. `none` sets no borders on the map. `range` (the default) uses the border generation from the nroute.c code. This is a quick border generation system, but can generate odd borders where empires overlap. `allygen` is based upon the [allygen](http://dotclue.org/t20/) code created by J. Greely. This is a more comprehensive border generation system, which produced better, but not perfect borders. 
+``borders`` select the algorithm used to draw the borders between various alleginaces. `none` sets no borders on the map. `range` (the default) uses the border generation from the nroute.c code. This is a quick border generation system, but can generate odd borders where empires overlap. `allygen` is based upon the [allygen](http://dotclue.org/t20/) code created by J. Greely. This is a more comprehensive border generation system, which produced better, but not perfect borders. 
 
-The ``min-btn`` argument sets the minimum BTN, trade levels between worlds. Worlds where the calculated trade between two worlds is below this threshold are ignored. This serves as an optimization to avoid calculating trade between two worlds which won't add much to the overall trade. The default value (13) works well for the imperium, but for areas where worlds are less populous, or have lower TLs overall, setting this lower allow generating more routes. 
+The ``min-btn`` argument sets the minimum BTN, trade levels between worlds. Worlds where the calculated trade between two worlds is below this threshold are ignored. This serves as an optimization to avoid calculating trade between two worlds which won't add much to the overall trade. The default value (13) works well for the Imperium, but for areas where worlds are less populous, or have lower TLs overall, setting this lower allow generating more routes. 
 
 The ``min-route-btn`` defines the minimum BTN drawn on the map. The default (8) is scaled for the Imperial standard. For poorer areas, setting this lower will include routes for more worlds. The ``min-route-btn`` and ``min-btn`` work together to produce a better map. For optimal results set ``min-btn`` to `min-route-btn` * 2 - 1 (15 for the default settings). 
 
@@ -62,7 +68,11 @@ The ``min-route-btn`` defines the minimum BTN drawn on the map. The default (8) 
 
 ``min-ally-count`` controls which allegiance codes are output in the top_summary.wiki file. For a map with many small empires it may be worth while setting this to 0 to include all of them in the output file. 
 
-``pop-code`` controls the interpretation of the population modifier. `fixed` is the standard Traveller interpretation of the code. `scaled` treats the value as a index into a scaled array of values.
+``pop-code`` controls the interpretation of the population modifier. `fixed` is the standard Traveller interpretation of the code.  `benford` re-distributes, using a random number generator, the existing population codes to match [Benford's Law](http://en.wikipedia.org/wiki/Benford%27s_law). This produces a more accurate population distribution, and reduces the population by about 30%. `scaled` treats the value as a index into a scaled array of values, attempting to produce the same results as the `benford` population multiplier, but without the random generation. 
+
+``owned-worlds`` is used by the T5 Second Survey team to verify the owned (Government type 6) worlds have a valid controlling world government. When enabled it produces an `owned-worlds.txt` report. This report lists each owned world, the current listed owner (if any), and a list of candidate worlds 
+
+The ``routes`` option select the route processing for drawing on the map. The `trade` option drawn the trade routes as described above. The `comm` option drawn a communications network, connecting the most important worlds, capitals, naval depots, and scout way stations within the various empires. `none` produces maps with no routes drawn. The last option is useful for producing the statistical output without the longer route production time. 
 
 Input format
 ------------
@@ -79,10 +89,22 @@ There are three types of output files:
 
 2) The raw route data. Three files called `stars.txt`, `routes.txt`, and `ranges.txt` are the output of the three internal data structures used to generate the trade map. `ranges.txt` is the list of trade partner pairs. This is the list driving the route generation process. `routes.txt` is the list of all possible routes of max-jump between each star, which is then trimmed. `stars.txt` also built from the max-jump distance star pairs and holds the final trade route information. 
 
-3) The wiki summary. Two files called `summary.wiki` and `top_summary.wiki` have the accumulated statistical information. This data is formatted for putting into the Traveller wiki in the [Trade map summary](http://wiki.travellerrpg.com/Trade_map_summary) page. 
+3) The wiki summary, formatted for putting into the Traveller wiki in the [Trade map summary](http://wiki.travellerrpg.com/Trade_map_summary) page, and consisting of the following files:
+
+* `summary.wiki` contains the economic breakdown by sector. 
+* `top_summary.wiki` contains the economic breakdown by Allegiance code, and a summary breakdown of the UWP components.
+* `tcs_summary.wiki` contains a sector level breakdown of the [Trillion Credit Squadron](http://wiki.travellerrpg.com/Trillion_Credit_Squadron) economic and military budgets. 
+* `subsector_summary.wiki` contains the same economic breakdown as `summary.wiki`, but by sub-sector. 
+
 
 Performance
 -----------
 
-The process takes between O(n^2) and O(n^3) processing time, meaning the more stars (and hence routes), the longer the process takes. Expeimentation has shown that small areas (100-200 stars) take a few seconds, full sectors (400-600 stars) take a minute, multi-sector areas (around 2000 stars) take 20 minutes, and the entirely of charted space (114 sectors, 44,977 stars) takes 11 hours 15 minutes
+The process takes between O(n^2) and O(n^3) processing time, meaning the more stars (and hence routes), the longer the process takes. Experimentation has shown:
+
+* Small areas (100-200 stars) take a few seconds
+* Full sectors (400-600 stars) take one to two minutes 
+* Multi-sector areas (around 2000 stars) take 20 to 30 minutes
+* The T5 Second survey area (30 sectors, 12880 stars) takes 3 hours
+* The entirely of charted space (114 sectors, 44,977 stars) takes 11 hours 15 minutes
 
