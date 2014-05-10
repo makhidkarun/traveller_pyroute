@@ -17,6 +17,8 @@ def process():
     parser = argparse.ArgumentParser(description='Traveller trade route generator.')
     parser.add_argument('--borders', choices=['none', 'range', 'allygen'], default='range',
                         help='Allegiance border generation')
+    parser.add_argument('--ally-match', choices=['collapse', 'separate'], default='collapse',
+                        help='Allegiance matching for borders')
     parser.add_argument('--min-btn', dest='btn', default=13, type=int, 
                         help='Minimum BTN used for route calculation, default [13]')
     parser.add_argument('--min-ally-count', dest='ally_count', default=10, type=int,
@@ -49,7 +51,7 @@ def process():
     
     galaxy.generate_routes(args.routes)
     
-    galaxy.set_borders(args.borders)
+    galaxy.set_borders(args.borders, args.ally_match)
 
 
     if args.owned:

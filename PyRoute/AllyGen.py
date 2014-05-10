@@ -31,12 +31,12 @@ class AllyGen(object):
         self.galaxy = galaxy
         self.borders = {} # 2D array using (q,r) as key, with flags for data
         
-    def create_borders (self):
+    def create_borders (self, match):
         """
             create borders around various allegiances, Algorithm one.
             From the nroute.c generation system. Every world controls a
             two hex radius. Where the allegiances are the same, the area
-            of control is contigious. Every Non-aligned world is
+            of control is contigious. Every Non-aligned world is independent
         """
         allyMap = {}
 
@@ -49,9 +49,11 @@ class AllyGen(object):
             if alg in self.nonAligned:
                 alg = self.nonAligned[0]
             # Collapse same Aligned into one
-            for sameAlg in self.sameAligned:
-                if alg in sameAlg:
-                    alg = sameAlg[0]
+            
+            if match == 'collapse':
+                alg = self.same_align(alg)
+            elif match == 'separate':
+                pass
             allyMap[(star.q, star.r)] = alg
 
         #self._output_map(allyMap, 0)
@@ -185,7 +187,7 @@ class AllyGen(object):
                 return sameAlg[0]
         return alg
               
-    def create_ally_map(self):
+    def create_ally_map(self, match):
         # Create list of stars
         stars = [star for star in self.galaxy.stars.nodes_iter()]
         allyMap = defaultdict(set)
@@ -196,10 +198,12 @@ class AllyGen(object):
             # Collapse non-aligned into one value
             if alg in self.nonAligned or alg in self.noOne:
                 alg = self.nonAligned[0]
+            
             # Collapse same Aligned into one
-            for sameAlg in self.sameAligned:
-                if alg in sameAlg:
-                    alg = sameAlg[0]
+            if match == 'collapse':
+                alg = self.same_align(alg)
+            elif match == 'separate':
+                pass
             allyMap[(star.q, star.r)].add((alg,0))
             starMap[(star.q, star.r)] = alg
 
