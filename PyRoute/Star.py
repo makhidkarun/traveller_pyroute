@@ -76,6 +76,7 @@ class Star (object):
         self.calculate_ru()
         self.calculate_TCS()
         self.owned_by()
+        #self.calculate_army()
         
         self.tradeIn  = 0
         self.tradeOver = 0
@@ -216,8 +217,12 @@ class Star (object):
         
         resources = int(self.economics[1],30)
         labor = int(self.economics[2], 20)
-        infrastructure = int(self.economics[3], 30)
-        efficency = int(self.economics[4:6])
+        if self.economics[3] == '-' :
+            infrastructure = int(self.economics[3:5])
+            efficency = int(self.economics[5:7])
+        else:
+            infrastructure = int(self.economics[3], 30)
+            efficency = int(self.economics[4:6])
         
         resources = resources if resources != 0 else 1
         resources += 0 if resources < 18 else -1
@@ -301,3 +306,35 @@ class Star (object):
         for code in self.tradeCode:
             if code.startswith(u'O:'):
                 self.ownedBy = code[2:]
+
+    def calculate_army(self):
+        #       3, 4, 5, 6, 7, 8, 9, A
+        
+        BE = [ [0, 0, 0, 0, 1, 10, 100, 1000], # TL 0
+               [0, 0, 0, 1, 5, 50, 500, 5000], # TL 1
+               [0, 1, 10, 100, 1000, 5000, 25000, 100000], # TL 2
+               [0, 1, 10, 100, 1000, 5000, 25000, 100000], # TL 3
+               [0, 1, 10, 100, 1000, 5000, 25000, 100000], # TL 4
+               [1, 2, 3, 30, 300, 3000, 30000, 250000], # TL 5
+               [1, 2, 3, 30, 300, 3000, 30000, 250000], # TL 6
+               [0, 1, 2, 20, 200, 2000, 20000, 200000], # TL 7
+               [0, 1, 2, 20, 200, 2000, 20000, 200000], # TL 8
+               [0, 0, 1, 14, 140, 1400, 14000, 140000], # TL 9
+               [0, 0, 1, 14, 140, 1400, 14000, 140000], # TL A
+               [0, 0, 1, 14, 140, 1400, 14000, 140000], # TL B
+               [0, 0, 1, 11, 110, 1100, 11000, 110000], # TL C
+               [0, 0, 1, 11, 110, 1100, 11000, 110000], # TL D
+               [0, 0, 1,  7,  70,  700,  7000,  70000], # TL E
+               [0, 0, 0,  5,  50,  500,  5000,  50000], # TL F
+               [0, 0, 0,  5,  50,  500,  5000,  50000], # TL G
+            ]
+        
+        pop_code = self.popCode - 3
+        if self.uwpCodes['Atmosphere'] in ['0123479ABC']:
+            pop_code -= 1
+        if pop_code >= 0:
+            logging.getLogger('PyRoute.Star').info(u'name: {}, tl: {}, popCode: {}'.format(self.name, self.tl, pop_code))    
+            self.raw_be = BE[self.tl][pop_code]
+        else: 
+            self.raw_be = 0
+        

@@ -72,7 +72,7 @@ class Galaxy(object):
 (.{15,}) +
 (\w\w\w\w\w\w\w-\w) +
 (.{15,}) +
-((\{ [+-]?[0-5] \}) +(\([0-9A-Z]{3}[+-]\d\)) +(\[[0-9A-Z]{4}\])|( ) ( ) ( )) +
+((\{ [+-]?[0-5] \}) +(\([0-9A-Z]{2}[-]?[0-9A-Z][+-]\d\)) +(\[[0-9A-Z]{4}\])|( ) ( ) ( )) +
 (\w{1,5}|-) +
 (\w\w?|-|\*) +
 (\w|-) +
@@ -174,12 +174,12 @@ class Galaxy(object):
 
         self.trade.generate_routes()
         
-    def set_borders(self, border_gen):
+    def set_borders(self, border_gen, match):
         self.logger.info('setting borders...')
         if border_gen == 'range':
-            self.borders.create_borders()
+            self.borders.create_borders(match)
         elif border_gen == 'allygen':
-            self.borders.create_ally_map()
+            self.borders.create_ally_map(match)
         else:
             pass
 
