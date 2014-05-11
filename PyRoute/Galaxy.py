@@ -72,7 +72,7 @@ class Galaxy(object):
 (.{15,}) +
 (\w\w\w\w\w\w\w-\w) +
 (.{15,}) +
-((\{ [+-]?[0-5] \}) +(\([0-9A-Z]{2}[-]?[0-9A-Z][+-]\d\)) +(\[[0-9A-Z]{4}\])|( ) ( ) ( )) +
+((\{ [+-]?[0-5] \}) +(\([0-9A-Z]{3}[+-]\d\)) +(\[[0-9A-Z]{4}\])|( ) ( ) ( )) +
 (\w{1,5}|-) +
 (\w\w?|-|\*) +
 (\w|-) +
@@ -98,7 +98,7 @@ class Galaxy(object):
         self.min_btn = min_btn
         self.route_btn = route_btn
         
-    def read_sectors (self, sectors, pop_code):
+    def read_sectors (self, sectors, pop_code, match):
         for sector in sectors:
             try:
                 lines = [line for line in codecs.open(sector,'r', 'utf-8')]
@@ -122,8 +122,15 @@ class Galaxy(object):
                 if line.startswith ('# Alleg:'):
                     algCode = line[8:].split(':',1)[0].strip()
                     algName = line[8:].split(':',1)[1].strip().strip('"')
-                    algCode = AllyGen.same_align(algCode)
-                    self.alg[algCode] = (algName, ObjectStatistics())
+                    # Collapse same Aligned into one
+                    if match == 'collapse':
+                        algCode = AllyGen.same_align(algCode)
+                        self.alg[algCode] = (algName, ObjectStatistics())
+                    elif match == 'separate':
+                        base = AllyGen.same_align(algCode)
+                        if base not in self.alg: self.alg[base] = (algName, ObjectStatistics())
+                        if algCode not in self.alg: self.alg[algCode] = (algName, ObjectStatistics())
+                        pass
                 
             for line in lines[lineno:]:
                 if line.startswith('#') or len(line) < 20: 

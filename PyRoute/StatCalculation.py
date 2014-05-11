@@ -45,7 +45,7 @@ class StatCalculation(object):
         self.uwp['Tech Level'] = {}
         self.uwp['Pop Code'] = {}
         
-    def calculate_statistics(self):
+    def calculate_statistics(self, match):
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
         for sector in self.galaxy.sectors:
             if sector is None: continue
@@ -53,10 +53,18 @@ class StatCalculation(object):
                 self.add_stats(sector.stats, star)
                 self.add_stats(self.galaxy.stats, star)
                 self.add_stats(sector.subsectors[star.subsector()].stats, star)
-                algStats = self.galaxy.alg.setdefault(AllyGen.same_align(star.alg), ("Unknown", ObjectStatistics()))[1]
-                self.add_stats(algStats, star)
-                self.max_tl (algStats, star)
-                
+                if match == 'collapse':
+                    algStats = self.galaxy.alg[AllyGen.same_align(star.alg)][1]
+                    self.add_stats(algStats, star)
+                    self.max_tl (algStats, star)
+                elif match == 'separate':
+                    algStats = self.galaxy.alg[star.alg][1]
+                    self.add_stats(algStats, star)
+                    self.max_tl (algStats, star)
+                    both = self.galaxy.alg[AllyGen.same_align(star.alg)][1]
+                    self.add_stats(both, star)
+                    self.max_tl(both, star)
+                    
                 for uwpCode, uwpValue in star.uwpCodes.iteritems():
                     stats = self.uwp[uwpCode].setdefault(uwpValue, ObjectStatistics())
                     self.add_stats(stats, star)

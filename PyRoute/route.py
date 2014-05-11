@@ -44,7 +44,7 @@ def process():
     logger.info("starting processing")
     
     galaxy = Galaxy(args.btn, args.max_jump, args.route_btn);
-    galaxy.read_sectors (args.sector, args.pop_code)
+    galaxy.read_sectors (args.sector, args.pop_code, args.ally_match)
     
     logger.info ("%s sectors read" % len(galaxy.sectors))
     
@@ -68,7 +68,7 @@ def process():
         galaxy.write_routes()
     
     stats = StatCalculation(galaxy)
-    stats.calculate_statistics()
+    stats.calculate_statistics(args.ally_match)
     stats.write_statistics(args.ally_count)
     
     logger.info("process complete")
