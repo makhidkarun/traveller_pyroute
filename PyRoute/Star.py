@@ -225,16 +225,21 @@ class Star (object):
             efficency = int(self.economics[4:6])
         
         resources = resources if resources != 0 else 1
-        resources += 0 if resources < 18 else -1
+        # No I in eHex, so J,K,L all -1
+        resources -= 0 if resources < 18 else 1
         
         labor = labor if labor != 0 else 1
+        labor = labor if self.popCode != 0 else 0
         
         infrastructure = infrastructure if infrastructure != 0 else 1
         infrastructure += 0 if infrastructure < 18 else -1
         
         efficency = efficency if efficency != 0 else 1
-        
-        self.ru = resources * labor * infrastructure * efficency
+        if efficency < 0: 
+            efficency = 1 + (efficency * 0.1)
+            self.ru = int(round(resources * labor * infrastructure * efficency))
+        else:
+            self.ru = resources * labor * infrastructure * efficency
         
     def calculate_TCS(self):
         tax_rate = {'0': 0.50, '1': 0.8, '2': 1.0, '3': 0.9, '4': 0.85, 
