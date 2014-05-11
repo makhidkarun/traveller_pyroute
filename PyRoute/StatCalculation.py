@@ -22,6 +22,8 @@ class ObjectStatistics(object):
         self.maxPort    = 'X'
         self.sum_ru     = 0
         self.shipyards  = 0
+        self.col_be     = 0
+        self.im_be      = 0
         
 
 class StatCalculation(object):
@@ -85,6 +87,8 @@ class StatCalculation(object):
         stats.sum_ru += star.ru
         stats.shipyards += star.ship_capacity
         stats.tradeVol += star.tradeOver
+        stats.col_be += star.col_be
+        stats.im_be += star.im_be
         
     def max_tl (self, stats, star):
         stats.maxTL = max(stats.maxTL, star.tl)

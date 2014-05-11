@@ -7,6 +7,7 @@ Created on Mar 5, 2014
 import logging
 import bisect
 import random
+from AllyGen import AllyGen
 
 class Star (object):
     def __init__ (self, line, starline, sector, pop_code):
@@ -76,7 +77,7 @@ class Star (object):
         self.calculate_ru()
         self.calculate_TCS()
         self.owned_by()
-        #self.calculate_army()
+        self.calculate_army()
         
         self.tradeIn  = 0
         self.tradeOver = 0
@@ -110,6 +111,10 @@ class Star (object):
     def hex_distance(self, star):
         return max(abs(self.x - star.x), abs(self.y - star.y), abs(self.z -star.z))
         
+    @staticmethod    
+    def huristicDistance(star1, star2):
+        return max(abs(star1.x - star2.x), abs(star1.y - star2.y), abs(star1.z - star2.z))
+    
     @staticmethod
     def axial_distance(Hex1, Hex2):
         return (abs(Hex1[0] - Hex2[0]) + abs(Hex1[1] - Hex2[1])
@@ -317,29 +322,39 @@ class Star (object):
         
         BE = [ [0, 0, 0, 0, 1, 10, 100, 1000], # TL 0
                [0, 0, 0, 1, 5, 50, 500, 5000], # TL 1
-               [0, 1, 10, 100, 1000, 5000, 25000, 100000], # TL 2
-               [0, 1, 10, 100, 1000, 5000, 25000, 100000], # TL 3
-               [0, 1, 10, 100, 1000, 5000, 25000, 100000], # TL 4
-               [1, 2, 3, 30, 300, 3000, 30000, 250000], # TL 5
-               [1, 2, 3, 30, 300, 3000, 30000, 250000], # TL 6
+               [0, 0, 1, 5, 50, 500, 5000, 50000], # TL 2
+               [0, 1, 10, 100, 1000, 10000, 50000, 100000], # TL 3
+               [0, 1, 10, 100, 1000, 2000, 20000, 200000], # TL 4
+               [1, 2, 3, 30, 300, 3000, 30000, 300000], # TL 5
+               [1, 2, 3, 30, 300, 3000, 30000, 300000], # TL 6
                [0, 1, 2, 20, 200, 2000, 20000, 200000], # TL 7
                [0, 1, 2, 20, 200, 2000, 20000, 200000], # TL 8
-               [0, 0, 1, 14, 140, 1400, 14000, 140000], # TL 9
-               [0, 0, 1, 14, 140, 1400, 14000, 140000], # TL A
-               [0, 0, 1, 14, 140, 1400, 14000, 140000], # TL B
-               [0, 0, 1, 11, 110, 1100, 11000, 110000], # TL C
-               [0, 0, 1, 11, 110, 1100, 11000, 110000], # TL D
-               [0, 0, 1,  7,  70,  700,  7000,  70000], # TL E
+               [0, 0, 1, 15, 150, 1500, 15000, 150000], # TL 9
+               [0, 0, 1, 15, 150, 1500, 15000, 150000], # TL A
+               [0, 0, 1, 12, 120, 1200, 12000, 120000], # TL B
+               [0, 0, 1, 12, 120, 1200, 12000, 120000], # TL C
+               [0, 0, 1, 10, 100, 1000, 10000, 100000], # TL D
+               [0, 0, 0,  7,  70,  700,  7000,  70000], # TL E
                [0, 0, 0,  5,  50,  500,  5000,  50000], # TL F
                [0, 0, 0,  5,  50,  500,  5000,  50000], # TL G
             ]
         
         pop_code = self.popCode - 3
-        if self.uwpCodes['Atmosphere'] in ['0123479ABC']:
+        if self.uwpCodes['Atmosphere'] not in ['568']:
             pop_code -= 1
         if pop_code >= 0:
-            logging.getLogger('PyRoute.Star').info(u'name: {}, tl: {}, popCode: {}'.format(self.name, self.tl, pop_code))    
             self.raw_be = BE[self.tl][pop_code]
         else: 
             self.raw_be = 0
+ 
+        self.col_be = self.raw_be * 0.1 if self.tl >= 9 else 0
+            
+        if AllyGen.are_allies(u'Im', self.alg):
+            self.im_be = self.raw_be * 0.05
+            if self.tl < 13:
+                mul = 1-((13 - self.tl)/10.0)
+                self.im_be = self.im_be * mul
+        else:
+            self.im_be = 0
+            
         

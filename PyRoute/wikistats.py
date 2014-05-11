@@ -6,12 +6,13 @@ Created on Mar 22, 2014
 import os
 import numpypy
 import numpy
+from AllyGen import AllyGen
 
 class WikiStats(object):
     '''
     classdocs
     '''
-
+    stat_header='{| class=\"wikitable sortable\"\n!Sector!! X,Y !! Worlds !! Population (millions) !! Economy (Bcr) !! Per Capita (Cr) !! Trade Volume (BCr) !! Int. Trade (BCr) !! Ext. Trade (BCr) !! RU !! Shipyard Capacity (MTons) !! Colonial Army (BEs)\n'
 
     def __init__(self, galaxy, uwp, min_alg_count=10):
         '''
@@ -33,8 +34,7 @@ class WikiStats(object):
         with open (path, 'w+') as f:
             f.write('==Economic Summary==\n')
             f.write('===Statistical Analysis===\n')
-            f.write('Ppoulations are in millions, economy and trade in billions.\n')
-            f.write('{| class=\"wikitable sortable\"\n!Sector!! X,Y !! Worlds !! Population (millions) !! Economy (Bcr) !! Per Capita (Cr) !! Trade Volume (BCr) !! Int. Trade (BCr) !! Ext. Trade (BCr) !! RU !! Shipyard Capacity (MTons)\n')
+            f.write(self.stat_header)
             for sector in self.galaxy.sectors:
                 f.write('|-\n')
                 f.write('|{0}\n'.format(sector.wiki_name()))
@@ -62,6 +62,8 @@ class WikiStats(object):
         f.write('|align="right"|{:,d}\n'.format(int(stats.tradeExt/1e9)))
         f.write('|align="right"|{:,d}\n'.format(stats.sum_ru))
         f.write('|align="right"|{:,d}\n'.format(stats.shipyards))
+        f.write('|align="right"|{:,.2f}\n'.format(stats.col_be))
+        
 
     def top_summary(self):
         path = os.path.join(self.galaxy.output_path, 'top_summary.wiki')
@@ -87,13 +89,19 @@ class WikiStats(object):
         
     def write_allegiances (self,f,alg):
         alg_sort = sorted(alg.iterkeys())
-        f.write('{| class=\"wikitable sortable\"\n!Code ||Name||Worlds||Population (millions)||GNP (BCr)||Shipyard Capacity (MTons)\n')
+        f.write('{| class=\"wikitable sortable\"\n!Code ||Name||Worlds||Population (millions)||GNP (BCr)|| RU ||Shipyard Capacity (MTons)||Armed Forces (BE)\n')
+        
+        
         for code in alg_sort:
             if alg[code][1].number < self.min_alg_count:
                 continue
             f.write('|-\n| {} || [[{}]] '.format(code, alg[code][0]))
             stats = alg[code][1]
-            f.write('|| {:,d} || {:,d} || {:,d} || {:,d}\n'.format(stats.number, stats.population, stats.economy, stats.shipyards))
+            f.write('|| {:,d} || {:,d} || {:,d} || {:,d} || {:,d} '.format(stats.number, stats.population, stats.economy, stats.sum_ru, stats.shipyards))
+            if AllyGen.are_allies(u'Im', code):
+                f.write('|| {:,.2f}\n'.format(stats.im_be))
+            else:
+                f.write('|| {:,.2f}\n'.format(stats.col_be))
         f.write('|}\n')
             
     
@@ -190,7 +198,7 @@ class WikiStats(object):
         with open (path, 'w+') as f:
             f.write('=== Economic Summary by Subsector ===\n')
             f.write('Ppoulations are in millions, economy and trade in billions.\n')
-            f.write('{| class=\"wikitable sortable\"\n!Sector!!X,Y!!Worlds !!Population (Millions) !!Economy (BCr) !!Per Capita (Cr) !!Trade Volume (BCr)!! Int. Trade (BCr) !! Ext. Trade (BCr) !! RU !! Shipyard Capacity (MTons)\n')
+            f.write(self.stat_header)
             for sector in self.galaxy.sectors:
                 for subsector in sector.subsectors.itervalues():
                     f.write('|-\n')

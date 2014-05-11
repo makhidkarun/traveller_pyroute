@@ -8,6 +8,7 @@ import logging
 import itertools
 import networkx as nx
 from AllyGen import AllyGen
+from Star import Star
 
 class RouteCalculation (object):
     # How aggressive should the route finder be about reusing existing routes?
@@ -34,10 +35,6 @@ class RouteCalculation (object):
     def route_weight (self, star, target):
         raise NotImplementedError ("Base Class")
     
-    @staticmethod
-    def heuristic(u, v):
-        return u.hex_distance(v)
-
     @staticmethod
     def calc_trade (btn):
         '''
@@ -199,7 +196,7 @@ class TradeCalculation(RouteCalculation):
         otherwise update the trade information. 
         '''
         try:
-            route = nx.astar_path(self.galaxy.routes, star, target, self.heuristic)
+            route = nx.astar_path(self.galaxy.routes, star, target, Star.huristicDistance)
         except  nx.NetworkXNoPath:
             return
 
