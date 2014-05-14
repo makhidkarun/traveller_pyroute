@@ -410,7 +410,8 @@ class CommCalculation(RouteCalculation):
         worlds = [star for star in self.galaxy.ranges.nodes_iter() if \
                   len(set(['Cp', 'Cx', 'Cs']) & set(star.tradeCode)) > 0 or \
                   len(set(['D', 'W', 'X']) & set(star.baseCode)) > 0 or \
-                  star.ru >= 10000 ]
+                  star.ru >= 10000 or \
+                  (AllyGen.are_allies(u'As', star.alg) and star.popCode >= 9)]
         
         for star, neighbor in itertools.combinations(worlds, 2):
             if AllyGen.are_allies(star.alg, neighbor.alg):
@@ -418,13 +419,11 @@ class CommCalculation(RouteCalculation):
                 self.galaxy.ranges.add_edge(star, neighbor, {'distance': dist})
         
         for star,neighbor in itertools.combinations(self.galaxy.ranges.nodes_iter(), 2):
-            if not self.owned and  not AllyGen.are_allies(star.alg, neighbor.alg):
+            if not self.owned and not AllyGen.are_allies(star.alg, neighbor.alg) :
                 continue
             dist = star.hex_distance (neighbor)
             if dist <= self.galaxy.max_jump_range: 
-
                 weight = self.route_weight(star, neighbor)
-                
                 self.galaxy.stars.add_edge (star, neighbor, {'distance': dist,
                                                   'weight': weight,
                                                   'trade': 0,
@@ -433,8 +432,6 @@ class CommCalculation(RouteCalculation):
                                                   'weight': weight,
                                                   'trade': 0,
                                                   'count': 0})
-
-
     
     def calculate_routes(self):
         self.logger.info('sorting routes...')
@@ -473,12 +470,13 @@ class CommCalculation(RouteCalculation):
         except  nx.NetworkXNoPath:
             return
 
+        trade = self.calc_trade(19) if AllyGen.are_allies(u'As', star.alg) else self.calc_trade(21)
         start = route[0]
         for end in route[1:]:
             end.tradeCount += 1 if end != route[-1] else 0
-            self.galaxy.stars[start][end]['trade'] = self.calc_trade(21)
+            self.galaxy.stars[start][end]['trade'] = trade
             self.galaxy.stars[start][end]['count'] += 1
-            self.galaxy.routes[start][end]['trade'] = self.calc_trade(21)
+            self.galaxy.routes[start][end]['trade'] = trade
             self.galaxy.routes[start][end]['count'] += 1
             self.galaxy.routes[start][end]['weight'] -= \
                 self.galaxy.routes[start][end]['weight'] / self.route_reuse
