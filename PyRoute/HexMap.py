@@ -22,8 +22,9 @@ class HexMap(object):
     Used pypdflite to directly generate the PDF files. 
     '''
 
-    def __init__(self, galaxy, min_btn = 8):
+    def __init__(self, galaxy, routes, min_btn = 8):
         self.galaxy = galaxy
+        self.routes = routes
         self.ym = 9     # half a hex height
         self.xm = 6     # half the length of one side
         self.colorStart = 0
@@ -321,8 +322,10 @@ class HexMap(object):
             
         tradeIn = self.trade_to_btn(star.tradeIn)
         tradeOver = self.trade_to_btn(star.tradeOver)
-        added += "{0}{1:d}{2:X}{3:X}{4:X}".format(star.baseCode, star.ggCount, star.wtn, tradeIn, tradeOver)
-
+        if self.routes == 'trade':
+            added += "{0}{1:d}{2:X}{3:X}{4:X}".format(star.baseCode, star.ggCount, star.wtn, tradeIn, tradeOver)
+        elif self.routes == 'comm':
+            added += "{}{} {}".format(star.baseCode,star.ggCount,star.importance)
         width = pdf.get_font()._string_width(added)
         point.y_plus(6)
         point.x = col

@@ -49,7 +49,7 @@ def process():
     logger.info ("%s sectors read" % len(galaxy.sectors))
     
     
-    galaxy.generate_routes(args.routes)
+    galaxy.generate_routes(args.routes, args.owned)
     
     galaxy.set_borders(args.borders, args.ally_match)
 
@@ -61,7 +61,7 @@ def process():
         galaxy.trade.calculate_routes()
     
     if args.maps:
-        pdfmap = HexMap(galaxy, args.route_btn)
+        pdfmap = HexMap(galaxy, args.routes, args.route_btn)
         pdfmap.write_maps()
         
     if args.routes:

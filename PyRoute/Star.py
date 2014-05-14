@@ -112,7 +112,7 @@ class Star (object):
         return max(abs(self.x - star.x), abs(self.y - star.y), abs(self.z -star.z))
         
     @staticmethod    
-    def huristicDistance(star1, star2):
+    def heuristicDistance(star1, star2):
         return max(abs(star1.x - star2.x), abs(star1.y - star2.y), abs(star1.z - star2.z))
     
     @staticmethod

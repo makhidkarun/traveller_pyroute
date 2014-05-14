@@ -171,11 +171,11 @@ class Galaxy(object):
             elif sector.x == neighbor.x and sector.y == neighbor.y:
                 self.logger.error("Duplicate sector %s and %s" % (sector.name, neighbor.name))
     
-    def generate_routes(self, routes):
+    def generate_routes(self, routes, owned):
         if routes == 'trade':
             self.trade = TradeCalculation(self, self.min_btn, self.route_btn)
         elif routes == 'comm':
-            self.trade = CommCalculation(self)
+            self.trade = CommCalculation(self, owned)
         elif routes == 'none':
             self.trade = NoneCalculation(self)
 
