@@ -93,6 +93,16 @@ class Star (object):
     def __repr__(self):
         return u"{} ({} {})".format(self.name, self.sector.name, self.position)
     
+    
+    def __key(self):
+        return (self.position, self.name, self.uwp, self.sector.name)
+
+    def __eq__(self, y):
+        return self.__key() == y.__key()
+
+    def __hash__(self):
+        return hash(self.__key())
+
     def set_location (self, dx, dy):
         # convert odd-q offset to cube
         q = int (self.position[0:2]) + dx -1
