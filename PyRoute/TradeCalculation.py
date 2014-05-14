@@ -196,7 +196,7 @@ class TradeCalculation(RouteCalculation):
         otherwise update the trade information. 
         '''
         try:
-            route = nx.astar_path(self.galaxy.routes, star, target, Star.huristicDistance)
+            route = nx.astar_path(self.galaxy.routes, star, target, Star.heuristicDistance)
         except  nx.NetworkXNoPath:
             return
 
@@ -397,11 +397,12 @@ class CommCalculation(RouteCalculation):
     # Weight for route over a distance. The relative cost for
     # moving between two worlds a given distance apart
     # in a single jump.         
-    distance_weight = [0, 70, 60, 50, 40, 50, 450 ]
+    distance_weight = [0, 70, 65, 60, 60, 60, 70  ]
     
-    def __init__(self, galaxy):
+    def __init__(self, galaxy, owned):
         super(CommCalculation, self).__init__(galaxy)
         self.route_reuse = 5
+        self.owned = owned
 
     def generate_routes(self):
         self.logger.info('generating jumps...')
@@ -409,7 +410,7 @@ class CommCalculation(RouteCalculation):
         worlds = [star for star in self.galaxy.ranges.nodes_iter() if \
                   len(set(['Cp', 'Cx', 'Cs']) & set(star.tradeCode)) > 0 or \
                   len(set(['D', 'W', 'X']) & set(star.baseCode)) > 0 or \
-                  star.importance == 4 ]
+                  star.ru >= 10000 ]
         
         for star, neighbor in itertools.combinations(worlds, 2):
             if AllyGen.are_allies(star.alg, neighbor.alg):
@@ -417,7 +418,7 @@ class CommCalculation(RouteCalculation):
                 self.galaxy.ranges.add_edge(star, neighbor, {'distance': dist})
         
         for star,neighbor in itertools.combinations(self.galaxy.ranges.nodes_iter(), 2):
-            if not AllyGen.are_allies(star.alg, neighbor.alg):
+            if not self.owned and  not AllyGen.are_allies(star.alg, neighbor.alg):
                 continue
             dist = star.hex_distance (neighbor)
             if dist <= self.galaxy.max_jump_range: 
@@ -459,14 +460,16 @@ class CommCalculation(RouteCalculation):
         #    weight += 25
         if star.zone in 'RF' or target.zone in 'RF':
             weight += 50
+        if star.popCode == 0 or target.popCode == 0:
+            weight += 25
         weight -= 3 * (star.importance + target.importance)
-        weight -= 5 if 'S' in star.baseCode or 'S' in target.baseCode else 0
+        weight -= 6 if 'S' in star.baseCode or 'S' in target.baseCode else 0
         
         return weight
     
     def get_route_between (self, star, target):
         try:
-            route = nx.astar_path(self.galaxy.routes, star, target, self.heuristic)
+            route = nx.astar_path(self.galaxy.routes, star, target, Star.heuristicDistance)
         except  nx.NetworkXNoPath:
             return
 
