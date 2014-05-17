@@ -397,7 +397,7 @@ class CommCalculation(RouteCalculation):
     # Weight for route over a distance. The relative cost for
     # moving between two worlds a given distance apart
     # in a single jump.         
-    distance_weight = [0, 70, 65, 60, 60, 60, 70  ]
+    distance_weight = [0, 70, 65, 60, 60, 130, 150  ]
     
     def __init__(self, galaxy, owned):
         super(CommCalculation, self).__init__(galaxy)
