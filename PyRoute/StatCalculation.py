@@ -55,15 +55,17 @@ class StatCalculation(object):
                 self.add_stats(sector.stats, star)
                 self.add_stats(self.galaxy.stats, star)
                 self.add_stats(sector.subsectors[star.subsector()].stats, star)
+                self.max_tl(sector.stats, star)
+                self.max_tl(sector.subsectors[star.subsector()].stats, star)
                 if match == 'collapse':
-                    algStats = self.galaxy.alg[AllyGen.same_align(star.alg)][1]
+                    algStats = self.galaxy.alg[AllyGen.same_align(star.alg)].stats
                     self.add_stats(algStats, star)
                     self.max_tl (algStats, star)
                 elif match == 'separate':
-                    algStats = self.galaxy.alg[star.alg][1]
+                    algStats = self.galaxy.alg[star.alg].stats
                     self.add_stats(algStats, star)
                     self.max_tl (algStats, star)
-                    both = self.galaxy.alg[AllyGen.same_align(star.alg)][1]
+                    both = self.galaxy.alg[AllyGen.same_align(star.alg)].stats
                     self.add_stats(both, star)
                     self.max_tl(both, star)
                     
@@ -77,8 +79,8 @@ class StatCalculation(object):
                 
         self.per_capita(self.galaxy.stats)
         
-        for stats in self.galaxy.alg.itervalues():
-            self.per_capita(stats[1])
+        for alg in self.galaxy.alg.itervalues():
+            self.per_capita(alg.stats)
 
     def add_stats(self, stats, star):
         stats.population += star.population
@@ -117,8 +119,8 @@ class StatCalculation(object):
             if sector is None: continue
             self.logger.debug('Sector ' + sector.name + ' star count: ' + str(sector.stats.number))
             
-        for aleg, stats in self.galaxy.alg.iteritems():
-            s = u'Allegiance {0} ({1}) star count: {2:,d}'.format(stats[0], aleg, stats[1].number)
+        for code,aleg in self.galaxy.alg.iteritems():
+            s = u'Allegiance {0} ({1}) star count: {2:,d}'.format(aleg.description, code, aleg.stats.number)
             self.logger.debug(s)
             
         wiki = WikiStats(self.galaxy, self.uwp, ally_count)

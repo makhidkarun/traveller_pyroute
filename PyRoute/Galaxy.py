@@ -15,6 +15,19 @@ from TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation
 from StatCalculation import ObjectStatistics
 from AllyGen import AllyGen
 
+class Allegiance(object):
+    def __init__(self, code, description):
+        self.code = code
+        self.description = description
+        self.stats = ObjectStatistics()
+        self.worlds = []
+        
+    def wiki_title(self):
+        return self.wiki_name()
+    
+    def wiki_name(self):
+        return u'[[{}]]'.format(self.description)
+
 class Subsector(object):
     def __init__(self, name, position, sector):
         self.sector = sector
@@ -24,8 +37,11 @@ class Subsector(object):
         self.worlds = []
 
     def wiki_name(self):
-        return '[[{0} Subsector|{0}]]'.format(self.name)
-
+        return u'[[{0} Subsector|{0}]]'.format(self.name)
+    
+    def wiki_title(self):
+        return u'{0} - {1}'.format(self.sector.wiki_name(), self.wiki_name())
+ 
 class Sector (object):
     def __init__ (self, name, position):
         self.name = name[1:].strip()
@@ -44,13 +60,15 @@ class Sector (object):
     def __str__(self):
         return "{} ({},{})".format(self.name, str(self.x), str(self.y))
 
+    def sector_name (self):
+        return self.name[:-7] if self.name.endswith(u'Sector') else self.name
+    
     def wiki_name(self):
-        if self.name.endswith('Sector'):
-            name = self.name[:-7]
-        else:
-            name = self.name
-        return '|[[{0} Sector|{0}]]'.format(name)
+        return u'[[{0} Sector|{0}]]'.format(self.sector_name())
 
+    def wiki_title (self):
+        return self.wiki_name()
+    
     def find_world_by_pos(self, pos):
         for world in self.worlds:
             if world.position == pos:
@@ -125,11 +143,11 @@ class Galaxy(object):
                     # Collapse same Aligned into one
                     if match == 'collapse':
                         algCode = AllyGen.same_align(algCode)
-                        self.alg[algCode] = (algName, ObjectStatistics())
+                        self.alg[algCode] = Allegiance(algCode, algName) 
                     elif match == 'separate':
                         base = AllyGen.same_align(algCode)
-                        if base not in self.alg: self.alg[base] = (algName, ObjectStatistics())
-                        if algCode not in self.alg: self.alg[algCode] = (algName, ObjectStatistics())
+                        if base not in self.alg: self.alg[base] = Allegiance(base, algName)
+                        if algCode not in self.alg: self.alg[algCode] = Allegiance(algCode, algName)
                         pass
                 
             for line in lines[lineno:]:
@@ -138,6 +156,12 @@ class Galaxy(object):
                 star = Star (line, self.starline, sec, pop_code)
                 sec.worlds.append(star)
                 sec.subsectors[star.subsector()].worlds.append(star)
+                
+                self.alg[star.alg].worlds.append(star)
+                base = AllyGen.same_align(star.alg)
+                if base != star.alg:
+                    self.alg[base].worlds.append(star)
+                    
             
             self.sectors.append(sec)
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds) ) )
@@ -216,7 +240,7 @@ class Galaxy(object):
                 ownedBy = [star for star in self.stars.neighbors_iter(world) \
                             if star.tl >= 9 and star.popCode >= 6 and \
                                star.port in 'ABC' and star.ownedBy == star and \
-                               star.alg[0:2] == world.alg[0:2]]
+                               AllyGen.are_allies(star.alg, world.alg)]
                 
                 ownedBy.sort(reverse=True,
                              key=lambda star: star.popCode)

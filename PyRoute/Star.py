@@ -93,7 +93,6 @@ class Star (object):
     def __repr__(self):
         return u"{} ({} {})".format(self.name, self.sector.name, self.position)
     
-    
     def __key(self):
         return (self.position, self.name, self.uwp, self.sector.name)
 
@@ -102,6 +101,11 @@ class Star (object):
 
     def __hash__(self):
         return hash(self.__key())
+
+    def wiki_name(self):
+        name = u" ".join(w.capitalize() for w in self.name.lower().split())
+        name = u'{{WorldS|' + name + u'|' + self.sector.sector_name() + u'|' + self.position + u'}}'
+        return name
 
     def set_location (self, dx, dy):
         # convert odd-q offset to cube
