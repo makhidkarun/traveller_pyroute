@@ -12,7 +12,7 @@ class AllyGen(object):
     classdocs
     '''
     noOne = [u'--']
-    nonAligned = [u'Na', u'Va', u'NaHu', u'NaVa', u'NaAs', u'CsIm', u'CsZh']
+    nonAligned = [u'Na', u'Va', u'NaHu', u'NaVa', u'NaAs']
     sameAligned = [(u'Im', u'ImAp', u'ImDa', u'ImDc', u'ImDd', u'ImDg', u'ImDi', u'ImDs', u'ImDv', 
                         u'ImLa', u'ImLu', u'ImSy', u'ImVd'),
                     (u'As', u'A0', u'A1', u'A2', u'A3', u'A4', u'A5', u'A6', u'A7', u'A8', 
@@ -20,7 +20,8 @@ class AllyGen(object):
                         u'AsMw', u'AsSc', u'AsSF', u'AsT0', u'AsT1', u'AsT2', u'AsT3', u'AsT4', 
                         u'AsT5', u'AsT6', u'AsT7', u'AsT8', u'AsT9', u'AsTv', u'AsVc',
                         u'AsWc', u'AsXx'),
-                    (u'Hv',u'H1', u'H2', u'Hc'),
+                    (u'Hv', u'H1', u'H2', u'Hc'),
+                    (u'Jp', u'JuHl', u'JuPr', u'JuRu'),
                     (u'So', u'SoCf'),
                     (u'Zh', u'ZhCo')]
 
@@ -257,9 +258,9 @@ class AllyGen(object):
                             if alg in self.nonAligned:
                                 maxAlly = alg
                                 break 
-                            if self.galaxy.alg[alg][1].number > maxCount:
+                            if self.galaxy.alg[alg].stats.number > maxCount:
                                 maxAlly = alg
-                                maxCount =  self.galaxy.alg[alg][1].number
+                                maxCount =  self.galaxy.alg[alg].stats.number
                         allyMap[Hex] = maxAlly
                 
         self._output_map(allyMap, 2)
