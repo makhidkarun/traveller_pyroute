@@ -406,10 +406,10 @@ class TradeCalculation(RouteCalculation):
                 target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr / 2
                 
         if AllyGen.are_allies(star.alg, target.alg):
-            self.galaxy.alg[AllyGen.same_align(star.alg)][1].trade += tradeCr
+            self.galaxy.alg[AllyGen.same_align(star.alg)].stats.trade += tradeCr
         else:
-            self.galaxy.alg[AllyGen.same_align(star.alg)][1].tradeExt += tradeCr / 2
-            self.galaxy.alg[AllyGen.same_align(target.alg)][1].tradeExt += tradeCr / 2
+            self.galaxy.alg[AllyGen.same_align(star.alg)].stats.tradeExt += tradeCr / 2
+            self.galaxy.alg[AllyGen.same_align(target.alg)].stats.tradeExt += tradeCr / 2
             
         self.galaxy.stats.trade += tradeCr
         
@@ -541,8 +541,6 @@ class TradeCalculation(RouteCalculation):
 
     def route_weight (self, star, target):
         dist = star.hex_distance(target)
-        if dist in [4,5,6]:
-            dist = 4
         weight = self.distance_weight[dist]
         if target.alg != star.alg:
             weight += 25
