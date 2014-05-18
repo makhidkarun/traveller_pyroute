@@ -39,14 +39,13 @@ class HexMap(object):
         '''
         logging.getLogger("PyRoute.HexMap").info("writing {:d} sector maps...".format(len(self.galaxy.sectors)))
         for sector in self.galaxy.sectors:
-            if sector is None: continue
             pdf = self.document(sector)
             self.write_base_map(pdf, sector)
             
             self.draw_borders(pdf, sector)
             
-            sector_trade = [x for x in self.galaxy.stars.edges_iter(sector.worlds, True) \
-              if x[2]['trade'] > 0 and self.trade_to_btn(x[2]['trade']) >= self.min_btn ]
+            sector_trade = [star for star in self.galaxy.stars.edges_iter(sector.worlds, True) \
+              if star[2]['trade'] > 0 and self.trade_to_btn(star[2]['trade']) >= self.min_btn ]
 
             logging.getLogger('PyRoute.HexMap').debug("Worlds with trade: {}".format(len(sector_trade)))                
 
@@ -88,7 +87,7 @@ class HexMap(object):
         self.hex_grid(pdf, self._draw_all, 0.5)
         
     def sector_name(self,pdf,name):
-        cursor = PDFCursor(5, 25, True)
+        cursor = PDFCursor(5, 0, True)
         def_font = pdf.get_font()
         pdf.set_font('times', size=30)
         width = pdf.get_font()._string_width(name)
@@ -106,7 +105,7 @@ class HexMap(object):
         pdf.set_font (font=def_font)
 
     def rimward_sector(self, pdf, name):
-        cursor = PDFCursor(306 ,779, True)
+        cursor = PDFCursor(306 ,767, True)
         def_font = pdf.get_font()
         pdf.set_font('times', size=10)
         cursor.x_plus(-pdf.get_font()._string_width(name)/2)
@@ -326,6 +325,8 @@ class HexMap(object):
             added += "{0}{1:d}{2:X}{3:X}{4:X}".format(star.baseCode, star.ggCount, star.wtn, tradeIn, tradeOver)
         elif self.routes == 'comm':
             added += "{}{} {}".format(star.baseCode,star.ggCount,star.importance)
+        elif self.routes == 'xroute':
+            added += " {}".format(star.importance)
         width = pdf.get_font()._string_width(added)
         point.y_plus(6)
         point.x = col
