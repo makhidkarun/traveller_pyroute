@@ -109,7 +109,7 @@ class WikiStats(object):
                 stats = alg[code].stats
                 f.write('|| {:,d} || {:,d} || {:,d} || {:,d} || {:,d} '.format(stats.number, stats.population, stats.economy, stats.sum_ru, stats.shipyards))
                 if AllyGen.are_allies(u'Im', code):
-                    f.write('|| {:,.2f}\n'.format(stats.im_be))
+                    f.write('|| {:,.2f} (IA) + {:,.2F} (CA)\n'.format(stats.im_be, stats.col_be))
                 else:
                     f.write('|| {:,.2f}\n'.format(stats.col_be))
             f.write('|}\n')
