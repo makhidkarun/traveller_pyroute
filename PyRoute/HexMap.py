@@ -87,7 +87,7 @@ class HexMap(object):
         self.hex_grid(pdf, self._draw_all, 0.5)
         
     def sector_name(self,pdf,name):
-        cursor = PDFCursor(5, 0, True)
+        cursor = PDFCursor(5, -5, True)
         def_font = pdf.get_font()
         pdf.set_font('times', size=30)
         width = pdf.get_font()._string_width(name)
@@ -97,10 +97,11 @@ class HexMap(object):
 
 
     def coreward_sector(self, pdf, name):
-        cursor = PDFCursor(306, self.y_start - self.xm, True)
+        cursor = PDFCursor(5, self.y_start - 15, True)
         def_font = pdf.get_font()
         pdf.set_font('times', size=10)
-        cursor.x_plus(-pdf.get_font()._string_width(name)/2)
+        width = pdf.get_font()._string_width(name)/2
+        cursor.x = 306 - width
         pdf.add_text(name, cursor)
         pdf.set_font (font=def_font)
 
@@ -337,7 +338,15 @@ class HexMap(object):
         
     def trade_line(self, pdf, edge, data):
         
-        tradeColors = ['red','yellow', 'green', 'cyan', 'blue', 'purple', 'violet' ]
+        tradeColors = [(255, 0, 0),     # Red
+                       (240, 240, 32),   # yellow - darker
+                       (0, 255, 0),     # green
+                       (0, 255, 255),   # Cyan
+                       (96, 96, 255),     # blue - lighter
+                       (128, 0, 128),   # purple
+                       (148, 0, 211),   # violet
+                       ]
+        
         start = edge[0]
         end = edge[1]
 
@@ -349,6 +358,8 @@ class HexMap(object):
             trade = 6
             
         tradeColor = tradeColors[trade]
+        color = pdf.get_color()
+        color.set_color_by_number(tradeColor[0], tradeColor[1], tradeColor[2])
 
         starty = self.y_start + ( self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
         lineStart = PDFCursor ((self.xm * 3 * (start.col)) + self.ym, starty)
@@ -368,8 +379,7 @@ class HexMap(object):
             
         endy   = self.y_start + ( self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
         lineEnd = PDFCursor ((self.xm * 3 * (endCol)) + self.ym, endy)
-        color = pdf.get_color()
-        color.set_color_by_name(tradeColor)
+
         line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, style='solid', color=color, size=1)
         line._draw()
 
