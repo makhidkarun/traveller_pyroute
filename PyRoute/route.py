@@ -32,8 +32,10 @@ def process():
 
     parser.add_argument('--owned-worlds', dest='owned', default=False, action='store_true')
     
-    parser.add_argument('--routes', dest='routes', choices=['trade', 'comm', 'none'], default='trade',
+    parser.add_argument('--routes', dest='routes', choices=['trade', 'comm','xroute', 'none'], default='trade',
                         help='Route type to be generated')
+    
+    parser.add_argument('--output', default='maps', help='output directory for maps, statistics')
     
     parser.add_argument('--no-trade', dest='trade', default=True, action='store_false')
     parser.add_argument('--no-maps', dest='maps', default=True, action='store_false')
@@ -44,6 +46,8 @@ def process():
     logger.info("starting processing")
     
     galaxy = Galaxy(args.btn, args.max_jump, args.route_btn);
+    galaxy.output_path = args.output
+    
     galaxy.read_sectors (args.sector, args.pop_code, args.ally_match)
     
     logger.info ("%s sectors read" % len(galaxy.sectors))
