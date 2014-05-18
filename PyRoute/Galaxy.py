@@ -157,10 +157,13 @@ class Galaxy(object):
                 sec.worlds.append(star)
                 sec.subsectors[star.subsector()].worlds.append(star)
                 
-                self.alg[star.alg].worlds.append(star)
                 base = AllyGen.same_align(star.alg)
-                if base != star.alg:
+                if match == 'collapse':
                     self.alg[base].worlds.append(star)
+                elif match == 'separate':
+                    self.alg[star.alg].world.append(star)
+                    if base != star.alg:
+                        self.alg[base].worlds.append(star)
                     
             
             self.sectors.append(sec)
