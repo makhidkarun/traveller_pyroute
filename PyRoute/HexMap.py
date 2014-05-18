@@ -339,7 +339,7 @@ class HexMap(object):
     def trade_line(self, pdf, edge, data):
         
         tradeColors = [(255, 0, 0),     # Red
-                       (240, 240, 32),   # yellow - darker
+                       (224, 224, 16),   # yellow - darker
                        (0, 255, 0),     # green
                        (0, 255, 255),   # Cyan
                        (96, 96, 255),     # blue - lighter
