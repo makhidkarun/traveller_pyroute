@@ -137,8 +137,9 @@ class NoneCalculation(RouteCalculation):
 
 class XRouteCalculation (RouteCalculation):
     distance_weight = [0, 95, 90, 85, 80, 75, 70  ]
-    capSec_weight = [0, 95, 90, 85, 80, 75, 70]
-    inSec_weight  = [0, 140, 110, 95, 70, 85, 95]
+    capSec_weight = [0, 95, 90, 85, 75, 75, 70]
+    inSec_weight  = [0, 140, 110, 85, 70, 95, 140]
+    impt_weight   = [0, 90, 80, 70, 70, 110, 140]
     
 
     def __init__(self, galaxy):
@@ -149,9 +150,10 @@ class XRouteCalculation (RouteCalculation):
         pass
 
     def base_route_filter (self, star, neighbor):
-        if not AllyGen.are_allies(u'Im', star.alg) and not AllyGen.are_allies(u'Im', neighbor.alg):
+        if not AllyGen.are_allies(star.alg, neighbor.alg) :
             return True
-        
+        if not AllyGen.are_allies(u'Im', star.alg):
+            return True
         if star.zone in ['R', 'F'] or neighbor.zone in ['R','F']:
             return True
 
@@ -160,49 +162,36 @@ class XRouteCalculation (RouteCalculation):
     def generate_routes(self):
         self.distance_weight = self.capSec_weight
         self.generate_base_routes()
-        
-        
-    def routes_pass_1(self):
-        # Pass 1: Get routes at J6  Capital and sector captials 
         self.capital = [star for star in self.galaxy.ranges.nodes_iter() if \
                    AllyGen.are_allies(u'Im', star.alg) and 
                    'Cx' in star.tradeCode]
-        
-        # This should be 1 element long
-        self.logger.info(self.capital)
-        
         self.secCapitals = [star for star in self.galaxy.ranges.nodes_iter() if \
                    AllyGen.are_allies(u'Im', star.alg) and 
                    'Cs' in star.tradeCode]
-        
-        for star in self.secCapitals:
-            self.get_route_between(star, self.capital[0], self.calc_trade(25), Star.heuristicDistance)
-        
-        
-    def calculate_routes(self):
-        self.logger.info('XRoute pass 1')
-        self.routes_pass_1()
-        
-        self.distance_weight = self.inSec_weight
-        
-        self.logger.info('XRoute pass 2')
-        for (star, neighbor, data) in self.galaxy.stars.edges_iter(data=True):
-            data['weight']=self.route_weight(star, neighbor)
-            if data['count'] > 0:
-                data['weight'] -= data['weight'] / self.route_reuse
-            self.galaxy.routes[star][neighbor]['weight'] = data['weight']
+        self.subCapitals = [star for star in self.galaxy.ranges.nodes_iter() if \
+                   AllyGen.are_allies(u'Im', star.alg) and 
+                   'Cp' in star.tradeCode]
 
-        self.secCapitals.append(self.capital)
+        
+    def routes_pass_1(self):
+        # Pass 1: Get routes at J6  Capital and sector captials 
+        # This should be 1 element long
+        self.logger.info(self.capital)
+        if len(self.capital) == 0:
+            return
+        for star in self.secCapitals:
+            self.get_route_between(self.capital[0], star, self.calc_trade(25), Star.heuristicDistance)
+    
+    def routes_pass_2(self):
+        # Step 2a - reweight the routes to be more weighted to J4 than J6
+        self.reweight_routes(self.inSec_weight)
+
+        secCapitals = self.secCapitals + self.capital
         for sector in self.galaxy.sectors:
             
-            secCap = [star for star in sector.worlds if \
-                      AllyGen.are_allies(u"Im", star.alg) and \
-                      ('Cs' in star.tradeCode or 'Cx' in star.tradeCode)]
+            secCap = [star for star in secCapitals if star.sector == sector]
             self.logger.info(secCap)
-            
-            subCap = [star for star in sector.worlds if \
-                      AllyGen.are_allies(u"Im", star.alg) and 'Cp' in star.tradeCode]
-
+            subCap = [star for star in self.subCapitals if star.sector == sector]
 
             if len(secCap) == 0:
                 if len(subCap) == 0:
@@ -210,21 +199,53 @@ class XRouteCalculation (RouteCalculation):
                 else:
                     self.logger.info("{} has subsector capitals but no sector capital".format(sector.name))
                     for star in subCap:
-                        dist = (None, 9999)
-                        for capital in self.secCapitals:
-                            newDist = capital.hex_distance(star)
-                            if newDist < dist[1]:
-                                dist = (capital, newDist)
-                        self.get_route_between(star, dist[0], self.calc_trade(23), Star.heuristicDistance)
+                        capital = self.find_nearest_capital(star, secCapitals)
+                        self.get_route_between(capital[0], star, self.calc_trade(23), Star.heuristicDistance)
             else:
                 for star in subCap:
-                    self.get_route_between(star, secCap[0], self.calc_trade(23), Star.heuristicDistance)
+                    self.get_route_between(secCap[0], star, self.calc_trade(23), Star.heuristicDistance)
 
-    @staticmethod    
-    def heuristicDistance1(star1, star2):
-        dist = star1.hex_distance(star2)
+    def routes_pass_3 (self):
+        self.reweight_routes(self.impt_weight)
+        important = [star for star in self.galaxy.ranges.nodes_iter() if \
+                     AllyGen.are_allies(u'Im', star.alg) and 
+                     star.importance >= 4 and star.tradeCount == 0]
+        
+        self.logger.info ('Important worlds: {}'.format(len(important)))
+        capitalList = self.capital + self.secCapitals + self.subCapitals
+        
+        for star in important:
+            capital = self.find_nearest_capital(star, capitalList)
+            self.get_route_between (capital[0], star, self.calc_trade(21), Star.heuristicDistance)
+                
+    def calculate_routes(self):
+        self.logger.info('XRoute pass 1')
+        self.routes_pass_1()
+        
+        self.logger.info('XRoute pass 2')
+        self.routes_pass_2()
+
+        self.logger.info('XRoute pass 3')
+        self.routes_pass_3()
+        
+    def reweight_routes (self, weightList):
+        self.distance_weight = weightList
+        for (star, neighbor, data) in self.galaxy.stars.edges_iter(data=True):
+            data['weight']=self.route_weight(star, neighbor)
+            if data['count'] > 0:
+                data['weight'] -= data['weight'] / self.route_reuse
+            if data['count'] > 5:
+                data['weight'] -= data['weight'] / self.route_reuse
+            self.galaxy.routes[star][neighbor]['weight'] = data['weight']
+        
+    def find_nearest_capital (self, world, capitals):
+        dist = (None, 9999)
+        for capital in capitals:
+            newDist = capital.hex_distance(world)
+            if newDist < dist[1]:
+                dist = (capital, newDist)
         return dist
-    
+        
     def get_route_between (self, star, target, trade, heuristic):
         try:
             route = nx.astar_path(self.galaxy.routes, star, target, heuristic)
@@ -258,8 +279,9 @@ class XRouteCalculation (RouteCalculation):
             weight += 25
         weight -= 3 * (star.importance + target.importance)
         weight -= 6 if 'S' in star.baseCode or 'S' in target.baseCode else 0
-        weight -= 6 if 'W' in star.baseCode or 'S' in target.baseCode else 0
+        weight -= 6 if 'W' in star.baseCode or 'W' in target.baseCode else 0
         weight -= 3 if 'N' in star.baseCode or 'N' in target.baseCode else 0
+        weight -= 3 if 'D' in star.baseCode or 'D' in target.baseCode else 0
         
         return weight
 
