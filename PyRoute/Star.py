@@ -26,9 +26,12 @@ class Star (object):
         self.pop   = self.uwp[4]
         self.gov   = self.uwp[5]
         self.law   = self.uwp[6]
-        self.tl = int(self.uwp[8],20)
-        self.popCode = int(self.pop,16)
-
+        self.tl = int(self.uwp[8],36)
+        try:
+            self.popCode = int(self.pop,12)
+        except ValueError:
+            self.popCode = 12
+            
         self.tradeCode = data[3].strip().split()
             
         if (data[6]):
@@ -184,7 +187,7 @@ class Star (object):
             self.uwpCodes['Pop Code'] = str(popM/10)
 
 
-        self.gwp = int (self.population * calcGWP[self.tl] / 1000)    
+        self.gwp = int (self.population * calcGWP[min(self.tl,19)] / 1000)    
         #self.gwp = int (pow(10,self.popCode) * popCodeM[self.popM] * calcGWP[self.tl] / 1e10 )
         if self.rich:
             self.gwp = self.gwp * 16 / 10
@@ -270,12 +273,15 @@ class Star (object):
                  'F': 0.75,
                  # Aslan Government codes
                  'G': 1.0, 'H': 1.0, 'J': 1.2, 'K': 1.1, 'L': 1.0,
-                 'M': 1.1, 'N': 1.2
+                 'M': 1.1, 'N': 1.2,
+                 # Unknown Gov Codes
+                 'I': 1.0, 'P': 1.0, 'Q': 1.0, 'R': 1.0, 'S': 1.0,'T': 1.0, 
+                 'U': 1.0, 'V': 1.0, 'W': 1.0, 'X': 1.0
                  }
         self.ship_capacity = long (self.population * tax_rate[self.uwpCodes['Government']] * 1000)
-        gwp_base = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 28]
+        gwp_base = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 28, 32]
         if self.tl >= 5:
-            self.tcs_gwp = self.population * gwp_base[self.tl - 5] * 1000
+            self.tcs_gwp = self.population * gwp_base[min(self.tl - 5, 13)] * 1000
         else:
             self.tcs_gwp = 0
             
@@ -356,11 +362,11 @@ class Star (object):
                [0, 0, 0,  5,  50,  500,  5000,  50000], # TL G
             ]
         
-        pop_code = self.popCode - 3
+        pop_code = min(self.popCode - 3, 7)
         if self.uwpCodes['Atmosphere'] not in ['568']:
             pop_code -= 1
         if pop_code >= 0:
-            self.raw_be = BE[self.tl][pop_code]
+            self.raw_be = BE[min(self.tl, 16)][pop_code]
         else: 
             self.raw_be = 0
  
