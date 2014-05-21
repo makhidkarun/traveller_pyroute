@@ -161,7 +161,7 @@ class Galaxy(object):
                 if match == 'collapse':
                     self.alg[base].worlds.append(star)
                 elif match == 'separate':
-                    self.alg[star.alg].world.append(star)
+                    self.alg[star.alg].worlds.append(star)
                     if base != star.alg:
                         self.alg[base].worlds.append(star)
                     
@@ -178,7 +178,7 @@ class Galaxy(object):
             for star in sector.worlds:
                 self.stars.add_node(star)
                 self.ranges.add_node(star)
-                self.routes.add_node(star)
+                #self.routes.add_node(star)
         self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
         
     def set_bounding_sectors(self):
@@ -220,9 +220,9 @@ class Galaxy(object):
             pass
 
     def write_routes(self):
-        path = os.path.join(self.output_path, 'routes.txt')
-        with codecs.open(path, 'wb') as f:
-            nx.write_edgelist(self.routes, f, data=True)
+        #path = os.path.join(self.output_path, 'routes.txt')
+        #with codecs.open(path, 'wb') as f:
+        #    nx.write_edgelist(self.routes, f, data=True)
         path = os.path.join(self.output_path, 'ranges.txt')
         with codecs.open(path, "wb") as f:
             nx.write_edgelist(self.ranges, f, data=True)
