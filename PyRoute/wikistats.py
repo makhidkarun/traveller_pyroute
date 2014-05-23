@@ -98,14 +98,14 @@ class WikiStats(object):
         
     def write_allegiances (self, alg):
         path = os.path.join(self.galaxy.output_path, 'alleg_summary.wiki')
-        with open (path, 'w+') as f:
+        with codecs.open(path, "wb", 'utf_8') as f:
             f.write('===[[Allegiance Code|Allegiance Information]]===\n')
             alg_sort = sorted(alg.iterkeys())
             f.write('{| class=\"wikitable sortable\"\n!Code ||Name||Worlds||Population (millions)||GNP (BCr)|| RU ||Shipyard Capacity (MTons)||Armed Forces (BE)\n')
             for code in alg_sort:
                 if alg[code].stats.number < self.min_alg_count:
                     continue
-                f.write('|-\n| {} || {} '.format(code, alg[code].wiki_name()))
+                f.write(u'|-\n| {} || {} '.format(code, alg[code].wiki_name()))
                 stats = alg[code].stats
                 f.write('|| {:,d} || {:,d} || {:,d} || {:,d} || {:,d} '.format(stats.number, stats.population, stats.economy, stats.sum_ru, stats.shipyards))
                 if AllyGen.are_allies(u'Im', code):
@@ -117,7 +117,7 @@ class WikiStats(object):
             area_type = "Allegiance"
             f.write('=== {} Statistics ===\n'.format(area_type))
             f.write('{| class=\"wikitable sortable\"\n')
-            f.write('! {} !! statistics\n'.format(area_type))
+            f.write(u'! {} !! statistics\n'.format(area_type))
             for code in alg_sort:
                 self.text_area_statistics(f, "", alg[code])
             f.write('|}\n')
@@ -138,12 +138,14 @@ class WikiStats(object):
                 stats = self.uwp.get(name, {}).get(index, default_stats)
                 value = stats.number
                 f.write('||{}'.format(value))
-            if self.uwp[name].keys() in ['X']:
-                index = 'X'
-                stats = self.uwp.get(name, {}).get(index, default_stats)
-                value = stats.number
-                f.write ('||{}'.format(value))
-            else:
+            found = False
+            for index in self.uwp[name].iterkeys():
+                if index not in '0123456789ABCDEFGH':
+                    stats = self.uwp[name][index]
+                    f.write ('||{:d}'.format(stats.number))
+                    found = True
+                    break
+            if not found:
                 f.write('||0')
         f.write('\n')
         
@@ -159,13 +161,17 @@ class WikiStats(object):
                 stats = self.uwp.get(name, {}).get(index, default_stats)
                 value = int(stats.population / (population / 100)) if population > 0 else 0
                 f.write('||{:d}%'.format(value))
-            if self.uwp[name].keys() in ['X']:
-                index = 'X'
-                stats = self.uwp.get(name, {}).get(index, default_stats)
-                value = int(stats.population / (population / 100)) if population > 0 else 0
-                f.write ('||{:d}%'.format(value))
-            else:
-                f.write('||0')
+            
+            found = False
+            for index in self.uwp[name].iterkeys():
+                if index not in '0123456789ABCDEFGH':
+                    stats = self.uwp[name][index]
+                    value = int(stats.population / (population / 100)) if population > 0 else 0
+                    f.write ('||{:d}%'.format(value))
+                    found = True
+                    break
+            if not found:
+                f.write('||0%')
         f.write('\n|}')
         
     def ru_statistics (self):
@@ -236,7 +242,7 @@ class WikiStats(object):
     def text_area_statistics(self, f, area_type, area):
             f.write('|-\n')
             f.write(u'|{0}\n'.format(area.wiki_title()))
-            f.write('|| The {} {} contains {:d} worlds with a population of'.format(area.wiki_name(), area_type, 
+            f.write(u'|| The {} {} contains {:d} worlds with a population of'.format(area.wiki_name(), area_type, 
                                                      area.stats.number))
             if area.stats.population >= 1000 :
                 f.write(' {:,d} billion.'.format(area.stats.population/1000))
@@ -279,5 +285,5 @@ class WikiStats(object):
                     f.write(".")
             f.write('\n')
 
-def baseN(num,b,numerals="0123456789ABCDEFGHijklmnopqrstuvwxyz"):
+def baseN(num,b,numerals="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
     return ((num == 0) and numerals[0]) or (baseN(num // b, b, numerals).lstrip(numerals[0]) + numerals[num % b])        
