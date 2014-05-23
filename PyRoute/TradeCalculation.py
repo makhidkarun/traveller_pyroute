@@ -75,11 +75,6 @@ class RouteCalculation (object):
                                                   'trade': 0,
                                                   'btn': btn,
                                                   'count': 0})
-                #self.galaxy.routes.add_edge (star, neighbor, {'distance': dist,
-                #                                  'weight': weight,
-                #                                  'trade': 0,
-                #                                  'btn': btn,
-                #                                  'count': 0})
 
     @staticmethod
     def get_btn (star1, star2):
@@ -236,7 +231,6 @@ class XRouteCalculation (RouteCalculation):
                 data['weight'] -= data['weight'] / self.route_reuse
             if data['count'] > 5:
                 data['weight'] -= data['weight'] / self.route_reuse
-            #self.galaxy.routes[star][neighbor]['weight'] = data['weight']
         
     def find_nearest_capital (self, world, capitals):
         dist = (None, 9999)
@@ -257,10 +251,6 @@ class XRouteCalculation (RouteCalculation):
             end.tradeCount += 1 if end != route[-1] else 0
             self.galaxy.stars[start][end]['trade'] = max(trade, self.galaxy.stars[start][end]['trade'])
             self.galaxy.stars[start][end]['count'] += 1
-            #self.galaxy.routes[start][end]['trade'] = max(trade, self.galaxy.stars[start][end]['trade'])
-            #self.galaxy.routes[start][end]['count'] += 1
-            #self.galaxy.routes[start][end]['weight'] -= \
-            #    self.galaxy.routes[start][end]['weight'] / self.route_reuse
             self.galaxy.stars[start][end]['weight'] -= \
                 self.galaxy.stars[start][end]['weight'] / self.route_reuse
             start = end
@@ -391,7 +381,6 @@ class TradeCalculation(RouteCalculation):
             counter += 1
             processed += 1
         self.logger.info('processed {} routes at BTN {}'.format(counter,base_btn))
-        #self.logger.info('Routes: %s' % self.galaxy.routes.number_of_edges())
         
     
     def get_trade_between(self, star, target):
@@ -450,14 +439,6 @@ class TradeCalculation(RouteCalculation):
             
             self.galaxy.stars[start][end]['trade'] += tradeCr
             self.galaxy.stars[start][end]['count'] += 1
-            
-            #self.galaxy.routes[start][end]['trade'] += tradeCr
-            #self.galaxy.routes[start][end]['count'] += 1
-            # Reduce the weight of this route. 
-            # As the higher trade routes create established routes 
-            # which are more likely to be followed by lower trade routes
-            #self.galaxy.routes[start][end]['weight'] -= \
-            #    self.galaxy.routes[start][end]['weight'] / self.route_reuse
             self.galaxy.stars[start][end]['weight'] -= \
                 self.galaxy.stars[start][end]['weight'] / self.route_reuse
             start = end
@@ -484,14 +465,10 @@ class TradeCalculation(RouteCalculation):
                 # Reduce the weight of this route. 
                 # As the higher trade routes create established routes 
                 # which are more likely to be followed by lower trade routes
-                #self.galaxy.routes[start][end]['weight'] -= \
-                #    self.galaxy.routes[start][end]['weight'] / self.route_reuse
             elif self.galaxy.stars.has_edge(start, end):
                 self.galaxy.stars[start][end]['trade'] += tradeCr
                 dist += self.galaxy.stars[start][end]['distance']
                 weight += self.galaxy.stars[start][end]['weight']
-                #self.galaxy.routes[start][end]['weight'] -= \
-                #    self.galaxy.routes[start][end]['weight'] / self.route_reuse
             else:
                 print start, end, self.galaxy.routes.has_edge(start, end)
             start = end
@@ -645,7 +622,7 @@ class CommCalculation(RouteCalculation):
     
     def get_route_between (self, star, target):
         try:
-            route = nx.astar_path(self.galaxy.routes, star, target, Star.heuristicDistance)
+            route = nx.astar_path(self.galaxy.stars, star, target, Star.heuristicDistance)
         except  nx.NetworkXNoPath:
             return
 
@@ -655,10 +632,6 @@ class CommCalculation(RouteCalculation):
             end.tradeCount += 1 if end != route[-1] else 0
             self.galaxy.stars[start][end]['trade'] = trade
             self.galaxy.stars[start][end]['count'] += 1
-            #self.galaxy.routes[start][end]['trade'] = trade
-            #self.galaxy.routes[start][end]['count'] += 1
-            #self.galaxy.routes[start][end]['weight'] -= \
-            #    self.galaxy.routes[start][end]['weight'] / self.route_reuse
             self.galaxy.stars[start][end]['weight'] -= \
                 self.galaxy.stars[start][end]['weight'] / self.route_reuse
             start = end
