@@ -321,9 +321,10 @@ class HexMap(object):
             added += ' '
             
         tradeIn = self.trade_to_btn(star.tradeIn)
-        tradeOver = self.trade_to_btn(star.tradeOver)
+        #tradeOver = self.trade_to_btn(star.tradeOver)
+        tradeCount = self.trade_to_btn(star.tradeCount)
         if self.routes == 'trade':
-            added += "{0}{1:d}{2:X}{3:X}{4:X}".format(star.baseCode, star.ggCount, star.wtn, tradeIn, tradeOver)
+            added += "{}{:X}{:X}{:d}".format(star.baseCode, star.wtn, tradeIn, tradeCount)
         elif self.routes == 'comm':
             added += "{}{} {}".format(star.baseCode,star.ggCount,star.importance)
         elif self.routes == 'xroute':

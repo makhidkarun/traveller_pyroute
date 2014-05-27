@@ -173,7 +173,6 @@ class Galaxy(object):
         
     def set_positions(self):
         for sector in self.sectors:
-            if sector is None: continue
             for star in sector.worlds:
                 self.stars.add_node(star)
                 self.ranges.add_node(star)
@@ -217,7 +216,7 @@ class Galaxy(object):
         else:
             pass
 
-    def write_routes(self):
+    def write_routes(self, routes=None):
         path = os.path.join(self.output_path, 'ranges.txt')
         with codecs.open(path, "wb") as f:
             nx.write_edgelist(self.ranges, f, data=True)
@@ -228,6 +227,13 @@ class Galaxy(object):
         with open(path, "wb") as f:
             for key, value in self.borders.borders.iteritems():
                 f.write("{}-{}: border: {}\n".format(key[0],key[1], value))
+
+        if routes == 'xroute':
+            path = os.path.join (self.output_path, 'stations.txt')
+            with codecs.open(path, "wb") as f:
+                stars = [star for star in self.stars.nodes_iter() if star.tradeCount > 0]
+                for star in stars:
+                    f.write ("{} - {}\n".format(star, star.tradeCount))
     
 
     def process_owned_worlds(self):

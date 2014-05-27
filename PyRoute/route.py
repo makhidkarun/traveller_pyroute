@@ -69,7 +69,7 @@ def process():
         pdfmap.write_maps()
         
     if args.routes:
-        galaxy.write_routes()
+        galaxy.write_routes(args.routes)
     
     stats = StatCalculation(galaxy)
     stats.calculate_statistics(args.ally_match)
