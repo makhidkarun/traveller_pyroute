@@ -4,37 +4,40 @@ Created on Mar 7, 2014
 @author: tjoneslo
 '''
 import unittest
-from PyRoute.Star import Star
 import re
+import sys
+sys.path.append('../PyRoute')
+from Star import Star
+from Galaxy import Sector
+from TradeCalculation import TradeCalculation
 
 class Test(unittest.TestCase):
 
     def setUp(self):
-        regex = """
+        regex =  """
 ^(\d\d\d\d) +
 (.{15,}) +
 (\w\w\w\w\w\w\w-\w) +
 (.{15,}) +
-(\{ [-]?\d \}| ) +
-(\([0-9A-Z]{3}[+-]\d\)| ) +
-(\[[0-9A-Z]{4}\]| ) +
+((\{ [+-]?[0-5] \}) +(\([0-9A-Z]{3}[+-]\d\)) +(\[[0-9A-Z]{4}\])|( ) ( ) ( )) +
 (\w{1,5}|-) +
-(\w|-) +
+(\w\w?|-|\*) +
 (\w|-) +
 ([0-9][0-9A-F][0-9A-F]) +
 (\d{1,}| )+
-(\w\w) +
+([A-Z0-9-][A-Za-z0-9-]{1,3}) 
 (.*)
 """
+
         star_regex = ''.join([line.rstrip('\n') for line in regex])
         self.starline = re.compile(star_regex)
 
     def testParseIrkigkhan(self):
         star1 = Star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-                     self.starline)
+                     self.starline, Sector('Core', ' 0, 0'), 'fixed')
         
         self.assertTrue(star1.position == '0103')
-        self.assertTrue(star1.q == 1 and star1.r == 3, "%s, %s" % (star1.q, star1.r))
+        self.assertTrue(star1.q == 0 and star1.r == 2, "%s, %s" % (star1.q, star1.r))
         self.assertTrue(star1.name == 'Irkigkhan')
         self.assertTrue(star1.uwp == 'C9C4733-9')
         self.assertTrue(star1.alg == 'Im')
@@ -44,14 +47,13 @@ class Test(unittest.TestCase):
         self.assertFalse(star1.agricultural)
         self.assertFalse(star1.poor)
         self.assertFalse(star1.rich)
-        self.assertTrue(star1.resources)
         self.assertTrue(star1.ggCount == 3)
 
     def testParseShanaMa(self):
         star1 = Star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (300-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-                     self.starline)
+                     self.starline,  Sector('Core', ' 0, 0'), 'fixed')
         self.assertTrue(star1.position == '0104')
-        self.assertTrue(star1.q == 1 and star1.r == 4, "%s, %s" % (star1.q, star1.r))
+        self.assertTrue(star1.q == 0 and star1.r == 3, "%s, %s" % (star1.q, star1.r))
         self.assertTrue(star1.name == 'Shana Ma')
         self.assertTrue(star1.uwp == 'E551112-7')
         self.assertTrue(star1.alg == 'Im')
@@ -61,7 +63,6 @@ class Test(unittest.TestCase):
         self.assertFalse(star1.agricultural)
         self.assertTrue(star1.poor)
         self.assertFalse(star1.rich)
-        self.assertFalse(star1.resources)
         self.assertTrue(star1.ggCount == 3)
         
     def testAPortModifier(self):
@@ -114,8 +115,27 @@ class Test(unittest.TestCase):
         for uwtn in xrange(15):
             wtn = int(round(max(0, (uwtn - 5) / 2)))
             self.assertTrue (wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
+
+    def testCalcTrade(self):
+        self.assertEqual(TradeCalculation.calc_trade(0), 1)
+        self.assertEqual(TradeCalculation.calc_trade(1), 5)
+        self.assertEqual(TradeCalculation.calc_trade(2), 10)
+        self.assertEqual(TradeCalculation.calc_trade(3), 50)
+        self.assertEqual(TradeCalculation.calc_trade(4), 100)
+        self.assertEqual(TradeCalculation.calc_trade(5), 500)
+        self.assertEqual(TradeCalculation.calc_trade(6), 1000)
         
         
+    def testPassengerBTN(self):
+        self.assertEqual(TradeCalculation.calc_passengers(10), 0)
+        self.assertEqual(TradeCalculation.calc_passengers(11), 5)
+        self.assertEqual(TradeCalculation.calc_passengers(12), 10)
+        self.assertEqual(TradeCalculation.calc_passengers(13), 50)
+        self.assertEqual(TradeCalculation.calc_passengers(14), 100)
+        self.assertEqual(TradeCalculation.calc_passengers(15), 500)
+
+
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
