@@ -4,6 +4,7 @@ Created on Mar 17, 2014
 @author: tjoneslo
 '''
 import logging
+import math
 from wikistats import WikiStats
 from collections import OrderedDict
 from AllyGen import AllyGen
@@ -24,7 +25,8 @@ class ObjectStatistics(object):
         self.shipyards  = 0
         self.col_be     = 0
         self.im_be      = 0
-        
+        self.passengers = 0
+        self.spa_people = 0
 
 class StatCalculation(object):
     '''
@@ -52,6 +54,15 @@ class StatCalculation(object):
         for sector in self.galaxy.sectors:
             if sector is None: continue
             for star in sector.worlds:
+                star.starportSize = max(self.trade_to_btn(star.tradeIn + star.tradeOver) - 5,0)
+                star.starportBudget = \
+                    ((star.tradeIn / 10000) * 150 +\
+                    (star.tradeOver/10000) * 140 +\
+                    (star.passIn) * 500 + \
+                    (star.passOver) * 460) / 1000000
+                    
+                star.starportPop = int(star.starportBudget / 0.2)
+                
                 self.add_stats(sector.stats, star)
                 self.add_stats(self.galaxy.stats, star)
                 self.add_stats(sector.subsectors[star.subsector()].stats, star)
@@ -88,9 +99,11 @@ class StatCalculation(object):
         stats.number += 1
         stats.sum_ru += star.ru
         stats.shipyards += star.ship_capacity
-        stats.tradeVol += star.tradeOver
+        stats.tradeVol += (star.tradeOver + star.tradeIn)
         stats.col_be += star.col_be
         stats.im_be += star.im_be
+        stats.passengers  += star.passIn
+        stats.spa_people += star.starportPop
         
     def max_tl (self, stats, star):
         stats.maxTL = max(stats.maxTL, star.tl)
@@ -116,7 +129,6 @@ class StatCalculation(object):
         self.logger.info('Charted population {:,d}'.format(self.galaxy.stats.population))
         
         for sector in self.galaxy.sectors:
-            if sector is None: continue
             self.logger.debug('Sector ' + sector.name + ' star count: ' + str(sector.stats.number))
             
         for code,aleg in self.galaxy.alg.iteritems():
@@ -126,3 +138,8 @@ class StatCalculation(object):
         wiki = WikiStats(self.galaxy, self.uwp, ally_count)
         wiki.write_statistics()
         
+    @staticmethod
+    def trade_to_btn(trade):
+        if trade == 0:
+            return 0
+        return int(math.log(trade,10))

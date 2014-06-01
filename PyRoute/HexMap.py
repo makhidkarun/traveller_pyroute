@@ -3,7 +3,6 @@ Created on Mar 8, 2014
 
 @author: tjoneslo
 '''
-import math
 import os
 import logging
 from pypdflite import PDFLite
@@ -14,6 +13,7 @@ from pypdflite.pdfobjects.pdftext import PDFText
 from Galaxy import Sector
 from Galaxy import Galaxy
 from Star import Star
+from StatCalculation import StatCalculation
 
 
 class HexMap(object):
@@ -45,14 +45,14 @@ class HexMap(object):
             self.draw_borders(pdf, sector)
             
             sector_trade = [star for star in self.galaxy.stars.edges_iter(sector.worlds, True) \
-              if star[2]['trade'] > 0 and self.trade_to_btn(star[2]['trade']) >= self.min_btn ]
+              if star[2]['trade'] > 0 and StatCalculation.trade_to_btn(star[2]['trade']) >= self.min_btn ]
 
             logging.getLogger('PyRoute.HexMap').debug("Worlds with trade: {}".format(len(sector_trade)))                
 
             sector_trade.sort(key=lambda line : line[2]['trade'])
             
             for (star,neighbor,data) in sector_trade:
-                self.galaxy.stars[star][neighbor]['trade btn'] = self.trade_to_btn(data['trade'])
+                self.galaxy.stars[star][neighbor]['trade btn'] = StatCalculation.trade_to_btn(data['trade'])
                 self.trade_line(pdf, [star, neighbor], data)
 
             # Get all the worlds in this sector
@@ -320,11 +320,12 @@ class HexMap(object):
         else:
             added += ' '
             
-        tradeIn = self.trade_to_btn(star.tradeIn)
+        tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
+        tradeThrough = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
         #tradeOver = self.trade_to_btn(star.tradeOver)
-        tradeCount = self.trade_to_btn(star.tradeCount)
+        tradeCount = StatCalculation.trade_to_btn(star.tradeCount)
         if self.routes == 'trade':
-            added += "{}{:X}{:X}{:d}".format(star.baseCode, star.wtn, tradeIn, tradeCount)
+            added += "{:X}{:X}{:X}{:d}".format(star.wtn, tradeIn, tradeThrough, tradeCount)
         elif self.routes == 'comm':
             added += "{}{} {}".format(star.baseCode,star.ggCount,star.importance)
         elif self.routes == 'xroute':
@@ -351,7 +352,7 @@ class HexMap(object):
         start = edge[0]
         end = edge[1]
 
-        trade = self.trade_to_btn(data['trade']) - self.min_btn
+        trade = StatCalculation.trade_to_btn(data['trade']) - self.min_btn
         if trade < 0: 
             return
         if trade > 6:
@@ -431,11 +432,6 @@ class HexMap(object):
             w += font.character_widths[i] if i in font.character_widths else 600
         return w * font.font_size / 1000.0
       
-    @staticmethod
-    def trade_to_btn(trade):
-        if trade == 0:
-            return 0
-        return int(math.log(trade,10))
     
         
 if __name__ == '__main__':

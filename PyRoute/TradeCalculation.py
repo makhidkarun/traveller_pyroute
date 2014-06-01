@@ -81,7 +81,7 @@ class RouteCalculation (object):
                           self.galaxy.ranges.number_of_edges()))
 
     @staticmethod
-    def get_btn (star1, star2):
+    def get_btn (star1, star2, distance=None):
         '''
         Calculate the BTN between two stars, which is the sum of the worlds
         WTNs plus a modifier for types, minus a modifier for distance. 
@@ -96,8 +96,9 @@ class RouteCalculation (object):
         
         if not AllyGen.are_allies(star1.alg, star2.alg):
             btn -= 1
-                        
-        distance = star1.hex_distance(star2)
+                   
+        if not distance:    
+            distance = star1.hex_distance(star2)
         jump_index = bisect.bisect_left(TradeCalculation.btn_jump_range, distance)
         #if distance <= 3:
         #    logging.getLogger('PyRoute.TradeCalculation').info("{} -> index {}".format(distance, jump_index))
@@ -107,6 +108,15 @@ class RouteCalculation (object):
         btn = min(btn, max_btn)
         return btn
 
+    @staticmethod
+    def get_passenger_btn(btn, star, neighbor):
+            passBTN = btn + \
+                1 if star.rich or neighbor.rich else 0 + \
+                1 if 'Cp' in star.tradeCode or 'Cp' in neighbor.tradeCode else 0 + \
+                2 if 'Cs' in star.tradeCode or 'Cs' in neighbor.tradeCode else 0 + \
+                2 if 'Cx' in star.tradeCode or 'Cx' in neighbor.tradeCode else 0
+            return passBTN
+        
     @staticmethod
     def calc_trade (btn):
         '''
@@ -119,6 +129,17 @@ class RouteCalculation (object):
             
         return trade
 
+    @staticmethod
+    def calc_passengers(btn):
+        trade = 0
+        if (btn <= 10):
+            trade  = 0
+        elif btn & 1:
+            trade = (10 ** ((btn - 11)/2)) * 5
+        else:
+            trade = 10 ** ((btn - 10)/2) 
+        return trade
+    
         
 class NoneCalculation(RouteCalculation):
     def __init__(self, galaxy):
@@ -398,6 +419,8 @@ class TradeCalculation(RouteCalculation):
     def base_route_filter (self, star, neighbor):
         if star.zone in ['R', 'F'] or neighbor.zone in ['R','F']:
             return True
+        if 'Ba' in star.tradeCode or 'Ba' in neighbor.tradeCode:
+            return True
         return False
 
     def base_range_routes (self, star, neighbor):
@@ -407,8 +430,10 @@ class TradeCalculation(RouteCalculation):
         # add all the stars in the BTN range, but  skip this pair
         # if there there isn't enough trade to warrant a trade check
         if dist <= max_dist and btn >= self.min_btn:
+            passBTN = self.get_passenger_btn(btn, star, neighbor)
             self.galaxy.ranges.add_edge(star, neighbor, {'distance': dist,
-                                                  'btn': btn})
+                                                  'btn': btn,
+                                                  'passenger btn': passBTN})
         
     
     def generate_routes(self):
@@ -479,19 +504,19 @@ class TradeCalculation(RouteCalculation):
         except  nx.NetworkXNoPath:
             return
 
-        # Gather basic statistics. 
-        tradeBTN = self.get_btn(star, target)
-        tradeCr = self.calc_trade(tradeBTN)
-        star.tradeIn += tradeCr / 2
-        target.tradeIn += tradeCr / 2
+        # Update the trade route (edges)
+        tradeCr,tradePass = self.route_update_simple (route)
 
         if star.sector != target.sector :
             star.sector.stats.tradeExt += tradeCr / 2
             target.sector.stats.tradeExt += tradeCr / 2
             star.sector.subsectors[star.subsector()].stats.tradeExt += tradeCr / 2
             target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr / 2
+            star.sector.stats.passengers += tradePass / 2
+            target.sector.stats.passengers += tradePass / 2
         else:
             star.sector.stats.trade += tradeCr
+            star.sector.stats.passengers += tradePass
             if star.subsector() == target.subsector():
                 star.sector.subsectors[star.subsector()].stats.trade += tradeCr
             else:
@@ -500,17 +525,19 @@ class TradeCalculation(RouteCalculation):
                 
         if AllyGen.are_allies(star.alg, target.alg):
             self.galaxy.alg[AllyGen.same_align(star.alg)].stats.trade += tradeCr
+            self.galaxy.alg[AllyGen.same_align(star.alg)].stats.passengers += tradePass
         else:
             self.galaxy.alg[AllyGen.same_align(star.alg)].stats.tradeExt += tradeCr / 2
             self.galaxy.alg[AllyGen.same_align(target.alg)].stats.tradeExt += tradeCr / 2
+            self.galaxy.alg[AllyGen.same_align(star.alg)].stats.passengers += tradePass / 2
+            self.galaxy.alg[AllyGen.same_align(target.alg)].stats.passengers += tradePass / 2
             
         self.galaxy.stats.trade += tradeCr
+        self.galaxy.stats.passengers += tradePass
         
-        # Update the trade route (edges)
-        self.route_update_simple (route, tradeCr)
     
     
-    def route_update_simple (self, route, tradeCr):
+    def route_update_simple (self, route):
         '''
         Update the trade calculations based upon the route selected.
         - add the trade values for the worlds, and edges 
@@ -521,17 +548,35 @@ class TradeCalculation(RouteCalculation):
         start = route[0]
         for end in route[1:]:
             distance += start.hex_distance(end)
+            start = end
+
+        # Internal statistics
+        self.galaxy.ranges[route[0]][route[-1]]['actual distance'] = distance
+        self.galaxy.ranges[route[0]][route[-1]]['jumps'] = len(route) - 1
+
+        # Gather basic statistics. 
+        tradeBTN = self.get_btn(route[0], route[-1], distance)
+        tradeCr = self.calc_trade(tradeBTN)
+        route[0].tradeIn += tradeCr / 2
+        route[-1].tradeIn += tradeCr / 2
+        tradePassBTN = self.get_passenger_btn(tradeBTN, route[0], route[-1])
+        tradePass    = self.calc_passengers(tradePassBTN)
+        
+        route[0].passIn += tradePass
+        route[0].passIn += tradePass
+        
+        start = route[0]
+        for end in route[1:]:
             end.tradeOver += tradeCr if end != route[-1] else 0
             end.tradeCount += 1 if end != route[-1] else 0
-            
+            end.passOver += tradePass if end != route[-1] else 0
             self.galaxy.stars[start][end]['trade'] += tradeCr
             self.galaxy.stars[start][end]['count'] += 1
             self.galaxy.stars[start][end]['weight'] -= \
                 self.galaxy.stars[start][end]['weight'] / self.route_reuse
             start = end
             
-        self.galaxy.ranges[route[0]][route[-1]]['actual distance'] = distance
-        self.galaxy.ranges[route[0]][route[-1]]['jumps'] = len(route) - 1
+        return (tradeCr, tradePass)
     
     def route_update_skip (self, route, tradeCr):
         '''

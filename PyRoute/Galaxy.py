@@ -124,6 +124,7 @@ class Galaxy(object):
                 continue
             
             sec = Sector (lines[3], lines[4])
+            sec.filename = os.path.basename(sector)
             
             lineno = 0
             for line in lines:

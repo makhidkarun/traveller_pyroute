@@ -7,6 +7,7 @@ Created on Mar 5, 2014
 import logging
 import bisect
 import random
+import math
 from AllyGen import AllyGen
 
 class Star (object):
@@ -85,6 +86,11 @@ class Star (object):
         self.tradeIn  = 0
         self.tradeOver = 0
         self.tradeCount = 0
+        self.passIn = 0
+        self.passOver = 0
+        self.starportSize = 0
+        self.starportBudget = 0
+        self.starportPop = 0
         
     def __unicode__(self):
         return u"{} ({} {})".format(self.name, self.sector.name, self.position)
@@ -233,7 +239,7 @@ class Star (object):
         if port == 'X':
             self.wtn = (self.wtn - 5) / 2
             
-        self.wtn = int(round(max(0, self.wtn)))
+        self.wtn = math.trunc(max(0, self.wtn))
 
     def calculate_ru(self):
         if not self.economics: 
