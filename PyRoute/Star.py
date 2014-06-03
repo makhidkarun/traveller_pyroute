@@ -97,6 +97,7 @@ class Star (object):
         
     def __str__(self):
         name = u"%s (%s %s)" % (self.name,self.sector.name, self.position)
+	#return name
         return name.encode('utf-8')
 
     def __repr__(self):

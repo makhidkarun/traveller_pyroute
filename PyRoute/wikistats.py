@@ -7,8 +7,8 @@ import os
 
 import platform;
 if platform.python_implementation() == "PyPy":
-    import numpypy
-import numpy
+    import _numpypy
+#import numpy
 import codecs
 import datetime
 from AllyGen import AllyGen
