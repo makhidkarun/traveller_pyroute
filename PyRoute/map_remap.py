@@ -15,15 +15,33 @@ import re
 import math
 import argparse
 from collections import defaultdict
-
+import xml.etree.ElementTree as ET
+import os
+import codecs
+import string
 
 def sort_key(aString):
     return aString[-8:-3]
+
+from xml.dom import minidom
+
+def prettify(elem):
+    """Return a pretty-printed XML string for the Element.
+    """
+    rough_string = ET.tostring(elem, 'utf-8')
+    rough_string = string.replace(rough_string, '\r\n', '\n')
+    rough_string = string.replace(rough_string, '\n', '')
+    rough_string = string.replace(rough_string, '>    <', '><')
+    rough_string = string.replace(rough_string, '>  <','><')
+    reparsed = minidom.parseString(rough_string)
+    return reparsed.toprettyxml(indent="  ")
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='route remap for trade routes')
     parser.add_argument('route_file', help='PyRoute route (stars.txt) to process')
+    parser.add_argument('metadata_source', help='TravellerMap metadata xml source file directory')
+    parser.add_argument('output_dir', help='output directory for xml metadata')
     args = parser.parse_args()
 
     tradeColors = ['99FF0000','BFFFFF00', '8000BF00', '9900FFFF', '990000FF', 'BF800080', 'violet' ]
@@ -31,56 +49,61 @@ if __name__ == '__main__':
     regex = ".*\((.*) (\d\d\d\d)\).*\((.*) (\d\d\d\d)\) .* 'trade': ([0-9]*[L]?)" 
     match = re.compile(regex)
     #Kuunaa (Core 0304) Irkigkhan (Core 0103) {'distance': 2, 'btn': 13, 'weight': 41, 'trade': 1000000000}
-    with open(args.route_file) as f:
-        content = f.readlines()
-        
     sectors = defaultdict(list)
-    output = []
-    for entry in content:
-        data = match.match(entry).groups()
-        sectorStart = data[0]
-        start = data[1]
-        sectorEnd = data[2]
-        end = data[3]
-        trade = long(data[4])
-        
-        if trade == 0:
-            continue
-        
-        btn = int(math.log(trade,10))
-        
-        if btn - 8 < 0:
-            continue
-        color = tradeColors[btn-8]
-        routeType = 'btn%02d'%btn
 
-        offset = " "
-        if sectorStart != sectorEnd:
-            startx = int(start[0:2])
-            starty = int(start[2:4])
-            endx = int(end[0:2])
-            endy = int(end[2:4])
+    with open(args.route_file) as f:
+        for entry in f:
+            data = match.match(entry).groups()
+            sectorStart = data[0]
+            start = data[1]
+            sectorEnd = data[2]
+            end = data[3]
+            trade = long(data[4])
             
-            if startx < 4 and endx > 28:
-                offset += ' EndOffsetX="-1" '
-            elif startx > 28 and endx < 4:
-                offset += ' EndOffsetX="1" '
-            if starty < 4 and endy > 36:
-                offset += ' EndOffsetY="-1" '
-            elif starty > 36 and endy < 5:
-                offset += ' EndOffsetY="1" '
-            #EndOffsetX="-1" EndOffsetY="+1"
-            pass
-        
-        
-        output = '<Route Start="{}" End="{}"{}Color="#{}" Type="{}"/>'.format(start, end, offset, color, routeType)
-                
-        sectors[sectorStart].append(output)
+            if trade == 0:
+                continue
+            
+            btn = int(math.log(trade,10))
+            
+            if btn - 8 < 0:
+                continue
+            color = tradeColors[btn-8]
+            routeType = 'btn%02d'%btn
+    
+            output = ET.Element('Route', {'Start': start, 'End': end, 'Color': color, 'Type': routeType})
 
-    for sector,output in sectors.iteritems():
-        output.sort(key=sort_key)
-        outFile = "maps/%s.xml" % sector
-        with open (outFile, "wb") as f:
-            for line in output:
-                f.write(line + "\n")
-        
+            if sectorStart != sectorEnd:
+                startx = int(start[0:2])
+                starty = int(start[2:4])
+                endx = int(end[0:2])
+                endy = int(end[2:4])
+                
+                if startx < 4 and endx > 28:
+                    output.attrib['EndOffsetX'] = '-1'
+                elif startx > 28 and endx < 4:
+                    output.attrib['EndOffsetX'] = '1'
+                if starty < 4 and endy > 36:
+                    output.attrib['EndOffsetY'] = '-1'
+                elif starty > 36 and endy < 5:
+                    output.attrib['EndOffsetY'] = '1'
+            
+            sectors[sectorStart].append(output)
+
+    for sector in sectors.iterkeys():
+        tree = ET.ElementTree()
+        path = os.path.join(args.metadata_source, '%s.xml' % sector)
+        tree.parse(path)
+        routes = tree.find('Routes')
+        if routes: 
+            for route in routes.iter('Route'):
+                if route.attrib.get('Type', '').startswith('btn'):
+                    routes.remove(route)
+        else:
+            routes = ET.Element('Routes')
+            tree.getroot().append(routes)
+
+        routes.extend(sectors[sector])
+        pretty = prettify(tree.getroot())
+        outPath = os.path.join(args.output_dir, '%s.xml' % sector)
+        with codecs.open(outPath, 'wb', 'utf-8') as f:
+            f.write(pretty)
