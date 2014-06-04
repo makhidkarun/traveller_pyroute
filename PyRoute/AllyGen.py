@@ -208,7 +208,7 @@ class AllyGen(object):
             allyMap[(star.q, star.r)].add((alg,0))
             starMap[(star.q, star.r)] = alg
 
-        self._output_map(allyMap, 0)
+        #self._output_map(allyMap, 0)
         
         #Pass 1: generate initial allegiance arrays, 
         # with overlapping maps
@@ -230,7 +230,7 @@ class AllyGen(object):
                         allyMap[neighbor].add((alg,star.axial_distance(Hex,neighbor)))
                         neighbor = self._get_neighbor(neighbor, direction)
 
-        self._output_map(allyMap, 1)
+        #self._output_map(allyMap, 1)
 
         # Pass 2: find overlapping areas and reduce
         # 0: hexes with only one claimant, give it to them
@@ -263,7 +263,7 @@ class AllyGen(object):
                                 maxCount =  self.galaxy.alg[alg].stats.number
                         allyMap[Hex] = maxAlly
                 
-        self._output_map(allyMap, 2)
+        #self._output_map(allyMap, 2)
 
         # Pass 3: find lonely claimed hexes and remove them
         # Do two passes through the data
@@ -284,6 +284,6 @@ class AllyGen(object):
                     allyMap[Hex] = self.nonAligned[0]
                     
                     
-        self._output_map(allyMap, 3)
+        #self._output_map(allyMap, 3)
         self._generate_borders(allyMap)
         
