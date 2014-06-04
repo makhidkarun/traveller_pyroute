@@ -32,7 +32,7 @@ def get_url (url, sector, suffix):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='route remap for trade routes')
+    parser = argparse.ArgumentParser(description='Download sector/metadata from TravellerMap')
     parser.add_argument('sector_list', help='List of sectors to download')
     parser.add_argument('output_dir', help='output directory for sector data and xml metadata')
     args = parser.parse_args()
