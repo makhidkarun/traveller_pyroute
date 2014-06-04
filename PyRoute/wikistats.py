@@ -108,17 +108,24 @@ class WikiStats(object):
         with codecs.open(path, "wb", 'utf_8') as f:
             f.write('===[[Allegiance Code|Allegiance Information]]===\n')
             alg_sort = sorted(alg.iterkeys())
-            f.write('{| class=\"wikitable sortable\"\n!Code ||Name||Worlds||Population (millions)||GNP (BCr)|| RU ||Shipyard Capacity (MTons)||Armed Forces (BE)\n')
+            f.write('{| class=\"wikitable sortable\"\n!Code !! Name !! Worlds !! Population (millions) !! Economy (BCr) !! Per Capita (Cr) !!  RU !! Shipyard Capacity (MTons) !! Armed Forces (BEs) !! SPA Population\n')
             for code in alg_sort:
                 if alg[code].stats.number < self.min_alg_count:
                     continue
                 f.write(u'|-\n| {} || {} '.format(code, alg[code].wiki_name()))
                 stats = alg[code].stats
-                f.write('|| {:,d} || {:,d} || {:,d} || {:,d} || {:,d} '.format(stats.number, stats.population, stats.economy, stats.sum_ru, stats.shipyards))
+                f.write('|| {:,d} '.format(stats.number))
+                f.write('|| {:,d} '.format(stats.population))
+                f.write('|| {:,d} '.format(stats.economy))
+                f.write('|| {:,d} '.format(stats.percapita))
+                f.write('|| {:,d} '.format(stats.sum_ru))
+                f.write('|| {:,d} '.format(stats.shipyards))
                 if AllyGen.are_allies(u'Im', code):
-                    f.write('|| {:,.2f} (IA) + {:,.2F} (CA)\n'.format(stats.im_be, stats.col_be))
+                    f.write('|| {:,.2f} (IA) + {:,.2F} (CA)'.format(stats.im_be, stats.col_be))
                 else:
-                    f.write('|| {:,.2f}\n'.format(stats.col_be))
+                    f.write('|| {:,.2f}'.format(stats.col_be))
+                f.write ('|| {:,d}'.format(stats.spa_people))
+                f.write('\n')
             f.write('|}\n')
             
             area_type = "Allegiance"

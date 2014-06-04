@@ -87,7 +87,6 @@ class StatCalculation(object):
             self.per_capita(sector.stats) # Per capital sector stats
             for subsector in sector.subsectors.itervalues():
                 self.per_capita(subsector.stats)
-                
         self.per_capita(self.galaxy.stats)
         
         for alg in self.galaxy.alg.itervalues():

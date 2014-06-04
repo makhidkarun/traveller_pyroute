@@ -219,10 +219,10 @@ class Galaxy(object):
 
     def write_routes(self, routes=None):
         path = os.path.join(self.output_path, 'ranges.txt')
-        with codecs.open(path, "wb") as f:
+        with open(path, "wb") as f:
             nx.write_edgelist(self.ranges, f, data=True)
         path = os.path.join(self.output_path, 'stars.txt')
-        with codecs.open(path, "wb") as f:
+        with open(path, "wb") as f:
             nx.write_edgelist(self.stars, f, data=True)
         path = os.path.join (self.output_path, 'borders.txt')
         with open(path, "wb") as f:
