@@ -238,7 +238,9 @@ class WikiStats(object):
             f.write('=== Economic Summary by Subsector ===\n')
             f.write(self.stat_header)
             for sector in self.galaxy.sectors:
-                for subsector in sector.subsectors.itervalues():
+                subsectors = [s for s in sector.subsectors.itervalues()]
+                subsectors.sort(key=lambda s: s.position)
+                for subsector in subsectors:
                     f.write('|-\n')
                     f.write(u'|{}\n'.format(subsector.wiki_title()))
                     f.write('|| {:d},{:d}: {}\n'.format(sector.x, sector.y, subsector.position))
@@ -256,29 +258,30 @@ class WikiStats(object):
     def text_area_statistics(self, f, area_type, area):
             f.write('|-\n')
             f.write(u'|{0}\n'.format(area.wiki_title()))
-            f.write(u'|| The {} {} contains {:d} worlds with a population of'.format(area.wiki_name(), area_type, 
-                                                     area.stats.number))
-            if area.stats.population >= 1000 :
-                f.write(' {:,d} billion.'.format(area.stats.population/1000))
-            else:
-                f.write(' {:,d} million.'.format(area.stats.population))
             
-            if len(area.worlds) > 0:
-                popWorld = sorted(area.worlds, key=lambda world : world.population)[-1]
-                f.write(' The highest population is ')
-                if popWorld.popCode >= 9:
-                    f.write('{:,d} billion'.format(popWorld.population/1000))
-                elif popWorld.popCode >=6 :
-                    f.write('{:,d} million'.format(popWorld.population))
-                else:
-                    f.write('less than 1 million')
+            if area_type == 'subsector':
+                f.write(u'|| {}, {} {} of {},'.format(area.wiki_name(), area_type,
+                                                    area.position, area.sector.wiki_name()))
+            else:
+                f.write(u'|| The {} {} '.format(area.wiki_name(), area_type))
 
+            if len(area.worlds) > 0:
+                f.write('contains {:d} worlds with a population of'.format(area.stats.number))
+                self.write_population(area.stats.population, f)
+                popWorld = max(area.worlds, key=lambda w : w.population)
+                f.write(' The highest population is ')
+                self.write_population(popWorld.population, f)
                 f.write(u', at {}.'.format(popWorld.wiki_name()))
                 
                 TLWorlds = [world for world in area.worlds if world.tl == area.stats.maxTL]
-                if len(TLWorlds) > 0 and len(TLWorlds) < 6:
-                    f.write(' The highest tech level is {} at '.format(baseN(area.stats.maxTL,18)))
-                    f.write (", ".join(w.wiki_name() for w in TLWorlds))
+                if len(TLWorlds) == 1:
+                    f.write(' The highest tech level is {} at {}.'.format(baseN(area.stats.maxTL,18), 
+                                                                          TLWorlds[0].wiki_name()))
+                elif len(TLWorlds) > 1:
+                    f.write(' The highest tech level is {} at '.format(baseN(area.stats.maxTL,18))) 
+                    TLWorlds = TLWorlds[0:6]
+                    f.write (", ".join(w.wiki_name() for w in TLWorlds[:-1]))
+                    f.write (", and {}".format(TLWorlds[-1].wiki_name()))
                     f.write (".")
                 
                 subsectorCp = [world for world in area.worlds if 'Cp' in world.tradeCode]
@@ -297,6 +300,10 @@ class WikiStats(object):
                     f.write(u' The subsector capital is at ')
                     f.write(subsectorCp[0].wiki_name())
                     f.write(".")
+            else:
+                f.write (' contains no charted worlds.')
+                
+            #There are seven naval bases in the subsector and four scout bases.
             f.write('\n')
             
     def write_world_statistics(self):
@@ -310,6 +317,9 @@ class WikiStats(object):
                 f.write('# {}\n\n'.format(datetime.datetime.now()))
                 f.write('# {}\n'.format(sector.name))
                 f.write('# {},{}\n\n'.format(sector.x, sector.y))
+                
+                f.write('# Source: http://www.travellermap.com/api/sec?sector={}&type=SecondSurvey\n'.format(sector.name))
+                f.write('# Key: http://wiki.travellerrpg.com/Trade_map_key\n\n')
                 
                 subsector = [sub for sub in sector.subsectors.itervalues()]
                 subsector.sort(key=lambda sub : sub.position)
@@ -334,6 +344,15 @@ class WikiStats(object):
                     f.write('{:6d}'.format(star.starportSize))
                     f.write('{:10,d}'.format(star.starportPop))
                     f.write('\n')
+
+    def write_population(self, population, f):
+            if population >= 1000 :
+                f.write(' {:,d} billion.'.format(population/1000))
+            elif population >= 1:
+                f.write(' {:,d} million.'.format(population))
+            else:
+                f.write(' less than 1 million.')
+            
                     
     
 def baseN(num,b,numerals="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
