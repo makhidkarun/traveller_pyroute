@@ -214,6 +214,8 @@ class Galaxy(object):
             self.borders.create_borders(match)
         elif border_gen == 'allygen':
             self.borders.create_ally_map(match)
+        elif border_gen == 'erode':
+            self.borders.create_erode_border(match)
         else:
             pass
 

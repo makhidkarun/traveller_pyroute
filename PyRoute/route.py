@@ -15,7 +15,7 @@ logger = logging.getLogger('PyRoute')
 
 def process():
     parser = argparse.ArgumentParser(description='Traveller trade route generator.')
-    parser.add_argument('--borders', choices=['none', 'range', 'allygen'], default='range',
+    parser.add_argument('--borders', choices=['none', 'range', 'allygen', 'erode'], default='range',
                         help='Allegiance border generation')
     parser.add_argument('--ally-match', choices=['collapse', 'separate'], default='collapse',
                         help='Allegiance matching for borders')
