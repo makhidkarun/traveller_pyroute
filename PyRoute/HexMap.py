@@ -302,12 +302,12 @@ class HexMap(object):
         self.zone(pdf, star, point.copy())
         
         width = self.string_width(pdf.get_font(), star.uwp)
-        point.y_plus(4)
+        point.y_plus(6)
         point.x_plus(self.ym -(width/2))
         pdf.add_text (star.uwp.encode('ascii', 'replace'), point)
         
         width = self.string_width(pdf.get_font(), star.name)
-        point.y_plus(6)
+        point.y_plus(3.5)
         point.x = col
         point.x_plus(self.ym - (width/2))
         pdf.add_text(star.name.encode('ascii', 'replace'), point)
@@ -319,7 +319,15 @@ class HexMap(object):
             added += '*'
         else:
             added += ' '
-            
+        
+        added += '{:d}'.format (star.ggCount)
+        point.y_plus(3.5)
+        point.x = col
+        width = pdf.get_font()._string_width(added)
+        point.x_plus(self.ym - (width/2))
+        pdf.add_text(added, point)
+
+        added = ''            
         tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
         tradeThrough = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
         #tradeOver = self.trade_to_btn(star.tradeOver)
@@ -331,7 +339,7 @@ class HexMap(object):
         elif self.routes == 'xroute':
             added += " {}".format(star.importance)
         width = pdf.get_font()._string_width(added)
-        point.y_plus(6)
+        point.y_plus(3.5)
         point.x = col
         point.x_plus(self.ym - (width/2))
         pdf.add_text(added, point)
