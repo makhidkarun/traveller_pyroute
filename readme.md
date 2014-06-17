@@ -24,7 +24,7 @@ Running the program
 ===================
 
     $ python PyRoute/route.py --help 
-    usage: route.py [-h] [--borders {none,range,allygen}]
+    usage: route.py [-h] [--borders {none,range,allygen,erode}]
                 [--ally-match {collapse,separate}] [--min-btn BTN]
                 [--min-ally-count ALLY_COUNT] [--min-route-btn ROUTE_BTN]
                 [--max-jump MAX_JUMP] [--pop-code {fixed,scaled,benford}]
@@ -62,7 +62,9 @@ Running the program
 
 The default values used for the program are scaled for the standards set by the Traveller world generation used in the T5 Second Survey, and by extension, the values used by most of the Traveller world generation systems. The parameters are present to allow generating routes in areas where the worlds don't conform to Imperial standards. 
 
-``borders`` select the algorithm used to draw the borders between various allegiances. `none` sets no borders on the map. `range` (the default) uses the border generation from the nroute.c code. This is a quick border generation system, but can generate odd borders where empires overlap. `allygen` is based upon the [allygen](http://dotclue.org/t20/) code created by J. Greely. This is a more comprehensive border generation system, which produced better, but not perfect borders. 
+``borders`` select the algorithm used to draw the borders between various allegiances. `none` sets no borders on the map. `range` (the default) uses the border generation from the nroute.c code. `allygen` is based upon the [allygen](http://dotclue.org/t20/) code created by J. Greely. `erode` is based upon the border system from [TravellerMap](http://travellermap.com/borders/doc.htm).
+
+``ally-match`` determine how the more detailed T5 allegiance codes are either grouped or separated to determine where borders are drawn. 
 
 The ``min-btn`` argument sets the minimum BTN, trade levels between worlds. Worlds where the calculated trade between two worlds is below this threshold are ignored. This serves as an optimization to avoid calculating trade between two worlds which won't add much to the overall trade. The default value (13) works well for the Imperium, but for areas where worlds are less populous, or have lower TLs overall, setting this lower allow generating more routes. 
 
@@ -81,7 +83,7 @@ The ``routes`` option select the route processing for drawing on the map. The `t
 Input format
 ------------
 
-PyRoute assumes the input files are the generated raw data files from [Traveller Map](http://www.travellermap.com). The raw data format is described [here](http://travellermap.com/doc/secondsurvey.html). But the header information, especially the sector name, location, and the _Alleg_ information is also required and will cause failure or unexpected results if incorrectly formatted. 
+PyRoute assumes the input files are the generated raw data files from [Traveller Map](http://www.travellermap.com). The raw data format is described [here](http://travellermap.com/doc/secondsurvey.html). The header information, especially the sector name, location, subsectors list, and the _Alleg_ information is also required and will cause failure or unexpected results if incorrectly formatted. 
 
 
 Output files
@@ -111,5 +113,21 @@ The process takes between O(n^2) and O(n^3) processing time, meaning the more st
 * Small areas (100-200 stars) take a few seconds
 * Full sectors (400-600 stars) take one to two minutes 
 * Multi-sector areas (around 2000 stars) take 20 to 30 minutes
-* The T5 Second survey area (30 sectors, 12880 stars) takes 3 hours
+* The T5 Second survey area (30 sectors, 12880 stars) takes 3-4 hours
 * The entire of charted space (132 sectors, 50,598 stars) takes 15 hours. 
+
+Map Borders
+===========
+
+The PyRoute program has four border generation algorithms, with one option for selection of allies. 
+
+`ally-match` option determines if similar allied groups are grouped as one empire, or separated into their component parts. With the new T5 Second Survey, the Allegiance codes have become 4 characters. This allows identifying sub-groups within a larger empire. For example the Third Imperium (code Im) now has different codes for each domain (for example, ImDe for the Domain of Deneb). Setting `ally-match` to `collapse` considered the worlds in the Domain of Deneb and the Domain of Vland to be in the same empire. Setting `ally-match` to `separate` determines these to be different empires and draws a border between the two domains. 
+
+The four systems for determining how borders are drawn are: 
+
+* `none` - draw no borders on the map. 
+* `range` - This is a simple system from the original nroute.c code. This is a two pass process. The first pass sets the alignment of each empty hex around each world to that of the world. The second pass extends the the empty hex alignment selection to the next circle of hexes. If a hex already has an alignment, either because there is a world there or selected by earlier step, the previous selection is kept. 
+* `allygen` - This is a partial re-implementation of the system presented in [allygen](http://dotclue.org/t20/) code created by J. Greely. As implemented here, this is a three pass process. The first pass marks each hex around every world as aligned with that world. The distance of selected hexes depends upon the center world's starport (E,X ports have none, A ports have range of 4). If there is more than one world claiming an empty hex, the list of claimants is kept. The second pass, the alignments of the empty hexes is resolved by selecting (in order) the single claimant, the closer world, or the larger empire. In a third pass, some of the hexes at the edge of each empire are set back to unaligned to avoid having odd protuberances.
+*  `erode` is based upon the border drawing system from [TravellerMap](http://travellermap.com/borders/doc.htm). The page has an excellent description of the reason for borders and the algorithm. This is a multi-pass system. The first step is to mark some of the empty hexes with an allegiance code. As described (and implemented) the original system picks one allegiance code and marks every hex on the map. The PyRoute implementation uses slightly modified version of the allygen selection process to perform the initial marking of the empty hexes. This uses the first two steps of the allygen process to mark empty hexes in a radius around each world, then uses a system to select one allegiance for each empty hex. The third pass uses the alternating erode and span breaking system from the border drawing system to reset alignments of empty hexes outside the empire. The fourth step, bridge building, is mention in the article and implemented in code, re-establishes the alignments of some empty hexes between aligned worlds otherwise separated by the third step. 
+
+
