@@ -44,6 +44,7 @@ class Star (object):
         self.zone = data[13].strip()
         self.ggCount = int(data[14][2],16)
         self.popM = int(data[14][0])
+        self.belts = int(data[14][1], 16)
         
         self.alg = data[16].strip()
         

@@ -5,13 +5,10 @@ Created on Mar 22, 2014
 '''
 import os
 
-import platform;
-if platform.python_implementation() == "PyPy":
-    import numpypy
-import numpy
 import codecs
 import datetime
 from AllyGen import AllyGen
+import urllib
 
 class WikiStats(object):
     '''
@@ -31,7 +28,6 @@ class WikiStats(object):
         self.summary_statistics()
         self.top_summary()
         self.tcs_statistics()
-        #self.ru_statistics()
         self.subsector_statistics()
         self.write_allegiances(self.galaxy.alg)
         self.write_world_statistics()
@@ -188,29 +184,6 @@ class WikiStats(object):
                 f.write('||0%')
         f.write('\n|}')
         
-    def ru_statistics (self):
-        path = os.path.join(self.galaxy.output_path, 'ru_summary.wiki')
-        with open (path, 'w+') as f:
-            f.write('=== Resource Units statistics by sector ===\n')
-            f.write('{| class=\"wikitable sortable\"\n!Sector!!X,Y!!Worlds !! negative RUs !! positive RUs !! sum(RU) !! avg(RU) !! min(RU) !! max(RU) \n')
-            for sector in self.galaxy.sectors:
-                star_ru = [star.ru for star in sector.worlds]
-                neg_ru = [star.ru for star in sector.worlds if star.ru <= 0]
-                pos_ru = [star.ru for star in sector.worlds if star.ru >0]
-                ru_sum = sum(star_ru)
-                if ru_sum != 0 :
-                    f.write('|-\n')
-                    f.write('|{0}\n'.format(sector.wiki_name()))
-                    f.write('| {:d},{:d}\n'.format(sector.x, sector.y))
-                    f.write('|align="right"|{:d}\n'.format(sector.stats.number))
-                    f.write('|align="right"|{:d}\n'.format(len(neg_ru)))
-                    f.write('|align="right"|{:d}\n'.format(len(pos_ru)))
-                    f.write('|align="right"|{:,d}\n'.format(ru_sum))
-                    f.write('|align="right"|{:10.4f}\n'.format(numpy.average(star_ru)))
-                    f.write('|align="right"|{:10.0f}\n'.format(numpy.amin(star_ru)))
-                    f.write('|align="right"|{:10.0f}\n'.format(numpy.amax(star_ru)))
-            f.write('|}\n')
-        
     def tcs_statistics (self):
         path = os.path.join(self.galaxy.output_path, 'tcs_summary.wiki')
         with open (path, 'w+') as f:
@@ -318,20 +291,23 @@ class WikiStats(object):
                 f.write('# {}\n'.format(sector.name))
                 f.write('# {},{}\n\n'.format(sector.x, sector.y))
                 
-                f.write('# Source: http://www.travellermap.com/api/sec?sector={}&type=SecondSurvey\n'.format(sector.name))
+                params = urllib.urlencode({'sector': sector, 'type': 'SecondSurvey'})
+                url = 'http://www.travellermap.com/api/sec?%s' % params
+                f.write('# Source: {}\n'.format(url))
                 f.write('# Key: http://wiki.travellerrpg.com/Trade_map_key\n\n')
-                
+
                 subsector = [sub for sub in sector.subsectors.itervalues()]
                 subsector.sort(key=lambda sub : sub.position)
                 for s in subsector:
                     f.write('# Subsector {}: {}\n'.format(s.position, s.name))
                 f.write('\n')
-                f.write('Hex  Name                 UWP       {Ix}    WTN GWP(MCr) Trade(MCr) Passengers   RU   Build Cap    Army  Port  SPA pop  \n')
-                f.write('---- -------------------- --------- ------- --- -------- ---------- ---------- ------ ----------- ------ ----  -------- \n')
+                f.write('Hex  Name                 UWP       PBG   {Ix}   WTN GWP(MCr) Trade(MCr) Passengers   RU   Build Cap    Army  Port  SPA pop  \n')
+                f.write('---- -------------------- --------- ---  ------- --- -------- ---------- ---------- ------ ----------- ------ ----  -------- \n')
                 for star in sector.worlds:
                     f.write('{:5}'.format(star.position))
                     f.write(u'{:21}'.format(star.name))
                     f.write('{:10}'.format(star.uwp))
+                    f.write('{:d}{:d}{:d}  '.format(star.popM, star.belts, star.ggCount))
                     f.write('{{ {:d} }}'.format(star.importance))
                     f.write(onespace if star.importance < 0 else twospace)
                     f.write('{:3d}'.format(star.wtn))
