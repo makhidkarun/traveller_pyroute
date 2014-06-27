@@ -161,7 +161,11 @@ class Galaxy(object):
                 if match == 'collapse':
                     self.alg[base].worlds.append(star)
                 elif match == 'separate':
-                    self.alg[star.alg].worlds.append(star)
+                    try: 
+                        self.alg[star.alg].worlds.append(star)
+                    except KeyError:
+                        self.logger.error ("Allegiance %s is not in the %s sector file allegiance list" % (star.alg, sec))
+                        raise SystemExit(3)
                     if base != star.alg:
                         self.alg[base].worlds.append(star)
                     
