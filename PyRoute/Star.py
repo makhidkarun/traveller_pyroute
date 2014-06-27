@@ -370,7 +370,7 @@ class Star (object):
             ]
         
         pop_code = min(self.popCode - 3, 7)
-        if self.uwpCodes['Atmosphere'] not in ['568']:
+        if self.uwpCodes['Atmosphere'] not in '568':
             pop_code -= 1
         if pop_code >= 0:
             self.raw_be = BE[min(self.tl, 16)][pop_code]
