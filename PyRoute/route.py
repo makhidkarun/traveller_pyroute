@@ -63,17 +63,17 @@ def process():
 
     if args.trade:
         galaxy.trade.calculate_routes()
+
+    if args.routes:
+        galaxy.write_routes(args.routes)
+
+    stats = StatCalculation(galaxy)
+    stats.calculate_statistics(args.ally_match)
+    stats.write_statistics(args.ally_count)
     
     if args.maps:
         pdfmap = HexMap(galaxy, args.routes, args.route_btn)
         pdfmap.write_maps()
-        
-    if args.routes:
-        galaxy.write_routes(args.routes)
-    
-    stats = StatCalculation(galaxy)
-    stats.calculate_statistics(args.ally_match)
-    stats.write_statistics(args.ally_count)
     
     logger.info("process complete")
 
