@@ -71,18 +71,19 @@ class HexMap(object):
 
             for star in sector.worlds:
                 self.system(pdf, star)
+            if sector.coreward:
+                self.coreward_sector(pdf, sector.coreward.name)
+            if sector.rimward:
+                self.rimward_sector(pdf, sector.rimward.name)
+            if sector.spinward:
+                self.spinward_sector(pdf, sector.spinward.name)
+            if sector.trailing:
+                self.trailing_sector(pdf, sector.trailing.name)
+            
             self.writer.close()
 
     def write_base_map(self, pdf, sector):
         self.sector_name(pdf, sector.name)
-        if sector.coreward:
-            self.coreward_sector(pdf, sector.coreward.name)
-        if sector.rimward:
-            self.rimward_sector(pdf, sector.rimward.name)
-        if sector.spinward:
-            self.spinward_sector(pdf, sector.spinward.name)
-        if sector.trailing:
-            self.trailing_sector(pdf, sector.trailing.name)
         self.subsector_grid(pdf)
         self.hex_grid(pdf, self._draw_all, 0.5)
         
@@ -124,7 +125,7 @@ class HexMap(object):
         pdf.set_font (font=def_font)
         
     def trailing_sector(self, pdf, name):
-        cursor = PDFCursor(596, 390, True)
+        cursor = PDFCursor(598, 390, True)
         def_font = pdf.get_font()
         pdf.set_font('times', size=10)
         cursor.y_plus(-(pdf.get_font()._string_width(name)/2))
@@ -302,15 +303,18 @@ class HexMap(object):
         self.zone(pdf, star, point.copy())
         
         width = self.string_width(pdf.get_font(), star.uwp)
-        point.y_plus(6)
+        point.y_plus(7)
         point.x_plus(self.ym -(width/2))
         pdf.add_text (star.uwp.encode('ascii', 'replace'), point)
         
-        width = self.string_width(pdf.get_font(), star.name)
+        for chars in xrange(len(star.name), 0, -1):
+            width = self.string_width(pdf.get_font(), star.name[:chars])
+            if width <= self.xm * 3.5:
+                break
         point.y_plus(3.5)
         point.x = col
         point.x_plus(self.ym - (width/2))
-        pdf.add_text(star.name.encode('ascii', 'replace'), point)
+        pdf.add_text(star.name[:chars].encode('ascii', 'replace'), point)
         
         added = star.alg
         if 'Cp' in star.tradeCode:
@@ -330,10 +334,9 @@ class HexMap(object):
         added = ''            
         tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
         tradeThrough = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
-        #tradeOver = self.trade_to_btn(star.tradeOver)
-        tradeCount = StatCalculation.trade_to_btn(star.tradeCount)
+        
         if self.routes == 'trade':
-            added += "{:X}{:X}{:X}{:d}".format(star.wtn, tradeIn, tradeThrough, tradeCount)
+            added += "{:X}{:X}{:X}{:d}".format(star.wtn, tradeIn, tradeThrough, star.starportSize)
         elif self.routes == 'comm':
             added += "{}{} {}".format(star.baseCode,star.ggCount,star.importance)
         elif self.routes == 'xroute':
@@ -372,12 +375,13 @@ class HexMap(object):
         color.set_color_by_number(tradeColor[0], tradeColor[1], tradeColor[2])
 
         starty = self.y_start + ( self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
-        lineStart = PDFCursor ((self.xm * 3 * (start.col)) + self.ym, starty)
+        startx = (self.xm * 3 * (start.col)) + self.ym
 
         endRow = end.row
         endCol = end.col
-        
+        endCircle = True
         if (end.sector != start.sector):
+            endCircle = False
             if end.sector.x < start.sector.x:
                 endCol -= 32
             if end.sector.x > start.sector.x:
@@ -386,9 +390,17 @@ class HexMap(object):
                 endRow -= 40
             if end.sector.y > start.sector.y:
                 endRow += 40
-            
-        endy   = self.y_start + ( self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
-        lineEnd = PDFCursor ((self.xm * 3 * (endCol)) + self.ym, endy)
+            endy   = self.y_start + ( self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
+            endx   = (self.xm * 3 * endCol) + self.ym
+
+            (startx, starty),(endx, endy) = self.clipping(startx, starty, endx, endy)
+
+        else:
+            endy   = self.y_start + ( self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
+            endx   = (self.xm * 3 * endCol) + self.ym
+
+        lineStart = PDFCursor (startx, starty)
+        lineEnd = PDFCursor (endx, endy)
 
         line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, style='solid', color=color, size=1)
         line._draw()
@@ -396,8 +408,10 @@ class HexMap(object):
         radius = PDFCursor(2, 2)
         circle = PDFEllipse(pdf.session, pdf.page, lineStart, radius, color, size=3)
         circle._draw()
-        circle = PDFEllipse(pdf.session, pdf.page, lineEnd, radius, color, size=3)
-        circle._draw()
+        
+        if endCircle: 
+            circle = PDFEllipse(pdf.session, pdf.page, lineEnd, radius, color, size=3)
+            circle._draw()
         
 
                         
@@ -434,13 +448,41 @@ class HexMap(object):
         
     @staticmethod
     def string_width(font, string):
-        #pdf.get_font()._string_width(star.uwp)
         w = 0
         for i in string:
             w += font.character_widths[i] if i in font.character_widths else 600
         return w * font.font_size / 1000.0
       
-    
+    def clipping(self, startx, starty, endx, endy):
+        points_t = [0.0,1.0]
+        line_pt_1 = [startx, starty]
+        line_pt_2 = [endx, endy]
+
+        if startx == endx:
+            if starty > endy:
+                return ((startx, min(max(starty, endy), 780)),
+                        (startx, max(min(starty, endy), 42)))
+            else: 
+                return ((startx, max(min(starty, endy), 42)),
+                        (startx, min(max(starty, endy), 780)))
+
+        if starty == endy:
+            if startx > endx: 
+                return ((min(max(startx, endx), 600), starty), 
+                        (max(min(startx, endx),  15), starty))
+            else:
+                return ((max(min(startx, endx),  15), starty),
+                        (min(max(startx, endx), 600), starty))
+ 
+        points_t.append( float(15-startx)/(endx-startx) )
+        points_t.append( float(600-startx)/(endx-startx) )
+        points_t.append( float(780-starty)/(endy-starty) )
+        points_t.append( float(42-starty)/(endy-starty) )
+         
+        points_t.sort()
+        result = [(pt_1 + t*(pt_2-pt_1)) for t in (points_t[2],points_t[3]) for (pt_1, pt_2) in zip(line_pt_1, line_pt_2)]
+        logging.getLogger("PyRoute.HexMap").debug (result)
+        return (result[0],result[1]), (result[2], result[3])
         
 if __name__ == '__main__':
     sector = Sector('# Core', '# 0,0')
