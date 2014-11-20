@@ -34,6 +34,8 @@ def process():
     
     parser.add_argument('--routes', dest='routes', choices=['trade', 'comm','xroute', 'none'], default='trade',
                         help='Route type to be generated')
+    parser.add_argument('--route-reuse', default=10, type=int,
+                        help='Scale for reusing routes during route generation')
     
     parser.add_argument('--output', default='maps', help='output directory for maps, statistics')
     
@@ -53,7 +55,7 @@ def process():
     logger.info ("%s sectors read" % len(galaxy.sectors))
     
     
-    galaxy.generate_routes(args.routes, args.owned)
+    galaxy.generate_routes(args.routes, args.owned, args.route_reuse)
     
     galaxy.set_borders(args.borders, args.ally_match)
 

@@ -387,13 +387,13 @@ class XRouteCalculation (RouteCalculation):
 
 class TradeCalculation(RouteCalculation):
     '''
-    Perform the trade calcuations by generating the routes
+    Perform the trade calculations by generating the routes
     between all the trade pairs
     '''
     # Weight for route over a distance. The relative cost for
     # moving freight between two worlds a given distance apart
     # in a single jump.         
-    distance_weight = [0, 30, 50, 80, 150, 240, 450 ]
+    distance_weight = [0, 30, 50, 70, 90, 120, 140 ]
     # Set an initial range for influence for worlds based upon their
     # wtn. For a given world look up the range given by (wtn-8) (min 0), 
     # and the system checks every other world in that range for trade 
@@ -405,7 +405,7 @@ class TradeCalculation(RouteCalculation):
     max_wtn = 15
 
 
-    def __init__(self, galaxy, min_btn=13, route_btn = 8):
+    def __init__(self, galaxy, min_btn=13, route_btn = 8, route_reuse=10):
         super(TradeCalculation, self).__init__(galaxy)
 
         # Minimum BTN to calculate routes for. BTN between two worlds less than
@@ -415,6 +415,10 @@ class TradeCalculation(RouteCalculation):
 
         # Minimum WTN to process routes for
         self.min_wtn = route_btn
+        
+        # Override the default setting for route-reuse from the base class
+        # based upon program arguments. 
+        self.route_reuse = route_reuse;
 
     def base_route_filter (self, star, neighbor):
         if star.zone in ['R', 'F'] or neighbor.zone in ['R','F']:
@@ -450,16 +454,14 @@ class TradeCalculation(RouteCalculation):
             if len(self.galaxy.stars.neighbors(star)) < 11:
                 continue
             neighbor_routes = [(s,n,d) for (s,n,d) in self.galaxy.stars.edges_iter([star], True)]
-            neighbor_routes = sorted (neighbor_routes, key=lambda tn: tn[2]['btn'])
-            neighbor_routes = sorted (neighbor_routes, key=lambda tn: tn[2]['distance'])
-            neighbor_routes = sorted (neighbor_routes, key=lambda tn: tn[2]['weight'], reverse=True)
+            neighbor_routes.sort(key=lambda tn: (tn[2]['btn'],tn[2]['distance']))
             
             length = len(neighbor_routes)
             
             for (s,n,d) in neighbor_routes:
                 if len(self.galaxy.stars.neighbors(n)) < 15: 
                     continue
-                if length <= 15:
+                if length <= 21:
                     break
                 self.galaxy.stars.remove_edge(s,n)
                 length -= 1
@@ -473,13 +475,13 @@ class TradeCalculation(RouteCalculation):
         '''
         self.logger.info('sorting routes...')
         btn = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges_iter(data=True)]
-        btn_array = sorted(btn, key=lambda tn: tn[2]['btn'], reverse=True)
+        btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
         
         base_btn = 0
         counter = 0
         processed = 0
-        total = len(btn_array)
-        for (star,neighbor,data) in btn_array:
+        total = len(btn)
+        for (star,neighbor,data) in btn:
             if base_btn != data['btn']:
                 if counter > 0:
                     self.logger.info('processed {} routes at BTN {}'.format(counter,base_btn))
