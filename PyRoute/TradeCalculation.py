@@ -392,8 +392,21 @@ class TradeCalculation(RouteCalculation):
     '''
     # Weight for route over a distance. The relative cost for
     # moving freight between two worlds a given distance apart
-    # in a single jump.         
-    distance_weight = [0, 30, 50, 70, 90, 120, 140 ]
+    # in a single jump.
+    # These are made up from whole cloth.          
+    #distance_weight = [0, 30, 50, 70, 90, 120, 140 ]
+    
+    # GT Weights based upon one pass estimate
+    distance_weight = [0, 30, 50, 70, 110, 170, 300]
+    
+    # Pure HG weights
+    #distance_weight = [0, 30, 50, 75, 130, 230, 490]
+
+    # MGT weights
+    #distance_weight = [0, 30, 60, 105, 190, 410, 2470]
+
+
+
     # Set an initial range for influence for worlds based upon their
     # wtn. For a given world look up the range given by (wtn-8) (min 0), 
     # and the system checks every other world in that range for trade 
