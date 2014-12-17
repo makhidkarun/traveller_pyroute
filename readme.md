@@ -28,7 +28,8 @@ Running the program
                 [--ally-match {collapse,separate}] [--min-btn BTN]
                 [--min-ally-count ALLY_COUNT] [--min-route-btn ROUTE_BTN]
                 [--max-jump MAX_JUMP] [--pop-code {fixed,scaled,benford}]
-                [--owned-worlds] [--routes {trade,comm,xroute,none}]
+                [--owned-worlds] 
+                [--routes {trade,comm,xroute,none}][--route-reuse ROUTE_REUSE]
                 [--output OUTPUT] [--no-trade] [--no-maps] [--version]
                 sector [sector ...]
 
@@ -55,6 +56,9 @@ Running the program
       --owned-worlds
       --routes {trade,comm,xroute,none}
                             Route type to be generated
+      --route-reuse ROUTE_REUSE
+                            Scale for reusing routes during route generation
+
       --output OUTPUT       output directory for maps, statistics
       --no-trade
       --no-maps
@@ -79,6 +83,9 @@ The ``min-route-btn`` defines the minimum BTN drawn on the map. The default (8) 
 ``owned-worlds`` is used by the T5 Second Survey team to verify the owned (Government type 6) worlds have a valid controlling world government. When enabled it produces an `owned-worlds.txt` report. This report lists each owned world, the current listed owner (if any), and a list of candidate worlds 
 
 The ``routes`` option select the route processing for drawing on the map. The `trade` option drawn the trade routes as described above. The `comm` option drawn a communications network, connecting the most important worlds, capitals, naval depots, and scout way stations within the various empires. `xroute` is a second option to draw a communications route for the Imperial sectors. `none` produces maps with no routes drawn. The last option is useful for producing the statistical output without the longer route production time. 
+
+The ``route-reuse`` option affects the `trade` route generation. As routes are generated from larger worlds to smaller worlds, the system prefers to use an already established (probably large) route even if it is slightly longer (in both parsecs and number of jumps). The default value is 10, and is an arbitrary value. Setting this below 10 results in a lot of main routes with a few spiky connectors. Setting it above 20 results in many nearby (almost overlapping) routes. 
+
 
 Input format
 ------------
