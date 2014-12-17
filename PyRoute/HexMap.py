@@ -170,7 +170,7 @@ class HexMap(object):
         color = pdf.get_color()
         color.set_color_by_name(colorname)
         
-        hline = PDFLine(pdf.session, pdf.page, hlineStart, hlineEnd, style='solid', color=color, size=width)
+        hline = PDFLine(pdf.session, pdf.page, hlineStart, hlineEnd, stroke='solid', color=color, size=width)
 
         return (hlineStart, hlineEnd, hline)
     
@@ -196,7 +196,7 @@ class HexMap(object):
         color = pdf.get_color()
         color.set_color_by_name(colorname)
         
-        lline = PDFLine(pdf.session, pdf.page, llineStart, llineEnd, style='solid', color=color, size=width)
+        lline = PDFLine(pdf.session, pdf.page, llineStart, llineEnd, stroke='solid', color=color, size=width)
        
         return (llineStart, llineEnd, lline)
 
@@ -220,7 +220,7 @@ class HexMap(object):
         
         color = pdf.get_color()
         color.set_color_by_name(colorname)
-        rline = PDFLine(pdf.session, pdf.page, rlineStart, rlineEnd, style='solid', color=color, size=width)
+        rline = PDFLine(pdf.session, pdf.page, rlineStart, rlineEnd, stroke='solid', color=color, size=width)
 
         return (rlineStart, rlineEnd, rline)
 
@@ -402,7 +402,7 @@ class HexMap(object):
         lineStart = PDFCursor (startx, starty)
         lineEnd = PDFCursor (endx, endy)
 
-        line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, style='solid', color=color, size=1)
+        line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, stroke='solid', color=color, size=1)
         line._draw()
 
         radius = PDFCursor(2, 2)
