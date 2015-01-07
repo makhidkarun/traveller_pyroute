@@ -58,7 +58,7 @@ class Sector (object):
         self.rimward = None
         
     def __str__(self):
-        return "{} ({},{})".format(self.name, str(self.x), str(self.y))
+        return u"{} ({},{})".format(self.name, str(self.x), str(self.y))
 
     def sector_name (self):
         return self.name[:-7] if self.name.endswith(u'Sector') else self.name
@@ -231,13 +231,13 @@ class Galaxy(object):
         with open(path, "wb") as f:
             nx.write_edgelist(self.stars, f, data=True)
         path = os.path.join (self.output_path, 'borders.txt')
-        with open(path, "wb") as f:
+        with codecs.open(path, "wb", "utf-8") as f:
             for key, value in self.borders.borders.iteritems():
                 f.write("{}-{}: border: {}\n".format(key[0],key[1], value))
 
         if routes == 'xroute':
             path = os.path.join (self.output_path, 'stations.txt')
-            with codecs.open(path, "wb") as f:
+            with codecs.open(path, "wb", 'utf-8') as f:
                 stars = [star for star in self.stars.nodes_iter() if star.tradeCount > 0]
                 for star in stars:
                     f.write ("{} - {}\n".format(star, star.tradeCount))

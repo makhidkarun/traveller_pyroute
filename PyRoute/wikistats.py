@@ -331,8 +331,7 @@ class WikiStats(object):
                 f.write(' {:,d} million.'.format(population))
             else:
                 f.write(' less than 1 million.')
-            
-                    
-    
+
 def baseN(num,b,numerals="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
-    return ((num == 0) and numerals[0]) or (baseN(num // b, b, numerals).lstrip(numerals[0]) + numerals[num % b])        
+    return ((num == 0) and numerals[0]) or (baseN(num // b, b, numerals).lstrip(numerals[0]) + numerals[num % b])
+        
