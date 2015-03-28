@@ -6,7 +6,7 @@ Created on Mar 17, 2014
 import logging
 import math
 from wikistats import WikiStats
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from AllyGen import AllyGen
 
 class ObjectStatistics(object):
@@ -21,12 +21,18 @@ class ObjectStatistics(object):
         self.milBudget  = 0
         self.maxTL      = 0
         self.maxPort    = 'X'
+        self.maxPop     = 0
         self.sum_ru     = 0
         self.shipyards  = 0
         self.col_be     = 0
         self.im_be      = 0
         self.passengers = 0
         self.spa_people = 0
+        
+        self.code_counts = defaultdict(int)
+        self.gg_count   = 0
+        self.naval_bases = 0
+        self.scout_bases = 0
 
 class StatCalculation(object):
     '''
@@ -103,10 +109,19 @@ class StatCalculation(object):
         stats.im_be += star.im_be
         stats.passengers  += star.passIn
         stats.spa_people += star.starportPop
-        
+        for code in star.tradeCode:
+            stats.code_counts[code] += 1
+        if star.ggCount:
+            stats.gg_count += 1
+        if 'N' in star.baseCode:
+            stats.naval_bases += 1
+        if 'S' in star.baseCode:
+            stats.scout_bases += 1
+   
     def max_tl (self, stats, star):
         stats.maxTL = max(stats.maxTL, star.tl)
         stats.maxPort = 'ABCDEX'[min('ABCDEX'.index(star.uwpCodes['Starport']), 'ABCDEX'.index(stats.maxPort))]
+        stats.maxPop = max (stats.maxPop, star.popCode)
     
     def per_capita(self, stats):
         stats.percapita = stats.economy

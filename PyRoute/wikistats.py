@@ -9,6 +9,7 @@ import codecs
 import datetime
 from AllyGen import AllyGen
 import urllib
+import math
 
 class WikiStats(object):
     '''
@@ -60,7 +61,7 @@ class WikiStats(object):
             f.write('{| class="wikitable sortable"\n')
             f.write('! {} !! statistics\n'.format(area_type))
             for sector in self.galaxy.sectors:
-                self.text_area_statistics(f, "sector", sector)
+                self.text_area_long(f, "sector", sector)
             f.write('|}\n')
         
             
@@ -228,6 +229,134 @@ class WikiStats(object):
                     self.text_area_statistics(f, "subsector", subsector)
             f.write('|}\n')
                     
+# This sector has <N> worlds, of which <N> have native gas giants.
+# The estimated population for the sector is <N size> sapients (not necessarily humans). 
+# There are <N> Agricultural (Ag) worlds versus <N> Non-Agricultural (Na) worlds. 
+# There are <N> Non-Industrial (Ni) Worlds versus <N> Industrial (In) worlds.
+# There are <N> Rich (Ri) worlds versus <N> Poor (Po) worlds. 
+# There are <N> Water Worlds (Wa), 17 Ice-Capped worlds (Ic), 42 Desert worlds (De), and 54 Vacuum (Va) worlds. 
+# There are <N> High Population (Hi) worlds versus <N> Low Population (Lo) worlds. 
+# There are <N> Asteroid Belts (As) in the sector. 
+# There are <N> Barren (Ba) worlds. 
+# There are <N> naval bases in the subsector and <N> scout bases.
+# The highest population world in the sector is {{WorldS|Saazi (Antares 0533)}}; the lowest population world is {{WorldS|Lampigas}}
+# The average tech level in the sector is 6 (most lie between 3 and 9). 
+
+    def text_area_long(self, f, area_type, area):
+        f.write('|-\n')
+        f.write(u'|{}\n'.format(area.wiki_title()))
+        if area_type == 'subsector':
+            f.write(u'|| {}, {} {} of {} '.format(area.wiki_name(), area_type, 
+                                                 area.position, area.sector.wiki_name()))
+        else:
+            f.write(u'|| The {} {} '.format(area.wiki_name(), area_type))
+        
+        if len(area.worlds) == 0:
+            f.write ('contains no charted worlds.\n')
+            return
+        
+        f.write(u'has {:d} worlds, of which {:d} have native gas giants. '.format(area.stats.number, area.stats.gg_count)) 
+        f.write(u'The estimated population for the {} is '.format(area_type))
+        self.write_population(area.stats.population, f)
+        f.write(u' sophonts (not necessarily humans). ')
+
+        f.write('There ')
+        self.write_count(f, area.stats.code_counts.get('Ag', 0), 'Agricultural (Ag) world')
+        f.write(' versus ')
+        self.write_count(f, area.stats.code_counts.get('Na', 0), 'Non-Agricultural (Na) world', False)
+        f.write('. ')
+        
+        f.write('There ')
+        self.write_count(f, area.stats.code_counts.get('Ni', 0), 'Non-industrial (Ni) world')
+        f.write(' versus ')
+        self.write_count(f, area.stats.code_counts.get('In', 0), 'Industrial (In) world', False)
+        f.write('. ')
+        
+        f.write('There ')
+        self.write_count(f, area.stats.code_counts.get('Ri', 0), 'Rich (Ri) world')
+        f.write(' versus ')
+        self.write_count(f, area.stats.code_counts.get('Po', 0), 'Poor (Po) world',False)
+        f.write('. ')
+        
+        f.write('There ')
+        self.write_count(f, area.stats.code_counts.get('Wa', 0) + area.stats.code_counts.get('Oc', 0), 'Water (Wa) and Ocean (Oc) world')
+        f.write(', ')
+        self.write_count(f, area.stats.code_counts.get('Ic', 0), 'Ice-capped (Ic) world', False)
+        f.write(', ')
+        self.write_count(f, area.stats.code_counts.get('De', 0), 'Desert (De) world', False)
+        f.write(', ')
+        self.write_count(f, area.stats.code_counts.get('As', 0), 'Asteroid (As) belt', False)
+        f.write(', and ')
+        self.write_count(f, area.stats.code_counts.get('Va', 0), 'Vacuum (Va) world', False)
+        f.write('. ')
+
+        f.write('There ')
+        self.write_count(f, area.stats.code_counts.get('Hi', 0), 'High population (Hi) world')
+        f.write(' versus ')
+        self.write_count(f, area.stats.code_counts.get('Lo', 0), 'Low population (Lo) world', False)
+        f.write(' and ')
+        self.write_count(f, area.stats.code_counts.get('Ba', 0), 'Barren (Ba) world', False)
+        f.write('. ')
+
+        f.write('There ')
+        self.write_count(f, area.stats.naval_bases, 'Naval base')
+        f.write (' and ')
+        self.write_count(f, area.stats.scout_bases, 'Scout base', False)
+        f.write('. ')
+        
+        PopWorlds = [world for world in area.worlds if world.popCode == area.stats.maxPop]
+        if len(PopWorlds) == 1:
+            f.write(u'The highest population world is {}.'.format(PopWorlds[0].wiki_name()))
+        elif len(PopWorlds) > 1:
+            PopWorlds.sort(key=lambda star: star.popM, reverse=True)
+            maxPopM = PopWorlds[0].popM
+            PopWorlds = [world for world in PopWorlds if world.popM == maxPopM]
+
+            if len(PopWorlds) == 1:
+                f.write(u'The highest population world is {}. '.format(PopWorlds[0].wiki_name()))
+            else:
+                f.write(' The highest population worlds are '.format(baseN(area.stats.maxTL,18))) 
+                PopWorlds = PopWorlds[0:6]
+                f.write(u", ".join(w.wiki_name() for w in PopWorlds[:-1]))
+                f.write(u", and {}".format(PopWorlds[-1].wiki_name()))
+                f.write('. ')
+        
+        TLWorlds = [world for world in area.worlds if world.tl == area.stats.maxTL]
+        if len(TLWorlds) == 1:
+            f.write(' The highest tech level is {} at {}. '.format(baseN(area.stats.maxTL,18), 
+                                                                  TLWorlds[0].wiki_name()))
+        elif len(TLWorlds) > 1:
+            f.write(' The highest tech level is {} at '.format(baseN(area.stats.maxTL,18))) 
+            TLWorlds = TLWorlds[0:6]
+            f.write (", ".join(w.wiki_name() for w in TLWorlds[:-1]))
+            f.write (", and {}".format(TLWorlds[-1].wiki_name()))
+            f.write ('. ')
+
+        TLList = [world.tl for world in area.worlds]
+        mean = sum(TLList) / len(TLList)
+        TLVar = [math.pow(tl - mean, 2) for tl in TLList]
+        stddev = math.sqrt(sum(TLVar) / len(TLVar))
+        f.write('The average technology level is {:d}'.format(int(mean)))
+        f.write(' (with most between {:d} and {:d}). '.format(int(mean-stddev), int(mean+stddev)))
+
+        subsectorCp = [world for world in area.worlds if 'Cp' in world.tradeCode]
+        sectorCp = [world for world in area.worlds if 'Cs' in world.tradeCode]
+        capital = [world for world in area.worlds if 'Cx' in world.tradeCode]
+        
+        if len(capital) > 0 :
+            for world in capital: 
+                alg = self.galaxy.alg[AllyGen.same_align(world.alg)]
+                f.write('\n* The capital of {} is at {}.'.format(alg.wiki_name(), world.wiki_name()))
+        elif len(sectorCp) > 0 :
+            f.write(u' The sector capital is at ')
+            f.write(sectorCp[0].wiki_name())
+            f.write('.')
+        elif len (subsectorCp) > 0 :
+            f.write(u' The subsector capital is at ')
+            f.write(subsectorCp[0].wiki_name())
+            f.write('.')
+        f.write('\n')
+
     def text_area_statistics(self, f, area_type, area):
             f.write('|-\n')
             f.write(u'|{0}\n'.format(area.wiki_title()))
@@ -239,23 +368,24 @@ class WikiStats(object):
                 f.write(u'|| The {} {} '.format(area.wiki_name(), area_type))
 
             if len(area.worlds) > 0:
-                f.write('contains {:d} worlds with a population of'.format(area.stats.number))
+                f.write('contains {:d} worlds with a population of '.format(area.stats.number))
                 self.write_population(area.stats.population, f)
+                f.write('. ')
                 popWorld = max(area.worlds, key=lambda w : w.population)
                 f.write(' The highest population is ')
                 self.write_population(popWorld.population, f)
-                f.write(u', at {}.'.format(popWorld.wiki_name()))
+                f.write(u', at {}. '.format(popWorld.wiki_name()))
                 
                 TLWorlds = [world for world in area.worlds if world.tl == area.stats.maxTL]
                 if len(TLWorlds) == 1:
-                    f.write(' The highest tech level is {} at {}.'.format(baseN(area.stats.maxTL,18), 
+                    f.write('The highest tech level is {} at {}.'.format(baseN(area.stats.maxTL,18), 
                                                                           TLWorlds[0].wiki_name()))
                 elif len(TLWorlds) > 1:
-                    f.write(' The highest tech level is {} at '.format(baseN(area.stats.maxTL,18))) 
+                    f.write('The highest tech level is {} at '.format(baseN(area.stats.maxTL,18))) 
                     TLWorlds = TLWorlds[0:6]
                     f.write (", ".join(w.wiki_name() for w in TLWorlds[:-1]))
                     f.write (", and {}".format(TLWorlds[-1].wiki_name()))
-                    f.write (".")
+                    f.write (". ")
                 
                 subsectorCp = [world for world in area.worlds if 'Cp' in world.tradeCode]
                 sectorCp = [world for world in area.worlds if 'Cs' in world.tradeCode]
@@ -276,7 +406,6 @@ class WikiStats(object):
             else:
                 f.write (' contains no charted worlds.')
                 
-            #There are seven naval bases in the subsector and four scout bases.
             f.write('\n')
             
     def write_world_statistics(self):
@@ -324,13 +453,25 @@ class WikiStats(object):
                     f.write('\n')
                 f.write('}}\n[[Category:Sectors with sector data]]\n')
 
+    def write_count(self, f, count, text, is_are = True):
+        if count == 0 :
+            if is_are: f.write('are ') 
+            f.write('no {}s'.format(text))
+        elif count == 1:
+            if is_are: f.write('is ')
+            f.write('one {}'.format(text))
+        else:
+            if is_are: f.write('are ')
+            f.write('{:d} {}s'.format(count, text))
+            
+            
     def write_population(self, population, f):
             if population >= 1000 :
-                f.write(' {:,d} billion.'.format(population/1000))
+                f.write('{:,d} billion'.format(population/1000))
             elif population >= 1:
-                f.write(' {:,d} million.'.format(population))
+                f.write('{:,d} million'.format(population))
             else:
-                f.write(' less than 1 million.')
+                f.write('less than 1 million')
 
 def baseN(num,b,numerals="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
     return ((num == 0) and numerals[0]) or (baseN(num // b, b, numerals).lstrip(numerals[0]) + numerals[num % b])
