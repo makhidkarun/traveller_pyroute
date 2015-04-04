@@ -343,6 +343,8 @@ class Star (object):
         
     def owned_by(self):
         self.ownedBy = self
+        if self.gov == '6': 
+            self.ownedBy = None
         for code in self.tradeCode:
             if code.startswith(u'O:'):
                 self.ownedBy = code[2:]

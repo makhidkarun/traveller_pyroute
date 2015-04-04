@@ -261,7 +261,9 @@ class Galaxy(object):
                              key=lambda star: star.importance - (star.hex_distance(world) - 1))
                 
                 owner = None
-                if len(world.ownedBy) > 4:
+                if world.ownedBy is None:
+                    owner = None
+                elif len(world.ownedBy) > 4:
                     ownedSec = world.ownedBy[0:4]
                     ownedHex = world.ownedBy[5:]
                     owner = None
