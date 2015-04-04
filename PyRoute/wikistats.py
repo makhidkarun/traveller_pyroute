@@ -337,7 +337,7 @@ class WikiStats(object):
         TLVar = [math.pow(tl - mean, 2) for tl in TLList]
         stddev = math.sqrt(sum(TLVar) / len(TLVar))
         f.write('The average technology level is {:d}'.format(int(mean)))
-        f.write(' (with most between {:d} and {:d}). '.format(int(mean-stddev), int(mean+stddev)))
+        f.write(' (with most between {:d} and {:d}). '.format(max(int(mean-stddev),0), int(mean+stddev)))
 
         subsectorCp = [world for world in area.worlds if 'Cp' in world.tradeCode]
         sectorCp = [world for world in area.worlds if 'Cs' in world.tradeCode]
