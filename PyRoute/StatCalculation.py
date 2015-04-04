@@ -113,9 +113,9 @@ class StatCalculation(object):
             stats.code_counts[code] += 1
         if star.ggCount:
             stats.gg_count += 1
-        if 'N' in star.baseCode:
+        if 'N' in star.baseCode or 'K' in star.baseCode:
             stats.naval_bases += 1
-        if 'S' in star.baseCode:
+        if 'S' in star.baseCode or 'V' in star.baseCode:
             stats.scout_bases += 1
    
     def max_tl (self, stats, star):
