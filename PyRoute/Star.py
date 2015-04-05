@@ -34,6 +34,11 @@ class Star (object):
             self.popCode = 12
             
         self.tradeCode = data[3].strip().split()
+        
+        if '(' in data[3] :
+            self.homeworld = data[3].strip().split('(',1)[1].split(')',1)[0]
+        else:
+            self.homeworld = None 
             
         if (data[6]):
             self.economics = data[6].strip()
