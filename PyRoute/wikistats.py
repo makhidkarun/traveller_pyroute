@@ -69,6 +69,11 @@ class WikiStats(object):
             for sector in self.galaxy.sectors:
                 f.write('[[{} Sector/summary]]\n'.format(sector.sector_name()))
         
+        path = os.path.join(self.galaxy.output_path, 'subsector_list.txt')
+        with open(path, 'w+') as f:
+            for sector in self.galaxy.sectors:
+                for subsector in sector.subsectors.itervalues():
+                    f.write('[[{} Subsector/summary]]\n'.format(subsector.name))
             
     def write_stats(self, f, stats):
         f.write('|align="right"|{:d}\n'.format(stats.number))

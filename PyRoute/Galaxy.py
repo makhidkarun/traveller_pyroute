@@ -15,26 +15,28 @@ from TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation,
 from StatCalculation import ObjectStatistics
 from AllyGen import AllyGen
 
-class Allegiance(object):
-    def __init__(self, code, description):
-        self.code = code
-        self.description = description
-        self.stats = ObjectStatistics()
+class AreaItem(object):
+    def __init__(self, name):
+        self.name=name
         self.worlds = []
-        
+        self.stats = ObjectStatistics()
+
     def wiki_title(self):
         return self.wiki_name()
-    
-    def wiki_name(self):
-        return u'[[{}]]'.format(self.description)
 
-class Subsector(object):
+    def wiki_name(self):
+        return u'[[{}]]'.format(self.name)
+
+class Allegiance(AreaItem):
+    def __init__(self, code, name):
+        super(Allegiance, self).__init__(name)
+        self.code = code
+        
+class Subsector(AreaItem):
     def __init__(self, name, position, sector):
+        super(Subsector, self).__init__(name)
         self.sector = sector
-        self.name = name
         self.position = position
-        self.stats = ObjectStatistics()
-        self.worlds = []
 
     def wiki_name(self):
         return u'[[{0} Subsector|{0}]]'.format(self.name)
@@ -42,16 +44,15 @@ class Subsector(object):
     def wiki_title(self):
         return u'{0} - {1}'.format(self.sector.wiki_name(), self.wiki_name())
  
-class Sector (object):
+class Sector (AreaItem):
     def __init__ (self, name, position):
-        self.name = name[1:].strip()
+        super(Sector, self).__init__(name[1:].strip())
+
         self.x = int(position[1:].split(',')[0])
         self.y = int(position[1:].split(',')[1])
         self.dx = self.x * 32
         self.dy = self.y * 40
         self.subsectors = {}
-        self.worlds = []
-        self.stats = ObjectStatistics()
         self.spinward = None
         self.trailing = None
         self.coreward = None
@@ -66,9 +67,6 @@ class Sector (object):
     def wiki_name(self):
         return u'[[{0} Sector|{0}]]'.format(self.sector_name())
 
-    def wiki_title (self):
-        return self.wiki_name()
-    
     def find_world_by_pos(self, pos):
         for world in self.worlds:
             if world.position == pos:
@@ -126,11 +124,8 @@ class Galaxy(object):
             sec = Sector (lines[3], lines[4])
             sec.filename = os.path.basename(sector)
             
-            lineno = 0
-            for line in lines:
-                lineno += 1
+            for lineno, line in enumerate(lines):
                 if line.startswith ('Hex'):
-                    lineno += 1
                     break
                 if line.startswith ('# Subsector'):
                     data = line[11:].split(':',1)
@@ -143,14 +138,14 @@ class Galaxy(object):
                     # Collapse same Aligned into one
                     if match == 'collapse':
                         algCode = AllyGen.same_align(algCode)
-                        self.alg[algCode] = Allegiance(algCode, algName) 
+                        if algCode not in self.alg: self.alg[algCode] = Allegiance(algCode, algName) 
                     elif match == 'separate':
                         base = AllyGen.same_align(algCode)
                         if base not in self.alg: self.alg[base] = Allegiance(base, algName)
                         if algCode not in self.alg: self.alg[algCode] = Allegiance(algCode, algName)
                         pass
                 
-            for line in lines[lineno:]:
+            for line in lines[lineno+2:]:
                 if line.startswith('#') or len(line) < 20: 
                     continue
                 star = Star (line, self.starline, sec, pop_code)

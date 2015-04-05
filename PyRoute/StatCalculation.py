@@ -146,7 +146,7 @@ class StatCalculation(object):
             self.logger.debug('Sector ' + sector.name + ' star count: ' + str(sector.stats.number))
             
         for code,aleg in self.galaxy.alg.iteritems():
-            s = u'Allegiance {0} ({1}) star count: {2:,d}'.format(aleg.description, code, aleg.stats.number)
+            s = u'Allegiance {0} ({1}) star count: {2:,d}'.format(aleg.name, code, aleg.stats.number)
             self.logger.debug(s)
             
         wiki = WikiStats(self.galaxy, self.uwp, ally_count)
