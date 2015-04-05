@@ -63,6 +63,11 @@ class WikiStats(object):
             for sector in self.galaxy.sectors:
                 self.text_area_long(f, "sector", sector)
             f.write('|}\n')
+
+        path = os.path.join(self.galaxy.output_path, 'sectors_list.txt')
+        with open (path, 'w+') as f:
+            for sector in self.galaxy.sectors:
+                f.write('[[{} Sector/summary]]\n'.format(sector.sector_name()))
         
             
     def write_stats(self, f, stats):
@@ -226,7 +231,7 @@ class WikiStats(object):
             f.write('! {} !! statistics\n'.format(area_type))
             for sector in self.galaxy.sectors:
                 for subsector in sector.subsectors.itervalues():
-                    self.text_area_statistics(f, "subsector", subsector)
+                    self.text_area_long(f, "subsector", subsector)
             f.write('|}\n')
                     
 # This sector has <N> worlds, of which <N> have native gas giants.
@@ -304,6 +309,13 @@ class WikiStats(object):
         self.write_count(f, area.stats.scout_bases, 'Scout base', False)
         f.write('. ')
         
+        HomeWorlds = [world for world in area.worlds if world.homeworld is not None]
+        if (len(HomeWorlds) > 0):
+            f.write(u'In {} there '.format(area.wiki_name()))
+            self.write_count(f, len(HomeWorlds), 'race homeworld', True)
+            f.write('. ')
+        
+        
         PopWorlds = [world for world in area.worlds if world.popCode == area.stats.maxPop]
         if len(PopWorlds) == 1:
             f.write(u'The highest population world is {}.'.format(PopWorlds[0].wiki_name()))
@@ -348,11 +360,11 @@ class WikiStats(object):
                 alg = self.galaxy.alg[AllyGen.same_align(world.alg)]
                 f.write('\n* The capital of {} is at {}.'.format(alg.wiki_name(), world.wiki_name()))
         elif len(sectorCp) > 0 :
-            f.write(u' The sector capital is at ')
+            f.write(u'The sector capital is at ')
             f.write(sectorCp[0].wiki_name())
             f.write('.')
         elif len (subsectorCp) > 0 :
-            f.write(u' The subsector capital is at ')
+            f.write(u'The subsector capital is at ')
             f.write(subsectorCp[0].wiki_name())
             f.write('.')
         f.write('\n')
@@ -362,7 +374,7 @@ class WikiStats(object):
             f.write(u'|{0}\n'.format(area.wiki_title()))
             
             if area_type == 'subsector':
-                f.write(u'|| {}, {} {} of {},'.format(area.wiki_name(), area_type,
+                f.write(u'|| {}, {} {} of {}, '.format(area.wiki_name(), area_type,
                                                     area.position, area.sector.wiki_name()))
             else:
                 f.write(u'|| The {} {} '.format(area.wiki_name(), area_type))
