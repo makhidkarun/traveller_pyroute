@@ -21,10 +21,11 @@ class AllyGen(object):
                         u'AsMw', u'AsSc', u'AsSF', u'AsT0', u'AsT1', u'AsT2', u'AsT3', u'AsT4', 
                         u'AsT5', u'AsT6', u'AsT7', u'AsT8', u'AsT9', u'AsTv', u'AsVc',
                         u'AsWc', u'AsXx'),
-                    (u'Hv', u'H1', u'H2', u'Hc'),
-                    (u'Jp', u'JuHl', u'JuPr', u'JuRu'),
-                    (u'So', u'SoCf'),
-                    (u'Zh', u'ZhCo')]
+                    (u'HvFd', u'H1', u'H2', u'Hc', u'Hv'),
+                    (u'JuPr', u'JuHl', u'JP', u'JuRu'),
+                    (u'SoCf', u'So'),
+                    (u'CoLp', u'Lp'),
+                    (u'ZhCo', u'Zh')]
 
     def __init__(self, galaxy):
         '''
