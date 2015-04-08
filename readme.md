@@ -33,36 +33,36 @@ Running the program
                 [--output OUTPUT] [--no-trade] [--no-maps] [--version]
                 sector [sector ...]
 
-    Traveller trade route generator.
+Traveller trade route generator.
 
-    positional arguments:
-      sector                T5SS sector file(s) to process
+  positional arguments:
+    sector                T5SS sector file(s) to process
 
-    optional arguments:
-      -h, --help            show this help message and exit
-      --borders {none,range,allygen}
-                            Allegiance border generation
-      --ally-match {collapse,separate}
-                            Allegiance matching for borders
-      --min-btn BTN         Minimum BTN used for route calculation, default [13]
-      --min-ally-count ALLY_COUNT
-                            Minimum number of worlds in an allegiance for output,
-                            default [10]
-      --min-route-btn ROUTE_BTN
-                            Minimum btn for drawing on the map, default [8]
-      --max-jump MAX_JUMP   Maximum jump distance for trade routes, default [4]
-      --pop-code {fixed,scaled,benford}
-                            Interpretation of the population modifier code
-      --owned-worlds
-      --routes {trade,comm,xroute,none}
-                            Route type to be generated
-      --route-reuse ROUTE_REUSE
-                            Scale for reusing routes during route generation
-
-      --output OUTPUT       output directory for maps, statistics
-      --no-trade
-      --no-maps
-      --version             show program's version number and exit
+  optional arguments:
+    -h, --help            show this help message and exit
+    --borders {none,range,allygen,erode}
+                          Allegiance border generation, default [range]
+    --ally-match {collapse,separate}
+                          Allegiance matching for borders, default [collapse]
+    --min-btn BTN         Minimum BTN used for route calculation, default [13]
+    --min-ally-count ALLY_COUNT
+                          Minimum number of worlds in an allegiance for output,
+                          default [10]
+    --min-route-btn ROUTE_BTN
+                          Minimum btn for drawing on the map, default [8]
+    --max-jump MAX_JUMP   Maximum jump distance for trade routes, default [4]
+    --pop-code {fixed,scaled,benford}
+                          Interpretation of the population modifier code,
+                          default [scaled]
+    --owned-worlds
+    --routes {trade,comm,xroute,none}
+                          Route type to be generated, default [trade]
+    --route-reuse ROUTE_REUSE
+                          Scale for reusing routes during route generation
+    --output OUTPUT       output directory for maps, statistics
+    --no-trade
+    --no-maps
+    --version             show program's version number and exit
 
 The default values used for the program are scaled for the standards set by the Traveller world generation used in the T5 Second Survey, and by extension, the values used by most of the Traveller world generation systems. The parameters are present to allow generating routes in areas where the worlds don't conform to Imperial standards. 
 

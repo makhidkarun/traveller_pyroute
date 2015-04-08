@@ -405,8 +405,6 @@ class TradeCalculation(RouteCalculation):
     # MGT weights
     #distance_weight = [0, 30, 60, 105, 190, 410, 2470]
 
-
-
     # Set an initial range for influence for worlds based upon their
     # wtn. For a given world look up the range given by (wtn-8) (min 0), 
     # and the system checks every other world in that range for trade 

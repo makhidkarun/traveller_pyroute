@@ -16,9 +16,9 @@ logger = logging.getLogger('PyRoute')
 def process():
     parser = argparse.ArgumentParser(description='Traveller trade route generator.')
     parser.add_argument('--borders', choices=['none', 'range', 'allygen', 'erode'], default='range',
-                        help='Allegiance border generation')
+                        help='Allegiance border generation, default [range]')
     parser.add_argument('--ally-match', choices=['collapse', 'separate'], default='collapse',
-                        help='Allegiance matching for borders')
+                        help='Allegiance matching for borders, default [collapse]')
     parser.add_argument('--min-btn', dest='btn', default=13, type=int, 
                         help='Minimum BTN used for route calculation, default [13]')
     parser.add_argument('--min-ally-count', dest='ally_count', default=10, type=int,
@@ -28,12 +28,12 @@ def process():
     parser.add_argument('--max-jump', dest='max_jump', default=4, type=int,
                         help='Maximum jump distance for trade routes, default [4]')
     parser.add_argument('--pop-code', choices=['fixed', 'scaled', 'benford'], default='scaled',
-                        help='Interpretation of the population modifier code')
+                        help='Interpretation of the population modifier code, default [scaled]')
 
     parser.add_argument('--owned-worlds', dest='owned', default=False, action='store_true')
     
     parser.add_argument('--routes', dest='routes', choices=['trade', 'comm','xroute', 'none'], default='trade',
-                        help='Route type to be generated')
+                        help='Route type to be generated, default [trade]')
     parser.add_argument('--route-reuse', default=10, type=int,
                         help='Scale for reusing routes during route generation')
     
@@ -41,7 +41,7 @@ def process():
     
     parser.add_argument('--no-trade', dest='trade', default=True, action='store_false')
     parser.add_argument('--no-maps', dest='maps', default=True, action='store_false')
-    parser.add_argument('--version', action='version', version='%(prog)s 0.2')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.3')
     parser.add_argument('sector', nargs='+', help='T5SS sector file(s) to process')
     args = parser.parse_args()
     
