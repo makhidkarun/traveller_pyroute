@@ -167,6 +167,24 @@ class AllyGen(object):
                 f.write("{}-{}: border: {}\n".format(key[0],key[1], value))
         
     @staticmethod
+    def are_owned_allies(alg1, alg2):
+        '''
+        public function to determine if the Allegiances of two
+        world are considered allied for the owned world checks. 
+        '''
+        if alg1 is None or alg2 is None:
+            return False
+        if alg1 in AllyGen.noOne or alg2 in AllyGen.noOne:
+            return False
+        if alg1 == alg2:
+            return True
+        for sameAlg in AllyGen.sameAligned:
+            if alg1 in sameAlg and alg2 in sameAlg:
+                return True
+        return False
+        
+    
+    @staticmethod
     def are_allies(alg1, alg2):
         '''
         Public function to determine if the Allegiance of two 

@@ -248,7 +248,7 @@ class Galaxy(object):
                 ownedBy = [star for star in self.stars.neighbors_iter(world) \
                             if star.tl >= 9 and star.popCode >= 6 and \
                                star.port in 'ABC' and star.ownedBy == star and \
-                               AllyGen.are_allies(star.alg, world.alg)]
+                               AllyGen.are_owned_allies(star.alg, world.alg)]
                 
                 ownedBy.sort(reverse=True,
                              key=lambda star: star.popCode)
