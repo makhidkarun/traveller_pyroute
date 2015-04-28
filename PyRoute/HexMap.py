@@ -283,8 +283,9 @@ class HexMap(object):
     def draw_borders(self, pdf, sector):
         self.sector = sector
         self.hex_grid(pdf, self._draw_borders, 1.5, 'salmon')
-        
-    def convert_hex_to_axial(self, row, col):
+
+    @staticmethod        
+    def convert_hex_to_axial(row, col):
         x = row
         z = col - (row - (row & 1)) / 2
         return (x, z)
@@ -433,7 +434,7 @@ class HexMap(object):
         
     
     def document(self, sector):
-        path = os.path.join(self.galaxy.output_path, sector.name+".pdf")
+        path = os.path.join(self.galaxy.output_path, sector.sector_name()+" Sector.pdf")
         self.writer = PDFLite(path)
         
         title = "Sector %s" % sector
