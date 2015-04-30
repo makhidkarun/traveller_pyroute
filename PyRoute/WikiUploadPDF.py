@@ -1,3 +1,4 @@
+#!/usr/bin/python
 '''
 Created on Apr 26, 2015
 
@@ -10,6 +11,7 @@ Created on Apr 26, 2015
 #
 #
 from wikitools import wiki
+from wikitools import api
 from wikitools.wikifile import File
 from wikitools.page import Page
 import warnings
@@ -37,15 +39,22 @@ def uploadSummaryText(site, summaryFile):
         while (not (lines[index].startswith('|-') or lines[index].startswith('|}'))):
             text += lines[index]
             index += 1
-        
-        target_page = Page(site, targetTitle)
-        result = target_page.edit(text=text, summary='Trade Map update sector summary', 
-                                  bot=True, nocreate=True)
 
-        if result['edit']['result'] == 'Success':
-            print 'Saved: {}'.format(targetTitle)
-        else:
-            print 'Save failed {}'.format(targetTitle) 
+        try:
+            target_page = Page(site, targetTitle)
+            result = target_page.edit(text=text, summary='Trade Map update sector summary', 
+                                      bot=True, nocreate=True)
+    
+            if result['edit']['result'] == 'Success':
+                print 'Saved: {}'.format(targetTitle)
+            else:
+                print 'Save failed {}'.format(targetTitle) 
+        except api.APIError as e:
+            if e.args[0] == 'missingtitle':
+                print "UploadSummary for page {}, pages does not exist".format(baseTitle)
+            else:
+                print "UploadSummary for page {} got exception {} ".format(baseTitle, e)
+            
         if lines[index].startswith('|}'):
             break       
         index += 1
@@ -54,26 +63,26 @@ def uploadPDF(site, filename):
     with open(filename, "rb") as f:        
         try:
             page = File (site, os.path.basename(filename))
-            page.setPageInfo()
             page.upload(f, "{{Trade map summary}}", ignorewarnings=True)
         except Exception as e:
-            print "Got Exception: {}".format(e)
+            print "UploadPDF for {} got exception: {}".format(filename, e)
 #            traceback.print_exc()
     
 
 def uploadSec (site, filename):
     with codecs.open(filename, "r", 'utf-8') as f:
         text = f.read()
-
-    targetTitle = os.path.splitext(os.path.basename(filename))[0] + "/data"    
-    target_page = Page(site, targetTitle)
-    result = target_page.edit(text=text, summary='Trade Map update sector data', 
-                              bot=True, nocreate=True)
-    if result['edit']['result'] == 'Success':
-        print 'Saved: {}'.format(targetTitle)
-    else:
-        print 'Save failed {}'.format(targetTitle) 
-
+    try :
+        targetTitle = os.path.splitext(os.path.basename(filename))[0] + "/data"    
+        target_page = Page(site, targetTitle)
+        result = target_page.edit(text=text, summary='Trade Map update sector data', 
+                                  bot=True, nocreate=True)
+        if result['edit']['result'] == 'Success':
+            print 'Saved: {}'.format(targetTitle)
+        else:
+            print 'Save failed {}'.format(targetTitle) 
+    except Exception as e:
+        print "uploadSec for {} got exception: {}".format(filename, e)
     
 
 if __name__ == '__main__':
@@ -81,7 +90,7 @@ if __name__ == '__main__':
     
     # create a Wiki object
     site = wiki.Wiki("http://wiki.travellerrpg.com/api.php") 
-    site.login("GORT",remember=True)
+    site.login("AB-101", remember=True)
 
     for f in glob.glob('../maps/*Sector.pdf'):
         uploadPDF(site, f)
@@ -92,7 +101,7 @@ if __name__ == '__main__':
         time.sleep(10)
         
     uploadSummaryText(site, "../maps/summary.wiki")
-    uploadSummaryText(site, "../maps/summary_subsector.wiki")
+    uploadSummaryText(site, "../maps/subsector_summary.wiki")
     
         
     

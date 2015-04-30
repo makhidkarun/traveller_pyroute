@@ -42,7 +42,7 @@ class Subsector(AreaItem):
         return u'[[{0} Subsector|{0}]]'.format(self.name)
     
     def wiki_title(self):
-        return u'{0} - {1}'.format(self.sector.wiki_name(), self.wiki_name())
+        return u'{0} - {1}'.format(self.wiki_name(), self.sector.wiki_name())
  
 class Sector (AreaItem):
     def __init__ (self, name, position):
