@@ -17,11 +17,9 @@ def get_url (url, sector, suffix):
     encoding=f.headers['content-type'].split('charset=')[-1]
     content = f.read()
     if encoding == 'text/xml':
-        ucontent = unicode(content, 'utf-8')
-        ucontent = string.replace(content, '\r\n', '\n')
+        ucontent = unicode(content, 'utf-8').replace('\r\n', '\n')
     else:
-        ucontent = unicode(content, encoding)
-        ucontent = string.replace(ucontent, '\r\n', '\n')
+        ucontent = unicode(content, encoding).replace('\r\n','\n')
     
     path = os.path.join(args.output_dir, '%s.%s' % (sector, suffix))
     
