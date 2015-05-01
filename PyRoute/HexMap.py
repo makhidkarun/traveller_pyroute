@@ -308,14 +308,15 @@ class HexMap(object):
         point.x_plus(self.ym -(width/2))
         pdf.add_text (star.uwp.encode('ascii', 'replace'), point)
         
-        for chars in xrange(len(star.name), 0, -1):
-            width = self.string_width(pdf.get_font(), star.name[:chars])
-            if width <= self.xm * 3.5:
-                break
-        point.y_plus(3.5)
-        point.x = col
-        point.x_plus(self.ym - (width/2))
-        pdf.add_text(star.name[:chars].encode('ascii', 'replace'), point)
+        if len(star.name) > 0:
+            for chars in xrange(len(star.name), 0, -1):
+                width = self.string_width(pdf.get_font(), star.name[:chars])
+                if width <= self.xm * 3.5:
+                    break
+            point.y_plus(3.5)
+            point.x = col
+            point.x_plus(self.ym - (width/2))
+            pdf.add_text(star.name[:chars].encode('ascii', 'replace'), point)
         
         added = star.alg
         if 'Cp' in star.tradeCode:
