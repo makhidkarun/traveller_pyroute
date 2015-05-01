@@ -63,7 +63,11 @@ def uploadPDF(site, filename):
     with open(filename, "rb") as f:        
         try:
             page = File (site, os.path.basename(filename))
-            page.upload(f, "{{Trade map summary}}", ignorewarnings=True)
+            result = page.upload(f, "{{Trade map summary}}", ignorewarnings=True)
+            if result['edit']['result'] == 'Success':
+                print 'Saved: {}'.format(filename)
+            else:
+                print 'Save failed {}'.format(filename) 
         except Exception as e:
             print "UploadPDF for {} got exception: {}".format(filename, e)
 #            traceback.print_exc()
@@ -90,7 +94,7 @@ if __name__ == '__main__':
     
     # create a Wiki object
     site = wiki.Wiki("http://wiki.travellerrpg.com/api.php") 
-    site.login("AB-101", remember=True)
+    site.login("AB-101", "", remember=True)
 
     for f in glob.glob('../maps/*Sector.pdf'):
         uploadPDF(site, f)
@@ -100,7 +104,7 @@ if __name__ == '__main__':
         uploadSec (site, f)
         time.sleep(10)
         
-    uploadSummaryText(site, "../maps/summary.wiki")
+    #uploadSummaryText(site, "../maps/summary.wiki")
     uploadSummaryText(site, "../maps/subsector_summary.wiki")
     
         
