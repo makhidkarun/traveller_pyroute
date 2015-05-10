@@ -14,6 +14,7 @@ from wikitools import wiki
 from wikitools import api
 from wikitools.wikifile import File
 from wikitools.page import Page
+import argparse
 import warnings
 import os
 import codecs
@@ -31,7 +32,17 @@ def uploadSummaryText(site, summaryFile):
     index = 1;
     
     while True:
-        baseTitle = lines[index].split('|')[1].strip('[')
+        baseTitle = lines[index].split('|')[1]
+        if not baseTitle.startswith('[['):
+            print "Upload Summary for {} not a page, skipped".format(baseTitle)
+            while (not (lines[index].startswith('|-') or lines[index].startswith('|}'))):
+                index += 1
+            if lines[index].startswith('|}'):
+                break    
+            index += 1   
+            continue
+        else:
+            baseTitle = baseTitle.strip('[')
         targetTitle= "{}/summary".format(baseTitle)
         index += 1
         text = lines[index][3:]
@@ -51,7 +62,7 @@ def uploadSummaryText(site, summaryFile):
                 print 'Save failed {}'.format(targetTitle) 
         except api.APIError as e:
             if e.args[0] == 'missingtitle':
-                print "UploadSummary for page {}, pages does not exist".format(baseTitle)
+                print "UploadSummary for page {}, page does not exist, skipped".format(baseTitle)
             else:
                 print "UploadSummary for page {} got exception {} ".format(baseTitle, e)
             
@@ -63,8 +74,8 @@ def uploadPDF(site, filename):
     with open(filename, "rb") as f:        
         try:
             page = File (site, os.path.basename(filename))
-            result = page.upload(f, "{{Trade map summary}}", ignorewarnings=True)
-            if result['edit']['result'] == 'Success':
+            result = page.upload(f, "{{Trade map disclaimer}}", ignorewarnings=True)
+            if result['upload']['result'] == 'Success':
                 print 'Saved: {}'.format(filename)
             else:
                 print 'Save failed {}'.format(filename) 
@@ -91,21 +102,40 @@ def uploadSec (site, filename):
 
 if __name__ == '__main__':
     warnings.simplefilter("always")
+
+
+    parser = argparse.ArgumentParser(description='Trade map generator wiki upload.')
+    parser.add_argument('--input', default='../maps', help='output directory for maps, statistics')
+    parser.add_argument('--no-maps', dest='maps', default=True, action='store_false')
+    parser.add_argument('--no-secs', dest='secs', default=True, action='store_false')
+    parser.add_argument('--no-summary', dest='summary', default=True, action='store_false')
+    parser.add_argument('--no-subsector', dest='subsector', default=True, action='store_false')
+    
+    args = parser.parse_args()
+
     
     # create a Wiki object
     site = wiki.Wiki("http://wiki.travellerrpg.com/api.php") 
-    site.login("AB-101", "", remember=True)
+    site.login("AB-101", remember=True)
 
-    for f in glob.glob('../maps/*Sector.pdf'):
-        uploadPDF(site, f)
-        time.sleep(10)
-        
-    for f in glob.glob('../maps/*Sector.sec'):
-        uploadSec (site, f)
-        time.sleep(10)
-        
-    #uploadSummaryText(site, "../maps/summary.wiki")
-    uploadSummaryText(site, "../maps/subsector_summary.wiki")
+    if args.maps:
+        path = os.path.join(args.input, "*Sector.pdf")
+        for f in glob.glob(path):
+            uploadPDF(site, f)
+            time.sleep(10)
+
+    if args.secs:        
+        path = os.path.join(args.input, "*Sector.sec")
+        for f in glob.glob(path):
+            uploadSec (site, f)
+            time.sleep(10)
+
+    if args.summary:
+        path = os.path.join(args.input, "summary.wiki")
+        uploadSummaryText(site, path)
+    if args.subsector:
+        path = os.path.join(args.input, "subsector_summary.wiki")
+        uploadSummaryText(site, path)
     
         
     
