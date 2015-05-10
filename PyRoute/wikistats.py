@@ -340,13 +340,13 @@ class WikiStats(object):
         
         TLWorlds = [world for world in area.worlds if world.tl == area.stats.maxTL]
         if len(TLWorlds) == 1:
-            f.write(' The highest tech level is {} at {}. '.format(baseN(area.stats.maxTL,18), 
+            f.write(u' The highest tech level is {} at {}. '.format(baseN(area.stats.maxTL,18), 
                                                                   TLWorlds[0].wiki_name()))
         elif len(TLWorlds) > 1:
             f.write(' The highest tech level is {} at '.format(baseN(area.stats.maxTL,18))) 
             TLWorlds = TLWorlds[0:6]
-            f.write (", ".join(w.wiki_name() for w in TLWorlds[:-1]))
-            f.write (", and {}".format(TLWorlds[-1].wiki_name()))
+            f.write (u", ".join(w.wiki_name() for w in TLWorlds[:-1]))
+            f.write (u", and {}".format(TLWorlds[-1].wiki_name()))
             f.write ('. ')
 
         TLList = [world.tl for world in area.worlds]
@@ -363,7 +363,7 @@ class WikiStats(object):
         if len(capital) > 0 :
             for world in capital: 
                 alg = self.galaxy.alg[AllyGen.same_align(world.alg)]
-                f.write('\n* The capital of {} is at {}.'.format(alg.wiki_name(), world.wiki_name()))
+                f.write(u'\n* The capital of {} is at {}.'.format(alg.wiki_name(), world.wiki_name()))
         elif len(sectorCp) > 0 :
             f.write(u'The sector capital is at ')
             f.write(sectorCp[0].wiki_name())
@@ -395,13 +395,13 @@ class WikiStats(object):
                 
                 TLWorlds = [world for world in area.worlds if world.tl == area.stats.maxTL]
                 if len(TLWorlds) == 1:
-                    f.write('The highest tech level is {} at {}.'.format(baseN(area.stats.maxTL,18), 
+                    f.write(u'The highest tech level is {} at {}.'.format(baseN(area.stats.maxTL,18), 
                                                                           TLWorlds[0].wiki_name()))
                 elif len(TLWorlds) > 1:
-                    f.write('The highest tech level is {} at '.format(baseN(area.stats.maxTL,18))) 
+                    f.write(u'The highest tech level is {} at '.format(baseN(area.stats.maxTL,18))) 
                     TLWorlds = TLWorlds[0:6]
-                    f.write (", ".join(w.wiki_name() for w in TLWorlds[:-1]))
-                    f.write (", and {}".format(TLWorlds[-1].wiki_name()))
+                    f.write (u", ".join(w.wiki_name() for w in TLWorlds[:-1]))
+                    f.write (u", and {}".format(TLWorlds[-1].wiki_name()))
                     f.write (". ")
                 
                 subsectorCp = [world for world in area.worlds if 'Cp' in world.tradeCode]

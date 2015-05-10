@@ -39,7 +39,10 @@ class Subsector(AreaItem):
         self.position = position
 
     def wiki_name(self):
-        return u'[[{0} Subsector|{0}]]'.format(self.name)
+        if len(self.name) == 0:
+            return u'Position {0}'.format(self.position)
+        else:
+            return u'[[{0} Subsector|{0}]]'.format(self.name)
     
     def wiki_title(self):
         return u'{0} - {1}'.format(self.wiki_name(), self.sector.wiki_name())
