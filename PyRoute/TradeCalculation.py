@@ -144,18 +144,29 @@ class RouteCalculation (object):
 class NoneCalculation(RouteCalculation):
     def __init__(self, galaxy):
         super(NoneCalculation, self).__init__(galaxy)
+    
+    # Pure HG Base jump sitance cost
+    distance_weight = [0, 30, 50, 75, 130, 230, 490]
 
     def generate_routes(self):
+        self.generate_base_routes()        
         pass
     
     def calculate_routes(self):
         pass
 
     def base_route_filter (self, star, neighbor):
-        return True;
+        if not AllyGen.are_allies(star.alg, neighbor.alg) :
+            return True
+        return False
 
     def base_range_routes (self, star, neighbor):
         pass
+
+    def route_weight (self, star, target):
+        dist = star.hex_distance(target)
+        weight = self.distance_weight[dist]
+        return weight
 
 class XRouteCalculation (RouteCalculation):
     distance_weight = [0, 95, 90, 85, 80, 75, 70  ]
@@ -241,7 +252,7 @@ class XRouteCalculation (RouteCalculation):
         self.reweight_routes(self.inSec_weight)
 
         secCapitals = self.secCapitals + self.capital
-        for sector in self.galaxy.sectors:
+        for sector in self.galaxy.sectors.itervalues():
             
             secCap = [star for star in secCapitals if star.sector == sector]
             self.logger.info(secCap)
@@ -703,10 +714,11 @@ class CommCalculation(RouteCalculation):
     # in a single jump.         
     distance_weight = [0, 70, 65, 60, 60, 130, 150  ]
     
-    def __init__(self, galaxy, owned):
+    def __init__(self, galaxy, owned, reuse = 5):
         super(CommCalculation, self).__init__(galaxy)
-        self.route_reuse = 5
+        self.route_reuse = reuse
         self.owned = owned
+        self.min_importance = 3
 
     def base_route_filter (self, star, neighbor):
         if not self.owned and not AllyGen.are_allies(star.alg, neighbor.alg) :
@@ -716,17 +728,40 @@ class CommCalculation(RouteCalculation):
     def base_range_routes (self, star, neighbor):
         pass
     
+    def endpoint_selection(self, star):
+        # Capital of sector, subsector, or empire are in the list
+        if len(set(['Cp', 'Cx', 'Cs']) & set(star.tradeCode)) > 0:
+            return True
+        
+        # if it has a Deopt, Way station, or XBoat station
+        if len(set(['D', 'W', 'K']) & set(star.baseCode)) > 0:
+            return True
+        
+        # if it is rich 
+        if star.ru > 10000:
+            return True
+        
+        # if it is important
+        
+        if star.importance > self.galaxy.alg[star.alg_base].min_importance:
+            return True
+        
+        return False
+        
     def generate_routes(self):
         
         self.generate_base_routes()
 
         self.logger.info('generating ranges...')
         
-        worlds = [star for star in self.galaxy.ranges.nodes_iter() if \
-                  len(set(['Cp', 'Cx', 'Cs']) & set(star.tradeCode)) > 0 or \
-                  len(set(['D', 'W', 'X']) & set(star.baseCode)) > 0 or \
-                  star.ru >= 10000 or \
-                  (AllyGen.are_allies(u'As', star.alg) and star.popCode >= 9)]
+        for alg in self.galaxy.alg.itervalues():
+            alg.min_importance = 3
+            ix4_worlds = [star for star in alg.worlds if star.importance > 3]
+            if len(ix4_worlds) < len(alg.worlds) / 10:
+                alg.min_importance = 2
+                self.logger.info("setting {} min_importance to 2".format(alg.name))
+        
+        worlds = [star for star in self.galaxy.ranges.nodes_iter() if self.endpoint_selection(star)]
         
         for star, neighbor in itertools.combinations(worlds, 2):
             if AllyGen.are_allies(star.alg, neighbor.alg):
