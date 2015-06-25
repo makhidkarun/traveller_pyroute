@@ -31,18 +31,19 @@ class WikiStats(object):
         self.tcs_statistics()
         self.subsector_statistics()
         self.write_allegiances(self.galaxy.alg)
+        self.write_worlds_wiki_stats()
         self.write_world_statistics()
         
     def summary_statistics(self):
         path = os.path.join(self.galaxy.output_path, 'summary.wiki')
-        with open (path, 'w+') as f:
+        with codecs.open (path, 'w+','utf-8') as f:
             f.write('==Economic Summary==\n')
             f.write('===Statistical Analysis===\n')
             f.write(self.stat_header)
-            for sector in self.galaxy.sectors:
+            for sector in self.galaxy.sectors.itervalues():
                 f.write('|-\n')
-                f.write('|{0}\n'.format(sector.wiki_name()))
-                f.write('|| {:d},{:d}\n'.format(sector.x, sector.y))
+                f.write(u'|{0}\n'.format(sector.wiki_name()))
+                f.write(u'|| {:d},{:d}\n'.format(sector.x, sector.y))
                 self.write_stats(f, sector.stats)
                 
             if 'Im' in self.galaxy.alg:
@@ -60,18 +61,18 @@ class WikiStats(object):
             f.write('=== {} Statistics ===\n'.format(area_type))
             f.write('{| class="wikitable sortable"\n')
             f.write('! {} !! statistics\n'.format(area_type))
-            for sector in self.galaxy.sectors:
+            for sector in self.galaxy.sectors.itervalues():
                 self.text_area_long(f, "sector", sector)
             f.write('|}\n')
 
         path = os.path.join(self.galaxy.output_path, 'sectors_list.txt')
         with open (path, 'w+') as f:
-            for sector in self.galaxy.sectors:
-                f.write('[[{} Sector/summary]]\n'.format(sector.sector_name()))
+            for sector in self.galaxy.sectors.itervalues():
+                f.write(u'[[{} Sector/summary]]\n'.format(sector.sector_name()))
         
         path = os.path.join(self.galaxy.output_path, 'subsector_list.txt')
         with open(path, 'w+') as f:
-            for sector in self.galaxy.sectors:
+            for sector in self.galaxy.sectors.itervalues():
                 for subsector in sector.subsectors.itervalues():
                     f.write('[[{} Subsector/summary]]\n'.format(subsector.name))
             
@@ -92,7 +93,7 @@ class WikiStats(object):
 
     def top_summary(self):
         path = os.path.join(self.galaxy.output_path, 'top_summary.wiki')
-        with open (path, 'w+') as f:
+        with codecs.open (path, 'w+','utf-8') as f:
             f.write('==Top level Summary==\n')
             f.write('{|\n')
             f.write('|Systems || {}\n'.format(self.galaxy.stats.number))
@@ -197,11 +198,11 @@ class WikiStats(object):
         
     def tcs_statistics (self):
         path = os.path.join(self.galaxy.output_path, 'tcs_summary.wiki')
-        with open (path, 'w+') as f:
+        with codecs.open (path, 'w+','utf-8') as f:
             f.write('=== TCS Military budgets by sector ===\n')
             f.write('budgets in BCr, capacity in MegaTons\n')
             f.write('{| class=\"wikitable sortable\"\n!Sector!!X,Y!!Worlds !! Budget (BCr) !! Shipyard Capacity (MTons)\n')
-            for sector in self.galaxy.sectors:
+            for sector in self.galaxy.sectors.itervalues():
                 budget = [star.budget/1000 for star in sector.worlds]
                 capacity = [star.ship_capacity/1000000 for star in sector.worlds]
                 budget_sum = sum(budget)
@@ -221,7 +222,7 @@ class WikiStats(object):
         with codecs.open (path, 'w+','utf-8') as f:
             f.write('=== Economic Summary by Subsector ===\n')
             f.write(self.stat_header)
-            for sector in self.galaxy.sectors:
+            for sector in self.galaxy.sectors.itervalues():
                 subsectors = [s for s in sector.subsectors.itervalues()]
                 subsectors.sort(key=lambda s: s.position)
                 for subsector in subsectors:
@@ -234,7 +235,7 @@ class WikiStats(object):
             f.write('=== {} Statistics ===\n'.format(area_type))
             f.write('{| class="wikitable sortable"\n')
             f.write('! {} !! statistics\n'.format(area_type))
-            for sector in self.galaxy.sectors:
+            for sector in self.galaxy.sectors.itervalues():
                 for subsector in sector.subsectors.itervalues():
                     self.text_area_long(f, "subsector", subsector)
             f.write('|}\n')
@@ -424,11 +425,43 @@ class WikiStats(object):
                 f.write (' contains no charted worlds.')
                 
             f.write('\n')
-            
+    
+    def write_worlds_wiki_stats(self):
+        for sector in self.galaxy.sectors.itervalues():
+            path = os.path.join(self.galaxy.output_path, sector.sector_name()+" Sector.wiki")
+            with codecs.open(path, 'w+', 'utf-8') as f:
+                f.write ('<section begin="header"/>\n')
+                f.write ('{| class="wikitable sortable" width="90%"\n')
+                f.write (u'|+ {} economic data\n'.format(sector.sector_name()))
+                f.write (u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!RU!!GWP (BCr)!!Trade (BCr)!!Passengers!!Build!!Army!!Port!!SPA Population!!Subsector\n')
+                f.write ('<section end="header"/>')
+                for subsector in sector.subsectors.itervalues():
+                    f.write(u'<section begin="{}"/>\n'.format(subsector.name))
+                    for star in subsector.worlds:
+                        f.write ('|-\n')
+                        f.write('|{:5}'.format(star.position))
+                        f.write(u'||{:21}'.format(star.name))
+                        f.write('||{:10}'.format(star.uwp))
+                        f.write('||{:d}{:d}{:d}  '.format(star.popM, star.belts, star.ggCount))
+                        f.write('||{{ {:d} }}'.format(star.importance))
+                        f.write('||{:3d}'.format(star.wtn))
+                        f.write('||{:10,d}'.format(star.gwp))
+                        f.write('||{:8,d}'.format(star.ru))
+                        f.write('||{:10,d}'.format(star.tradeIn/1000000))
+                        f.write('||{:10,d}'.format(star.passIn))
+                        f.write('||{:11,d}'.format(star.ship_capacity))
+                        f.write('||{:8,d}'.format(star.raw_be))
+                        f.write('||{:6d}'.format(star.starportSize))
+                        f.write('||{:10,d}'.format(star.starportPop))
+                        f.write(u'||{}'.format(subsector.wiki_name()))
+                        f.write('\n')
+                    f.write (u'<section end="{}"/>'.format(subsector.name))
+                f.write('\n|}\n[[Category:Sectors with sector economic data]]\n')
+                
     def write_world_statistics(self):
         onespace = ' '
         twospace = '  '
-        for sector in self.galaxy.sectors:
+        for sector in self.galaxy.sectors.itervalues():
             
             path = os.path.join(self.galaxy.output_path, sector.sector_name()+" Sector.sec")
             with codecs.open (path, 'w+','utf-8') as f:
