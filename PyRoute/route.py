@@ -1,3 +1,4 @@
+#!/usr/bin/pypy
 '''
 Created on Mar 2, 2014
 
@@ -42,8 +43,11 @@ def process():
     parser.add_argument('--no-trade', dest='trade', default=True, action='store_false')
     parser.add_argument('--no-maps', dest='maps', default=True, action='store_false')
     parser.add_argument('--version', action='version', version='%(prog)s 0.3')
+    parser.add_argument('--log-level', default='INFO')
     parser.add_argument('sector', nargs='+', help='T5SS sector file(s) to process')
     args = parser.parse_args()
+
+    set_logging(args.log_level)
     
     logger.info("starting processing")
     
@@ -80,16 +84,15 @@ def process():
     logger.info("process complete")
 
 
-def set_logging():
-    logger.setLevel(logging.INFO)
+def set_logging(level):
+    logger.setLevel(level)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     # create console handler and set level to debug
     ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
+    ch.setLevel(level)
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
 if __name__ == '__main__':
-    set_logging()
     process()
     
