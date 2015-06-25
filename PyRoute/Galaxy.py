@@ -7,6 +7,7 @@ import logging
 import re
 import codecs
 import os
+import ast
 import itertools
 import networkx as nx
 
@@ -107,7 +108,7 @@ class Galaxy(object):
         self.starline = re.compile(star_regex)
         self.stars = nx.Graph()
         self.ranges = nx.Graph()
-        self.sectors = []
+        self.sectors = {}
         self.alg = {}
         self.stats = ObjectStatistics()
         self.borders = AllyGen(self)
@@ -158,6 +159,7 @@ class Galaxy(object):
                 base = AllyGen.same_align(star.alg)
                 if match == 'collapse':
                     self.alg[base].worlds.append(star)
+                    star.alg_base = base;
                 elif match == 'separate':
                     try: 
                         self.alg[star.alg].worlds.append(star)
@@ -166,23 +168,21 @@ class Galaxy(object):
                         raise SystemExit(3)
                     if base != star.alg:
                         self.alg[base].worlds.append(star)
-                    
-            
-            self.sectors.append(sec)
+            self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds) ) )
 
         self.set_bounding_sectors()
         self.set_positions()
         
     def set_positions(self):
-        for sector in self.sectors:
+        for sector in self.sectors.itervalues():
             for star in sector.worlds:
                 self.stars.add_node(star)
                 self.ranges.add_node(star)
         self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
         
     def set_bounding_sectors(self):
-        for sector, neighbor in itertools.combinations(self.sectors,2):
+        for sector, neighbor in itertools.combinations(self.sectors.itervalues(),2):
             if sector.x - 1 == neighbor.x and sector.y == neighbor.y:
                 sector.spinward = neighbor
                 neighbor.trailing = sector
@@ -202,7 +202,7 @@ class Galaxy(object):
         if routes == 'trade':
             self.trade = TradeCalculation(self, self.min_btn, self.route_btn, reuse)
         elif routes == 'comm':
-            self.trade = CommCalculation(self, owned)
+            self.trade = CommCalculation(self, owned, reuse)
         elif routes == 'xroute':
             self.trade = XRouteCalculation(self)
         elif routes == 'none':
@@ -231,15 +231,33 @@ class Galaxy(object):
         path = os.path.join (self.output_path, 'borders.txt')
         with codecs.open(path, "wb", "utf-8") as f:
             for key, value in self.borders.borders.iteritems():
-                f.write("{}-{}: border: {}\n".format(key[0],key[1], value))
+                f.write(u"{}-{}: border: {}\n".format(key[0],key[1], value))
 
         if routes == 'xroute':
             path = os.path.join (self.output_path, 'stations.txt')
             with codecs.open(path, "wb", 'utf-8') as f:
                 stars = [star for star in self.stars.nodes_iter() if star.tradeCount > 0]
                 for star in stars:
-                    f.write ("{} - {}\n".format(star, star.tradeCount))
+                    f.write (u"{} - {}\n".format(star, star.tradeCount))
     
+    def read_routes (self, routes=None):
+        route_regex = "^({1,}) \(({3,}) (\d\d\d\d)\) ({1,}) \(({3,}) (\d\d\d\d)\) (\{.*\})"    
+        routeline = re.compile(route_regex)
+        path = os.path.join(self.output_path, 'ranges.txt')
+        with open(path, "wb") as f:
+            for line in f:
+                data = routeline.match(line).group()
+                sec1 = data[2].strip()
+                hex1 = data[3]
+                sec2 = data[4].strip()
+                hex2 = data[5]
+                routeData = ast.literal_eval(data[6])
+                
+                world1 = self.sectors[sec1].find_world_by_pos(hex1)
+                world2 = self.sectors[sec2].find_world_by_pos(hex2)
+                
+                self.ranges.add_edge(world1, world2, routeData)
+               
 
     def process_owned_worlds(self):
         path = os.path.join(self.output_path, 'owned-worlds.txt')
@@ -261,6 +279,10 @@ class Galaxy(object):
                 owner = None
                 if world.ownedBy is None:
                     owner = None
+                elif world.ownedBy == 'Mr':
+                    owner = 'Mr'
+                elif world.ownedBy == 'Re':
+                    owner = 'Re'
                 elif len(world.ownedBy) > 4:
                     ownedSec = world.ownedBy[0:4]
                     ownedHex = world.ownedBy[5:]
@@ -275,12 +297,10 @@ class Galaxy(object):
                         owner = world.sector.coreward.find_world_by_pos(ownedHex)
                     elif world.row > 36 and owner is None and world.sector.rimward:
                         owner = world.sector.rimward.find_world_by_pos(ownedHex)
-                    
-                    
                 elif len(world.ownedBy) == 4:
                     owner = world.sector.find_world_by_pos(world.ownedBy)
+
                 self.logger.debug(u"Worlds {} is owned by {}".format(world,owner))
                 f.write (u'"{}" : "{}", {}\n'.format(world, owner,
-                                            (u', '.join(u'"' + repr(item) + u'"' for item in ownedBy[0:4]))))
+                                            (u', '.join(u'"' + unicode(item) + u'"' for item in ownedBy[0:4]))))
                 world.ownedBy = (owner, ownedBy[0:4])
-

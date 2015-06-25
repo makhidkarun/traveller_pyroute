@@ -12,8 +12,9 @@ from AllyGen import AllyGen
 
 class Star (object):
     def __init__ (self, line, starline, sector, pop_code):
+        self.logger = logging.getLogger('PyRoute.Star')
         self.sector = sector
-        logging.getLogger('PyRoute.Star').debug(line)
+        self.logger.debug(line)
         data = starline.match(line).groups()
         self.position = data[0].strip()
         self.set_location(sector.dx, sector.dy)
@@ -52,6 +53,7 @@ class Star (object):
         self.belts = int(data[14][1], 16)
         
         self.alg = data[16].strip()
+        self.alg_base = self.alg
         
         self.uwpCodes = {'Starport': self.port,
                            'Size': self.size,
@@ -78,7 +80,7 @@ class Star (object):
             imp = int(data[5][1:-1].strip())
             self.calculate_importance()
             if imp != self.importance:
-                logging.getLogger('PyRoute.Star').error(u'{}-{} Calculated importance {} does not match generated importance {}'.format(self, self.baseCode, self.importance, imp))
+                self.logger.error(u'{}-{} Calculated importance {} does not match generated importance {}'.format(self, self.baseCode, self.importance, imp))
         else:
             self.calculate_importance()
 
@@ -173,9 +175,7 @@ class Star (object):
         subsector = ["ABCD","EFGH","IJKL","MNOP"]
         indexy = (self.col - 1) / 8
         indexx = (self.row - 1) / 10
-        
         return subsector[indexx][indexy]
-        pass
     
     def calculate_gwp(self, pop_code):
         calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400, 24400, 39000, 39000]
@@ -353,6 +353,14 @@ class Star (object):
         for code in self.tradeCode:
             if code.startswith(u'O:'):
                 self.ownedBy = code[2:]
+                break
+            elif code.startswith(u'Mr'):
+                self.ownedBy = 'Mr'
+            elif code == u'Re':
+                self.ownedBy = 'Re'
+        if (self.gov == '6' and not self.ownedBy) or (self.gov != '6' and self.ownedBy != self):
+            self.logger.error (u"{} has incorrect government code {} - {}".format(self, self.gov, self.tradeCode))
+            
 
     def calculate_army(self):
         #       3, 4, 5, 6, 7, 8, 9, A

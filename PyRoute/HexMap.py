@@ -38,7 +38,7 @@ class HexMap(object):
         Call this to output the trade maps
         '''
         logging.getLogger("PyRoute.HexMap").info("writing {:d} sector maps...".format(len(self.galaxy.sectors)))
-        for sector in self.galaxy.sectors:
+        for sector in self.galaxy.sectors.itervalues():
             pdf = self.document(sector)
             self.write_base_map(pdf, sector)
             
