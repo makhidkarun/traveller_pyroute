@@ -29,7 +29,7 @@ def uploadSummaryText(site, summaryFile):
         return 
     index = [i for i,n in enumerate(lines) if 'Statistics' in n][0]
     lines = lines[index + 3:]
-    index = 1;
+    index = 1
     
     while True:
         baseTitle = lines[index].split('|')[1]
@@ -103,7 +103,6 @@ def uploadSec (site, filename):
 if __name__ == '__main__':
     warnings.simplefilter("always")
 
-
     parser = argparse.ArgumentParser(description='Trade map generator wiki upload.')
     parser.add_argument('--input', default='../maps', help='output directory for maps, statistics')
     parser.add_argument('--no-maps', dest='maps', default=True, action='store_false')
@@ -112,7 +111,6 @@ if __name__ == '__main__':
     parser.add_argument('--no-subsector', dest='subsector', default=True, action='store_false')
     
     args = parser.parse_args()
-
     
     # create a Wiki object
     site = wiki.Wiki("http://wiki.travellerrpg.com/api.php") 

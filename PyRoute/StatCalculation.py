@@ -57,7 +57,7 @@ class StatCalculation(object):
         
     def calculate_statistics(self, match):
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
-        for sector in self.galaxy.sectors:
+        for sector in self.galaxy.sectors.itervalues():
             if sector is None: continue
             for star in sector.worlds:
                 star.starportSize = max(self.trade_to_btn(star.tradeIn + star.tradeOver) - 5,0)
@@ -142,7 +142,7 @@ class StatCalculation(object):
         self.logger.info('Charted star count: ' + str(self.galaxy.stats.number))
         self.logger.info('Charted population {:,d}'.format(self.galaxy.stats.population))
         
-        for sector in self.galaxy.sectors:
+        for sector in self.galaxy.sectors.itervalues():
             self.logger.debug('Sector ' + sector.name + ' star count: ' + str(sector.stats.number))
             
         for code,aleg in self.galaxy.alg.iteritems():
