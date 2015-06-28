@@ -10,6 +10,7 @@ import datetime
 from AllyGen import AllyGen
 import urllib
 import math
+from Star import Nobles
 
 class WikiStats(object):
     '''
@@ -321,6 +322,41 @@ class WikiStats(object):
             self.write_count(f, len(HomeWorlds), 'race homeworld', True)
             f.write('. ')
         
+        nobles = Nobles()
+        for world in area.worlds:
+            nobles.accumulate(world.nobles)
+        if nobles.nobles['Knights'] > 0:
+            f.write('The Imperial nobility includes ')
+            self.write_count(f, nobles.nobles['Knights'], 'Knight', False)
+            f.write(', ')
+            self.write_count(f, nobles.nobles['Baronets'], 'Baronet', False)
+            f.write(', ')
+            self.write_count(f, nobles.nobles['Barons'], 'Baron', False)
+            f.write(', ')
+            self.write_count(f, nobles.nobles['Marquis'], 'Marqui', False)
+            f.write(', ')
+            self.write_count(f, nobles.nobles['Vicounts'], 'Vicount', False)
+            f.write(', ')
+            self.write_count(f, nobles.nobles['Counts'], 'Count', False)
+            if nobles.nobles['Sector Dukes'] > 0 or nobles.nobles['Archdukes'] > 0:
+                f.write(', ') 
+            else:
+                f.write(', and ')
+            self.write_count(f, nobles.nobles['Dukes'], 'Duke', False)
+            if nobles.nobles['Sector Dukes'] > 0:
+                if nobles.nobles['Archdukes'] > 0:
+                    f.write(', ')  
+                else: 
+                    f.write(', and ')
+                self.write_count(f, nobles.nobles['Sector Dukes'], 'Subsector Duke', False)
+            if nobles.nobles['Archdukes'] > 0:
+                f.write(', and ')
+                self.write_count(f, nobles.nobles['Archdukes'], 'Archduke', False)
+
+            if nobles.nobles['Emperor'] > 0:
+                f.write(' along with ')
+                self.write_count(f, nobles.nobles['Emperor'], 'Emperor', False)
+            f.write('. ')
         
         PopWorlds = [world for world in area.worlds if world.popCode == area.stats.maxPop]
         if len(PopWorlds) == 1:

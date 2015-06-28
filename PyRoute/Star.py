@@ -10,6 +10,38 @@ import random
 import math
 from AllyGen import AllyGen
 
+class Nobles(object):
+    def __init__ (self):
+        self.nobles = {'Knights': 0, 
+                       'Baronets': 0,
+                       'Barons': 0,
+                       'Marquis': 0,
+                       'Vicounts': 0,
+                       'Counts': 0,
+                       'Dukes': 0,
+                       'Sector Dukes': 0,
+                       'Archdukes': 0,
+                       'Emperor': 0}
+        self.codes = {'B': 'Knights',
+                      'c': 'Baronets',
+                      'C': 'Barons',
+                      'D': 'Marquis',
+                      'e': 'Vicounts',
+                      'E': 'Counts',
+                      'f': 'Dukes',
+                      'F': 'Sector Dukes',
+                      'G': 'Archdukes',
+                      'H': 'Emperor'}
+        
+    def count(self, nobility):
+        for code, rank in self.codes.iteritems():
+            if code in nobility:
+                self.nobles[rank] += 1
+
+    def accumulate(self, nobles):
+        for rank, count in nobles.nobles.iteritems():
+            self.nobles[rank] += count
+            
 class Star (object):
     def __init__ (self, line, starline, sector, pop_code):
         self.logger = logging.getLogger('PyRoute.Star')
@@ -46,6 +78,9 @@ class Star (object):
         else:
             self.economics = None
             
+        self.nobles = Nobles()
+        self.nobles.count(data[11])
+        
         self.baseCode = data[12].strip()
         self.zone = data[13].strip()
         self.ggCount = int(data[14][2],16)
@@ -352,7 +387,10 @@ class Star (object):
             self.ownedBy = None
         for code in self.tradeCode:
             if code.startswith(u'O:'):
-                self.ownedBy = code[2:]
+                if len(code) == 2:
+                    self.ownedBy = 'XXXX'
+                else:
+                    self.ownedBy = code[2:]
                 break
             elif code.startswith(u'Mr'):
                 self.ownedBy = 'Mr'
