@@ -8,6 +8,8 @@ Created on Mar 2, 2014
 
 import argparse
 import logging
+import codecs
+import os
 from Galaxy import Galaxy
 from HexMap import HexMap
 from StatCalculation import StatCalculation
@@ -44,7 +46,9 @@ def process():
     parser.add_argument('--no-maps', dest='maps', default=True, action='store_false')
     parser.add_argument('--version', action='version', version='%(prog)s 0.3')
     parser.add_argument('--log-level', default='INFO')
-    parser.add_argument('sector', nargs='+', help='T5SS sector file(s) to process')
+    parser.add_argument('--input', default='sectors', help='input directory for sectors')
+    parser.add_argument('--sectors', default=None, help='file with list of sector names to process')
+    parser.add_argument('sector', nargs='*', help='T5SS sector file(s) to process')
     args = parser.parse_args()
 
     set_logging(args.log_level)
@@ -54,7 +58,11 @@ def process():
     galaxy = Galaxy(args.btn, args.max_jump, args.route_btn);
     galaxy.output_path = args.output
     
-    galaxy.read_sectors (args.sector, args.pop_code, args.ally_match)
+    sectors_list = args.sector
+    if args.sectors is not None:
+        sectors_list.extend(get_sectors(args.sectors, args.input))
+    
+    galaxy.read_sectors (sectors_list, args.pop_code, args.ally_match)
     
     logger.info ("%s sectors read" % len(galaxy.sectors))
     
@@ -83,6 +91,16 @@ def process():
     
     logger.info("process complete")
 
+def get_sectors(sector, input_dir):
+    try:
+        lines = [line for line in codecs.open(sector,'r', 'utf-8')]
+    except (OSError, IOError):
+        logger.error("sector file %s not found" % sector)
+    sector_list = []
+    for line in lines:
+        sector_list.append(os.path.join(input_dir, line.strip()+'.sec'))
+    logger.info(sector_list)
+    return sector_list
 
 def set_logging(level):
     logger.setLevel(level)
