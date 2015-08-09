@@ -94,7 +94,7 @@ if __name__ == '__main__':
         path = os.path.join(args.metadata_source, '%s.xml' % sector)
         tree.parse(path)
         routes = tree.find('Routes')
-        if routes: 
+        if routes is not None: 
             for route in routes.iter('Route'):
                 if route.attrib.get('Type', '').startswith('btn'):
                     routes.remove(route)

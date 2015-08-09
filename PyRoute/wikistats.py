@@ -384,7 +384,7 @@ class WikiStats(object):
             TLWorlds = TLWorlds[0:6]
             f.write (u", ".join(w.wiki_name() for w in TLWorlds[:-1]))
             f.write (u", and {}".format(TLWorlds[-1].wiki_name()))
-            f.write ('. ')
+            f.write (u'. ')
 
         TLList = [world.tl for world in area.worlds]
         mean = sum(TLList) / len(TLList)

@@ -123,7 +123,7 @@ if __name__ == '__main__':
             time.sleep(10)
 
     if args.secs:        
-        path = os.path.join(args.input, "*Sector.sec")
+        path = os.path.join(args.input, "*Sector.wiki")
         for f in glob.glob(path):
             uploadSec (site, f)
             time.sleep(10)
