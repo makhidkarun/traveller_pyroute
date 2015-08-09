@@ -397,7 +397,7 @@ class Star (object):
             elif code == u'Re':
                 self.ownedBy = 'Re'
         if (self.gov == '6' and not self.ownedBy) or (self.gov != '6' and self.ownedBy != self):
-            self.logger.error (u"{} has incorrect government code {} - {}".format(self, self.gov, self.tradeCode))
+            self.logger.debug (u"{} has incorrect government code {} - {}".format(self, self.gov, self.tradeCode))
             
 
     def calculate_army(self):
