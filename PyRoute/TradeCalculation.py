@@ -712,62 +712,95 @@ class CommCalculation(RouteCalculation):
     # Weight for route over a distance. The relative cost for
     # moving between two worlds a given distance apart
     # in a single jump.         
-    distance_weight = [0, 70, 65, 60, 60, 130, 150  ]
+    distance_weight = [0, 70, 65, 60, 70, 130, 150  ]
     
     def __init__(self, galaxy, owned, reuse = 5):
         super(CommCalculation, self).__init__(galaxy)
         self.route_reuse = reuse
         self.owned = owned
-        self.min_importance = 3
+        self.min_importance = 4
 
     def base_route_filter (self, star, neighbor):
-        if not self.owned and not AllyGen.are_allies(star.alg, neighbor.alg) :
+        if star.zone in ['R', 'F'] or neighbor.zone in ['R','F']:
+            return True
+        if not AllyGen.are_allies(star.alg, neighbor.alg) :
             return True
         return False
 
     def base_range_routes (self, star, neighbor):
-        pass
-    
-    def endpoint_selection(self, star):
+        min_importance = self.galaxy.alg[star.alg_base].min_importance
+        if self.endpoint_selection(star, min_importance) and self.endpoint_selection(neighbor, min_importance):
+            dist = star.hex_distance (neighbor)
+            
+            if ((self.capitals(star) or self.bases(star)) and (self.capitals(neighbor) or self.bases(neighbor)) and dist < 100) or \
+                dist < 20:
+                flags = [self.capitals(star) and self.capitals(neighbor),
+                         self.capitals(star) or self.capitals(neighbor),
+                         self.bases(star) or self.bases(neighbor), 
+                         self.important(star, min_importance) or self.important(neighbor, min_importance),
+                         self.is_rich(star) or self.is_rich(star)]
+                self.galaxy.ranges.add_edge(star, neighbor, {'distance': dist, 'flags': flags})
+
+    def capitals(self, star):
         # Capital of sector, subsector, or empire are in the list
-        if len(set(['Cp', 'Cx', 'Cs']) & set(star.tradeCode)) > 0:
-            return True
-        
-        # if it has a Deopt, Way station, or XBoat station
-        if len(set(['D', 'W', 'K']) & set(star.baseCode)) > 0:
-            return True
-        
-        # if it is rich 
-        if star.ru > 10000:
-            return True
-        
-        # if it is important
-        
-        if star.importance > self.galaxy.alg[star.alg_base].min_importance:
-            return True
-        
-        return False
-        
+        return len(set(['Cp', 'Cx', 'Cs']) & set(star.tradeCode)) > 0
+
+    def bases(self, star):                    
+        # if it has a Deopt, Way station, or XBoat station,
+        # or external naval base
+        return len(set(['D', 'W', 'K']) & set(star.baseCode)) > 0 
+                
+    def important(self, star, min_importance):
+        return star.importance > min_importance
+
+    def is_rich(self, star):
+        return star.ru > 10000
+           
+    def endpoint_selection(self, star, min_importance):
+        return self.capitals(star) or self.bases(star) or \
+            self.important(star, min_importance) or self.is_rich(star)
+         
     def generate_routes(self):
-        
-        self.generate_base_routes()
-
-        self.logger.info('generating ranges...')
-        
         for alg in self.galaxy.alg.itervalues():
-            alg.min_importance = 3
-            ix4_worlds = [star for star in alg.worlds if star.importance > 3]
-            if len(ix4_worlds) < len(alg.worlds) / 10:
-                alg.min_importance = 2
-                self.logger.info("setting {} min_importance to 2".format(alg.name))
-        
-        worlds = [star for star in self.galaxy.ranges.nodes_iter() if self.endpoint_selection(star)]
-        
-        for star, neighbor in itertools.combinations(worlds, 2):
-            if AllyGen.are_allies(star.alg, neighbor.alg):
-                dist = star.hex_distance (neighbor)
-                self.galaxy.ranges.add_edge(star, neighbor, {'distance': dist})
+            # No comm routes for the non-aligned worlds. 
+            if AllyGen.is_nonaligned(alg):
+                continue
+            alg.min_importance = 4
+            self.logger.info(u"Alg {} has {} worlds".format(alg.name, len(alg.worlds)))
+            ix5_worlds = [star for star in alg.worlds if star.importance > alg.min_importance]
+            self.logger.info(u"Alg {} has {} ix 5 worlds".format(alg.name, len(ix5_worlds)))
+            if len(ix5_worlds) == 0 or len(ix5_worlds) < len(alg.worlds) / 1000:
+                alg.min_importance = 3
+            
+                ix4_worlds = [star for star in alg.worlds if star.importance > 3]
+                self.logger.info(u"Alg {} has {} ix 5/4 worlds".format(alg.name, len(ix4_worlds)))
+                if len (ix4_worlds) == 0 or len(ix4_worlds) < len(alg.worlds) / 100:
+                    alg.min_importance = 2
+                    self.logger.info("setting {} min importance to 2".format(alg.name))
+                else:
+                    self.logger.info("setting {} min importance to 3".format(alg.name))
 
+        self.generate_base_routes()
+        
+        routes = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges_iter(data=True) if d['distance'] < 3]
+        
+        self.logger.info ("considering {} worlds for removal".format(len(routes)))
+        removed = 0;
+        for route in routes:
+            imp = self.galaxy.alg[route[0].alg_base].min_importance
+            if (len(self.galaxy.alg[route[0].alg_base].worlds) < 100 and d['distance'] > 1 ) or \
+                len(self.galaxy.alg[route[0].alg_base].worlds) < 25:
+                continue
+            star = self.more_important(route[0], route[1], imp)
+            if star is not None:
+                removed += 1
+                neighbors = self.galaxy.ranges.neighbors(star)
+                for neighbor in neighbors:
+                    self.galaxy.ranges.remove_edge(star, neighbor)
+            else:
+                self.logger.info(u"Route considered but not removed: {}".format(route))
+             
+        self.logger.info("Removed {} worlds".format(removed))             
         self.logger.info("Routes: %s  -  connections: %s" % 
                          (self.galaxy.stars.number_of_edges(), 
                           self.galaxy.ranges.number_of_edges()))
@@ -775,7 +808,8 @@ class CommCalculation(RouteCalculation):
     def calculate_routes(self):
         self.logger.info('sorting routes...')
         routes = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges_iter(data=True)]
-        routes.sort(key=lambda route : route[2]['distance'] )
+        routes.sort(key=lambda route : route[2]['distance'])
+        routes.sort(key=lambda route : route[2]['flags'], reverse=True)
         total = len(routes)
         processed = 0
         self.logger.info('Routes: {}'.format(total))
@@ -784,6 +818,10 @@ class CommCalculation(RouteCalculation):
                 self.logger.info('processed {} routes, at {}%'.format(processed, processed/(total/100)))
             self.get_route_between(star, neighbor)
             processed += 1
+        
+        for (star, neighbor, data) in self.stars.edges_iter(data=True):
+            pass   
+        
 
     def route_weight (self, star, target):
         dist = star.hex_distance(target)
@@ -798,10 +836,36 @@ class CommCalculation(RouteCalculation):
             weight += 50
         if star.popCode == 0 or target.popCode == 0:
             weight += 25
-        weight -= 3 * (star.importance + target.importance)
+        weight -= 2 * (star.importance + target.importance)
         weight -= 6 if 'S' in star.baseCode or 'S' in target.baseCode else 0
+        weight -= 6 if self.capitals(star) or self.capitals(target) else 0
+        weight -= 6 if self.bases(star) or self.bases(target) else 0
+        weight -= 3 if self.is_rich(star) or self.is_rich(target) else 0
         
         return weight
+
+    def more_important(self, star, neighbor, imp):
+        set1 = [self.capitals(star), self.bases(star), self.important(star, imp), self.is_rich(star)]
+        set2 = [self.capitals(neighbor), self.bases(neighbor), self.important(neighbor, imp), self.is_rich(neighbor)]
+
+        if set1 > set2:
+            return neighbor
+        elif set1 < set2:
+            return star
+        else:
+            if self.bases(star) and self.bases(neighbor):
+                return self.lesser_importance(star, neighbor)
+            if self.is_rich(star) and self.is_rich(neighbor):
+                return self.lesser_importance(star, neighbor)
+            return None
+        
+    def lesser_importance(self, star, neighbor):
+            if star.importance > neighbor.importance:
+                return neighbor
+            elif star.importance < neighbor.importance:
+                return star
+            else:
+                return None
     
     def get_route_between (self, star, target):
         try:
