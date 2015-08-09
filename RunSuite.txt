@@ -2,7 +2,7 @@
 python PyRoute/downloadsec.py sectorlist.txt  ../sectors
 
 # generate the maps and data
-nohup pypy PyRoute/route.py --borders erode --min-btn 15 --pop-code fixed --routes trade --max-jump=5 --output /root/maps /root/sectors/*.sec  > route.log 2>&1 &
+nohup pypy PyRoute/route.py --borders erode --min-btn 15 --pop-code fixed --routes trade --max-jump=5 --output /root/maps --input /root/sectors --sectors sectorlist.txt  > route.log 2>&1 &
 
 # Upload the sector summaries. 
 python PyRoute/WikiUploadPDF.py
@@ -10,4 +10,6 @@ python PyRoute/WikiUploadPDF.py
 # Update the xml files for TravellerMap
 python PyRoute/map_remap.py ../maps/stars.txt ../sectors/ ../maps
 
+pypy PyRoute/route.py --borders erode --min-btn 15 --pop-code fixed --routes comm --max-jump 4 --route-reuse 3 --output maps_xroute --input sectors_review
 
+ 
