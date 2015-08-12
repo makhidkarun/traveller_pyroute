@@ -84,11 +84,11 @@ def uploadPDF(site, filename):
 #            traceback.print_exc()
     
 
-def uploadSec (site, filename):
+def uploadSec (site, filename, place):
     with codecs.open(filename, "r", 'utf-8') as f:
         text = f.read()
     try :
-        targetTitle = os.path.splitext(os.path.basename(filename))[0] + "/data"    
+        targetTitle = os.path.splitext(os.path.basename(filename))[0] + place    
         target_page = Page(site, targetTitle)
         result = target_page.edit(text=text, summary='Trade Map update sector data', 
                                   bot=True, nocreate=True)
@@ -120,13 +120,17 @@ if __name__ == '__main__':
         path = os.path.join(args.input, "*Sector.pdf")
         for f in glob.glob(path):
             uploadPDF(site, f)
-            time.sleep(10)
+            time.sleep(5)
 
     if args.secs:        
-        path = os.path.join(args.input, "*Sector.wiki")
+        path = os.path.join(args.input, "*Sector.economic.wiki")
         for f in glob.glob(path):
-            uploadSec (site, f)
-            time.sleep(10)
+            uploadSec (site, f, "/economic")
+            time.sleep(5)
+        path = os.path.join(args.input, "*Sector.sector.wiki")
+        for f in glob.glob(path):
+            uploadSec (site, f, "/sector")
+            time.sleep(5)
 
     if args.summary:
         path = os.path.join(args.input, "summary.wiki")

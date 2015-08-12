@@ -33,6 +33,7 @@ class WikiStats(object):
         self.subsector_statistics()
         self.write_allegiances(self.galaxy.alg)
         self.write_worlds_wiki_stats()
+        self.write_sector_wiki()
         self.write_world_statistics()
         
     def summary_statistics(self):
@@ -462,9 +463,40 @@ class WikiStats(object):
                 
             f.write('\n')
     
+    def write_sector_wiki(self):
+        for sector in self.galaxy.sectors.itervalues():
+            path = os.path.join(self.galaxy.output_path, sector.sector_name() + " Sector.sector.wiki")
+            with codecs.open(path, 'w+', 'utf-8') as f:
+                f.write ('<section begin="header"/>\n')
+                f.write ('{| class="wikitable sortable" width="90%"\n')
+                f.write (u'|+ {} sector data\n'.format(sector.sector_name()))
+                f.write (u'!Hex!!Name!!UWP!!Remarks!!{Ix}!!(Ex)!![Cx]!!Noble!!Base!!Zone!!PBG!!Worlds!!Alg!!Stellar')
+                f.write ('<section end="header"/>')
+                for subsector in sector.subsectors.itervalues():
+                    f.write(u'<section begin="{}"/>\n'.format(subsector.name))
+                    for star in subsector.worlds:
+                        f.write ('|-\n')
+                        f.write('|{:5}'.format(star.position))
+                        f.write(u'||{:21}'.format(star.wiki_short_name()))
+                        f.write(u'||{:10}'.format(star.uwp))
+                        f.write(u'||{}'.format(' '.join(star.tradeCode)))
+                        f.write(u'||{{{:d}}}'.format(star.importance))
+                        f.write(u'||{}'.format(star.economics))
+                        f.write(u'||{}'.format(star.social))
+                        f.write(u'||{}'.format(star.nobles))
+                        f.write(u'||{}'.format(star.baseCode))
+                        f.write(u'||{}'.format(star.zone))
+                        f.write(u'||{:d}{:d}{:d}'.format(star.popM, star.belts, star.ggCount))
+                        f.write(u'||{:d}'.format(star.worlds))
+                        f.write(u'||{}'.format(star.alg))
+                        f.write(u'||{}'.format(star.stars))
+                        f.write('\n')
+                    f.write (u'<section end="{}"/>'.format(subsector.name))
+                f.write('\n|}\n[[Category:Sectors with sector data]]\n')                     
+    
     def write_worlds_wiki_stats(self):
         for sector in self.galaxy.sectors.itervalues():
-            path = os.path.join(self.galaxy.output_path, sector.sector_name()+" Sector.wiki")
+            path = os.path.join(self.galaxy.output_path, sector.sector_name()+" Sector.economic.wiki")
             with codecs.open(path, 'w+', 'utf-8') as f:
                 f.write ('<section begin="header"/>\n')
                 f.write ('{| class="wikitable sortable" width="90%"\n')

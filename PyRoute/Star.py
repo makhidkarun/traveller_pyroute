@@ -32,6 +32,12 @@ class Nobles(object):
                       'F': 'Sector Dukes',
                       'G': 'Archdukes',
                       'H': 'Emperor'}
+    def __str__(self):
+        nobility=""
+        for rank, count in self.nobles.iteritems():
+            if count > 0:
+                nobility += self.codes.keys()[self.codes.values().index(rank)]
+        return ''.join(sorted(nobility, key=lambda v: (v.lower(), v[0].isupper())))
         
     def count(self, nobility):
         for code, rank in self.codes.iteritems():
@@ -73,11 +79,9 @@ class Star (object):
         else:
             self.homeworld = None 
             
-        if (data[6]):
-            self.economics = data[6].strip()
-        else:
-            self.economics = None
-            
+        self.economics = data[6].strip() if data[6] else None
+        self.social = data[7].strip() if data[7] else None
+        
         self.nobles = Nobles()
         self.nobles.count(data[11])
         
@@ -86,9 +90,13 @@ class Star (object):
         self.ggCount = int(data[14][2],16)
         self.popM = int(data[14][0])
         self.belts = int(data[14][1], 16)
+
+        self.worlds = int(data[15])
         
         self.alg = data[16].strip()
         self.alg_base = self.alg
+        
+        self.stars = data[17].strip()
         
         self.uwpCodes = {'Starport': self.port,
                            'Size': self.size,
@@ -161,6 +169,10 @@ class Star (object):
         name = u" ".join(w.capitalize() for w in self.name.lower().split())
         name = u'{{WorldS|' + name + u'|' + self.sector.sector_name() + u'|' + self.position + u'}}'
         return name
+
+    def wiki_short_name(self):
+        name = u" ".join(w.capitalize() for w in self.name.lower().split())
+        return u'[[{} (world)|]]'.format(name)
 
     def set_location (self, dx, dy):
         # convert odd-q offset to cube
