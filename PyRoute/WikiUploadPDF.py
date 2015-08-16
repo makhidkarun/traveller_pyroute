@@ -54,7 +54,7 @@ def uploadSummaryText(site, summaryFile):
         try:
             target_page = Page(site, targetTitle)
             result = target_page.edit(text=text, summary='Trade Map update sector summary', 
-                                      bot=True, nocreate=True)
+                                      bot=True, nocreate=True,skipmd5=True)
     
             if result['edit']['result'] == 'Success':
                 print 'Saved: {}'.format(targetTitle)
@@ -88,10 +88,10 @@ def uploadSec (site, filename, place):
     with codecs.open(filename, "r", 'utf-8') as f:
         text = f.read()
     try :
-        targetTitle = os.path.splitext(os.path.basename(filename))[0] + place    
+        targetTitle = os.path.basename(filename).split('.')[0] + place    
         target_page = Page(site, targetTitle)
         result = target_page.edit(text=text, summary='Trade Map update sector data', 
-                                  bot=True, nocreate=True)
+                                  bot=True, nocreate=True, skipmd5=True)
         if result['edit']['result'] == 'Success':
             print 'Saved: {}'.format(targetTitle)
         else:
@@ -138,6 +138,3 @@ if __name__ == '__main__':
     if args.subsector:
         path = os.path.join(args.input, "subsector_summary.wiki")
         uploadSummaryText(site, path)
-    
-        
-    
