@@ -49,4 +49,4 @@ if __name__ == '__main__':
         url = 'http://travellermap.com/api/metadata?%s' % params
         get_url (url, sector, 'xml')
         
-        time.sleep(10)
+        time.sleep(5)

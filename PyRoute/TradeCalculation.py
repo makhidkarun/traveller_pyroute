@@ -145,11 +145,11 @@ class NoneCalculation(RouteCalculation):
     def __init__(self, galaxy):
         super(NoneCalculation, self).__init__(galaxy)
     
-    # Pure HG Base jump sitance cost
+    # Pure HG Base jump distance cost
     distance_weight = [0, 30, 50, 75, 130, 230, 490]
 
     def generate_routes(self):
-        self.generate_base_routes()        
+        #self.generate_base_routes()        
         pass
     
     def calculate_routes(self):

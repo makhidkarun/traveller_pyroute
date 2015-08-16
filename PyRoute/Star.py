@@ -91,7 +91,7 @@ class Star (object):
         self.popM = int(data[14][0])
         self.belts = int(data[14][1], 16)
 
-        self.worlds = int(data[15])
+        self.worlds = int(data[15]) if data[15].isdigit() else 0
         
         self.alg = data[16].strip()
         self.alg_base = self.alg
