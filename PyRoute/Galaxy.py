@@ -97,7 +97,7 @@ class Galaxy(object):
 (\w\w?|-|\*) +
 (\w|-) +
 ([0-9][0-9A-F][0-9A-F]) +
-(\d{1,}) +
+(\d{1,}| )+
 ([A-Z0-9-][A-Za-z0-9?-]{1,3}) 
 (.*)
 """
@@ -124,6 +124,7 @@ class Galaxy(object):
             except (OSError, IOError):
                 self.logger.error("sector file %s not found" % sector)
                 continue
+            self.logger.debug('reading %s ' % sector)
             
             sec = Sector (lines[3], lines[4])
             sec.filename = os.path.basename(sector)
@@ -158,13 +159,18 @@ class Galaxy(object):
                 
                 base = AllyGen.same_align(star.alg)
                 if match == 'collapse':
-                    self.alg[base].worlds.append(star)
+                    try:
+                        self.alg[base].worlds.append(star)
+                    except KeyError:
+                        self.logger.error(u"Allegiance code {} is not in the {} sector file allegiance list".format(base, sec))
+                        self.alg[base] = Allegiance(base, "Unknown Allegiance")
+                        self.alg[base].worlds.append(star)
                     star.alg_base = base;
                 elif match == 'separate':
                     try: 
                         self.alg[star.alg].worlds.append(star)
                     except KeyError:
-                        self.logger.error ("Allegiance %s is not in the %s sector file allegiance list" % (star.alg, sec))
+                        self.logger.error (u"Allegiance {} is not in the {} sector file allegiance list".format(star.alg, sec))
                         raise SystemExit(3)
                     if base != star.alg:
                         self.alg[base].worlds.append(star)
