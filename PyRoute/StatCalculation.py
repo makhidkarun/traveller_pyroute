@@ -33,6 +33,7 @@ class ObjectStatistics(object):
         self.gg_count   = 0
         self.naval_bases = 0
         self.scout_bases = 0
+        self.way_stations = 0
 
 class StatCalculation(object):
     '''
@@ -117,6 +118,8 @@ class StatCalculation(object):
             stats.naval_bases += 1
         if 'S' in star.baseCode or 'V' in star.baseCode:
             stats.scout_bases += 1
+        if 'W' in star.baseCode:
+            stats.way_stations += 1
    
     def max_tl (self, stats, star):
         stats.maxTL = max(stats.maxTL, star.tl)

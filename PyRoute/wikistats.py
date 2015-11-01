@@ -247,11 +247,12 @@ class WikiStats(object):
 # There are <N> Agricultural (Ag) worlds versus <N> Non-Agricultural (Na) worlds. 
 # There are <N> Non-Industrial (Ni) Worlds versus <N> Industrial (In) worlds.
 # There are <N> Rich (Ri) worlds versus <N> Poor (Po) worlds. 
-# There are <N> Water Worlds (Wa), 17 Ice-Capped worlds (Ic), 42 Desert worlds (De), and 54 Vacuum (Va) worlds. 
+# There are <N> Water Worlds (Wa), <N> Ice-Capped worlds (Ic), <N> Desert worlds (De), and <N> Vacuum (Va) worlds. 
 # There are <N> High Population (Hi) worlds versus <N> Low Population (Lo) worlds. 
 # There are <N> Asteroid Belts (As) in the sector. 
 # There are <N> Barren (Ba) worlds. 
-# There are <N> naval bases in the subsector and <N> scout bases.
+# There are <N> naval bases in the <area>, <N> scout bases, and <N> way stations.
+# In <area> there are <N> race homeworlds. 
 # The highest population world in the sector is {{WorldS|Saazi (Antares 0533)}}; the lowest population world is {{WorldS|Lampigas}}
 # The average tech level in the sector is 6 (most lie between 3 and 9). 
 
@@ -313,8 +314,10 @@ class WikiStats(object):
 
         f.write('There ')
         self.write_count(f, area.stats.naval_bases, 'Naval base')
-        f.write (' and ')
+        f.write (u' in the {}, '.format(area_type))
         self.write_count(f, area.stats.scout_bases, 'Scout base', False)
+        f.write (', and ')
+        self.write_count(f, area.stats.way_stations, 'Way station', False)
         f.write('. ')
         
         HomeWorlds = [world for world in area.worlds if world.homeworld is not None]
@@ -361,7 +364,7 @@ class WikiStats(object):
         
         PopWorlds = [world for world in area.worlds if world.popCode == area.stats.maxPop]
         if len(PopWorlds) == 1:
-            f.write(u'The highest population world is {}.'.format(PopWorlds[0].wiki_name()))
+            f.write(u'The highest population world is {}. '.format(PopWorlds[0].wiki_name()))
         elif len(PopWorlds) > 1:
             PopWorlds.sort(key=lambda star: star.popM, reverse=True)
             maxPopM = PopWorlds[0].popM
@@ -370,7 +373,7 @@ class WikiStats(object):
             if len(PopWorlds) == 1:
                 f.write(u'The highest population world is {}. '.format(PopWorlds[0].wiki_name()))
             else:
-                f.write(' The highest population worlds are '.format(baseN(area.stats.maxTL,18))) 
+                f.write('The highest population worlds are '.format(baseN(area.stats.maxTL,18))) 
                 PopWorlds = PopWorlds[0:6]
                 f.write(u", ".join(w.wiki_name() for w in PopWorlds[:-1]))
                 f.write(u", and {}".format(PopWorlds[-1].wiki_name()))
@@ -378,10 +381,10 @@ class WikiStats(object):
         
         TLWorlds = [world for world in area.worlds if world.tl == area.stats.maxTL]
         if len(TLWorlds) == 1:
-            f.write(u' The highest tech level is {} at {}. '.format(baseN(area.stats.maxTL,18), 
+            f.write(u'The highest tech level is {} at {}. '.format(baseN(area.stats.maxTL,18), 
                                                                   TLWorlds[0].wiki_name()))
         elif len(TLWorlds) > 1:
-            f.write(' The highest tech level is {} at '.format(baseN(area.stats.maxTL,18))) 
+            f.write('The highest tech level is {} at '.format(baseN(area.stats.maxTL,18))) 
             TLWorlds = TLWorlds[0:6]
             f.write (u", ".join(w.wiki_name() for w in TLWorlds[:-1]))
             f.write (u", and {}".format(TLWorlds[-1].wiki_name()))
@@ -574,13 +577,13 @@ class WikiStats(object):
     def write_count(self, f, count, text, is_are = True):
         if count == 0 :
             if is_are: f.write('are ') 
-            f.write('no {}s'.format(text))
+            f.write(u'no {}s'.format(text))
         elif count == 1:
             if is_are: f.write('is ')
-            f.write('one {}'.format(text))
+            f.write(u'one {}'.format(text))
         else:
             if is_are: f.write('are ')
-            f.write('{:d} {}s'.format(count, text))
+            f.write(u'{:d} {}s'.format(count, text))
             
             
     def write_population(self, population, f):
