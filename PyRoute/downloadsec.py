@@ -6,7 +6,6 @@ Created on Jun 3, 2014
 import urllib2
 import urllib
 import codecs
-import string
 import time
 import os
 import argparse

@@ -71,12 +71,14 @@ class WikiStats(object):
         with open (path, 'w+') as f:
             for sector in self.galaxy.sectors.itervalues():
                 f.write(u'[[{} Sector/summary]]\n'.format(sector.sector_name()))
+                    
         
         path = os.path.join(self.galaxy.output_path, 'subsector_list.txt')
-        with open(path, 'w+') as f:
+        with codecs.open (path, 'w+','utf-8') as f:
             for sector in self.galaxy.sectors.itervalues():
                 for subsector in sector.subsectors.itervalues():
-                    f.write('[[{} Subsector/summary]]\n'.format(subsector.name))
+                    f.write(u'[[{} Subsector/summary]]\n'.format(subsector.name))
+                        
             
     def write_stats(self, f, stats):
         f.write('|align="right"|{:d}\n'.format(stats.number))
@@ -551,7 +553,7 @@ class WikiStats(object):
                 subsector = [sub for sub in sector.subsectors.itervalues()]
                 subsector.sort(key=lambda sub : sub.position)
                 for s in subsector:
-                    f.write('# Subsector {}: {}\n'.format(s.position, s.name))
+                    f.write(u'# Subsector {}: {}\n'.format(s.position, s.name))
                 f.write('\n')
                 f.write('Hex  Name                 UWP       PBG   {Ix}   WTN GWP(BCr) Trade(BCr) Passengers   RU   Build Cap    Army  Port  SPA pop  \n')
                 f.write('---  -------------------- --------- ---  ------- --- -------- ---------- ---------- ------ ----------- ------ ----  -------- \n')

@@ -87,9 +87,9 @@ class Star (object):
         
         self.baseCode = data[12].strip()
         self.zone = data[13].strip()
-        self.ggCount = int(data[14][2],16)
-        self.popM = int(data[14][0])
-        self.belts = int(data[14][1], 16)
+        self.ggCount = int(data[14][2],16) if data[14][2] != 'X' else 0
+        self.popM = int(data[14][0]) if data[14][0] != 'X' else 0
+        self.belts = int(data[14][1], 16) if data[14][1] != 'X' else 0
 
         self.worlds = int(data[15]) if data[15].isdigit() else 0
         
