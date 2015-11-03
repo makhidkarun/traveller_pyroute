@@ -33,7 +33,7 @@ Running the program
                 [--output OUTPUT] [--no-trade] [--no-maps] [--version]
                 sector [sector ...]
 
-Traveller trade route generator.
+    Traveller trade route generator.
 
     positional arguments:
       sector                T5SS sector file(s) to process
@@ -76,7 +76,7 @@ The ``min-route-btn`` defines the minimum BTN drawn on the map. The default (8) 
 
 ``max-jump`` selects the maximum distance used for trade route generation. Changing this can be based on jump drive availability. For lower TL areas or eras, setting this to 2 or 3 makes the rules reflect an earlier era. For an area where the stars are spread, set to 5 or 6 to include routes across the gaps. 
 
-``min-ally-count`` controls which allegiance codes are output in the `alleg_summary.wiki` file. For a map with many small empires it may be worth while setting this to 0 to include all of them in the output file. 
+``min-ally-count`` controls which allegiance codes are output in the `alleg_summary.wiki` file. The value is the minimum number of worlds in an empire to be includes in the output. The default is 10 worlds. For a map with many small empires it may be worth while setting this to 0 to include all of them in the output file. 
 
 ``pop-code`` controls the interpretation of the population modifier. `fixed` is the standard Traveller interpretation of the code.  `benford` re-distributes, using a random number generator, the existing population codes to match [Benford's Law](http://en.wikipedia.org/wiki/Benford%27s_law). This produces a more accurate population distribution, and reduces the population by about 30%. `scaled` treats the value as a index into a scaled array of values, attempting to produce the same results as the `benford` population multiplier, but without the random generation. 
 
@@ -121,7 +121,7 @@ The process takes between O(n^2) and O(n^3) processing time, meaning the more st
 * Full sectors (400-600 stars) take one to two minutes 
 * Multi-sector areas (around 2000 stars) take 20 to 30 minutes
 * The T5 Second survey area (30 sectors, 12880 stars) takes 3-4 hours
-* The entire of charted space (132 sectors, 50,598 stars) takes 15 hours. 
+* The entire of charted space (132 sectors, 50,598 stars) takes 15 to 18 hours. 
 
 Map Borders
 ===========
