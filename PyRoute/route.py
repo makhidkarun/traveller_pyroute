@@ -35,7 +35,7 @@ def process():
 
     parser.add_argument('--owned-worlds', dest='owned', default=False, action='store_true')
     
-    parser.add_argument('--routes', dest='routes', choices=['trade', 'comm','xroute', 'none'], default='trade',
+    parser.add_argument('--routes', dest='routes', choices=['trade', 'comm','xroute', 'owned', 'none'], default='trade',
                         help='Route type to be generated, default [trade]')
     parser.add_argument('--route-reuse', default=10, type=int,
                         help='Scale for reusing routes during route generation')

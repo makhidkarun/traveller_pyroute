@@ -12,7 +12,7 @@ import itertools
 import networkx as nx
 
 from Star import Star
-from TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation, XRouteCalculation
+from TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation, XRouteCalculation, OwnedWorldCalculation
 from StatCalculation import ObjectStatistics
 from AllyGen import AllyGen
 
@@ -211,6 +211,8 @@ class Galaxy(object):
             self.trade = CommCalculation(self, owned, reuse)
         elif routes == 'xroute':
             self.trade = XRouteCalculation(self)
+        elif routes == 'owned':
+            self.trade = OwnedWorldCalculation(self)
         elif routes == 'none':
             self.trade = NoneCalculation(self)
 

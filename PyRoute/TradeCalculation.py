@@ -156,7 +156,7 @@ class NoneCalculation(RouteCalculation):
         pass
 
     def base_route_filter (self, star, neighbor):
-        if not AllyGen.are_allies(star.alg, neighbor.alg) :
+        if not AllyGen.are_owned_allies(star.alg, neighbor.alg) :
             return True
         return False
 
@@ -168,6 +168,35 @@ class NoneCalculation(RouteCalculation):
         weight = self.distance_weight[dist]
         return weight
 
+class OwnedWorldCalculation(RouteCalculation):
+    def __init__(self, galaxy):
+        super(OwnedWorldCalculation, self).__init__(galaxy)
+    
+    # Pure HG Base jump distance cost
+    distance_weight = [0, 30, 50, 75, 130, 230, 490]
+
+    def generate_routes(self):
+        self.generate_base_routes()        
+        pass
+    
+    def calculate_routes(self):
+        pass
+
+    def base_route_filter (self, star, neighbor):
+        return not AllyGen.are_owned_allies(star.alg, neighbor.alg)
+        #if not AllyGen.are_owned_allies(star.alg, neighbor.alg) :
+        #    return True
+        #return False
+
+    def base_range_routes (self, star, neighbor):
+        pass
+
+    def route_weight (self, star, target):
+        dist = star.hex_distance(target)
+        weight = self.distance_weight[dist]
+        return weight
+    
+    
 class XRouteCalculation (RouteCalculation):
     distance_weight = [0, 95, 90, 85, 80, 75, 70  ]
     capSec_weight = [0, 95, 90, 85, 75, 75, 70]
