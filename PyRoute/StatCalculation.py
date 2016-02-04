@@ -8,6 +8,7 @@ import math
 from wikistats import WikiStats
 from collections import OrderedDict, defaultdict
 from AllyGen import AllyGen
+from Star import UWPCodes
 
 class ObjectStatistics(object):
     def __init__(self):
@@ -35,6 +36,14 @@ class ObjectStatistics(object):
         self.scout_bases = 0
         self.way_stations = 0
 
+class UWPCollection(object):
+    def __init__(self):
+        self.uwp = OrderedDict()
+        for uwpCode in UWPCodes:
+            self.uwp[uwpCode] = {}
+    def stats(self, code, value):
+        return self.uwp[code].setdefault(value, ObjectStatistics())
+
 class StatCalculation(object):
     '''
     Statistics calculations and output.
@@ -45,6 +54,9 @@ class StatCalculation(object):
         self.logger = logging.getLogger('PyRoute.StatCalculation')
 
         self.galaxy = galaxy
+        self.all_uwp = UWPCollection()
+        self.imp_uwp = UWPCollection()
+        
         self.uwp    = OrderedDict()
         self.uwp['Starport'] = {}
         self.uwp['Size'] = {}
@@ -79,6 +91,11 @@ class StatCalculation(object):
                     algStats = self.galaxy.alg[AllyGen.same_align(star.alg)].stats
                     self.add_stats(algStats, star)
                     self.max_tl (algStats, star)
+                    
+                    if AllyGen.imperial_align(star.alg):
+                        for uwpCode, uwpValue in star.uwpCodes.iteritems():
+                            self.add_stats(self.imp_uwp.stats(uwpCode, uwpValue), star)
+                            
                 elif match == 'separate':
                     algStats = self.galaxy.alg[star.alg].stats
                     self.add_stats(algStats, star)
@@ -88,8 +105,7 @@ class StatCalculation(object):
                     self.max_tl(both, star)
                     
                 for uwpCode, uwpValue in star.uwpCodes.iteritems():
-                    stats = self.uwp[uwpCode].setdefault(uwpValue, ObjectStatistics())
-                    self.add_stats(stats, star)
+                    self.add_stats(self.all_uwp.stats(uwpCode, uwpValue), star)
                 
             self.per_capita(sector.stats) # Per capital sector stats
             for subsector in sector.subsectors.itervalues():

@@ -10,6 +10,19 @@ import random
 import math
 from AllyGen import AllyGen
 
+class UWPCodes(object):
+    def __init__(self):
+        self.uwpCodes = ['Starport', 
+                         'Size',
+                         'Atmosphere',
+                         'Hydrographics',
+                         'Population',
+                         'Government',
+                         'Law Level',
+                         'Tech Level',
+                         'Pop Code']
+
+
 class Nobles(object):
     def __init__ (self):
         self.nobles = {'Knights': 0, 

@@ -218,6 +218,10 @@ class AllyGen(object):
                 return sameAlg[0]
         return alg
 
+    @staticmethod
+    def imperial_align(alg):
+        return AllyGen.same_align(alg) == 'Im'
+    
     def create_ally_map(self, match):
         allyMap = self._ally_map(match)
         #self._output_map(allyMap, 3)
