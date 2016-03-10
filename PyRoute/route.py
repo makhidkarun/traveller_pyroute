@@ -113,4 +113,3 @@ def set_logging(level):
 
 if __name__ == '__main__':
     process()
-    

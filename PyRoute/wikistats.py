@@ -386,7 +386,7 @@ class WikiStats(object):
             f.write(u'The highest tech level is {} at {}. '.format(baseN(area.stats.maxTL,18), 
                                                                   TLWorlds[0].wiki_name()))
         elif len(TLWorlds) > 1:
-            f.write('The highest tech level is {} at '.format(baseN(area.stats.maxTL,18))) 
+            f.write(u'The highest tech level is {} at '.format(baseN(area.stats.maxTL,18))) 
             TLWorlds = TLWorlds[0:6]
             f.write (u", ".join(w.wiki_name() for w in TLWorlds[:-1]))
             f.write (u", and {}".format(TLWorlds[-1].wiki_name()))
@@ -598,4 +598,3 @@ class WikiStats(object):
 
 def baseN(num,b,numerals="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
     return ((num == 0) and numerals[0]) or (baseN(num // b, b, numerals).lstrip(numerals[0]) + numerals[num % b])
-        
