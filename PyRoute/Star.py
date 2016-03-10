@@ -66,7 +66,11 @@ class Star (object):
         self.logger = logging.getLogger('PyRoute.Star')
         self.sector = sector
         self.logger.debug(line)
-        data = starline.match(line).groups()
+        if starline.match(line):
+            data = starline.match(line).groups()
+        else:
+            self.logger.error(u"Unmatched Line: {}".format(line))
+            return
         self.position = data[0].strip()
         self.set_location(sector.dx, sector.dy)
         self.name = data[1].strip()
@@ -92,8 +96,8 @@ class Star (object):
         else:
             self.homeworld = None 
             
-        self.economics = data[6].strip() if data[6] else None
-        self.social = data[7].strip() if data[7] else None
+        self.economics = data[6].strip() if data[6] and data[6].strip() != u'-' else None
+        self.social = data[7].strip() if data[7] and data[7].strip() != u'-' else None
         
         self.nobles = Nobles()
         self.nobles.count(data[11])
