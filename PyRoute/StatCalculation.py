@@ -39,8 +39,9 @@ class ObjectStatistics(object):
 class UWPCollection(object):
     def __init__(self):
         self.uwp = OrderedDict()
-        for uwpCode in UWPCodes:
+        for uwpCode in UWPCodes.uwpCodes:
             self.uwp[uwpCode] = {}
+
     def stats(self, code, value):
         return self.uwp[code].setdefault(value, ObjectStatistics())
 
@@ -49,24 +50,12 @@ class StatCalculation(object):
     Statistics calculations and output.
     '''
 
-
     def __init__(self, galaxy):
         self.logger = logging.getLogger('PyRoute.StatCalculation')
 
         self.galaxy = galaxy
         self.all_uwp = UWPCollection()
         self.imp_uwp = UWPCollection()
-        
-        self.uwp    = OrderedDict()
-        self.uwp['Starport'] = {}
-        self.uwp['Size'] = {}
-        self.uwp['Atmosphere'] = {}
-        self.uwp['Hydrographics'] = {}
-        self.uwp['Population'] = {}
-        self.uwp['Government'] = {}
-        self.uwp['Law Level'] = {}
-        self.uwp['Tech Level'] = {}
-        self.uwp['Pop Code'] = {}
         
     def calculate_statistics(self, match):
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
@@ -168,7 +157,7 @@ class StatCalculation(object):
             s = u'Allegiance {0} ({1}) star count: {2:,d}'.format(aleg.name, code, aleg.stats.number)
             self.logger.debug(s)
             
-        wiki = WikiStats(self.galaxy, self.uwp, ally_count)
+        wiki = WikiStats(self.galaxy, self.all_uwp, ally_count)
         wiki.write_statistics()
         
     @staticmethod

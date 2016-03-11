@@ -92,17 +92,16 @@ class Galaxy(object):
 (.{15,}) +
 (\w\w\w\w\w\w\w-\w) +
 (.{15,}) +
-((\{ [+-]?[0-5] \}) +(\([0-9A-Z]{3}[+-]\d\)|-) +(\[[0-9A-Z]{4}\]|-)|( ) ( ) ( )) +
+((\{ [+-]?[0-5] \}) +(\([0-9A-Z]{3}[+-]\d\)| - ) +(\[[0-9A-Z]{4}\]| - )|( ) ( ) ( )) +
 (\w{1,5}|-) +
 (\w\w?|-|\*) +
 (\w|-) +
 ([0-9X][0-9A-FX][0-9A-FX]) +
-(\d{1,}| )+
+(\d{1,}| ) +
 ([A-Z0-9-][A-Za-z0-9?-]{1,3}) 
 (.*)
 """
 #(\{ [0-9] \}|\{ -[1-3] \}| ) +
-
         star_regex = ''.join([line.rstrip('\n') for line in regex])
         self.logger.debug("Pattern: %s" % star_regex)
         self.starline = re.compile(star_regex)
