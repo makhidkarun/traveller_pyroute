@@ -9,19 +9,23 @@ import bisect
 import random
 import math
 from AllyGen import AllyGen
+from collections import OrderedDict
 
 class UWPCodes(object):
+    uwpCodes = ['Starport', 
+                 'Size',
+                 'Atmosphere',
+                 'Hydrographics',
+                 'Population',
+                 'Government',
+                 'Law Level',
+                 'Tech Level',
+                 'Pop Code']
+    
     def __init__(self):
-        self.uwpCodes = ['Starport', 
-                         'Size',
-                         'Atmosphere',
-                         'Hydrographics',
-                         'Population',
-                         'Government',
-                         'Law Level',
-                         'Tech Level',
-                         'Pop Code']
-
+        self.codes = OrderedDict()
+        for uwpCode in UWPCodes.uwpCodes:
+            self.codes[uwpCode] = "X"
 
 class Nobles(object):
     def __init__ (self):
@@ -114,7 +118,7 @@ class Star (object):
         self.alg_base = self.alg
         
         self.stars = data[17].strip()
-        
+       
         self.uwpCodes = {'Starport': self.port,
                            'Size': self.size,
                            'Atmosphere': self.atmo,
