@@ -45,6 +45,12 @@ class UWPCollection(object):
     def stats(self, code, value):
         return self.uwp[code].setdefault(value, ObjectStatistics())
 
+    def __getitem__ (self,index):
+        return self.uwp[index]
+
+    def __setitem__ (self, index, value):
+        self.uwp[index] = value
+
 class StatCalculation(object):
     '''
     Statistics calculations and output.

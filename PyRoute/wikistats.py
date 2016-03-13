@@ -157,17 +157,16 @@ class WikiStats(object):
         for x in range(18):
             f.write('||{}'.format(baseN(x,18)))
         f.write('||I-Z')
-        for name in self.uwp.iterkeys():
+        for name, values in self.uwp.uwp.iteritems():
             f.write('\n|- \n| {}'.format(name))
             for x in range(18):
                 index = baseN(x,18)
-                stats = self.uwp.get(name, {}).get(index, default_stats)
+                stats = self.uwp.uwp.get(name, {}).get(index, default_stats)
                 value = stats.number
                 f.write('||{}'.format(value))
             found = False
-            for index in self.uwp[name].iterkeys():
+            for index, stats in values.iteritems():
                 if index not in '0123456789ABCDEFGH':
-                    stats = self.uwp[name][index]
                     f.write ('||{:d}'.format(stats.number))
                     found = True
                     break
@@ -180,18 +179,17 @@ class WikiStats(object):
         population = self.galaxy.stats.population
         default_stats = ObjectStatistics()
 
-        for name in self.uwp.iterkeys():
+        for name, values in self.uwp.uwp.iteritems():
             f.write('\n|- \n| {}'.format(name))
             for x in range(18):
                 index = baseN(x,18)
-                stats = self.uwp.get(name, {}).get(index, default_stats)
+                stats = self.uwp.uwp.get(name, {}).get(index, default_stats)
                 value = int(stats.population / (population / 100)) if population > 0 else 0
                 f.write('||{:d}%'.format(value))
             
             found = False
-            for index in self.uwp[name].iterkeys():
+            for index, stats in values.iteritems():
                 if index not in '0123456789ABCDEFGH':
-                    stats = self.uwp[name][index]
                     value = int(stats.population / (population / 100)) if population > 0 else 0
                     f.write ('||{:d}%'.format(value))
                     found = True
