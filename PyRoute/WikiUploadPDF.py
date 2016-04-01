@@ -21,12 +21,13 @@ import codecs
 import glob
 import time
 from itertools import izip
+import traceback
 
 def uploadSummaryText(site, summaryFile):
     try:
         lines = [line for line in codecs.open(summaryFile,'r', 'utf-8')]
     except (OSError, IOError):
-        print "Summary file not found: {}".format(summaryFile)
+        print u"Summary file not found: {}".format(summaryFile)
         return 
     index = [i for i,n in enumerate(lines) if 'Statistics' in n][0]
     lines = lines[index + 3:]
@@ -35,7 +36,7 @@ def uploadSummaryText(site, summaryFile):
     while True:
         baseTitle = lines[index].split('|')[1]
         if not baseTitle.startswith('[['):
-            print "Upload Summary for {} not a page, skipped".format(baseTitle)
+            print u"Upload Summary for {} not a page, skipped".format(baseTitle)
             while (not (lines[index].startswith('|-') or lines[index].startswith('|}'))):
                 index += 1
             if lines[index].startswith('|}'):
@@ -44,7 +45,7 @@ def uploadSummaryText(site, summaryFile):
             continue
         else:
             baseTitle = baseTitle.strip('[')
-        targetTitle= "{}/summary".format(baseTitle)
+        targetTitle= u"{}/summary".format(baseTitle)
         index += 1
         text = lines[index][3:]
         index += 1
@@ -58,14 +59,14 @@ def uploadSummaryText(site, summaryFile):
                                       bot=True, nocreate=True,skipmd5=True)
     
             if result['edit']['result'] == 'Success':
-                print 'Saved: {}'.format(targetTitle)
+                print u'Saved: {}'.format(targetTitle)
             else:
-                print 'Save failed {}'.format(targetTitle) 
+                print u'Save failed {}'.format(targetTitle) 
         except api.APIError as e:
             if e.args[0] == 'missingtitle':
-                print "UploadSummary for page {}, page does not exist, skipped".format(baseTitle)
+                print u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle)
             else:
-                print "UploadSummary for page {} got exception {} ".format(baseTitle, e)
+                print u"UploadSummary for page {} got exception {} ".format(baseTitle, e)
             
         if lines[index].startswith('|}'):
             break       
@@ -82,7 +83,7 @@ def uploadPDF(site, filename):
                 print 'Save failed {}'.format(filename) 
         except Exception as e:
             print "UploadPDF for {} got exception: {}".format(filename, e)
-#            traceback.print_exc()
+            traceback.print_exc()
     
 
 def uploadSec (site, filename, place):
@@ -145,7 +146,7 @@ def uploadWorlds (site, sectorFile, economicFile):
     try:
         sectorLines = [line for line in codecs.open(sectorFile,'r', 'utf-8')]
     except (OSError, IOError):
-        print "Sector file not found: {}".format(sectorFile)
+        print u"Sector file not found: {}".format(sectorFile)
         return
 
     sectorData = [line.split(u"||") for line in sectorLines[5:]
@@ -155,7 +156,7 @@ def uploadWorlds (site, sectorFile, economicFile):
     try:
         economicLines = [line for line in codecs.open(economicFile, 'r', 'utf-8')]
     except (OSError, IOError):
-        print "Economic file not found: {}".format(economicFile)
+        print u"Economic file not found: {}".format(economicFile)
         return
     economicData = [line.split(u"||") for line in economicLines[5:]
                     if not(line.startswith(u'|-') or line.startswith(u'<section') 
@@ -164,7 +165,7 @@ def uploadWorlds (site, sectorFile, economicFile):
     sectorName = economicLines[2][3:-15]
     for sec, eco in zip (sectorData, economicData):
         if not sec[0] == eco[0]:
-            print "{} is not equal to {}".format(sec[0], eco[0])
+            print u"{} is not equal to {}".format(sec[0], eco[0])
             break
         pcodes = ['As', 'De', 'Fl', 'He', 'Ic', 'Oc', 'Va', 'Wa']
         dcodes = ['Cp', 'Cx', 'Cs', 'Mr', 'Da', 'Pz', 'An', 'Ab', 'Fo', 'Re', 'Sa', 'Tz']
