@@ -732,10 +732,8 @@ class TradeCalculation(RouteCalculation):
             weight += 25
         if star.port in 'DEX':
             weight += 25
+        weight -= star.importance + target.importance
         return weight
-
-    
-    
     
 class CommCalculation(RouteCalculation):
     # Weight for route over a distance. The relative cost for
@@ -743,10 +741,9 @@ class CommCalculation(RouteCalculation):
     # in a single jump.         
     distance_weight = [0, 70, 65, 60, 70, 130, 150  ]
     
-    def __init__(self, galaxy, owned, reuse = 5):
+    def __init__(self, galaxy, reuse = 5):
         super(CommCalculation, self).__init__(galaxy)
         self.route_reuse = reuse
-        self.owned = owned
         self.min_importance = 4
 
     def base_route_filter (self, star, neighbor):

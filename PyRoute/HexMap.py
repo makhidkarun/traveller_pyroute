@@ -415,8 +415,6 @@ class HexMap(object):
             circle = PDFEllipse(pdf.session, pdf.page, lineEnd, radius, color, size=3)
             circle._draw()
         
-
-                        
     def zone(self, pdf, star, point):
         point.x_plus(self.ym)
         point.y_plus(self.ym)
