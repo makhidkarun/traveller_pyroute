@@ -151,6 +151,11 @@ class StatCalculation(object):
         else:
             stats.shipyards = 0
         
+    def find_colonizer(self, world, owner_hex):
+        for target in self.galaxy.ranges.neighbors_iter(world):
+            if target.position == owner_hex:
+                target.tradeCode.append("C:{}-{}".format(world.sector[0:4], world.position))
+                pass
             
     def write_statistics(self, ally_count):
         self.logger.info('Charted star count: ' + str(self.galaxy.stats.number))

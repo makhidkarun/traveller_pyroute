@@ -20,6 +20,7 @@ import os
 import codecs
 import glob
 import time
+import re
 from itertools import izip
 import traceback
 
@@ -142,7 +143,20 @@ def uploadWorlds (site, sectorFile, economicFile):
  |portSize  = {29}
  |spa       = {30}
 }}}}'''
+    
+    page_template = u'''{{{{StellarDataQuery|name={{{{World|{0}|{1}|{2}|{3}}}}} }}}}
 
+== Description (Astrography & Planetology) ==
+No information yet available. 
+ 
+== History & Background (Dossier) ==
+No information yet available. 
+
+== References & Contributors (Sources) ==
+{{{{Incomplete}}}}
+{{{{Source}}}}
+{{{{LEN}}}}
+'''
     try:
         sectorLines = [line for line in codecs.open(sectorFile,'r', 'utf-8')]
     except (OSError, IOError):
@@ -163,26 +177,39 @@ def uploadWorlds (site, sectorFile, economicFile):
                            or line.startswith(u'|}') or line.startswith(u'[[Category:'))]
 
     sectorName = economicLines[2][3:-15]
+    print u"Uploading {}".format(sectorName)
     for sec, eco in zip (sectorData, economicData):
+        
         if not sec[0] == eco[0]:
             print u"{} is not equal to {}".format(sec[0], eco[0])
             break
+        subsectorName = eco[14].split(u'|')[1].strip(u'\n').strip(u']')
         pcodes = ['As', 'De', 'Fl', 'He', 'Ic', 'Oc', 'Va', 'Wa']
-        dcodes = ['Cp', 'Cx', 'Cs', 'Mr', 'Da', 'Pz', 'An', 'Ab', 'Fo', 'Re', 'Sa', 'Tz']
+        dcodes = ['Cp', 'Cx', 'Cs', 'Mr', 'Da', 'Di', 'Pz', 'An', 'Ab', 'Fo', 'Re', 'Sa', 'Tz', 'Lk']
         codes = sec[3].split()
         pcode = set(pcodes) & set(codes)
         dcode = set(dcodes) & set(codes)
 
-        sophonts = [code for code in codes if len(code) >= 4 and not code.startswith(u'O:')]
-        owned = [code for code in codes if code.startswith(u'O:')]
-
-        codeset = set(codes) - set(sophonts) - dcode - set(owned)
-        dcode = list(dcode) + owned
+        owned = [code for code in codes if code.startswith(u'O:') or code.startswith(u'C:')]
+        homeworlds = re.findall(ur"\([^)]+\)\S?", sec[3], re.U)
+        
+        codeCheck = set(codes) - dcode - set(owned) - set(homeworlds)
+        sophCodes = [code for code in codeCheck if len(code)>4]
+        
+        sophonts = homeworlds + sophCodes
+        
+        codeset = set(codes) - dcode - set(owned) - set(sophCodes)
 
         if len(pcode) > 0:
-            pcode = pcode.pop()
+            pcode = sorted(list(pcode))[0]
         else:
             pcode = ''
+
+        colony = [code if len(code) > 6 else u'O:'+ sectorName[0:4] + u'-' + code[2:]
+                 for code in owned if code.startswith(u'O:')]
+        parent =  [code if len(code) > 6 else u'C:'+ sectorName[0:4] + u'-' + code[2:]
+                 for code in owned if code.startswith(u'C:')]
+        dcode = list(dcode) + colony + parent
 
         starparts = sec[13].split()
         stars = []
@@ -197,7 +224,7 @@ def uploadWorlds (site, sectorFile, economicFile):
             stars.append(starparts[-1])
 
         hexNo = sec[0].strip(u'|').strip()
-        worldPage = sec[1].strip().strip(u'[]').strip(u'|')
+        worldPage = eco[1].strip() + u" (world)"
         try:
             target_page = Page(site, worldPage)
             categories = target_page.getCategories(True)
@@ -207,42 +234,66 @@ def uploadWorlds (site, sectorFile, economicFile):
                 worldPage = worldName[0] + u'('+ shortName + u' ' + hexNo + u') (' + worldName[1]
         except NoPage:
             print u"Missing Page: {}".format(worldPage)
-            continue
+            page_data = page_template.format(eco[1].strip(), sectorName, subsectorName, hexNo)
+            target_page = Page(site, worldPage)
+            try:
+                result = target_page.edit(text=page_data, summary='Trade Map update created world page', 
+                                      bot=True, skipmd5=True)
 
-        data = data_template.format(eco[1].strip(),                                 # World
-                                    sectorName,                                     # Sector
-                                    eco[14].split(u'|')[1].strip(u'\n').strip(u']'),# Subsector
-                                    hexNo,                                          # hex
-                                    worldPage,                                      # Name
-                                    sec[2].strip(),                                 # UWP
-                                    pcode,                                          # pcode
-                                    u','.join(sorted(list(codeset))),               # codes
-                                    u','.join(sophonts),                            # sophonts
-                                    u','.join(sorted(list(dcode))),                 # details
-                                    sec[4].strip(u'{}'),                            # ix (important)
-                                    sec[5].strip(u'()'),                            # ex (Economiv)
-                                    sec[6].strip(u'[]'),                            # cx (cultureal)
-                                    sec[7].strip(),                                 # nobility
-                                    sec[8].strip(),                                 # bases
-                                    sec[9].strip(),                                 # Zone
-                                    sec[10][0],                                     # pop mult
-                                    sec[10][1],                                     # Belts
-                                    sec[10][2],                                     # GG Count
-                                    sec[11],                                        # Worlds
-                                    sec[12],                                        # Alegiance
-                                    u','.join(stars),                               # stars
-                                    eco[5].strip(),                                 # wtn
-                                    eco[6].strip(),                                 # RU
-                                    eco[7].strip(),                                 # GWP
-                                    eco[8].strip(),                                 # Trade
-                                    eco[9].strip(),                                 # Passengers
-                                    eco[10].strip(),                                # build capacity
-                                    eco[11].strip(),                                # Army
-                                    eco[12].strip(),                                # port size
-                                    eco[13].strip()                                 # spa population
+                if result['edit']['result'] == 'Success':
+                    print u'Saved: {}'.format(worldPage)
+            except api.APIError as e:
+                print u"UploadSummary for page {} got exception {} ".format(worldPage, e)
+                continue
+
+        data = data_template.format(eco[1].strip(),                   # World
+                                    sectorName,                       # Sector
+                                    subsectorName,                    # Subsector
+                                    hexNo,                            # hex
+                                    worldPage,                        # Name
+                                    sec[2].strip(),                   # UWP
+                                    pcode,                            # pcode
+                                    u','.join(sorted(list(codeset))), # codes
+                                    u','.join(sophonts),              # sophonts
+                                    u','.join(sorted(list(dcode))),   # details
+                                    sec[4].strip(u'{}'),              # ix (important)
+                                    sec[5].strip(u'()'),              # ex (Economiv)
+                                    sec[6].strip(u'[]'),              # cx (cultureal)
+                                    sec[7].strip(),                   # nobility
+                                    sec[8].strip(),                   # bases
+                                    sec[9].strip(),                   # Zone
+                                    sec[10][0],                       # pop mult
+                                    sec[10][1],                       # Belts
+                                    sec[10][2],                       # GG Count
+                                    sec[11],                          # Worlds
+                                    sec[12],                          # Alegiance
+                                    u','.join(stars),                 # stars
+                                    int(eco[5].strip())/2,            # wtn
+                                    eco[6].strip(),                   # RU
+                                    eco[7].strip(),                   # GWP
+                                    eco[8].strip(),                   # Trade
+                                    eco[9].strip(),                   # Passengers
+                                    eco[10].strip(),                  # build capacity
+                                    eco[11].strip(),                  # Army
+                                    eco[12].strip(),                  # port size
+                                    eco[13].strip()                   # spa population
                                     )
         try:
             target_page = Page(site,  worldPage + u'/data')
+            if target_page.exists:
+                page_text = unicode(target_page.getWikiText(), 'utf-8')
+                templates = re.findall (ur"{{[^}]*}}", page_text, re.U)
+                newtemplates = [template if not u"|era       = Milieu 1116" in template else data
+                                for template in templates]
+                newdata = u'\n'.join(newtemplates) 
+                if u"|era       = Milieu 1116" not in newdata:
+                    newtemplates.insert(0, data)
+                    newdata = u'\n'.join(newtemplates)
+                
+                if newdata == page_text:
+                    print u'No changes to template: skipping {}'.format(worldPage) 
+                    continue            
+                data = newdata
             result = target_page.edit(text=data, summary='Trade Map update world data', 
                                       bot=True, skipmd5=True)
 
@@ -256,7 +307,7 @@ def uploadWorlds (site, sectorFile, economicFile):
             else:
                 print u"UploadSummary for page {} got exception {} ".format(worldPage, e)
 
-shortNames = {u'Dagudashaag': u'Da'}
+shortNames = {u'Dagudashaag': u'Da', u'Empty Quarter': u'EQ', u'Spinward Marches': u'SM'}
 
 if __name__ == '__main__':
     warnings.simplefilter("always")
