@@ -184,8 +184,10 @@ No information yet available.
             print u"{} is not equal to {}".format(sec[0], eco[0])
             break
         subsectorName = eco[14].split(u'|')[1].strip(u'\n').strip(u']')
-        pcodes = ['As', 'De', 'Fl', 'He', 'Ic', 'Oc', 'Va', 'Wa']
-        dcodes = ['Cp', 'Cx', 'Cs', 'Mr', 'Da', 'Di', 'Pz', 'An', 'Ab', 'Fo', 'Re', 'Sa', 'Tz', 'Lk']
+        pcodes = ['As', 'De', 'Ga', 'Fl', 'He', 'Ic', 'Oc', 'Po', 'Va', 'Wa']
+        dcodes = ['Cp', 'Cx', 'Cs', 'Mr', 'Da', 'Di', 'Pz', 'An', 'Ab', 'Fo', 'Px', 
+                  'Re', 'Rs', 'Sa', 'Tz', 'Lk', 
+                  'RsA', 'RsB','RsG','RsD','RsE','RsZ', 'RsT']
         codes = sec[3].split()
         pcode = set(pcodes) & set(codes)
         dcode = set(dcodes) & set(codes)
