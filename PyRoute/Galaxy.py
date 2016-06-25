@@ -84,7 +84,7 @@ class Galaxy(object):
     '''
     def __init__(self, min_btn, max_jump=4, route_btn=8):
         '''
-        Constructor
+       Constructor
         '''
         self.logger = logging.getLogger('PyRoute.Galaxy')
         regex = """

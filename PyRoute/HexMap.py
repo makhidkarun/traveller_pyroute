@@ -96,7 +96,6 @@ class HexMap(object):
         pdf.add_text (name, cursor)
         pdf.set_font(font=def_font)
 
-
     def coreward_sector(self, pdf, name):
         cursor = PDFCursor(5, self.y_start - 15, True)
         def_font = pdf.get_font()
