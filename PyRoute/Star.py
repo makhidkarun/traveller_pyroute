@@ -250,11 +250,11 @@ class Star (object):
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
 
         if pop_code == 'scaled':
-            self.population =int (pow (10, self.popCode) * popCodeM[self.popM] / 1e7) 
+            self.population =pow (10, self.popCode) * popCodeM[self.popM] / 1e7 
             self.uwpCodes['Pop Code'] = str(popCodeM[self.popM]/10)
             
         elif pop_code == 'fixed':
-            self.population = int (pow (10, self.popCode) * self.popM / 1e6)
+            self.population = pow (10, self.popCode) * self.popM / 1e6
             
         elif pop_code == 'benford':
             popCodeRange=[0.243529203, 0.442507049, 0.610740422, 0.756470797, 0.885014099, 1]
@@ -263,11 +263,11 @@ class Star (object):
                 popM = popCodeM[self.popM]
             else:            
                 popM = (bisect.bisect(popCodeRange, random.random()) + 4) * 10
-            self.population = int (pow (10, self.popCode) * popM / 1e7)
+            self.population = pow (10, self.popCode) * popM / 1e7
             self.uwpCodes['Pop Code'] = str(popM/10)
 
 
-        self.gwp = int (self.population * calcGWP[min(self.tl,19)] / 1000)    
+        self.gwp = self.population * calcGWP[min(self.tl,19)] / 1000    
         #self.gwp = int (pow(10,self.popCode) * popCodeM[self.popM] * calcGWP[self.tl] / 1e10 )
         if self.rich:
             self.gwp = self.gwp * 16 / 10
@@ -281,7 +281,9 @@ class Star (object):
             self.gwp = self.gwp * 8 / 10
         if self.extreme:
             self.gwp = self.gwp * 8 / 10    
-        
+        self.gwp = int(self.gwp)
+        self.population = int(self.population)
+ 
     def calculate_wtn(self):
         self.wtn = self.popCode
         self.wtn -= 1 if self.tl == 0 else 0
@@ -345,6 +347,8 @@ class Star (object):
             self.ru = int(round(resources * labor * infrastructure * efficency))
         else:
             self.ru = resources * labor * infrastructure * efficency
+        
+        self.logger.debug ("RU = {0} * {1} * {2} * {3} = {4}".format(resources, labor, infrastructure, efficency, self.ru) )
         
     def calculate_TCS(self):
         tax_rate = {'0': 0.50, '1': 0.8, '2': 1.0, '3': 0.9, '4': 0.85, 
