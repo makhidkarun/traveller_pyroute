@@ -504,7 +504,7 @@ class WikiStats(object):
                 f.write ('<section begin="header"/>\n')
                 f.write ('{| class="wikitable sortable" width="90%"\n')
                 f.write (u'|+ {} economic data\n'.format(sector.sector_name()))
-                f.write (u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!RU!!GWP (BCr)!!Trade (BCr)!!Passengers!!Build!!Army!!Port!!SPA Population!!Subsector\n')
+                f.write (u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!RU!!GWP (BCr)!!Trade (MCr/year)!!Passengers / year!!Build!!Army!!Port!!SPA Population!!Subsector\n')
                 f.write ('<section end="header"/>')
                 for subsector in sector.subsectors.itervalues():
                     f.write(u'<section begin="{}"/>\n'.format(subsector.name))
@@ -516,8 +516,8 @@ class WikiStats(object):
                         f.write('||{:d}{:d}{:d}  '.format(star.popM, star.belts, star.ggCount))
                         f.write('||{{ {:d} }}'.format(star.importance))
                         f.write('||{:3d}'.format(star.wtn))
-                        f.write('||{:10,d}'.format(star.gwp))
                         f.write('||{:8,d}'.format(star.ru))
+                        f.write('||{:10,d}'.format(star.gwp))
                         f.write('||{:10,d}'.format(star.tradeIn/1000000))
                         f.write('||{:10,d}'.format(star.passIn))
                         f.write('||{:11,d}'.format(star.ship_capacity))
