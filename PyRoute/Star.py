@@ -154,6 +154,7 @@ class Star (object):
         self.calculate_TCS()
         self.owned_by()
         self.calculate_army()
+        self.calculate_pcode()
         
         self.tradeIn  = 0
         self.tradeOver = 0
@@ -418,6 +419,18 @@ class Star (object):
         imp += 1 if self.baseCode in [u'NS', u'NW', u'W', u'D', u'X', u'RT', u'CK', u'KM'] else 0 
         self.importance = imp
         
+    def calculate_pcode(self):
+        self.pcode = None
+        self.pcode = 'He' if 'He' in self.tradeCode else self.pcode
+        self.pcode = 'De' if 'De' in self.tradeCode else self.pcode
+        self.pcode = 'Fl' if 'Fl' in self.tradeCode else self.pcode
+        self.pcode = 'Po' if 'Po' in self.tradeCode else self.pcode
+        self.pcode = 'Va' if 'Va' in self.tradeCode else self.pcode
+        self.pcode = 'Ic' if 'Ic' in self.tradeCode else self.pcode
+        self.pcode = 'As' if 'As' in self.tradeCode else self.pcode
+        self.pcode = 'Oc' if 'Oc' in self.tradeCode else self.pcode
+        self.pcode = 'Wa' if 'Wa' in self.tradeCode else self.pcode
+
     def owned_by(self):
         self.ownedBy = self
         if self.gov == '6': 
