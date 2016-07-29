@@ -36,8 +36,15 @@ class Allegiance(AreaItem):
 class Subsector(AreaItem):
     def __init__(self, name, position, sector):
         super(Subsector, self).__init__(name)
+        self.positions = ["ABCD","EFGH","IJKL","MNOP"]
         self.sector = sector
         self.position = position
+        self.spinward = None
+        self.trailing = None
+        self.coreward = None
+        self.rimward = None
+        self.dx = sector.dx
+        self.dy = sector.dy
 
     def wiki_name(self):
         if len(self.name) == 0:
@@ -48,6 +55,34 @@ class Subsector(AreaItem):
     def wiki_title(self):
         return u'{0} - {1}'.format(self.wiki_name(), self.sector.wiki_name())
  
+    def set_bounding_subsectors (self):
+        posrow = 0
+        for row in self.positions:
+            if self.position in row:
+                pos = self.positions[posrow].index(self.position)
+                break
+            posrow += 1
+
+        if posrow == 0:
+            self.coreward = self.sector.coreward.subsectors[self.positions[3][pos]] if self.sector.coreward else None
+        else: 
+            self.coreward = self.sector.subsectors[self.positions[posrow-1][pos]]
+
+        if pos == 0:
+            self.spinward = self.sector.spinward.subsectors[self.positions[posrow][3]] if self.sector.spinward else None
+        else:
+            self.spinward = self.sector.subsectors[self.positions[posrow][pos - 1]]
+
+        if posrow == 3:
+            self.rimward = self.sector.rimward.subsectors[self.positions[0][pos]] if self.sector.rimward else None
+        else:
+            self.rimward = self.sector.subsectors[self.positions[posrow+1][pos]]
+            
+        if pos == 3:
+            self.trailing = self.sector.trailing.subsectors[self.positions[posrow][0]] if self.sector.trailing else None
+        else:
+            self.trailing = self.sector.subsectors[self.positions[posrow][pos + 1]]         
+
 class Sector (AreaItem):
     def __init__ (self, name, position):
         super(Sector, self).__init__(name[1:].strip())
@@ -93,8 +128,8 @@ class Galaxy(object):
 (\w\w\w\w\w\w\w-\w) +
 (.{15,}) +
 ((\{ [+-]?[0-5] \}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]| -)|( ) ( ) ( )) +
-(\w{1,5}|-) +
-(\w\w?|-|\*) +
+(\w{1,5}|-| ) +
+(\w{1,3}|-|\*) +
 (\w|-) +
 ([0-9X][0-9A-FX][0-9A-FX]) +
 (\d{1,}| ) +
@@ -177,6 +212,7 @@ class Galaxy(object):
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds) ) )
 
         self.set_bounding_sectors()
+        self.set_bounding_subsectors()
         self.set_positions()
         
     def set_positions(self):
@@ -202,6 +238,11 @@ class Galaxy(object):
                 neighbor.coreward = sector
             elif sector.x == neighbor.x and sector.y == neighbor.y:
                 self.logger.error("Duplicate sector %s and %s" % (sector.name, neighbor.name))
+
+    def set_bounding_subsectors(self):
+        for sector in self.sectors.itervalues():
+            for subsector in sector.subsectors.itervalues():
+                subsector.set_bounding_subsectors()
     
     def generate_routes(self, routes, reuse=10):
         if routes == 'trade':
