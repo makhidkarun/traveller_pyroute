@@ -8,11 +8,13 @@ import logging
 from pypdflite import PDFLite,PDFCursor
 from pypdflite.pdfobjects.pdfline import PDFLine
 from pypdflite.pdfobjects.pdftext import PDFText
+from pypdflite.pdfobjects.pdfellipse import PDFEllipse
 from PIL import Image, ImageDraw, ImageColor, ImageFont
 from StatCalculation import StatCalculation
 from Galaxy import Sector
 from Galaxy import Galaxy
 from Star import Star
+import route
 
 class Cursor (object):
     
@@ -97,14 +99,22 @@ class Map(object):
     def add_line(self, doc, start, end, color):
         ''' Add a line to the document, from start to end, in color'''
         raise NotImplementedError ("Base Class")
-    
+
+    def add_circle(self, doc, center, colorname):
+        ''' Add a circle to the document, from start to end, in color'''
+        raise NotImplementedError ("Base Class")
+
     def get_line(self, doc, start, end, colorname, width):
         ''' get a line draw method processor'''
         raise NotImplementedError ("Base Class")
         #color = pdf.get_color()
         #color.set_color_by_name(colorname)
         # hline = PDFLine(pdf.session, pdf.page, hlineStart, hlineEnd, stroke='solid', color=color, size=width)
-    
+
+    def place_system(self, doc, star):
+        '''Write a single world information into the map'''
+        raise NotImplementedError ("Base Class")
+
     def write_maps(self):
         '''
         Starting point for writing PDF files. 
@@ -143,13 +153,13 @@ class Map(object):
             #            self.trade_line(doc, [star, neighbor], data)
 
             for star in sector.worlds:
-                self.system(doc, star)
+                self.place_system(doc, star)
             
             self.close()
 
     def write_base_map(self, doc, sector):
         self.sector_name(doc, sector.name)
-        self.subsector_grid(doc)
+        self.subsector_grid(doc, sector)
         self.hex_grid(doc, self._draw_all, 0.5)
         if sector.coreward:
             self.coreward_sector(doc, sector.coreward.name)
@@ -160,7 +170,19 @@ class Map(object):
         if sector.trailing:
             self.trailing_sector(doc, sector.trailing.name)
 
-    def subsector_grid(self, doc):
+
+    def zone(self, doc, star, point):
+        point.x_plus(self.xm)
+        point.y_plus(self.ym)
+
+        if star.zone in ['R', 'F']:
+            self.add_circle(doc, point, self.xm, 'crimson')
+        elif star.zone in ['A', 'U'] :
+            self.add_circle(doc, point, self.xm, 'goldenrod')
+        else: # no zone -> do nothing
+            return
+
+    def subsector_grid(self, doc, sector):
         vlineStart = self.cursor(0, self.y_start)
         vlineEnd  = self.cursor(0, self.y_start + (180 * 4))
         for x in xrange (self.x_start, 598, 144):
@@ -210,6 +232,28 @@ class Map(object):
         lline._draw()
         if (y > 0):
             rline._draw()
+
+    def _draw_borders(self, x, y, hline, lline, rline):
+        q, r = self.convert_hex_to_axial(x + self.sector.dx, y + self.sector.dy - 1)
+
+        if self.galaxy.borders.borders.get((q,r), False):
+            if self.galaxy.borders.borders[(q,r)] & 1:
+                hline._draw()
+
+            if self.galaxy.borders.borders[(q,r)] & 2 and y > 0:
+                rline._draw()
+
+            if self.galaxy.borders.borders[(q,r)] & 4:
+                lline._draw()
+
+    def draw_borders(self, pdf, sector):
+        self.hex_grid(pdf, self._draw_borders, 1.5, 'salmon')
+
+    @staticmethod        
+    def convert_hex_to_axial(row, col):
+        x = row
+        z = col - (row - (row & 1)) / 2
+        return (x, z)
 
     def _hline(self, doc, width, colorname):
         hlineStart = self.cursor(0,0)
@@ -361,11 +405,79 @@ class PDFSectorMap(Map):
         pdf.set_draw_color(color)
         pdf.add_line(cursor1=start, cursor2=end)
             
+    def add_circle(self, pdf, center, radius, colorname):
+        color = pdf.get_color()
+        color.set_color_by_name(colorname)
+        radius = PDFCursor(radius, radius)
+        circle = PDFEllipse(pdf.session, pdf.page, center, radius, color, size=2)
+        circle._draw()
+
     def get_line(self, doc, start, end, colorname, width):
         ''' get a line draw method processor'''
         color = doc.get_color()
         color.set_color_by_name(colorname)
         return PDFLine(doc.session, doc.page, start, end, stroke='solid', color=color, size=width)
+
+    def place_system(self, pdf, star):
+        def_font = pdf.get_font()
+        pdf.set_font('times', size=4)
+
+        col = (self.xm * 3 * (star.col))
+        if (star.col & 1):
+            row = (self.y_start - self.ym * 2) + (star.row * self.ym * 2) 
+        else:
+            row = (self.y_start - self.ym) +  (star.row * self.ym * 2)
+
+        point = PDFCursor(col, row)
+        self.zone(pdf, star, point.copy())
+
+        width = self.string_width(pdf.get_font(), star.uwp)
+        point.y_plus(7)
+        point.x_plus(self.ym -(width/2))
+        pdf.add_text (star.uwp.encode('ascii', 'replace'), point)
+
+        if len(star.name) > 0:
+            for chars in xrange(len(star.name), 0, -1):
+                width = self.string_width(pdf.get_font(), star.name[:chars])
+                if width <= self.xm * 3.5:
+                    break
+            point.y_plus(3.5)
+            point.x = col
+            point.x_plus(self.ym - (width/2))
+            pdf.add_text(star.name[:chars].encode('ascii', 'replace'), point)
+
+        added = star.alg
+        if 'Cp' in star.tradeCode:
+            added += '+'
+        elif 'Cx' in star.tradeCode or 'Cs' in star.tradeCode:
+            added += '*'
+        else:
+            added += ' '
+
+        added += '{:d}'.format (star.ggCount)
+        point.y_plus(3.5)
+        point.x = col
+        width = pdf.get_font()._string_width(added)
+        point.x_plus(self.ym - (width/2))
+        pdf.add_text(added, point)
+
+        added = ''
+        tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
+        tradeThrough = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
+
+        if self.routes == 'trade':
+            added += "{:X}{:X}{:X}{:d}".format(star.wtn, tradeIn, tradeThrough, star.starportSize)
+        elif self.routes == 'comm':
+            added += "{}{} {}".format(star.baseCode,star.ggCount,star.importance)
+        elif self.routes == 'xroute':
+            added += " {}".format(star.importance)
+        width = pdf.get_font()._string_width(added)
+        point.y_plus(3.5)
+        point.x = col
+        point.x_plus(self.ym - (width/2))
+        pdf.add_text(added, point)
+        
+        pdf.set_font(def_font)
         
 class GraphicMap (Map):
     def __init__(self, galaxy, routes):
@@ -373,6 +485,7 @@ class GraphicMap (Map):
         self.fillBlack = (0,0,0,255)
         self.fillWhite = (255, 255, 255, 255)
         self.fillBlue  = (0, 0, 205, 255)
+        self.fillRed   = (205, 0, 0, 255)
         self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf',30)
         self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf',10)
         self.image_size = (612,792)
@@ -393,6 +506,10 @@ class GraphicMap (Map):
     def add_line(self, doc, start, end, colorname):
         color = ImageColor.getrgb(colorname)
         doc.line([(start.x, start.y), (end.x, end.y)], color)
+
+    def add_circle(self, doc, center, radius, colorname):
+        color = ImageColor.getrgb(colorname)
+        doc.ellipse([(center.x-radius, center.y-radius), (center.x+radius, center.y+radius)], outline=color)
         
     def get_line(self, doc, start, end, colorname, width):
         return GraphicLine (doc, start, end, colorname, width)
@@ -458,6 +575,13 @@ class GraphicSubsectorMap (GraphicMap):
         self.spinPos        = (0, 554 / 2)
         self.trailPos       = (392, 554 / 2)
         self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf',16)
+        self.hexFont   = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 10)
+        self.hexFont2  = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 12)
+        self.hexFont3  = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 18)
+        self.positions={'A': (0,0), 'B': (-8, 0), 'C': (-16, 0), 'D': (-24, 0),
+                   'E': (0,-10), 'F': (-8,-10), 'G': (-16,-10), 'H': (-24, -10),
+                   'I': (0,-20), 'J': (-8,-20), 'K': (-16,-20), 'L': (-24, -20),
+                   'M': (0,-30), 'N': (-8,-30), 'O': (-16,-30), 'P': (-24, -30)}
         
     def document(self, sector):
         self.sector = sector
@@ -465,38 +589,34 @@ class GraphicSubsectorMap (GraphicMap):
         return ImageDraw.Draw(self.image)
     
     def sector_name(self,doc,name):
-        size = self.titleFont.getsize(name)
+        #size = self.titleFont.getsize(name)
         pos = (self.x_start,570)
         doc.text(pos, name, font=self.titleFont,fill=self.fillBlue)
         
-    def subsector_grid(self, doc):
+    def subsector_grid(self, doc, sector):
         # Draw inner line around hex grid
+
+        
         start = self.cursor(25,25)
-        end   = self.cursor(384,25)
-        line = self.get_line(doc, start, end, "white", 4)
-        line._draw()
-        start.x = end.x; start.y = end.y
-        end.y = 538
-        line._draw()
-        start.x = end.x; start.y = end.y
-        end.x = 25
-        line._draw()
-        start.x = end.x; start.y = end.y
-        end.y = 25
-        line._draw()
-        #Draw outer line around hex grid
-        start.x = 15; start.y = 15
-        end.x   = 396; end.y = 15
-        line._draw()
-        start.x = end.x; start.y = end.y
-        end.y = 548
-        line._draw()
-        start.x = end.x; start.y = end.y
-        end.x = 15
-        line._draw()
-        start.x = end.x; start.y = end.y
-        end.y = 15
-        line._draw()
+        end = self.cursor(385,538)
+        color = "white"
+
+        doc.rectangle([(start.x-1, start.y-1),(end.x+1, end.y+1)], outline=color, fill=None )
+        doc.rectangle([(start.x, start.y),(end.x, end.y)], outline=color, fill=None )
+        doc.rectangle([(start.x+1, start.y+1),(end.x-1, end.y-1)], outline=color, fill=None )
+        doc.rectangle([(start.x+2, start.y+2),(end.x-2, end.y-2)], outline=color, fill=None )
+
+
+        start.x = 15; start.y=15
+        end.x = 396; end.y = 548
+        doc.rectangle([(start.x-1, start.y-1),(end.x+1, end.y+1)], outline=color, fill=None )
+        doc.rectangle([(start.x, start.y),(end.x, end.y)], outline=color, fill=None )
+        doc.rectangle([(start.x+1, start.y+1),(end.x-1, end.y-1)], outline=color, fill=None )
+        doc.rectangle([(start.x+2, start.y+2),(end.x-2, end.y-2)], outline=color, fill=None )
+
+        radius = 3
+        line = self.get_line(doc, start, end, color, radius * 2)
+
         #Draw holes in outer line for names
         line.color = ImageColor.getrgb ("black")
         start.y = 15; end.y = 15
@@ -529,6 +649,164 @@ class GraphicSubsectorMap (GraphicMap):
         for y in xrange(1,5,1):
             start.y_plus(); end.y_plus()
             line._draw()
+            
+        for x in xrange(1,9,1):
+            for y in xrange(1,11,1):
+                
+                location = (-self.positions[sector.position][0]+x,-self.positions[sector.position][1]+y)
+
+                q, r = self.convert_hex_to_axial(location[0] + self.sector.dx - 1, 
+                                                 location[1] + self.sector.dy - 1)
+
+
+                name = "{0:02d}{1:02d}".format(location[0], location[1])
+                
+                print ("looking at {} -> {}".format(name,(q,r)))
+
+                print ("found {0} is aligned: {1}".format(name , self.galaxy.borders.allyMap[(q,r)]))
+                
+                col = self.xm * 3 * x
+                if (x & 1):
+                    row = (self.y_start - self.ym * 2) + (y * self.ym * 2) 
+                else:
+                    row = (self.y_start - self.ym) +  (y * self.ym * 2)
+                point = PDFCursor(col, row)
+                point.x_plus(self.xm)
+                point.y_plus(self.ym)
+                
+                alegColor = {"Na": "#000000", "Im" : "#994343", "Zh": "#435699" }
+                doc.polygon([(point.x - self.xm, point.y - self.ym),
+                             (point.x + self.xm, point.y - self.ym),
+                             (point.x + self.xm*2,   point.y),
+                             (point.x + self.xm, point.y + self.ym),
+                             (point.x - self.xm, point.y + self.ym),
+                             (point.x - self.xm*2,   point.y)],
+                             outline=None, fill = alegColor[self.galaxy.borders.allyMap[(q,r)]] )
+                point.y_plus (-self.ym)
+                size = self.hexFont.getsize(name)
+                pos = (point.x - size[0]/2, point.y)
+                doc.text(pos, name, font=self.hexFont,fill=self.fillWhite)
+                
+
+    def place_system(self, doc, star):
+        col = star.col + self.positions[star.subsector()][0]
+        row = star.row + self.positions[star.subsector()][1]
+        
+        col = self.xm * 3 * col
+        if (star.col & 1):
+            row = (self.y_start - self.ym * 2) + (row * self.ym * 2) 
+        else:
+            row = (self.y_start - self.ym) +  (row * self.ym * 2)
+             
+        point = PDFCursor(col, row)
+        self.zone(doc, star, point.copy())
+
+        # Put the point in the center of the hex
+        point.x_plus(self.xm)
+        point.y_plus(self.ym)
+
+        #Draw the center dot colored to reflect the world type. 
+        radius = self.xm / 2
+        radius -= 1
+        pcolor = {'As': '#8E9397', 'De': '#EDC9AF', 'Fl': '#FFB0B0', 'He': '#FF8D3F', 'Ic':'#A5F2F3',
+                  'Oc': '#0094ED', 'Po': '#C4D6C4', 'Va': '#F0F0F0', 'Wa': '#7ACFF7'}
+        if star.pcode and star.pcode in pcolor:
+            color = ImageColor.getrgb(pcolor[star.pcode])
+        else:
+            color = ImageColor.getrgb('#C0FFC0')
+        
+        if star.pcode == 'As':
+            worldCharacter = u'\u2059'
+            size = self.hexFont3.getsize(worldCharacter)
+            pos = (point.x - size[0]/2, point.y - size[1])
+            doc.text(pos, worldCharacter, font=self.hexFont3, fill=self.textFill)
+            
+        else:
+            doc.ellipse([(point.x-radius, point.y-radius), (point.x+radius, point.y+radius)], fill=color, outline=color)
+        
+        # write the GG dot
+        if star.ggCount:
+            pass
+
+        # Write Port code        
+        size = self.hexFont.getsize(star.port)
+        pos = (point.x - (size[0] / 2) + 1, point.y - (2* size[1] + 2))
+        doc.text(pos, star.port, font=self.hexFont, fill= self.textFill)
+
+        size = self.hexFont.getsize(star.name)
+        pos = (point.x - (size[0] / 2) + 1, point.y + size[1])
+        doc.text(pos, star.name, font=self.hexFont, fill=self.textFill)
+        
+        if star.ggCount:
+            ggCharacter = u'\u25CF'
+            size = self.hexFont.getsize(ggCharacter)
+            pos = (point.x + 2 * size[0], point.y - (2.5 * size[1]))
+            doc.text(pos, ggCharacter, font=self.hexFont, fill=self.textFill)
+            
+        if 'N' in star.baseCode or 'K' in star.baseCode:
+            baseCharacter = u'\u066D'
+            size = self.hexFont3.getsize(baseCharacter)
+            pos = (point.x - 1.25 * size[0], point.y - (2.5 * size[1]))
+            doc.text(pos, baseCharacter, font=self.hexFont3, fill=self.textFill)
+            print "Base for " + star.name + " : " + star.baseCode
+            
+        if 'S' in star.baseCode:
+            baseCharacter = u'\u25B2'
+            size = self.hexFont2.getsize(baseCharacter)
+            pos = (point.x - 2.5 * size[0], point.y - (2 * size[1]))
+            doc.text(pos, baseCharacter, font=self.hexFont2, fill=self.textFill)
+            print "Base for " + star.name + " : " + star.baseCode
+            
+        if 'W' in star.baseCode:
+            baseCharacter = u'\u25B2'
+            size = self.hexFont2.getsize(baseCharacter)
+            pos = (point.x - 2.5 * size[0], point.y - (2 * size[1]))
+            doc.text(pos, baseCharacter, font=self.hexFont2, fill=self.fillRed)
+            print "Base for " + star.name + " : " + star.baseCode
+            
+            
+        #if len(star.name) > 0:
+        #    for chars in xrange(len(star.name), 0, -1):
+        #        width = self.string_width(pdf.get_font(), star.name[:chars])
+        #        if width <= self.xm * 3.5:
+        #            break
+        #    point.y_plus(3.5)
+        #   point.x = col
+        #    point.x_plus(self.ym - (width/2))
+        #    pdf.add_text(star.name[:chars].encode('ascii', 'replace'), point)
+        # 
+        #added = star.alg
+        #if 'Cp' in star.tradeCode:
+        #    added += '+'
+        #elif 'Cx' in star.tradeCode or 'Cs' in star.tradeCode:
+        #    added += '*'
+        #else:
+        #    added += ' '
+        # 
+        #added += '{:d}'.format (star.ggCount)
+        #point.y_plus(3.5)
+        #point.x = col
+        #width = pdf.get_font()._string_width(added)
+        #point.x_plus(self.ym - (width/2))
+        #pdf.add_text(added, point)
+
+        #added = ''            
+        #tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
+        #tradeThrough = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
+        
+        #if self.routes == 'trade':
+        #    added += "{:X}{:X}{:X}{:d}".format(star.wtn, tradeIn, tradeThrough, star.starportSize)
+        #elif self.routes == 'comm':
+        #    added += "{}{} {}".format(star.baseCode,star.ggCount,star.importance)
+        #elif self.routes == 'xroute':
+        #    added += " {}".format(star.importance)
+        #width = pdf.get_font()._string_width(added)
+        #point.y_plus(3.5)
+        #point.x = col
+        #point.x_plus(self.ym - (width/2))
+        #pdf.add_text(added, point)
+        
+        #pdf.set_font(def_font)
 
 class GraphicLine(object):
     def __init__(self, image, lineStart, lineEnd, colorname, width):
@@ -543,19 +821,20 @@ class GraphicLine(object):
 
         
 if __name__ == '__main__':
-    sector = Sector('# Core', '# 0,0')
-    sector.spinward = Sector('# Dagudashaag', '# -1,0')
-    sector.trailing = Sector('# Fornast', '# 1,0')
-    sector.coreward = Sector('# Lishun', '# 0, -1')
-    sector.rimward  = Sector('# Massilia', '# 0, 1')
-    galaxy = Galaxy (0,0)
+    
+    #route.set_logging('DEBUG')
+    galaxy = Galaxy(15, 4, 8)
     galaxy.output_path = '.'
-    hexMap = PDFSectorMap(galaxy, None)
-    pdf = hexMap.document(sector)
-    hexMap.write_base_map (pdf, sector)
-    hexMap.close()
-
+    galaxy.read_sectors(['../test_data/SpinwardMarches.sec'], 'fixed', 'collapse')
+    galaxy.set_borders('range', 'collapse')
+    
     graphMap = GraphicSubsectorMap (galaxy, None)
-    img = graphMap.document (sector)
-    graphMap.write_base_map(img, sector)
+    img = graphMap.document(galaxy.sectors['Spinward Marches'])
+    subsector = galaxy.sectors['Spinward Marches'].subsectors['B']
+    
+    graphMap.write_base_map(img, subsector)
+    #graphMap.draw_borders(img, subsector)
+    for star in subsector.worlds:
+        graphMap.place_system(img, star)
+
     graphMap.close()
