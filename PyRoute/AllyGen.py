@@ -37,6 +37,7 @@ class AllyGen(object):
         '''
         self.galaxy = galaxy
         self.borders = {} # 2D array using (q,r) as key, with flags for data
+        self.allyMap = {}
         
     def create_borders (self, match):
         """
@@ -45,7 +46,6 @@ class AllyGen(object):
             two hex radius. Where the allegiances are the same, the area
             of control is contigious. Every Non-aligned world is independent
         """
-        allyMap = {}
 
         for star in self.galaxy.stars.nodes_iter():
             alg = star.alg
@@ -61,17 +61,17 @@ class AllyGen(object):
                 alg = self.same_align(alg)
             elif match == 'separate':
                 pass
-            allyMap[(star.q, star.r)] = alg
+            self.allyMap[(star.q, star.r)] = alg
 
         #self._output_map(allyMap, 0)
         
-        allyMap = self.step_map(allyMap)
+        self.allyMap = self.step_map(self.allyMap)
         #self._output_map(allyMap, 1)
 
-        allyMap = self.step_map(allyMap)
+        self.allyMap = self.step_map(self.allyMap)
         #self._output_map(allyMap, 2)
 
-        self._generate_borders(allyMap)
+        self._generate_borders(self.allyMap)
 
     def _generate_borders(self, allyMap):
         '''
@@ -223,9 +223,9 @@ class AllyGen(object):
         return AllyGen.same_align(alg) == 'Im'
     
     def create_ally_map(self, match):
-        allyMap = self._ally_map(match)
+        self.allyMap = self._ally_map(match)
         #self._output_map(allyMap, 3)
-        self._generate_borders(allyMap)
+        self._generate_borders(self.allyMap)
                       
     def _ally_map(self, match):
         # Create list of stars
@@ -324,31 +324,33 @@ class AllyGen(object):
         return allyMap
         
     def create_erode_border(self, match):
-        starMap = {}
-        for star in self.galaxy.stars.nodes_iter():
-            alg = star.alg
-            # Skip the non-entity worlds
-            if alg in self.noOne:
-                continue;
-            # Collapse non-aligned into each their own 
-            if alg in self.nonAligned:
-                alg = self.nonAligned[0]
+        #starMap = {}
+        #for star in self.galaxy.stars.nodes_iter():
+        #    alg = star.alg
+        #    # Skip the non-entity worlds
+        #    if alg in self.noOne:
+        #        continue;
+        #    # Collapse non-aligned into each their own 
+        #    if alg in self.nonAligned:
+        #        alg = self.nonAligned[0]
             # Collapse same Aligned into one
-            
-            if match == 'collapse':
-                alg = self.same_align(alg)
-            elif match == 'separate':
-                pass
-            starMap[(star.q,star.r)] = alg
+        #
+        #    if match == 'collapse':
+        ##        alg = self.same_align(alg)
+        #    elif match == 'separate':
+        #        pass
+        #    starMap[(star.q,star.r)] = alg
 
         
-        allyMap = self._erode_map(match)
+        allyMap,starMap = self._erode_map(match)
         changed = True
         while changed: 
             changed,allyMap = self._erode(allyMap, starMap)
         self._build_bridges(allyMap, starMap)
-        self._generate_borders(allyMap)
         
+        self.allyMap = allyMap
+        self._generate_borders(allyMap)
+
     def _erode(self, allyMap, starMap):
         newMap = {}
         edgeMap = {}
@@ -499,4 +501,4 @@ class AllyGen(object):
                                 maxCount =  self.galaxy.alg[alg].stats.number
                         allyMap[Hex] = maxAlly
 
-        return allyMap
+        return allyMap, starMap
