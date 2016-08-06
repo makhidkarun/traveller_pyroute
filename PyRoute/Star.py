@@ -139,6 +139,7 @@ class Star (object):
                 'Na' in self.tradeCode or 'Va' in self.tradeCode or 'Wa' in self.tradeCode or \
                 'He' in self.tradeCode
         self.nonAgricultural = 'Na' in self.tradeCode
+        self.capital = 'Cp' in self.tradeCode or 'Cx' in self.tradeCode or 'Cs'in self.tradeCode
 
         if (data[5]):
             imp = int(data[5][1:-1].strip())
