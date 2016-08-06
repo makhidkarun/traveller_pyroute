@@ -3,18 +3,21 @@ Created on May 14, 2016
 
 @author: tjoneslo
 '''
-import os
 import logging
+import os
 from pypdflite import PDFLite,PDFCursor
+from pypdflite.pdfobjects.pdfellipse import PDFEllipse
 from pypdflite.pdfobjects.pdfline import PDFLine
 from pypdflite.pdfobjects.pdftext import PDFText
-from pypdflite.pdfobjects.pdfellipse import PDFEllipse
-from PIL import Image, ImageDraw, ImageColor, ImageFont
-from StatCalculation import StatCalculation
-from Galaxy import Sector
+
 from Galaxy import Galaxy
+from Galaxy import Sector
+from AllyGen import AllyGen
+from PIL import Image, ImageDraw, ImageColor, ImageFont
 from Star import Star
+from StatCalculation import StatCalculation
 import route
+
 
 class Cursor (object):
     
@@ -484,8 +487,8 @@ class GraphicMap (Map):
         super(GraphicMap, self).__init__(galaxy, routes)
         self.fillBlack = (0,0,0,255)
         self.fillWhite = (255, 255, 255, 255)
-        self.fillBlue  = (0, 0, 205, 255)
-        self.fillRed   = (205, 0, 0, 255)
+        self.fillBlue  = (50, 215, 255, 255)
+        self.fillRed   = (219,70,70,255)
         self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf',30)
         self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf',10)
         self.image_size = (612,792)
@@ -575,9 +578,13 @@ class GraphicSubsectorMap (GraphicMap):
         self.spinPos        = (0, 554 / 2)
         self.trailPos       = (392, 554 / 2)
         self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf',16)
+        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf',24)
         self.hexFont   = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 10)
+        self.worldFont = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 11)
         self.hexFont2  = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 12)
         self.hexFont3  = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 18)
+        self.hexFont4  = ImageFont.truetype("/home/tjoneslo/.local/share/fonts/Symbola.ttf", 12)
+        self.hexFont5  = ImageFont.truetype("/home/tjoneslo/.local/share/fonts/Symbola.ttf", 18)
         self.positions={'A': (0,0), 'B': (-8, 0), 'C': (-16, 0), 'D': (-24, 0),
                    'E': (0,-10), 'F': (-8,-10), 'G': (-16,-10), 'H': (-24, -10),
                    'I': (0,-20), 'J': (-8,-20), 'K': (-16,-20), 'L': (-24, -20),
@@ -589,14 +596,21 @@ class GraphicSubsectorMap (GraphicMap):
         return ImageDraw.Draw(self.image)
     
     def sector_name(self,doc,name):
-        #size = self.titleFont.getsize(name)
-        pos = (self.x_start,570)
-        doc.text(pos, name, font=self.titleFont,fill=self.fillBlue)
+        pass
         
     def subsector_grid(self, doc, sector):
-        # Draw inner line around hex grid
+        pos = (10,570)
+        name = sector.name + " / " + sector.sector.name
+        size = doc.textsize(name, self.titleFont)
+        if size[0] > 320:
+            name = sector.name + " /"
+            doc.text(pos, name, font=self.titleFont, fill=self.fillBlue)
+            pos = (pos[0],pos[1]+size[1] + 4)
+            doc.text(pos, sector.sector.name, font=self.titleFont, fill=self.fillBlue)
+        else:
+            doc.text(pos, name,font=self.titleFont,fill=self.fillBlue)
 
-        
+        # Draw inner line around hex grid
         start = self.cursor(25,25)
         end = self.cursor(385,538)
         color = "white"
@@ -634,6 +648,7 @@ class GraphicSubsectorMap (GraphicMap):
         line.color = ImageColor.getrgb("grey")
         line.width = 1
         # vertical lines
+        
         start.x = 396; start.y = 560; start.set_deltas(-15, 17)
         end.x   = 396; end.y = 628; end.set_deltas(-15, 17)
         
@@ -649,6 +664,12 @@ class GraphicSubsectorMap (GraphicMap):
         for y in xrange(1,5,1):
             start.y_plus(); end.y_plus()
             line._draw()
+
+        pos = self.positions[sector.position]
+        start.x=336 + ((-pos[0] / 8) * 15)
+        start.y=560 + ((-pos[1] / 10) * 17)
+        doc.rectangle([(start.x, start.y),(start.x+15, start.y+17)], outline=line.color, fill=line.color )
+
             
         for x in xrange(1,9,1):
             for y in xrange(1,11,1):
@@ -658,12 +679,12 @@ class GraphicSubsectorMap (GraphicMap):
                 q, r = self.convert_hex_to_axial(location[0] + self.sector.dx - 1, 
                                                  location[1] + self.sector.dy - 1)
 
-
+                pos = (q,r)
                 name = "{0:02d}{1:02d}".format(location[0], location[1])
                 
-                print ("looking at {} -> {}".format(name,(q,r)))
+                #print ("looking at {} -> {} ->  {}".format(name,(x,y),(q,r)))
 
-                print ("found {0} is aligned: {1}".format(name , self.galaxy.borders.allyMap[(q,r)]))
+                #print ("found {0} is aligned: {1}".format(name , self.galaxy.borders.allyMap[(q,r)]))
                 
                 col = self.xm * 3 * x
                 if (x & 1):
@@ -673,21 +694,64 @@ class GraphicSubsectorMap (GraphicMap):
                 point = PDFCursor(col, row)
                 point.x_plus(self.xm)
                 point.y_plus(self.ym)
-                
-                alegColor = {"Na": "#000000", "Im" : "#994343", "Zh": "#435699" }
-                doc.polygon([(point.x - self.xm, point.y - self.ym),
-                             (point.x + self.xm, point.y - self.ym),
-                             (point.x + self.xm*2,   point.y),
-                             (point.x + self.xm, point.y + self.ym),
-                             (point.x - self.xm, point.y + self.ym),
-                             (point.x - self.xm*2,   point.y)],
-                             outline=None, fill = alegColor[self.galaxy.borders.allyMap[(q,r)]] )
+                self.draw_border (doc, pos, point)
                 point.y_plus (-self.ym)
                 size = self.hexFont.getsize(name)
                 pos = (point.x - size[0]/2, point.y)
-                doc.text(pos, name, font=self.hexFont,fill=self.fillWhite)
                 
+                doc.text(pos, name, font=self.hexFont,fill=self.fillWhite)
 
+    def draw_border(self, doc, pos, point):
+        alegColor = {"Na": "#000000", "Im" : "#8E2D2A", "Zh": "#485D91",
+                     "CsZh": "#000000", "CsIm": "#000000", "CsRe": "#000000",
+                     "ReDe": "#8E2D2A", "FeAr": "#632f46",
+                     "SwCf": "#00647C", "DaCf": "#3a3a3a"}
+        start = self.cursor(25,25)
+        end = self.cursor(385,538)
+        line = self.get_line(doc, start, end, "#b7b7b7", 3)
+        if pos in self.galaxy.borders.allyMap:
+            aleg = self.galaxy.borders.allyMap[pos]
+            color = alegColor.get(aleg, '#000000')
+            doc.polygon([(point.x - self.xm, point.y - self.ym),
+                         (point.x + self.xm, point.y - self.ym),
+                         (point.x + self.xm*2,   point.y),
+                         (point.x + self.xm, point.y + self.ym),
+                         (point.x - self.xm, point.y + self.ym),
+                         (point.x - self.xm*2,   point.y)],
+                         outline=None, fill = color )
+            if AllyGen.is_nonaligned(aleg): 
+                return
+            for n in xrange(6):
+                next_hex = AllyGen._get_neighbor(pos, n)
+                next_aleg = self.galaxy.borders.allyMap[next_hex] \
+                        if next_hex in self.galaxy.borders.allyMap \
+                        else AllyGen.noOne[0]
+                if not AllyGen.are_allies(aleg, next_aleg):
+                    if n == 1:
+                        start.x = point.x + self.xm * 2; start.y = point.y 
+                        end.x =  point.x + self.xm; end.y = point.y - self.ym
+                        line._draw() 
+                    elif n == 2:
+                        start.x = point.x - self.xm; start.y = point.y - self.ym
+                        end.x =  point.x + self.xm; end.y = point.y - self.ym
+                        line._draw()
+                    elif n == 3:
+                        start.x = point.x - self.xm; start.y = point.y - self.ym
+                        end.x = point.x - self.xm * 2; end.y = point.y
+                        line._draw()
+                    elif n == 4:
+                        start.x = point.x - self.xm * 2; start.y = point.y
+                        end.x = point.x - self.xm; end.y = point.y + self.ym
+                        line._draw()
+                    elif n == 5:
+                        start.x = point.x - self.xm; start.y = point.y + self.ym
+                        end.x = point.x + self.xm ; end.y = point.y + self.ym
+                        line._draw()
+                    elif n == 0:
+                        start.x = point.x + self.xm; start.y = point.y + self.ym
+                        end.x = point.x + self.xm * 2; end.y = point.y
+                        line._draw()
+        
     def place_system(self, doc, star):
         col = star.col + self.positions[star.subsector()][0]
         row = star.row + self.positions[star.subsector()][1]
@@ -724,47 +788,60 @@ class GraphicSubsectorMap (GraphicMap):
         else:
             doc.ellipse([(point.x-radius, point.y-radius), (point.x+radius, point.y+radius)], fill=color, outline=color)
         
-        # write the GG dot
-        if star.ggCount:
-            pass
-
         # Write Port code        
         size = self.hexFont.getsize(star.port)
         pos = (point.x - (size[0] / 2) + 1, point.y - (2* size[1] + 2))
         doc.text(pos, star.port, font=self.hexFont, fill= self.textFill)
 
-        size = self.hexFont.getsize(star.name)
+        name = star.name
+        if 'Hi' in star.tradeCode:
+            name = name.upper()
+        elif 'Lo' in star.tradeCode:
+            name = name.lower()
+        size = self.worldFont.getsize(name)
         pos = (point.x - (size[0] / 2) + 1, point.y + size[1])
-        doc.text(pos, star.name, font=self.hexFont, fill=self.textFill)
+        if star.capital:
+            doc.text (pos, name, font=self.worldFont, fill=self.fillRed)
+        else:
+            doc.text(pos, name, font=self.worldFont, fill=self.textFill)
         
         if star.ggCount:
-            ggCharacter = u'\u25CF'
-            size = self.hexFont.getsize(ggCharacter)
-            pos = (point.x + 2 * size[0], point.y - (2.5 * size[1]))
-            doc.text(pos, ggCharacter, font=self.hexFont, fill=self.textFill)
-            
+            self.print_base_char(u'\u25CF', self.hexFont, point, (2, -2.5), doc)
+           
         if 'N' in star.baseCode or 'K' in star.baseCode:
-            baseCharacter = u'\u066D'
-            size = self.hexFont3.getsize(baseCharacter)
-            pos = (point.x - 1.25 * size[0], point.y - (2.5 * size[1]))
-            doc.text(pos, baseCharacter, font=self.hexFont3, fill=self.textFill)
+            self.print_base_char( u'\u066D', self.hexFont3, point, (-1.25, -2.5), doc)
             print "Base for " + star.name + " : " + star.baseCode
             
         if 'S' in star.baseCode:
-            baseCharacter = u'\u25B2'
-            size = self.hexFont2.getsize(baseCharacter)
-            pos = (point.x - 2.5 * size[0], point.y - (2 * size[1]))
-            doc.text(pos, baseCharacter, font=self.hexFont2, fill=self.textFill)
+            self.print_base_char(u'\u25B2', self.hexFont4, point, (-2.5, -2), doc)
             print "Base for " + star.name + " : " + star.baseCode
             
         if 'W' in star.baseCode:
             baseCharacter = u'\u25B2'
-            size = self.hexFont2.getsize(baseCharacter)
+            size = self.hexFont4.getsize(baseCharacter)
             pos = (point.x - 2.5 * size[0], point.y - (2 * size[1]))
-            doc.text(pos, baseCharacter, font=self.hexFont2, fill=self.fillRed)
+            doc.text(pos, baseCharacter, font=self.hexFont4, fill=self.fillRed)
             print "Base for " + star.name + " : " + star.baseCode
+
+        if 'I' in star.baseCode:
+            self.print_base_char(u'\u2316', self.hexFont5, point, (-2.5, -0.5), doc)
+            print "Base for " + star.name + " : " + star.baseCode
+        
+        research = {'RsA': u'\u0391', 'RsB': u'\u0392', 'RsG': u'\u0393', 
+                    'RsD': u'\u0394', 'RdE': u'\u0395', 'RsZ': u'\u0396',
+                    'RsT': u'\u0398', 'RsI': u'\u0399', 'RsK': u'\u039A'}
+        keys =  set(research.keys()).intersection(star.tradeCode)
+        if len(keys) == 1:
+            station = next(iter(keys))
+            self.print_base_char(research[station], self.hexFont4, point, (-2, -0.5), doc)
+            print u"Research station for " + star.name + u" : " + " ".join(star.tradeCode)
             
-            
+    def print_base_char(self, baseCharacter, font, point, multiplier, doc):            
+            size = font.getsize(baseCharacter)
+            pos = (point.x + (multiplier[0] * size[0]), point.y + (multiplier[1] * size[1]))
+            doc.text(pos, baseCharacter, font=font, fill=self.textFill)
+
+        
         #if len(star.name) > 0:
         #    for chars in xrange(len(star.name), 0, -1):
         #        width = self.string_width(pdf.get_font(), star.name[:chars])
@@ -825,12 +902,12 @@ if __name__ == '__main__':
     #route.set_logging('DEBUG')
     galaxy = Galaxy(15, 4, 8)
     galaxy.output_path = '.'
-    galaxy.read_sectors(['../test_data/SpinwardMarches.sec'], 'fixed', 'collapse')
-    galaxy.set_borders('range', 'collapse')
+    galaxy.read_sectors(['../sectors_tne/SpinwardMarches.sec'], 'fixed', 'collapse')
+    galaxy.set_borders('erode', 'collapse')
     
     graphMap = GraphicSubsectorMap (galaxy, None)
     img = graphMap.document(galaxy.sectors['Spinward Marches'])
-    subsector = galaxy.sectors['Spinward Marches'].subsectors['B']
+    subsector = galaxy.sectors['Spinward Marches'].subsectors['P']
     
     graphMap.write_base_map(img, subsector)
     #graphMap.draw_borders(img, subsector)
