@@ -145,7 +145,7 @@ class WikiStats(object):
             f.write('{| class=\"wikitable sortable\"\n')
             f.write(u'! {} !! statistics\n'.format(area_type))
             for code in alg_sort:
-                self.text_area_statistics(f, "", alg[code])
+                self.text_area_statistics(f, area_type, alg[code])
             f.write('|}\n')
                 
             
@@ -425,17 +425,27 @@ class WikiStats(object):
             f.write(u'|{0}\n'.format(area.wiki_title()))
             
             if area_type == 'subsector':
-                f.write(u'|| {}, {} {} of {}, '.format(area.wiki_name(), area_type,
+                f.write(u'|| {}, {} {} of {}, contains '.format(area.wiki_name(), area_type,
                                                     area.position, area.sector.wiki_name()))
+            elif area_type == 'Allegiance':
+                f.write(u'|| The {}'.format(area.wiki_name()))
+                if area.code[0:2] == 'Na':
+                    f.write(' worlds consist of ')
+                elif area.code[0:2] == 'Cs':
+                    f.write (' consists of ')
+                else:
+                    f.write(' contains ')
             else:
-                f.write(u'|| The {} {} '.format(area.wiki_name(), area_type))
+                f.write(u'|| The {} {} contains '.format(area.wiki_name(), area_type))
+            
 
             if len(area.worlds) > 0:
-                f.write('contains {:d} worlds with a population of '.format(area.stats.number))
+                self.write_count(f, area.stats.number, 'world', False)
+                f.write(u' with a population of ')
                 self.write_population(area.stats.population, f)
                 f.write('. ')
                 popWorld = max(area.worlds, key=lambda w : w.population)
-                f.write(' The highest population is ')
+                f.write(u' The highest population is ')
                 self.write_population(popWorld.population, f)
                 f.write(u', at {}. '.format(popWorld.wiki_name()))
                 
@@ -467,7 +477,7 @@ class WikiStats(object):
                     f.write(subsectorCp[0].wiki_name())
                     f.write(".")
             else:
-                f.write (' contains no charted worlds.')
+                f.write (' no charted worlds.')
                 
             f.write('\n')
     
