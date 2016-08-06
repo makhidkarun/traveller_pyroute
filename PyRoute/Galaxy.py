@@ -32,7 +32,16 @@ class Allegiance(AreaItem):
     def __init__(self, code, name):
         super(Allegiance, self).__init__(name)
         self.code = code
-        
+
+    def wiki_name(self):
+        if self.code.startswith('Na'):
+            names = self.name.split (',')
+            return u'[[{}]] {}'.format(names[0], names[1].strip())
+        elif self.code.startswith('Cs'):
+            names = self.name.split(',')
+            return u'[[{}]]s of the [[{}]]'.format(names[0].strip(), names[1].strip())
+        return  u'[[{}]]'.format(self.name)
+
 class Subsector(AreaItem):
     def __init__(self, name, position, sector):
         super(Subsector, self).__init__(name)

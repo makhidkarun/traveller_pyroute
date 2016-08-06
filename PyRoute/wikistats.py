@@ -437,7 +437,6 @@ class WikiStats(object):
                     f.write(' contains ')
             else:
                 f.write(u'|| The {} {} contains '.format(area.wiki_name(), area_type))
-            
 
             if len(area.worlds) > 0:
                 self.write_count(f, area.stats.number, 'world', False)
