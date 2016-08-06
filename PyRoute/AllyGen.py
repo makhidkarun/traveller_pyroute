@@ -7,13 +7,12 @@ from operator import itemgetter
 from collections import defaultdict
 import os
 
-
 class AllyGen(object):
     '''
     classdocs
     '''
     noOne = [u'--']
-    nonAligned = [u'Na', u'Va', u'NaHu', u'NaVa', u'NaXX', u'CsIm', u'CsVa']
+    nonAligned = [u'Na', u'Va', u'NaHu', u'NaVa', u'NaXX', u'CsIm', u'CsVa', u'CsZh', u'CsRe']
     sameAligned = [(u'Im', u'ImAp', u'ImDa', u'ImDc', u'ImDd', u'ImDg', u'ImDi', u'ImDs', u'ImDv', 
                         u'ImLa', u'ImLu', u'ImSy', u'ImVd'),
                     (u'As', u'A0', u'A1', u'A2', u'A3', u'A4', u'A5', u'A6', u'A7', u'A8', 
@@ -41,7 +40,7 @@ class AllyGen(object):
         
     def create_borders (self, match):
         """
-            create borders around various allegiances, Algorithm one.
+            Create borders around various allegiances, Algorithm one.
             From the nroute.c generation system. Every world controls a
             two hex radius. Where the allegiances are the same, the area
             of control is contigious. Every Non-aligned world is independent
@@ -87,12 +86,12 @@ class AllyGen(object):
         '''
         for Hex in allyMap.iterkeys():
             if self._set_border(allyMap, Hex, 2): # up
-                neighbor = self._get_neighbor(Hex, 2)
+                neighbor = AllyGen._get_neighbor(Hex, 2)
                 self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | 1
             if self._set_border(allyMap, Hex, 5): # down
                 self.borders[Hex] = self.borders.setdefault(Hex, 0) | 1
             if self._set_border(allyMap, Hex, 1): # upper right
-                neighbor = self._get_neighbor(Hex, 1)
+                neighbor = AllyGen._get_neighbor(Hex, 1)
                 if Hex[0] & 1:
                     self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | 2
                 else:
@@ -103,7 +102,7 @@ class AllyGen(object):
                 else:
                     self.borders[(Hex[0],Hex[1]-1)] = self.borders.setdefault((Hex[0],Hex[1]-1), 0) | 4
             if self._set_border(allyMap, Hex, 0): # down right
-                neighbor = self._get_neighbor(Hex, 0)
+                neighbor = AllyGen._get_neighbor(Hex, 0)
                 if Hex[0] & 1:
                     self.borders[(Hex[0]+1,Hex[1]-1)] = self.borders.setdefault((Hex[0]+1,Hex[1]-1), 0) | 4
                 else:
@@ -209,7 +208,7 @@ class AllyGen(object):
 
     @staticmethod
     def is_nonaligned(alg):
-        return alg in AllyGen.nonAligned
+        return alg in AllyGen.nonAligned or alg in AllyGen.noOne
 
     @staticmethod
     def same_align(alg):
@@ -223,6 +222,14 @@ class AllyGen(object):
         return AllyGen.same_align(alg) == 'Im'
     
     def create_ally_map(self, match):
+        '''
+            Create borders around various allegiances, Algorithm Two.
+            From the AllyGen http://dotclue.org/t20/ code created by J. Greely.
+            Each world is given a radius of area to claim based upon starport.
+            Overlapping claims are resolved to a single claim
+            Edges of the map are sliced down.
+        '''
+
         self.allyMap = self._ally_map(match)
         #self._output_map(allyMap, 3)
         self._generate_borders(self.allyMap)
@@ -263,11 +270,11 @@ class AllyGen(object):
             if alg in self.nonAligned:
                 maxRange = 2
             for dist in xrange (maxRange):
-                neighbor = self._get_neighbor(Hex, 4, dist)
+                neighbor = AllyGen._get_neighbor(Hex, 4, dist)
                 for direction in xrange(6):
                     for _ in xrange(dist):
                         allyMap[neighbor].add((alg,star.axial_distance(Hex,neighbor)))
-                        neighbor = self._get_neighbor(neighbor, direction)
+                        neighbor = AllyGen._get_neighbor(neighbor, direction)
 
         #self._output_map(allyMap, 1)
 
@@ -311,7 +318,7 @@ class AllyGen(object):
                 if starMap.get(Hex, False): continue
                 neighborAlgs = defaultdict(int)
                 for direction in xrange(6):
-                    neighborAlg = allyMap.get(self._get_neighbor(Hex, direction), None)
+                    neighborAlg = allyMap.get(AllyGen._get_neighbor(Hex, direction), None)
                     neighborAlgs [neighborAlg] += 1 
                     
                 algList = sorted(neighborAlgs.iteritems(), key=itemgetter(1), reverse=True)
@@ -324,74 +331,101 @@ class AllyGen(object):
         return allyMap
         
     def create_erode_border(self, match):
-        #starMap = {}
-        #for star in self.galaxy.stars.nodes_iter():
-        #    alg = star.alg
-        #    # Skip the non-entity worlds
-        #    if alg in self.noOne:
-        #        continue;
-        #    # Collapse non-aligned into each their own 
-        #    if alg in self.nonAligned:
-        #        alg = self.nonAligned[0]
-            # Collapse same Aligned into one
-        #
-        #    if match == 'collapse':
-        ##        alg = self.same_align(alg)
-        #    elif match == 'separate':
-        #        pass
-        #    starMap[(star.q,star.r)] = alg
-
-        
+        '''
+        Create borders around various allegiances, Algorithm Three.
+        From TravellerMap http://travellermap.com/borders/doc.htm
+        '''
         allyMap,starMap = self._erode_map(match)
         changed = True
+        change_count = 0
         while changed: 
+            print change_count;
+            if change_count == 100:
+                break
             changed,allyMap = self._erode(allyMap, starMap)
+            if not changed:
+                changed,allyMap = self._break_spans(allyMap,starMap)
+                print "Break Spans at: " + str(change_count)
+            change_count += 1
+
         self._build_bridges(allyMap, starMap)
         
         self.allyMap = allyMap
         self._generate_borders(allyMap)
 
     def _erode(self, allyMap, starMap):
+        '''
+        Remove edges.
+        '''
         newMap = {}
-        edgeMap = {}
         changed = False
         
         # Erode, remove empty hex from polity 
         # if three contiguous hexes are not aligned
         for Hex in allyMap.iterkeys():
+            # Worlds keep their allegiances.
             if starMap.get(Hex, False): 
                 newMap[Hex] = starMap[Hex]
                 continue
-            found = False
+            if allyMap[Hex] in AllyGen.nonAligned or allyMap[Hex] in AllyGen.noOne:
+                newMap[Hex] = allyMap[Hex]
+                continue
+
+            # Check for three continuous empty hexes around this hex
             for direction in xrange(6):
                 notCount = 0
                 for check in xrange(3):
-                    checkHex = self._get_neighbor(Hex, (direction + check) % 6)
+                    checkHex = AllyGen._get_neighbor(Hex, (direction + check) % 6)
                     neighborAlg = allyMap.get(checkHex, None)
-                    if not self.are_allies(allyMap[Hex], neighborAlg):
+                    if not AllyGen.are_allies(allyMap[Hex], neighborAlg):
                         notCount += 1
                 if notCount >= 3:
-                    changed = True
-                    found = True
                     break
-                elif notCount in [1,2]:
-                    edgeMap[Hex] = allyMap[Hex]
-                
-            if not found:
+
+            if notCount >= 3:
+                changed = True
+            else: # No empty hex range found, keep allegiance.
                 newMap[Hex] = allyMap[Hex]
-        
-        # BreakSpans - Find a span of four empty (edge) hexes 
-        # and break the span by setting one to not aligned. 
-        for Hex in edgeMap.iterkeys():
+        return changed, newMap
+
+    def _break_spans(self, allyMap, starMap):
+        ''''
+        BreakSpans - Find a span of four empty (edge) hexes
+        and break the span by setting one to not aligned.
+        '''
+        edgeMap = {}
+        changed = False
+        # Create the edge map, of hexes on the borber
+        for Hex in allyMap.iterkeys():
             for direction in xrange(6):
-                checkHex = self._get_neighbor(Hex, direction)
-                if edgeMap.get(checkHex, False) and \
-                    edgeMap.get(self._get_neighbor(Hex, direction, 2), False) and \
-                    edgeMap.get(self._get_neighbor(Hex, direction, 3), False):
-                    newMap[checkHex] = None
+                checkHex = AllyGen._get_neighbor(Hex, direction)
+                neighborAlg = allyMap.get(checkHex, None)
+                if not AllyGen.are_allies(allyMap[Hex], neighborAlg):
+                    edgeMap[Hex] = allyMap[Hex]
+
+        for Hex in edgeMap.iterkeys():
+            if starMap.get(Hex, False):
+                continue
+            for direction in xrange(6):
+                if self._check_aligned(starMap, edgeMap, Hex, direction, 1) and \
+                    self._check_aligned(starMap, edgeMap, Hex, direction, 2) and \
+                    self._check_aligned(starMap, edgeMap, Hex, direction, 3) :
+                    checkHex = AllyGen._get_neighbor(Hex, direction, 1)
+                    allyMap[checkHex] = None
+                    edgeMap[checkHex] = None
                     changed = True
                     break
-        return changed,newMap
+
+        return changed,allyMap
+
+    def _check_aligned (self, starMap, edgeMap, Hex, direction, distance):
+        startAlleg = edgeMap[Hex]
+        checkHex = AllyGen._get_neighbor(Hex, direction, distance)
+        # Occupied hex does not count as aligned for this check
+        if starMap.get(checkHex, False):
+            return False
+        checkAlleg = edgeMap.get(checkHex, None)
+        return AllyGen.are_allies(startAlleg, checkAlleg)
 
     def _build_bridges(self, allyMap, starMap):
         ''' Build a bridge between two worlds one hex apart as to avoid
@@ -405,7 +439,7 @@ class AllyGen(object):
         newBridge = None
         checked = []
         for direction in xrange(6):
-            checkHex = self._get_neighbor(Hex, direction)
+            checkHex = AllyGen._get_neighbor(Hex, direction)
             if starMap.get(checkHex, False):
                 if self.are_allies(starMap[Hex], starMap[checkHex]):
                     checked.append(checkHex)
@@ -414,7 +448,7 @@ class AllyGen(object):
                 checked.append(checkHex)
                 continue
             for second in xrange(6):
-                searchHex = self._get_neighbor(checkHex, second)
+                searchHex = AllyGen._get_neighbor(checkHex, second)
                 if searchHex in checked:
                     newBridge = None
                     continue
@@ -428,7 +462,12 @@ class AllyGen(object):
             allyMap[newBridge] = starMap[Hex]
 
     def _erode_map(self, match):
-                # Create list of stars
+        '''
+        Generate the initial map of allegiances for the erode map.
+        Note: This does not match the original system.
+        '''
+        # Create list of stars
+        print "Generating list of stars for erode border"
         stars = [star for star in self.galaxy.stars.nodes_iter()]
         allyMap = defaultdict(set)
         starMap = {}
@@ -452,7 +491,6 @@ class AllyGen(object):
         #Pass 1: generate initial allegiance arrays, 
         # with overlapping maps
         for star in stars:
-            # skip the E/X ports 
             Hex = (star.q, star.r)
             alg = starMap[Hex]
             
@@ -461,16 +499,17 @@ class AllyGen(object):
             else:
                 maxRange = ['D','C','B','A'].index(star.port) + 2
                 
-            maxRange = 3
             if alg in self.nonAligned:
-                maxRange = 2
-            for dist in xrange (maxRange):
+                maxRange = 0
+            # Walk the ring filling in the hexes around star with this neighbor
+            for dist in xrange (1, maxRange):
+                # Start in direction 0, at distance n
                 neighbor = self._get_neighbor(Hex, 4, dist)
-                for direction in xrange(6):
+                # walk six sides
+                for side in xrange(6):
                     for _ in xrange(dist):
                         allyMap[neighbor].add((alg,star.axial_distance(Hex,neighbor)))
-                        neighbor = self._get_neighbor(neighbor, direction)
-
+                        neighbor = self._get_neighbor(neighbor, side)
         #self._output_map(allyMap, 1)
 
         # Pass 2: find overlapping areas and reduce
