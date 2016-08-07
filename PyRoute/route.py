@@ -12,6 +12,7 @@ import codecs
 import os
 from Galaxy import Galaxy
 from HexMap import HexMap
+from SubsectorMap import GraphicSubsectorMap
 from StatCalculation import StatCalculation
 
 logger = logging.getLogger('PyRoute')
@@ -44,6 +45,7 @@ def process():
     
     parser.add_argument('--no-trade', dest='trade', default=True, action='store_false')
     parser.add_argument('--no-maps', dest='maps', default=True, action='store_false')
+    parser.add_argument('--no-subsector-maps', dest='subsectors', default=True, action='store_false')
     parser.add_argument('--version', action='version', version='%(prog)s 0.3')
     parser.add_argument('--log-level', default='INFO')
     parser.add_argument('--input', default='sectors', help='input directory for sectors')
@@ -88,6 +90,11 @@ def process():
     if args.maps:
         pdfmap = HexMap(galaxy, args.routes, args.route_btn)
         pdfmap.write_maps()
+        
+        if args.subsectors:
+            graphMap = GraphicSubsectorMap (galaxy, args.routes)
+            graphMap.write_maps()
+
     
     logger.info("process complete")
 
