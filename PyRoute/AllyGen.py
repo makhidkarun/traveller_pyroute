@@ -3,6 +3,7 @@ Created on Mar 26, 2014
 
 @author: tjoneslo
 '''
+import logging
 from operator import itemgetter
 from collections import defaultdict
 import os
@@ -37,6 +38,8 @@ class AllyGen(object):
         self.galaxy = galaxy
         self.borders = {} # 2D array using (q,r) as key, with flags for data
         self.allyMap = {}
+        self.logger = logging.getLogger('PyRoute.AllyGen')
+
         
     def create_borders (self, match):
         """
@@ -45,7 +48,7 @@ class AllyGen(object):
             two hex radius. Where the allegiances are the same, the area
             of control is contigious. Every Non-aligned world is independent
         """
-
+        self.logger.info('Processing worlds for border drawing')
         for star in self.galaxy.stars.nodes_iter():
             alg = star.alg
             # Skip the non-entity worlds
@@ -229,6 +232,7 @@ class AllyGen(object):
             Overlapping claims are resolved to a single claim
             Edges of the map are sliced down.
         '''
+        self.logger.info('Processing worlds for ally map drawing')
 
         self.allyMap = self._ally_map(match)
         #self._output_map(allyMap, 3)
@@ -335,19 +339,20 @@ class AllyGen(object):
         Create borders around various allegiances, Algorithm Three.
         From TravellerMap http://travellermap.com/borders/doc.htm
         '''
+        self.logger.info('Processing worlds for erode map drawing')
         allyMap,starMap = self._erode_map(match)
         changed = True
         change_count = 0
         while changed: 
-            print change_count;
             if change_count == 100:
+                self.logger.error('Change count for map processing exceeded expected value of 100')
                 break
             changed,allyMap = self._erode(allyMap, starMap)
             if not changed:
                 changed,allyMap = self._break_spans(allyMap,starMap)
-                print "Break Spans at: " + str(change_count)
             change_count += 1
 
+        self.logger.debug('Change Count: {}'.format(change_count))
         self._build_bridges(allyMap, starMap)
         
         self.allyMap = allyMap
@@ -467,7 +472,6 @@ class AllyGen(object):
         Note: This does not match the original system.
         '''
         # Create list of stars
-        print "Generating list of stars for erode border"
         stars = [star for star in self.galaxy.stars.nodes_iter()]
         allyMap = defaultdict(set)
         starMap = {}
