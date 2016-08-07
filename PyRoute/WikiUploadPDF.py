@@ -14,6 +14,7 @@ from wikitools import wiki
 from wikitools import api
 from wikitools.wikifile import File
 from wikitools.page import Page, NoPage
+import logging
 import argparse
 import warnings
 import os
@@ -24,11 +25,11 @@ import re
 from itertools import izip
 import traceback
 
-def uploadSummaryText(site, summaryFile):
+def uploadSummaryText(site, summaryFile, era):
     try:
         lines = [line for line in codecs.open(summaryFile,'r', 'utf-8')]
     except (OSError, IOError):
-        print u"Summary file not found: {}".format(summaryFile)
+        logging.Logger("WikiUpload").error(u"Summary file not found: {}".format(summaryFile))
         return 
     index = [i for i,n in enumerate(lines) if 'Statistics' in n][0]
     lines = lines[index + 3:]
@@ -37,7 +38,7 @@ def uploadSummaryText(site, summaryFile):
     while True:
         baseTitle = lines[index].split('|')[1]
         if not baseTitle.startswith('[['):
-            print u"Upload Summary for {} not a page, skipped".format(baseTitle)
+            logging.Logger("WikiUpload").info(u"Upload Summary for {} not a page, skipped".format(baseTitle))
             while (not (lines[index].startswith('|-') or lines[index].startswith('|}'))):
                 index += 1
             if lines[index].startswith('|}'):
@@ -54,20 +55,33 @@ def uploadSummaryText(site, summaryFile):
             text += lines[index]
             index += 1
 
+        target_page = None
         try:
             target_page = Page(site, targetTitle)
-            result = target_page.edit(text=text, summary='Trade Map update sector summary', 
+            categories = target_page.getCategories(True)
+            if 'Category:Meta' in categories:
+                targetTitle += u'/{}'.format(era)
+                target_page = Page(site, targetTitle) 
+        except api.APIError as e:
+            if e.args[0] == 'missingtitle':
+                logging.Logger("WikiUpload").error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
+            else:
+                logging.Logger("WikiUpload").error(u"UploadSummary for page {} got exception {} ".format(baseTitle, e))
+            return
+        
+        try:
+            result = target_page.edit(text=text, summary='Trade Map update summary', 
                                       bot=True, nocreate=True,skipmd5=True)
     
             if result['edit']['result'] == 'Success':
-                print u'Saved: {}'.format(targetTitle)
+                logging.Logger("WikiUpload").info(u'Saved: {}'.format(targetTitle))
             else:
-                print u'Save failed {}'.format(targetTitle) 
+                logging.Logger("WikiUpload").info(u'Save failed {}'.format(targetTitle)) 
         except api.APIError as e:
             if e.args[0] == 'missingtitle':
-                print u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle)
+                logging.Logger("WikiUpload").error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
             else:
-                print u"UploadSummary for page {} got exception {} ".format(baseTitle, e)
+                logging.Logger("WikiUpload").error(u"UploadSummary for page {} got exception {} ".format(baseTitle, e))
             
         if lines[index].startswith('|}'):
             break       
@@ -79,41 +93,53 @@ def uploadPDF(site, filename):
             page = File (site, os.path.basename(filename))
             result = page.upload(f, "{{Trade map disclaimer}}", ignorewarnings=True)
             if result['upload']['result'] == 'Success':
-                print 'Saved: {}'.format(filename)
+                logging.Logger("WikiUpload").info(u'Saved: {}'.format(filename))
             else:
-                print 'Save failed {}'.format(filename) 
+                logging.Logger("WikiUpload").error(u'Save failed {}'.format(filename)) 
         except Exception as e:
-            print "UploadPDF for {} got exception: {}".format(filename, e)
+            logging.Logger("WikiUpload").error("UploadPDF for {} got exception: {}".format(filename, e))
             traceback.print_exc()
-    
 
-def uploadSec (site, filename, place):
+def uploadSec (site, filename, place, era):
     with codecs.open(filename, "r", 'utf-8') as f:
         text = f.read()
+    target_page=None
     try :
         targetTitle = os.path.basename(filename).split('.')[0] + place    
         target_page = Page(site, targetTitle)
+        categories = target_page.getCategories(True)
+        if 'Category:Meta' in categories:
+            targetTitle += u'/{}'.format(era)
+            target_page = Page(site, targetTitle) 
+    except api.APIError as e:
+        if e.args[0] == 'missingtitle':
+            logging.Logger("WikiUpload").error(u"UploadSummary for page {}, page does not exist, skipped".format(targetTitle))
+        else:
+            logging.Logger("WikiUpload").error(u"UploadSummary for page {} got exception {} ".format(targetTitle, e))
+        return
+    
+    try:        
         result = target_page.edit(text=text, summary='Trade Map update sector data', 
                                   bot=True, nocreate=True, skipmd5=True)
         if result['edit']['result'] == 'Success':
-            print 'Saved: {}'.format(targetTitle)
+            logging.Logger("WikiUpload").info(u'Saved: {}'.format(targetTitle))
         else:
-            print 'Save failed {}'.format(targetTitle) 
+            logging.Logger("WikiUpload").error('Save failed {}'.format(targetTitle)) 
     except Exception as e:
-        print "uploadSec for {} got exception: {}".format(filename, e)
+        logging.Logger("WikiUpload").error("uploadSec for {} got exception: {}".format(filename, e))
 
 def pairwise(iterable):
     "s -> (s0, s1), (s2, s3), (s4, s5), ..."
     a = iter(iterable)
     return izip(a, a)
     
-def uploadWorlds (site, sectorFile, economicFile):
+def uploadWorlds (site, sectorFile, economicFile, era):
     data_template=u'''
 {{{{StellarData
  |world     = {0}
  |sector    = {1}
  |subsector = {2}
- |era       = Milieu 1116
+ |era       = {31}
  |hex       = {3}
  |name      = {4}
  |UWP       = {5}
@@ -160,7 +186,7 @@ No information yet available.
     try:
         sectorLines = [line for line in codecs.open(sectorFile,'r', 'utf-8')]
     except (OSError, IOError):
-        print u"Sector file not found: {}".format(sectorFile)
+        logging.Logger("WikiUpload").error(u"Sector file not found: {}".format(sectorFile))
         return
 
     sectorData = [line.split(u"||") for line in sectorLines[5:]
@@ -170,18 +196,18 @@ No information yet available.
     try:
         economicLines = [line for line in codecs.open(economicFile, 'r', 'utf-8')]
     except (OSError, IOError):
-        print u"Economic file not found: {}".format(economicFile)
+        logging.Logger("WikiUpload").error(u"Economic file not found: {}".format(economicFile))
         return
     economicData = [line.split(u"||") for line in economicLines[5:]
                     if not(line.startswith(u'|-') or line.startswith(u'<section') 
                            or line.startswith(u'|}') or line.startswith(u'[[Category:'))]
 
     sectorName = economicLines[2][3:-15]
-    print u"Uploading {}".format(sectorName)
+    logging.Logger("WikiUpload").info( u"Uploading {}".format(sectorName))
     for sec, eco in zip (sectorData, economicData):
         
         if not sec[0] == eco[0]:
-            print u"{} is not equal to {}".format(sec[0], eco[0])
+            logging.Logger("WikiUpload").error(u"{} is not equal to {}".format(sec[0], eco[0]))
             break
         subsectorName = eco[14].split(u'|')[1].strip(u'\n').strip(u']')
         pcodes = ['As', 'De', 'Ga', 'Fl', 'He', 'Ic', 'Oc', 'Po', 'Va', 'Wa']
@@ -235,7 +261,7 @@ No information yet available.
                 shortName = shortNames[sectorName]
                 worldPage = worldName[0] + u'('+ shortName + u' ' + hexNo + u') (' + worldName[1]
         except NoPage:
-            print u"Missing Page: {}".format(worldPage)
+            logging.Logger("WikiUpload").info( u"Missing Page: {}".format(worldPage))
             page_data = page_template.format(eco[1].strip(), sectorName, subsectorName, hexNo)
             target_page = Page(site, worldPage)
             try:
@@ -243,9 +269,9 @@ No information yet available.
                                       bot=True, skipmd5=True)
 
                 if result['edit']['result'] == 'Success':
-                    print u'Saved: {}'.format(worldPage)
+                    logging.Logger("WikiUpload").info(u'Saved: {}'.format(worldPage))
             except api.APIError as e:
-                print u"UploadSummary for page {} got exception {} ".format(worldPage, e)
+                logging.Logger("WikiUpload").error(u"UploadSummary for page {} got exception {} ".format(worldPage, e))
                 continue
 
         data = data_template.format(eco[1].strip(),                   # World
@@ -278,36 +304,38 @@ No information yet available.
                                     eco[10].strip(),                  # build capacity
                                     eco[11].strip(),                  # Army
                                     eco[12].strip(),                  # port size
-                                    eco[13].strip()                   # spa population
+                                    eco[13].strip(),                  # spa population
+                                    era                               # era
                                     )
         try:
             target_page = Page(site,  worldPage + u'/data')
             if target_page.exists:
                 page_text = unicode(target_page.getWikiText(), 'utf-8')
                 templates = re.findall (ur"{{[^}]*}}", page_text, re.U)
-                newtemplates = [template if not u"|era       = Milieu 1116" in template else data
+                era_name = u"|era       = {}".format(era)
+                newtemplates = [template if not era_name in template else data
                                 for template in templates]
                 newdata = u'\n'.join(newtemplates) 
-                if u"|era       = Milieu 1116" not in newdata:
+                if era_name not in newdata:
                     newtemplates.insert(0, data)
                     newdata = u'\n'.join(newtemplates)
                 
                 if newdata == page_text:
-                    print u'No changes to template: skipping {}'.format(worldPage) 
+                    logging.Logger("WikiUpload").info(u'No changes to template: skipping {}'.format(worldPage)) 
                     continue            
                 data = newdata
             result = target_page.edit(text=data, summary='Trade Map update world data', 
                                       bot=True, skipmd5=True)
 
             if result['edit']['result'] == 'Success':
-                print u'Saved: {}/data'.format(worldPage)
+                logging.Logger("WikiUpload").info(u'Saved: {}/data'.format(worldPage))
             else:
-                print u'Save failed {}/data'.format(worldPage)
+                logging.Logger("WikiUpload").error(u'Save failed {}/data'.format(worldPage))
         except api.APIError as e:
             if e.args[0] == 'missingtitle':
-                print u"UploadSummary for page {}, page does not exist".format(worldPage)
+                logging.Logger("WikiUpload").error(u"UploadSummary for page {}, page does not exist".format(worldPage))
             else:
-                print u"UploadSummary for page {} got exception {} ".format(worldPage, e)
+                logging.Logger("WikiUpload").error(u"UploadSummary for page {} got exception {} ".format(worldPage, e))
 
 shortNames = {u'Dagudashaag': u'Da', u'Empty Quarter': u'EQ', u'Spinward Marches': u'SM'}
 
@@ -322,6 +350,7 @@ if __name__ == '__main__':
     parser.add_argument('--no-subsector', dest='subsector', default=True, action='store_false')
     parser.add_argument('--no-worlds', dest="worlds", default=True, action='store_false')
     parser.add_argument('--site', dest='site', default='http://wiki.travellerrpg.com/api.php')
+    parser.add_argument('--era', dest='era', default='Milieu 1116')
     
     args = parser.parse_args()
     
@@ -348,10 +377,10 @@ if __name__ == '__main__':
 
     if args.summary:
         path = os.path.join(args.input, "summary.wiki")
-        uploadSummaryText(site, path)
+        uploadSummaryText(site, path, args.era)
     if args.subsector:
         path = os.path.join(args.input, "subsector_summary.wiki")
-        uploadSummaryText(site, path)
+        uploadSummaryText(site, path, args.era)
 
     if args.worlds:
         path = os.path.join(args.input, "*Sector.economic.wiki")
@@ -359,4 +388,4 @@ if __name__ == '__main__':
             sector = os.path.basename(eco)[:-21]
             if sector in shortNames.keys():
                 sec = eco.replace('Sector.economic.wiki', 'Sector.sector.wiki')
-                uploadWorlds(site, sec, eco)
+                uploadWorlds(site, sec, eco, args.era)
