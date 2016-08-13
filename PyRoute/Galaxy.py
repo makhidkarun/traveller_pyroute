@@ -40,6 +40,9 @@ class Allegiance(AreaItem):
         elif self.code.startswith('Cs'):
             names = self.name.split(',')
             return u'[[{}]]s of the [[{}]]'.format(names[0].strip(), names[1].strip())
+        elif ',' in self.name:
+            names=self.name.split(',')
+            return u'[[{}]], [[{}]]'.format(names[0].strip(), names[1].strip())
         return  u'[[{}]]'.format(self.name)
 
 class Subsector(AreaItem):

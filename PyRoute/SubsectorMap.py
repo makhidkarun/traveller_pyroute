@@ -51,7 +51,6 @@ class GraphicSubsectorMap (GraphicMap):
         self.image.save(path)
 
     def write_maps(self):
-        
         maps = len(self.galaxy.sectors) * 16
         logging.getLogger("PyRoute.SubsectorMap").info("writing {:d} subsector maps...".format(maps))
         
@@ -70,7 +69,7 @@ class GraphicSubsectorMap (GraphicMap):
         pos = (10,570)
         name = sector.name + " / " + sector.sector.name
         size = doc.textsize(name, self.titleFont)
-        if size[0] > 320:
+        if size[0] > 340:
             name = sector.name + " /"
             doc.text(pos, name, font=self.titleFont, fill=self.fillBlue)
             pos = (pos[0],pos[1]+size[1] + 4)
@@ -117,8 +116,8 @@ class GraphicSubsectorMap (GraphicMap):
         line.width = 1
         # vertical lines
         
-        start.x = 396; start.y = 560; start.set_deltas(-15, 17)
-        end.x   = 396; end.y = 628; end.set_deltas(-15, 17)
+        start.x = 396; start.y = 560; start.set_deltas(-11, 17)
+        end.x   = 396; end.y = 628; end.set_deltas(-11, 17)
         
         line._draw()
         for x in xrange(1, 5, 1):
@@ -126,17 +125,17 @@ class GraphicSubsectorMap (GraphicMap):
             line._draw();
             
         # Horizontal lines
-        start.x = 396; start.y = 560; start.set_deltas(15, 17)
-        end.x   = 336; end.y = 560; end.set_deltas(15, 17)
+        start.x = 396; start.y = 560; start.set_deltas(11, 17)
+        end.x   = 352; end.y = 560; end.set_deltas(11, 17)
         line._draw()
         for y in xrange(1,5,1):
             start.y_plus(); end.y_plus()
             line._draw()
 
         pos = self.positions[sector.position]
-        start.x=336 + ((-pos[0] / 8) * 15)
+        start.x=352 + ((-pos[0] / 8) * 11)
         start.y=560 + ((-pos[1] / 10) * 17)
-        doc.rectangle([(start.x, start.y),(start.x+15, start.y+17)], outline=line.color, fill=line.color )
+        doc.rectangle([(start.x, start.y),(start.x+11, start.y+17)], outline=line.color, fill=line.color )
 
             
         for x in xrange(1,self.x_count,1):
