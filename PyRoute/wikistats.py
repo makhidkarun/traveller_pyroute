@@ -7,10 +7,11 @@ import os
 
 import codecs
 import datetime
-from AllyGen import AllyGen
 import urllib
 import math
+import inflect
 from Star import Nobles
+from AllyGen import AllyGen
 
 class WikiStats(object):
     '''
@@ -25,6 +26,7 @@ class WikiStats(object):
         self.galaxy = galaxy
         self.uwp  = uwp
         self.min_alg_count = min_alg_count
+        self.plural = inflect.engine()
 
     def write_statistics(self):
         self.summary_statistics()
@@ -274,48 +276,39 @@ class WikiStats(object):
         self.write_population(area.stats.population, f)
         f.write(u' sophonts (not necessarily humans). ')
 
+        worlds = []
+        worlds.append(self.get_count(area.stats.code_counts.get('Hi', 0), 'world', True, ' High population (Hi)'))
+        worlds.append(self.get_count(area.stats.code_counts.get('Ph', 0), 'world', False, ' Moderate population (Ph)'))
+        worlds.append(self.get_count(area.stats.code_counts.get('Ni', 0), 'world', False, ' Non-industrial (Ni)'))
+        worlds.append(self.get_count(area.stats.code_counts.get('Lo', 0), 'world', False, ' Low population (Lo)'))
+        worlds.append(self.get_count(area.stats.code_counts.get('Ba', 0), 'world', False, ' Barren (Ba)'))
+        f.write(u'There {}. '.format(self.plural.join(worlds)))
+        
         f.write('There ')
-        self.write_count(f, area.stats.code_counts.get('Hi', 0), 'High population (Hi) world')
-        f.write(', ')
-        self.write_count(f, area.stats.code_counts.get('Ph', 0), 'Moderate population (Ph) world', False)
-        f.write(', ')
-        self.write_count(f, area.stats.code_counts.get('Ni', 0), 'Non-industrial (Ni) world', False)
-        f.write(', ')
-        self.write_count(f, area.stats.code_counts.get('Lo', 0), 'Low population (Lo) world', False)
-        f.write(', and ')
-        self.write_count(f, area.stats.code_counts.get('Ba', 0), 'Barren (Ba) world', False)
-        f.write('. ')
-
-        f.write('There ')
-        self.write_count(f, area.stats.code_counts.get('Ag', 0), 'Agricultural (Ag) world')
+        self.write_count(f, area.stats.code_counts.get('Ag', 0), 'world', True, ' Agricultural (Ag)')
         f.write(' versus ')
-        self.write_count(f, area.stats.code_counts.get('Pa', 0), 'Pre-Agricultural (Pa) world', False)
+        self.write_count(f, area.stats.code_counts.get('Pa', 0), 'world', False, ' Pre-Agricultural (Pa)')
         f.write(', and ')
-        self.write_count(f, area.stats.code_counts.get('Na', 0), 'Non-Agricultural (Na) world', False)
+        self.write_count(f, area.stats.code_counts.get('Na', 0), 'world', False, ' Non-Agricultural (Na)')
         f.write('. ')
         
         f.write('There ')
-        self.write_count(f, area.stats.code_counts.get('Ri', 0), 'Rich (Ri) world')
+        self.write_count(f, area.stats.code_counts.get('Ri', 0), 'world', True, ' Rich (Ri)')
         f.write(' versus ')
-        self.write_count(f, area.stats.code_counts.get('In', 0), 'Industrial (In) world', False)
+        self.write_count(f, area.stats.code_counts.get('In', 0), 'world', False, ' Industrial (In)')
         f.write('. ')
         
-        f.write('There ')
-        self.write_count(f, area.stats.code_counts.get('Wa', 0) + area.stats.code_counts.get('Oc', 0), 'Water (Wa) and Ocean (Oc) world')
-        f.write(', ')
-        self.write_count(f, area.stats.code_counts.get('Ga', 0), 'Garden (Ga) world', False)
-        f.write(', ')
-        self.write_count(f, area.stats.code_counts.get('Ic', 0), 'Ice-capped (Ic) world', False)
-        f.write(', ')
-        self.write_count(f, area.stats.code_counts.get('Po', 0), 'Poor (Po) world', False)
-        f.write(', ')
-        self.write_count(f, area.stats.code_counts.get('De', 0), 'Desert (De) world', False)
-        f.write(', ')
-        self.write_count(f, area.stats.code_counts.get('As', 0), 'Asteroid (As) belt', False)
-        f.write(', and ')
-        self.write_count(f, area.stats.code_counts.get('Va', 0), 'Vacuum (Va) world', False)
-        f.write('. ')
-
+        worlds = []
+        worlds.append(self.get_count(area.stats.code_counts.get('As', 0), 'belt', True, ' Asteroid (As)'))
+        worlds.append(self.get_count(area.stats.code_counts.get('De', 0), 'world', False, ' Desert (De)'))
+        worlds.append(self.get_count(area.stats.code_counts.get('Ga', 0), 'world', False, ' Garden (Ga)'))
+        worlds.append(self.get_count(area.stats.code_counts.get('Ic', 0), 'world', False, ' Ice-capped (Ic)'))
+        worlds.append(self.get_count(area.stats.code_counts.get('Po', 0), 'world', False, ' Poor (Po)'))
+        worlds.append(self.get_count(area.stats.code_counts.get('Va', 0), 'world', False, ' Vacuum (Va)'))
+        worlds.append(self.get_count(area.stats.code_counts.get('Wa', 0) + area.stats.code_counts.get('Oc', 0), 
+                                     'world', False, ' Water (Wa) or Ocean (Oc)'))
+        
+        f.write(u'There {}. '.format(self.plural.join(worlds)))
 
         f.write('There ')
         self.write_count(f, area.stats.naval_bases, 'Naval base')
@@ -335,91 +328,29 @@ class WikiStats(object):
         for world in area.worlds:
             nobles.accumulate(world.nobles)
         if nobles.nobles['Knights'] > 0:
-            f.write('The Imperial nobility includes ')
-            self.write_count(f, nobles.nobles['Knights'], 'Knight', False)
-            f.write(', ')
-            self.write_count(f, nobles.nobles['Baronets'], 'Baronet', False)
-            f.write(', ')
-            self.write_count(f, nobles.nobles['Barons'], 'Baron', False)
-            f.write(', ')
-            self.write_count(f, nobles.nobles['Marquis'], 'Marqui', False)
-            f.write(', ')
-            self.write_count(f, nobles.nobles['Vicounts'], 'Vicount', False)
-            f.write(', ')
-            self.write_count(f, nobles.nobles['Counts'], 'Count', False)
-            if nobles.nobles['Sector Dukes'] > 0 or nobles.nobles['Archdukes'] > 0:
-                f.write(', ') 
-            else:
-                f.write(', and ')
-            self.write_count(f, nobles.nobles['Dukes'], 'Duke', False)
+            nlist = []
+            nlist.append(self.get_count(nobles.nobles['Knights'], 'Knight', False))
+            nlist.append(self.get_count(nobles.nobles['Baronets'], 'Baronet', False))
+            nlist.append(self.get_count(nobles.nobles['Barons'], 'Baron', False))
+            nlist.append(self.get_count(nobles.nobles['Marquis'], 'Marquis', False))
+            nlist.append(self.get_count(nobles.nobles['Vicount'], 'Viscount', False))
+            nlist.append(self.get_count(nobles.nobles['Counts'], 'Count', False))
+            nlist.append(self.get_count(nobles.nobles['Duke'], 'Duke', False))
             if nobles.nobles['Sector Dukes'] > 0:
-                if nobles.nobles['Archdukes'] > 0:
-                    f.write(', ')  
-                else: 
-                    f.write(', and ')
-                self.write_count(f, nobles.nobles['Sector Dukes'], 'Subsector Duke', False)
+                nlist.append(self.get_count(nobles.nobles['Sector Dukes'], 'Subsector Duke', False))
             if nobles.nobles['Archdukes'] > 0:
-                f.write(', and ')
-                self.write_count(f, nobles.nobles['Archdukes'], 'Archduke', False)
-
+                nlist.append(self.get_count(nobles.nobles['Archdukes'], 'Archduke', False))
+            f.write('The Imperial nobility includes {}'.format(self.plural.join(nlist)))
             if nobles.nobles['Emperor'] > 0:
-                f.write(' along with ')
-                self.write_count(f, nobles.nobles['Emperor'], 'Emperor', False)
-            f.write('. ')
-        
-        PopWorlds = [world for world in area.worlds if world.popCode == area.stats.maxPop]
-        if len(PopWorlds) == 1:
-            f.write(u'The highest population world is {}. '.format(PopWorlds[0].wiki_name()))
-        elif len(PopWorlds) > 1:
-            PopWorlds.sort(key=lambda star: star.popM, reverse=True)
-            maxPopM = PopWorlds[0].popM
-            PopWorlds = [world for world in PopWorlds if world.popM == maxPopM]
-
-            if len(PopWorlds) == 1:
-                f.write(u'The highest population world is {}. '.format(PopWorlds[0].wiki_name()))
+                f.write(' along with the Emperor.')
             else:
-                f.write('The highest population worlds are '.format(baseN(area.stats.maxTL,18))) 
-                PopWorlds = PopWorlds[0:6]
-                f.write(u", ".join(w.wiki_name() for w in PopWorlds[:-1]))
-                f.write(u", and {}".format(PopWorlds[-1].wiki_name()))
-                f.write('. ')
-        
-        TLWorlds = [world for world in area.worlds if world.tl == area.stats.maxTL]
-        if len(TLWorlds) == 1:
-            f.write(u'The highest tech level is {} at {}. '.format(baseN(area.stats.maxTL,18), 
-                                                                  TLWorlds[0].wiki_name()))
-        elif len(TLWorlds) > 1:
-            f.write(u'The highest tech level is {} at '.format(baseN(area.stats.maxTL,18))) 
-            TLWorlds = TLWorlds[0:6]
-            f.write (u", ".join(w.wiki_name() for w in TLWorlds[:-1]))
-            f.write (u", and {}".format(TLWorlds[-1].wiki_name()))
-            f.write (u'. ')
+                f.write ('. ')
 
-        TLList = [world.tl for world in area.worlds]
-        mean = sum(TLList) / len(TLList)
-        TLVar = [math.pow(tl - mean, 2) for tl in TLList]
-        stddev = math.sqrt(sum(TLVar) / len(TLVar))
-        f.write('The average technology level is {:d}'.format(int(mean)))
-        f.write(' (with most between {:d} and {:d}). '.format(max(int(mean-stddev),0), int(mean+stddev)))
-
-        subsectorCp = [world for world in area.worlds if 'Cp' in world.tradeCode]
-        sectorCp = [world for world in area.worlds if 'Cs' in world.tradeCode]
-        capital = [world for world in area.worlds if 'Cx' in world.tradeCode]
+        self.text_area_pop_tl (f, area_type, area)
+        self.text_area_capitals(f, area_type, area)
         
-        if len(capital) > 0 :
-            for world in capital: 
-                alg = self.galaxy.alg[AllyGen.same_align(world.alg)]
-                f.write(u'\n* The capital of {} is at {}.'.format(alg.wiki_name(), world.wiki_name()))
-        elif len(sectorCp) > 0 :
-            f.write(u'The sector capital is at ')
-            f.write(sectorCp[0].wiki_name())
-            f.write('.')
-        elif len (subsectorCp) > 0 :
-            f.write(u'The subsector capital is at ')
-            f.write(subsectorCp[0].wiki_name())
-            f.write('.')
         f.write('\n')
-
+        
     def text_area_statistics(self, f, area_type, area):
             f.write('|-\n')
             f.write(u'|{0}\n'.format(area.wiki_title()))
@@ -443,42 +374,67 @@ class WikiStats(object):
                 f.write(u' with a population of ')
                 self.write_population(area.stats.population, f)
                 f.write('. ')
-                popWorld = max(area.worlds, key=lambda w : w.population)
-                f.write(u' The highest population is ')
-                self.write_population(popWorld.population, f)
-                f.write(u', at {}. '.format(popWorld.wiki_name()))
-                
-                TLWorlds = [world for world in area.worlds if world.tl == area.stats.maxTL]
-                if len(TLWorlds) == 1:
-                    f.write(u'The highest tech level is {} at {}.'.format(baseN(area.stats.maxTL,18), 
-                                                                          TLWorlds[0].wiki_name()))
-                elif len(TLWorlds) > 1:
-                    f.write(u'The highest tech level is {} at '.format(baseN(area.stats.maxTL,18))) 
-                    TLWorlds = TLWorlds[0:6]
-                    f.write (u", ".join(w.wiki_name() for w in TLWorlds[:-1]))
-                    f.write (u", and {}".format(TLWorlds[-1].wiki_name()))
-                    f.write (". ")
-                
-                subsectorCp = [world for world in area.worlds if 'Cp' in world.tradeCode]
-                sectorCp = [world for world in area.worlds if 'Cs' in world.tradeCode]
-                capital = [world for world in area.worlds if 'Cx' in world.tradeCode]
-                
-                if len(capital) > 0 :
-                    for world in capital: 
-                        alg = self.galaxy.alg[AllyGen.same_align(world.alg)]
-                        f.write('\n* The capital of {} is at {}.'.format(alg.wiki_name(), world.wiki_name()))
-                elif len(sectorCp) > 0 :
-                    f.write(u' The sector capital is at ')
-                    f.write(sectorCp[0].wiki_name())
-                    f.write('.')
-                elif len (subsectorCp) > 0 :
-                    f.write(u' The subsector capital is at ')
-                    f.write(subsectorCp[0].wiki_name())
-                    f.write(".")
+                if area.stats.population > 0:
+                    self.text_area_pop_tl(f, area_type, area)       
+                    self.text_area_capitals(f, area_type, area)         
             else:
                 f.write (' no charted worlds.')
                 
             f.write('\n')
+
+    def text_area_pop_tl (self, f, area_type, area):
+        PopWorlds = [world for world in area.worlds if world.popCode == area.stats.maxPop]
+        if len(PopWorlds) == 1:
+            f.write(u'The highest population world is {}. '.format(PopWorlds[0].wiki_name()))
+        elif len(PopWorlds) > 1:
+            PopWorlds.sort(key=lambda star: star.popM, reverse=True)
+            maxPopM = PopWorlds[0].popM
+            PopWorlds = [world.wiki_name() for world in PopWorlds if world.popM == maxPopM]
+            PopWorlds = PopWorlds[0:6]
+
+            self.plural.num(len(PopWorlds))
+            f.write(self.plural.inflect(u"The highest population plural(world) plural_verb(is) {}. ".
+                                        format(self.plural.join(PopWorlds))))
+            self.plural.num()
+        
+        TLWorlds = [world for world in area.worlds if world.tl == area.stats.maxTL]
+        TLWorlds = TLWorlds[0:6]
+        TLWorlds = [t.wiki_name() for t in TLWorlds]
+        f.write(u'The highest tech level is {} at {}. '.format(baseN(area.stats.maxTL,18),
+                                                               self.plural.join(TLWorlds))) 
+
+        TLList = [world.tl for world in area.worlds]
+        if len(TLList) > 3:
+            mean = sum(TLList) / len(TLList)
+            TLVar = [math.pow(tl - mean, 2) for tl in TLList]
+            stddev = math.sqrt(sum(TLVar) / len(TLVar))
+            f.write('The average technology level is {:d}'.format(int(mean)))
+            f.write(' (with most between {:d} and {:d}). '.format(max(int(mean-stddev),0), int(mean+stddev)))
+        
+    def text_area_capitals (self,f, area_type, area):
+        subsectorCp = [world for world in area.worlds if 'Cp' in world.tradeCode]
+        sectorCp = [world for world in area.worlds if 'Cs' in world.tradeCode]
+        capital = [world for world in area.worlds if 'Cx' in world.tradeCode]
+        
+        if len(capital) > 0 :
+            for world in capital: 
+                alg = self.galaxy.alg[AllyGen.same_align(world.alg)]
+                f.write(u'\n* The capital of {} is at {}.'.format(alg.wiki_name(), world.wiki_name()))
+        
+        if len(sectorCp) > 0 :
+            for world in sectorCp:
+                alg = self.galaxy.alg[AllyGen.same_align(world.alg)]
+                f.write(u'\n* The sector capital of {} is at {}.'.format(alg.wiki_name(), world.wiki_name()))
+       
+        if 0 < len (subsectorCp) < 17 :
+            for world in subsectorCp:
+                alg = self.galaxy.alg[AllyGen.same_align(world.alg)]
+                subsector = world.sector.subsectors[world.subsector()]
+                if area_type == 'sector' or area_type == 'Allegiance':
+                    f.write(u'\n* The {} subsector capital of {} is at {}.'.format(alg.wiki_name(),subsector.wiki_name(), world.wiki_name()))
+                #if area_type == 'subsector':
+                else:
+                    f.write(u'\n* The subsector capital of {} is at {}.'.format(alg.wiki_name(), world.wiki_name()))
     
     def write_sector_wiki(self):
         for sector in self.galaxy.sectors.itervalues():
@@ -588,17 +544,21 @@ class WikiStats(object):
                     f.write('\n')
                 f.write('}}\n[[Category:Sectors with sector data]]\n')
 
-    def write_count(self, f, count, text, is_are = True):
-        if count == 0 :
-            if is_are: f.write('are ') 
-            f.write(u'no {}s'.format(text))
-        elif count == 1:
-            if is_are: f.write('is ')
-            f.write(u'one {}'.format(text))
+    def get_count (self, count, text, is_are = True, lead_text=""):
+        self.plural.num(count)
+        c_text = self.plural.number_to_words(count, zero='no', threshold=10)
+        if is_are:
+            string = self.plural.inflect(u"plural_verb(is) {0}{1} plural({2})".format(c_text, lead_text, text))
+
         else:
-            if is_are: f.write('are ')
-            f.write(u'{:d} {}s'.format(count, text))
-            
+            string = self.plural.inflect(u"{0}{1} plural({2})".format(c_text, lead_text, text))
+        
+        self.plural.num()
+        return string
+        
+    def write_count(self, f, count, text, is_are = True, lead_text=""):
+        f.write (self.get_count(count, text, is_are, lead_text))
+           
             
     def write_population(self, population, f):
             if population >= 1000 :
