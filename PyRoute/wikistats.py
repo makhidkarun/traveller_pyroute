@@ -67,6 +67,7 @@ class WikiStats(object):
             f.write('! {} !! statistics\n'.format(area_type))
             for sector in self.galaxy.sectors.itervalues():
                 self.text_area_long(f, "sector", sector)
+                f.write('\n')
             f.write('|}\n')
 
         path = os.path.join(self.galaxy.output_path, 'sectors_list.txt')
@@ -147,11 +148,12 @@ class WikiStats(object):
             f.write('{| class=\"wikitable sortable\"\n')
             f.write(u'! {} !! statistics\n'.format(area_type))
             for code in alg_sort:
+                f.write('|-\n')
+                f.write(u'|{0}\n'.format(alg[code].wiki_title()))
+                f.write(u'|| ')
                 self.text_area_statistics(f, area_type, alg[code])
             f.write('|}\n')
-                
-            
-    
+
     def write_uwp_counts(self,f):
         from StatCalculation import ObjectStatistics
         default_stats = ObjectStatistics()
@@ -175,7 +177,7 @@ class WikiStats(object):
             if not found:
                 f.write('||0')
         f.write('\n')
-        
+
     def write_uwp_populations(self,f):
         from StatCalculation import ObjectStatistics
         population = self.galaxy.stats.population
@@ -199,7 +201,7 @@ class WikiStats(object):
             if not found:
                 f.write('||0%')
         f.write('\n|}')
-        
+
     def tcs_statistics (self):
         path = os.path.join(self.galaxy.output_path, 'tcs_summary.wiki')
         with codecs.open (path, 'w+','utf-8') as f:
@@ -220,7 +222,7 @@ class WikiStats(object):
                 f.write('|align="right"|{:,d}\n'.format(capacity_sum))
                 
             f.write('|}\n')
-            
+
     def subsector_statistics(self):
         path = os.path.join(self.galaxy.output_path, 'subsector_summary.wiki')
         with codecs.open (path, 'w+','utf-8') as f:
@@ -240,10 +242,18 @@ class WikiStats(object):
             f.write('{| class="wikitable sortable"\n')
             f.write('! {} !! statistics\n'.format(area_type))
             for sector in self.galaxy.sectors.itervalues():
-                for subsector in sector.subsectors.itervalues():
+                subsectors = [s for s in sector.subsectors.itervalues()]
+                subsectors.sort(key=lambda s: s.position)
+                for subsector in subsectors:
                     self.text_area_long(f, "subsector", subsector)
+                    f.write('\n=== Polity Listing ===')
+                    alegs = [alg for alg in subsector.alg.itervalues()]
+                    alegs.sort(key=lambda alg : alg.stats.number, reverse = True)
+                    for aleg in alegs:
+                        f.write('\n')
+                        self.text_area_statistics(f, "subsector", aleg, subsector)
             f.write('|}\n')
-                    
+
 # This sector has <N> worlds, of which <N> have native gas giants.
 # The estimated population for the sector is <N size> sapients (not necessarily humans). 
 # There are <N> Agricultural (Ag) worlds versus <N> Non-Agricultural (Na) worlds. 
@@ -266,11 +276,11 @@ class WikiStats(object):
                                                  area.position, area.sector.wiki_name()))
         else:
             f.write(u'|| The {} {} '.format(area.wiki_name(), area_type))
-        
+
         if len(area.worlds) == 0:
             f.write ('contains no charted worlds.\n')
             return
-        
+
         f.write(u'has {:d} worlds, of which {:d} have native gas giants. '.format(area.stats.number, area.stats.gg_count)) 
         f.write(u'The estimated population for the {} is '.format(area_type))
         self.write_population(area.stats.population, f)
@@ -283,7 +293,7 @@ class WikiStats(object):
         worlds.append(self.get_count(area.stats.code_counts.get('Lo', 0), 'world', False, ' Low population (Lo)'))
         worlds.append(self.get_count(area.stats.code_counts.get('Ba', 0), 'world', False, ' Barren (Ba)'))
         f.write(u'There {}. '.format(self.plural.join(worlds)))
-        
+
         f.write('There ')
         self.write_count(f, area.stats.code_counts.get('Ag', 0), 'world', True, ' Agricultural (Ag)')
         f.write(' versus ')
@@ -291,13 +301,13 @@ class WikiStats(object):
         f.write(', and ')
         self.write_count(f, area.stats.code_counts.get('Na', 0), 'world', False, ' Non-Agricultural (Na)')
         f.write('. ')
-        
+
         f.write('There ')
         self.write_count(f, area.stats.code_counts.get('Ri', 0), 'world', True, ' Rich (Ri)')
         f.write(' versus ')
         self.write_count(f, area.stats.code_counts.get('In', 0), 'world', False, ' Industrial (In)')
         f.write('. ')
-        
+
         worlds = []
         worlds.append(self.get_count(area.stats.code_counts.get('As', 0), 'belt', True, ' Asteroid (As)'))
         worlds.append(self.get_count(area.stats.code_counts.get('De', 0), 'world', False, ' Desert (De)'))
@@ -317,13 +327,13 @@ class WikiStats(object):
         f.write (', and ')
         self.write_count(f, area.stats.way_stations, 'Way station', False)
         f.write('. ')
-        
+
         HomeWorlds = [world for world in area.worlds if world.homeworld is not None]
         if (len(HomeWorlds) > 0):
             f.write(u'In {} there '.format(area.wiki_name()))
             self.write_count(f, len(HomeWorlds), 'race homeworld', True)
             f.write('. ')
-        
+
         nobles = Nobles()
         for world in area.worlds:
             nobles.accumulate(world.nobles)
@@ -342,45 +352,39 @@ class WikiStats(object):
                 nlist.append(self.get_count(nobles.nobles['Archdukes'], 'Archduke', False))
             f.write('The Imperial nobility includes {}'.format(self.plural.join(nlist)))
             if nobles.nobles['Emperor'] > 0:
-                f.write(' along with the Emperor.')
+                f.write(' along with the Emperor. ')
             else:
                 f.write ('. ')
 
         self.text_area_pop_tl (f, area_type, area)
-        self.text_area_capitals(f, area_type, area)
-        
-        f.write('\n')
-        
-    def text_area_statistics(self, f, area_type, area):
-            f.write('|-\n')
-            f.write(u'|{0}\n'.format(area.wiki_title()))
-            
-            if area_type == 'subsector':
-                f.write(u'|| {}, {} {} of {}, contains '.format(area.wiki_name(), area_type,
-                                                    area.position, area.sector.wiki_name()))
-            elif area_type == 'Allegiance':
-                f.write(u'|| The {}'.format(area.wiki_name()))
-                if area.code[0:2] == 'Na':
-                    f.write(' worlds consist of ')
-                elif area.code[0:2] == 'Cs':
-                    f.write (' consists of ')
-                else:
-                    f.write(' contains ')
-            else:
-                f.write(u'|| The {} {} contains '.format(area.wiki_name(), area_type))
+        if area_type != 'subsector':
+            self.text_area_capitals(f, area_type, area)
 
-            if len(area.worlds) > 0:
-                self.write_count(f, area.stats.number, 'world', False)
-                f.write(u' with a population of ')
-                self.write_population(area.stats.population, f)
-                f.write('. ')
-                if area.stats.population > 0:
-                    self.text_area_pop_tl(f, area_type, area)       
-                    self.text_area_capitals(f, area_type, area)         
-            else:
-                f.write (' no charted worlds.')
-                
-            f.write('\n')
+    def text_area_statistics(self, f, area_type, area, contain=None):
+        
+        outString = u'The {}'.format(area.wiki_name())
+        if area.code[0:2] == 'Na':
+            outString += u' worlds{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
+        elif area.code[0:2] == 'Cs':
+            outString += u'{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
+        else:
+            outString += u'{} has jurisdiction over '.format(u' in '+ contain.wiki_name() if contain else "")
+
+        f.write(outString)       
+        if contain and contain.stats.number == len(area.worlds):
+            f.write ('all of the worlds. ')
+            self.text_area_capitals(f, area_type, area)
+        elif len(area.worlds) > 0:
+            self.write_count(f, area.stats.number, 'world', False)
+            f.write(u' with a population of ')
+            self.write_population(area.stats.population, f)
+            f.write('. ')
+            if area.stats.population > 0:
+                self.text_area_pop_tl(f, area_type, area)       
+                self.text_area_capitals(f, area_type, area)         
+        else:
+            f.write (' no charted worlds.')
+        f.write('\n')
 
     def text_area_pop_tl (self, f, area_type, area):
         PopWorlds = [world for world in area.worlds if world.popCode == area.stats.maxPop]
@@ -415,27 +419,29 @@ class WikiStats(object):
         subsectorCp = [world for world in area.worlds if 'Cp' in world.tradeCode]
         sectorCp = [world for world in area.worlds if 'Cs' in world.tradeCode]
         capital = [world for world in area.worlds if 'Cx' in world.tradeCode]
-        
+
+        lead = "\n* " if area_type == 'sector' or area_type == 'Allegiance' else ""
+
         if len(capital) > 0 :
             for world in capital: 
                 alg = self.galaxy.alg[AllyGen.same_align(world.alg)]
-                f.write(u'\n* The capital of {} is at {}.'.format(alg.wiki_name(), world.wiki_name()))
-        
+                f.write(u'{}The capital of {} is {}.'.format(lead, alg.wiki_name(), world.wiki_name()))
+
         if len(sectorCp) > 0 :
             for world in sectorCp:
                 alg = self.galaxy.alg[AllyGen.same_align(world.alg)]
-                f.write(u'\n* The sector capital of {} is at {}.'.format(alg.wiki_name(), world.wiki_name()))
-       
+                f.write(u'{}The sector capital of {} is {}.'.format(lead, alg.wiki_name(), world.wiki_name()))
+
         if 0 < len (subsectorCp) < 17 :
             for world in subsectorCp:
                 alg = self.galaxy.alg[AllyGen.same_align(world.alg)]
                 subsector = world.sector.subsectors[world.subsector()]
                 if area_type == 'sector' or area_type == 'Allegiance':
-                    f.write(u'\n* The {} subsector capital of {} is at {}.'.format(alg.wiki_name(),subsector.wiki_name(), world.wiki_name()))
+                    f.write(u'{}The {} subsector capital of {} is {}.'.format(lead, alg.wiki_name(),subsector.wiki_name(), world.wiki_name()))
                 #if area_type == 'subsector':
                 else:
-                    f.write(u'\n* The subsector capital of {} is at {}.'.format(alg.wiki_name(), world.wiki_name()))
-    
+                    f.write(u'{}The subsector capital is {}.'.format(lead, world.wiki_name()))
+
     def write_sector_wiki(self):
         for sector in self.galaxy.sectors.itervalues():
             path = os.path.join(self.galaxy.output_path, sector.sector_name() + " Sector.sector.wiki")
@@ -549,7 +555,6 @@ class WikiStats(object):
         c_text = self.plural.number_to_words(count, zero='no', threshold=10)
         if is_are:
             string = self.plural.inflect(u"plural_verb(is) {0}{1} plural({2})".format(c_text, lead_text, text))
-
         else:
             string = self.plural.inflect(u"{0}{1} plural({2})".format(c_text, lead_text, text))
         
