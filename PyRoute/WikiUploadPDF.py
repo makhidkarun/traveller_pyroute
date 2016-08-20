@@ -25,6 +25,8 @@ import re
 from itertools import izip
 import traceback
 
+logger = logging.getLogger('WikiUpload')
+
 def uploadSummaryText(site, summaryFile, era):
     try:
         lines = [line for line in codecs.open(summaryFile,'r', 'utf-8')]
@@ -226,7 +228,7 @@ No information yet available.
         
         sophonts = homeworlds + sophCodes
         
-        codeset = set(codes) - dcode - set(owned) - set(sophCodes)
+        codeset = set(codes) - dcode - set(owned) - set(sophCodes) - set(homeworlds)
 
         if len(pcode) > 0:
             pcode = sorted(list(pcode))[0]
@@ -337,7 +339,17 @@ No information yet available.
             else:
                 logging.Logger("WikiUpload").error(u"UploadSummary for page {} got exception {} ".format(worldPage, e))
 
-shortNames = {u'Dagudashaag': u'Da', u'Empty Quarter': u'EQ', u'Spinward Marches': u'SM'}
+shortNames = {u'Dagudashaag': u'Da', u'Deneb': u'De', 
+              u'Empty Quarter': u'EQ', u'Spinward Marches': u'SM' }
+
+def set_logging(level):
+    logger.setLevel(level)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    # create console handler and set level to debug
+    ch = logging.StreamHandler()
+    ch.setLevel(level)
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
 if __name__ == '__main__':
     warnings.simplefilter("always")
@@ -353,7 +365,8 @@ if __name__ == '__main__':
     parser.add_argument('--era', dest='era', default='Milieu 1116')
     
     args = parser.parse_args()
-    
+    set_logging(args.log_level)
+
     # create a Wiki object
     site = wiki.Wiki(args.site)
     #site = wiki.Wiki("http://localhost/wiki/api.php")
