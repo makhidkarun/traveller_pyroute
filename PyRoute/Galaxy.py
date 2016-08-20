@@ -57,6 +57,7 @@ class Subsector(AreaItem):
         self.rimward = None
         self.dx = sector.dx
         self.dy = sector.dy
+        self.alg = {}
 
     def wiki_name(self):
         if len(self.name) == 0:
@@ -104,6 +105,7 @@ class Sector (AreaItem):
         self.dx = self.x * 32
         self.dy = self.y * 40
         self.subsectors = {}
+        self.alg = {}
         self.spinward = None
         self.trailing = None
         self.coreward = None
@@ -203,30 +205,32 @@ class Galaxy(object):
                 sec.worlds.append(star)
                 sec.subsectors[star.subsector()].worlds.append(star)
                 
-                base = AllyGen.same_align(star.alg)
-                if match == 'collapse':
-                    try:
-                        self.alg[base].worlds.append(star)
-                    except KeyError:
-                        self.logger.error(u"Allegiance code {} is not in the {} sector file allegiance list".format(base, sec))
-                        self.alg[base] = Allegiance(base, "Unknown Allegiance")
-                        self.alg[base].worlds.append(star)
-                    star.alg_base = base;
-                elif match == 'separate':
-                    try: 
-                        self.alg[star.alg].worlds.append(star)
-                    except KeyError:
-                        self.logger.error (u"Allegiance {} is not in the {} sector file allegiance list".format(star.alg, sec))
-                        raise SystemExit(3)
-                    if base != star.alg:
-                        self.alg[base].worlds.append(star)
+                self.set_area_alg(star, self, match, self.alg)
+                self.set_area_alg(star, sec, match, self.alg)
+                self.set_area_alg(star, sec.subsectors[star.subsector()], match, self.alg)
+
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds) ) )
 
         self.set_bounding_sectors()
         self.set_bounding_subsectors()
         self.set_positions()
+
+    def set_area_alg(self, star, area, match, algs):
+        base = AllyGen.same_align(star.alg)
+        star.alg_base = base
         
+        if match == 'collapse':
+            base_alg = algs.get(base, Allegiance(base, 'Unknown Allegiance'))
+            area.alg.setdefault(base, Allegiance(base_alg.code, base_alg.name)).worlds.append(star)
+        elif match == 'separate':
+            base_alg = algs.get(star.alg, Allegiance(star.alg, 'Unknown Allegiance'))
+            area.alg.setdefault(star.alg, Allegiance(base_alg.code, base_alg.name)).worlds.append(star)
+            
+            if base != star.alg:
+                base_alg = algs[base]
+                area.alg.setdefault(base, Allegiance(base_alg.code, base_alg.name)).worlds.append(star)
+                
     def set_positions(self):
         for sector in self.sectors.itervalues():
             for star in sector.worlds:

@@ -83,21 +83,22 @@ class StatCalculation(object):
                 self.max_tl(sector.stats, star)
                 self.max_tl(sector.subsectors[star.subsector()].stats, star)
                 if match == 'collapse':
-                    algStats = self.galaxy.alg[AllyGen.same_align(star.alg)].stats
-                    self.add_stats(algStats, star)
-                    self.max_tl (algStats, star)
+                    self.add_alg_stats(self.galaxy, star, AllyGen.same_align(star.alg))
+                    self.add_alg_stats(sector, star, AllyGen.same_align(star.alg))
+                    self.add_alg_stats(sector.subsectors[star.subsector()], star,AllyGen.same_align(star.alg))
                     
                     if AllyGen.imperial_align(star.alg):
                         for uwpCode, uwpValue in star.uwpCodes.iteritems():
                             self.add_stats(self.imp_uwp.stats(uwpCode, uwpValue), star)
-                            
+                    
                 elif match == 'separate':
-                    algStats = self.galaxy.alg[star.alg].stats
-                    self.add_stats(algStats, star)
-                    self.max_tl (algStats, star)
-                    both = self.galaxy.alg[AllyGen.same_align(star.alg)].stats
-                    self.add_stats(both, star)
-                    self.max_tl(both, star)
+                    self.add_alg_stats(self.galaxy, star, star.alg)
+                    self.add_alg_stats(sector, star, star.alg)
+                    self.add_alg_stats(sector.subsectors[star.subsector()], star, star.alg)
+
+                    self.add_alg_stats(self.galaxy, star, AllyGen.same_align(star.alg))
+                    self.add_alg_stats(sector, star, AllyGen.same_align(star.alg))
+                    self.add_alg_stats(sector.subsectors[star.subsector()], star,AllyGen.same_align(star.alg))
                     
                 for uwpCode, uwpValue in star.uwpCodes.iteritems():
                     self.add_stats(self.all_uwp.stats(uwpCode, uwpValue), star)
@@ -110,6 +111,12 @@ class StatCalculation(object):
         for alg in self.galaxy.alg.itervalues():
             self.per_capita(alg.stats)
 
+    def add_alg_stats(self, area, star, alg):
+        algStats = area.alg[alg].stats
+        self.add_stats(algStats, star)
+        self.max_tl(algStats, star)
+       
+        
     def add_stats(self, stats, star):
         stats.population += star.population
         stats.economy += star.gwp
