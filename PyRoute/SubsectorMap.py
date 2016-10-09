@@ -24,6 +24,7 @@ class GraphicSubsectorMap (GraphicMap):
     x_count    = 9
     y_count    = 11
     
+    
     def __init__(self, galaxy, routes):
         super(GraphicSubsectorMap, self).__init__(galaxy, routes)
         self.x_start = 28
@@ -56,6 +57,7 @@ class GraphicSubsectorMap (GraphicMap):
         
         for sector in self.galaxy.sectors.itervalues():
             for subsector in sector.subsectors.itervalues():
+                self.subsector = subsector
                 img = self.document(sector)
                 self.write_base_map(img, subsector)
                 for star in subsector.worlds:
@@ -120,7 +122,7 @@ class GraphicSubsectorMap (GraphicMap):
         end.x   = 396; end.y = 628; end.set_deltas(-11, 17)
         
         line._draw()
-        for x in xrange(1, 5, 1):
+        for _ in xrange(1, 5, 1):
             start.x_plus(); end.x_plus()
             line._draw();
             
@@ -128,7 +130,7 @@ class GraphicSubsectorMap (GraphicMap):
         start.x = 396; start.y = 560; start.set_deltas(11, 17)
         end.x   = 352; end.y = 560; end.set_deltas(11, 17)
         line._draw()
-        for y in xrange(1,5,1):
+        for _ in xrange(1,5,1):
             start.y_plus(); end.y_plus()
             line._draw()
 
@@ -137,43 +139,62 @@ class GraphicSubsectorMap (GraphicMap):
         start.y=560 + ((-pos[1] / 10) * 17)
         doc.rectangle([(start.x, start.y),(start.x+11, start.y+17)], outline=line.color, fill=line.color )
 
-            
+    def _set_pos (self, x, y):
+        location = (-self.positions[self.subsector.position][0]+x,
+                -self.positions[self.subsector.position][1]+y)
+        
+        q, r = self.convert_hex_to_axial(location[0] + self.sector.dx - 1, 
+                                     location[1] + self.sector.dy - 1)
+        
+        pos = (q,r)
+        col = self.xm * 3 * x
+        if (x & 1):
+            row = (self.y_start - self.ym * 2) + (y * self.ym * 2) 
+        else:
+            row = (self.y_start - self.ym) +  (y * self.ym * 2)
+        point = self.cursor(col, row)
+        point.x_plus(self.xm)
+        point.y_plus(self.ym)
+        return pos, point, location
+
+    def hex_grid(self, doc, draw, width, colorname = 'gray'):
+
+        # Fill each hex with color (if needed)
+        
         for x in xrange(1,self.x_count,1):
             for y in xrange(1,self.y_count,1):
-                
-                location = (-self.positions[sector.position][0]+x,-self.positions[sector.position][1]+y)
+                pos, point,_ = self._set_pos(x,y)
+                self.fill_aleg_hex(doc, pos, point)
 
-                q, r = self.convert_hex_to_axial(location[0] + self.sector.dx - 1, 
-                                                 location[1] + self.sector.dy - 1)
-
-                pos = (q,r)
-                name = "{0:02d}{1:02d}".format(location[0], location[1])
-                col = self.xm * 3 * x
-                if (x & 1):
-                    row = (self.y_start - self.ym * 2) + (y * self.ym * 2) 
-                else:
-                    row = (self.y_start - self.ym) +  (y * self.ym * 2)
-                point = self.cursor(col, row)
-                point.x_plus(self.xm)
-                point.y_plus(self.ym)
+        # Draw the base hexes
+        super (GraphicSubsectorMap, self).hex_grid(doc, draw, width, colorname)
+        
+        # Draw the borders and add the hex numbers
+        for x in xrange(1,self.x_count,1):
+            for y in xrange(1,self.y_count,1):
+                pos, point,location = self._set_pos(x, y)
                 self.draw_border (doc, pos, point)
+                
+                name = "{0:02d}{1:02d}".format(location[0], location[1])
                 point.y_plus (-self.ym)
                 size = self.hexFont.getsize(name)
                 pos = (point.x - size[0]/2, point.y)
                 
                 doc.text(pos, name, font=self.hexFont,fill=self.fillWhite)
 
-    def draw_border(self, doc, pos, point):
-        alegColor = {"Na": "#000000", "Im" : "#65201d", "Zh": "#485D91",
+    alegColor = {"Na": "#000000", "Im" : "#65201d", "Zh": "#485D91",
                      "CsZh": "#000000", "CsIm": "#000000", "CsRe": "#000000",
                      "ReDe": "#65201d", "FeAr": "#592a3f",
                      "SwCf": "#00647C", "DaCf": "#3a3a3a"}
-        start = self.cursor(25,25)
-        end = self.cursor(385,538)
-        line = self.get_line(doc, start, end, "#b7b7b7", 3)
+    borderColor = {"Na": "#000000", "Im" : "#b05652", "Zh": "#485D91",
+                     "CsZh": "#000000", "CsIm": "#000000", "CsRe": "#000000",
+                     "ReDe": "#b05652", "FeAr": "#592a3f",
+                     "SwCf": "#00647C", "DaCf": "#3a3a3a"}
+
+    def fill_aleg_hex(self, doc, pos, point):
         if pos in self.galaxy.borders.allyMap:
             aleg = self.galaxy.borders.allyMap[pos]
-            color = alegColor.get(aleg, '#000000')
+            color = self.alegColor.get(aleg, '#000000')
             doc.polygon([(point.x - self.xm, point.y - self.ym),
                          (point.x + self.xm, point.y - self.ym),
                          (point.x + self.xm*2,   point.y),
@@ -181,6 +202,15 @@ class GraphicSubsectorMap (GraphicMap):
                          (point.x - self.xm, point.y + self.ym),
                          (point.x - self.xm*2,   point.y)],
                          outline=None, fill = color )
+
+    def draw_border(self, doc, pos, point):
+        start = self.cursor(25,25)
+        end = self.cursor(385,538)
+        if pos in self.galaxy.borders.allyMap:
+            aleg = self.galaxy.borders.allyMap[pos]
+            bColor = self.borderColor.get(aleg, '#b7b7b7')
+            line = self.get_line(doc, start, end, bColor, 3)
+                    
             if AllyGen.is_nonaligned(aleg): 
                 return
             for n in xrange(6):
@@ -278,11 +308,12 @@ class GraphicSubsectorMap (GraphicMap):
             self.print_base_char(u'\u25B2', self.hexFont4, point, (-2.5, -2), doc)
             self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
             
+        if 'D' in star.baseCode:
+            self.print_base_char(u'\u25A0', self.hexFont4, point, (-2, -0.5), doc)
+            self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
+            
         if 'W' in star.baseCode:
-            baseCharacter = u'\u25B2'
-            size = self.hexFont4.getsize(baseCharacter)
-            pos = (point.x - 2.5 * size[0], point.y - (2 * size[1]))
-            doc.text(pos, baseCharacter, font=self.hexFont4, fill=self.fillRed)
+            self.print_base_char( u'\u25B2', self.hexFont4, point, (-2.5, -2), doc, GraphicMap.fillRed)
             self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
 
         if 'I' in star.baseCode:
@@ -295,13 +326,13 @@ class GraphicSubsectorMap (GraphicMap):
         keys =  set(research.keys()).intersection(star.tradeCode)
         if len(keys) == 1:
             station = next(iter(keys))
-            self.print_base_char(research[station], self.hexFont4, point, (-2, -0.5), doc)
+            self.print_base_char(research[station], self.hexFont4, point, (-2, -0.5), doc, GraphicMap.fillRed)
             self.logger.debug(u"Research station for {} : {}".format(star.name, " ".join(star.tradeCode)))
             
-    def print_base_char(self, baseCharacter, font, point, multiplier, doc):            
+    def print_base_char(self, baseCharacter, font, point, multiplier, doc, fill=GraphicMap.fillWhite):            
             size = font.getsize(baseCharacter)
             pos = (point.x + (multiplier[0] * size[0]), point.y + (multiplier[1] * size[1]))
-            doc.text(pos, baseCharacter, font=font, fill=self.textFill)
+            doc.text(pos, baseCharacter, font=font, fill=fill)
 
         
         #if len(star.name) > 0:

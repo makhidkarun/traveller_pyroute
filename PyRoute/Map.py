@@ -500,16 +500,16 @@ class GraphicMap (Map):
     rimPos     = (image_size[0] / 2, image_size[1] - 10)
     spinPos    = (0, image_size[1] / 2)
     trailPos   = (image_size[0] - 14, image_size[1]/ 2)
+    fillBlack = (0,0,0,255)
+    fillWhite = (255, 255, 255, 255)
+    fillBlue  = (50, 215, 255, 255)
+    fillRed   = (219,70,70,255)
 
     def __init__(self, galaxy, routes):
         super(GraphicMap, self).__init__(galaxy, routes)
-        self.fillBlack = (0,0,0,255)
-        self.fillWhite = (255, 255, 255, 255)
-        self.fillBlue  = (50, 215, 255, 255)
-        self.fillRed   = (219,70,70,255)
         self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf',30)
         self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf',10)
-        self.textFill  = self.fillBlack
+        self.textFill  = GraphicMap.fillBlack
 
     def close (self):
         path = os.path.join(self.galaxy.output_path, self.sector.sector_name()+" Sector.png")
