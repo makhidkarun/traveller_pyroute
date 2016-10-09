@@ -44,7 +44,7 @@ if __name__ == '__main__':
     parser.add_argument('output_dir', help='output directory for xml metadata')
     args = parser.parse_args()
 
-    tradeColors = ['99FF0000','BFFFFF00', '8000BF00', '9900FFFF', '990000FF', 'BF800080', 'violet' ]
+    tradeColors = ['#99FF0000','#BFFFFF00', '#8000BF00', '#9900FFFF', '#990000FF', '#BF800080', 'violet' ]
 
     regex = ".*\((.*) (\d\d\d\d)\).*\((.*) (\d\d\d\d)\) .* 'trade': ([0-9]*[L]?)" 
     match = re.compile(regex)
