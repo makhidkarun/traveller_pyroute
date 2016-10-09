@@ -156,6 +156,7 @@ class Star (object):
         self.owned_by()
         self.calculate_army()
         self.calculate_pcode()
+        self.calculate_world_codes()
         
         self.tradeIn  = 0
         self.tradeOver = 0
@@ -417,7 +418,7 @@ class Star (object):
         imp += 1 if self.agricultural else 0
         imp += 1 if self.rich else 0
         imp += 1 if self.industrial else 0
-        imp += 1 if self.baseCode in [u'NS', u'NW', u'W', u'D', u'X', u'RT', u'CK', u'KM'] else 0 
+        imp += 1 if self.baseCode in [u'NS', u'NW', u'W', u'D', u'X', u'KV'] else 0
         self.importance = imp
         
     def calculate_pcode(self):
@@ -431,6 +432,71 @@ class Star (object):
         self.pcode = 'As' if 'As' in self.tradeCode else self.pcode
         self.pcode = 'Oc' if 'Oc' in self.tradeCode else self.pcode
         self.pcode = 'Wa' if 'Wa' in self.tradeCode else self.pcode
+
+#        self.port = self.uwp[0]
+#        self.size = self.uwp[1]
+#        self.atmo = self.uwp[2]
+#        self.hydro = self.uwp[3]
+#        self.pop   = self.uwp[4]
+#        self.gov   = self.uwp[5]
+#        self.law   = self.uwp[6]
+#        self.tl = int(self.uwp[8],36)
+
+    def _check_planet_code(self, code, size, atmo, hydro):
+        size = '0123456789ABC' if size is None else size
+        atmo = '0123456789ABCDEF' if atmo is None else atmo
+        hydro = '0123456789A' if hydro is None else hydro
+
+        if self.size in size and self.atmo in atmo and self.hydro in hydro \
+            and code not in self.tradeCode:
+            self.logger.error(u'{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode))
+        if code in self.tradeCode and \
+            not (self.size in size and self.atmo in atmo and self.hydro in hydro):
+            self.logger.error(u'{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode))
+
+    def _check_pop_code(self, code, pop):
+        if self.pop in pop and code not in self.tradeCode:
+            self.logger.error(u'{} - Calculated "{}" not in trade codes {}'.format(self, code, self.tradeCode))
+        if code in self.tradeCode and self.pop not in pop:
+            self.logger.error(u'{} - Found invalid "{}" code on world with {} population: {}'.format(self, code, self.pop, self.tradeCode))
+
+    def _check_econ_code(self, code, atmo, hydro, pop):
+        atmo = '0123456789ABCDEF' if atmo is None else atmo
+        hydro = '0123456789A' if hydro is None else hydro
+        pop = '0123456789ABC' if pop is None else pop
+
+        if self.atmo in atmo and self.hydro in hydro and self.pop in pop \
+            and code not in self.tradeCode:
+            self.logger.error(u'{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode))
+        if code in self.tradeCode and \
+            not (self.atmo in atmo and self.hydro in hydro and self.pop in pop):
+            self.logger.error(u'{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode))
+
+    def calculate_world_codes(self):
+        self._check_planet_code('As', '0', '0', '0')
+        self._check_planet_code('De', None, '23456789', '0')
+        self._check_planet_code('Fl', None, 'ABC', '123456789A')
+        self._check_planet_code('Ga', '678', '568', '567')
+        self._check_planet_code('He', '3456789ABC', '2479ABC', '012')
+        self._check_planet_code('Ic', None, '01', '123456789A')
+        self._check_planet_code('Po', None, '2345', '0123')
+        self._check_planet_code('Oc', 'ABCD', '3456789ABC', 'A')
+        self._check_planet_code('Va', None, '0', None)
+        self._check_planet_code('Wa', '3456789', '3456789ABC', 'A')
+
+        self._check_pop_code('Ba', '0')
+        self._check_pop_code('Lo', '123')
+        self._check_pop_code('Ni', '456')
+        self._check_pop_code('Ph', '8')
+        self._check_pop_code('Hi', '9ABC')
+
+        self._check_econ_code('Pa', '456789', '45678', '48')
+        self._check_econ_code('Ag', '456789', '45678', '567')
+        self._check_econ_code('Na', '0123', '0123', '6789ABC')
+        self._check_econ_code('Pi', '012479', None, '78')
+        self._check_econ_code('In', '012479ABC', None, '9ABC')
+        self._check_econ_code('Pr', '68', None,'59')
+        self._check_econ_code('Ri', '68', None, '678')
 
     def owned_by(self):
         self.ownedBy = self
