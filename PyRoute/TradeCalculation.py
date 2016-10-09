@@ -96,7 +96,10 @@ class RouteCalculation (object):
         
         if not AllyGen.are_allies(star1.alg, star2.alg):
             btn -= 1
-                   
+            
+        if star1.alg == u'Wild' or star2.alg == u'Wild':
+            btn -= 1
+            
         if not distance:    
             distance = star1.hex_distance(star2)
         jump_index = bisect.bisect_left(TradeCalculation.btn_jump_range, distance)

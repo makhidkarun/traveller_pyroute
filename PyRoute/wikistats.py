@@ -363,7 +363,7 @@ class WikiStats(object):
     def text_area_statistics(self, f, area_type, area, contain=None):
         
         outString = u'The {}'.format(area.wiki_name())
-        if area.code[0:2] == 'Na':
+        if area.code[0:2] == 'Na' or area.code == 'Wild':
             outString += u' worlds{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
         elif area.code[0:2] == 'Cs':
             outString += u'{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
