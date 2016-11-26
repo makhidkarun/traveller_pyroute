@@ -175,7 +175,7 @@ class Map(object):
     def write_base_map(self, doc, sector):
         self.sector_name(doc, sector.name)
         self.subsector_grid(doc, sector)
-        self.hex_grid(doc, self._draw_all, 0.5)
+        self.hex_grid(doc, self._draw_all, 2)
         if sector.coreward:
             self.coreward_sector(doc, sector.coreward.name)
         if sector.rimward:
@@ -503,7 +503,7 @@ class GraphicMap (Map):
     fillBlack = (0,0,0,255)
     fillWhite = (255, 255, 255, 255)
     fillBlue  = (50, 215, 255, 255)
-    fillRed   = (219,70,70,255)
+    fillRed   = (255,48,48,255)
 
     def __init__(self, galaxy, routes):
         super(GraphicMap, self).__init__(galaxy, routes)

@@ -17,8 +17,8 @@ class GraphicSubsectorMap (GraphicMap):
                'M': (0,-30), 'N': (-8,-30), 'O': (-16,-30), 'P': (-24, -30)}
 
     image_size = (413,636)
-    corePos    = (image_size[0] / 2, 15)
-    rimPos     = (image_size[0] / 2, 554)
+    corePos    = (image_size[0] / 2, 20)
+    rimPos     = (image_size[0] / 2, 558)
     spinPos    = (0, 554 / 2)
     trailPos   = (392, 554 / 2)
     x_count    = 9
@@ -34,7 +34,7 @@ class GraphicSubsectorMap (GraphicMap):
         self.textFill = self.fillWhite
         self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf',16)
         self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf',24)
-        self.hexFont   = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 10)
+        self.hexFont   = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 8)
         self.worldFont = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 11)
         self.hexFont2  = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 12)
         self.hexFont3  = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 18)
@@ -62,6 +62,8 @@ class GraphicSubsectorMap (GraphicMap):
                 self.write_base_map(img, subsector)
                 for star in subsector.worlds:
                     self.place_system(img, star)
+                for star in subsector.worlds:
+                    self.write_name(img, star)
                 self.close(subsector.name)
 
     def sector_name(self,doc,name):
@@ -176,20 +178,22 @@ class GraphicSubsectorMap (GraphicMap):
                 self.draw_border (doc, pos, point)
                 
                 name = "{0:02d}{1:02d}".format(location[0], location[1])
-                point.y_plus (-self.ym)
+                point.y_plus (-self.ym + 1)
                 size = self.hexFont.getsize(name)
                 pos = (point.x - size[0]/2, point.y)
                 
                 doc.text(pos, name, font=self.hexFont,fill=self.fillWhite)
 
-    alegColor = {"Na": "#000000", "Im" : "#65201d", "Zh": "#485D91",
+    alegColor = {"Na": "#000000", "Im" : "#401312", "Zh": "#26314e",
                      "CsZh": "#000000", "CsIm": "#000000", "CsRe": "#000000",
-                     "ReDe": "#65201d", "FeAr": "#592a3f",
-                     "SwCf": "#00647C", "DaCf": "#3a3a3a"}
-    borderColor = {"Na": "#000000", "Im" : "#b05652", "Zh": "#485D91",
+                     "ReDe": "#401312", "FeAr": "#3E1D2C",
+                     "SwCf": "#003C4A", "DaCf": "#222222",
+                     "VAsP": "#11470C", "VDeG": "#11470C", "VInL": "#11470C", "VOpA":"#11470C"}
+    borderColor = {"Na": "#000000", "Im" : "#FF7978", "Zh": "#818ded",
                      "CsZh": "#000000", "CsIm": "#000000", "CsRe": "#000000",
-                     "ReDe": "#b05652", "FeAr": "#592a3f",
-                     "SwCf": "#00647C", "DaCf": "#3a3a3a"}
+                     "ReDe": "#FF7978", "FeAr": "#cc849f",
+                     "SwCf": "#33b2c0", "DaCf": "#d7d7d7",
+                     "VAsP": "#238E18", "VDeG": "#238E18", "VInL": "#238E18", "VOpA": "#238E18"}
 
     def fill_aleg_hex(self, doc, pos, point):
         if pos in self.galaxy.borders.allyMap:
@@ -208,7 +212,7 @@ class GraphicSubsectorMap (GraphicMap):
         end = self.cursor(385,538)
         if pos in self.galaxy.borders.allyMap:
             aleg = self.galaxy.borders.allyMap[pos]
-            bColor = self.borderColor.get(aleg, '#b7b7b7')
+            bColor = self.borderColor.get(aleg, '#f2f2f2')
             line = self.get_line(doc, start, end, bColor, 3)
                     
             if AllyGen.is_nonaligned(aleg): 
@@ -245,16 +249,7 @@ class GraphicSubsectorMap (GraphicMap):
                         line._draw()
         
     def place_system(self, doc, star):
-        col = star.col + self.positions[star.subsector()][0]
-        row = star.row + self.positions[star.subsector()][1]
-        
-        col = self.xm * 3 * col
-        if (star.col & 1):
-            row = (self.y_start - self.ym * 2) + (row * self.ym * 2) 
-        else:
-            row = (self.y_start - self.ym) +  (row * self.ym * 2)
-             
-        point = self.cursor(col, row)
+        point = self.get_world_centerpoint(star)
         self.zone(doc, star, point.copy())
 
         # Put the point in the center of the hex
@@ -274,38 +269,27 @@ class GraphicSubsectorMap (GraphicMap):
         if star.pcode == 'As':
             worldCharacter = u'\u2059'
             size = self.hexFont3.getsize(worldCharacter)
-            pos = (point.x - size[0]/2, point.y - size[1])
+            pos = (point.x - size[0]/2, point.y - size[1] * 0.6)
             doc.text(pos, worldCharacter, font=self.hexFont3, fill=self.textFill)
             
         else:
             doc.ellipse([(point.x-radius, point.y-radius), (point.x+radius, point.y+radius)], fill=color, outline=color)
         
         # Write Port code        
-        size = self.hexFont.getsize(star.port)
-        pos = (point.x - (size[0] / 2) + 1, point.y - (2* size[1] + 2))
-        doc.text(pos, star.port, font=self.hexFont, fill= self.textFill)
+        size = self.worldFont.getsize(star.port)
+        pos = (point.x - (size[0] / 2) + 1, point.y - (2* size[1]) + 1)
+        doc.text(pos, star.port, font=self.worldFont, fill= self.textFill)
 
-        name = star.name
-        if 'Hi' in star.tradeCode:
-            name = name.upper()
-        elif 'Lo' in star.tradeCode:
-            name = name.lower()
-        size = self.worldFont.getsize(name)
-        pos = (point.x - (size[0] / 2) + 1, point.y + size[1])
-        if star.capital:
-            doc.text (pos, name, font=self.worldFont, fill=self.fillRed)
-        else:
-            doc.text(pos, name, font=self.worldFont, fill=self.textFill)
         
         if star.ggCount:
-            self.print_base_char(u'\u25CF', self.hexFont, point, (2, -2.5), doc)
+            self.print_base_char(u'\u25CF', self.worldFont, point, (1.75, -2), doc)
            
         if 'N' in star.baseCode or 'K' in star.baseCode:
-            self.print_base_char( u'\u066D', self.hexFont3, point, (-1.25, -2.5), doc)
+            self.print_base_char( u'\u066D', self.hexFont3, point, (-1.25, -1.5), doc)
             self.logger.debug(u"Base for {} : {}".format(star.name,star.baseCode))
             
         if 'S' in star.baseCode:
-            self.print_base_char(u'\u25B2', self.hexFont4, point, (-2.5, -2), doc)
+            self.print_base_char(u'\u25B2', self.hexFont4, point, (-2.25, -1.5), doc)
             self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
             
         if 'D' in star.baseCode:
@@ -313,7 +297,7 @@ class GraphicSubsectorMap (GraphicMap):
             self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
             
         if 'W' in star.baseCode:
-            self.print_base_char( u'\u25B2', self.hexFont4, point, (-2.5, -2), doc, GraphicMap.fillRed)
+            self.print_base_char( u'\u25B2', self.hexFont4, point, (-2.25, -1.5), doc, GraphicMap.fillRed)
             self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
 
         if 'I' in star.baseCode:
@@ -328,7 +312,39 @@ class GraphicSubsectorMap (GraphicMap):
             station = next(iter(keys))
             self.print_base_char(research[station], self.hexFont4, point, (-2, -0.5), doc, GraphicMap.fillRed)
             self.logger.debug(u"Research station for {} : {}".format(star.name, " ".join(star.tradeCode)))
-            
+
+    # Write the name of the world on the map (last).
+    def write_name(self, doc, star):
+        point = self.get_world_centerpoint(star)
+        # Put the point in the center of the hex
+        point.x_plus(self.xm)
+        point.y_plus(self.ym)
+
+        name = star.name
+        if 'Hi' in star.tradeCode:
+            name = name.upper()
+        elif 'Lo' in star.tradeCode:
+            name = name.lower()
+        size = self.worldFont.getsize(name)
+        pos = (point.x - (size[0] / 2) + 1, point.y + size[1])
+        if star.capital:
+            doc.text (pos, name, font=self.worldFont, fill=self.fillRed)
+        else:
+            doc.text(pos, name, font=self.worldFont, fill=self.textFill)
+
+    # Get the center of the hex for writing a world
+    def get_world_centerpoint(self,star):
+        col = star.col + self.positions[star.subsector()][0]
+        row = star.row + self.positions[star.subsector()][1]
+        
+        col = self.xm * 3 * col
+        if (star.col & 1):
+            row = (self.y_start - self.ym * 2) + (row * self.ym * 2) 
+        else:
+            row = (self.y_start - self.ym) +  (row * self.ym * 2)
+             
+        return self.cursor(col, row)
+    
     def print_base_char(self, baseCharacter, font, point, multiplier, doc, fill=GraphicMap.fillWhite):            
             size = font.getsize(baseCharacter)
             pos = (point.x + (multiplier[0] * size[0]), point.y + (multiplier[1] * size[1]))
