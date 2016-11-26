@@ -440,10 +440,10 @@ class TradeCalculation(RouteCalculation):
     #distance_weight = [0, 30, 50, 70, 90, 120, 140 ]
     
     # GT Weights based upon one pass estimate
-    distance_weight = [0, 30, 50, 70, 110, 170, 300]
+    #distance_weight = [0, 30, 50, 70, 110, 170, 300]
     
     # Pure HG weights
-    #distance_weight = [0, 30, 50, 75, 130, 230, 490]
+    distance_weight = [0, 30, 50, 75, 130, 230, 490]
 
     # MGT weights
     #distance_weight = [0, 30, 60, 105, 190, 410, 2470]
