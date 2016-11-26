@@ -13,7 +13,8 @@ class AllyGen(object):
     classdocs
     '''
     noOne = [u'--']
-    nonAligned = [u'Na', u'Va', u'NaHu', u'NaVa', u'NaXX', u'CsIm', u'CsVa', u'CsZh', u'CsRe', u'Wild']
+    nonAligned = [u'Na', u'Va', u'NaHu', u'NaVa', u'NaXX', u'CsIm', u'CsVa', u'CsZh', u'CsRe',
+                  u'Wild', u'VaEx']
     sameAligned = [(u'Im', u'ImAp', u'ImDa', u'ImDc', u'ImDd', u'ImDg', u'ImDi', u'ImDs', u'ImDv', 
                         u'ImLa', u'ImLu', u'ImSy', u'ImVd'),
                     (u'As', u'A0', u'A1', u'A2', u'A3', u'A4', u'A5', u'A6', u'A7', u'A8', 
@@ -25,10 +26,14 @@ class AllyGen(object):
                     (u'JP', u'JuPr', u'JuHl', u'JuRu'),
                     (u'So', u'SoCf', u'SoNS', u'SoRD', u'SoWu'),
                     (u'CoLp', u'Lp'),
-                    (u'Va', u'V40S', u'VARC', u'VAug', u'VBkA', u'VCKd', u'VDzF', u'VLIn',
-                            u'VPGa', u'VRrS', u'VRuk', u'VSDp', u'VSEq', u'VThE', u'VTzE',
-                            u'VUru', u'VVar', u'VWan', u'VWP2'),
-                    (u'Zh', u'ZhCo', u'ZhCa', u'ZhIN')]
+                    (u'Va', u'V40S', u'VARC', u'VAug', u'VBkA', u'VCKd', u'VDzF', 
+                            u'VLIn', u'VPGa', u'VRrS', u'VRuk', u'VSDp', u'VSEq', u'VThE', 
+                            u'VTzE', u'VUru', u'VVar', u'VWan', u'VWP2'),
+                    (u'Vd', u'VDeG'),
+                    (u'Vo', u'VOpA'),
+                    (u'Vx', u'VAsP'),
+                    (u'V9', u'VInL'),
+                    (u'Zh', u'ZhCo', u'ZhCa', u'ZhIN', u'ZhSh')]
     
 
     def __init__(self, galaxy):
