@@ -129,6 +129,8 @@ class Star (object):
                            'Tech Level': self.uwp[8],
                            'Pop Code': str(self.popM)}
         
+        self.check_world_codes()
+
         self.rich = 'Ri' in self.tradeCode 
         self.industrial = 'In' in self.tradeCode 
         self.agricultural = 'Ag' in self.tradeCode 
@@ -141,6 +143,7 @@ class Star (object):
         self.nonAgricultural = 'Na' in self.tradeCode
         self.capital = 'Cp' in self.tradeCode or 'Cx' in self.tradeCode or 'Cs'in self.tradeCode
 
+
         if (data[5]):
             imp = int(data[5][1:-1].strip())
             self.calculate_importance()
@@ -149,14 +152,16 @@ class Star (object):
         else:
             self.calculate_importance()
 
+        self.check_ex()
+
         self.calculate_wtn()
         self.calculate_gwp(pop_code)
-        self.calculate_ru()
+
         self.calculate_TCS()
         self.owned_by()
         self.calculate_army()
         self.calculate_pcode()
-        self.calculate_world_codes()
+        self.calculate_ru()
         
         self.tradeIn  = 0
         self.tradeOver = 0
@@ -320,6 +325,25 @@ class Star (object):
             
         self.wtn = math.trunc(max(0, self.wtn))
 
+    def check_ex(self):
+        if not self.economics:
+            return
+        
+        labor     = int(self.economics[2], 20)
+        infrastructure = int(self.economics[3], 30)
+
+        if labor != max(self.popCode - 1, 0) :
+            self.logger.error(u'{} - EX Calculated labor {} does not match generated labor {}'.format(self, labor, max(self.popCode - 1, 0)))
+
+        if 'Ba' in self.tradeCode and infrastructure != 0:
+            self.logger.error(u'{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self, infrastructure, 0))
+        elif 'Lo' in self.tradeCode and infrastructure != 1:
+            self.logger.error(u'{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self, infrastructure, 1))
+        elif 'Ni' in self.tradeCode and not 0 <= infrastructure <= 6 + self.importance:
+            self.logger.error(u'{} - EX Calculated infrastructure {} not in NI range 0 - {}'.format(self, infrastructure, 6 + self.importance))
+        elif not 0 <= infrastructure <= 12 + self.importance:
+            self.logger.error(u'{} - EX Calculated infrastructure {} not in range 0 - {}'.format(self, infrastructure, 12 + self.importance))
+    
     def calculate_ru(self):
         if not self.economics: 
             self.ru = 0
@@ -472,7 +496,7 @@ class Star (object):
             not (self.atmo in atmo and self.hydro in hydro and self.pop in pop):
             self.logger.error(u'{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode))
 
-    def calculate_world_codes(self):
+    def check_world_codes(self):
         self._check_planet_code('As', '0', '0', '0')
         self._check_planet_code('De', None, '23456789', '0')
         self._check_planet_code('Fl', None, 'ABC', '123456789A')
@@ -484,7 +508,7 @@ class Star (object):
         self._check_planet_code('Va', None, '0', None)
         self._check_planet_code('Wa', '3456789', '3456789ABC', 'A')
 
-        self._check_pop_code('Ba', '0')
+        #self._check_pop_code('Ba', '0')
         self._check_pop_code('Lo', '123')
         self._check_pop_code('Ni', '456')
         self._check_pop_code('Ph', '8')
