@@ -216,7 +216,8 @@ No information yet available.
         dcodes = ['Cp', 'Cx', 'Cs', 'Mr', 'Da', 'Di', 'Pz', 'An', 'Ab', 'Fo', 'Px', 
                   'Re', 'Rs', 'Sa', 'Tz', 'Lk', 
                   'RsA', 'RsB','RsG','RsD','RsE','RsZ', 'RsT',
-                  'Fr', 'Co', 'Tp', 'Ho', 'Tr', 'Tu' ]
+                  'Fr', 'Co', 'Tp', 'Ho', 'Tr', 'Tu',
+                  'Cm', 'Tw' ]
         codes = sec[3].split()
         pcode = set(pcodes) & set(codes)
         dcode = set(dcodes) & set(codes)
@@ -258,11 +259,20 @@ No information yet available.
         worldPage = eco[1].strip() + u" (world)"
         try:
             target_page = Page(site, worldPage)
+            # First, check if this is a disambiguation page, if so generate
+            # the alternate (location) name
             categories = target_page.getCategories(True)
             if 'Category:Disambiguation pages' in categories:
                 worldName = worldPage.split(u'(')
                 shortName = shortNames[sectorName]
                 worldPage = worldName[0] + u'('+ shortName + u' ' + hexNo + u') (' + worldName[1]
+                target_page = Page(site, worldPage)
+                
+            # Second, check if this page was redirected to another page
+            if target_page.title != worldPage:
+                logger.info(u"Redirect {} to {}".format(worldPage, target_page.title))
+                worldPage = target_page.title
+                
         except NoPage:
             logger.info( u"Missing Page: {}".format(worldPage))
             page_data = page_template.format(eco[1].strip(), sectorName, subsectorName, hexNo)
