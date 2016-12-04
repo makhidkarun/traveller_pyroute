@@ -12,7 +12,7 @@ import codecs
 import os
 from Galaxy import Galaxy
 from HexMap import HexMap
-from SubsectorMap import GraphicSubsectorMap
+from SubsectorMap2 import GraphicSubsectorMap
 from StatCalculation import StatCalculation
 
 logger = logging.getLogger('PyRoute')
