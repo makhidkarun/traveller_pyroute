@@ -84,13 +84,13 @@ The ``min-route-btn`` defines the minimum BTN drawn on the map. The default (8) 
 
 The ``routes`` option select the route processing for drawing on the map. The `trade` option drawn the trade routes as described above. The `comm` option drawn a communications network, connecting the most important worlds, capitals, naval depots, and scout way stations within the various empires. `xroute` is a second option to draw a communications route for the Imperial sectors. `none` produces maps with no routes drawn. The last option is useful for producing the statistical output without the longer route production time. 
 
-The ``route-reuse`` option affects the `trade` route generation. As routes are generated from larger worlds to smaller worlds, the system prefers to use an already established (probably large) route even if it is slightly longer (in both parsecs and number of jumps). The default value is 10, and is an arbitrary value. Setting this below 10 results in a lot of main routes with a few spiky connectors. Setting it above 20 results in many nearby (almost overlapping) routes. 
+The ``route-reuse`` option affects the `trade` route generation. As routes are generated from larger WTN worlds to smaller WTN worlds, the system prefers to use an already established (probably large) route even if it is slightly longer (in both parsecs and number of jumps). The default value is 10, and is an arbitrary value. Setting this lower results in more main routes with a few spiky connectors. Setting it higher results in many nearby (almost overlapping) routes. Setting it to 30 or above results in every short distance route being individually mapped. 
 
 
 Input format
 ------------
 
-PyRoute assumes the input files are the generated raw data files from [Traveller Map](http://www.travellermap.com). The raw data format is described [here](http://travellermap.com/doc/secondsurvey.html). The header information, especially the sector name, location, subsectors list, and the _Alleg_ information is also required and will cause failure or unexpected results if incorrectly formatted. 
+PyRoute assumes the input files are the generated raw data files from [Traveller Map](http://www.travellermap.com). The raw data format is described [here](http://travellermap.com/doc/secondsurvey.html). The header information, especially the sector name, location, subsectors list, and the _Alleg_ information is also require. The parser is not especially robust and will cause failures or unexpected results if the data is incorrectly formatted. 
 
 
 Output files
