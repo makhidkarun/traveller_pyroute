@@ -327,8 +327,9 @@ class Galaxy(object):
                
 
     def process_owned_worlds(self):
-        path = os.path.join(self.output_path, 'owned-worlds.txt')
-        with codecs.open(path,'w+', 'utf-8') as f:
+        ow_names = os.path.join(self.output_path, 'owned-worlds-names.csv')
+        ow_list = os.path.join(self.output_path, 'owned-worlds-list.csv')
+        with codecs.open(ow_names, 'w+', 'utf-8') as f, codecs.open(ow_list, 'w+', 'utf-8') as g:
 
             for world in self.stars.nodes_iter():
                 if world.ownedBy == world:
@@ -364,10 +365,26 @@ class Galaxy(object):
                         owner = world.sector.coreward.find_world_by_pos(ownedHex)
                     elif world.row > 36 and owner is None and world.sector.rimward:
                         owner = world.sector.rimward.find_world_by_pos(ownedHex)
+                    
+                    # If we can't find world in the sector next door, try the this one
+                    if owner == None:
+                        owner = world.sector.find_world_by_pos(ownedHex)
                 elif len(world.ownedBy) == 4:
                     owner = world.sector.find_world_by_pos(world.ownedBy)
 
                 self.logger.debug(u"Worlds {} is owned by {}".format(world,owner))
-                f.write (u'"{}" : "{}", {}\n'.format(world, owner,
-                                            (u', '.join(u'"' + unicode(item) + u'"' for item in ownedBy[0:4]))))
+                
+                ow_path_items = [u'"{}"'.format(world), u'"{}"'.format(owner)]
+                ow_path_items.extend([u'"{}"'.format(item) for item in ownedBy[0:4]])
+                ow_path_world = u', '.join(ow_path_items)
+                f.write(ow_path_world + u'\n')
+                
+                
+                ow_list_items = [u'"{}"'.format(world.sector.name[0:4])]
+                ow_list_items.append(u'"{}"'.format(world.position))
+                ow_list_items.append(u'"{}"'.format(owner))
+                ow_list_items.extend([u'"O:{}"'.format(item.sec_pos(world.sector)) for item in ownedBy[0:4]])
+                ow_list_world = u', '.join(ow_list_items)
+                g.write(ow_list_world + u'\n')
+                
                 world.ownedBy = (owner, ownedBy[0:4])
