@@ -343,9 +343,9 @@ class WikiStats(object):
             nlist.append(self.get_count(nobles.nobles['Baronets'], 'Baronet', False))
             nlist.append(self.get_count(nobles.nobles['Barons'], 'Baron', False))
             nlist.append(self.get_count(nobles.nobles['Marquis'], 'Marquis', False))
-            nlist.append(self.get_count(nobles.nobles['Vicount'], 'Viscount', False))
+            nlist.append(self.get_count(nobles.nobles['Vicounts'], 'Viscount', False))
             nlist.append(self.get_count(nobles.nobles['Counts'], 'Count', False))
-            nlist.append(self.get_count(nobles.nobles['Duke'], 'Duke', False))
+            nlist.append(self.get_count(nobles.nobles['Dukes'], 'Duke', False))
             if nobles.nobles['Sector Dukes'] > 0:
                 nlist.append(self.get_count(nobles.nobles['Sector Dukes'], 'Subsector Duke', False))
             if nobles.nobles['Archdukes'] > 0:
