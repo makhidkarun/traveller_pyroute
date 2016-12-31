@@ -508,10 +508,20 @@ class TradeCalculation(RouteCalculation):
             if len(self.galaxy.stars.neighbors(star)) < 11:
                 continue
             neighbor_routes = [(s,n,d) for (s,n,d) in self.galaxy.stars.edges_iter([star], True)]
-            neighbor_routes.sort(key=lambda tn: (tn[2]['btn'],tn[2]['distance']))
+            # Need to do two sorts here:
+            # BTN low to high to gind them first
+            # Range high to low to find them first 
+            neighbor_routes.sort(key=lambda tn: tn[2]['btn'])
+            neighbor_routes.sort(key=lambda tn: tn[2]['distance'], reverse=True)
             
             length = len(neighbor_routes)
-            
+
+            # remove edges from the list which are 
+            # A) The most distant first
+            # B) The lowest BTN for equal distant routes
+            # If the neighbor has only a few (<15) connections don't remove that one
+            # until there are 20 connections left. 
+            # This may be reduced by other stars deciding you are too far away.             
             for (s,n,d) in neighbor_routes:
                 if len(self.galaxy.stars.neighbors(n)) < 15: 
                     continue
