@@ -87,9 +87,9 @@ class Star (object):
         self.pop   = self.uwp[4]
         self.gov   = self.uwp[5]
         self.law   = self.uwp[6]
-        self.tl = int(self.uwp[8],36)
+        self.tl = self._ehex_to_int(self.uwp[8])
         try:
-            self.popCode = int(self.pop,12)
+            self.popCode = self._ehex_to_int(self.pop)
         except ValueError:
             self.popCode = 12
             
@@ -153,6 +153,7 @@ class Star (object):
             self.calculate_importance()
 
         self.check_ex()
+        self.check_cx()
 
         self.calculate_wtn()
         self.calculate_gwp(pop_code)
@@ -203,6 +204,12 @@ class Star (object):
         name = u" ".join(w.capitalize() for w in self.name.lower().split())
         return u'[[{} (world)|]]'.format(name)
 
+    def sec_pos(self, sector):
+        if self.sector == sector:
+            return self.position
+        else:
+            return self.sector.name[0:4] + u'-' + self.position
+        
     def set_location (self, dx, dy):
         # convert odd-q offset to cube
         q = int (self.position[0:2]) + dx -1
@@ -329,8 +336,8 @@ class Star (object):
         if not self.economics:
             return
         
-        labor     = int(self.economics[2], 20)
-        infrastructure = int(self.economics[3], 30)
+        labor     = self._ehex_to_int(self.economics[2])
+        infrastructure = self._ehex_to_int(self.economics[3])
 
         if labor != max(self.popCode - 1, 0) :
             self.logger.error(u'{} - EX Calculated labor {} does not match generated labor {}'.format(self, labor, max(self.popCode - 1, 0)))
@@ -344,18 +351,47 @@ class Star (object):
         elif not 0 <= infrastructure <= 12 + self.importance:
             self.logger.error(u'{} - EX Calculated infrastructure {} not in range 0 - {}'.format(self, infrastructure, 12 + self.importance))
     
+    def check_cx(self):
+        if not self.economics:
+            return
+        pop = self.popCode
+        
+        homogeneity = self._ehex_to_int(self.social[1])# pop + flux, min 1
+        if pop == 0 and homogeneity != 0:
+            self.logger.error(u'{} - CX calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity))
+        elif pop != 0 and not max(1, pop-5) <= homogeneity <= pop + 5:
+            self.logger.error(u'{} - CX calculated homogeneity {} not in range {} - {}'.format(self, homogeneity, max(1,pop-5), pop+5))
+            
+        acceptance = self._ehex_to_int(self.social[2]) # pop + Ix, min 1
+        if pop == 0 and acceptance != 0:
+            self.logger.error(u'{} - CX calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
+        elif pop != 0 and not max(1, pop + self.importance) == acceptance:
+            self.logger.error(u'{} - CX Calculated acceptance {} does not match generated acceptance {}'.format(self, acceptance, max(1, pop + self.importance))) 
+
+        strangeness = self._ehex_to_int(self.social[3]) # flux + 5 
+        if pop == 0 and strangeness != 0:
+            self.logger.error(u'{} - CX calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness))
+        elif pop != 0 and not 1 <= strangeness <= 10:
+            self.logger.error(u'{} - CX calculated stranteness {} not in range {} - {}'.format(self, strangeness, 1, 10))
+            
+        symbols = self._ehex_to_int(self.social[4]) # TL + flux, min 1
+        if pop == 0 and symbols != 0:
+            self.logger.error(u'{} - CX calculated symbols {} should be 0 for barren worlds'.format(self, symbols))
+        elif pop != 0 and not max(1,self.tl - 5) <= symbols <= self.tl + 5:
+            self.logger.error(u'{} - CX calculated symbols {} not in range {} - {}'.format(self, symbols, max(1,self.tl - 5), self.tl + 5))
+
     def calculate_ru(self):
         if not self.economics: 
             self.ru = 0
             return
         
-        resources = int(self.economics[1],30)
-        labor = int(self.economics[2], 20)
+        resources = self._ehex_to_int(self.economics[1])
+        labor = self._ehex_to_int(self.economics[2])
         if self.economics[3] == '-' :
-            infrastructure = int(self.economics[3:5])
+            infrastructure = self._ehex_to_int(self.economics[3:5])
             efficency = int(self.economics[5:7])
         else:
-            infrastructure = int(self.economics[3], 30)
+            infrastructure = self._ehex_to_int(self.economics[3])
             efficency = int(self.economics[4:6])
         
         resources = resources if resources != 0 else 1
@@ -442,7 +478,7 @@ class Star (object):
         imp += 1 if self.agricultural else 0
         imp += 1 if self.rich else 0
         imp += 1 if self.industrial else 0
-        imp += 1 if self.baseCode in [u'NS', u'NW', u'W', u'D', u'X', u'KV'] else 0
+        imp += 1 if self.baseCode in [u'NS', u'NW', u'W', u'D', u'X', u'KV', u'RT', u'CK', u'KM'] else 0
         self.importance = imp
         
     def calculate_pcode(self):
@@ -504,9 +540,9 @@ class Star (object):
         self._check_planet_code('He', '3456789ABC', '2479ABC', '012')
         self._check_planet_code('Ic', None, '01', '123456789A')
         self._check_planet_code('Po', None, '2345', '0123')
-        self._check_planet_code('Oc', 'ABCD', '3456789ABC', 'A')
+        self._check_planet_code('Oc', 'ABCD', '3456789', 'A')
         self._check_planet_code('Va', None, '0', None)
-        self._check_planet_code('Wa', '3456789', '3456789ABC', 'A')
+        self._check_planet_code('Wa', '3456789', '3456789', 'A')
 
         #self._check_pop_code('Ba', '0')
         self._check_pop_code('Lo', '123')
@@ -581,4 +617,7 @@ class Star (object):
         else:
             self.im_be = 0
             
-        
+    def _ehex_to_int(self, value):
+        val = int(value, 36)
+        val -= 1 if val > 18 else 0
+        return val
