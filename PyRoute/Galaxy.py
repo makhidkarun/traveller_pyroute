@@ -351,6 +351,8 @@ class Galaxy(object):
                     owner = 'Mr'
                 elif world.ownedBy == 'Re':
                     owner = 'Re'
+                elif world.ownedBy == 'Px':
+                    owner = 'Px'
                 elif len(world.ownedBy) > 4:
                     ownedSec = world.ownedBy[0:4]
                     ownedHex = world.ownedBy[5:]

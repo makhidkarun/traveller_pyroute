@@ -372,7 +372,7 @@ class Star (object):
         if pop == 0 and strangeness != 0:
             self.logger.error(u'{} - CX calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness))
         elif pop != 0 and not 1 <= strangeness <= 10:
-            self.logger.error(u'{} - CX calculated stranteness {} not in range {} - {}'.format(self, strangeness, 1, 10))
+            self.logger.error(u'{} - CX calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10))
             
         symbols = self._ehex_to_int(self.social[4]) # TL + flux, min 1
         if pop == 0 and symbols != 0:
@@ -571,8 +571,10 @@ class Star (object):
                 break
             elif code.startswith(u'Mr'):
                 self.ownedBy = 'Mr'
-            elif code == u'Re':
+            elif code.startswith(u'Re'):
                 self.ownedBy = 'Re'
+            elif code.startswith(u'Px'):
+                self.ownedBy = 'Px'
         if (self.gov == '6' and not self.ownedBy) or (self.gov != '6' and self.ownedBy != self):
             self.logger.debug (u"{} has incorrect government code {} - {}".format(self, self.gov, self.tradeCode))
             
