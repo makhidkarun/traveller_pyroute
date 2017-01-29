@@ -13,28 +13,28 @@ class AllyGen(object):
     classdocs
     '''
     noOne = [u'--']
-    nonAligned = [u'Na', u'Va', u'NaHu', u'NaVa', u'NaXX', u'CsIm', u'CsVa', u'CsZh', u'CsRe',
-                  u'Wild', u'VaEx']
+    nonAligned = [u'Na', u'Va', u'NaHu', u'NaVa', u'NaAs', u'NaXX', u'VaEx'
+                  u'CsCa', u'CsHv', u'CsIm', u'CsMP', u'CsVa', u'CsZh', u'CsRe',
+                  u'Wild']
     sameAligned = [(u'Im', u'ImAp', u'ImDa', u'ImDc', u'ImDd', u'ImDg', u'ImDi', u'ImDs', u'ImDv', 
-                        u'ImLa', u'ImLu', u'ImSy', u'ImVd'),
+                        u'ImLa', u'ImLc', u'ImLu', u'ImSy', u'ImVd'),
                     (u'As', u'A0', u'A1', u'A2', u'A3', u'A4', u'A5', u'A6', u'A7', u'A8', 
                         u'A9', u'TE', u'Of', u'If',
                         u'AsIf', u'AsMw', u'AsOf', u'AsSc', u'AsSF', u'AsT0', u'AsT1', u'AsT2',
                         u'AsT3', u'AsT4', u'AsT5', u'AsT6', u'AsT7', u'AsT8', u'AsT9', u'AsTA',
                         u'AsTv', u'AsTz', u'AsVc', u'AsWc', u'AsXX', u'GlEm', u'NaAs' ),
                     (u'Hv', u'HvFd', u'H1', u'H2', u'Hc', u'Hv'),
-                    (u'JP', u'JuPr', u'JuHl', u'JuRu'),
-                    (u'So', u'SoCf', u'SoNS', u'SoRD', u'SoWu'),
-                    (u'CoLp', u'Lp'),
-                    (u'Va', u'V40S', u'VARC', u'VAug', u'VBkA', u'VCKd', u'VDzF', 
-                            u'VLIn', u'VPGa', u'VRrS', u'VRuk', u'VSDp', u'VSEq', u'VThE', 
-                            u'VTzE', u'VUru', u'VVar', u'VWan', u'VWP2'),
+                    (u'JP', u'JuPr', u'JAOz', u'JAsi', u'JCoK', u'JHhk', u'JLum', u'JMen',
+                            u'JPSt', u'JRar', u'JUkh', u'JuHl', u'JuRu', u'JVug'),
+                    (u'So', u'SoCf', u'SoBF', u'SoCT', u'SoFr', u'SoHn', u'SoKv', u'SoNS',
+                            u'SoQu', u'SoRD', u'SoWu'),
+                    (u'Lp', u'CoLp'),
                     (u'Vd', u'VDeG'),
                     (u'Vo', u'VOpA'),
                     (u'Vx', u'VAsP'),
                     (u'V9', u'VInL'),
-                    (u'Zh', u'ZhCo', u'ZhCa', u'ZhIN', u'ZhSh')]
-    
+                    (u'Zh', u'ZhAx', u'ZhCa', u'ZhCh', u'ZhCo', u'ZhIa', u'ZhIN', 
+                            u'ZhJp', u'ZhMe', u'ZhOb', u'ZhSh', u'ZhVQ')]
 
     def __init__(self, galaxy):
         '''
