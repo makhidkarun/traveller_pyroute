@@ -73,7 +73,6 @@ def process():
     
     galaxy.set_borders(args.borders, args.ally_match)
 
-
     if args.owned:
         galaxy.process_owned_worlds()
 

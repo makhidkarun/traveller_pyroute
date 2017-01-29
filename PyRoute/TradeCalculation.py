@@ -199,7 +199,6 @@ class OwnedWorldCalculation(RouteCalculation):
         weight = self.distance_weight[dist]
         return weight
     
-    
 class XRouteCalculation (RouteCalculation):
     distance_weight = [0, 95, 90, 85, 80, 75, 70  ]
     capSec_weight = [0, 95, 90, 85, 75, 75, 70]
@@ -427,7 +426,6 @@ class XRouteCalculation (RouteCalculation):
         
         return weight
 
-
 class TradeCalculation(RouteCalculation):
     '''
     Perform the trade calculations by generating the routes
@@ -484,7 +482,7 @@ class TradeCalculation(RouteCalculation):
     def base_range_routes (self, star, neighbor):
         dist = star.hex_distance (neighbor)
         max_dist = self.btn_range[ min(max (0, max(star.wtn, neighbor.wtn) - self.min_wtn), 5)]
-        btn = self.get_btn(star, neighbor)
+        btn = self.get_btn(star, neighbor, dist)
         # add all the stars in the BTN range, but  skip this pair
         # if there there isn't enough trade to warrant a trade check
         if dist <= max_dist and btn >= self.min_btn:
