@@ -627,7 +627,7 @@ class TradeCalculation(RouteCalculation):
         tradePass    = self.calc_passengers(tradePassBTN)
         
         route[0].passIn += tradePass
-        route[0].passIn += tradePass
+        route[-1].passIn += tradePass
         
         start = route[0]
         for end in route[1:]:
