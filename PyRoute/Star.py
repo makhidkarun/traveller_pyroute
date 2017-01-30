@@ -172,6 +172,14 @@ class Star (object):
         self.starportSize = 0
         self.starportBudget = 0
         self.starportPop = 0
+
+        self.eti_cargo_volume = 0
+        self.eti_pass_volume = 0
+        self.eti_cargo = 0
+        self.eti_passenger = 0
+        self.eti_worlds = 0
+        self.calculate_eti()
+        
         
     def __unicode__(self):
         return u"{} ({} {})".format(self.name, self.sector.name, self.position)
@@ -480,6 +488,30 @@ class Star (object):
         imp += 1 if self.industrial else 0
         imp += 1 if self.baseCode in [u'NS', u'NW', u'W', u'D', u'X', u'KV', u'RT', u'CK', u'KM'] else 0
         self.importance = imp
+    
+    def calculate_eti(self):
+        eti = 0
+        eti += 1 if self.port in 'AB' else 0
+        eti -= 1 if self.port in 'DEX' else 0
+        eti += 1 if self.tl >= 10 else 0
+        eti -= 1 if self.tl <= 7 else 0
+        eti += 1 if self.baseCode in [u'NS', u'NW', u'D', u'X', u'KV', u'RT', u'CK', u'KM'] else 0
+        eti += 1 if self.capital else 0
+        eti += 1 if self.agricultural else 0
+        eti += 1 if self.rich else 0
+        eti += 1 if self.industrial else 0
+        eti -= 1 if self.poor else 0
+        eti -= 1 if self.popCode <= 3 else 0
+        eti += 1 if self.popCode >= 9 else 0
+        eti -= 1 if self.zone in ['A', 'U'] else 0
+        eti -= 8 if self.zone in ['R', 'F'] else 0
+        self.eti_cargo = eti
+        eti -= 1 if self.baseCode in [u'NS', u'NW', u'D', u'X', u'KV', u'RT', u'CK', u'KM'] else 0
+        eti -= 1 if self.agricultural else 0
+        eti -= 2 if self.industrial else 0
+        eti -= 1 if self.zone in ['A', 'U'] else 0
+        self.eti_passenger = eti
+        
         
     def calculate_pcode(self):
         self.pcode = None

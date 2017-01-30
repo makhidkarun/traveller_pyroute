@@ -35,6 +35,10 @@ class ObjectStatistics(object):
         self.naval_bases = 0
         self.scout_bases = 0
         self.way_stations = 0
+        
+        self.eti_worlds = 0
+        self.eti_cargo = 0
+        self.eti_pass = 0
 
 class UWPCollection(object):
     def __init__(self):
@@ -103,7 +107,7 @@ class StatCalculation(object):
                 for uwpCode, uwpValue in star.uwpCodes.iteritems():
                     self.add_stats(self.all_uwp.stats(uwpCode, uwpValue), star)
                 
-            self.per_capita(sector.stats) # Per capital sector stats
+            self.per_capita(sector.stats) # Per capita sector stats
             for subsector in sector.subsectors.itervalues():
                 self.per_capita(subsector.stats)
         self.per_capita(self.galaxy.stats)
@@ -138,6 +142,10 @@ class StatCalculation(object):
             stats.scout_bases += 1
         if 'W' in star.baseCode:
             stats.way_stations += 1
+        if star.eti_cargo_volume > 0 or star.eti_pass_volume > 0 :
+            stats.eti_worlds += 1
+        stats.eti_cargo += star.eti_cargo_volume
+        stats.eti_pass += star.eti_pass_volume
    
     def max_tl (self, stats, star):
         stats.maxTL = max(stats.maxTL, star.tl)

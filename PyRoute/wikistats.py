@@ -17,7 +17,11 @@ class WikiStats(object):
     '''
     classdocs
     '''
-    stat_header='{| class=\"wikitable sortable\"\n!Sector!! X,Y !! Worlds !! Population (millions) !! Economy (Bcr) !! Per Capita (Cr) !! Trade Volume (BCr) !! Int. Trade (BCr) !! Ext. Trade (BCr) !! RU !! Shipyard Capacity (MTons) !! Colonial Army (BEs) !! Travellers (M) !! SPA Pop\n'
+    stat_header='{| class=\"wikitable sortable\"\n!Sector!! X,Y !! Worlds ' + \
+        '!! Population (millions) !! Economy (Bcr) !! Per Capita (Cr) ' + \
+        '!! Trade Volume (BCr / year) !! Int. Trade (BCr / year) !! Ext. Trade (BCr/year) '+ \
+        '!! RU !! Shipyard Capacity (MTons) !! Colonial Army (BEs) ' + \
+        '!! Travellers (M / year) !! SPA Pop !! ETI worlds !! ETI Cargo (tons / year) !! ETI passengers (per year)\n'
 
     def __init__(self, galaxy, uwp, min_alg_count=10):
         '''
@@ -96,7 +100,9 @@ class WikiStats(object):
         f.write('|align="right"|{:,.2f}\n'.format(stats.col_be))
         f.write('|align="right"|{:,d}\n'.format(stats.passengers/1000000))
         f.write('|align="right"|{:,d}\n'.format(stats.spa_people))
-        
+        f.write('|align="right"|{:,d}\n'.format(stats.eti_worlds))
+        f.write('|align="right"|{:,d}\n'.format(int(stats.eti_cargo * 50)))
+        f.write('|align="right"|{:,d}\n'.format(int(stats.eti_pass * 50)))      
 
     def top_summary(self):
         path = os.path.join(self.galaxy.output_path, 'top_summary.wiki')
@@ -480,7 +486,10 @@ class WikiStats(object):
                 f.write ('<section begin="header"/>\n')
                 f.write ('{| class="wikitable sortable" width="90%"\n')
                 f.write (u'|+ {} economic data\n'.format(sector.sector_name()))
-                f.write (u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!RU!!GWP (BCr)!!Trade (MCr/year)!!Passengers / year!!Build!!Army!!Port!!SPA Population!!Subsector\n')
+                f.write (u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!RU!!GWP (BCr)!!Trade (MCr/year)' + \
+                         '!!Passengers (per year)!!Build!!Army!!Port!!SPA Population' + \
+                         '!!ETI Index!!ETI Pass Index!!ETI worlds!!ETI Cargo (tons/year)!!ETI Passengers (per year)' + \
+                         '!!Subsector\n')
                 f.write ('<section end="header"/>')
                 for subsector in sector.subsectors.itervalues():
                     f.write(u'<section begin="{}"/>\n'.format(subsector.name))
@@ -500,6 +509,11 @@ class WikiStats(object):
                         f.write('||{:8,d}'.format(star.raw_be))
                         f.write('||{:6d}'.format(star.starportSize))
                         f.write('||{:10,d}'.format(star.starportPop))
+                        f.write('||{:d}'.format(star.eti_cargo))
+                        f.write('||{:d}'.format(star.eti_passenger))
+                        f.write('||{:10,d}'.format(star.eti_worlds))
+                        f.write('||{:10,d}'.format(int(star.eti_cargo_volume * 50)))
+                        f.write('||{:10,d}'.format(int(star.eti_pass_volume * 50)))
                         f.write(u'||{}'.format(subsector.wiki_name()))
                         f.write('\n')
                     f.write (u'<section end="{}"/>'.format(subsector.name))

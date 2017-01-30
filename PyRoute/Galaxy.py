@@ -9,6 +9,7 @@ import codecs
 import os
 import ast
 import itertools
+import math
 import networkx as nx
 
 from Star import Star
@@ -307,6 +308,27 @@ class Galaxy(object):
                 for star in stars:
                     f.write (u"{} - {}\n".format(star, star.tradeCount))
     
+    def process_eti(self):
+        self.logger.info("Processing ETI for worlds")
+        for (world,neighbor) in self.stars.edges_iter(None, data=False):
+            distanceMod = int(world.hex_distance(neighbor)/2)
+            CargoTradeIndex = int(round(math.sqrt(
+                                max(world.eti_cargo - distanceMod, 0) * 
+                                max(neighbor.eti_cargo - distanceMod, 0))))
+            PassTradeIndex = int(round(math.sqrt(
+                                max(world.eti_passenger - distanceMod, 0) * 
+                                max(neighbor.eti_passenger - distanceMod, 0))))
+            self.stars[world][neighbor]['CargoTradeIndex'] = CargoTradeIndex
+            self.stars[world][neighbor]['PassTradeIndex']  = PassTradeIndex
+            if CargoTradeIndex > 0:
+                world.eti_cargo_volume += math.pow(10, CargoTradeIndex) * 10
+                neighbor.eti_cargo_volume += math.pow(10, CargoTradeIndex) * 10
+                world.eti_worlds += 1
+                neighbor.eti_worlds += 1
+            if PassTradeIndex > 0:
+                world.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
+                neighbor.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
+                     
     def read_routes (self, routes=None):
         route_regex = "^({1,}) \(({3,}) (\d\d\d\d)\) ({1,}) \(({3,}) (\d\d\d\d)\) (\{.*\})"    
         routeline = re.compile(route_regex)
