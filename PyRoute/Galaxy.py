@@ -168,7 +168,7 @@ class Galaxy(object):
         self.min_btn = min_btn
         self.route_btn = route_btn
         
-    def read_sectors (self, sectors, pop_code, match):
+    def read_sectors (self, sectors, pop_code, match, ru_calc):
         for sector in sectors:
             try:
                 lines = [line for line in codecs.open(sector,'r', 'utf-8')]
@@ -204,7 +204,7 @@ class Galaxy(object):
             for line in lines[lineno+2:]:
                 if line.startswith('#') or len(line) < 20: 
                     continue
-                star = Star (line, self.starline, sec, pop_code)
+                star = Star (line, self.starline, sec, pop_code, ru_calc)
                 sec.worlds.append(star)
                 sec.subsectors[star.subsector()].worlds.append(star)
                 
