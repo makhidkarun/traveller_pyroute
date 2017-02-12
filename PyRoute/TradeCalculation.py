@@ -75,7 +75,19 @@ class RouteCalculation (object):
                                                   'trade': 0,
                                                   'btn': btn,
                                                   'count': 0})
-
+        # Manage the pre-generated routes
+        for star in self.galaxy.stars:
+            for route in star.routes:
+                if len(route) == 7:
+                    route_des = route[3:]
+                else:
+                    route_des = route[7:]
+                for neighbor in self.galaxy.stars.neighbors(star):
+                    if neighbor.position == route_des:
+                        if route.startswith('Xb'):
+                            self.galaxy.stars[star][neighbor]['xboat'] = True
+                        elif route.startswith('Tr'):
+                            self.galaxy.stars[star][neighbor]['comm'] = True
         self.logger.info("base routes: %s  -  ranges: %s" % 
                          (self.galaxy.stars.number_of_edges(), 
                           self.galaxy.ranges.number_of_edges()))
@@ -525,6 +537,8 @@ class TradeCalculation(RouteCalculation):
                     continue
                 if length <= 21:
                     break
+                if d.get('xboat',False) or d.get('comm', False):
+                    continue
                 self.galaxy.stars.remove_edge(s,n)
                 length -= 1
         self.logger.info('Final route count {}'.format(self.galaxy.stars.number_of_edges()))
@@ -856,7 +870,7 @@ class CommCalculation(RouteCalculation):
             self.get_route_between(star, neighbor)
             processed += 1
         
-        for (star, neighbor, data) in self.stars.edges_iter(data=True):
+        for (star, neighbor, data) in self.galaxy.stars.edges_iter(data=True):
             pass   
         
 
@@ -878,6 +892,7 @@ class CommCalculation(RouteCalculation):
         weight -= 6 if self.capitals(star) or self.capitals(target) else 0
         weight -= 6 if self.bases(star) or self.bases(target) else 0
         weight -= 3 if self.is_rich(star) or self.is_rich(target) else 0
+        weight -= 6 if 'M' in star.baseCode or 'M' in target.baseCode else 0 
         
         return weight
 

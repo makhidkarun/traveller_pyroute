@@ -66,7 +66,7 @@ class Nobles(object):
             self.nobles[rank] += count
             
 class Star (object):
-    def __init__ (self, line, starline, sector, pop_code):
+    def __init__ (self, line, starline, sector, pop_code, ru_calc):
         self.logger = logging.getLogger('PyRoute.Star')
         self.sector = sector
         self.logger.debug(line)
@@ -118,7 +118,8 @@ class Star (object):
         self.alg_base = self.alg
         
         self.stars = data[17].strip()
-       
+        self.extract_routes()
+        
         self.uwpCodes = {'Starport': self.port,
                            'Size': self.size,
                            'Atmosphere': self.atmo,
@@ -136,10 +137,10 @@ class Star (object):
         self.agricultural = 'Ag' in self.tradeCode 
         self.poor = 'Po' in self.tradeCode 
         self.nonIndustrial = 'Ni' in self.tradeCode 
-        self.extreme = 'As' in self.tradeCode or 'Ba' in self.tradeCode or \
+        self.extreme = 'As' in self.tradeCode or \
                 'Fl' in self.tradeCode or 'Ic' in self.tradeCode or 'De' in self.tradeCode or \
                 'Na' in self.tradeCode or 'Va' in self.tradeCode or 'Wa' in self.tradeCode or \
-                'He' in self.tradeCode
+                'He' in self.tradeCode or 'Oc' in self.tradeCode
         self.nonAgricultural = 'Na' in self.tradeCode
         self.capital = 'Cp' in self.tradeCode or 'Cx' in self.tradeCode or 'Cs'in self.tradeCode
 
@@ -162,7 +163,7 @@ class Star (object):
         self.owned_by()
         self.calculate_army()
         self.calculate_pcode()
-        self.calculate_ru()
+        self.calculate_ru(ru_calc)
         
         self.tradeIn  = 0
         self.tradeOver = 0
@@ -380,7 +381,7 @@ class Star (object):
         elif pop != 0 and not max(1,self.tl - 5) <= symbols <= self.tl + 5:
             self.logger.error(u'{} - CX calculated symbols {} not in range {} - {}'.format(self, symbols, max(1,self.tl - 5), self.tl + 5))
 
-    def calculate_ru(self):
+    def calculate_ru(self, ru_calc):
         if not self.economics: 
             self.ru = 0
             return
@@ -406,7 +407,9 @@ class Star (object):
         
         efficency = efficency if efficency != 0 else 1
         if efficency < 0: 
-            efficency = 1 + (efficency * 0.1)
+            if ru_calc == 'scaled':
+                efficency = 1 + (efficency * 0.1)
+            # else ru_calc == 'negative' -> use efficency as written
             self.ru = int(round(resources * labor * infrastructure * efficency))
         else:
             self.ru = resources * labor * infrastructure * efficency
@@ -623,3 +626,20 @@ class Star (object):
         val = int(value, 36)
         val -= 1 if val > 18 else 0
         return val
+    
+    def extract_routes(self):
+        str_split = self.stars.split()
+        self.routes = [route for route in str_split if route.startswith('Xb:') or route.startswith('Tr:')]
+
+        start_xb = self.stars.find('Xb:')
+        start_tr = self.stars.find('Tr:')
+        
+        start_xb = len(self.stars) if start_xb < 0 else start_xb
+        start_tr = len(self.stars) if start_tr < 0 else start_tr
+        
+        star_end = min(start_xb, start_tr)
+        
+        self.stars = self.stars[0:star_end].strip()
+        if len(self.routes) > 0:
+            self.logger.debug("{} - routes: {}".format(self, self.routes))
+        
