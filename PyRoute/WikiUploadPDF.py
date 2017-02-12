@@ -70,6 +70,9 @@ def uploadSummaryText(site, summaryFile, era):
             else:
                 logger.error(u"UploadSummary for page {} got exception {} ".format(baseTitle, e))
             return
+        except NoPage as e:
+            logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
+            return
         
         try:
             result = target_page.edit(text=text, summary='Trade Map update summary', 
@@ -84,6 +87,8 @@ def uploadSummaryText(site, summaryFile, era):
                 logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
             else:
                 logger.error(u"UploadSummary for page {} got exception {} ".format(baseTitle, e))
+        except NoPage as e:
+            logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
             
         if lines[index].startswith('|}'):
             break       
@@ -118,6 +123,9 @@ def uploadSec (site, filename, place, era):
             logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(targetTitle))
         else:
             logger.error(u"UploadSummary for page {} got exception {} ".format(targetTitle, e))
+        return
+    except NoPage as e:
+        logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(targetTitle))
         return
     
     try:        
@@ -372,7 +380,7 @@ def process():
     parser.add_argument('--no-secs', dest='secs', default=True, action='store_false')
     parser.add_argument('--no-summary', dest='summary', default=True, action='store_false')
     parser.add_argument('--no-subsector', dest='subsector', default=True, action='store_false')
-    parser.add_argument('--no-worlds', dest="worlds", default=True, action='store_false')
+    parser.add_argument('--worlds', default=None)
     parser.add_argument('--site', dest='site', default='http://wiki.travellerrpg.com/api.php')
     parser.add_argument('--era', dest='era', default='Milieu 1116')
     parser.add_argument('--log-level', default='INFO')
@@ -389,17 +397,14 @@ def process():
         path = os.path.join(args.input, "*Sector.pdf")
         for f in glob.glob(path):
             uploadPDF(site, f)
-            time.sleep(5)
 
     if args.secs:        
         path = os.path.join(args.input, "*Sector.economic.wiki")
         for f in glob.glob(path):
-            uploadSec (site, f, "/economic")
-            time.sleep(5)
+            uploadSec (site, f, "/economic", args.era)
         path = os.path.join(args.input, "*Sector.sector.wiki")
         for f in glob.glob(path):
-            uploadSec (site, f, "/sector")
-            time.sleep(5)
+            uploadSec (site, f, "/sector", args.era)
 
     if args.summary:
         path = os.path.join(args.input, "summary.wiki")
@@ -409,9 +414,9 @@ def process():
         uploadSummaryText(site, path, args.era)
 
     if args.worlds:
-        path = os.path.join(args.input, "*Sector.economic.wiki")
+        path = os.path.join(args.input, "{0} Sector.economic.wiki".format(args.worlds))
         for eco in glob.glob(path):
-            sector = os.path.basename(eco)[:-21]
+            sector = args.worlds
             if sector in shortNames.keys():
                 sec = eco.replace('Sector.economic.wiki', 'Sector.sector.wiki')
                 uploadWorlds(site, sec, eco, args.era)
