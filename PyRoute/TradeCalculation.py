@@ -582,6 +582,8 @@ class TradeCalculation(RouteCalculation):
         except  nx.NetworkXNoPath:
             return
 
+        # TODO: Generate the routes in both directions- A->B and B->A. 
+        # if they produce different routes (they might), select the the lower cost one
         # Update the trade route (edges)
         tradeCr,tradePass = self.route_update_simple (route)
 
