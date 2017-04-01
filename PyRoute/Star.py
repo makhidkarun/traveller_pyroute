@@ -137,6 +137,7 @@ class Star (object):
         self.agricultural = 'Ag' in self.tradeCode 
         self.poor = 'Po' in self.tradeCode 
         self.nonIndustrial = 'Ni' in self.tradeCode 
+        self.low = 'Lo' in self.tradeCode
         self.extreme = 'As' in self.tradeCode or \
                 'Fl' in self.tradeCode or 'Ic' in self.tradeCode or 'De' in self.tradeCode or \
                 'Na' in self.tradeCode or 'Va' in self.tradeCode or 'Wa' in self.tradeCode or \
@@ -263,6 +264,7 @@ class Star (object):
     
     def calculate_gwp(self, pop_code):
         calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400, 24400, 39000, 39000]
+        flatGWP = [229, 301, 396, 521, 685, 902, 1186, 1560, 2051,2698, 3548, 4667, 6138, 8072, 10617, 13964, 18365, 24155, 31769, 41783]
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
 
         if pop_code == 'scaled':
@@ -282,23 +284,16 @@ class Star (object):
             self.population = pow (10, self.popCode) * popM / 1e7
             self.uwpCodes['Pop Code'] = str(popM/10)
 
+        self.perCapita = calcGWP[min(self.tl,19)]
+        self.perCapita *= 1.6 if self.rich else 1
+        self.perCapita *= 1.4 if self.industrial else 1
+        self.perCapita *= 1.2 if self.agricultural else 1
+        self.perCapita *= 0.8 if self.extreme or self.poor or self.nonIndustrial or self.low else 1
 
-        self.gwp = self.population * calcGWP[min(self.tl,19)] / 1000    
-        #self.gwp = int (pow(10,self.popCode) * popCodeM[self.popM] * calcGWP[self.tl] / 1e10 )
-        if self.rich:
-            self.gwp = self.gwp * 16 / 10
-        if self.industrial:
-            self.gwp = self.gwp * 14 / 10
-        if self.agricultural:
-            self.gwp = self.gwp * 12 / 10
-        if self.poor:
-            self.gwp = self.gwp * 8 / 10
-        if self.nonIndustrial:
-            self.gwp = self.gwp * 8 / 10
-        if self.extreme:
-            self.gwp = self.gwp * 8 / 10    
+        self.gwp = self.population * self.perCapita / 1000    
         self.gwp = int(self.gwp)
         self.population = int(self.population)
+        self.perCapita = int(self.perCapita)
  
     def calculate_wtn(self):
         self.wtn = self.popCode
