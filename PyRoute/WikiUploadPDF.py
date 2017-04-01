@@ -182,13 +182,13 @@ def uploadWorlds (site, sectorFile, economicFile, era):
     
     page_template = u'''{{{{StellarDataQuery|name={{{{World|{0}|{1}|{2}|{3}}}}} }}}}
 
-== Description ==
+== Astrography and planetology ==
 No information yet available. 
  
-== History and Background ==
+== History and background ==
 No information yet available. 
 
-== References and Contributors ==
+== References and contributors ==
 {{{{Incomplete}}}}
 {{{{Source}}}}
 {{{{LEN}}}}
@@ -415,6 +415,8 @@ def process():
 
     if args.worlds:
         path = os.path.join(args.input, "{0} Sector.economic.wiki".format(args.worlds))
+        logger.debug("Checking Path {} -> {}".format(path, glob.glob(path)))
+
         for eco in glob.glob(path):
             sector = args.worlds
             if sector in shortNames.keys():
