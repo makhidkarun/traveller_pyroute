@@ -11,7 +11,11 @@ import os
 import argparse
 
 def get_url (url, sector, suffix):
-    f = urllib2.urlopen(url)
+    try:
+        f = urllib2.urlopen(url)
+    except urllib2.HTTPError as ex:
+        print "get URL failed: {} -> {}".format(url, ex)
+        return
     
     encoding=f.headers['content-type'].split('charset=')[-1]
     content = f.read()
@@ -21,7 +25,7 @@ def get_url (url, sector, suffix):
         ucontent = unicode(content, encoding).replace('\r\n','\n')
     
     path = os.path.join(args.output_dir, '%s.%s' % (sector, suffix))
-    
+
     with codecs.open(path, 'wb', 'utf-8') as out:
         out.write (ucontent)
     f.close()
