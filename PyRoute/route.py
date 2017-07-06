@@ -92,8 +92,8 @@ def process():
         galaxy.write_routes(args.routes)
 
     stats = StatCalculation(galaxy)
-    stats.calculate_statistics(args.ally_match)
-    stats.write_statistics(args.ally_count)
+    stats.calculate_statistics()
+    stats.write_statistics(args.ally_count, args.ally_match)
     
     if args.maps:
         pdfmap = HexMap(galaxy, args.routes, args.route_btn)

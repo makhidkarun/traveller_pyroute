@@ -29,16 +29,17 @@ class AreaItem(object):
         return u'[[{}]]'.format(self.name)
 
 class Allegiance(AreaItem):
-    def __init__(self, code, name):
+    def __init__(self, code, name, base = False):
         super(Allegiance, self).__init__(name)
         self.code = code
+        self.base = base
 
     def wiki_name(self):
         if self.code.startswith('Na'):
-            names = self.name.split (',')
+            names = self.name.split (',') if ',' in self.name else [self.name, '']
             return u'[[{}]] {}'.format(names[0], names[1].strip())
         elif self.code.startswith('Cs'):
-            names = self.name.split(',')
+            names = self.name.split(',') if ',' in self.name else [self.name, '']
             return u'[[{}]]s of the [[{}]]'.format(names[0].strip(), names[1].strip())
         elif ',' in self.name:
             names=self.name.split(',')
@@ -191,16 +192,14 @@ class Galaxy(object):
                 if line.startswith ('# Alleg:'):
                     algCode = line[8:].split(':',1)[0].strip()
                     algName = line[8:].split(':',1)[1].strip().strip('"')
-                    # Collapse same Aligned into one
-                    if match == 'collapse':
-                        algCode = AllyGen.same_align(algCode)
-                        if algCode not in self.alg: self.alg[algCode] = Allegiance(algCode, algName) 
-                    elif match == 'separate':
-                        base = AllyGen.same_align(algCode)
-                        if base not in self.alg: self.alg[base] = Allegiance(base, algName)
-                        if algCode not in self.alg: self.alg[algCode] = Allegiance(algCode, algName)
-                        pass
-                
+                    
+                    base = AllyGen.same_align(algCode)
+                    if base not in self.alg:
+                        baseName = algName.split(',')[0].strip()
+                        self.alg[base] = Allegiance(base, baseName, base=True)
+                    if algCode not in self.alg:
+                        self.alg[algCode] = Allegiance(algCode, algName, base=False)
+
             for line in lines[lineno+2:]:
                 if line.startswith('#') or len(line) < 20: 
                     continue
@@ -222,17 +221,12 @@ class Galaxy(object):
     def set_area_alg(self, star, area, match, algs):
         base = AllyGen.same_align(star.alg)
         star.alg_base = base
-        
-        if match == 'collapse':
-            base_alg = algs.get(base, Allegiance(base, 'Unknown Allegiance'))
-            area.alg.setdefault(base, Allegiance(base_alg.code, base_alg.name)).worlds.append(star)
-        elif match == 'separate':
-            base_alg = algs.get(star.alg, Allegiance(star.alg, 'Unknown Allegiance'))
-            area.alg.setdefault(star.alg, Allegiance(base_alg.code, base_alg.name)).worlds.append(star)
-            
-            if base != star.alg:
-                base_alg = algs[base]
-                area.alg.setdefault(base, Allegiance(base_alg.code, base_alg.name)).worlds.append(star)
+        base_alg = algs.get(star.alg, Allegiance(star.alg, 'Unknown Allegiance', base=False))
+        area.alg.setdefault(star.alg, Allegiance(base_alg.code, base_alg.name, base=False)).worlds.append(star)
+
+        if base != star.alg:
+            base_alg = algs[base]
+            area.alg.setdefault(base, Allegiance(base_alg.code, base_alg.name, base=True)).worlds.append(star)
                 
     def set_positions(self):
         for sector in self.sectors.itervalues():

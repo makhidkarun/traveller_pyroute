@@ -75,23 +75,26 @@ class RouteCalculation (object):
                                                   'trade': 0,
                                                   'btn': btn,
                                                   'count': 0})
-        # Manage the pre-generated routes
-        for star in self.galaxy.stars:
-            for route in star.routes:
-                if len(route) == 7:
-                    route_des = route[3:]
-                else:
-                    route_des = route[7:]
-                for neighbor in self.galaxy.stars.neighbors(star):
-                    if neighbor.position == route_des:
-                        if route.startswith('Xb'):
-                            self.galaxy.stars[star][neighbor]['xboat'] = True
-                        elif route.startswith('Tr'):
-                            self.galaxy.stars[star][neighbor]['comm'] = True
+                self.check_existing_routes(star, neighbor)
+
         self.logger.info("base routes: %s  -  ranges: %s" % 
                          (self.galaxy.stars.number_of_edges(), 
                           self.galaxy.ranges.number_of_edges()))
 
+
+    def check_existing_routes(self, star, neighbor):
+        for route in star.routes:
+            if len(route) == 7:
+                route_des = route[3:]
+            else:
+                route_des = route[8:]
+            if neighbor.position == route_des:
+                if route.startswith('Xb'):
+                    self.galaxy.stars[star][neighbor]['xboat'] = True
+                elif route.startswith('Tr'):
+                    self.galaxy.stars[star][neighbor]['comm'] = True
+
+    
     @staticmethod
     def get_btn (star1, star2, distance=None):
         '''
@@ -766,7 +769,7 @@ class CommCalculation(RouteCalculation):
     # Weight for route over a distance. The relative cost for
     # moving between two worlds a given distance apart
     # in a single jump.         
-    distance_weight = [0, 70, 65, 60, 70, 130, 150  ]
+    distance_weight = [0, 70, 65, 60, 70, 100, 130, 9999, 9999, 9999, 300 ]
     
     def __init__(self, galaxy, reuse = 5):
         super(CommCalculation, self).__init__(galaxy)
@@ -781,17 +784,20 @@ class CommCalculation(RouteCalculation):
         return False
 
     def base_range_routes (self, star, neighbor):
+        if not getattr(self.galaxy.alg[star.alg_base],'min_importance', False):
+            return
         min_importance = self.galaxy.alg[star.alg_base].min_importance
         if self.endpoint_selection(star, min_importance) and self.endpoint_selection(neighbor, min_importance):
             dist = star.hex_distance (neighbor)
             
-            if ((self.capitals(star) or self.bases(star)) and (self.capitals(neighbor) or self.bases(neighbor)) and dist < 100) or \
+            if ((self.capitals(star) or self.bases(star)) and \
+                (self.capitals(neighbor) or self.bases(neighbor)) and dist < 100) or \
                 dist < 20:
                 flags = [self.capitals(star) and self.capitals(neighbor),
                          self.capitals(star) or self.capitals(neighbor),
                          self.bases(star) or self.bases(neighbor), 
                          self.important(star, min_importance) or self.important(neighbor, min_importance),
-                         self.is_rich(star) or self.is_rich(star)]
+                         self.is_rich(star) or self.is_rich(neighbor)]
                 self.galaxy.ranges.add_edge(star, neighbor, {'distance': dist, 'flags': flags})
 
     def capitals(self, star):
@@ -800,9 +806,13 @@ class CommCalculation(RouteCalculation):
 
     def bases(self, star):                    
         # if it has a Deopt, Way station, or XBoat station,
-        # or external naval base
-        return len(set(['D', 'W', 'K']) & set(star.baseCode)) > 0 
+        # or external naval base or (aslan) Tlaukhu nase
+        return len(set(['D', 'W', 'K', 'T']) & set(star.baseCode)) > 0
                 
+    def comm_bases(self, star):
+        # Imperial scout or naval base, external military base, or Aslan clan base
+        return len(set(['S', 'N', 'M', 'R']) & set(star.baseCode)) > 0
+
     def important(self, star, min_importance):
         return star.importance > min_importance
 
@@ -817,6 +827,10 @@ class CommCalculation(RouteCalculation):
         for alg in self.galaxy.alg.itervalues():
             # No comm routes for the non-aligned worlds. 
             if AllyGen.is_nonaligned(alg):
+                continue
+            # No comm routes for small empires
+            if len(alg.worlds) < 25:
+                self.logger.info("skipping Alg: {} with {} worlds".format(alg.name, len(alg.worlds))) 
                 continue
             alg.min_importance = 4
             self.logger.info(u"Alg {} has {} worlds".format(alg.name, len(alg.worlds)))
@@ -872,8 +886,12 @@ class CommCalculation(RouteCalculation):
             self.get_route_between(star, neighbor)
             processed += 1
         
-        for (star, neighbor, data) in self.galaxy.stars.edges_iter(data=True):
-            pass   
+        active = [(s,n,d) for (s,n,d) in self.galaxy.stars.edges_iter(data=True) if d['count'] > 0]
+        active_graph = nx.Graph()
+
+        active_graph.add_edges_from(active)
+        #for (star, neighbor, data) in self.galaxy.stars.edges_iter(data=True):
+        #    pass
         
 
     def route_weight (self, star, target):
@@ -890,12 +908,10 @@ class CommCalculation(RouteCalculation):
         if star.popCode == 0 or target.popCode == 0:
             weight += 25
         weight -= 2 * (star.importance + target.importance)
-        weight -= 6 if 'S' in star.baseCode or 'S' in target.baseCode else 0
+        weight -= 6 if self.comm_bases(star) or self.comm_bases(target) else 0
         weight -= 6 if self.capitals(star) or self.capitals(target) else 0
         weight -= 6 if self.bases(star) or self.bases(target) else 0
         weight -= 3 if self.is_rich(star) or self.is_rich(target) else 0
-        weight -= 6 if 'M' in star.baseCode or 'M' in target.baseCode else 0 
-        
         return weight
 
     def more_important(self, star, neighbor, imp):
@@ -927,12 +943,17 @@ class CommCalculation(RouteCalculation):
         except  nx.NetworkXNoPath:
             return
 
-        trade = self.calc_trade(19) if AllyGen.are_allies(u'As', star.alg) else self.calc_trade(21)
+        trade = self.calc_trade(19) if AllyGen.are_allies(u'As', star.alg) else self.calc_trade(23)
         start = route[0]
         for end in route[1:]:
             end.tradeCount += 1 if end != route[-1] else 0
             self.galaxy.stars[start][end]['trade'] = trade
             self.galaxy.stars[start][end]['count'] += 1
-            self.galaxy.stars[start][end]['weight'] -= \
-                self.galaxy.stars[start][end]['weight'] / self.route_reuse
+            if start == route[0] or end == route[-1]:
+                self.galaxy.stars[start][end]['weight'] = \
+                    max(self.galaxy.stars[start][end]['weight'] - 2,
+                        self.route_reuse)
+            else:
+                self.galaxy.stars[start][end]['weight'] -= \
+                    self.galaxy.stars[start][end]['weight'] / self.route_reuse
             start = end

@@ -469,8 +469,9 @@ class Star (object):
         imp = 0
         imp += 1 if self.port in 'AB' else 0
         imp -= 1 if self.port in 'DEX' else 0
-        imp += 1 if self.tl >= 10 else 0
         imp -= 1 if self.tl <= 8 else 0
+        imp += 1 if self.tl >= 10 else 0
+        imp += 1 if self.tl >= 16 else 0
         imp -= 1 if self.popCode <= 6 else 0
         imp += 1 if self.popCode >= 9 else 0
         imp += 1 if self.agricultural else 0

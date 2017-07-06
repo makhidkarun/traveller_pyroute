@@ -19,7 +19,7 @@ class WikiStats(object):
     '''
     stat_header='{| class=\"wikitable sortable\"\n!Sector!! X,Y !! Worlds !! Population (millions) !! Economy (Bcr) !! Per Capita (Cr) !! Trade Volume (BCr) !! Int. Trade (BCr) !! Ext. Trade (BCr) !! RU !! Shipyard Capacity (MTons) !! Colonial Army (BEs) !! Travellers (M) !! SPA Pop\n'
 
-    def __init__(self, galaxy, uwp, min_alg_count=10):
+    def __init__(self, galaxy, uwp, min_alg_count=10, match_alg = 'collapse'):
         '''
         Constructor
         '''
@@ -27,6 +27,7 @@ class WikiStats(object):
         self.uwp  = uwp
         self.min_alg_count = min_alg_count
         self.plural = inflect.engine()
+        self.match_alg = match_alg == 'collapse'
 
     def write_statistics(self):
         self.summary_statistics()
@@ -122,13 +123,15 @@ class WikiStats(object):
         path = os.path.join(self.galaxy.output_path, 'alleg_summary.wiki')
         with codecs.open(path, "wb", 'utf_8') as f:
             f.write('===[[Allegiance Code|Allegiance Information]]===\n')
-            alg_sort = sorted(alg.iterkeys())
+            
+            alg_sort = [alg for alg in alg.itervalues() if alg.base == self.match_alg]
+            alg_sort.sort(key=lambda alg : alg.stats.number, reverse = True)
             f.write('{| class=\"wikitable sortable\"\n!Code !! Name !! Worlds !! Population (millions) !! Economy (BCr) !! Per Capita (Cr) !!  RU !! Shipyard Capacity (MTons) !! Armed Forces (BEs) !! SPA Population\n')
             for code in alg_sort:
-                if alg[code].stats.number < self.min_alg_count:
+                if code.stats.number < self.min_alg_count:
                     continue
-                f.write(u'|-\n| {} || {} '.format(code, alg[code].wiki_name()))
-                stats = alg[code].stats
+                f.write(u'|-\n| {} || {} '.format(code.code, code.wiki_name()))
+                stats = code.stats
                 f.write('|| {:,d} '.format(stats.number))
                 f.write('|| {:,d} '.format(stats.population))
                 f.write('|| {:,d} '.format(stats.economy))
@@ -149,9 +152,9 @@ class WikiStats(object):
             f.write(u'! {} !! statistics\n'.format(area_type))
             for code in alg_sort:
                 f.write('|-\n')
-                f.write(u'|{0}\n'.format(alg[code].wiki_title()))
+                f.write(u'|{0}\n'.format(code.wiki_title()))
                 f.write(u'|| ')
-                self.text_area_statistics(f, area_type, alg[code])
+                self.text_area_statistics(f, area_type, code)
             f.write('|}\n')
 
     def write_uwp_counts(self,f):
@@ -247,7 +250,7 @@ class WikiStats(object):
                 for subsector in subsectors:
                     self.text_area_long(f, "subsector", subsector)
                     f.write('\n=== Polity Listing ===')
-                    alegs = [alg for alg in subsector.alg.itervalues()]
+                    alegs = [alg for alg in subsector.alg.itervalues() if alg.base == self.match_alg]
                     alegs.sort(key=lambda alg : alg.stats.number, reverse = True)
                     for aleg in alegs:
                         f.write('\n')
