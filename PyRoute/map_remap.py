@@ -36,6 +36,35 @@ def prettify(elem):
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
+def output_link (start, end, color, routeType, sectorStart, sectorEnd):
+    output = ET.Element('Route', {'Start': start, 'End': end, 'Color': color, 'Type': routeType})
+
+    if sectorStart == sectorEnd:
+        return (output, None)
+
+    outStart = output
+    outEnd   = ET.Element('Route', {'Start': end, 'End': start, 'Color': color, 'Type': routeType})
+    startx = int(start[0:2])
+    starty = int(start[2:4])
+    endx = int(end[0:2])
+    endy = int(end[2:4])
+
+    if startx <= 4 and endx >= 28:
+        outStart.attrib['EndOffsetX'] = '-1'
+        outEnd.attrib['EndOffsetX'] = '1'
+    elif startx >= 28 and endx <= 4:
+        outStart.attrib['EndOffsetX'] = '1'
+        outEnd.attrib['EndOffsetX'] = '-1'
+    if starty <= 4 and endy >= 36:
+        outStart.attrib['EndOffsetY'] = '-1'
+        outEnd.attrib['EndOffsetY'] = '1'
+    elif starty >= 36 and endy <= 4:
+        outStart.attrib['EndOffsetY'] = '1'
+        outEnd.attrib['EndOffsetY'] = '-1'
+
+    return (outStart,outEnd)
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='route remap for trade routes')
@@ -70,24 +99,11 @@ if __name__ == '__main__':
             color = tradeColors[btn-8]
             routeType = 'btn%02d'%btn
     
-            output = ET.Element('Route', {'Start': start, 'End': end, 'Color': color, 'Type': routeType})
+            (outStart, outEnd) = output_link(start, end, color, routeType, sectorStart, sectorEnd)
 
-            if sectorStart != sectorEnd:
-                startx = int(start[0:2])
-                starty = int(start[2:4])
-                endx = int(end[0:2])
-                endy = int(end[2:4])
-                
-                if startx < 4 and endx > 28:
-                    output.attrib['EndOffsetX'] = '-1'
-                elif startx > 28 and endx < 4:
-                    output.attrib['EndOffsetX'] = '1'
-                if starty < 4 and endy > 36:
-                    output.attrib['EndOffsetY'] = '-1'
-                elif starty > 36 and endy < 5:
-                    output.attrib['EndOffsetY'] = '1'
-            
-            sectors[sectorStart].append(output)
+            sectors[sectorStart].append(outStart)
+            if outEnd is not None:
+                sectors[sectorEnd].append(outEnd)
 
     for sector in sectors.iterkeys():
         tree = ET.ElementTree()
