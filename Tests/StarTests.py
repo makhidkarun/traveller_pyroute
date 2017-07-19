@@ -143,6 +143,18 @@ class Test(unittest.TestCase):
         newHash = star1.__hash__()
         self.assertEqual(oldHash,  newHash)
 
+    def TestEquals(self):
+        star1 = Star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+             self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
+        star2 = Star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+             self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
+        star3 = Star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (300-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                     self.starline,  Sector('Core', ' 0, 0'), 'fixed',  None)
+        
+        self.assertEqual(star1,  star2)
+        self.assertNotEqual(star1,  star3)
+        self.assertNotEqual(star2,  star3)
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
