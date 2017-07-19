@@ -174,6 +174,7 @@ class Star (object):
         self.starportSize = 0
         self.starportBudget = 0
         self.starportPop = 0
+        self._hash = None
         
     def __unicode__(self):
         return u"{} ({} {})".format(self.name, self.sector.name, self.position)
@@ -195,7 +196,9 @@ class Star (object):
             return False
 
     def __hash__(self):
-        return hash(self.__key())
+        if self._hash is None:
+            self._hash = hash(self.__key())
+        return self._hash
 
     def wiki_name(self):
         name = u" ".join(w.capitalize() for w in self.name.lower().split())
@@ -638,4 +641,3 @@ class Star (object):
         self.stars = self.stars[0:star_end].strip()
         if len(self.routes) > 0:
             self.logger.debug("{} - routes: {}".format(self, self.routes))
-        
