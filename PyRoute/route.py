@@ -73,7 +73,7 @@ def process():
     if args.sectors is not None:
         sectors_list.extend(get_sectors(args.sectors, args.input))
     
-    galaxy.read_sectors (sectors_list, args.pop_code, args.ally_match, args.ru_calc)
+    galaxy.read_sectors (sectors_list, args.pop_code, args.ru_calc)
     
     logger.info ("%s sectors read" % len(galaxy.sectors))
     

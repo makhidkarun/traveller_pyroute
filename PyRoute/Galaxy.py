@@ -143,13 +143,13 @@ class Galaxy(object):
         regex = """
 ^(\d\d\d\d) +
 (.{15,}) +
-(\w\w\w\w\w\w\w-\w) +
+(\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?) +
 (.{15,}) +
-((\{ [+-]?[0-5] \}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]| -)|( ) ( ) ( )) +
+((\{ ?[+-]?[0-5] ?\}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]| -)|( ) ( ) ( )) +
 (\w{1,5}|-| ) +
 (\w{1,3}|-|\*) +
 (\w|-) +
-([0-9X][0-9A-FX][0-9A-FX]) +
+([0-9X?][0-9A-FX?][0-9A-FX?]) +
 (\d{1,}| ) +
 ([A-Z0-9-][A-Za-z0-9?-]{1,3}) 
 (.*)
@@ -169,7 +169,7 @@ class Galaxy(object):
         self.min_btn = min_btn
         self.route_btn = route_btn
         
-    def read_sectors (self, sectors, pop_code, match, ru_calc):
+    def read_sectors (self, sectors, pop_code, ru_calc):
         for sector in sectors:
             try:
                 lines = [line for line in codecs.open(sector,'r', 'utf-8')]
@@ -195,8 +195,7 @@ class Galaxy(object):
                     
                     base = AllyGen.same_align(algCode)
                     if base not in self.alg:
-                        baseName = algName.split(',')[0].strip()
-                        self.alg[base] = Allegiance(base, baseName, base=True)
+                        self.alg[base] = Allegiance(base,AllyGen.same_align_name(base,algName), base=True)
                     if algCode not in self.alg:
                         self.alg[algCode] = Allegiance(algCode, algName, base=False)
 
@@ -206,10 +205,11 @@ class Galaxy(object):
                 star = Star (line, self.starline, sec, pop_code, ru_calc)
                 sec.worlds.append(star)
                 sec.subsectors[star.subsector()].worlds.append(star)
-                
-                self.set_area_alg(star, self, match, self.alg)
-                self.set_area_alg(star, sec, match, self.alg)
-                self.set_area_alg(star, sec.subsectors[star.subsector()], match, self.alg)
+                star.alg_base = AllyGen.same_align(star.alg)
+
+                self.set_area_alg(star, self, self.alg)
+                self.set_area_alg(star, sec, self.alg)
+                self.set_area_alg(star, sec.subsectors[star.subsector()], self.alg)
 
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds) ) )
@@ -218,15 +218,16 @@ class Galaxy(object):
         self.set_bounding_subsectors()
         self.set_positions()
 
-    def set_area_alg(self, star, area, match, algs):
-        base = AllyGen.same_align(star.alg)
-        star.alg_base = base
-        base_alg = algs.get(star.alg, Allegiance(star.alg, 'Unknown Allegiance', base=False))
-        area.alg.setdefault(star.alg, Allegiance(base_alg.code, base_alg.name, base=False)).worlds.append(star)
 
-        if base != star.alg:
-            base_alg = algs[base]
-            area.alg.setdefault(base, Allegiance(base_alg.code, base_alg.name, base=True)).worlds.append(star)
+    def set_area_alg(self, star, area, algs):
+        full_alg = algs.get(star.alg, Allegiance(star.alg, 'Unknown Allegiance', base=False))
+        base_alg = algs.get(star.alg_base, Allegiance(star.alg_base, 'Unknown Allegiance', base=True))
+
+        area.alg.setdefault(star.alg, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
+
+        if star.alg_base != star.alg:
+            area.alg.setdefault(star.alg_base, Allegiance(base_alg.code, base_alg.name, base=True)).worlds.append(star)
+
                 
     def set_positions(self):
         for sector in self.sectors.itervalues():
@@ -234,6 +235,7 @@ class Galaxy(object):
                 self.stars.add_node(star)
                 self.ranges.add_node(star)
         self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
+
         
     def set_bounding_sectors(self):
         for sector, neighbor in itertools.combinations(self.sectors.itervalues(),2):
@@ -252,11 +254,13 @@ class Galaxy(object):
             elif sector.x == neighbor.x and sector.y == neighbor.y:
                 self.logger.error("Duplicate sector %s and %s" % (sector.name, neighbor.name))
 
+
     def set_bounding_subsectors(self):
         for sector in self.sectors.itervalues():
             for subsector in sector.subsectors.itervalues():
                 subsector.set_bounding_subsectors()
-    
+
+
     def generate_routes(self, routes, reuse=10):
         if routes == 'trade':
             self.trade = TradeCalculation(self, self.min_btn, self.route_btn, reuse)
@@ -270,6 +274,7 @@ class Galaxy(object):
             self.trade = NoneCalculation(self)
 
         self.trade.generate_routes()
+
         
     def set_borders(self, border_gen, match):
         self.logger.info('setting borders...')
@@ -281,6 +286,7 @@ class Galaxy(object):
             self.borders.create_erode_border(match)
         else:
             pass
+
 
     def write_routes(self, routes=None):
         path = os.path.join(self.output_path, 'ranges.txt')
@@ -300,7 +306,8 @@ class Galaxy(object):
                 stars = [star for star in self.stars.nodes_iter() if star.tradeCount > 0]
                 for star in stars:
                     f.write (u"{} - {}\n".format(star, star.tradeCount))
-    
+
+
     def read_routes (self, routes=None):
         route_regex = "^({1,}) \(({3,}) (\d\d\d\d)\) ({1,}) \(({3,}) (\d\d\d\d)\) (\{.*\})"    
         routeline = re.compile(route_regex)

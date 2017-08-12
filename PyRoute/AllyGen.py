@@ -46,7 +46,39 @@ class AllyGen(object):
         self.allyMap = {}
         self.logger = logging.getLogger('PyRoute.AllyGen')
 
-        
+
+    @staticmethod
+    def is_nonaligned(alg):
+        return alg in AllyGen.nonAligned or alg in AllyGen.noOne
+
+
+    @staticmethod
+    def same_align(alg):
+        for sameAlg in AllyGen.sameAligned:
+            if alg in sameAlg:
+                return sameAlg[0]
+        return alg
+
+
+    @staticmethod
+    def imperial_align(alg):
+        return AllyGen.same_align(alg) == 'Im'
+
+
+    @staticmethod
+    def same_align_name(alg, alg_name):
+        if alg in AllyGen.nonAligned:
+            return alg_name
+        else:
+            return alg_name.split(',')[0].strip()
+    
+    @staticmethod
+    def sort_allegiances(alg_list, match):
+        algs = [alg for alg in alg_list.itervalues() if alg.base == match]
+        algs.sort(key=lambda alg : alg.stats.number, reverse = True)
+        return algs
+
+
     def create_borders (self, match):
         """
             Create borders around various allegiances, Algorithm one.
@@ -64,11 +96,8 @@ class AllyGen(object):
             if alg in self.nonAligned:
                 alg = self.nonAligned[0]
             # Collapse same Aligned into one
-            
-            if match == 'collapse':
-                alg = self.same_align(alg)
-            elif match == 'separate':
-                pass
+            alg = self.same_align(alg) if match == 'collapse' else alg
+
             self.allyMap[(star.q, star.r)] = alg
 
         #self._output_map(allyMap, 0)
@@ -215,20 +244,7 @@ class AllyGen(object):
                 return True
         return False
 
-    @staticmethod
-    def is_nonaligned(alg):
-        return alg in AllyGen.nonAligned or alg in AllyGen.noOne
 
-    @staticmethod
-    def same_align(alg):
-        for sameAlg in AllyGen.sameAligned:
-            if alg in sameAlg:
-                return sameAlg[0]
-        return alg
-
-    @staticmethod
-    def imperial_align(alg):
-        return AllyGen.same_align(alg) == 'Im'
     
     def create_ally_map(self, match):
         '''
@@ -504,7 +520,7 @@ class AllyGen(object):
             Hex = (star.q, star.r)
             alg = starMap[Hex]
             
-            if star.port in ['E', 'X']: 
+            if star.port in ['E', 'X', '?']:
                 maxRange = 1
             else:
                 maxRange = ['D','C','B','A'].index(star.port) + 2

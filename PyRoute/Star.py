@@ -75,6 +75,9 @@ class Star (object):
         else:
             self.logger.error(u"Unmatched Line: {}".format(line))
             return
+        
+        self.logger.debug (data)
+        
         self.position = data[0].strip()
         self.set_location(sector.dx, sector.dy)
         self.name = data[1].strip()
@@ -108,9 +111,9 @@ class Star (object):
         
         self.baseCode = data[12].strip()
         self.zone = data[13].strip()
-        self.ggCount = int(data[14][2],16) if data[14][2] != 'X' else 0
-        self.popM = int(data[14][0]) if data[14][0] != 'X' else 0
-        self.belts = int(data[14][1], 16) if data[14][1] != 'X' else 0
+        self.ggCount = int(data[14][2],16) if data[14][2] not in 'X?' else 0
+        self.popM = int(data[14][0]) if data[14][0] not in 'X?' else 0
+        self.belts = int(data[14][1], 16) if data[14][1] not in 'X?' else 0
 
         self.worlds = int(data[15]) if data[15].strip().isdigit() else 0
         
@@ -421,7 +424,7 @@ class Star (object):
                  'M': 1.1, 'N': 1.2,
                  # Unknown Gov Codes
                  'I': 1.0, 'P': 1.0, 'Q': 1.0, 'R': 1.0, 'S': 1.0,'T': 1.0, 
-                 'U': 1.0, 'V': 1.0, 'W': 1.0, 'X': 1.0
+                 'U': 1.0, 'V': 1.0, 'W': 1.0, 'X': 1.0, '?': 0.0
                  }
         self.ship_capacity = long (self.population * tax_rate[self.uwpCodes['Government']] * 1000)
         gwp_base = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 28, 32]
@@ -619,7 +622,7 @@ class Star (object):
             self.im_be = 0
             
     def _ehex_to_int(self, value):
-        val = int(value, 36)
+        val = int(value, 36) if value in '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ' else 0
         val -= 1 if val > 18 else 0
         return val
     

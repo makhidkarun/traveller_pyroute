@@ -80,6 +80,7 @@ class StatCalculation(object):
                 self.add_stats(sector.stats, star)
                 self.add_stats(self.galaxy.stats, star)
                 self.add_stats(sector.subsectors[star.subsector()].stats, star)
+                
                 self.max_tl(sector.stats, star)
                 self.max_tl(sector.subsectors[star.subsector()].stats, star)
                 
@@ -87,9 +88,10 @@ class StatCalculation(object):
                 self.add_alg_stats(sector, star, star.alg)
                 self.add_alg_stats(sector.subsectors[star.subsector()], star, star.alg)
 
-                self.add_alg_stats(self.galaxy, star, star.alg_base)
-                self.add_alg_stats(sector, star, star.alg_base)
-                self.add_alg_stats(sector.subsectors[star.subsector()], star, star.alg_base)
+                if star.alg_base != star.alg:
+                    self.add_alg_stats(self.galaxy, star, star.alg_base)
+                    self.add_alg_stats(sector, star, star.alg_base)
+                    self.add_alg_stats(sector.subsectors[star.subsector()], star, star.alg_base)
 
                 if AllyGen.imperial_align(star.alg):
                     for uwpCode, uwpValue in star.uwpCodes.iteritems():
@@ -136,7 +138,7 @@ class StatCalculation(object):
    
     def max_tl (self, stats, star):
         stats.maxTL = max(stats.maxTL, star.tl)
-        stats.maxPort = 'ABCDEX'[min('ABCDEX'.index(star.uwpCodes['Starport']), 'ABCDEX'.index(stats.maxPort))]
+        stats.maxPort = 'ABCDEX?'[min('ABCDEX?'.index(star.uwpCodes['Starport']), 'ABCDEX?'.index(stats.maxPort))]
         stats.maxPop = max (stats.maxPop, star.popCode)
     
     def per_capita(self, stats):

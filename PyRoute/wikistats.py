@@ -123,22 +123,21 @@ class WikiStats(object):
         path = os.path.join(self.galaxy.output_path, 'alleg_summary.wiki')
         with codecs.open(path, "wb", 'utf_8') as f:
             f.write('===[[Allegiance Code|Allegiance Information]]===\n')
-            
-            alg_sort = [alg for alg in alg.itervalues() if alg.base == self.match_alg]
-            alg_sort.sort(key=lambda alg : alg.stats.number, reverse = True)
+            allegiances_sorted = AllyGen.sort_allegiances(alg, self.match_alg)
+
             f.write('{| class=\"wikitable sortable\"\n!Code !! Name !! Worlds !! Population (millions) !! Economy (BCr) !! Per Capita (Cr) !!  RU !! Shipyard Capacity (MTons) !! Armed Forces (BEs) !! SPA Population\n')
-            for code in alg_sort:
-                if code.stats.number < self.min_alg_count:
+            for allegiance in allegiances_sorted:
+                if allegiance.stats.number < self.min_alg_count:
                     continue
-                f.write(u'|-\n| {} || {} '.format(code.code, code.wiki_name()))
-                stats = code.stats
+                f.write(u'|-\n| {} || {} '.format(allegiance.code, allegiance.wiki_name()))
+                stats = allegiance.stats
                 f.write('|| {:,d} '.format(stats.number))
                 f.write('|| {:,d} '.format(stats.population))
                 f.write('|| {:,d} '.format(stats.economy))
                 f.write('|| {:,d} '.format(stats.percapita))
                 f.write('|| {:,d} '.format(stats.sum_ru))
                 f.write('|| {:,d} '.format(stats.shipyards))
-                if AllyGen.are_allies(u'Im', code):
+                if AllyGen.are_allies(u'Im', allegiance):
                     f.write('|| {:,.2f} (IA) + {:,.2F} (CA)'.format(stats.im_be, stats.col_be))
                 else:
                     f.write('|| {:,.2f}'.format(stats.col_be))
@@ -150,11 +149,11 @@ class WikiStats(object):
             f.write('=== {} Statistics ===\n'.format(area_type))
             f.write('{| class=\"wikitable sortable\"\n')
             f.write(u'! {} !! statistics\n'.format(area_type))
-            for code in alg_sort:
+            for allegiance in allegiances_sorted:
                 f.write('|-\n')
-                f.write(u'|{0}\n'.format(code.wiki_title()))
+                f.write(u'|{0}\n'.format(allegiance.wiki_title()))
                 f.write(u'|| ')
-                self.text_area_statistics(f, area_type, code)
+                self.text_area_statistics(f, area_type, allegiance)
             f.write('|}\n')
 
     def write_uwp_counts(self,f):
@@ -250,11 +249,10 @@ class WikiStats(object):
                 for subsector in subsectors:
                     self.text_area_long(f, "subsector", subsector)
                     f.write('\n=== Polity Listing ===')
-                    alegs = [alg for alg in subsector.alg.itervalues() if alg.base == self.match_alg]
-                    alegs.sort(key=lambda alg : alg.stats.number, reverse = True)
-                    for aleg in alegs:
+                    allegiances_sorted = AllyGen.sort_allegiances(subsector.alg, self.match_alg)
+                    for allegiance in allegiances_sorted:
                         f.write('\n')
-                        self.text_area_statistics(f, "subsector", aleg, subsector)
+                        self.text_area_statistics(f, "subsector", allegiance, subsector)
             f.write('|}\n')
 
 # This sector has <N> worlds, of which <N> have native gas giants.
