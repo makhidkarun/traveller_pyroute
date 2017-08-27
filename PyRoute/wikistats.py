@@ -69,6 +69,10 @@ class WikiStats(object):
             for sector in self.galaxy.sectors.itervalues():
                 self.text_area_long(f, "sector", sector)
                 f.write('\n')
+                allegiances_sorted = AllyGen.sort_allegiances(sector.alg, self.match_alg)
+                for allegiance in allegiances_sorted:
+                    f.write('\n')
+                    self.text_area_statistics(f, "sector", allegiance, sector)
             f.write('|}\n')
 
         path = os.path.join(self.galaxy.output_path, 'sectors_list.txt')
@@ -124,7 +128,6 @@ class WikiStats(object):
         with codecs.open(path, "wb", 'utf_8') as f:
             f.write('===[[Allegiance Code|Allegiance Information]]===\n')
             allegiances_sorted = AllyGen.sort_allegiances(alg, self.match_alg)
-
             f.write('{| class=\"wikitable sortable\"\n!Code !! Name !! Worlds !! Population (millions) !! Economy (BCr) !! Per Capita (Cr) !!  RU !! Shipyard Capacity (MTons) !! Armed Forces (BEs) !! SPA Population\n')
             for allegiance in allegiances_sorted:
                 if allegiance.stats.number < self.min_alg_count:
@@ -363,28 +366,37 @@ class WikiStats(object):
 
     def text_area_statistics(self, f, area_type, area, contain=None):
         
-        outString = u'The {}'.format(area.wiki_name())
-        if area.code[0:2] == 'Na' or area.code in ['Wild', 'VaEx', 'Va']:
-            outString += u' worlds{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
-        elif area.code[0:2] == 'Cs':
-            outString += u'{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
-        else:
-            outString += u'{} has jurisdiction over '.format(u' in '+ contain.wiki_name() if contain else "")
-
-        f.write(outString)       
-        if contain and contain.stats.number == len(area.worlds):
-            f.write ('all of the worlds. ')
-            self.text_area_capitals(f, area_type, area)
-        elif len(area.worlds) > 0:
-            self.write_count(f, area.stats.number, 'world', False)
-            f.write(u' with a population of ')
-            self.write_population(area.stats.population, f)
-            f.write('. ')
-            if area.stats.population > 0:
-                self.text_area_pop_tl(f, area_type, area)       
-                self.text_area_capitals(f, area_type, area)         
-        else:
-            f.write (' no charted worlds.')
+        if AllyGen.is_unclaimed(area.code):
+            outString = u'There '
+            outString += self.get_count(area.stats.number, 'system', True, ' unclaimed or unexplored')
+            if contain:
+                outString += u' in {}.'.format(contain.wiki_name())
+            else:
+                outString += u'.'
+            f.write(outString)
+        else: 
+            outString = u'The {}'.format(area.wiki_name())
+            if area.code[0:2] == 'Na' or area.code in ['Wild', 'VaEx', 'Va']:
+                outString += u' worlds{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
+            elif area.code[0:2] == 'Cs':
+                outString += u'{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
+            else:
+                outString += u'{} has jurisdiction over '.format(u' in '+ contain.wiki_name() if contain else "")
+    
+            f.write(outString)       
+            if contain and contain.stats.number == len(area.worlds):
+                f.write ('all of the worlds. ')
+                self.text_area_capitals(f, area_type, area)
+            elif len(area.worlds) > 0:
+                self.write_count(f, area.stats.number, 'world', False)
+                f.write(u' with a population of ')
+                self.write_population(area.stats.population, f)
+                f.write('. ')
+                if area.stats.population > 0:
+                    self.text_area_pop_tl(f, area_type, area)       
+                    self.text_area_capitals(f, area_type, area)         
+            else:
+                f.write (' no charted worlds.')
         f.write('\n')
 
     def text_area_pop_tl (self, f, area_type, area):
@@ -481,7 +493,7 @@ class WikiStats(object):
                 f.write ('<section begin="header"/>\n')
                 f.write ('{| class="wikitable sortable" width="90%"\n')
                 f.write (u'|+ {} economic data\n'.format(sector.sector_name()))
-                f.write (u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!RU!!Per Capita (Cr)!!GWP (BCr)!!Trade (MCr/year)!!Passengers / year!!Build!!Army!!Port!!SPA Population!!Subsector\n')
+                f.write (u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!RU!!Per Capita (Cr)!!GWP (BCr)!!Trade (MCr/year)!!Passengers / year!!Build!!Army!!Port!!SPA Population!!MSRP!!Subsector\n')
                 f.write ('<section end="header"/>')
                 for subsector in sector.subsectors.itervalues():
                     f.write(u'<section begin="{}"/>\n'.format(subsector.name))
@@ -502,6 +514,7 @@ class WikiStats(object):
                         f.write('||{:8,d}'.format(star.raw_be))
                         f.write('||{:6d}'.format(star.starportSize))
                         f.write('||{:10,d}'.format(star.starportPop))
+                        f.write('||{:d}'.format(star.mspr))
                         f.write(u'||{}'.format(subsector.wiki_name()))
                         f.write('\n')
                     f.write (u'<section end="{}"/>'.format(subsector.name))

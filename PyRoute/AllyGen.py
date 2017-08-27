@@ -48,6 +48,11 @@ class AllyGen(object):
 
 
     @staticmethod
+    def is_unclaimed(alg):
+        return alg in AllyGen.noOne
+
+
+    @staticmethod
     def is_nonaligned(alg):
         return alg in AllyGen.nonAligned or alg in AllyGen.noOne
 
@@ -73,8 +78,15 @@ class AllyGen(object):
             return alg_name.split(',')[0].strip()
     
     @staticmethod
-    def sort_allegiances(alg_list, match):
-        algs = [alg for alg in alg_list.itervalues() if alg.base == match]
+    def sort_allegiances(alg_list, base_match_only):
+        # The logic: 
+        # base_match_only == true -> --ally-match=collapse
+        # only what the base allegiances
+        # base_match_only == false -> --ally-match=separate
+        # want the non-base code or the base codes for single code allegiances. 
+        algs = [alg for alg in alg_list.itervalues() if 
+                (base_match_only and alg.base) or 
+                (not base_match_only and (not alg.base or AllyGen.same_align(alg) == alg))]
         algs.sort(key=lambda alg : alg.stats.number, reverse = True)
         return algs
 

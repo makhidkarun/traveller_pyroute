@@ -169,9 +169,11 @@ class StatCalculation(object):
             self.logger.debug('Sector ' + sector.name + ' star count: ' + str(sector.stats.number))
             
         for code,aleg in self.galaxy.alg.iteritems():
-            s = u'Allegiance {0} ({1}) star count: {2:,d}'.format(aleg.name, code, aleg.stats.number)
+            s = u'Allegiance {0} ({1}: base {3}) star count: {2:,d}'.format(aleg.name, code, aleg.stats.number, aleg.base)
             self.logger.debug(s)
-            
+        
+        self.logger.debug ("min count: {}, match: {}".format(ally_count, ally_match))
+                           
         wiki = WikiStats(self.galaxy, self.all_uwp, ally_count, ally_match)
         wiki.write_statistics()
         
