@@ -161,6 +161,7 @@ class Star (object):
         self.check_cx()
 
         self.calculate_wtn()
+        self.calculate_mspr()
         self.calculate_gwp(pop_code)
 
         self.calculate_TCS()
@@ -237,10 +238,12 @@ class Star (object):
         
     def hex_distance(self, star):
         return max(abs(self.x - star.x), abs(self.y - star.y), abs(self.z -star.z))
+
         
     @staticmethod    
     def heuristicDistance(star1, star2):
         return max(abs(star1.x - star2.x), abs(star1.y - star2.y), abs(star1.z - star2.z))
+
     
     @staticmethod
     def axial_distance(Hex1, Hex2):
@@ -264,11 +267,13 @@ class Star (object):
             return dx
         return dx + dy / 2
     
+
     def subsector(self):
         subsector = ["ABCD","EFGH","IJKL","MNOP"]
         indexy = (self.col - 1) / 8
         indexx = (self.row - 1) / 10
         return subsector[indexx][indexy]
+    
     
     def calculate_gwp(self, pop_code):
         calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400, 24400, 39000, 39000]
@@ -303,6 +308,21 @@ class Star (object):
         self.population = int(self.population)
         self.perCapita = int(self.perCapita)
  
+ 
+    def calculate_mspr(self):
+        self.mspr = 9
+        
+        if self.atmo in ['0','1','2','3','A','B','C']:
+            self.mspr = 0
+        else:
+            self.mspr -= 2 if self.size in ['0', '1']  else 0
+            self.mspr -= 1 if self.size in ['2','3','4'] else 0
+            self.mspr -= 1 if self.hydro in ['1','2','A'] else 0
+            self.mspr -= 2 if self.hydro in ['0'] else 0
+            self.mspr -= 1 if self.atmo in ['4','5','8','9'] else 0 # thin or dense
+            self.mspr -= 1 if self.atmo in ['4','7','9'] else 0 # poluted   
+        
+        
     def calculate_wtn(self):
         self.wtn = self.popCode
         self.wtn -= 1 if self.tl == 0 else 0

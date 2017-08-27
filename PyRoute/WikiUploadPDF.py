@@ -20,7 +20,6 @@ import warnings
 import os
 import codecs
 import glob
-import time
 import re
 from itertools import izip
 import traceback
@@ -67,12 +66,15 @@ def uploadSummaryText(site, summaryFile, era):
         except api.APIError as e:
             if e.args[0] == 'missingtitle':
                 logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
+                index += 1
+                continue
             else:
                 logger.error(u"UploadSummary for page {} got exception {} ".format(baseTitle, e))
-            return
+                return
         except NoPage as e:
             logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
-            return
+            index += 1
+            continue
         
         try:
             result = target_page.edit(text=text, summary='Trade Map update summary', 
@@ -178,6 +180,7 @@ def uploadWorlds (site, sectorFile, economicFile, era):
  |army      = {28}
  |portSize  = {29}
  |spa       = {30}
+ |mspr      = {32}
 }}}}'''
     
     page_template = u'''{{{{StellarDataQuery|name={{{{World|{0}|{1}|{2}|{3}}}}} }}}}
@@ -326,7 +329,8 @@ No information yet available.
                                     eco[11].strip(),                  # Army
                                     eco[12].strip(),                  # port size
                                     eco[13].strip(),                  # spa population
-                                    era                               # era
+                                    era,                              # era
+                                    eco[14].strip()                   # MSPR
                                     )
         try:
             target_page = Page(site,  worldPage + u'/data')

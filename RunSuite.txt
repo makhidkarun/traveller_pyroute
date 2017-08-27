@@ -5,11 +5,13 @@ python PyRoute/downloadsec.py sectorlist.txt  ../sectors
 nohup pypy PyRoute/route.py --borders erode --min-btn 15 --pop-code fixed --routes trade --max-jump=5 --output /root/maps --input /root/sectors --sectors sectorlist.txt  > route.log 2>&1 &
 
 # Upload the sector summaries. 
-python PyRoute/WikiUploadPDF.py
+python PyRoute/WikiUploadPDF.py --input Runs/runs_map14
 
 # Update the xml files for TravellerMap
 python PyRoute/map_remap.py ../maps/stars.txt ../sectors/ ../maps
 
-pypy PyRoute/route.py --borders erode --min-btn 15 --pop-code fixed --routes comm --max-jump 4 --route-reuse 3 --output maps_xroute --input sectors_review
+pypy PyRoute/route.py --borders erode --min-btn 15 --pop-code fixed --routes comm --max-jump 4 --route-reuse 3 --output sectors/review --input sectors/review --sectors sectors/review/reviewlist.txt
 
- 
+python PyRoute/route.py --borders erode --min-btn 13 --pop-code fixed --routes comm --no-subsector-maps --max-jump 6 --route-reuse 9 --output Runs/imperial_xroute --input sectors/Imperial --sectors sectorimplist.txt
+python PyRoute/map_remap.py Runs/imperial_xroute/stars.txt sectors/Imperial Runs/imperial_xroute
+
