@@ -374,7 +374,7 @@ class WikiStats(object):
             else:
                 outString += u'.'
             f.write(outString)
-        else: 
+        else:
             outString = u'The {}'.format(area.wiki_name())
             if area.code[0:2] == 'Na' or area.code in ['Wild', 'VaEx', 'Va']:
                 outString += u' worlds{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
@@ -382,8 +382,8 @@ class WikiStats(object):
                 outString += u'{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
             else:
                 outString += u'{} has jurisdiction over '.format(u' in '+ contain.wiki_name() if contain else "")
-    
-            f.write(outString)       
+
+            f.write(outString)
             if contain and contain.stats.number == len(area.worlds):
                 f.write ('all of the worlds. ')
                 self.text_area_capitals(f, area_type, area)
@@ -393,8 +393,8 @@ class WikiStats(object):
                 self.write_population(area.stats.population, f)
                 f.write('. ')
                 if area.stats.population > 0:
-                    self.text_area_pop_tl(f, area_type, area)       
-                    self.text_area_capitals(f, area_type, area)         
+                    self.text_area_pop_tl(f, area_type, area)
+                    self.text_area_capitals(f, area_type, area)
             else:
                 f.write (' no charted worlds.')
         f.write('\n')
