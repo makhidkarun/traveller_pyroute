@@ -179,6 +179,7 @@ class Star (object):
         self.eti_passenger = 0
         self.eti_worlds = 0
         self.calculate_eti()
+        self.calculate_tradegoods()
         
         
     def __unicode__(self):
@@ -512,6 +513,27 @@ class Star (object):
         eti -= 1 if self.zone in ['A', 'U'] else 0
         self.eti_passenger = eti
         
+    def calculate_tradegoods(self):
+        cost = 4
+        cost -= 1 if self.agricultural else 0
+        cost -= 1 if 'As' in self.tradeCode else 0
+        cost += 1 if 'De' in self.tradeCode else 0
+        cost += 1 if 'Fl' in self.tradeCode else 0
+        cost -= 1 if 'Hi' in self.tradeCode else 0
+        cost -= 1 if 'In' in self.tradeCode else 0
+        cost += 2 if 'Lo' in self.tradeCode else 0
+        cost += 1 if 'Ni' in self.tradeCode else 0
+        cost -= 1 if 'Po' in self.tradeCode else 0
+        cost += 1 if 'Ri' in self.tradeCode else 0
+        cost += 1 if 'Va' in self.tradeCode else 0
+        cost += self.tl / 10
+        cost -= 1 if 'A' in self.port else 0
+        cost += 1 if 'C' in self.port else 0
+        cost += 2 if 'D' in self.port else 0
+        cost += 3 if 'E' in self.port else 0
+        cost += 5 if 'X' in self.port else 0
+        self.trade_cost = cost
+        self.trade_id = u"{}-{} {} Cr{d}".format(self.port, self.uwp_codes['Tech Level'], self.tradeCode, cost*1000)
         
     def calculate_pcode(self):
         self.pcode = None

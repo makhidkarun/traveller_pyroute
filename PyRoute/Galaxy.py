@@ -311,7 +311,8 @@ class Galaxy(object):
     def process_eti(self):
         self.logger.info("Processing ETI for worlds")
         for (world,neighbor) in self.stars.edges_iter(None, data=False):
-            distanceMod = int(world.hex_distance(neighbor)/2)
+            distance = world.hex_distance(neighbor)
+            distanceMod = int(distance/2)
             CargoTradeIndex = int(round(math.sqrt(
                                 max(world.eti_cargo - distanceMod, 0) * 
                                 max(neighbor.eti_cargo - distanceMod, 0))))
@@ -328,6 +329,13 @@ class Galaxy(object):
             if PassTradeIndex > 0:
                 world.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
                 neighbor.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
+            
+    def process_tradegoods(self):
+        self.logger.info("Processing TradeGoods for worlds")
+        for (world,neighbor) in self.stars.edges_iter(None, data=False):
+            distance = world.hex_distance(neighbor)
+            price = 5
+            
                      
     def read_routes (self, routes=None):
         route_regex = "^({1,}) \(({3,}) (\d\d\d\d)\) ({1,}) \(({3,}) (\d\d\d\d)\) (\{.*\})"    
