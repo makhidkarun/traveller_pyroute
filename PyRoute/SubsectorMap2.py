@@ -5,6 +5,7 @@ Created on Aug 7, 2016
 '''
 import os
 import logging
+import math
 from Map import GraphicMap
 from Galaxy import Galaxy
 from AllyGen import AllyGen
@@ -61,6 +62,7 @@ class GraphicSubsectorMap (GraphicMap):
                 self.subsector = subsector
                 img = self.document(sector)
                 self.write_base_map(img, subsector)
+                img = self.trade_lines(img, subsector)
                 for star in subsector.worlds:
                     self.place_system(img, star)
                 for star in subsector.worlds:
@@ -215,6 +217,7 @@ class GraphicSubsectorMap (GraphicMap):
                          (point.x - self.xm*2,   point.y)],
                          outline=None, fill = color )
 
+
     def draw_border(self, doc, pos, point):
         start = self.cursor(25,25)
         end = self.cursor(385,538)
@@ -255,7 +258,8 @@ class GraphicSubsectorMap (GraphicMap):
                         start.x = point.x + self.xm; start.y = point.y + self.ym
                         end.x = point.x + self.xm * 2; end.y = point.y
                         line._draw()
-        
+
+
     def place_system(self, doc, star):
         point = self.get_world_centerpoint(star)
         self.zone(doc, star, point.copy())
@@ -265,8 +269,7 @@ class GraphicSubsectorMap (GraphicMap):
         point.y_plus(self.ym)
 
         #Draw the center dot colored to reflect the world type. 
-        radius = self.xm / 2
-        radius -= 1
+        radius = (self.xm / 2) -1
         pcolor = {'As': '#8E9397', 'De': '#d17533', 'Fl': '#e37dff', 'He': '#ff6f0c', 'Ic':'#A5F2F3',
                   'Oc': '#0094ED', 'Po': '#6a986a', 'Va': '#c9c9c9', 'Wa': '#4abef4'}
         if star.pcode and star.pcode in pcolor:
@@ -340,25 +343,136 @@ class GraphicSubsectorMap (GraphicMap):
         else:
             doc.text(pos, name, font=self.worldFont, fill=self.textFill)
 
+
+    def _world_point(self, hex_row, hex_col):
+        col = self.xm * 3 * hex_col
+        if (hex_col & 1):
+            row = (self.y_start - self.ym * 2) + (hex_row * self.ym * 2) 
+        else:
+            row = (self.y_start - self.ym) +  (hex_row * self.ym * 2)
+        return self.cursor(col, row)
+
+
     # Get the center of the hex for writing a world
-    def get_world_centerpoint(self,star):
+    def get_world_centerpoint(self, star):
         col = star.col + self.positions[star.subsector()][0]
         row = star.row + self.positions[star.subsector()][1]
+        return self._world_point(row, col)
+
+
+    def other_subsector_point(self, star, position):
+        col_out = star.col + self.positions[position][0]
+        row_out = star.row + self.positions[position][1]
+        return self._world_point(row_out, col_out)
         
-        col = self.xm * 3 * col
-        if (star.col & 1):
-            row = (self.y_start - self.ym * 2) + (row * self.ym * 2) 
-        else:
-            row = (self.y_start - self.ym) +  (row * self.ym * 2)
-             
-        return self.cursor(col, row)
-    
+
     def print_base_char(self, baseCharacter, font, point, multiplier, doc, fill=GraphicMap.fillWhite):            
             size = font.getsize(baseCharacter)
             pos = (point.x + (multiplier[0] * size[0]), point.y + (multiplier[1] * size[1]))
             doc.text(pos, baseCharacter, font=font, fill=fill)
 
+
+    def trade_lines(self, doc, subsector):
+        self.logger.info(u"Processing: {}".format(subsector.name))
+        self.image = self.image.convert("RGBA")
+        img = Image.new("RGBA", self.image_size, 0)
+        draw = ImageDraw.Draw(img)
+
+        trade = [pair for pair in self.galaxy.stars.edges_iter(subsector.worlds, True) \
+                 if pair[2]['distance'] < 3 and \
+                 (pair[2]['SourceMarketPrice'] > 0 or pair[2]['TargetMarketPrice'] > 0)]
         
+        self.logger.info(u"generating routes for {} worlds".format(len(trade)))
+        for (star,neighbor,data) in trade:
+            self.trade_line(draw, star,neighbor, data, subsector.position)
+        
+        cropped = img.crop((53,53,760,1067))
+        cropped = cropped.crop((-53,-53, 760+(826-760-53),1067 + (1272-1067-53)))
+        self.image = Image.alpha_composite(self.image, cropped)
+        self.logger.info (u"Completed trade_lines for {}".format(subsector.name))
+        return ImageDraw.Draw(self.image)
+
+        
+    def trade_color(self, trade):
+        tcolor = {0: "#0500ff", 1: "#0012ff", 2: "#0094ff", 3: "#00ffa8",
+                  4: "#8aff00", 5: "#FFd200", 6: "#FF8200", 7: "#FF3200",
+                  9: "#FF0030", 9: "#FF00B0",10: "#FF04F0",11:"#FF0CF0"}  
+        return tcolor.get(trade, "#000000")
+
+
+    def centerpoint (self, star):
+        point = self.get_world_centerpoint(star)
+        point.x_plus(self.xm)
+        point.y_plus(self.ym)
+        return point
+    
+    def other_centerpoint(self, star, position):
+        point = self.other_subsector_point(star, position)
+        point.x_plus(self.xm)
+        point.y_plus(self.ym)
+        return point
+    
+
+    def trade_line(self, doc, star, neighbor, data, position):
+        if star.subsector() == neighbor.subsector():
+            star_start = self.centerpoint(star)
+            star_end = self.centerpoint(neighbor)
+        elif star.subsector() == position:
+            star_start = self.centerpoint(star)
+            star_end = self.other_centerpoint(neighbor, position)
+            pass
+        elif neighbor.subsector() == position:
+            star_start = self.other_centerpoint(star, position)
+            star_end = self.centerpoint(neighbor)
+
+            #self.logger.info ("trade to different subsector: {} - {}".format(star, neighbor))
+        #    return 
+        if data['SourceMarketPrice'] > 0:
+            trade = data['SourceMarketPrice'] - 1000 - (star.trade_cost * 1000)
+            if trade > 0:
+                color = self.trade_color(int(round(trade/1000)))
+                self.draw_one_arc(doc, star_start, star_end, color)
+        if data['TargetMarketPrice'] > 0:
+            trade = data['TargetMarketPrice'] - 1000 - (neighbor.trade_cost * 1000)
+            if trade > 0:
+                color = self.trade_color(int(round(trade/1000)))
+                self.draw_one_arc(doc, star_end, star_start, color)
+        
+    def draw_one_arc (self, doc, start, end, color):
+        center = self.circle_center(start, end)
+        self.draw_arc(doc, center, start, end, color)
+        
+    def circle_center(self, start, end):
+        # Caluclate the center of an equlateral triangle  from start and end
+        #root3 = math.sqrt(3)
+        root3 = 2
+        xm = 0.5 * (start.x + end.x)
+        ym = 0.5 * (start.y + end.y)
+        
+        xslope = (xm - start.x)
+        yslope = (ym - start.y)
+        
+        slope = xslope/yslope if yslope != 0 else 0
+
+        cx = xm + (root3 * slope)
+        cy = ym + (root3 * slope)
+               
+        return self.cursor(round(cx), round(cy))
+
+
+    def draw_arc(self, doc, center, start, end, color):
+        r = math.sqrt ((start.x - center.x) ** 2 + (start.y - center.y) ** 2)
+        x1 = center.x - r 
+        y1 = center.y - r
+        x2 = center.x + r
+        y2 = center.y + r
+        startAngle = (180/math.pi) * math.atan2(start.y - center.y, start.x - center.x)
+        endAngle = (180/math.pi) * math.atan2(end.y - center.y, end.x - center.x)
+        
+        for i in range(-2, 2):
+            doc.arc([x1 + i,y1,x2 + i, y2], startAngle, endAngle, color)
+            doc.arc([x1, y1 + i, x2, y2 + i],startAngle, endAngle, color)
+                
         #if len(star.name) > 0:
         #    for chars in xrange(len(star.name), 0, -1):
         #        width = self.string_width(pdf.get_font(), star.name[:chars])

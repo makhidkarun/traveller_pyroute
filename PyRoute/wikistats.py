@@ -489,6 +489,7 @@ class WikiStats(object):
                 f.write (u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!RU!!GWP (BCr)!!Trade (MCr/year)' + \
                          '!!Passengers (per year)!!Build!!Army!!Port!!SPA Population' + \
                          '!!ETI Index!!ETI Pass Index!!ETI worlds!!ETI Cargo (tons/year)!!ETI Passengers (per year)' + \
+                         '!!Trade Goods' +\
                          '!!Subsector\n')
                 f.write ('<section end="header"/>')
                 for subsector in sector.subsectors.itervalues():
@@ -514,6 +515,7 @@ class WikiStats(object):
                         f.write('||{:10,d}'.format(star.eti_worlds))
                         f.write('||{:10,d}'.format(int(star.eti_cargo_volume * 50)))
                         f.write('||{:10,d}'.format(int(star.eti_pass_volume * 50)))
+                        f.write('||{}'.format(star.trade_id))
                         f.write(u'||{}'.format(subsector.wiki_name()))
                         f.write('\n')
                     f.write (u'<section end="{}"/>'.format(subsector.name))

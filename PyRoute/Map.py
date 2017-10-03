@@ -63,6 +63,10 @@ class Cursor (object):
         new_cursor.set_deltas(self.dx, self.dy)
         return new_cursor
 
+    def __str__(self):
+        return u"({:f}, {:f})".format(self.x, self.y)
+
+
 class GraphicLine(object):
     def __init__(self, image, lineStart, lineEnd, colorname, width):
         self.image = image

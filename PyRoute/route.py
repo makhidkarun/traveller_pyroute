@@ -79,6 +79,7 @@ def process():
     if args.trade:
         galaxy.trade.calculate_routes()
         galaxy.process_eti()
+        galaxy.process_tradegoods()
 
     if args.routes:
         galaxy.write_routes(args.routes)
