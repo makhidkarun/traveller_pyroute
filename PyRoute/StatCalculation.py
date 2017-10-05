@@ -67,7 +67,7 @@ class StatCalculation(object):
         self.all_uwp = UWPCollection()
         self.imp_uwp = UWPCollection()
         
-    def calculate_statistics(self, match):
+    def calculate_statistics(self):
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
         for sector in self.galaxy.sectors.itervalues():
             if sector is None: continue
@@ -80,29 +80,26 @@ class StatCalculation(object):
                     (star.passOver) * 460) / 1000000
                     
                 star.starportPop = int(star.starportBudget / 0.2)
-                
+
                 self.add_stats(sector.stats, star)
                 self.add_stats(self.galaxy.stats, star)
                 self.add_stats(sector.subsectors[star.subsector()].stats, star)
+                
                 self.max_tl(sector.stats, star)
                 self.max_tl(sector.subsectors[star.subsector()].stats, star)
-                if match == 'collapse':
-                    self.add_alg_stats(self.galaxy, star, AllyGen.same_align(star.alg))
-                    self.add_alg_stats(sector, star, AllyGen.same_align(star.alg))
-                    self.add_alg_stats(sector.subsectors[star.subsector()], star,AllyGen.same_align(star.alg))
-                    
-                    if AllyGen.imperial_align(star.alg):
-                        for uwpCode, uwpValue in star.uwpCodes.iteritems():
-                            self.add_stats(self.imp_uwp.stats(uwpCode, uwpValue), star)
-                    
-                elif match == 'separate':
-                    self.add_alg_stats(self.galaxy, star, star.alg)
-                    self.add_alg_stats(sector, star, star.alg)
-                    self.add_alg_stats(sector.subsectors[star.subsector()], star, star.alg)
+                
+                self.add_alg_stats(self.galaxy, star, star.alg)
+                self.add_alg_stats(sector, star, star.alg)
+                self.add_alg_stats(sector.subsectors[star.subsector()], star, star.alg)
 
-                    self.add_alg_stats(self.galaxy, star, AllyGen.same_align(star.alg))
-                    self.add_alg_stats(sector, star, AllyGen.same_align(star.alg))
-                    self.add_alg_stats(sector.subsectors[star.subsector()], star,AllyGen.same_align(star.alg))
+                if star.alg_base != star.alg:
+                    self.add_alg_stats(self.galaxy, star, star.alg_base)
+                    self.add_alg_stats(sector, star, star.alg_base)
+                    self.add_alg_stats(sector.subsectors[star.subsector()], star, star.alg_base)
+
+                if AllyGen.imperial_align(star.alg):
+                    for uwpCode, uwpValue in star.uwpCodes.iteritems():
+                        self.add_stats(self.imp_uwp.stats(uwpCode, uwpValue), star)
                     
                 for uwpCode, uwpValue in star.uwpCodes.iteritems():
                     self.add_stats(self.all_uwp.stats(uwpCode, uwpValue), star)
@@ -149,7 +146,7 @@ class StatCalculation(object):
    
     def max_tl (self, stats, star):
         stats.maxTL = max(stats.maxTL, star.tl)
-        stats.maxPort = 'ABCDEX'[min('ABCDEX'.index(star.uwpCodes['Starport']), 'ABCDEX'.index(stats.maxPort))]
+        stats.maxPort = 'ABCDEX?'[min('ABCDEX?'.index(star.uwpCodes['Starport']), 'ABCDEX?'.index(stats.maxPort))]
         stats.maxPop = max (stats.maxPop, star.popCode)
     
     def per_capita(self, stats):
@@ -172,7 +169,7 @@ class StatCalculation(object):
                 target.tradeCode.append("C:{}-{}".format(world.sector[0:4], world.position))
                 pass
             
-    def write_statistics(self, ally_count):
+    def write_statistics(self, ally_count, ally_match):
         self.logger.info('Charted star count: ' + str(self.galaxy.stats.number))
         self.logger.info('Charted population {:,d}'.format(self.galaxy.stats.population))
         
@@ -180,10 +177,12 @@ class StatCalculation(object):
             self.logger.debug('Sector ' + sector.name + ' star count: ' + str(sector.stats.number))
             
         for code,aleg in self.galaxy.alg.iteritems():
-            s = u'Allegiance {0} ({1}) star count: {2:,d}'.format(aleg.name, code, aleg.stats.number)
+            s = u'Allegiance {0} ({1}: base {3}) star count: {2:,d}'.format(aleg.name, code, aleg.stats.number, aleg.base)
             self.logger.debug(s)
-            
-        wiki = WikiStats(self.galaxy, self.all_uwp, ally_count)
+        
+        self.logger.debug ("min count: {}, match: {}".format(ally_count, ally_match))
+                           
+        wiki = WikiStats(self.galaxy, self.all_uwp, ally_count, ally_match)
         wiki.write_statistics()
         
     @staticmethod

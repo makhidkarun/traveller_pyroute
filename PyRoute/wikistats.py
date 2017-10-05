@@ -23,7 +23,7 @@ class WikiStats(object):
         '!! RU !! Shipyard Capacity (MTons) !! Colonial Army (BEs) ' + \
         '!! Travellers (M / year) !! SPA Pop !! ETI worlds !! ETI Cargo (tons / year) !! ETI passengers (per year)\n'
 
-    def __init__(self, galaxy, uwp, min_alg_count=10):
+    def __init__(self, galaxy, uwp, min_alg_count=10, match_alg = 'collapse'):
         '''
         Constructor
         '''
@@ -31,6 +31,7 @@ class WikiStats(object):
         self.uwp  = uwp
         self.min_alg_count = min_alg_count
         self.plural = inflect.engine()
+        self.match_alg = match_alg == 'collapse'
 
     def write_statistics(self):
         self.summary_statistics()
@@ -72,6 +73,10 @@ class WikiStats(object):
             for sector in self.galaxy.sectors.itervalues():
                 self.text_area_long(f, "sector", sector)
                 f.write('\n')
+                allegiances_sorted = AllyGen.sort_allegiances(sector.alg, self.match_alg)
+                for allegiance in allegiances_sorted:
+                    f.write('\n')
+                    self.text_area_statistics(f, "sector", allegiance, sector)
             f.write('|}\n')
 
         path = os.path.join(self.galaxy.output_path, 'sectors_list.txt')
@@ -128,20 +133,20 @@ class WikiStats(object):
         path = os.path.join(self.galaxy.output_path, 'alleg_summary.wiki')
         with codecs.open(path, "wb", 'utf_8') as f:
             f.write('===[[Allegiance Code|Allegiance Information]]===\n')
-            alg_sort = sorted(alg.iterkeys())
+            allegiances_sorted = AllyGen.sort_allegiances(alg, self.match_alg)
             f.write('{| class=\"wikitable sortable\"\n!Code !! Name !! Worlds !! Population (millions) !! Economy (BCr) !! Per Capita (Cr) !!  RU !! Shipyard Capacity (MTons) !! Armed Forces (BEs) !! SPA Population\n')
-            for code in alg_sort:
-                if alg[code].stats.number < self.min_alg_count:
+            for allegiance in allegiances_sorted:
+                if allegiance.stats.number < self.min_alg_count:
                     continue
-                f.write(u'|-\n| {} || {} '.format(code, alg[code].wiki_name()))
-                stats = alg[code].stats
+                f.write(u'|-\n| {} || {} '.format(allegiance.code, allegiance.wiki_name()))
+                stats = allegiance.stats
                 f.write('|| {:,d} '.format(stats.number))
                 f.write('|| {:,d} '.format(stats.population))
                 f.write('|| {:,d} '.format(stats.economy))
                 f.write('|| {:,d} '.format(stats.percapita))
                 f.write('|| {:,d} '.format(stats.sum_ru))
                 f.write('|| {:,d} '.format(stats.shipyards))
-                if AllyGen.are_allies(u'Im', code):
+                if AllyGen.are_allies(u'Im', allegiance):
                     f.write('|| {:,.2f} (IA) + {:,.2F} (CA)'.format(stats.im_be, stats.col_be))
                 else:
                     f.write('|| {:,.2f}'.format(stats.col_be))
@@ -153,11 +158,11 @@ class WikiStats(object):
             f.write('=== {} Statistics ===\n'.format(area_type))
             f.write('{| class=\"wikitable sortable\"\n')
             f.write(u'! {} !! statistics\n'.format(area_type))
-            for code in alg_sort:
+            for allegiance in allegiances_sorted:
                 f.write('|-\n')
-                f.write(u'|{0}\n'.format(alg[code].wiki_title()))
+                f.write(u'|{0}\n'.format(allegiance.wiki_title()))
                 f.write(u'|| ')
-                self.text_area_statistics(f, area_type, alg[code])
+                self.text_area_statistics(f, area_type, allegiance)
             f.write('|}\n')
 
     def write_uwp_counts(self,f):
@@ -253,11 +258,10 @@ class WikiStats(object):
                 for subsector in subsectors:
                     self.text_area_long(f, "subsector", subsector)
                     f.write('\n=== Polity Listing ===')
-                    alegs = [alg for alg in subsector.alg.itervalues()]
-                    alegs.sort(key=lambda alg : alg.stats.number, reverse = True)
-                    for aleg in alegs:
+                    allegiances_sorted = AllyGen.sort_allegiances(subsector.alg, self.match_alg)
+                    for allegiance in allegiances_sorted:
                         f.write('\n')
-                        self.text_area_statistics(f, "subsector", aleg, subsector)
+                        self.text_area_statistics(f, "subsector", allegiance, subsector)
             f.write('|}\n')
 
 # This sector has <N> worlds, of which <N> have native gas giants.
@@ -334,10 +338,10 @@ class WikiStats(object):
         self.write_count(f, area.stats.way_stations, 'Way station', False)
         f.write('. ')
 
-        HomeWorlds = [world for world in area.worlds if world.homeworld is not None]
-        if (len(HomeWorlds) > 0):
+        homeworlds = [world for world in area.worlds if world.tradeCodes.homeworld is not None]
+        if len(homeworlds) > 0:
             f.write(u'In {} there '.format(area.wiki_name()))
-            self.write_count(f, len(HomeWorlds), 'race homeworld', True)
+            self.write_count(f, len(homeworlds), 'race homeworld', True)
             f.write('. ')
 
         nobles = Nobles()
@@ -368,28 +372,37 @@ class WikiStats(object):
 
     def text_area_statistics(self, f, area_type, area, contain=None):
         
-        outString = u'The {}'.format(area.wiki_name())
-        if area.code[0:2] == 'Na' or area.code in ['Wild', 'VaEx', 'Va']:
-            outString += u' worlds{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
-        elif area.code[0:2] == 'Cs':
-            outString += u'{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
+        if AllyGen.is_unclaimed(area.code):
+            outString = u'There '
+            outString += self.get_count(area.stats.number, 'system', True, ' unclaimed or unexplored')
+            if contain:
+                outString += u' in {}.'.format(contain.wiki_name())
+            else:
+                outString += u'.'
+            f.write(outString)
         else:
-            outString += u'{} has jurisdiction over '.format(u' in '+ contain.wiki_name() if contain else "")
+            outString = u'The {}'.format(area.wiki_name())
+            if area.code[0:2] == 'Na' or area.code in ['Wild', 'VaEx', 'Va']:
+                outString += u' worlds{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
+            elif area.code[0:2] == 'Cs':
+                outString += u'{} encompasses '.format(u' in ' + contain.wiki_name() if contain else "")
+            else:
+                outString += u'{} has jurisdiction over '.format(u' in '+ contain.wiki_name() if contain else "")
 
-        f.write(outString)       
-        if contain and contain.stats.number == len(area.worlds):
-            f.write ('all of the worlds. ')
-            self.text_area_capitals(f, area_type, area)
-        elif len(area.worlds) > 0:
-            self.write_count(f, area.stats.number, 'world', False)
-            f.write(u' with a population of ')
-            self.write_population(area.stats.population, f)
-            f.write('. ')
-            if area.stats.population > 0:
-                self.text_area_pop_tl(f, area_type, area)       
-                self.text_area_capitals(f, area_type, area)         
-        else:
-            f.write (' no charted worlds.')
+            f.write(outString)
+            if contain and contain.stats.number == len(area.worlds):
+                f.write ('all of the worlds. ')
+                self.text_area_capitals(f, area_type, area)
+            elif len(area.worlds) > 0:
+                self.write_count(f, area.stats.number, 'world', False)
+                f.write(u' with a population of ')
+                self.write_population(area.stats.population, f)
+                f.write('. ')
+                if area.stats.population > 0:
+                    self.text_area_pop_tl(f, area_type, area)
+                    self.text_area_capitals(f, area_type, area)
+            else:
+                f.write (' no charted worlds.')
         f.write('\n')
 
     def text_area_pop_tl (self, f, area_type, area):
@@ -422,9 +435,9 @@ class WikiStats(object):
             f.write(' (with most between {:d} and {:d}). '.format(max(int(mean-stddev),0), int(mean+stddev)))
         
     def text_area_capitals (self,f, area_type, area):
-        subsectorCp = [world for world in area.worlds if 'Cp' in world.tradeCode]
-        sectorCp = [world for world in area.worlds if 'Cs' in world.tradeCode]
-        capital = [world for world in area.worlds if 'Cx' in world.tradeCode]
+        subsectorCp = [world for world in area.worlds if world.tradeCode.subsector_capital]
+        sectorCp = [world for world in area.worlds if world.tradeCode.sector_capital]
+        capital = [world for world in area.worlds if world.tradeCode.other_capital]
 
         lead = "\n* " if area_type == 'sector' or area_type == 'Allegiance' else ""
 
@@ -464,7 +477,7 @@ class WikiStats(object):
                         f.write('|{:5}'.format(star.position))
                         f.write(u'||{:21}'.format(star.wiki_short_name()))
                         f.write(u'||{:10}'.format(star.uwp))
-                        f.write(u'||{}'.format(' '.join(star.tradeCode)))
+                        f.write(u'||{}'.format(star.tradeCode))
                         f.write(u'||{{{:d}}}'.format(star.importance))
                         f.write(u'||{}'.format(star.economics))
                         f.write(u'||{}'.format(star.social))
@@ -486,7 +499,7 @@ class WikiStats(object):
                 f.write ('<section begin="header"/>\n')
                 f.write ('{| class="wikitable sortable" width="90%"\n')
                 f.write (u'|+ {} economic data\n'.format(sector.sector_name()))
-                f.write (u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!RU!!GWP (BCr)!!Trade (MCr/year)' + \
+                f.write (u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!MSPR!!RU!!GWP (BCr)!!Trade (MCr/year)' + \
                          '!!Passengers (per year)!!Build!!Army!!Port!!SPA Population' + \
                          '!!ETI Index!!ETI Pass Index!!ETI worlds!!ETI Cargo (tons/year)!!ETI Passengers (per year)' + \
                          '!!Trade Goods' +\
@@ -497,12 +510,14 @@ class WikiStats(object):
                     for star in subsector.worlds:
                         f.write ('|-\n')
                         f.write('|{:5}'.format(star.position))
-                        f.write(u'||{:21}'.format(star.name))
+                        f.write(u'||{:21}'.format(star.wiki_short_name()))
                         f.write('||{:10}'.format(star.uwp))
                         f.write('||{:d}{:d}{:d}  '.format(star.popM, star.belts, star.ggCount))
                         f.write('||{{ {:d} }}'.format(star.importance))
                         f.write('||{:3d}'.format(star.wtn))
+                        f.write('||{:d}'.format(star.mspr))
                         f.write('||{:8,d}'.format(star.ru))
+                        f.write('||{:10,d}'.format(star.perCapita))
                         f.write('||{:10,d}'.format(star.gwp))
                         f.write('||{:10,d}'.format(star.tradeIn/1000000))
                         f.write('||{:10,d}'.format(star.passIn))

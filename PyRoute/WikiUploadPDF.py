@@ -20,7 +20,6 @@ import warnings
 import os
 import codecs
 import glob
-import time
 import re
 from itertools import izip
 import traceback
@@ -67,9 +66,15 @@ def uploadSummaryText(site, summaryFile, era):
         except api.APIError as e:
             if e.args[0] == 'missingtitle':
                 logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
+                index += 1
+                continue
             else:
                 logger.error(u"UploadSummary for page {} got exception {} ".format(baseTitle, e))
-            return
+                return
+        except NoPage as e:
+            logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
+            index += 1
+            continue
         
         try:
             result = target_page.edit(text=text, summary='Trade Map update summary', 
@@ -84,6 +89,8 @@ def uploadSummaryText(site, summaryFile, era):
                 logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
             else:
                 logger.error(u"UploadSummary for page {} got exception {} ".format(baseTitle, e))
+        except NoPage as e:
+            logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
             
         if lines[index].startswith('|}'):
             break       
@@ -118,6 +125,9 @@ def uploadSec (site, filename, place, era):
             logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(targetTitle))
         else:
             logger.error(u"UploadSummary for page {} got exception {} ".format(targetTitle, e))
+        return
+    except NoPage as e:
+        logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(targetTitle))
         return
     
     try:        
@@ -170,17 +180,18 @@ def uploadWorlds (site, sectorFile, economicFile, era):
  |army      = {28}
  |portSize  = {29}
  |spa       = {30}
+ |mspr      = {32}
 }}}}'''
     
     page_template = u'''{{{{StellarDataQuery|name={{{{World|{0}|{1}|{2}|{3}}}}} }}}}
 
-== Description ==
+== Astrography and planetology ==
 No information yet available. 
  
-== History and Background ==
+== History and background ==
 No information yet available. 
 
-== References and Contributors ==
+== References and contributors ==
 {{{{Incomplete}}}}
 {{{{Source}}}}
 {{{{LEN}}}}
@@ -318,7 +329,8 @@ No information yet available.
                                     eco[11].strip(),                  # Army
                                     eco[12].strip(),                  # port size
                                     eco[13].strip(),                  # spa population
-                                    era                               # era
+                                    era,                              # era
+                                    eco[14].strip()                   # MSPR
                                     )
         try:
             target_page = Page(site,  worldPage + u'/data')
@@ -372,7 +384,7 @@ def process():
     parser.add_argument('--no-secs', dest='secs', default=True, action='store_false')
     parser.add_argument('--no-summary', dest='summary', default=True, action='store_false')
     parser.add_argument('--no-subsector', dest='subsector', default=True, action='store_false')
-    parser.add_argument('--no-worlds', dest="worlds", default=True, action='store_false')
+    parser.add_argument('--worlds', default=None)
     parser.add_argument('--site', dest='site', default='http://wiki.travellerrpg.com/api.php')
     parser.add_argument('--era', dest='era', default='Milieu 1116')
     parser.add_argument('--log-level', default='INFO')
@@ -389,17 +401,14 @@ def process():
         path = os.path.join(args.input, "*Sector.pdf")
         for f in glob.glob(path):
             uploadPDF(site, f)
-            time.sleep(5)
 
     if args.secs:        
         path = os.path.join(args.input, "*Sector.economic.wiki")
         for f in glob.glob(path):
-            uploadSec (site, f, "/economic")
-            time.sleep(5)
+            uploadSec (site, f, "/economic", args.era)
         path = os.path.join(args.input, "*Sector.sector.wiki")
         for f in glob.glob(path):
-            uploadSec (site, f, "/sector")
-            time.sleep(5)
+            uploadSec (site, f, "/sector", args.era)
 
     if args.summary:
         path = os.path.join(args.input, "summary.wiki")
@@ -409,9 +418,11 @@ def process():
         uploadSummaryText(site, path, args.era)
 
     if args.worlds:
-        path = os.path.join(args.input, "*Sector.economic.wiki")
+        path = os.path.join(args.input, "{0} Sector.economic.wiki".format(args.worlds))
+        logger.debug("Checking Path {} -> {}".format(path, glob.glob(path)))
+
         for eco in glob.glob(path):
-            sector = os.path.basename(eco)[:-21]
+            sector = args.worlds
             if sector in shortNames.keys():
                 sec = eco.replace('Sector.economic.wiki', 'Sector.sector.wiki')
                 uploadWorlds(site, sec, eco, args.era)

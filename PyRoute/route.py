@@ -19,38 +19,47 @@ logger = logging.getLogger('PyRoute')
 
 def process():
     parser = argparse.ArgumentParser(description='Traveller trade route generator.')
-    parser.add_argument('--borders', choices=['none', 'range', 'allygen', 'erode'], default='range',
-                        help='Allegiance border generation, default [range]')
-    parser.add_argument('--ally-match', choices=['collapse', 'separate'], default='collapse',
-                        help='Allegiance matching for borders, default [collapse]')
-    parser.add_argument('--min-btn', dest='btn', default=13, type=int, 
-                        help='Minimum BTN used for route calculation, default [13]')
-    parser.add_argument('--min-ally-count', dest='ally_count', default=10, type=int,
-                        help='Minimum number of worlds in an allegiance for output, default [10]')
-    parser.add_argument('--min-route-btn', dest='route_btn', default=8, type=int,
-                        help='Minimum btn for drawing on the map, default [8]' )
-    parser.add_argument('--max-jump', dest='max_jump', default=4, type=int,
-                        help='Maximum jump distance for trade routes, default [4]')
-    parser.add_argument('--pop-code', choices=['fixed', 'scaled', 'benford'], default='scaled',
-                        help='Interpretation of the population modifier code, default [scaled]')
 
-    parser.add_argument('--owned-worlds', dest='owned', default=False, action='store_true')
-    
-    parser.add_argument('--routes', dest='routes', choices=['trade', 'comm','xroute', 'owned', 'none'], default='trade',
+    alleg = parser.add_argument_group('Allegiance', 'Alter processing of allegiances')
+    alleg.add_argument('--borders', choices=['none', 'range', 'allygen', 'erode'], default='range',
+                        help='Allegiance border generation, default [range]')
+    alleg.add_argument('--ally-match', choices=['collapse', 'separate'], default='collapse',
+                        help='Allegiance matching for borders, default [collapse]')
+
+    route = parser.add_argument_group('Routes', 'Route generation options')
+    route.add_argument('--routes', dest='routes', choices=['trade', 'comm','xroute', 'owned', 'none'], default='trade',
                         help='Route type to be generated, default [trade]')
-    parser.add_argument('--route-reuse', default=10, type=int,
+    route.add_argument('--min-btn', dest='btn', default=13, type=int, 
+                        help='Minimum BTN used for route calculation, default [13]')
+    route.add_argument('--min-route-btn', dest='route_btn', default=8, type=int,
+                        help='Minimum btn for drawing on the map, default [8]' )
+    route.add_argument('--max-jump', dest='max_jump', default=4, type=int,
+                        help='Maximum jump distance for trade routes, default [4]')
+    route.add_argument('--pop-code', choices=['fixed', 'scaled', 'benford'], default='scaled',
+                        help='Interpretation of the population modifier code, default [scaled]')
+    route.add_argument('--route-reuse', default=10, type=int,
                         help='Scale for reusing routes during route generation')
+    route.add_argument('--ru-calc', default='scaled', choices=['scaled','negative'],
+                       help='RU calculation, default [scaled]')
+
+    output = parser.add_argument_group('output', 'Output options')
     
-    parser.add_argument('--output', default='maps', help='output directory for maps, statistics')
+    output.add_argument('--output', default='maps', help='output directory for maps, statistics')
+    output.add_argument('--owned-worlds', dest='owned', default=False, action='store_true')   
+    output.add_argument('--no-trade', dest='trade', default=True, action='store_false')
+    output.add_argument('--no-maps', dest='maps', default=True, action='store_false')
+    output.add_argument('--no-subsector-maps', dest='subsectors', default=True, action='store_false')
+    output.add_argument('--min-ally-count', dest='ally_count', default=10, type=int,
+                        help='Minimum number of worlds in an allegiance for output, default [10]')
     
-    parser.add_argument('--no-trade', dest='trade', default=True, action='store_false')
-    parser.add_argument('--no-maps', dest='maps', default=True, action='store_false')
-    parser.add_argument('--no-subsector-maps', dest='subsectors', default=True, action='store_false')
+    source = parser.add_argument_group('input', 'Source of data options')
+    source.add_argument('--input', default='sectors', help='input directory for sectors')
+    source.add_argument('--sectors', default=None, help='file with list of sector names to process')
+    source.add_argument('sector', nargs='*', help='T5SS sector file(s) to process')
+    
     parser.add_argument('--version', action='version', version='%(prog)s 0.3')
     parser.add_argument('--log-level', default='INFO')
-    parser.add_argument('--input', default='sectors', help='input directory for sectors')
-    parser.add_argument('--sectors', default=None, help='file with list of sector names to process')
-    parser.add_argument('sector', nargs='*', help='T5SS sector file(s) to process')
+    
     args = parser.parse_args()
 
     set_logging(args.log_level)
@@ -64,7 +73,7 @@ def process():
     if args.sectors is not None:
         sectors_list.extend(get_sectors(args.sectors, args.input))
     
-    galaxy.read_sectors (sectors_list, args.pop_code, args.ally_match)
+    galaxy.read_sectors (sectors_list, args.pop_code, args.ru_calc)
     
     logger.info ("%s sectors read" % len(galaxy.sectors))
     
@@ -85,8 +94,8 @@ def process():
         galaxy.write_routes(args.routes)
 
     stats = StatCalculation(galaxy)
-    stats.calculate_statistics(args.ally_match)
-    stats.write_statistics(args.ally_count)
+    stats.calculate_statistics()
+    stats.write_statistics(args.ally_count, args.ally_match)
     
     if args.maps:
         pdfmap = HexMap(galaxy, args.routes, args.route_btn)

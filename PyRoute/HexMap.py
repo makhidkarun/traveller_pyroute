@@ -43,7 +43,13 @@ class HexMap(object):
             self.write_base_map(pdf, sector)
             
             self.draw_borders(pdf, sector)
-            
+
+
+            comm_routes = [star for star in self.galaxy.stars.edges_iter(sector.worlds, True)\
+                         if star[2].get('xboat',False) or star[2].get('comm', False)]
+            for (star, neighbor, data) in comm_routes:
+                    self.comm_line(pdf, [star, neighbor])
+                  
             sector_trade = [star for star in self.galaxy.stars.edges_iter(sector.worlds, True) \
               if star[2]['trade'] > 0 and StatCalculation.trade_to_btn(star[2]['trade']) >= self.min_btn ]
 
@@ -318,9 +324,9 @@ class HexMap(object):
             pdf.add_text(star.name[:chars].encode('ascii', 'replace'), point)
         
         added = star.alg
-        if 'Cp' in star.tradeCode:
+        if star.tradeCode.subsector_capital:
             added += '+'
-        elif 'Cx' in star.tradeCode or 'Cs' in star.tradeCode:
+        elif star.tradeCode.sector_capital or star.tradeCode.other_capital:
             added += '*'
         else:
             added += ' '
@@ -413,6 +419,42 @@ class HexMap(object):
         if endCircle: 
             circle = PDFEllipse(pdf.session, pdf.page, lineEnd, radius, color, size=3)
             circle._draw()
+    
+    def comm_line(self, pdf, edge):
+        start = edge[0]
+        end = edge[1]
+        color = pdf.get_color()
+        color.set_color_by_number(102,178,102)
+
+        starty = self.y_start + ( self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
+        startx = (self.xm * 3 * (start.col)) + self.ym
+
+        endRow = end.row
+        endCol = end.col
+        if (end.sector != start.sector):
+            if end.sector.x < start.sector.x:
+                endCol -= 32
+            if end.sector.x > start.sector.x:
+                endCol += 32
+            if end.sector.y < start.sector.y:
+                endRow -= 40
+            if end.sector.y > start.sector.y:
+                endRow += 40
+            endy   = self.y_start + ( self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
+            endx   = (self.xm * 3 * endCol) + self.ym
+
+            (startx, starty),(endx, endy) = self.clipping(startx, starty, endx, endy)
+
+        else:
+            endy   = self.y_start + ( self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
+            endx   = (self.xm * 3 * endCol) + self.ym
+
+        lineStart = PDFCursor (startx, starty)
+        lineEnd = PDFCursor (endx, endy)
+
+        line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, stroke='solid', color=color, size=3)
+        line._draw()
+        
         
     def zone(self, pdf, star, point):
         point.x_plus(self.ym)
