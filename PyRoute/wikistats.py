@@ -332,10 +332,10 @@ class WikiStats(object):
         self.write_count(f, area.stats.way_stations, 'Way station', False)
         f.write('. ')
 
-        HomeWorlds = [world for world in area.worlds if world.homeworld is not None]
-        if (len(HomeWorlds) > 0):
+        homeworlds = [world for world in area.worlds if world.tradeCodes.homeworld is not None]
+        if len(homeworlds) > 0:
             f.write(u'In {} there '.format(area.wiki_name()))
-            self.write_count(f, len(HomeWorlds), 'race homeworld', True)
+            self.write_count(f, len(homeworlds), 'race homeworld', True)
             f.write('. ')
 
         nobles = Nobles()
@@ -429,9 +429,9 @@ class WikiStats(object):
             f.write(' (with most between {:d} and {:d}). '.format(max(int(mean-stddev),0), int(mean+stddev)))
         
     def text_area_capitals (self,f, area_type, area):
-        subsectorCp = [world for world in area.worlds if 'Cp' in world.tradeCode]
-        sectorCp = [world for world in area.worlds if 'Cs' in world.tradeCode]
-        capital = [world for world in area.worlds if 'Cx' in world.tradeCode]
+        subsectorCp = [world for world in area.worlds if world.tradeCode.subsector_capital]
+        sectorCp = [world for world in area.worlds if world.tradeCode.sector_capital]
+        capital = [world for world in area.worlds if world.tradeCode.other_capital]
 
         lead = "\n* " if area_type == 'sector' or area_type == 'Allegiance' else ""
 
@@ -471,7 +471,7 @@ class WikiStats(object):
                         f.write('|{:5}'.format(star.position))
                         f.write(u'||{:21}'.format(star.wiki_short_name()))
                         f.write(u'||{:10}'.format(star.uwp))
-                        f.write(u'||{}'.format(' '.join(star.tradeCode)))
+                        f.write(u'||{}'.format(star.tradeCode))
                         f.write(u'||{{{:d}}}'.format(star.importance))
                         f.write(u'||{}'.format(star.economics))
                         f.write(u'||{}'.format(star.social))

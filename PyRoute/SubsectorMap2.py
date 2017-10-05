@@ -267,20 +267,15 @@ class GraphicSubsectorMap (GraphicMap):
         #Draw the center dot colored to reflect the world type. 
         radius = self.xm / 2
         radius -= 1
-        pcolor = {'As': '#8E9397', 'De': '#d17533', 'Fl': '#e37dff', 'He': '#ff6f0c', 'Ic':'#A5F2F3',
-                  'Oc': '#0094ED', 'Po': '#6a986a', 'Va': '#c9c9c9', 'Wa': '#4abef4'}
-        if star.pcode and star.pcode in pcolor:
-            color = ImageColor.getrgb(pcolor[star.pcode])
-        else:
-            color = ImageColor.getrgb('#44ff44')
         
-        if star.pcode == 'As':
+        if star.tradeCode.asteroid:
             worldCharacter = u'\u2059'
             size = self.hexFont3.getsize(worldCharacter)
             pos = (point.x - size[0]/2, point.y - size[1] * 0.6)
             doc.text(pos, worldCharacter, font=self.hexFont3, fill=self.textFill)
             
         else:
+            color = ImageColor.getrgb(star.tradeCode.pcode_color)
             doc.ellipse([(point.x-radius, point.y-radius), (point.x+radius, point.y+radius)], fill=color, outline=color)
         
         # Write Port code        
@@ -312,15 +307,11 @@ class GraphicSubsectorMap (GraphicMap):
             self.print_base_char(u'\u2316', self.hexFont5, point, (-2.5, -0.5), doc)
             self.logger.debug(u"Base for {} : {}".format(star.name,star.baseCode))
         
-        research = {'RsA': u'\u0391', 'RsB': u'\u0392', 'RsG': u'\u0393', 
-                    'RsD': u'\u0394', 'RdE': u'\u0395', 'RsZ': u'\u0396',
-                    'RsT': u'\u0398', 'RsI': u'\u0399', 'RsK': u'\u039A'}
-        keys =  set(research.keys()).intersection(star.tradeCode)
-        if len(keys) == 1:
-            station = next(iter(keys))
-            self.print_base_char(research[station], self.hexFont4, point, (-2.4, -0.5), doc, GraphicMap.fillRed)
-            self.logger.debug(u"Research station for {} : {}".format(star.name, " ".join(star.tradeCode)))
-
+        station_code = star.tradeCode.research_station_char
+        if station_code :
+            self.print_base_char(station_code, self.hexFont4, point, (-2.4, -0.5), doc, GraphicMap.fillRed)
+            self.logger.debug(u"Research station for {} : {}".format(star.name, star.tradeCode))
+            
     # Write the name of the world on the map (last).
     def write_name(self, doc, star):
         point = self.get_world_centerpoint(star)
@@ -329,9 +320,9 @@ class GraphicSubsectorMap (GraphicMap):
         point.y_plus(self.ym)
 
         name = star.name
-        if 'Hi' in star.tradeCode:
+        if star.tradeCode.high:
             name = name.upper()
-        elif 'Lo' in star.tradeCode:
+        elif star.tradeCode.low:
             name = name.lower()
         size = self.worldFont.getsize(name)
         pos = (point.x - (size[0] / 2) + 1, point.y + size[1])
