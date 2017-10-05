@@ -130,9 +130,9 @@ class RouteCalculation (object):
     def get_passenger_btn(btn, star, neighbor):
             passBTN = btn + \
                 1 if star.rich or neighbor.rich else 0 + \
-                1 if 'Cp' in star.tradeCode or 'Cp' in neighbor.tradeCode else 0 + \
-                2 if 'Cs' in star.tradeCode or 'Cs' in neighbor.tradeCode else 0 + \
-                2 if 'Cx' in star.tradeCode or 'Cx' in neighbor.tradeCode else 0
+                1 if star.tradeCode.subsector_capital or neighbor.tradeCode.subsector_capital else 0 + \
+                2 if star.tradeCode.sector_capital or neighbor.tradeCode.sector_capital else 0 + \
+                2 if star.tradeCode.other_capital or neighbor.tradeCode.other_capital else 0
             return passBTN
         
     @staticmethod
@@ -242,14 +242,11 @@ class XRouteCalculation (RouteCalculation):
         self.distance_weight = self.capSec_weight
         self.generate_base_routes()
         self.capital = [star for star in self.galaxy.ranges.nodes_iter() if \
-                   AllyGen.are_allies(u'Im', star.alg) and 
-                   'Cx' in star.tradeCode]
+                   AllyGen.are_allies(u'Im', star.alg) and star.tradeCode.other_capital]
         self.secCapitals = [star for star in self.galaxy.ranges.nodes_iter() if \
-                   AllyGen.are_allies(u'Im', star.alg) and 
-                   'Cs' in star.tradeCode]
+                   AllyGen.are_allies(u'Im', star.alg) and star.tradeCode.sector_capital]
         self.subCapitals = [star for star in self.galaxy.ranges.nodes_iter() if \
-                   AllyGen.are_allies(u'Im', star.alg) and 
-                   'Cp' in star.tradeCode]
+                   AllyGen.are_allies(u'Im', star.alg) and star.tradeCode.subsector_captial]
         
     def routes_pass_1(self):
         # Pass 1: Get routes at J6  Capital and sector capitals 
@@ -435,9 +432,9 @@ class XRouteCalculation (RouteCalculation):
         weight -= 6 if 'W' in star.baseCode or 'W' in target.baseCode else 0
         weight -= 3 if 'N' in star.baseCode or 'N' in target.baseCode else 0
         weight -= 3 if 'D' in star.baseCode or 'D' in target.baseCode else 0
-        weight -= 6 if 'Cp' in star.tradeCode or 'Cp' in target.tradeCode else 0
-        weight -= 6 if 'Cx' in star.tradeCode or 'Cx' in target.tradeCode else 0
-        weight -= 6 if 'Cs' in star.tradeCode or 'Cs' in target.tradeCode else 0
+        weight -= 6 if star.tradeCode.subsecor_capital or target.tradeCode.subsector_capital else 0
+        weight -= 6 if star.tradeCode.other_capital or target.tradeCode.other_capital else 0
+        weight -= 6 if star.tradeCode.sector_capital or target.tradeCode.sector_capital else 0
         
         return weight
 
@@ -490,7 +487,7 @@ class TradeCalculation(RouteCalculation):
     def base_route_filter (self, star, neighbor):
         if star.zone in ['R', 'F'] or neighbor.zone in ['R','F']:
             return True
-        if 'Ba' in star.tradeCode or 'Ba' in neighbor.tradeCode:
+        if star.tradeCode.barren or neighbor.tradeCode.barren:
             return True
         return False
 
@@ -802,7 +799,7 @@ class CommCalculation(RouteCalculation):
 
     def capitals(self, star):
         # Capital of sector, subsector, or empire are in the list
-        return len(set(['Cp', 'Cx', 'Cs']) & set(star.tradeCode)) > 0
+        return star.tradeCode.capital
 
     def bases(self, star):                    
         # if it has a Deopt, Way station, or XBoat station,

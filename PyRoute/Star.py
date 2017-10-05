@@ -9,6 +9,7 @@ import bisect
 import random
 import math
 from AllyGen import AllyGen
+from TradeCodes import TradeCodes
 from collections import OrderedDict
 
 class UWPCodes(object):
@@ -96,12 +97,8 @@ class Star (object):
         except ValueError:
             self.popCode = 12
             
-        self.tradeCode = data[3].strip().split()
-        
-        if '(' in data[3] :
-            self.homeworld = data[3].strip().split('(',1)[1].split(')',1)[0]
-        else:
-            self.homeworld = None 
+        self.tradeCode = TradeCodes(data[3].strip())
+        self.ownedBy = self.tradeCode.owned_by(self)
             
         self.economics = data[6].strip() if data[6] and data[6].strip() != u'-' else None
         self.social = data[7].strip() if data[7] and data[7].strip() != u'-' else None
@@ -133,21 +130,7 @@ class Star (object):
                            'Tech Level': self.uwp[8],
                            'Pop Code': str(self.popM)}
         
-        self.check_world_codes()
-
-        self.rich = 'Ri' in self.tradeCode 
-        self.industrial = 'In' in self.tradeCode 
-        self.agricultural = 'Ag' in self.tradeCode 
-        self.poor = 'Po' in self.tradeCode 
-        self.nonIndustrial = 'Ni' in self.tradeCode 
-        self.low = 'Lo' in self.tradeCode
-        self.extreme = 'As' in self.tradeCode or \
-                'Fl' in self.tradeCode or 'Ic' in self.tradeCode or 'De' in self.tradeCode or \
-                'Na' in self.tradeCode or 'Va' in self.tradeCode or 'Wa' in self.tradeCode or \
-                'He' in self.tradeCode or 'Oc' in self.tradeCode
-        self.nonAgricultural = 'Na' in self.tradeCode
-        self.capital = 'Cp' in self.tradeCode or 'Cx' in self.tradeCode or 'Cs'in self.tradeCode
-
+        self.tradeCode.check_world_codes(self)
 
         if (data[5]):
             imp = int(data[5][1:-1].strip())
@@ -165,9 +148,7 @@ class Star (object):
         self.calculate_gwp(pop_code)
 
         self.calculate_TCS()
-        self.owned_by()
         self.calculate_army()
-        self.calculate_pcode()
         self.calculate_ru(ru_calc)
         
         self.tradeIn  = 0
@@ -298,10 +279,11 @@ class Star (object):
             self.uwpCodes['Pop Code'] = str(popM/10)
 
         self.perCapita = calcGWP[min(self.tl,19)]
-        self.perCapita *= 1.6 if self.rich else 1
-        self.perCapita *= 1.4 if self.industrial else 1
-        self.perCapita *= 1.2 if self.agricultural else 1
-        self.perCapita *= 0.8 if self.extreme or self.poor or self.nonIndustrial or self.low else 1
+        self.perCapita *= 1.6 if self.tradeCode.rich else 1
+        self.perCapita *= 1.4 if self.tradeCode.industrial else 1
+        self.perCapita *= 1.2 if self.tradeCode.agricultural else 1
+        self.perCapita *= 0.8 if self.tradeCode.extreme or\
+         self.tradeCode.poor or self.tradeCode.nonindustrial or self.tradeCode.low else 1
 
         self.gwp = self.population * self.perCapita / 1000    
         self.gwp = int(self.gwp)
@@ -366,11 +348,11 @@ class Star (object):
         if labor != max(self.popCode - 1, 0) :
             self.logger.error(u'{} - EX Calculated labor {} does not match generated labor {}'.format(self, labor, max(self.popCode - 1, 0)))
 
-        if 'Ba' in self.tradeCode and infrastructure != 0:
+        if self.tradeCode.barren and infrastructure != 0:
             self.logger.error(u'{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self, infrastructure, 0))
-        elif 'Lo' in self.tradeCode and infrastructure != 1:
+        elif self.tradeCode.low and infrastructure != 1:
             self.logger.error(u'{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self, infrastructure, 1))
-        elif 'Ni' in self.tradeCode and not 0 <= infrastructure <= 6 + self.importance:
+        elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= 6 + self.importance:
             self.logger.error(u'{} - EX Calculated infrastructure {} not in NI range 0 - {}'.format(self, infrastructure, 6 + self.importance))
         elif not 0 <= infrastructure <= 12 + self.importance:
             self.logger.error(u'{} - EX Calculated infrastructure {} not in range 0 - {}'.format(self, infrastructure, 12 + self.importance))
@@ -458,17 +440,17 @@ class Star (object):
         else:
             self.tcs_gwp = 0
             
-        if self.rich:
+        if self.tradeCode.rich:
             self.tcs_gwp = self.tcs_gwp * 16 / 10
-        if self.industrial:
+        if self.tradeCode.industrial:
             self.tcs_gwp = self.tcs_gwp * 14 / 10
-        if self.agricultural:
+        if self.tradeCode.agricultural:
             self.tcs_gwp = self.tcs_gwp * 12 / 10
-        if self.poor:
+        if self.tradeCode.poor:
             self.tcs_gwp = self.tcs_gwp * 8 / 10
-        if self.nonIndustrial:
+        if self.tradeCode.nonindustrial:
             self.tcs_gwp = self.tcs_gwp * 8 / 10
-        if self.nonAgricultural:
+        if self.tradeCode.nonagricultural:
             self.tcs_gwp = self.tcs_gwp * 8 / 10
             
         budget = long (self.tcs_gwp * 0.03 * tax_rate[self.uwpCodes['Government']])
@@ -502,24 +484,12 @@ class Star (object):
         imp += 1 if self.tl >= 16 else 0
         imp -= 1 if self.popCode <= 6 else 0
         imp += 1 if self.popCode >= 9 else 0
-        imp += 1 if self.agricultural else 0
-        imp += 1 if self.rich else 0
-        imp += 1 if self.industrial else 0
+        imp += 1 if self.tradeCode.agricultural else 0
+        imp += 1 if self.tradeCode.rich else 0
+        imp += 1 if self.tradeCode.industrial else 0
         imp += 1 if self.baseCode in [u'NS', u'NW', u'W', u'D', u'X', u'KV', u'RT', u'CK', u'KM'] else 0
         self.importance = imp
         
-    def calculate_pcode(self):
-        self.pcode = None
-        self.pcode = 'He' if 'He' in self.tradeCode else self.pcode
-        self.pcode = 'De' if 'De' in self.tradeCode else self.pcode
-        self.pcode = 'Fl' if 'Fl' in self.tradeCode else self.pcode
-        self.pcode = 'Po' if 'Po' in self.tradeCode else self.pcode
-        self.pcode = 'Va' if 'Va' in self.tradeCode else self.pcode
-        self.pcode = 'Ic' if 'Ic' in self.tradeCode else self.pcode
-        self.pcode = 'As' if 'As' in self.tradeCode else self.pcode
-        self.pcode = 'Oc' if 'Oc' in self.tradeCode else self.pcode
-        self.pcode = 'Wa' if 'Wa' in self.tradeCode else self.pcode
-
 #        self.port = self.uwp[0]
 #        self.size = self.uwp[1]
 #        self.atmo = self.uwp[2]
@@ -529,82 +499,7 @@ class Star (object):
 #        self.law   = self.uwp[6]
 #        self.tl = int(self.uwp[8],36)
 
-    def _check_planet_code(self, code, size, atmo, hydro):
-        size = '0123456789ABC' if size is None else size
-        atmo = '0123456789ABCDEF' if atmo is None else atmo
-        hydro = '0123456789A' if hydro is None else hydro
-
-        if self.size in size and self.atmo in atmo and self.hydro in hydro \
-            and code not in self.tradeCode:
-            self.logger.error(u'{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode))
-        if code in self.tradeCode and \
-            not (self.size in size and self.atmo in atmo and self.hydro in hydro):
-            self.logger.error(u'{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode))
-
-    def _check_pop_code(self, code, pop):
-        if self.pop in pop and code not in self.tradeCode:
-            self.logger.error(u'{} - Calculated "{}" not in trade codes {}'.format(self, code, self.tradeCode))
-        if code in self.tradeCode and self.pop not in pop:
-            self.logger.error(u'{} - Found invalid "{}" code on world with {} population: {}'.format(self, code, self.pop, self.tradeCode))
-
-    def _check_econ_code(self, code, atmo, hydro, pop):
-        atmo = '0123456789ABCDEF' if atmo is None else atmo
-        hydro = '0123456789A' if hydro is None else hydro
-        pop = '0123456789ABC' if pop is None else pop
-
-        if self.atmo in atmo and self.hydro in hydro and self.pop in pop \
-            and code not in self.tradeCode:
-            self.logger.error(u'{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode))
-        if code in self.tradeCode and \
-            not (self.atmo in atmo and self.hydro in hydro and self.pop in pop):
-            self.logger.error(u'{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode))
-
-    def check_world_codes(self):
-        self._check_planet_code('As', '0', '0', '0')
-        self._check_planet_code('De', None, '23456789', '0')
-        self._check_planet_code('Fl', None, 'ABC', '123456789A')
-        self._check_planet_code('Ga', '678', '568', '567')
-        self._check_planet_code('He', '3456789ABC', '2479ABC', '012')
-        self._check_planet_code('Ic', None, '01', '123456789A')
-        self._check_planet_code('Po', None, '2345', '0123')
-        self._check_planet_code('Oc', 'ABCD', '3456789', 'A')
-        self._check_planet_code('Va', None, '0', None)
-        self._check_planet_code('Wa', '3456789', '3456789', 'A')
-
-        #self._check_pop_code('Ba', '0')
-        self._check_pop_code('Lo', '123')
-        self._check_pop_code('Ni', '456')
-        self._check_pop_code('Ph', '8')
-        self._check_pop_code('Hi', '9ABC')
-
-        self._check_econ_code('Pa', '456789', '45678', '48')
-        self._check_econ_code('Ag', '456789', '45678', '567')
-        self._check_econ_code('Na', '0123', '0123', '6789ABC')
-        self._check_econ_code('Pi', '012479', None, '78')
-        self._check_econ_code('In', '012479ABC', None, '9ABC')
-        self._check_econ_code('Pr', '68', None,'59')
-        self._check_econ_code('Ri', '68', None, '678')
-
-    def owned_by(self):
-        self.ownedBy = self
-        if self.gov == '6': 
-            self.ownedBy = None
-        for code in self.tradeCode:
-            if code.startswith(u'O:'):
-                if len(code) == 2:
-                    self.ownedBy = 'XXXX'
-                else:
-                    self.ownedBy = code[2:]
-                break
-            elif code.startswith(u'Mr'):
-                self.ownedBy = 'Mr'
-            elif code.startswith(u'Re'):
-                self.ownedBy = 'Re'
-            elif code.startswith(u'Px'):
-                self.ownedBy = 'Px'
-        if (self.gov == '6' and not self.ownedBy) or (self.gov != '6' and self.ownedBy != self):
-            self.logger.debug (u"{} has incorrect government code {} - {}".format(self, self.gov, self.tradeCode))
-            
+             
 
     def calculate_army(self):
         #       3, 4, 5, 6, 7, 8, 9, A

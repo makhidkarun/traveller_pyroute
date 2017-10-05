@@ -324,9 +324,9 @@ class HexMap(object):
             pdf.add_text(star.name[:chars].encode('ascii', 'replace'), point)
         
         added = star.alg
-        if 'Cp' in star.tradeCode:
+        if star.tradeCode.subsector_capital:
             added += '+'
-        elif 'Cx' in star.tradeCode or 'Cs' in star.tradeCode:
+        elif star.tradeCode.sector_capital or star.tradeCode.other_capital:
             added += '*'
         else:
             added += ' '
