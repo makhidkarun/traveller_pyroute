@@ -380,14 +380,15 @@ def process():
 
     parser = argparse.ArgumentParser(description='Trade map generator wiki upload.')
     parser.add_argument('--input', default='../maps', help='output directory for maps, statistics')
-    parser.add_argument('--no-maps', dest='maps', default=True, action='store_false')
-    parser.add_argument('--no-secs', dest='secs', default=True, action='store_false')
-    parser.add_argument('--no-summary', dest='summary', default=True, action='store_false')
-    parser.add_argument('--no-subsector', dest='subsector', default=True, action='store_false')
-    parser.add_argument('--worlds', default=None)
-    parser.add_argument('--site', dest='site', default='http://wiki.travellerrpg.com/api.php')
-    parser.add_argument('--era', dest='era', default='Milieu 1116')
+    parser.add_argument('--no-maps', dest='maps', default=True, action='store_false', help="Don't upload the sector PDF maps, default is upload the maps")
+    parser.add_argument('--no-secs', dest='secs', default=True, action='store_false', help="Don't upload the sector table pages, default is to upload the sector table pages")
+    parser.add_argument('--no-summary', dest='summary', default=True, action='store_false', help="Don't upload the sector summary pages, default is to upload the sector summary pages")
+    parser.add_argument('--no-subsector', dest='subsector', default=True, action='store_false', help="Don't upload the subsector summary pages, default is to upload the subsector summary pages")
+    parser.add_argument('--worlds', default=False, action='store_true', help="Upload the data for individual worlds, default is to not upload world data")
+    parser.add_argument('--era', dest='era', default='Milieu 1116', help="Set the era for the world upload data, default [Milieu 1116]")
     parser.add_argument('--log-level', default='INFO')
+    parser.add_argument('--site', dest='site', default='http://wiki.travellerrpg.com/api.php')
+    parser.add_argument('--user', default='AB-101', help="(Bot) user to connect to the wiki and perform the uploads, default [AB-101]")
     
     args = parser.parse_args()
     set_logging(args.log_level)
@@ -395,7 +396,7 @@ def process():
     # create a Wiki object
     site = wiki.Wiki(args.site)
     #site = wiki.Wiki("http://localhost/wiki/api.php")
-    site.login("AB-101", remember=True)
+    site.login(args.user, remember=True)
 
     if args.maps:
         path = os.path.join(args.input, "*Sector.pdf")
