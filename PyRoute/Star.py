@@ -67,108 +67,116 @@ class Nobles(object):
             self.nobles[rank] += count
             
 class Star (object):
-    def __init__ (self, line, starline, sector, pop_code, ru_calc):
+    def __init__ (self):
         self.logger = logging.getLogger('PyRoute.Star')
-        self.sector = sector
-        self.logger.debug(line)
+        
+    @staticmethod
+    def parse_line_into_star(line, starline, sector, pop_code, ru_calc):
+        star = Star()
+        star.sector = sector
+        star.logger.debug(line)
         if starline.match(line):
             data = starline.match(line).groups()
+        elif '{Anomaly}' in line:
+            star.logger.info("Found Anomaly, skpping processing: {}".format(line))
+            return None
         else:
-            self.logger.error(u"Unmatched Line: {}".format(line))
-            return
+            star.logger.error(u"Unmatched Line: {}".format(line))
+            return None
         
-        self.logger.debug (data)
+        star.logger.debug (data)
         
-        self.position = data[0].strip()
-        self.set_location(sector.dx, sector.dy)
-        self.name = data[1].strip()
+        star.position = data[0].strip()
+        star.set_location(sector.dx, sector.dy)
+        star.name = data[1].strip()
             
-        self.uwp = data[2].strip()
-        self.port = self.uwp[0]
-        self.size = self.uwp[1]
-        self.atmo = self.uwp[2]
-        self.hydro = self.uwp[3]
-        self.pop   = self.uwp[4]
-        self.gov   = self.uwp[5]
-        self.law   = self.uwp[6]
-        self.tl = self._ehex_to_int(self.uwp[8])
+        star.uwp = data[2].strip()
+        star.port = star.uwp[0]
+        star.size = star.uwp[1]
+        star.atmo = star.uwp[2]
+        star.hydro = star.uwp[3]
+        star.pop   = star.uwp[4]
+        star.gov   = star.uwp[5]
+        star.law   = star.uwp[6]
+        star.tl = star._ehex_to_int(star.uwp[8])
         try:
-            self.popCode = self._ehex_to_int(self.pop)
+            star.popCode = star._ehex_to_int(star.pop)
         except ValueError:
-            self.popCode = 12
+            star.popCode = 12
             
-        self.tradeCode = TradeCodes(data[3].strip())
-        self.ownedBy = self.tradeCode.owned_by(self)
+        star.tradeCode = TradeCodes(data[3].strip())
+        star.ownedBy = star.tradeCode.owned_by(star)
             
-        self.economics = data[6].strip() if data[6] and data[6].strip() != u'-' else None
-        self.social = data[7].strip() if data[7] and data[7].strip() != u'-' else None
+        star.economics = data[6].strip() if data[6] and data[6].strip() != u'-' else None
+        star.social = data[7].strip() if data[7] and data[7].strip() != u'-' else None
         
-        self.nobles = Nobles()
-        self.nobles.count(data[11])
+        star.nobles = Nobles()
+        star.nobles.count(data[11])
         
-        self.baseCode = data[12].strip()
-        self.zone = data[13].strip()
-        self.ggCount = int(data[14][2],16) if data[14][2] not in 'X?' else 0
-        self.popM = int(data[14][0]) if data[14][0] not in 'X?' else 0
-        self.belts = int(data[14][1], 16) if data[14][1] not in 'X?' else 0
+        star.baseCode = data[12].strip()
+        star.zone = data[13].strip()
+        star.ggCount = int(data[14][2],16) if data[14][2] not in 'X?' else 0
+        star.popM = int(data[14][0]) if data[14][0] not in 'X?' else 0
+        star.belts = int(data[14][1], 16) if data[14][1] not in 'X?' else 0
 
-        self.worlds = int(data[15]) if data[15].strip().isdigit() else 0
+        star.worlds = int(data[15]) if data[15].strip().isdigit() else 0
         
-        self.alg = data[16].strip()
-        self.alg_base = self.alg
+        star.alg = data[16].strip()
+        star.alg_base = star.alg
         
-        self.stars = data[17].strip()
-        self.extract_routes()
+        star.stars = data[17].strip()
+        star.extract_routes()
         
-        self.uwpCodes = {'Starport': self.port,
-                           'Size': self.size,
-                           'Atmosphere': self.atmo,
-                           'Hydrographics': self.hydro,
-                           'Population': self.pop,
-                           'Government': self.gov,
-                           'Law Level': self.law,
-                           'Tech Level': self.uwp[8],
-                           'Pop Code': str(self.popM)}
+        star.uwpCodes = {'Starport': star.port,
+                           'Size': star.size,
+                           'Atmosphere': star.atmo,
+                           'Hydrographics': star.hydro,
+                           'Population': star.pop,
+                           'Government': star.gov,
+                           'Law Level': star.law,
+                           'Tech Level': star.uwp[8],
+                           'Pop Code': str(star.popM)}
         
-        self.tradeCode.check_world_codes(self)
+        star.tradeCode.check_world_codes(star)
 
         if (data[5]):
             imp = int(data[5][1:-1].strip())
-            self.calculate_importance()
-            if imp != self.importance:
-                self.logger.error(u'{}-{} Calculated importance {} does not match generated importance {}'.format(self, self.baseCode, self.importance, imp))
+            star.calculate_importance()
+            if imp != star.importance:
+                star.logger.error(u'{}-{} Calculated importance {} does not match generated importance {}'.format(star, star.baseCode, star.importance, imp))
         else:
-            self.calculate_importance()
+            star.calculate_importance()
 
-        self.check_ex()
-        self.check_cx()
+        star.check_ex()
+        star.check_cx()
 
-        self.calculate_wtn()
-        self.calculate_mspr()
-        self.calculate_gwp(pop_code)
+        star.calculate_wtn()
+        star.calculate_mspr()
+        star.calculate_gwp(pop_code)
 
-        self.calculate_TCS()
-        self.calculate_army()
-        self.calculate_ru(ru_calc)
+        star.calculate_TCS()
+        star.calculate_army()
+        star.calculate_ru(ru_calc)
         
-        self.tradeIn  = 0
-        self.tradeOver = 0
-        self.tradeCount = 0
-        self.passIn = 0
-        self.passOver = 0
-        self.starportSize = 0
-        self.starportBudget = 0
-        self.starportPop = 0
+        star.tradeIn  = 0
+        star.tradeOver = 0
+        star.tradeCount = 0
+        star.passIn = 0
+        star.passOver = 0
+        star.starportSize = 0
+        star.starportBudget = 0
+        star.starportPop = 0
 
-        self.eti_cargo_volume = 0
-        self.eti_pass_volume = 0
-        self.eti_cargo = 0
-        self.eti_passenger = 0
-        self.eti_worlds = 0
-        self.calculate_eti()
-        self.calculate_tradegoods()
+        star.eti_cargo_volume = 0
+        star.eti_pass_volume = 0
+        star.eti_cargo = 0
+        star.eti_passenger = 0
+        star.eti_worlds = 0
+        star.calculate_eti()
+        star.calculate_tradegoods()
         
-        self._hash = None
+        star._hash = None
+        return star
         
     def __unicode__(self):
         return u"{} ({} {})".format(self.name, self.sector.name, self.position)
@@ -506,35 +514,35 @@ class Star (object):
         eti += 1 if self.tl >= 10 else 0
         eti -= 1 if self.tl <= 7 else 0
         eti += 1 if self.baseCode in [u'NS', u'NW', u'D', u'X', u'KV', u'RT', u'CK', u'KM'] else 0
-        eti += 1 if self.capital else 0
-        eti += 1 if self.agricultural else 0
-        eti += 1 if self.rich else 0
-        eti += 1 if self.industrial else 0
-        eti -= 1 if self.poor else 0
+        eti += 1 if self.tradeCode.capital else 0
+        eti += 1 if self.tradeCode.agricultural else 0
+        eti += 1 if self.tradeCode.rich else 0
+        eti += 1 if self.tradeCode.industrial else 0
+        eti -= 1 if self.tradeCode.poor else 0
         eti -= 1 if self.popCode <= 3 else 0
         eti += 1 if self.popCode >= 9 else 0
         eti -= 1 if self.zone in ['A', 'U'] else 0
         eti -= 8 if self.zone in ['R', 'F'] else 0
         self.eti_cargo = eti
         eti -= 1 if self.baseCode in [u'NS', u'NW', u'D', u'X', u'KV', u'RT', u'CK', u'KM'] else 0
-        eti -= 1 if self.agricultural else 0
-        eti -= 2 if self.industrial else 0
+        eti -= 1 if self.tradeCode.agricultural else 0
+        eti -= 2 if self.tradeCode.industrial else 0
         eti -= 1 if self.zone in ['A', 'U'] else 0
         self.eti_passenger = eti
         
     def calculate_tradegoods(self):
         cost = 4.0
-        cost -= 1 if self.agricultural else 0
-        cost -= 1 if 'As' in self.tradeCode else 0
-        cost += 1 if 'De' in self.tradeCode else 0
-        cost += 1 if 'Fl' in self.tradeCode else 0
-        cost -= 1 if 'Hi' in self.tradeCode else 0
-        cost -= 1 if 'In' in self.tradeCode else 0
-        cost += 2 if 'Lo' in self.tradeCode else 0
-        cost += 1 if 'Ni' in self.tradeCode else 0
-        cost -= 1 if 'Po' in self.tradeCode else 0
-        cost += 1 if 'Ri' in self.tradeCode else 0
-        cost += 1 if 'Va' in self.tradeCode else 0
+        cost -= 1 if self.tradeCode.agricultural else 0
+        cost -= 1 if self.tradeCode.asteroid else 0
+        cost += 1 if self.tradeCode.desert else 0
+        cost += 1 if self.tradeCode.fluid else 0
+        cost -= 1 if self.tradeCode.high else 0
+        cost -= 1 if self.tradeCode else 0
+        cost += 2 if self.tradeCode.low else 0
+        cost += 1 if self.tradeCode.nonindustrial else 0
+        cost -= 1 if self.tradeCode.poor else 0
+        cost += 1 if self.tradeCode.rich else 0
+        cost += 1 if self.tradeCode.vacuum else 0
         cost += self.tl / 10.0
         cost -= 1 if 'A' in self.port else 0
         cost += 1 if 'C' in self.port else 0
@@ -542,7 +550,8 @@ class Star (object):
         cost += 3 if 'E' in self.port else 0
         cost += 5 if 'X' in self.port else 0
         self.trade_cost = cost
-        self.trade_id = u"{}-{} {} Cr{}".format(self.port, self.uwpCodes['Tech Level'], ' '.join(self.tradeCode), int(cost*1000))
+        self.trade_id = u"{}-{} {} Cr{}".format(self.port, self.uwpCodes['Tech Level'], 
+                                                self.tradeCode.planet_codes(), int(cost*1000))
         
 #        self.port = self.uwp[0]
 #        self.size = self.uwp[1]
