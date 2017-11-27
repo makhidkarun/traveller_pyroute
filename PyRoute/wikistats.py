@@ -72,7 +72,7 @@ class WikiStats(object):
             f.write('! {} !! statistics\n'.format(area_type))
             for sector in self.galaxy.sectors.itervalues():
                 self.text_area_long(f, "sector", sector)
-                f.write('\n')
+                f.write('\n\n=== Polity Listing ===')
                 allegiances_sorted = AllyGen.sort_allegiances(sector.alg, self.match_alg)
                 for allegiance in allegiances_sorted:
                     f.write('\n')
@@ -338,7 +338,7 @@ class WikiStats(object):
         self.write_count(f, area.stats.way_stations, 'Way station', False)
         f.write('. ')
 
-        homeworlds = [world for world in area.worlds if world.tradeCodes.homeworld is not None]
+        homeworlds = [world for world in area.worlds if world.tradeCode.homeworld]
         if len(homeworlds) > 0:
             f.write(u'In {} there '.format(area.wiki_name()))
             self.write_count(f, len(homeworlds), 'race homeworld', True)
