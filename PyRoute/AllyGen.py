@@ -84,9 +84,10 @@ class AllyGen(object):
         # only what the base allegiances
         # base_match_only == false -> --ally-match=separate
         # want the non-base code or the base codes for single code allegiances. 
-        algs = [alg for alg in alg_list.itervalues() if 
-                (base_match_only and alg.base) or 
-                (not base_match_only and (not alg.base or AllyGen.same_align(alg) == alg))]
+        if base_match_only:
+            algs = [alg for alg in alg_list.itervalues() if alg.base]
+        else: 
+            algs = [alg for alg in alg_list.itervalues() if not alg.base]
         algs.sort(key=lambda alg : alg.stats.number, reverse = True)
         return algs
 

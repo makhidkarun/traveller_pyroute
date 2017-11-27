@@ -195,22 +195,23 @@ class Galaxy(object):
                     algName = line[8:].split(':',1)[1].strip().strip('"')
                     
                     base = AllyGen.same_align(algCode)
-                    if base not in self.alg:
-                        self.alg[base] = Allegiance(base,AllyGen.same_align_name(base,algName), base=True)
                     if algCode not in self.alg:
                         self.alg[algCode] = Allegiance(algCode, algName, base=False)
+                    if base not in self.alg:
+                        self.alg[base] = Allegiance(base, AllyGen.same_align_name(base,algName), base=True)
 
             for line in lines[lineno+2:]:
                 if line.startswith('#') or len(line) < 20: 
                     continue
-                star = Star (line, self.starline, sec, pop_code, ru_calc)
-                sec.worlds.append(star)
-                sec.subsectors[star.subsector()].worlds.append(star)
-                star.alg_base = AllyGen.same_align(star.alg)
-
-                self.set_area_alg(star, self, self.alg)
-                self.set_area_alg(star, sec, self.alg)
-                self.set_area_alg(star, sec.subsectors[star.subsector()], self.alg)
+                star = Star.parse_line_into_star(line, self.starline, sec, pop_code, ru_calc)
+                if star:
+                    sec.worlds.append(star)
+                    sec.subsectors[star.subsector()].worlds.append(star)
+                    star.alg_base = AllyGen.same_align(star.alg)
+    
+                    self.set_area_alg(star, self, self.alg)
+                    self.set_area_alg(star, sec, self.alg)
+                    self.set_area_alg(star, sec.subsectors[star.subsector()], self.alg)
 
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds) ) )
