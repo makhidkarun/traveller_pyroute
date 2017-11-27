@@ -129,7 +129,7 @@ class StatCalculation(object):
         stats.im_be += star.im_be
         stats.passengers  += star.passIn
         stats.spa_people += star.starportPop
-        for code in star.tradeCode:
+        for code in star.tradeCode.codes:
             stats.code_counts[code] += 1
         if star.ggCount:
             stats.gg_count += 1

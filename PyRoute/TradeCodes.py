@@ -30,20 +30,20 @@ class TradeCodes(object):
         Constructor
         '''
         self.logger = logging.getLogger('PyRoute.TradeCodes')
-        codes = initial_codes.split()
-        self.pcode = set(TradeCodes.pcodes) & set(codes)
-        self.dcode = set(TradeCodes.dcodes) & set(codes)
+        self.codes = initial_codes.split()
+        self.pcode = set(TradeCodes.pcodes) & set(self.codes)
+        self.dcode = set(TradeCodes.dcodes) & set(self.codes)
 
-        self.owned = [code for code in codes if code.startswith(u'O:') or code.startswith(u'C:')]
+        self.owned = [code for code in self.codes if code.startswith(u'O:') or code.startswith(u'C:')]
 
         self.sophonts = []
         for homeworld in re.findall(ur"\([^)]+\)\S?", initial_codes, re.U):
             self.sophonts.append(re.sub('[()]', '', homeworld))
             
-        codeCheck = set(codes) - self.dcode - set(self.owned)
+        codeCheck = set(self.codes) - self.dcode - set(self.owned)
         self.homeworlds = [code for code in codeCheck if len(code)>4]
         
-        self.codeset = set(codes) - self.dcode - set(self.owned) - set(self.homeworlds)
+        self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.homeworlds)
         self.codeset = sorted(list(self.codeset))
         
         if len(self.pcode) > 0:
@@ -59,6 +59,9 @@ class TradeCodes(object):
 
     def __str__(self):
         return u" ".join(self.codeset + self.dcode)
+    
+    def planet_codes(self):
+        return u" ".join(self.codeset)
         
     def calculate_pcode(self):
         return self.pcode
@@ -100,7 +103,7 @@ class TradeCodes(object):
             self.logger.error(u'{}-{} Calculated "{}" not in trade codes {}'.format(star, star.uwp, code, self.codeset))
             check = False
         if code in self.codeset and \
-            not (self.atmo in atmo and self.hydro in hydro and self.pop in pop):
+            not (star.atmo in atmo and star.hydro in hydro and star.pop in pop):
             self.logger.error(u'{}-{} Found invalid "{}" in trade codes: {}'.format(star, star.uwp, code, self.codeset))
             check = False
         return check
@@ -211,8 +214,24 @@ class TradeCodes(object):
         return 'Hi' in self.codeset
 
     @property
-    def asteriod (self):
+    def asteroid (self):
         return 'As' in self.codeset
+    
+    @property
+    def desert(self):
+        return 'De' in self.codeset
+    
+    @property
+    def fluid(self):
+        return 'Fl' in self.codeset
+
+    @property
+    def vacuum(self):
+        return 'Va' in self.codeset and 'As' not in self.codeset
+    
+    @property
+    def waterworld(self):
+        return 'Wa' in self.codeset or 'Oc' in self.codeset
 
     @property
     def extreme (self):
