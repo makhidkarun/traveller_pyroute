@@ -8,32 +8,18 @@ import re
 import sys
 sys.path.append('../PyRoute')
 from Star import Star
-from Galaxy import Sector
+from Galaxy import Sector,Galaxy
 from TradeCalculation import TradeCalculation
 
 class Test(unittest.TestCase):
 
     def setUp(self):
-        regex =  """
-^(\d\d\d\d) +
-(.{15,}) +
-(\w\w\w\w\w\w\w-\w) +
-(.{15,}) +
-((\{ [+-]?[0-5] \}) +(\([0-9A-Z]{3}[+-]\d\)) +(\[[0-9A-Z]{4}\])|( ) ( ) ( )) +
-(\w{1,5}|-) +
-(\w\w?|-|\*) +
-(\w|-) +
-([0-9][0-9A-F][0-9A-F]) +
-(\d{1,}| )+
-([A-Z0-9-][A-Za-z0-9-]{1,3}) 
-(.*)
-"""
 
-        star_regex = ''.join([line.rstrip('\n') for line in regex])
+        star_regex = ''.join([line.rstrip('\n') for line in Galaxy.regex])
         self.starline = re.compile(star_regex)
 
     def testParseIrkigkhan(self):
-        star1 = Star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+        star1 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
                      self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
         
         self.assertTrue(star1.position == '0103')
@@ -43,14 +29,15 @@ class Test(unittest.TestCase):
         self.assertTrue(star1.alg == 'Im')
         self.assertTrue(star1.population == 10, "Population %s" % star1.population)
         self.assertTrue(star1.wtn == 9, "wtn %s" % star1.wtn)
-        self.assertFalse(star1.industrial)
-        self.assertFalse(star1.agricultural)
-        self.assertFalse(star1.poor)
-        self.assertFalse(star1.rich)
+        self.assertFalse(star1.tradeCode.industrial)
+        self.assertFalse(star1.tradeCode.agricultural)
+        self.assertFalse(star1.tradeCode.poor)
+        self.assertFalse(star1.tradeCode.rich)
         self.assertTrue(star1.ggCount == 3)
+        self.assertEqual(star1.star_list, 'M2 V')
 
     def testParseShanaMa(self):
-        star1 = Star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (300-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+        star1 = Star.parse_line_into_star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (300-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
                      self.starline,  Sector('Core', ' 0, 0'), 'fixed',  None)
         self.assertTrue(star1.position == '0104')
         self.assertTrue(star1.q == 0 and star1.r == 3, "%s, %s" % (star1.q, star1.r))
@@ -59,11 +46,23 @@ class Test(unittest.TestCase):
         self.assertTrue(star1.alg == 'Im')
         self.assertTrue(star1.population == 0, "Population %s" % star1.population)
         self.assertTrue(star1.wtn == 2, "wtn %s" % star1.wtn)
-        self.assertFalse(star1.industrial)
-        self.assertFalse(star1.agricultural)
-        self.assertTrue(star1.poor)
-        self.assertFalse(star1.rich)
+        self.assertFalse(star1.tradeCode.industrial)
+        self.assertFalse(star1.tradeCode.agricultural)
+        self.assertTrue(star1.tradeCode.poor)
+        self.assertFalse(star1.tradeCode.rich)
         self.assertTrue(star1.ggCount == 3)
+        self.assertEqual(len(star1.star_list), 2)
+        self.assertEqual(star1.star_list, ['K2 IV', 'M7 V'])
+        
+    def testParseSyss(self):
+        star1 = Star.parse_line_into_star("2323 Syss                 C400746-8 Na Va Pi                   { -1 } (A67-2) [6647] BD   S  - 510 5  ImDv M9 III D M5 V",
+                     self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
+        self.assertEqual(star1.position, '2323')
+        self.assertEqual(star1.name, 'Syss')
+        self.assertEqual(star1.uwp, 'C400746-8')
+        self.assertEqual(star1.stars, 'M9 III D M5 V')
+        self.assertEqual(star1.star_list, ['M9 III', 'D', 'M5 V'])
+        
         
     def testAPortModifier(self):
         #cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
@@ -135,7 +134,7 @@ class Test(unittest.TestCase):
         self.assertEqual(TradeCalculation.calc_passengers(15), 500)
 
     def testHashValueSameAfterCaching(self):
-        star1 = Star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+        star1 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V  ",
              self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
     
         # Grabbing hash value twice, once to seed Star._hash, second to dig it out of that cache
@@ -144,11 +143,11 @@ class Test(unittest.TestCase):
         self.assertEqual(oldHash,  newHash)
 
     def TestEquals(self):
-        star1 = Star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+        star1 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
              self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
-        star2 = Star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+        star2 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
              self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
-        star3 = Star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (300-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+        star3 = Star.parse_line_into_star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (300-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
                      self.starline,  Sector('Core', ' 0, 0'), 'fixed',  None)
         
         self.assertEqual(star1,  star2)

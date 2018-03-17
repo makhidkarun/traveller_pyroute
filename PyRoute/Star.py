@@ -11,6 +11,14 @@ import math
 from AllyGen import AllyGen
 from TradeCodes import TradeCodes
 from collections import OrderedDict
+from itertools import izip
+
+
+def pairwise(iterable):
+    "s -> (s0, s1), (s2, s3), (s4, s5), ..."
+    a = iter(iterable)
+    return izip(a, a)
+
 
 class UWPCodes(object):
     uwpCodes = ['Starport', 
@@ -126,6 +134,7 @@ class Star (object):
         
         star.stars = data[17].strip()
         star.extract_routes()
+        star.split_stellar_data()
         
         star.uwpCodes = {'Starport': star.port,
                            'Size': star.size,
@@ -211,7 +220,7 @@ class Star (object):
 
     def wiki_short_name(self):
         name = u" ".join(w.capitalize() for w in self.name.lower().split())
-        return u'[[{} (world)|]]'.format(name)
+        return u'{} (world)'.format(name)
 
     def sec_pos(self, sector):
         if self.sector == sector:
@@ -279,11 +288,11 @@ class Star (object):
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
 
         if pop_code == 'scaled':
-            self.population =pow (10, self.popCode) * popCodeM[self.popM] / 1e7 
+            self.population = pow(10, self.popCode) * popCodeM[self.popM] / 1e7 
             self.uwpCodes['Pop Code'] = str(popCodeM[self.popM]/10)
             
         elif pop_code == 'fixed':
-            self.population = pow (10, self.popCode) * self.popM / 1e6
+            self.population = pow(10, self.popCode) * self.popM / 1e6
             
         elif pop_code == 'benford':
             popCodeRange=[0.243529203, 0.442507049, 0.610740422, 0.756470797, 0.885014099, 1]
@@ -295,7 +304,7 @@ class Star (object):
             self.population = pow (10, self.popCode) * popM / 1e7
             self.uwpCodes['Pop Code'] = str(popM/10)
 
-        self.perCapita = calcGWP[min(self.tl,19)]
+        self.perCapita = calcGWP[min(self.tl,19)] if self.population > 0 else 0
         self.perCapita *= 1.6 if self.tradeCode.rich else 1
         self.perCapita *= 1.4 if self.tradeCode.industrial else 1
         self.perCapita *= 1.2 if self.tradeCode.agricultural else 1
@@ -609,6 +618,22 @@ class Star (object):
         val -= 1 if val > 18 else 0
         return val
     
+    def split_stellar_data(self):
+        starparts = self.stars.split()
+        stars = []
+        
+        if len(starparts) == 1:
+            stars = starparts
+        else:
+            for (prev, current) in zip([None] + starparts[:-1], starparts):
+                if prev in [None, 'V', 'IV', 'Ia', 'Ib', 'II', 'III']:
+                    continue
+                if prev in ['D']:
+                    stars.append(prev)
+                else:
+                    stars.append(' '.join((prev, current)))
+        self.star_list = stars
+        
     def extract_routes(self):
         str_split = self.stars.split()
         self.routes = [route for route in str_split if route.startswith('Xb:') or route.startswith('Tr:')]
