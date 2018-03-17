@@ -62,7 +62,7 @@ class GraphicSubsectorMap (GraphicMap):
                 self.subsector = subsector
                 img = self.document(sector)
                 self.write_base_map(img, subsector)
-                img = self.trade_lines(img, subsector)
+                #img = self.trade_lines(img, subsector)
                 for star in subsector.worlds:
                     self.place_system(img, star)
                 for star in subsector.worlds:
@@ -329,7 +329,7 @@ class GraphicSubsectorMap (GraphicMap):
             name = name.lower()
         size = self.worldFont.getsize(name)
         pos = (point.x - (size[0] / 2) + 1, point.y + size[1])
-        if star.capital:
+        if star.tradeCode.capital:
             doc.text (pos, name, font=self.worldFont, fill=self.fillRed)
         else:
             doc.text(pos, name, font=self.worldFont, fill=self.textFill)
