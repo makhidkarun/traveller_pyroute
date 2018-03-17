@@ -102,11 +102,11 @@ class RouteCalculation (object):
         WTNs plus a modifier for types, minus a modifier for distance. 
         '''
         btn = star1.wtn + star2.wtn
-        if (star1.agricultural and (star2.nonAgricultural or star2.extreme)) or \
-            ((star1.nonAgricultural or star1.extreme) and star2.agricultural): 
+        if (star1.tradeCode.agricultural and (star2.tradeCode.nonagricultural or star2.tradeCode.extreme)) or \
+            ((star1.tradeCode.nonagricultural or star1.tradeCode.extreme) and star2.tradeCode.agricultural): 
             btn += 1
-        if (star1.nonIndustrial and star2.industrial) or \
-            (star2.nonIndustrial and star1.industrial): 
+        if (star1.tradeCode.nonindustrial and star2.tradeCode.industrial) or \
+            (star2.tradeCode.nonindustrial and star1.tradeCode.industrial): 
             btn += 1
         
         if not AllyGen.are_allies(star1.alg, star2.alg):
@@ -129,7 +129,7 @@ class RouteCalculation (object):
     @staticmethod
     def get_passenger_btn(btn, star, neighbor):
             passBTN = btn + \
-                1 if star.rich or neighbor.rich else 0 + \
+                1 if star.tradeCode.rich or neighbor.tradeCode.rich else 0 + \
                 1 if star.tradeCode.subsector_capital or neighbor.tradeCode.subsector_capital else 0 + \
                 2 if star.tradeCode.sector_capital or neighbor.tradeCode.sector_capital else 0 + \
                 2 if star.tradeCode.other_capital or neighbor.tradeCode.other_capital else 0
@@ -453,10 +453,16 @@ class TradeCalculation(RouteCalculation):
     #distance_weight = [0, 30, 50, 70, 110, 170, 300]
     
     # Pure HG weights
-    distance_weight = [0, 30, 50, 75, 130, 230, 490]
+    #distance_weight = [0, 30, 50, 75, 130, 230, 490]
 
     # MGT weights
     #distance_weight = [0, 30, 60, 105, 190, 410, 2470]
+
+    # T5 Weights, now with Hop Drive
+    distance_weight = [0, 30, 50, 75, 130, 230, 490, 9999, 9999, 9999, 300 ]
+    
+    #max_connections = [6, 18, 36, 60, 90, 126, 168, 216, 270, 330]
+    max_connections = [6, 12, 18, 30, 45, 63, 84, 108, 135, 165]
 
     # Set an initial range for influence for worlds based upon their
     # wtn. For a given world look up the range given by (wtn-8) (min 0), 
@@ -503,7 +509,6 @@ class TradeCalculation(RouteCalculation):
                                                   'btn': btn,
                                                   'passenger btn': passBTN})
         
-    
     def generate_routes(self):
         ''' 
         Generate the basic routes between all the stars. This creates two sets
@@ -535,7 +540,7 @@ class TradeCalculation(RouteCalculation):
             for (s,n,d) in neighbor_routes:
                 if len(self.galaxy.stars.neighbors(n)) < 15: 
                     continue
-                if length <= 21:
+                if length <= self.max_connections[self.galaxy.max_jump_range - 1]:
                     break
                 if d.get('xboat',False) or d.get('comm', False):
                     continue
