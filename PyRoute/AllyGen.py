@@ -12,8 +12,8 @@ class AllyGen(object):
     '''
     classdocs
     '''
-    noOne = [u'--']
-    nonAligned = [u'Na', u'Va', u'NaHu', u'NaVa', u'NaAs', u'NaXX', u'VaEx'
+    noOne = [u'--', u'??']
+    nonAligned = [u'Na', u'Va', u'Cs', u'NaHu', u'NaDr', u'NaVa', u'NaAs', u'NaXX', u'VaEx'
                   u'CsCa', u'CsHv', u'CsIm', u'CsMP', u'CsVa', u'CsZh', u'CsRe',
                   u'Wild']
     sameAligned = [(u'Im', u'ImAp', u'ImDa', u'ImDc', u'ImDd', u'ImDg', u'ImDi', u'ImDs', u'ImDv', 
