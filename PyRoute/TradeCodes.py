@@ -96,7 +96,7 @@ class TradeCodes(object):
     def _check_econ_code(self, star, code, atmo, hydro, pop):
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
-        pop = '0123456789ABC' if pop is None else pop
+        pop = '0123456789ABCD' if pop is None else pop
         check = True
         if star.atmo in atmo and star.hydro in hydro and star.pop in pop \
             and code not in self.codeset:
@@ -126,13 +126,13 @@ class TradeCodes(object):
         check = self._check_pop_code(star, 'Lo', '123') and check
         check = self._check_pop_code(star, 'Ni', '456') and check
         check = self._check_pop_code(star, 'Ph', '8') and check
-        check = self._check_pop_code(star, 'Hi', '9ABC') and check
+        check = self._check_pop_code(star, 'Hi', '9ABCD') and check
 
         check = self._check_econ_code(star, 'Pa', '456789', '45678', '48') and check
         check = self._check_econ_code(star, 'Ag', '456789', '45678', '567') and check
-        check = self._check_econ_code(star, 'Na', '0123', '0123', '6789ABC') and check
+        check = self._check_econ_code(star, 'Na', '0123', '0123', '6789ABCD') and check
         check = self._check_econ_code(star, 'Pi', '012479', None, '78') and check
-        check = self._check_econ_code(star, 'In', '012479ABC', None, '9ABC') and check
+        check = self._check_econ_code(star, 'In', '012479ABC', None, '9ABCD') and check
         check = self._check_econ_code(star, 'Pr', '68', None,'59') and check
         check = self._check_econ_code(star, 'Ri', '68', None, '678') and check
         return check
@@ -199,7 +199,7 @@ class TradeCodes(object):
 
     @property
     def barren (self):
-        return 'Ba' in self.codeset
+        return 'Ba' in self.codeset or 'Di' in self.codeset
 
     @property
     def low(self):
