@@ -136,27 +136,28 @@ class Galaxy(object):
     '''
     classdocs
     '''
-    def __init__(self, min_btn, max_jump=4, route_btn=8):
-        '''
-       Constructor
-        '''
-        self.logger = logging.getLogger('PyRoute.Galaxy')
-        regex = """
+    regex = """
 ^(\d\d\d\d) +
 (.{15,}) +
 (\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?) +
 (.{15,}) +
-((\{ ?[+-]?[0-5] ?\}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]| -)|( ) ( ) ( )) +
+((\{ ?[+-]?[0-6] ?\}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]| -)|( ) ( ) ( )) +
 (\w{1,5}|-| ) +
 (\w{1,3}|-|\*) +
 (\w|-) +
 ([0-9X?][0-9A-FX?][0-9A-FX?]) +
 (\d{1,}| ) +
-([A-Z0-9-][A-Za-z0-9?-]{1,3}) 
+([A-Z0-9?-][A-Za-z0-9?-]{1,3}) 
 (.*)
 """
-#(\{ [0-9] \}|\{ -[1-3] \}| ) +
-        star_regex = ''.join([line.rstrip('\n') for line in regex])
+
+    
+    def __init__(self, min_btn, max_jump=4, route_btn=8):
+        '''
+       Constructor
+        '''
+        self.logger = logging.getLogger('PyRoute.Galaxy')
+        star_regex = ''.join([line.rstrip('\n') for line in Galaxy.regex])
         self.logger.debug("Pattern: %s" % star_regex)
         self.starline = re.compile(star_regex)
         self.stars = nx.Graph()
@@ -362,8 +363,8 @@ class Galaxy(object):
              "Va": {"As":1, "In": 1, "Va": 1},
              "Wa": {"In":1, "Ri": 1, "Wa": 1, "Oc": 1},
              "Oc": {"In":1, "Ri": 1, "Wa": 1, "Oc": 1}}
-        source_codes = [code for code in source.tradeCode if code in actives_codes]
-        target_codes = [code for code in market.tradeCode if code in actives_codes]
+        source_codes = [code for code in source.tradeCode.codes if code in actives_codes]
+        target_codes = [code for code in market.tradeCode.codes if code in actives_codes]
         for code in source_codes:
             target_list = trade_table.get(code, {})
             for market_code in target_codes:
