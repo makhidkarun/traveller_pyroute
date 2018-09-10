@@ -11,6 +11,7 @@ import logging
 import codecs
 import os
 from Galaxy import Galaxy
+from SpeculativeTrade import SpeculativeTrade
 from HexMap import HexMap
 from SubsectorMap2 import GraphicSubsectorMap
 from StatCalculation import StatCalculation
@@ -41,6 +42,8 @@ def process():
                         help='Scale for reusing routes during route generation')
     route.add_argument('--ru-calc', default='scaled', choices=['scaled','negative'],
                        help='RU calculation, default [scaled]')
+    route.add_argument('--speculative-version', choices=['CT', 'T5', 'None'] ,default='CT',
+                       help='version of the speculative trade calculations, default [CT]')
 
     output = parser.add_argument_group('output', 'Output options')
     
@@ -88,7 +91,8 @@ def process():
     if args.trade:
         galaxy.trade.calculate_routes()
         galaxy.process_eti()
-        galaxy.process_tradegoods()
+        spectrade = SpeculativeTrade (args.speculative_version, galaxy.stars)
+        spectrade.process_tradegoods()
 
     if args.routes:
         galaxy.write_routes(args.routes)
@@ -102,7 +106,7 @@ def process():
         pdfmap.write_maps()
         
         if args.subsectors:
-            graphMap = GraphicSubsectorMap (galaxy, args.routes)
+            graphMap = GraphicSubsectorMap (galaxy, args.routes, args.speculative_version)
             graphMap.write_maps()
 
     
