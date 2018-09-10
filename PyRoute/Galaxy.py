@@ -29,6 +29,9 @@ class AreaItem(object):
     def wiki_name(self):
         return u'[[{}]]'.format(self.name)
 
+    def __str__(self):
+        return u'{}'.format(self.name)
+
 class Allegiance(AreaItem):
     def __init__(self, code, name, base = False):
         super(Allegiance, self).__init__(name)
@@ -46,6 +49,9 @@ class Allegiance(AreaItem):
             names=self.name.split(',')
             return u'[[{}]], [[{}]]'.format(names[0].strip(), names[1].strip())
         return  u'[[{}]]'.format(self.name)
+
+    def __str__(self):
+        return u'{} ([{})'.format(self.name, self.code)
 
 class Subsector(AreaItem):
     def __init__(self, name, position, sector):
@@ -196,10 +202,10 @@ class Galaxy(object):
                     algName = line[8:].split(':',1)[1].strip().strip('"')
                     
                     base = AllyGen.same_align(algCode)
-                    if algCode not in self.alg:
-                        self.alg[algCode] = Allegiance(algCode, algName, base=False)
                     if base not in self.alg:
                         self.alg[base] = Allegiance(base, AllyGen.same_align_name(base,algName), base=True)
+                    if algCode not in self.alg:
+                        self.alg[algCode] = Allegiance(algCode, algName, base=False)
 
             for line in lines[lineno+2:]:
                 if line.startswith('#') or len(line) < 20: 
@@ -220,6 +226,7 @@ class Galaxy(object):
         self.set_bounding_sectors()
         self.set_bounding_subsectors()
         self.set_positions()
+        self.logger.debug ("Allegiances: {}".format(self.alg))
 
 
     def set_area_alg(self, star, area, algs):
@@ -306,13 +313,13 @@ class Galaxy(object):
         if routes == 'xroute':
             path = os.path.join (self.output_path, 'stations.txt')
             with codecs.open(path, "wb", 'utf-8') as f:
-                stars = [star for star in self.stars.nodes_iter() if star.tradeCount > 0]
+                stars = [star for star in self.stars if star.tradeCount > 0]
                 for star in stars:
                     f.write (u"{} - {}\n".format(star, star.tradeCount))
     
     def process_eti(self):
         self.logger.info("Processing ETI for worlds")
-        for (world,neighbor) in self.stars.edges_iter(None, data=False):
+        for (world,neighbor) in self.stars.edges():
             distance = world.hex_distance(neighbor)
             distanceMod = int(distance/2)
             CargoTradeIndex = int(round(math.sqrt(
@@ -332,53 +339,6 @@ class Galaxy(object):
                 world.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
                 neighbor.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
             
-    def process_tradegoods(self):
-        self.logger.info("Processing TradeGoods for worlds")
-        for (world,neighbor) in self.stars.edges_iter(None, data=False):
-            distance = world.hex_distance(neighbor)
-            source_market = max(self.get_market_price(world, neighbor) - distance, 0)
-            target_market = max(self.get_market_price(neighbor, world) - distance, 0)
-            self.stars[world][neighbor]['SourceMarketPrice'] = int(source_market * 1000)
-            self.stars[world][neighbor]['TargetMarketPrice'] = int(target_market * 1000)
-            
-    def get_market_price (self, source, market):
-        price = 5.0
-        actives_codes = ["Ag","As","Ba", "De", "Fl", "Hi", "Ic", "In", "Lo",
-                          "Na", "Ni", "Po", "Ri", "Va", "Wa", "Oc"]
-        
-        trade_table = {
-             "Ag": {"Ag":1, "As": 1, "De": 1, "Hi": 1, "In": 1, "Lo": 1, "Na": 1, "Ri": 1},
-             "As": {"As":1, "In": 1, "Na": 1, "Ri": 1, "Va": 1},
-             "Ba": {"Ag":1, "In": 1},
-             "De": {"De":1, "Na": 1},
-             "Fl": {"Fl":1, "In": 1},
-             "Hi": {"Hi":1, "Lo": 1, "Ri": 1},
-             "Ic": {"In":1},
-             "In": {"Ag":1, "As": 1, "De": 1, "Fl": 1, "Hi": 1, "In": 1, "Ni": 1, "Po": 1, "Ri": 1, "Va": 1, "Wa": 1, "Oc": 1},
-             "Lo": {"In":1, "Ri": 1},
-             "Na": {"As":1, "De": 1, "Va": 1},
-             "Ni": {"In":1, "Ni":-1},
-             "Po": {"Po":-1},
-             "Ri": {"Ag":1, "De": 1, "Hi": 1, "In": 1, "Na": 1, "Ri": 1},
-             "Va": {"As":1, "In": 1, "Va": 1},
-             "Wa": {"In":1, "Ri": 1, "Wa": 1, "Oc": 1},
-             "Oc": {"In":1, "Ri": 1, "Wa": 1, "Oc": 1}}
-        source_codes = [code for code in source.tradeCode.codes if code in actives_codes]
-        target_codes = [code for code in market.tradeCode.codes if code in actives_codes]
-        for code in source_codes:
-            target_list = trade_table.get(code, {})
-            for market_code in target_codes:
-                price += target_list.get(market_code, 0)
-        
-        if "As" in target_codes or "As" in source_codes:
-            price -=1
-        if "Ba" in target_codes:
-            price = 0
-        if source.tl - market.tl > -10:
-            price += (price * (source.tl - market.tl)) / 10.0
-        else:
-            price = 0 
-        return price
 
     
     def read_routes (self, routes=None):
@@ -396,16 +356,15 @@ class Galaxy(object):
                 
                 world1 = self.sectors[sec1].find_world_by_pos(hex1)
                 world2 = self.sectors[sec2].find_world_by_pos(hex2)
-                
-                self.ranges.add_edge(world1, world2, routeData)
-               
+
+                self.ranges.add_edge_from([world1, world2, routeData])
 
     def process_owned_worlds(self):
         ow_names = os.path.join(self.output_path, 'owned-worlds-names.csv')
         ow_list = os.path.join(self.output_path, 'owned-worlds-list.csv')
         with codecs.open(ow_names, 'w+', 'utf-8') as f, codecs.open(ow_list, 'w+', 'utf-8') as g:
 
-            for world in self.stars.nodes_iter():
+            for world in self.stars:
                 if world.ownedBy == world:
                     continue
                 ownedBy = [star for star in self.stars.neighbors_iter(world) \

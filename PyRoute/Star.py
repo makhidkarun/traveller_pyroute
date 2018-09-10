@@ -182,7 +182,6 @@ class Star (object):
         star.eti_passenger = 0
         star.eti_worlds = 0
         star.calculate_eti()
-        star.calculate_tradegoods()
         
         star._hash = None
         return star
@@ -539,39 +538,6 @@ class Star (object):
         eti -= 1 if self.zone in ['A', 'U'] else 0
         self.eti_passenger = eti
         
-    def calculate_tradegoods(self):
-        cost = 4.0
-        cost -= 1 if self.tradeCode.agricultural else 0
-        cost -= 1 if self.tradeCode.asteroid else 0
-        cost += 1 if self.tradeCode.desert else 0
-        cost += 1 if self.tradeCode.fluid else 0
-        cost -= 1 if self.tradeCode.high else 0
-        cost -= 1 if self.tradeCode else 0
-        cost += 2 if self.tradeCode.low else 0
-        cost += 1 if self.tradeCode.nonindustrial else 0
-        cost -= 1 if self.tradeCode.poor else 0
-        cost += 1 if self.tradeCode.rich else 0
-        cost += 1 if self.tradeCode.vacuum else 0
-        cost += self.tl / 10.0
-        cost -= 1 if 'A' in self.port else 0
-        cost += 1 if 'C' in self.port else 0
-        cost += 2 if 'D' in self.port else 0
-        cost += 3 if 'E' in self.port else 0
-        cost += 5 if 'X' in self.port else 0
-        self.trade_cost = cost
-        self.trade_id = u"{}-{} {} Cr{}".format(self.port, self.uwpCodes['Tech Level'], 
-                                                self.tradeCode.planet_codes(), int(cost*1000))
-        
-#        self.port = self.uwp[0]
-#        self.size = self.uwp[1]
-#        self.atmo = self.uwp[2]
-#        self.hydro = self.uwp[3]
-#        self.pop   = self.uwp[4]
-#        self.gov   = self.uwp[5]
-#        self.law   = self.uwp[6]
-#        self.tl = int(self.uwp[8],36)
-
-             
 
     def calculate_army(self):
         #       3, 4, 5, 6, 7, 8, 9, A

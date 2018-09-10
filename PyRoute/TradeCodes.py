@@ -36,36 +36,46 @@ class TradeCodes(object):
 
         self.owned = [code for code in self.codes if code.startswith(u'O:') or code.startswith(u'C:')]
 
-        self.sophonts = []
-        for homeworld in re.findall(ur"\([^)]+\)\S?", initial_codes, re.U):
-            self.sophonts.append(re.sub('[()]', '', homeworld))
-            
-        codeCheck = set(self.codes) - self.dcode - set(self.owned)
-        self.homeworlds = [code for code in codeCheck if len(code)>4]
-        
-        self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.homeworlds)
+        self.homeworld_list = []
+        self.sophont_list= []
+        homeworlds_found = []
+
+        self.sophont_list = [code for code in self.codes if re.match(ur"\w{4}(\d|W)", code, re.U)]
+
+        for homeworld in re.findall(ur"[Di]*\([^)]+\)\d?", initial_codes, re.U):
+            sophont = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
+            self.homeworld_list.append(sophont)
+            match =  re.match(r'\(([^)]{4})[^)]*\)(\d)?', homeworld)
+            if sophont.startswith(u"Di"):
+                sophont = "{}{}".format(match.group(1), 'X')
+            else:
+                sophont = "{}{}".format(match.group(1), match.group(2) if match.group(2) else 'W')
+            self.sophont_list.append(sophont)
+            homeworlds_found.append(homeworld)
+
+        self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.sophont_list) - set(homeworlds_found)
         self.codeset = sorted(list(self.codeset))
-        
+
         if len(self.pcode) > 0:
             self.pcode = sorted(list(self.pcode))[0]
         else:
             self.pcode = None
-            
+
         self.owner = self.owners(None)
         self.colony = self.colonies(None)
-        
+
         self.dcode = list(self.dcode) + self.colony + self.owner
         self.dcode = sorted(self.dcode)
 
     def __str__(self):
         return u" ".join(self.codeset + self.dcode)
-    
+
     def planet_codes(self):
         return u" ".join(self.codeset)
-        
+
     def calculate_pcode(self):
         return self.pcode
-   
+
     def _check_planet_code(self, star, code, size, atmo, hydro):
         size = '0123456789ABC' if size is None else size
         atmo = '0123456789ABCDEF' if atmo is None else atmo
@@ -107,8 +117,8 @@ class TradeCodes(object):
             self.logger.error(u'{}-{} Found invalid "{}" in trade codes: {}'.format(star, star.uwp, code, self.codeset))
             check = False
         return check
-    
-    
+
+
     def check_world_codes(self, star):
         check = True
         check = self._check_planet_code(star, 'As', '0', '0', '0') and check
@@ -136,7 +146,7 @@ class TradeCodes(object):
         check = self._check_econ_code(star, 'Pr', '68', None,'59') and check
         check = self._check_econ_code(star, 'Ri', '68', None, '678') and check
         return check
-    
+
     def owned_by(self, star):
         self.ownedBy = self
         if star.gov == '6': 
@@ -157,15 +167,15 @@ class TradeCodes(object):
         if (star.gov == '6' and not self.ownedBy) or (star.gov != '6' and self.ownedBy != self):
             self.logger.debug (u"{} has incorrect government code {} - {}".format(star, star.gov, self.dcode))
         return self.owned_by
-    
-    
+
+
     def owners(self, sector_name):
         if not sector_name:
             return [code for code in self.owned if code.startswith('O:')]
         else:
             return [code if len(code) > 6 else u'O:'+ sector_name[0:4] + u'-' + code[2:]
                   for code in self.owned if code.startswith(u'O:')]
-        
+
     def colonies(self,sector_name):
         if not sector_name:
             return [code for code in self.owned if code.startswith(u'C:')]
@@ -175,24 +185,28 @@ class TradeCodes(object):
 
     @property
     def homeworld(self):
-        return self.sophonts if len(self.sophonts) > 0 else None
-        
+        return self.homeworld_list if len(self.homeworld_list) > 0 else None
+
+    @property
+    def sophonts(self):
+        return self.sophont_list if len(self.sophont_list) > 0 else None
+
     @property
     def rich(self):
         return 'Ri' in self.codeset
-    
+
     @property
     def industrial(self):
         return 'In' in self.codeset
-    
+
     @property
     def agricultural(self):
         return 'Ag' in self.codeset
-    
+
     @property
     def poor(self):
         return 'Po' in self.codeset
-    
+
     @property
     def nonagricultural (self):
         return 'Na' in self.codeset
@@ -208,7 +222,7 @@ class TradeCodes(object):
     @property
     def nonindustrial(self):
         return 'Ni' in self.codeset
-    
+
     @property
     def high (self):
         return 'Hi' in self.codeset
@@ -216,11 +230,11 @@ class TradeCodes(object):
     @property
     def asteroid (self):
         return 'As' in self.codeset
-    
+
     @property
     def desert(self):
         return 'De' in self.codeset
-    
+
     @property
     def fluid(self):
         return 'Fl' in self.codeset
@@ -228,7 +242,7 @@ class TradeCodes(object):
     @property
     def vacuum(self):
         return 'Va' in self.codeset and 'As' not in self.codeset
-    
+
     @property
     def waterworld(self):
         return 'Wa' in self.codeset or 'Oc' in self.codeset
@@ -236,7 +250,7 @@ class TradeCodes(object):
     @property
     def extreme (self):
         return len(self.ex_codes & set(self.dcode)) > 0
-    
+
     @property
     def capital (self):
         return 'Cp' in self.dcode or 'Cx' in self.dcode or 'Cs' in self.dcode
@@ -244,19 +258,19 @@ class TradeCodes(object):
     @property
     def subsector_capital (self):
         return 'Cp' in self.dcode
-    
+
     @property
     def sector_capital (self):
         return 'Cs' in self.dcode
-    
+
     @property
     def other_capital (self):
         return 'Cx' in self.dcode
-    
+
     @property
     def research_station (self):
         return set(self.research.keys()).intersection(self.dcode)
-    
+
     @property
     def research_station_char(self):
         stations = self.research_station
