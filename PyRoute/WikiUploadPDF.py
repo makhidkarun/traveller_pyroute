@@ -10,10 +10,11 @@ Created on Apr 26, 2015
 # pip install poster 
 #
 #
-from wikitools import wiki
 from wikitools import api
-from wikitools.wikifile import File
 from wikitools.page import Page, NoPage
+
+from travellerwikitools import WikiReview
+
 import logging
 import argparse
 import warnings
@@ -22,7 +23,6 @@ import codecs
 import glob
 import re
 from itertools import izip
-import traceback
 
 logger = logging.getLogger('WikiUpload')
 
@@ -57,88 +57,35 @@ def uploadSummaryText(site, summaryFile, era):
             index += 1
 
         target_page = None
-        try:
-            target_page = Page(site, targetTitle)
-            categories = target_page.getCategories(True)
-            if 'Category:Meta' in categories:
-                targetTitle += u'/{}'.format(era)
-                target_page = Page(site, targetTitle) 
-        except api.APIError as e:
-            if e.args[0] == 'missingtitle':
-                logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
-                index += 1
-                continue
-            else:
-                logger.error(u"UploadSummary for page {} got exception {} ".format(baseTitle, e))
-                return
-        except NoPage as e:
-            logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
+        target_page = site.get_page(targetTitle)
+        if target_page and 'Category:Meta' in target_page.getCategories(True):
+            targetTitle += u'/{}'.format(era)
+            target_page = site.get_page(targetTitle)
+            
+        if not target_page:
             index += 1
             continue
         
-        try:
-            result = target_page.edit(text=text, summary='Trade Map update summary', 
-                                      bot=True, nocreate=True,skipmd5=True)
-    
-            if result['edit']['result'] == 'Success':
-                logger.info(u'Saved: {}'.format(targetTitle))
-            else:
-                logger.info(u'Save failed {}'.format(targetTitle)) 
-        except api.APIError as e:
-            if e.args[0] == 'missingtitle':
-                logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
-            else:
-                logger.error(u"UploadSummary for page {} got exception {} ".format(baseTitle, e))
-        except NoPage as e:
-            logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(baseTitle))
+        site.save_page(target_page, text, 'Trade Map update summary')
             
         if lines[index].startswith('|}'):
             break       
         index += 1
         
-def uploadPDF(site, filename):
-    with open(filename, "rb") as f:        
-        try:
-            page = File (site, os.path.basename(filename))
-            result = page.upload(f, "{{Trade map disclaimer}}", ignorewarnings=True)
-            if result['upload']['result'] == 'Success':
-                logger.info(u'Saved: {}'.format(filename))
-            else:
-                logger.error(u'Save failed {}'.format(filename)) 
-        except Exception as e:
-            logger.error("UploadPDF for {} got exception: {}".format(filename, e))
-            traceback.print_exc()
-
 def uploadSec (site, filename, place, era):
     with codecs.open(filename, "r", 'utf-8') as f:
         text = f.read()
-    target_page=None
-    try :
-        targetTitle = os.path.basename(filename).split('.')[0] + place    
-        target_page = Page(site, targetTitle)
-        categories = target_page.getCategories(True)
-        if 'Category:Meta' in categories:
-            targetTitle += u'/{}'.format(era)
-            target_page = Page(site, targetTitle) 
-    except api.APIError as e:
-        if e.args[0] == 'missingtitle':
-            logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(targetTitle))
-        else:
-            logger.error(u"UploadSummary for page {} got exception {} ".format(targetTitle, e))
+    targetTitle = os.path.basename(filename).split('.')[0] + place   
+    target_page = site.get_page(targetTitle)
+    if target_page and 'Category:Meta' in target_page.getCategories(True):
+        targetTitle += u'/{}'.format(era)
+        target_page = site.get_page(targetTitle)
+        
+    if not target_page:
         return
-    except NoPage as e:
-        logger.error(u"UploadSummary for page {}, page does not exist, skipped".format(targetTitle))
-        return
-    
-    try:        
-        result = target_page.edit(text=text, summary='Trade Map update sector data', 
-                                  bot=True, nocreate=True, skipmd5=True)
-        if result['edit']['result'] == 'Success':
-            logger.info(u'Saved: {}'.format(targetTitle))
-        else:
-            logger.error('Save failed {}'.format(targetTitle)) 
-    except Exception as e:
-        logger.error("uploadSec for {} got exception: {}".format(filename, e))
+
+    site.save_page(target_page, text, 'Trade Map update sector data')
+
 
 def pairwise(iterable):
     "s -> (s0, s1), (s2, s3), (s4, s5), ..."
@@ -268,6 +215,20 @@ No information yet available.
 
         hexNo = sec[0].strip(u'|').strip()
         worldPage = eco[1].strip() + u" (world)"
+
+        worldName = worldPage.split(u'(')
+        shortName = shortNames[sectorName]
+        worldPage = worldName[0] + u'('+ shortName + u' ' + hexNo + u') (' + worldName[1]
+        
+        site.search_disambig = worldName
+        target_page = site.get_page(worldPage)
+        
+        
+        pages = [target_page] if not isinstance(target_page, (list, tuple)) else target_page
+        
+        for page in pages:
+            pass
+        
         try:
             target_page = Page(site, worldPage)
             # First, check if this is a disambiguation page, if so generate
@@ -393,30 +354,33 @@ def process():
     args = parser.parse_args()
     set_logging(args.log_level)
 
+    site = WikiReview.get_site(args.user, args.site)
+    wiki_review = WikiReview(site, None, False)
+
     # create a Wiki object
-    site = wiki.Wiki(args.site)
+    #site = wiki.Wiki(args.site)
     #site = wiki.Wiki("http://localhost/wiki/api.php")
-    site.login(args.user, remember=True)
+    #site.login(args.user, remember=True)
 
     if args.maps:
         path = os.path.join(args.input, "*Sector.pdf")
         for f in glob.glob(path):
-            uploadPDF(site, f)
+            wiki_review.upload_file(f)
 
     if args.secs:        
         path = os.path.join(args.input, "*Sector.economic.wiki")
         for f in glob.glob(path):
-            uploadSec (site, f, "/economic", args.era)
+            uploadSec (wiki_review, f, "/economic", args.era)
         path = os.path.join(args.input, "*Sector.sector.wiki")
         for f in glob.glob(path):
-            uploadSec (site, f, "/sector", args.era)
+            uploadSec (wiki_review, f, "/sector", args.era)
 
     if args.summary:
         path = os.path.join(args.input, "summary.wiki")
-        uploadSummaryText(site, path, args.era)
+        uploadSummaryText(wiki_review, path, args.era)
     if args.subsector:
         path = os.path.join(args.input, "subsector_summary.wiki")
-        uploadSummaryText(site, path, args.era)
+        uploadSummaryText(wiki_review, path, args.era)
 
     if args.worlds:
         path = os.path.join(args.input, "{0} Sector.economic.wiki".format(args.worlds))
@@ -426,7 +390,7 @@ def process():
             sector = args.worlds
             if sector in shortNames.keys():
                 sec = eco.replace('Sector.economic.wiki', 'Sector.sector.wiki')
-                uploadWorlds(site, sec, eco, args.era)
+                uploadWorlds(wiki_review, sec, eco, args.era)
 
 if __name__ == '__main__':
     process()

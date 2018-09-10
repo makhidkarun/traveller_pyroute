@@ -16,8 +16,7 @@ class WikiCreateWorld(object):
     '''
     classdocs
     '''
-    page_template = '''
-{{{{UWP 
+    page_template = '''{{{{UWP
  |name    = {{{{World|{full name}|{sector}|{subsector}|{pos}}}}}
  |system  = 
  |uc      = {uwp}
@@ -142,7 +141,6 @@ No information yet available.
         '''
 
     def get_star_template(self, star):
-
         if len(star.star_list) == 1:
             star_template = self.monostellarTemplate.format(star.name, star.star_list[0])
             star_category = None
@@ -156,20 +154,20 @@ No information yet available.
             logger.info("found system {} with {:d} stars".format(star.name, len(star.star_list)))
             star_template = None
             star_category = None
-        
+
         return (star_template, star_category)
-    
+
     def get_sources(self, star, sources):
         source_text = '{{Sources\n'
         index = 1
         for source in sources:
             source_text += " |S{}={}\n".format(index,source)
             index += 1
-            
+
         source_text += "}}\n"
-        
+
         return source_text
-    
+
     def get_categories(self, star, categories):
         base_categories = ['[[Category: First Imperium worlds]]', '[[Category: Humaniti worlds]]', '[[Category: Rule of Man worlds]]',
                            '[[Category: Second Imperium worlds]]','[[Category: Ziru Sirka worlds]]']
@@ -179,22 +177,21 @@ No information yet available.
             base_categories.extend(categories)
         base_categories.sort()
         return '\n'.join(base_categories)
-    
-        
+
     def get_comments(self, star):
         comments = []
         for code in star.tradeCode.dcode:
             comments.append('{{{{World summary comment|trade={} }}}}'.format(code))
         comments = '\n' + '\n'.join(comments) if len(comments) > 0 else ' '
         return comments
-    
+
     def get_bases(self, star):
         if star.baseCode != '-':
             bases = '\n{{{{World summary bases|bases={} }}}}'.format(star.baseCode)
         else:
             bases = ' '
         return bases
-    
+
     def get_nobility(self, star):
         if len(str(star.nobles)) :
             nobility = '''
@@ -204,9 +201,8 @@ No information yet available.
         else:
             nobility = '\n'
         return nobility
-    
+
     def create_page(self, star, categories, sources, full_name):
-        
         star_template, star_category = self.get_star_template(star)
         sources = self.get_sources(star, sources)
         comments = self.get_comments(star)
@@ -216,7 +212,7 @@ No information yet available.
         pcode = star.tradeCode.pcode if star.tradeCode.pcode else ''
         trade = ' '.join(star.tradeCode.codeset)
         categories = self.get_categories(star_category, categories)
-        
+
         formatting = {'sector': star.sector.name, 'subsector': subsector, 'pos': star.position,
                       'uwp': star.uwp, 'popc': star.uwpCodes['Pop Code'], 'zone': star.zone,
                       'alg': star.alg, 'pcode': pcode, 'nobility': str(star.nobles),
@@ -228,28 +224,28 @@ No information yet available.
                       'nobility summary': nobility, 'categories': categories,
                       'sources': sources, 'name': star.name, 'full name': full_name
                       }
-        
+
         page_text = self.page_template.format(**formatting)
         return page_text
-        
+
     def read_sector(self, sectors):
         galaxy = Galaxy (12)
         galaxy.read_sectors(sectors, 'fixed', 'scaled')
         return galaxy
-    
+
 def get_category_list(category_files):
     category_list = {}
     for cat in category_files:
         cat_name = '[[Category: {}]]'.format(os.path.splitext(os.path.basename(cat))[0].replace('_', ' '))
         cat_worlds = get_skip_list(cat)
         logger.info ("processing category: {} -> {} of {}".format(cat, cat_name, cat_worlds))
-        
+
         for world in cat_worlds:
             if world in category_list:
                 category_list[world].append(cat_name)
             else:
                 category_list[world] = [cat_name]
-                
+
     return category_list
 
 def get_sources_list(sources_files):
@@ -273,7 +269,7 @@ def get_skip_list(name):
 def get_max_list():
     with open('Zar_max_present.txt') as f:
         max_list = f.read().splitlines()
-        
+
     return max_list
 
 def set_logging(level):
@@ -291,13 +287,14 @@ def process():
     parser.add_argument('-c', '--category', action='append', help='File wilth list of worlds to append different category')
     parser.add_argument('-s', '--source', action='append', help='File with list of worlds to append a source')
     parser.add_argument('--log-level', default='INFO')
-    
+
     parser.add_argument('--site', dest='site', default='http://wiki.travellerrpg.com/api.php')
     parser.add_argument('--user', dest='user', default='AB-101', help='(Bot) user to connect to the wiki, default [AB-101]')
     parser.add_argument('--search-disambig', help='Search value to refine disambiguation title')
 
+    parser.add_argument('--save-to-wiki', dest='save', default=False, action='store_true', help='Save the generated pages to the wiki')
     parser.add_argument('sector', nargs='*', help='T5SS sector file(s) to process')
-    
+
     args = parser.parse_args()
     set_logging(args.log_level)
 
@@ -306,7 +303,7 @@ def process():
 
     site = WikiReview.get_site(args.user, args.site)
     wiki_review = WikiReview(site, None, args.search_disambig)
-    
+
     category_list = get_category_list(args.category)
     sources_list = get_sources_list(args.source)
 
@@ -327,12 +324,13 @@ def process():
 
         categories = category_list[star.name] if star.name in category_list else None
         sources = sources_list[star.name] if star.name in sources_list else []
-        
+
         new_page = worlds.create_page(star, categories, sources, title)
 
         print new_page
-        print "=============================================="     
-        #wiki_review.save_page(wiki_page.title, new_page)   
+        print "=============================================="
+        if args.save:
+            wiki_review.save_page(wiki_page.title, new_page)
 
 if __name__ == '__main__':
     process()

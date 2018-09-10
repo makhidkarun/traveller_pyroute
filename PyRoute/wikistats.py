@@ -5,6 +5,7 @@ Created on Mar 22, 2014
 '''
 import os
 
+import logging
 import codecs
 import datetime
 import urllib
@@ -32,6 +33,7 @@ class WikiStats(object):
         self.min_alg_count = min_alg_count
         self.plural = inflect.engine()
         self.match_alg = match_alg == 'collapse'
+        self.logger = logging.getLogger('PyRoute.WikiStats')
 
     def write_statistics(self):
         self.summary_statistics()
@@ -134,7 +136,9 @@ class WikiStats(object):
         with codecs.open(path, "wb", 'utf_8') as f:
             f.write('===[[Allegiance Code|Allegiance Information]]===\n')
             allegiances_sorted = AllyGen.sort_allegiances(alg, self.match_alg)
-            f.write('{| class=\"wikitable sortable\"\n!Code !! Name !! Worlds !! Population (millions) !! Economy (BCr) !! Per Capita (Cr) !!  RU !! Shipyard Capacity (MTons) !! Armed Forces (BEs) !! SPA Population\n')
+            self.logger.debug("Allegiances:  {}".format(allegiances_sorted))
+            f.write('{| class=\"wikitable sortable\"\n!Code !! Name !! Worlds !! Population (millions) ' + \
+                '!! Economy (BCr) !! Per Capita (Cr) !!  RU !! Shipyard Capacity (MTons) !! Armed Forces (BEs) !! SPA Population\n')
             for allegiance in allegiances_sorted:
                 if allegiance.stats.number < self.min_alg_count:
                     continue
@@ -193,6 +197,10 @@ class WikiStats(object):
         from StatCalculation import ObjectStatistics
         population = self.galaxy.stats.population
         default_stats = ObjectStatistics()
+        f.write('|-\n!Component')
+        for x in range(18):
+            f.write('||{}'.format(baseN(x,18)))
+        f.write('||I-Z')
 
         for name, values in self.uwp.uwp.iteritems():
             f.write('\n|- \n| {}'.format(name))
@@ -397,7 +405,16 @@ class WikiStats(object):
                 self.write_count(f, area.stats.number, 'world', False)
                 f.write(u' with a population of ')
                 self.write_population(area.stats.population, f)
-                f.write('. ')
+                
+                f.write(' (')
+                for (code, pop) in area.stats.pop_groups.iteritems():
+                    f.write(u"{}: ".format(code))
+                    self.write_population(pop, f)
+                    f.write(", ")
+                f.write('). ')
+                
+                f.write('The economy is BCr{:,d} and a per capita income of Cr{:,d}. '.format(area.stats.economy, area.stats.percapita))
+                
                 if area.stats.population > 0:
                     self.text_area_pop_tl(f, area_type, area)
                     self.text_area_capitals(f, area_type, area)
@@ -499,7 +516,7 @@ class WikiStats(object):
                 f.write ('<section begin="header"/>\n')
                 f.write ('{| class="wikitable sortable" width="90%"\n')
                 f.write (u'|+ {} economic data\n'.format(sector.sector_name()))
-                f.write (u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!MSPR!!RU!!GWP (BCr)!!Trade (MCr/year)' + \
+                f.write (u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!MSPR!!RU!!Per Capita (Cr)!!GWP (BCr)!!Trade (MCr/year)' + \
                          '!!Passengers (per year)!!Build!!Army!!Port!!SPA Population' + \
                          '!!ETI Index!!ETI Pass Index!!ETI worlds!!ETI Cargo (tons/year)!!ETI Passengers (per year)' + \
                          '!!Trade Goods' +\
