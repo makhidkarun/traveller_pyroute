@@ -14,7 +14,7 @@ class AllyGen(object):
     '''
     noOne = [u'--', u'??']
     nonAligned = [u'Na', u'Va', u'Cs', u'NaHu', u'NaDr', u'NaVa', u'NaAs', u'NaXX', u'VaEx'
-                  u'CsCa', u'CsHv', u'CsIm', u'CsMP', u'CsVa', u'CsZh', u'CsRe',
+                  u'CsCa', u'CsHv', u'CsIm', u'CsMP', u'CsVa', u'CsZh', u'CsRe', u'CsMo', u'CsRr',
                   u'Wild']
     sameAligned = [(u'Im', u'ImAp', u'ImDa', u'ImDc', u'ImDd', u'ImDg', u'ImDi', u'ImDs', u'ImDv', 
                         u'ImLa', u'ImLc', u'ImLu', u'ImSy', u'ImVd'),
@@ -87,7 +87,15 @@ class AllyGen(object):
         if base_match_only:
             algs = [alg for alg in alg_list.itervalues() if alg.base]
         else: 
-            algs = [alg for alg in alg_list.itervalues() if not alg.base]
+            base_algs = [alg for alg in alg_list.itervalues() if alg.base]
+            detail_algs = [alg for alg in alg_list.itervalues() if not alg.base]
+
+            for alg in detail_algs:
+                base_alg = alg_list[AllyGen.same_align(alg.code)]
+                if base_alg in base_algs:
+                    base_algs = base_algs.remove(base_alg)
+
+            algs = detail_algs + base_algs
         algs.sort(key=lambda alg : alg.stats.number, reverse = True)
         return algs
 
@@ -100,7 +108,7 @@ class AllyGen(object):
             of control is contigious. Every Non-aligned world is independent
         """
         self.logger.info('Processing worlds for border drawing')
-        for star in self.galaxy.stars.nodes_iter():
+        for star in self.galaxy.stars:
             alg = star.alg
             # Skip the non-entity worlds
             if alg in self.noOne:
@@ -275,7 +283,7 @@ class AllyGen(object):
                       
     def _ally_map(self, match):
         # Create list of stars
-        stars = [star for star in self.galaxy.stars.nodes_iter()]
+        stars = [star for star in self.galaxy.stars]
         allyMap = defaultdict(set)
         starMap = {}
         # Mark the map with all the stars        
@@ -507,7 +515,7 @@ class AllyGen(object):
         Note: This does not match the original system.
         '''
         # Create list of stars
-        stars = [star for star in self.galaxy.stars.nodes_iter()]
+        stars = [star for star in self.galaxy.stars]
         allyMap = defaultdict(set)
         starMap = {}
         # Mark the map with all the stars        

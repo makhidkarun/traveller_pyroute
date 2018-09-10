@@ -60,7 +60,7 @@ class RouteCalculation (object):
     
     def generate_base_routes (self):
         self.logger.info('generating jumps...')
-        for star,neighbor in itertools.combinations(self.galaxy.ranges.nodes_iter(), 2):
+        for star,neighbor in itertools.combinations(self.galaxy.ranges, 2):
             dist = star.hex_distance (neighbor)
             if self.base_route_filter (star, neighbor):
                 continue 
@@ -70,11 +70,8 @@ class RouteCalculation (object):
             if dist <= self.galaxy.max_jump_range: 
                 weight = self.route_weight(star, neighbor)
                 btn = self.get_btn(star, neighbor)
-                self.galaxy.stars.add_edge (star, neighbor, {'distance': dist,
-                                                  'weight': weight,
-                                                  'trade': 0,
-                                                  'btn': btn,
-                                                  'count': 0})
+                self.galaxy.stars.add_edge (star, neighbor, distance=dist,
+                                            weight=weight, trade=0, btn=btn, count=0)
                 self.check_existing_routes(star, neighbor)
 
         self.logger.info("base routes: %s  -  ranges: %s" % 
@@ -241,11 +238,11 @@ class XRouteCalculation (RouteCalculation):
     def generate_routes(self):
         self.distance_weight = self.capSec_weight
         self.generate_base_routes()
-        self.capital = [star for star in self.galaxy.ranges.nodes_iter() if \
+        self.capital = [star for star in self.galaxy.ranges if \
                    AllyGen.are_allies(u'Im', star.alg) and star.tradeCode.other_capital]
-        self.secCapitals = [star for star in self.galaxy.ranges.nodes_iter() if \
+        self.secCapitals = [star for star in self.galaxy.ranges if \
                    AllyGen.are_allies(u'Im', star.alg) and star.tradeCode.sector_capital]
-        self.subCapitals = [star for star in self.galaxy.ranges.nodes_iter() if \
+        self.subCapitals = [star for star in self.galaxy.ranges if \
                    AllyGen.are_allies(u'Im', star.alg) and star.tradeCode.subsector_captial]
         
     def routes_pass_1(self):
@@ -322,11 +319,11 @@ class XRouteCalculation (RouteCalculation):
 
     def routes_pass_3 (self):
         self.reweight_routes(self.impt_weight)
-        important = [star for star in self.galaxy.ranges.nodes_iter() if \
+        important = [star for star in self.galaxy.ranges if \
                      AllyGen.are_allies(u'Im', star.alg) and star.tradeCount == 0 
                      and (star.importance >= 4 or 'D' in star.baseCode or 'W' in star.baseCode)]
         
-        jumpStations = [star for star in self.galaxy.ranges.nodes_iter() if \
+        jumpStations = [star for star in self.galaxy.ranges if \
                       star.tradeCount > 0]
         
         self.logger.info ('Important worlds: {}, jump stations: {}'.format(len(important), len(jumpStations)))
@@ -372,7 +369,7 @@ class XRouteCalculation (RouteCalculation):
         
     def reweight_routes (self, weightList):
         self.distance_weight = weightList
-        for (star, neighbor, data) in self.galaxy.stars.edges_iter(data=True):
+        for (star, neighbor, data) in self.galaxy.stars.edges(data=True):
             data['weight']=self.route_weight(star, neighbor)
             for _ in xrange(1, min(data['count'],5)):
                 data['weight'] -= data['weight'] / self.route_reuse
@@ -396,9 +393,7 @@ class XRouteCalculation (RouteCalculation):
             route = nx.astar_path(self.galaxy.stars, star, target, heuristic)
         except  nx.NetworkXNoPath:
             return
-
-        dist = star.hex_distance(target)
-        self.galaxy.ranges.add_edge(star, target, {'distance': dist})
+        self.galaxy.ranges.add_edge(star, target, distance=star.hex_distance(target))
 
         distance = 0
         start = route[0]
@@ -505,9 +500,9 @@ class TradeCalculation(RouteCalculation):
         # if there there isn't enough trade to warrant a trade check
         if dist <= max_dist and btn >= self.min_btn:
             passBTN = self.get_passenger_btn(btn, star, neighbor)
-            self.galaxy.ranges.add_edge(star, neighbor, {'distance': dist,
-                                                  'btn': btn,
-                                                  'passenger btn': passBTN})
+            self.galaxy.ranges.add_edge(star, neighbor, distance=dist,
+                                                  btn=btn,
+                                                  passenger_btn=passBTN)
         
     def generate_routes(self):
         ''' 
@@ -519,10 +514,10 @@ class TradeCalculation(RouteCalculation):
         self.generate_base_routes()
 
         self.logger.info('calculating routes...')
-        for star in self.galaxy.stars.nodes_iter():
-            if len(self.galaxy.stars.neighbors(star)) < 11:
+        for star in self.galaxy.stars:
+            if len(self.galaxy.stars[star]) < 11:
                 continue
-            neighbor_routes = [(s,n,d) for (s,n,d) in self.galaxy.stars.edges_iter([star], True)]
+            neighbor_routes = [(s,n,d) for (s,n,d) in self.galaxy.stars.edges([star], True)]
             # Need to do two sorts here:
             # BTN low to high to gind them first
             # Range high to low to find them first 
@@ -538,7 +533,7 @@ class TradeCalculation(RouteCalculation):
             # until there are 20 connections left. 
             # This may be reduced by other stars deciding you are too far away.             
             for (s,n,d) in neighbor_routes:
-                if len(self.galaxy.stars.neighbors(n)) < 15: 
+                if len(self.galaxy.stars[n]) < 15:
                     continue
                 if length <= self.max_connections[self.galaxy.max_jump_range - 1]:
                     break
@@ -555,7 +550,7 @@ class TradeCalculation(RouteCalculation):
         for the lower routes to follow.
         '''
         self.logger.info('sorting routes...')
-        btn = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges_iter(data=True)]
+        btn = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges(data=True)]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
         
         base_btn = 0
@@ -695,10 +690,9 @@ class TradeCalculation(RouteCalculation):
             
         if len(route) > 6 and not usesJumpRoute:
             weight -= weight / self.route_reuse
-            self.galaxy.routes.add_edge (route[0], route[-1], {'distance': dist,
-                                                 'weight': weight,
-                                                  'trade': 0, 'route': route,
-                                                  'btn': 0})
+            self.galaxy.routes.add_edge (route[0], route[-1], distance=dist,
+                                                 weight=weight, trade=0, route=route,
+                                                btn=0)
             start = route[0]
             for end in route[1:]:
                 #self.galaxy.routes.remove_edge(start, end)
@@ -716,9 +710,9 @@ class TradeCalculation(RouteCalculation):
         
         # Loop through all the stars in the ranges list, i.e. all potential stars
         # within the range of the BTN route. 
-        for (newstar, target, _) in self.galaxy.ranges.edges_iter(star, True):
+        for (newstar, target, _) in self.galaxy.ranges.edges(star, True):
             if newstar != star:
-                self.logger.error("edges_iter found newstar %s != star %s" % (newstar, star))
+                self.logger.error("edges found newstar %s != star %s" % (newstar, star))
                 continue
 
             #Skip this pair if we've already done the trade
@@ -800,7 +794,7 @@ class CommCalculation(RouteCalculation):
                          self.bases(star) or self.bases(neighbor), 
                          self.important(star, min_importance) or self.important(neighbor, min_importance),
                          self.is_rich(star) or self.is_rich(neighbor)]
-                self.galaxy.ranges.add_edge(star, neighbor, {'distance': dist, 'flags': flags})
+                self.galaxy.ranges.add_edge(star, neighbor, distance=dist, flags=flags)
 
     def capitals(self, star):
         # Capital of sector, subsector, or empire are in the list
@@ -851,7 +845,7 @@ class CommCalculation(RouteCalculation):
 
         self.generate_base_routes()
         
-        routes = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges_iter(data=True) if d['distance'] < 3]
+        routes = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges(data=True) if d['distance'] < 3]
         
         self.logger.info ("considering {} worlds for removal".format(len(routes)))
         removed = 0;
@@ -876,7 +870,7 @@ class CommCalculation(RouteCalculation):
             
     def calculate_routes(self):
         self.logger.info('sorting routes...')
-        routes = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges_iter(data=True)]
+        routes = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges(data=True)]
         routes.sort(key=lambda route : route[2]['distance'])
         routes.sort(key=lambda route : route[2]['flags'], reverse=True)
         total = len(routes)
@@ -888,11 +882,11 @@ class CommCalculation(RouteCalculation):
             self.get_route_between(star, neighbor)
             processed += 1
         
-        active = [(s,n,d) for (s,n,d) in self.galaxy.stars.edges_iter(data=True) if d['count'] > 0]
+        active = [(s,n,d) for (s,n,d) in self.galaxy.stars.edges(data=True) if d['count'] > 0]
         active_graph = nx.Graph()
 
         active_graph.add_edges_from(active)
-        #for (star, neighbor, data) in self.galaxy.stars.edges_iter(data=True):
+        #for (star, neighbor, data) in self.galaxy.stars.edges(data=True):
         #    pass
         
 

@@ -146,7 +146,7 @@ class Map(object):
             
             self.draw_borders(doc, sector)
             
-            sector_trade = [star for star in self.galaxy.stars.edges_iter(sector.worlds, True) \
+            sector_trade = [star for star in self.galaxy.stars.edges(sector.worlds, True) \
               if star[2]['trade'] > 0 and StatCalculation.trade_to_btn(star[2]['trade']) >= self.min_btn ]
 
             logging.getLogger('PyRoute.Map').debug("Worlds with trade: {}".format(len(sector_trade)))                
@@ -158,7 +158,7 @@ class Map(object):
                 self.trade_line(doc, [star, neighbor], data)
 
             # Get all the worlds in this sector
-            #for (star, neighbor, data) in self.galaxy.stars.edges_iter(sector.worlds, True):
+            #for (star, neighbor, data) in self.galaxy.stars.edges(sector.worlds, True):
             #    if star.sector != sector:
             #        continue#
             #    if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:

@@ -26,22 +26,23 @@ class GraphicSubsectorMap (GraphicMap):
     y_count    = 11
     
     
-    def __init__(self, galaxy, routes):
+    def __init__(self, galaxy, routes, trade_version):
         super(GraphicSubsectorMap, self).__init__(galaxy, routes)
         self.x_start = 56
         self.y_start = 56
         self.ym = 48     # half a hex height
         self.xm = 28    # half the length of one side
         self.textFill = self.fillWhite
-        self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf',32)
-        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf',48)
+        self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf',32)
+        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf',48)
         self.hexFont   = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 15)
         self.worldFont = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 22)
         self.hexFont2  = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 22)
         self.hexFont3  = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 36)
-        self.hexFont4  = ImageFont.truetype("/home/tjoneslo/.local/share/fonts/Symbola.ttf", 22)
-        self.hexFont5  = ImageFont.truetype("/home/tjoneslo/.local/share/fonts/Symbola.ttf", 36)
+        self.hexFont4  = ImageFont.truetype("/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf", 22)
+        self.hexFont5  = ImageFont.truetype("/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf", 36)
         self.logger = logging.getLogger('PyRoute.GraphicSubsectorMap')
+        self.trade_version = trade_version
         
     def document(self, sector):
         self.sector = sector
@@ -62,7 +63,8 @@ class GraphicSubsectorMap (GraphicMap):
                 self.subsector = subsector
                 img = self.document(sector)
                 self.write_base_map(img, subsector)
-                #img = self.trade_lines(img, subsector)
+                if self.trade_version != 'None':
+                    img = self.trade_lines(img, subsector)
                 for star in subsector.worlds:
                     self.place_system(img, star)
                 for star in subsector.worlds:
@@ -364,23 +366,22 @@ class GraphicSubsectorMap (GraphicMap):
 
 
     def trade_lines(self, doc, subsector):
-        self.logger.info(u"Processing: {}".format(subsector.name))
         self.image = self.image.convert("RGBA")
         img = Image.new("RGBA", self.image_size, 0)
         draw = ImageDraw.Draw(img)
 
-        trade = [pair for pair in self.galaxy.stars.edges_iter(subsector.worlds, True) \
+        trade = [pair for pair in self.galaxy.stars.edges(subsector.worlds, True) \
                  if pair[2]['distance'] < 3 and \
                  (pair[2]['SourceMarketPrice'] > 0 or pair[2]['TargetMarketPrice'] > 0)]
         
-        self.logger.info(u"generating routes for {} worlds".format(len(trade)))
+        self.logger.info(u"Generating routes in {} for {} worlds".format(subsector.name,len(trade)))
         for (star,neighbor,data) in trade:
             self.trade_line(draw, star,neighbor, data, subsector.position)
         
         cropped = img.crop((53,53,760,1067))
         cropped = cropped.crop((-53,-53, 760+(826-760-53),1067 + (1272-1067-53)))
         self.image = Image.alpha_composite(self.image, cropped)
-        self.logger.info (u"Completed trade_lines for {}".format(subsector.name))
+        self.logger.debug (u"Completed trade_lines for {}".format(subsector.name))
         return ImageDraw.Draw(self.image)
 
         
