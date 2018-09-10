@@ -13,6 +13,8 @@ from Star import UWPCodes
 class ObjectStatistics(object):
     def __init__(self):
         self.population = 0
+        self.pop_groups = defaultdict(int)
+
         self.economy    = 0
         self.trade      = 0
         self.tradeExt   = 0
@@ -29,13 +31,11 @@ class ObjectStatistics(object):
         self.im_be      = 0
         self.passengers = 0
         self.spa_people = 0
-        
         self.code_counts = defaultdict(int)
         self.gg_count   = 0
         self.naval_bases = 0
         self.scout_bases = 0
         self.way_stations = 0
-        
         self.eti_worlds = 0
         self.eti_cargo = 0
         self.eti_pass = 0
@@ -116,10 +116,27 @@ class StatCalculation(object):
         algStats = area.alg[alg].stats
         self.add_stats(algStats, star)
         self.max_tl(algStats, star)
-       
-        
+
+
     def add_stats(self, stats, star):
         stats.population += star.population
+
+        if star.tradeCode.sophonts is None:
+            stats.pop_groups['Huma'] += star.population
+        else:
+            total_pct = 100
+            for sophont in star.tradeCode.sophonts:
+                soph_code = sophont[0:4]
+                soph_pct  = sophont[4:]
+                soph_pct = 100.0 if soph_pct == 'W' else 0.0 if soph_pct == 'X' else 5.0 if soph_pct == '0' else 10.0 * int(soph_pct)
+                total_pct -= soph_pct
+                stats.pop_groups[soph_code] += int(star.population * (soph_pct/100.0))
+
+                if total_pct < 0:
+                    self.logger.warn ("{} has sophont percent over 100%: {}".format(star, total_pct))
+                else:
+                    stats.pop_groups['Huma'] += int(star.population * (total_pct/100.0))
+
         stats.economy += star.gwp
         stats.number += 1
         stats.sum_ru += star.ru
