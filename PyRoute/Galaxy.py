@@ -367,7 +367,7 @@ class Galaxy(object):
             for world in self.stars:
                 if world.ownedBy == world:
                     continue
-                ownedBy = [star for star in self.stars.neighbors_iter(world) \
+                ownedBy = [star for star in self.stars.neighbors(world) \
                             if star.tl >= 9 and star.popCode >= 6 and \
                                star.port in 'ABC' and star.ownedBy == star and \
                                AllyGen.are_owned_allies(star.alg, world.alg)]
