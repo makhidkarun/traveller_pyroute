@@ -132,10 +132,10 @@ class StatCalculation(object):
                 total_pct -= soph_pct
                 stats.pop_groups[soph_code] += int(star.population * (soph_pct/100.0))
 
-                if total_pct < 0:
-                    self.logger.warn ("{} has sophont percent over 100%: {}".format(star, total_pct))
-                else:
-                    stats.pop_groups['Huma'] += int(star.population * (total_pct/100.0))
+            if total_pct < 0:
+                self.logger.warn ("{} has sophont percent over 100%: {}".format(star, total_pct))
+            elif total_pct > 0:
+                stats.pop_groups['Huma'] += int(star.population * (total_pct/100.0))
 
         stats.economy += star.gwp
         stats.number += 1
