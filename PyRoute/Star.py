@@ -213,13 +213,13 @@ class Star (object):
         return self._hash
 
     def wiki_name(self):
-        name = u" ".join(w.capitalize() for w in self.name.lower().split())
-        name = u'{{WorldS|' + name + u'|' + self.sector.sector_name() + u'|' + self.position + u'}}'
+        #name = u" ".join(w.capitalize() for w in self.name.lower().split())
+        name = u'{{WorldS|' + self.name + u'|' + self.sector.sector_name() + u'|' + self.position + u'}}'
         return name
 
     def wiki_short_name(self):
-        name = u" ".join(w.capitalize() for w in self.name.lower().split())
-        return u'{} (world)'.format(name)
+        #name = u" ".join(w.capitalize() for w in self.name.lower().split())
+        return u'{} (world)'.format(self.name)
 
     def sec_pos(self, sector):
         if self.sector == sector:

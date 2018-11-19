@@ -710,7 +710,7 @@ class TradeCalculation(RouteCalculation):
         
         # Loop through all the stars in the ranges list, i.e. all potential stars
         # within the range of the BTN route. 
-        for (newstar, target, _) in self.galaxy.ranges.edges(star, True):
+        for (newstar, target) in self.galaxy.ranges.edges(star, False):
             if newstar != star:
                 self.logger.error("edges found newstar %s != star %s" % (newstar, star))
                 continue

@@ -301,7 +301,7 @@ class WikiStats(object):
 
         f.write(u'has {:d} worlds, of which {:d} have native gas giants. '.format(area.stats.number, area.stats.gg_count)) 
         f.write(u'The estimated population for the {} is '.format(area_type))
-        self.write_population(area.stats.population, f)
+        f.write(self.write_population(area.stats.population))
         f.write(u' sophonts (not necessarily humans). ')
 
         worlds = []
@@ -404,13 +404,13 @@ class WikiStats(object):
             elif len(area.worlds) > 0:
                 self.write_count(f, area.stats.number, 'world', False)
                 f.write(u' with a population of ')
-                self.write_population(area.stats.population, f)
+                f.write(self.write_population(area.stats.population))
                 
                 f.write(' (')
+                sophonts = []
                 for (code, pop) in area.stats.pop_groups.iteritems():
-                    f.write(u"{}: ".format(code))
-                    self.write_population(pop, f)
-                    f.write(", ")
+                    sophonts.append(u"{}: {}".format(code, self.write_population(pop)))
+                f.write(", ".join(sophonts))
                 f.write('). ')
                 
                 f.write('The economy is BCr{:,d} and a per capita income of Cr{:,d}. '.format(area.stats.economy, area.stats.percapita))
@@ -613,13 +613,13 @@ class WikiStats(object):
         f.write (self.get_count(count, text, is_are, lead_text))
            
             
-    def write_population(self, population, f):
+    def write_population(self, population):
             if population >= 1000 :
-                f.write('{:,d} billion'.format(population/1000))
+                return '{:,d} billion'.format(population/1000)
             elif population >= 1:
-                f.write('{:,d} million'.format(population))
+                return '{:,d} million'.format(population)
             else:
-                f.write('less than 1 million')
+                return 'less than 1 million'
 
 def baseN(num,b,numerals="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
     return ((num == 0) and numerals[0]) or (baseN(num // b, b, numerals).lstrip(numerals[0]) + numerals[num % b])
