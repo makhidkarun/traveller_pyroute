@@ -9,6 +9,7 @@ import argparse
 import os
 from Galaxy import Galaxy
 from travellerwikitools import WikiReview
+from wikitools.page import Page
 
 logger = logging.getLogger('WikiCreateWorlds')
 
@@ -23,11 +24,12 @@ class WikiCreateWorld(object):
  |popc    = {popc}
  |zonec   = {zone}
  |alg     = {alg}
- |class   = 
+ |class   = {class}
  |trade   = {pcode}
  |climate = TBD
  |orbit   = TBD
  |gravity = TBD
+ |worlds  = {worlds}
  |nblty   = {nobility}
  |bases   = {bases}
  |primary = {stars}
@@ -35,7 +37,8 @@ class WikiCreateWorld(object):
  |GGcount = {ggcount}
 }}}}
 {{{{World summary |name= {name} |trade={trade} }}}}{comment summary}
-{{{{World summary {alg}|sector={sector}|subsector={subsector} }}}}{base summary}
+{{{{World summary {alg}|sector={sector}|subsector={subsector} }}}}
+* {{{{World summary allegiance|code={alg}|sector={sector}|subsector={subsector} }}}}{base summary}
 
 == Astrography and planetology == 
 No information yet available. 
@@ -111,7 +114,7 @@ No information yet available.
 {sources}
 
 {categories}
-{{{{LE|T5 Second Survey worlds}}}}
+{{{{LEN}}}}
 '''
     monostellarTemplate = '''
 {{{{MonostellarSystem
@@ -169,8 +172,9 @@ No information yet available.
         return source_text
 
     def get_categories(self, star, categories):
-        base_categories = ['[[Category: First Imperium worlds]]', '[[Category: Humaniti worlds]]', '[[Category: Rule of Man worlds]]',
-                           '[[Category: Second Imperium worlds]]','[[Category: Ziru Sirka worlds]]']
+        #base_categories = ['[[Category: First Imperium worlds]]', '[[Category: Humaniti worlds]]', '[[Category: Rule of Man worlds]]',
+        #                   '[[Category: Second Imperium worlds]]','[[Category: Ziru Sirka worlds]]']
+        base_categories = []
         if star:
             base_categories.append(star)
         if categories:
@@ -181,6 +185,8 @@ No information yet available.
     def get_comments(self, star):
         comments = []
         for code in star.tradeCode.dcode:
+            comments.append('{{{{World summary comment|trade={} }}}}'.format(code))
+        for code in star.tradeCode.xcode:
             comments.append('{{{{World summary comment|trade={} }}}}'.format(code))
         comments = '\n' + '\n'.join(comments) if len(comments) > 0 else ' '
         return comments
@@ -212,12 +218,15 @@ No information yet available.
         pcode = star.tradeCode.pcode if star.tradeCode.pcode else ''
         trade = ' '.join(star.tradeCode.codeset)
         categories = self.get_categories(star_category, categories)
+        classification = ' '.join(star.tradeCode.codeset)
+        if len(star.tradeCode.xcode) > 0:
+            classification += ' / ' + ' '.join(star.tradeCode.xcode)
 
         formatting = {'sector': star.sector.name, 'subsector': subsector, 'pos': star.position,
                       'uwp': star.uwp, 'popc': star.uwpCodes['Pop Code'], 'zone': star.zone,
                       'alg': star.alg, 'pcode': pcode, 'nobility': str(star.nobles),
-                      'bases': star.baseCode, 'stars': star.stars, 'belt': str(star.belts),
-                      'ggcount': str(star.ggCount), 'trade': trade,
+                      'bases': star.baseCode, 'stars': star.stars, 'belt': str(star.belts), 'worlds': star.worlds,
+                      'ggcount': str(star.ggCount), 'trade': trade, 'class': classification,
                       'star template': star_template, 'port': star.uwpCodes['Starport'], 
                       'tech': star.uwpCodes['Tech Level'], 'gov': star.uwpCodes['Government'],
                       'comment summary': comments, 'base summary': bases,
@@ -238,26 +247,27 @@ def get_category_list(category_files):
     for cat in category_files:
         cat_name = '[[Category: {}]]'.format(os.path.splitext(os.path.basename(cat))[0].replace('_', ' '))
         cat_worlds = get_skip_list(cat)
-        logger.info ("processing category: {} -> {} of {}".format(cat, cat_name, cat_worlds))
+        logger.debug ("processing category: {} -> {} of {}".format(cat, cat_name, cat_worlds))
 
         for world in cat_worlds:
-            if world in category_list:
-                category_list[world].append(cat_name)
+            if world.strip() in category_list:
+                category_list[world.strip()].append(cat_name)
             else:
-                category_list[world] = [cat_name]
+                category_list[world.strip()] = [cat_name]
 
     return category_list
 
 def get_sources_list(sources_files):
     sources_list = {}
+    
     for src in sources_files:
         src_worlds = get_skip_list(src)
         src_name = src_worlds[0]
         for world in src_worlds[1:]:
-            if world in sources_list:
-                sources_list[world].append(src_name)
+            if world.strip() in sources_list:
+                sources_list[world.strip()].append(src_name)
             else:
-                sources_list[world] = [src_name]
+                sources_list[world.strip()] = [src_name]
     return sources_list
 
 
@@ -273,13 +283,14 @@ def get_max_list():
     return max_list
 
 def set_logging(level):
-    logger.setLevel(level)
+    log = logging.getLogger()
+    log.setLevel(level)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     # create console handler and set level to debug
     ch = logging.StreamHandler()
     ch.setLevel(level)
     ch.setFormatter(formatter)
-    logger.addHandler(ch)
+    log.addHandler(ch)
 
 def process():
     parser = argparse.ArgumentParser(description='Traveller Wiki create world articles.', fromfile_prefix_chars='@')
@@ -288,7 +299,7 @@ def process():
     parser.add_argument('-s', '--source', action='append', help='File with list of worlds to append a source')
     parser.add_argument('--log-level', default='INFO')
 
-    parser.add_argument('--site', dest='site', default='http://wiki.travellerrpg.com/api.php')
+    parser.add_argument('--site', dest='site', default='https://wiki.travellerrpg.com/api.php')
     parser.add_argument('--user', dest='user', default='AB-101', help='(Bot) user to connect to the wiki, default [AB-101]')
     parser.add_argument('--search-disambig', help='Search value to refine disambiguation title')
 
@@ -302,7 +313,7 @@ def process():
     skip_list = get_skip_list(args.skip_list) if args.skip_list else []
 
     site = WikiReview.get_site(args.user, args.site)
-    wiki_review = WikiReview(site, None, args.search_disambig)
+    wiki_review = WikiReview(site, None, args.search_disambig, 1000)
 
     category_list = get_category_list(args.category)
     sources_list = get_sources_list(args.source)
@@ -315,8 +326,9 @@ def process():
         wiki_page = wiki_review.get_page(star.wiki_short_name())
         wiki_page = wiki_page[0] if isinstance(wiki_page, (list, tuple)) else wiki_page
         if wiki_page is None:
-            logger.info("Unable to find: {}, skipping".format(star.name))
-            continue
+            
+            logger.info("Unable to find: {}, creating new page".format(star.name))
+            wiki_page = Page(site, star.wiki_short_name())
 
         # Alpha (world)
         title = wiki_page.title[:-8]
@@ -327,10 +339,12 @@ def process():
 
         new_page = worlds.create_page(star, categories, sources, title)
 
-        print new_page
-        print "=============================================="
+        #print new_page
+        #print "=============================================="
         if args.save:
-            wiki_review.save_page(wiki_page.title, new_page)
+            logger.info("Saving Page: %s", wiki_page.title)
+            result = wiki_review.save_page(wiki_page, new_page, create=True)
+            logger.info("Save result: %s", result)
 
 if __name__ == '__main__':
     process()
