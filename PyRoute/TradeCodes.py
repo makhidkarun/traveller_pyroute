@@ -6,6 +6,7 @@ Created on Oct 3, 2017
 
 import re
 import logging
+import sys
 
 class TradeCodes(object):
     '''
@@ -23,7 +24,7 @@ class TradeCodes(object):
                 'RsT': u'\u0398', 'RsI': u'\u0399', 'RsK': u'\u039A'}
     pcolor = {'As': '#8E9397', 'De': '#d17533', 'Fl': '#e37dff', 'He': '#ff6f0c', 'Ic':'#A5F2F3',
               'Oc': '#0094ED', 'Po': '#6a986a', 'Va': '#c9c9c9', 'Wa': '#4abef4'}
-
+    ext_codes = set(['Lt', 'Ht', 'Lg', 'Hg'])
     
     def __init__(self, initial_codes):
         '''
@@ -33,6 +34,7 @@ class TradeCodes(object):
         self.codes = initial_codes.split()
         self.pcode = set(TradeCodes.pcodes) & set(self.codes)
         self.dcode = set(TradeCodes.dcodes) & set(self.codes)
+        self.xcode = TradeCodes.ext_codes & set(self.codes)
 
         self.owned = [code for code in self.codes if code.startswith(u'O:') or code.startswith(u'C:')]
 
@@ -45,15 +47,18 @@ class TradeCodes(object):
         for homeworld in re.findall(ur"[Di]*\([^)]+\)\d?", initial_codes, re.U):
             sophont = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
             self.homeworld_list.append(sophont)
-            match =  re.match(r'\(([^)]{4})[^)]*\)(\d)?', homeworld)
+            match =  re.match(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W)?', homeworld)
+            if match is None:
+                self.logger.error("Unable to process %s", initial_codes)
+                sys.exit(1)
             if sophont.startswith(u"Di"):
-                sophont = "{}{}".format(match.group(1), 'X')
+                sophont = "{code: <4}{pop}".format(code=match.group(1), pop='X')
             else:
-                sophont = "{}{}".format(match.group(1), match.group(2) if match.group(2) else 'W')
+                sophont = "{code: <4}{pop}".format(code=match.group(1), pop=match.group(2) if match.group(2) else 'W')
             self.sophont_list.append(sophont)
             homeworlds_found.append(homeworld)
 
-        self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.sophont_list) - set(homeworlds_found)
+        self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.sophont_list) - set(homeworlds_found) - self.xcode
         self.codeset = sorted(list(self.codeset))
 
         if len(self.pcode) > 0:
@@ -128,9 +133,9 @@ class TradeCodes(object):
         check = self._check_planet_code(star, 'He', '3456789ABC', '2479ABC', '012') and check
         check = self._check_planet_code(star, 'Ic', None, '01', '123456789A') and check
         check = self._check_planet_code(star, 'Po', None, '2345', '0123') and check
-        check = self._check_planet_code(star, 'Oc', 'ABCD', '3456789', 'A') and check
+        check = self._check_planet_code(star, 'Oc', 'ABCD', '3456789DEF', 'A') and check
         check = self._check_planet_code(star, 'Va', None, '0', None) and check
-        check = self._check_planet_code(star, 'Wa', '3456789', '3456789', 'A') and check
+        check = self._check_planet_code(star, 'Wa', '3456789', '3456789DEF', 'A') and check
 
         #self._check_pop_code('Ba', '0')
         check = self._check_pop_code(star, 'Lo', '123') and check
@@ -148,7 +153,7 @@ class TradeCodes(object):
         return check
 
     def owned_by(self, star):
-        self.ownedBy = self
+        self.ownedBy = star
         if star.gov == '6': 
             self.ownedBy = None
         for code in self.dcode:
@@ -166,7 +171,7 @@ class TradeCodes(object):
                 self.ownedBy = 'Px'
         if (star.gov == '6' and not self.ownedBy) or (star.gov != '6' and self.ownedBy != self):
             self.logger.debug (u"{} has incorrect government code {} - {}".format(star, star.gov, self.dcode))
-        return self.owned_by
+        return self.ownedBy
 
 
     def owners(self, sector_name):
