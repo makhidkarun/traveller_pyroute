@@ -19,9 +19,11 @@ class TestStar(unittest.TestCase):
         self.starline = re.compile(star_regex)
 
     def testParseIrkigkhan(self):
+        sector = Sector('Core', ' 0, 0')
         star1 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-                     self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
-        
+                     self.starline, sector, 'fixed',  None)
+
+        self.assertTrue(star1.sector.name == 'Core', star1.sector.name)
         self.assertTrue(star1.position == '0103')
         self.assertTrue(star1.q == 0 and star1.r == 2, "%s, %s" % (star1.q, star1.r))
         self.assertTrue(star1.name == 'Irkigkhan')
@@ -37,8 +39,11 @@ class TestStar(unittest.TestCase):
         self.assertEqual(star1.star_list, ['M2 V'])
 
     def testParseShanaMa(self):
+        sector = Sector('Core', ' 0, 0')
         star1 = Star.parse_line_into_star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (300-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-                     self.starline,  Sector('Core', ' 0, 0'), 'fixed',  None)
+                     self.starline,  sector, 'fixed',  None)
+
+        self.assertTrue(star1.sector.name == 'Core', star1.sector.name)
         self.assertTrue(star1.position == '0104')
         self.assertTrue(star1.q == 0 and star1.r == 3, "%s, %s" % (star1.q, star1.r))
         self.assertTrue(star1.name == 'Shana Ma')
@@ -55,8 +60,11 @@ class TestStar(unittest.TestCase):
         self.assertEqual(star1.star_list, ['K2 IV', 'M7 V'])
         
     def testParseSyss(self):
+        sector = Sector('Core', ' 0, 0')
         star1 = Star.parse_line_into_star("2323 Syss                 C400746-8 Na Va Pi                   { -1 } (A67-2) [6647] BD   S  - 510 5  ImDv M9 III D M5 V",
-                     self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
+                     self.starline, sector, 'fixed',  None)
+
+        self.assertTrue(star1.sector.name == 'Core', star1.sector.name)
         self.assertEqual(star1.position, '2323')
         self.assertEqual(star1.name, 'Syss')
         self.assertEqual(star1.uwp, 'C400746-8')
