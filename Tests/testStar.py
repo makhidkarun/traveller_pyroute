@@ -11,7 +11,7 @@ from Star import Star
 from Galaxy import Sector,Galaxy
 from TradeCalculation import TradeCalculation
 
-class Test(unittest.TestCase):
+class TestStar(unittest.TestCase):
 
     def setUp(self):
 
