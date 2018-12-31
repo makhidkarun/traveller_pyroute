@@ -7,3 +7,7 @@ Tests/*.class
 
 # ignore IDE-related detritus
 .idea/
+
+# ignore downloaded/generated files
+sectors/
+maps/
