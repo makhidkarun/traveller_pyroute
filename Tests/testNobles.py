@@ -19,7 +19,7 @@ class TestNobles(unittest.TestCase):
 
     def testStringWithOneViscount(self):
         nobles = Nobles()
-        nobles.nobles['Vicounts'] = 1
+        nobles.nobles['Viscounts'] = 1
 
         expected = 'e'
         self.assertEqual(expected, nobles.__str__())
@@ -29,18 +29,18 @@ class TestNobles(unittest.TestCase):
         nobles.count(['e'])
 
         expected = 1
-        actual = nobles.nobles['Vicounts']
+        actual = nobles.nobles['Viscounts']
 
         self.assertEqual(expected, actual)
 
     def testAccumulateSelf(self):
         nobles = Nobles()
-        nobles.nobles['Vicounts'] = 1
+        nobles.nobles['Viscounts'] = 1
 
         nobles.accumulate(nobles)
 
         expected = 2
-        actual = nobles.nobles['Vicounts']
+        actual = nobles.nobles['Viscounts']
 
         self.assertEqual(expected, actual)
 
