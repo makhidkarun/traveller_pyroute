@@ -23,7 +23,7 @@ class RouteCalculation (object):
     route_reuse = 10
     # BTN modifier for range. If the hex distance between two worlds 
     # or between two numbers in the jump range array, take jump modifier
-    # to the right. E.g distance 4 would be a btn modifer of -3.  
+    # to the right. E.g distance 4 would be a btn modifier of -3.
     btn_jump_range = [ 1,  2,  5,  9, 19, 29, 59, 99, 199, 299]
     btn_jump_mod   =[0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10]
 
@@ -41,12 +41,12 @@ class RouteCalculation (object):
         raise NotImplementedError ("Base Class")
 
     def base_route_filter (self, star, neighbor):
-        ''' 
+        '''
             Used in the generate_base_routes to filter (i.e. skip making a route)
-            between the star and neighbor. Used to remove un-helpful world links, 
-            links across borders, etc. 
+            between the star and neighbor. Used to remove un-helpful world links,
+            links across borders, etc.
             Return True to filter (ie. skip) creating a link between these two worlds
-            Return False to accept (i.e. create) a link between these two worlds. 
+            Return False to accept (i.e. create) a link between these two worlds.
         '''
         raise NotImplementedError ("Base Class")
     
@@ -519,7 +519,7 @@ class TradeCalculation(RouteCalculation):
                 continue
             neighbor_routes = [(s,n,d) for (s,n,d) in self.galaxy.stars.edges([star], True)]
             # Need to do two sorts here:
-            # BTN low to high to gind them first
+            # BTN low to high to find them first
             # Range high to low to find them first 
             neighbor_routes.sort(key=lambda tn: tn[2]['btn'])
             neighbor_routes.sort(key=lambda tn: tn[2]['distance'], reverse=True)
@@ -685,7 +685,7 @@ class TradeCalculation(RouteCalculation):
                 dist += self.galaxy.stars[start][end]['distance']
                 weight += self.galaxy.stars[start][end]['weight']
             else:
-                print start, end, self.galaxy.routes.has_edge(start, end)
+                print(start, end, self.galaxy.routes.has_edge(start, end))
             start = end
             
         if len(route) > 6 and not usesJumpRoute:
@@ -703,7 +703,7 @@ class TradeCalculation(RouteCalculation):
         ''' 
         Unused: 
         Calculate the trade route between starting star and all potential target.
-        This was the direct copy algorthim from nroute for doing route calculation
+        This was the direct copy algorithm from nroute for doing route calculation
         It was replaced by the process above which works better with the 
         pythonic data structures. It remains for historical purposes.  
         '''
@@ -801,8 +801,8 @@ class CommCalculation(RouteCalculation):
         return star.tradeCode.capital
 
     def bases(self, star):                    
-        # if it has a Deopt, Way station, or XBoat station,
-        # or external naval base or (aslan) Tlaukhu nase
+        # if it has a Depot, Way station, or XBoat station,
+        # or external naval base or (aslan) Tlaukhu base
         return len(set(['D', 'W', 'K', 'T']) & set(star.baseCode)) > 0
                 
     def comm_bases(self, star):
