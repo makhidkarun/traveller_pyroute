@@ -34,7 +34,7 @@ class TestStar(unittest.TestCase):
         self.assertFalse(star1.tradeCode.poor)
         self.assertFalse(star1.tradeCode.rich)
         self.assertTrue(star1.ggCount == 3)
-        self.assertEqual(star1.star_list, 'M2 V')
+        self.assertEqual(star1.star_list, ['M2 V'])
 
     def testParseShanaMa(self):
         star1 = Star.parse_line_into_star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (300-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
