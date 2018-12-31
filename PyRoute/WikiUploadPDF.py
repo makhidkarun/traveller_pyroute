@@ -270,8 +270,8 @@ No information yet available.
                                     u','.join(sophonts),              # sophonts
                                     u','.join(sorted(list(dcode))),   # details
                                     sec[4].strip(u'{}'),              # ix (important)
-                                    sec[5].strip(u'()'),              # ex (Economiv)
-                                    sec[6].strip(u'[]'),              # cx (cultureal)
+                                    sec[5].strip(u'()'),              # ex (economic)
+                                    sec[6].strip(u'[]'),              # cx (cultural)
                                     sec[7].strip(),                   # nobility
                                     sec[8].strip(),                   # bases
                                     sec[9].strip(),                   # Zone
@@ -279,7 +279,7 @@ No information yet available.
                                     sec[10][1],                       # Belts
                                     sec[10][2],                       # GG Count
                                     sec[11],                          # Worlds
-                                    sec[12],                          # Alegiance
+                                    sec[12],                          # Allegiance
                                     u','.join(stars),                 # stars
                                     int(eco[5].strip()),              # wtn
                                     eco[6].strip(),                   # RU
