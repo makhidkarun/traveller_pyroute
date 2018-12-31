@@ -327,7 +327,7 @@ class Star (object):
             self.mspr -= 1 if self.hydro in ['1','2','A'] else 0
             self.mspr -= 2 if self.hydro in ['0'] else 0
             self.mspr -= 1 if self.atmo in ['4','5','8','9'] else 0 # thin or dense
-            self.mspr -= 1 if self.atmo in ['4','7','9'] else 0 # poluted   
+            self.mspr -= 1 if self.atmo in ['4','7','9'] else 0 # polluted
         
         
     def calculate_wtn(self):
@@ -439,7 +439,7 @@ class Star (object):
         if efficency < 0: 
             if ru_calc == 'scaled':
                 efficency = 1 + (efficency * 0.1)
-            # else ru_calc == 'negative' -> use efficency as written
+            # else ru_calc == 'negative' -> use efficiency as written
             self.ru = int(round(resources * labor * infrastructure * efficency))
         else:
             self.ru = resources * labor * infrastructure * efficency
