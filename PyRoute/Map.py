@@ -143,7 +143,7 @@ class Map(object):
 
     def get_line(self, doc, start, end, colorname, width):
         """
-        get a line draw method processor
+        Get a line draw method processor
         """
         raise NotImplementedError ("Base Class")
         #color = pdf.get_color()
@@ -461,7 +461,7 @@ class PDFSectorMap(Map):
 
     def get_line(self, doc, start, end, colorname, width):
         """
-        get a line draw method processor
+        Get a line draw method processor
         """
         color = doc.get_color()
         color.set_color_by_name(colorname)

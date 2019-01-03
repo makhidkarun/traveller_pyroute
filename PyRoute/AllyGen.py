@@ -229,7 +229,7 @@ class AllyGen(object):
     @staticmethod
     def are_owned_allies(alg1, alg2):
         """
-        public function to determine if the Allegiances of two
+        Public function to determine if the Allegiances of two
         world are considered allied for the owned world checks.
         """
         if alg1 is None or alg2 is None:
