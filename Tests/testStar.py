@@ -38,9 +38,29 @@ class TestStar(unittest.TestCase):
         self.assertTrue(star1.ggCount == 3)
         self.assertEqual(star1.star_list, ['M2 V'])
 
+    def testParseIrkigkhanRUCollapse(self):
+        sector = Sector('Core', ' 0, 0')
+        star1 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+                     self.starline, sector, 'fixed',  'collapse')
+
+        expected = 756
+        actual = star1.ru
+
+        self.assertEqual(expected, actual)
+
+    def testParseIrkigkhanRUScaled(self):
+        sector = Sector('Core', ' 0, 0')
+        star1 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+                     self.starline, sector, 'fixed',  'scaled')
+
+        expected = 756
+        actual = star1.ru
+
+        self.assertEqual(expected, actual)
+
     def testParseShanaMa(self):
         sector = Sector('Core', ' 0, 0')
-        star1 = Star.parse_line_into_star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (300-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+        star1 = Star.parse_line_into_star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
                      self.starline,  sector, 'fixed',  None)
 
         self.assertTrue(star1.sector.name == 'Core', star1.sector.name)
@@ -155,7 +175,7 @@ class TestStar(unittest.TestCase):
              self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
         star2 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
              self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
-        star3 = Star.parse_line_into_star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (300-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+        star3 = Star.parse_line_into_star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
                      self.starline,  Sector('Core', ' 0, 0'), 'fixed',  None)
         
         self.assertEqual(star1,  star2)

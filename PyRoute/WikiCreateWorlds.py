@@ -295,7 +295,7 @@ def set_logging(level):
 def process():
     parser = argparse.ArgumentParser(description='Traveller Wiki create world articles.', fromfile_prefix_chars='@')
     parser.add_argument('--skip-list', help='file of worlds to skip adding/updating')
-    parser.add_argument('-c', '--category', action='append', help='File wilth list of worlds to append different category')
+    parser.add_argument('-c', '--category', action='append', help='File with list of worlds to append different category')
     parser.add_argument('-s', '--source', action='append', help='File with list of worlds to append a source')
     parser.add_argument('--log-level', default='INFO')
 

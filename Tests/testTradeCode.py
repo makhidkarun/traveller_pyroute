@@ -46,7 +46,7 @@ class TestTradeCode(unittest.TestCase):
         code = TradeCodes(u"Ph C:0404")
         self.assertTrue(code.owned == [u'C:0404'], code.owned)
         self.assertTrue(code.colonies("Spinward Marches") == [u'C:Spin-0404'], code.colonies("Spinward Marches"))
-        self.assertTrue(code.owners('Spinward Marvhes') == [])
+        self.assertTrue(code.owners('Spinward Marches') == [])
         
     def testOwned (self):
         code = TradeCodes(u"Ag O:1011")
@@ -76,7 +76,7 @@ class TestTradeCode(unittest.TestCase):
         self.assertTrue(code.sophonts == ['Wiki4', 'Huma2'])
         self.assertTrue(code.codeset == ['Ag'])
         
-    def testSophontCompbined(self):
+    def testSophontCombined(self):
         code = TradeCodes("Ri (Wiki) Huma4 Alph2 (Deneb)2")
         self.assertTrue(len(code.homeworld) > 0)
         self.assertTrue(code.sophonts == ['Huma4', 'Alph2', 'WikiW', 'Dene2'], msg=code.sophonts)

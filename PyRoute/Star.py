@@ -42,7 +42,7 @@ class Nobles(object):
                        'Baronets': 0,
                        'Barons': 0,
                        'Marquis': 0,
-                       'Vicounts': 0,
+                       'Viscounts': 0,
                        'Counts': 0,
                        'Dukes': 0,
                        'Sector Dukes': 0,
@@ -52,7 +52,7 @@ class Nobles(object):
                       'c': 'Baronets',
                       'C': 'Barons',
                       'D': 'Marquis',
-                      'e': 'Vicounts',
+                      'e': 'Viscounts',
                       'E': 'Counts',
                       'f': 'Dukes',
                       'F': 'Sector Dukes',
@@ -86,10 +86,10 @@ class Star (object):
         if starline.match(line):
             data = starline.match(line).groups()
         elif '{Anomaly}' in line:
-            star.logger.info("Found Anomaly, skpping processing: {}".format(line))
+            star.logger.info("Found anomaly, skipping processing: {}".format(line))
             return None
         else:
-            star.logger.error(u"Unmatched Line: {}".format(line))
+            star.logger.error(u"Unmatched line: {}".format(line))
             return None
         
         star.logger.debug (data)
@@ -327,7 +327,7 @@ class Star (object):
             self.mspr -= 1 if self.hydro in ['1','2','A'] else 0
             self.mspr -= 2 if self.hydro in ['0'] else 0
             self.mspr -= 1 if self.atmo in ['4','5','8','9'] else 0 # thin or dense
-            self.mspr -= 1 if self.atmo in ['4','7','9'] else 0 # poluted   
+            self.mspr -= 1 if self.atmo in ['4','7','9'] else 0 # polluted
         
         
     def calculate_wtn(self):
@@ -420,10 +420,10 @@ class Star (object):
         labor = self._ehex_to_int(self.economics[2])
         if self.economics[3] == '-' :
             infrastructure = self._ehex_to_int(self.economics[3:5])
-            efficency = int(self.economics[5:7])
+            efficiency = int(self.economics[5:7])
         else:
             infrastructure = self._ehex_to_int(self.economics[3])
-            efficency = int(self.economics[4:6])
+            efficiency = int(self.economics[4:6])
         
         resources = resources if resources != 0 else 1
         # No I in eHex, so J,K,L all -1
@@ -435,16 +435,16 @@ class Star (object):
         infrastructure = infrastructure if infrastructure != 0 else 1
         infrastructure += 0 if infrastructure < 18 else -1
         
-        efficency = efficency if efficency != 0 else 1
-        if efficency < 0: 
+        efficiency = efficiency if efficiency != 0 else 1
+        if efficiency < 0:
             if ru_calc == 'scaled':
-                efficency = 1 + (efficency * 0.1)
-            # else ru_calc == 'negative' -> use efficency as written
-            self.ru = int(round(resources * labor * infrastructure * efficency))
+                efficiency = 1 + (efficiency * 0.1)
+            # else ru_calc == 'negative' -> use efficiency as written
+            self.ru = int(round(resources * labor * infrastructure * efficiency))
         else:
-            self.ru = resources * labor * infrastructure * efficency
+            self.ru = resources * labor * infrastructure * efficiency
         
-        self.logger.debug ("RU = {0} * {1} * {2} * {3} = {4}".format(resources, labor, infrastructure, efficency, self.ru) )
+        self.logger.debug ("RU = {0} * {1} * {2} * {3} = {4}".format(resources, labor, infrastructure, efficiency, self.ru) )
         
     def calculate_TCS(self):
         tax_rate = {'0': 0.50, '1': 0.8, '2': 1.0, '3': 0.9, '4': 0.85, 

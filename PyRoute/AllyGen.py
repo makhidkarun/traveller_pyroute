@@ -108,7 +108,7 @@ class AllyGen(object):
             Create borders around various allegiances, Algorithm one.
             From the nroute.c generation system. Every world controls a
             two hex radius. Where the allegiances are the same, the area
-            of control is contigious. Every Non-aligned world is independent
+            of control is contiguous. Every Non-aligned world is independent
         """
         self.logger.info('Processing worlds for border drawing')
         for star in self.galaxy.stars:
@@ -306,7 +306,7 @@ class AllyGen(object):
 
         #self._output_map(allyMap, 0)
         
-        #Pass 1: generate initial allegiance arrays, 
+        # Pass 1: generate initial allegiance arrays,
         # with overlapping maps
         for star in stars:
             # skip the E/X ports 
@@ -446,7 +446,7 @@ class AllyGen(object):
         '''
         edgeMap = {}
         changed = False
-        # Create the edge map, of hexes on the borber
+        # Create the edge map, of hexes on the border
         for Hex in allyMap.iterkeys():
             for direction in xrange(6):
                 checkHex = AllyGen._get_neighbor(Hex, direction)

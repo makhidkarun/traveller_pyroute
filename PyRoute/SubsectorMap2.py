@@ -435,7 +435,7 @@ class GraphicSubsectorMap (GraphicMap):
         self.draw_arc(doc, center, start, end, color)
         
     def circle_center(self, start, end):
-        # Caluclate the center of an equlateral triangle  from start and end
+        # Calculate the center of an equilateral triangle from start and end
         #root3 = math.sqrt(3)
         root3 = 2
         xm = 0.5 * (start.x + end.x)
