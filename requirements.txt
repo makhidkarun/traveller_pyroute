@@ -3,4 +3,3 @@ pypdflite
 inflect
 Pillow
 wikitools==1.3
-poster
