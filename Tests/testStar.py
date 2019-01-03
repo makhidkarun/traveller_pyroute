@@ -11,6 +11,7 @@ from Star import Star
 from Galaxy import Sector,Galaxy
 from TradeCalculation import TradeCalculation
 
+
 class TestStar(unittest.TestCase):
 
     def setUp(self):
@@ -90,8 +91,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(star1.uwp, 'C400746-8')
         self.assertEqual(star1.stars, 'M9 III D M5 V')
         self.assertEqual(star1.star_list, ['M9 III', 'D', 'M5 V'])
-        
-        
+
     def testAPortModifier(self):
         #cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
         cwtn = [3,4,4,5,6,7,7,8,9,10,10,11,12,13,13,14]
@@ -114,8 +114,7 @@ class TestStar(unittest.TestCase):
             else:
                 wtn = int(round(max(0, (uwtn * 3 + 9)/4)))
             self.assertTrue (wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
-            
-        
+
     def testDPortModifier(self):
         cwtn = [1,2,3,4,4,5,6,7,7,8,8,9,9,10,10,11]
         for uwtn in xrange(15):        
@@ -124,7 +123,6 @@ class TestStar(unittest.TestCase):
             else:
                 wtn = int(round(max(0, (uwtn * 3 + 7) / 4)))
             self.assertTrue (wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
-        
 
     def testEPortModifier(self):
         cwtn = [1,2,2,3,4,5,5,6,6,7,7,8,8,9,9,10]
@@ -135,7 +133,6 @@ class TestStar(unittest.TestCase):
                 wtn = int(round(max(0, (uwtn * 3 + 5) / 4)))
             self.assertTrue (wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
-        
     def testXPortModifier(self):
         #cwtn =[0,1,2,3,0,0,0,1,1,2,2,3,3,4,4,5]
         cwtn = [0,0,0,0,0,0,0,1,1,2,2,3,3,4,4,5]
@@ -151,8 +148,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(TradeCalculation.calc_trade(4), 100)
         self.assertEqual(TradeCalculation.calc_trade(5), 500)
         self.assertEqual(TradeCalculation.calc_trade(6), 1000)
-        
-        
+
     def testPassengerBTN(self):
         self.assertEqual(TradeCalculation.calc_passengers(10), 0)
         self.assertEqual(TradeCalculation.calc_passengers(11), 5)
@@ -181,6 +177,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(star1,  star2)
         self.assertNotEqual(star1,  star3)
         self.assertNotEqual(star2,  star3)
+
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

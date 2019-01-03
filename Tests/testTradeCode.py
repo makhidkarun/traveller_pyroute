@@ -7,6 +7,7 @@ from TradeCodes import TradeCodes
 from Star import Star
 from Galaxy import Sector, Galaxy
 
+
 class TestTradeCode(unittest.TestCase):
 
     def setUp(self):
@@ -26,8 +27,7 @@ class TestTradeCode(unittest.TestCase):
         ch.setLevel("INFO")
         ch.setFormatter(formatter)
         self.logger.addHandler(ch)
-        
-        
+
     def testLo(self):
         code = TradeCodes("Lo")
         self.assertTrue(code.pcode is None)
@@ -97,7 +97,8 @@ class TestTradeCode(unittest.TestCase):
         code = TradeCodes("Wa")
         self.assertFalse(code.check_world_codes(self.star1))
         self.assertFalse(code.check_world_codes(self.star2))
-        
+
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
