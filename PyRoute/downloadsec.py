@@ -10,7 +10,7 @@ import time
 import os
 import argparse
 
-def get_url (url, sector, suffix):
+def get_url (url, sector, suffix, output_dir):
     try:
         f = urllib2.urlopen(url)
     except urllib2.HTTPError as ex:
@@ -24,7 +24,7 @@ def get_url (url, sector, suffix):
     else:
         ucontent = unicode(content, encoding).replace('\r\n','\n')
     
-    path = os.path.join(args.output_dir, '%s.%s' % (sector, suffix))
+    path = os.path.join(output_dir, '%s.%s' % (sector, suffix))
 
     with codecs.open(path, 'wb', 'utf-8') as out:
         out.write (ucontent)
@@ -49,10 +49,10 @@ if __name__ == '__main__':
             params['routes'] = '1'
         params = urllib.urlencode(params)
         url = 'http://www.travellermap.com/api/sec?%s' % params
-        get_url (url, sector, 'sec')
+        get_url (url, sector, 'sec', args.output_dir)
         
         params = urllib.urlencode({'sector': sector, 'accept': 'text/xml'})
         url = 'http://travellermap.com/api/metadata?%s' % params
-        get_url (url, sector, 'xml')
+        get_url (url, sector, 'xml', args.output_dir)
         
         time.sleep(5)

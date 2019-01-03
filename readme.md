@@ -13,7 +13,7 @@ The final output, the map of trade routes, is created by [PyPDFLite](https://git
 
 You can install the required libraries using pip:
 
-    pip install networkx pypdflite inflect Pillow
+    pip install -r requirements.txt
 
 
 For the math and layout of hex maps, I recommend the [Hexagonal Grids](http://www.redblobgames.com/grids/hexagons/) page which contains every item you will need to draw and manage hexagon maps.I recommend all the articles on the Red Blob Games site.
@@ -42,7 +42,7 @@ Running the program
     optional arguments:
       -h, --help            show this help message and exit
       --version             show program's version number and exit
-      --log-level LOG_LEVEL
+pip install -r requirements.txt      --log-level LOG_LEVEL
     
     Allegiance:
       Alter processing of allegiances
