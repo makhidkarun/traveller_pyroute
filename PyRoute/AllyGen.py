@@ -13,7 +13,7 @@ class AllyGen(object):
     classdocs
     '''
     noOne = [u'--', u'??']
-    nonAligned = [u'Na', u'Ns', u'Va', u'Cs', u'NaHu', u'NaDr', u'NaVa', u'NaAs', u'NaXx', u'VaEx', u'NaSo',
+    nonAligned = [u'Na', u'Ns', u'Va', u'Cs', u'Hc', u'NaHu', u'NaDr', u'NaVa', u'NaAs', u'NaXx', u'VaEx', u'NaSo',
                   u'CsCa', u'CsHv', u'CsIm', u'CsMP', u'CsVa', u'CsZh', u'CsRe', u'CsMo', u'CsRr',
                   u'Wild']
     sameAligned = [(u'Im', u'ImAp', u'ImDa', u'ImDc', u'ImDd', u'ImDg', u'ImDi', u'ImDs', u'ImDv', 
@@ -23,7 +23,7 @@ class AllyGen(object):
                         u'AsIf', u'AsMw', u'AsOf', u'AsSc', u'AsSF', u'AsT0', u'AsT1', u'AsT2',
                         u'AsT3', u'AsT4', u'AsT5', u'AsT6', u'AsT7', u'AsT8', u'AsT9', u'AsTA',
                         u'AsTv', u'AsTz', u'AsVc', u'AsWc', u'AsXX', u'GlEm', u'NaAs' ),
-                    (u'Hv', u'HvFd', u'H1', u'H2', u'Hc', u'Hv'),
+                    (u'Hv', u'HvFd', u'H1', u'H2', u'H3', u'H4', u'H5', u'H6', u'Hf', u'H?'),
                     (u'JP', u'J-', u'Jh', u'Hl', u'JuPr', 
                             u'JAOz', u'JAsi', u'JCoK', u'JHhk', u'JLum', u'JMen',
                             u'JPSt', u'JRar', u'JUkh', u'JuHl', u'JuRu', u'JVug'),
@@ -85,6 +85,7 @@ class AllyGen(object):
         # only what the base allegiances
         # base_match_only == false -> --ally-match=separate
         # want the non-base code or the base codes for single code allegiances. 
+
         if base_match_only:
             algs = [alg for alg in alg_list.itervalues() if alg.base]
         else: 
@@ -93,10 +94,11 @@ class AllyGen(object):
 
             for alg in detail_algs:
                 base_alg = alg_list[AllyGen.same_align(alg.code)]
-                if base_alg in base_algs:
+                if base_algs and base_alg in base_algs:
                     base_algs = base_algs.remove(base_alg)
 
-            algs = detail_algs + base_algs
+            algs = detail_algs
+            algs += base_algs if base_algs else []
         algs.sort(key=lambda alg : alg.stats.number, reverse = True)
         return algs
 
