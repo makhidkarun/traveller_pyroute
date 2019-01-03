@@ -473,7 +473,7 @@ class WikiStats(object):
                 subsector = world.sector.subsectors[world.subsector()]
                 if area_type == 'sector' or area_type == 'Allegiance':
                     f.write(u'{}The {} subsector capital of {} is {}.'.format(lead, alg.wiki_name(),subsector.wiki_name(), world.wiki_name()))
-                #if area_type == 'subsector':
+                # if area_type == 'subsector':
                 else:
                     f.write(u'{}The subsector capital is {}.'.format(lead, world.wiki_name()))
 

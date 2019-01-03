@@ -146,8 +146,8 @@ class Map(object):
         Get a line draw method processor
         """
         raise NotImplementedError ("Base Class")
-        #color = pdf.get_color()
-        #color.set_color_by_name(colorname)
+        # color = pdf.get_color()
+        # color.set_color_by_name(colorname)
         # hline = PDFLine(pdf.session, pdf.page, hlineStart, hlineEnd, stroke='solid', color=color, size=width)
 
     def place_system(self, doc, star):
@@ -180,7 +180,7 @@ class Map(object):
                 self.trade_line(doc, [star, neighbor], data)
 
             # Get all the worlds in this sector
-            #for (star, neighbor, data) in self.galaxy.stars.edges(sector.worlds, True):
+            # for (star, neighbor, data) in self.galaxy.stars.edges(sector.worlds, True):
             #    if star.sector != sector:
             #        continue#
             #    if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:

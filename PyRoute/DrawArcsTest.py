@@ -86,7 +86,7 @@ class DrawArcsTest (GraphicSubsectorMap):
 
     def draw_one_arc (self, doc, start, end):
         center = self.circle_center(start, end)
-        #self.logger.info("Points are : start: {}, end: {}, and center {}".format(start,end,center))
+        # self.logger.info("Points are : start: {}, end: {}, and center {}".format(start,end,center))
         self.draw_arc(doc, center, start, end)
 
     def centerpoint(self, row, col):
@@ -105,7 +105,7 @@ class DrawArcsTest (GraphicSubsectorMap):
     
     def circle_center(self, start, end):
         # Calculate the center of an equilateral triangle  from start and end
-        #root3 = math.sqrt(3)
+        # root3 = math.sqrt(3)
         root3 = 2
         xm = 0.5 * (start.x + end.x)
         ym = 0.5 * (start.y + end.y)
@@ -118,22 +118,22 @@ class DrawArcsTest (GraphicSubsectorMap):
         cx = xm + (root3 * slope)
         cy = ym + (root3 * slope)
         
-        #dist1 = math.sqrt ((start.x - end.x) ** 2 + (start.y - end.y) ** 2)
-        #dist2 = math.sqrt ((start.x - cx) ** 2 + (start.y - cy) ** 2)
-        ##dist3 = math.sqrt ((end.x - cx) ** 2 + (end.y - cy) ** 2)
-        #distm1 = math.sqrt((start.x - xm) ** 2 + (start.y - ym) ** 2)
-        #distm2 = math.sqrt((end.x - xm) ** 2 + (end.y - ym) ** 2)
-        #self.logger.info("X: {}, Y: {}, M: {}, X -> M: {}, Y -> M:{} ".format(start, end, (xm,ym), distm1, distm2))
-        #self.logger.info("X -> Y: {}, X -> C: {}, Y -> C: {}".format(dist1, dist2, dist3))
+        # dist1 = math.sqrt ((start.x - end.x) ** 2 + (start.y - end.y) ** 2)
+        # dist2 = math.sqrt ((start.x - cx) ** 2 + (start.y - cy) ** 2)
+        # dist3 = math.sqrt ((end.x - cx) ** 2 + (end.y - cy) ** 2)
+        # distm1 = math.sqrt((start.x - xm) ** 2 + (start.y - ym) ** 2)
+        # distm2 = math.sqrt((end.x - xm) ** 2 + (end.y - ym) ** 2)
+        # self.logger.info("X: {}, Y: {}, M: {}, X -> M: {}, Y -> M:{} ".format(start, end, (xm,ym), distm1, distm2))
+        # self.logger.info("X -> Y: {}, X -> C: {}, Y -> C: {}".format(dist1, dist2, dist3))
         
-        #slope = xslope/yslope if yslope != 0 else 0
+        # slope = xslope/yslope if yslope != 0 else 0
         
-        #self.logger.info("X -> Y slope: {}/{} = {}".format(xslope, yslope, slope))
+        # self.logger.info("X -> Y slope: {}/{} = {}".format(xslope, yslope, slope))
         
-        #cxslope = (xm - cx)
-        #cyslope = (ym - cy)
-        #cslope = cxslope/cyslope if cyslope != 0 else 0
-        #self.logger.info("M -> C slope: {}/{} = {}".format(cxslope, cyslope, cslope))
+        # cxslope = (xm - cx)
+        # cyslope = (ym - cy)
+        # cslope = cxslope/cyslope if cyslope != 0 else 0
+        # self.logger.info("M -> C slope: {}/{} = {}".format(cxslope, cyslope, cslope))
         
         return self.cursor(round(cx), round(cy))
 
@@ -146,18 +146,18 @@ class DrawArcsTest (GraphicSubsectorMap):
         startAngle = (180/math.pi) * math.atan2(start.y - center.y, start.x - center.x)
         endAngle = (180/math.pi) * math.atan2(end.y - center.y, end.x - center.x)
         
-        #self.logger.info ("Radius: {}, Starting Angle: {}, ending angle: {}".format(r,startAngle, endAngle))
+        # self.logger.info ("Radius: {}, Starting Angle: {}, ending angle: {}".format(r,startAngle, endAngle))
         
-        ##startAngle = startAngle * -1 if startAngle < 0 else startAngle
-        ##endAngle = endAngle * -1 if endAngle < 0 else endAngle
-        #doc.ellipse([x1,y1,x2,y2], outline=self.fillWhite)
+        # startAngle = startAngle * -1 if startAngle < 0 else startAngle
+        # endAngle = endAngle * -1 if endAngle < 0 else endAngle
+        # doc.ellipse([x1,y1,x2,y2], outline=self.fillWhite)
 
         for i in range(-4, 4):
             doc.arc([x1 + i,y1,x2 + i, y2], startAngle, endAngle, self.fillRed)
             doc.arc([x1, y1 + i, x2, y2 + i],startAngle, endAngle, self.fillRed)
             
-        #doc.ellipse([end.x-6, end.y-6, end.x+6, end.y+6], outline=self.fillWhite, fill=self.fillWhite)
-        #doc.ellipse([center.x-6, center.y-6, center.x+6, center.y+6], outline=self.fillBlue, fill=self.fillBlue)
+        # doc.ellipse([end.x-6, end.y-6, end.x+6, end.y+6], outline=self.fillWhite, fill=self.fillWhite)
+        # doc.ellipse([center.x-6, center.y-6, center.x+6, center.y+6], outline=self.fillBlue, fill=self.fillBlue)
 
 
 def set_logging(level):

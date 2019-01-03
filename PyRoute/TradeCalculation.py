@@ -114,7 +114,7 @@ class RouteCalculation (object):
         if not distance:    
             distance = star1.hex_distance(star2)
         jump_index = bisect.bisect_left(TradeCalculation.btn_jump_range, distance)
-        #if distance <= 3:
+        # if distance <= 3:
         #    logging.getLogger('PyRoute.TradeCalculation').info("{} -> index {}".format(distance, jump_index))
         btn += TradeCalculation.btn_jump_mod[jump_index]
         
@@ -163,7 +163,7 @@ class NoneCalculation(RouteCalculation):
     distance_weight = [0, 30, 50, 75, 130, 230, 490]
 
     def generate_routes(self):
-        #self.generate_base_routes()        
+        # self.generate_base_routes()
         pass
     
     def calculate_routes(self):
@@ -199,9 +199,9 @@ class OwnedWorldCalculation(RouteCalculation):
 
     def base_route_filter (self, star, neighbor):
         return not AllyGen.are_owned_allies(star.alg, neighbor.alg)
-        #if not AllyGen.are_owned_allies(star.alg, neighbor.alg) :
+        # if not AllyGen.are_owned_allies(star.alg, neighbor.alg) :
         #    return True
-        #return False
+        # return False
 
     def base_range_routes (self, star, neighbor):
         pass
@@ -440,21 +440,21 @@ class TradeCalculation(RouteCalculation):
     # moving freight between two worlds a given distance apart
     # in a single jump.
     # These are made up from whole cloth.          
-    #distance_weight = [0, 30, 50, 70, 90, 120, 140 ]
+    # distance_weight = [0, 30, 50, 70, 90, 120, 140 ]
     
     # GT Weights based upon one pass estimate
-    #distance_weight = [0, 30, 50, 70, 110, 170, 300]
+    # distance_weight = [0, 30, 50, 70, 110, 170, 300]
     
     # Pure HG weights
-    #distance_weight = [0, 30, 50, 75, 130, 230, 490]
+    # distance_weight = [0, 30, 50, 75, 130, 230, 490]
 
     # MGT weights
-    #distance_weight = [0, 30, 60, 105, 190, 410, 2470]
+    # distance_weight = [0, 30, 60, 105, 190, 410, 2470]
 
     # T5 Weights, now with Hop Drive
     distance_weight = [0, 30, 50, 75, 130, 230, 490, 9999, 9999, 9999, 300 ]
     
-    #max_connections = [6, 18, 36, 60, 90, 126, 168, 216, 270, 330]
+    # max_connections = [6, 18, 36, 60, 90, 126, 168, 216, 270, 330]
     max_connections = [6, 12, 18, 30, 45, 63, 84, 108, 135, 165]
 
     # Set an initial range for influence for worlds based upon their
@@ -689,7 +689,7 @@ class TradeCalculation(RouteCalculation):
                                                 btn=0)
             start = route[0]
             for end in route[1:]:
-                #self.galaxy.routes.remove_edge(start, end)
+                # self.galaxy.routes.remove_edge(start, end)
                 start = end
         return dist, weight
     
@@ -709,7 +709,7 @@ class TradeCalculation(RouteCalculation):
                 self.logger.error("edges found newstar %s != star %s" % (newstar, star))
                 continue
 
-            #Skip this pair if we've already done the trade
+            # Skip this pair if we've already done the trade
             # usually from the other star first. 
             if target in star.tradeMatched: 
                 continue
@@ -880,7 +880,7 @@ class CommCalculation(RouteCalculation):
         active_graph = nx.Graph()
 
         active_graph.add_edges_from(active)
-        #for (star, neighbor, data) in self.galaxy.stars.edges(data=True):
+        # for (star, neighbor, data) in self.galaxy.stars.edges(data=True):
         #    pass
 
     def route_weight (self, star, target):
@@ -890,7 +890,7 @@ class CommCalculation(RouteCalculation):
             weight += 25
         if star.port in 'DEX':
             weight += 25
-        #if star.zone in 'AU' or target.zone in 'AU':
+        # if star.zone in 'AU' or target.zone in 'AU':
         #    weight += 25
         if star.zone in 'RF' or target.zone in 'RF':
             weight += 50

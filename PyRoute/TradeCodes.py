@@ -135,7 +135,7 @@ class TradeCodes(object):
         check = self._check_planet_code(star, 'Va', None, '0', None) and check
         check = self._check_planet_code(star, 'Wa', '3456789', '3456789DEF', 'A') and check
 
-        #self._check_pop_code('Ba', '0')
+        # self._check_pop_code('Ba', '0')
         check = self._check_pop_code(star, 'Lo', '123') and check
         check = self._check_pop_code(star, 'Ni', '456') and check
         check = self._check_pop_code(star, 'Ph', '8') and check

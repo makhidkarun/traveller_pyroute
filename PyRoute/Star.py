@@ -218,12 +218,12 @@ class Star (object):
         return self._hash
 
     def wiki_name(self):
-        #name = u" ".join(w.capitalize() for w in self.name.lower().split())
+        # name = u" ".join(w.capitalize() for w in self.name.lower().split())
         name = u'{{WorldS|' + self.name + u'|' + self.sector.sector_name() + u'|' + self.position + u'}}'
         return name
 
     def wiki_short_name(self):
-        #name = u" ".join(w.capitalize() for w in self.name.lower().split())
+        # name = u" ".join(w.capitalize() for w in self.name.lower().split())
         return u'{} (world)'.format(self.name)
 
     def sec_pos(self, sector):
@@ -479,7 +479,7 @@ class Star (object):
             
         budget = long (self.tcs_gwp * 0.03 * tax_rate[self.uwpCodes['Government']])
         
-        #if AllyGen.sameAligned('Im', self.alg):
+        # if AllyGen.sameAligned('Im', self.alg):
         #    budget = budget * 0.3
         
         transfer_rate = {'A': 1.0, 'B': 0.95, 'C': 0.9, 'D': 0.85, 'E': 0.8}

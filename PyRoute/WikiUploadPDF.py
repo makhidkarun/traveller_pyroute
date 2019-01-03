@@ -364,9 +364,9 @@ def process():
     wiki_review = WikiReview(site, None, False)
 
     # create a Wiki object
-    #site = wiki.Wiki(args.site)
-    #site = wiki.Wiki("http://localhost/wiki/api.php")
-    #site.login(args.user, remember=True)
+    # site = wiki.Wiki(args.site)
+    # site = wiki.Wiki("http://localhost/wiki/api.php")
+    # site.login(args.user, remember=True)
 
     if args.maps:
         path = os.path.join(args.input, "*Sector.pdf")

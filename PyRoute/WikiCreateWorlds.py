@@ -173,7 +173,7 @@ No information yet available.
         return source_text
 
     def get_categories(self, star, categories):
-        #base_categories = ['[[Category: First Imperium worlds]]', '[[Category: Humaniti worlds]]', '[[Category: Rule of Man worlds]]',
+        # base_categories = ['[[Category: First Imperium worlds]]', '[[Category: Humaniti worlds]]', '[[Category: Rule of Man worlds]]',
         #                   '[[Category: Second Imperium worlds]]','[[Category: Ziru Sirka worlds]]']
         base_categories = []
         if star:
@@ -345,8 +345,8 @@ def process():
 
         new_page = worlds.create_page(star, categories, sources, title)
 
-        #print new_page
-        #print "=============================================="
+        # print new_page
+        # print "=============================================="
         if args.save:
             logger.info("Saving Page: %s", wiki_page.title)
             result = wiki_review.save_page(wiki_page, new_page, create=True)

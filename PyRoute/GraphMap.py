@@ -53,7 +53,7 @@ class GraphMap(object):
             draw.line([(0,sy+60), (self.image.size[0], sy+60)], fill=(0, 0, 128)) 
             draw.line([(0,sy+80), (self.image.size[0], sy+80)], fill=(0, 0, 192)) 
         
-        #for x,y in product (range(65), range(81)):
+        # for x,y in product (range(65), range(81)):
         #    if x % 64 == 0 or y % 80 == 0:
         #        self.image.putpixel((x, y), (0, 0, 192))
         #    elif x % 16 == 0 or y % 20 == 0:
@@ -66,7 +66,7 @@ class GraphMap(object):
             wx = x + self.gx
             wy = y + self.gy - 1
             self._draw_borders(wx, wy, px, py)
-            #self._draw_borders(sector, world.col, world.row, x, y)
+            # self._draw_borders(sector, world.col, world.row, x, y)
             
         for sector in self.galaxy.sectors.itervalues():   
             sx = (sector.x - self.dx) * 64
@@ -80,7 +80,7 @@ class GraphMap(object):
         self.image.save("Core.gif", None)
     
     def _draw_borders(self, wx, wy, lx, ly):
-        #q, r = HexMap.convert_hex_to_axial(wx + sector.dx, wy + sector.dy - 1)
+        # q, r = HexMap.convert_hex_to_axial(wx + sector.dx, wy + sector.dy - 1)
         q,r = HexMap.convert_hex_to_axial(wx, wy)
         if self.galaxy.borders.borders.get((q,r), False):
             if self.galaxy.borders.borders[(q,r)] & 1: # TOP 
@@ -93,7 +93,7 @@ class GraphMap(object):
                     self.image.putpixel((lx-1, ly), (0,255,160))
                 else:
                     self.image.putpixel((lx+1, ly), (0, 160, 160))
-            if self.galaxy.borders.borders[(q,r)] & 4 : # Lline
+            if self.galaxy.borders.borders[(q,r)] & 4 :  # Lline
                 if wy & 1:
                     self.image.putpixel((lx+1, ly), (160,0,160))
                 else:

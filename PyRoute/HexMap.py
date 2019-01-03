@@ -62,7 +62,7 @@ class HexMap(object):
                 self.trade_line(pdf, [star, neighbor], data)
 
             # Get all the worlds in this sector
-            #for (star, neighbor, data) in self.galaxy.stars.edges(sector.worlds, True):
+            # for (star, neighbor, data) in self.galaxy.stars.edges(sector.worlds, True):
             #    if star.sector != sector:
             #        continue#
             #    if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:

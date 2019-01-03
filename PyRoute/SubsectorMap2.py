@@ -110,7 +110,7 @@ class GraphicSubsectorMap (GraphicMap):
         radius = 3
         line = self.get_line(doc, start, end, color, radius * 2)
 
-        #Draw holes in outer line for names
+        # Draw holes in outer line for names
         line.color = ImageColor.getrgb ("black")
         # top line 
         start.y = 29; end.y = 29
@@ -268,7 +268,7 @@ class GraphicSubsectorMap (GraphicMap):
         point.x_plus(self.xm)
         point.y_plus(self.ym)
 
-        #Draw the center dot colored to reflect the world type. 
+        # Draw the center dot colored to reflect the world type.
         radius = (self.xm / 2) - 1
         
         if star.tradeCode.asteroid:
@@ -406,7 +406,7 @@ class GraphicSubsectorMap (GraphicMap):
             star_start = self.other_centerpoint(star, position)
             star_end = self.centerpoint(neighbor)
 
-            #self.logger.info ("trade to different subsector: {} - {}".format(star, neighbor))
+            # self.logger.info ("trade to different subsector: {} - {}".format(star, neighbor))
         #    return 
         if data['SourceMarketPrice'] > 0:
             trade = data['SourceMarketPrice'] - 1000 - (star.trade_cost * 1000)
@@ -425,7 +425,7 @@ class GraphicSubsectorMap (GraphicMap):
         
     def circle_center(self, start, end):
         # Calculate the center of an equilateral triangle from start and end
-        #root3 = math.sqrt(3)
+        # root3 = math.sqrt(3)
         root3 = 2
         xm = 0.5 * (start.x + end.x)
         ym = 0.5 * (start.y + end.y)
@@ -453,7 +453,7 @@ class GraphicSubsectorMap (GraphicMap):
             doc.arc([x1 + i,y1,x2 + i, y2], startAngle, endAngle, color)
             doc.arc([x1, y1 + i, x2, y2 + i],startAngle, endAngle, color)
                 
-        #if len(star.name) > 0:
+        # if len(star.name) > 0:
         #    for chars in xrange(len(star.name), 0, -1):
         #        width = self.string_width(pdf.get_font(), star.name[:chars])
         #        if width <= self.xm * 3.5:
@@ -463,43 +463,43 @@ class GraphicSubsectorMap (GraphicMap):
         #    point.x_plus(self.ym - (width/2))
         #    pdf.add_text(star.name[:chars].encode('ascii', 'replace'), point)
         # 
-        #added = star.alg
-        #if 'Cp' in star.tradeCode:
+        # added = star.alg
+        # if 'Cp' in star.tradeCode:
         #    added += '+'
-        #elif 'Cx' in star.tradeCode or 'Cs' in star.tradeCode:
+        # elif 'Cx' in star.tradeCode or 'Cs' in star.tradeCode:
         #    added += '*'
-        #else:
+        # else:
         #    added += ' '
         # 
-        #added += '{:d}'.format (star.ggCount)
-        #point.y_plus(3.5)
-        #point.x = col
-        #width = pdf.get_font()._string_width(added)
-        #point.x_plus(self.ym - (width/2))
-        #pdf.add_text(added, point)
+        # added += '{:d}'.format (star.ggCount)
+        # point.y_plus(3.5)
+        # point.x = col
+        # width = pdf.get_font()._string_width(added)
+        # point.x_plus(self.ym - (width/2))
+        # pdf.add_text(added, point)
 
-        #added = ''            
-        #tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
-        #tradeThrough = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
+        # added = ''
+        # tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
+        # tradeThrough = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
         
-        #if self.routes == 'trade':
+        # if self.routes == 'trade':
         #    added += "{:X}{:X}{:X}{:d}".format(star.wtn, tradeIn, tradeThrough, star.starportSize)
-        #elif self.routes == 'comm':
+        # elif self.routes == 'comm':
         #    added += "{}{} {}".format(star.baseCode,star.ggCount,star.importance)
-        #elif self.routes == 'xroute':
+        # elif self.routes == 'xroute':
         #    added += " {}".format(star.importance)
-        #width = pdf.get_font()._string_width(added)
-        #point.y_plus(3.5)
-        #point.x = col
-        #point.x_plus(self.ym - (width/2))
-        #pdf.add_text(added, point)
+        # width = pdf.get_font()._string_width(added)
+        # point.y_plus(3.5)
+        # point.x = col
+        # point.x_plus(self.ym - (width/2))
+        # pdf.add_text(added, point)
         
-        #pdf.set_font(def_font)
+        # pdf.set_font(def_font)
 
         
 if __name__ == '__main__':
     
-    #route.set_logging('DEBUG')
+    # route.set_logging('DEBUG')
     galaxy = Galaxy(15, 4, 8)
     galaxy.output_path = '.'
     galaxy.read_sectors(['../sectors_tne/SpinwardMarches.sec'], 'fixed', 'collapse')
@@ -508,12 +508,12 @@ if __name__ == '__main__':
     graphMap = GraphicSubsectorMap (galaxy, None)
     graphMap.write_maps()
     
-    #img = graphMap.document(galaxy.sectors['Spinward Marches'])
-    #subsector = galaxy.sectors['Spinward Marches'].subsectors['I']
+    # img = graphMap.document(galaxy.sectors['Spinward Marches'])
+    # subsector = galaxy.sectors['Spinward Marches'].subsectors['I']
     
-    #graphMap.write_base_map(img, subsector)
-    #graphMap.draw_borders(img, subsector)
-    #for star in subsector.worlds:
+    # graphMap.write_base_map(img, subsector)
+    # graphMap.draw_borders(img, subsector)
+    # for star in subsector.worlds:
     #    graphMap.place_system(img, star)
 
-    #graphMap.close()
+    # graphMap.close()
