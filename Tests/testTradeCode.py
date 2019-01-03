@@ -7,7 +7,7 @@ from TradeCodes import TradeCodes
 from Star import Star
 from Galaxy import Sector, Galaxy
 
-class Test(unittest.TestCase):
+class TestTradeCode(unittest.TestCase):
 
     def setUp(self):
         star_regex = ''.join([line.rstrip('\n') for line in Galaxy.regex])

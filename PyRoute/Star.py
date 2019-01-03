@@ -190,7 +190,7 @@ class Star (object):
         return u"{} ({} {})".format(self.name, self.sector.name, self.position)
         
     def __str__(self):
-        name = u"%s (%s %s)" % (self.name,self.sector.name, self.position)
+        name = u"%s (%s %s)" % (self.name, self.sector.name, self.position)
         return name.encode('utf-8')
 
     def __repr__(self):

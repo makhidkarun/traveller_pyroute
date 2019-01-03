@@ -109,7 +109,7 @@ class Subsector(AreaItem):
 
 class Sector (AreaItem):
     def __init__ (self, name, position):
-        super(Sector, self).__init__(name[1:].strip())
+        super(Sector, self).__init__(name[0:].strip())
 
         self.x = int(position[1:].split(',')[0])
         self.y = int(position[1:].split(',')[1])
