@@ -2,6 +2,8 @@ PyRoute/__pycache__/
 Tests/__pycache__/
 PyRoute/*.pyc
 Tests/*.pyc
+PyRoute/*.class
+Tests/*.class
 
 # ignore IDE-related detritus
 .idea/
