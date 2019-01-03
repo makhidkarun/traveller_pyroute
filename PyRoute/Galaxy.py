@@ -399,7 +399,7 @@ class Galaxy(object):
                         owner = world.sector.rimward.find_world_by_pos(ownedHex)
 
                     # If we can't find world in the sector next door, try the this one
-                    if owner == None:
+                    if owner is None:
                         owner = world.sector.find_world_by_pos(ownedHex)
                 elif len(world.ownedBy) == 4:
                     owner = world.sector.find_world_by_pos(world.ownedBy)
