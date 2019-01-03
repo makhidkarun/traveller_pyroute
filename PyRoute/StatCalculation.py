@@ -118,11 +118,21 @@ class StatCalculation(object):
         self.max_tl(algStats, star)
 
 
+    def add_pop_to_alg (self, stats, alg_base, population):
+        if alg_base == 'Hv':
+            stats.pop_groups['Hive'] += population
+        elif alg_base == 'As':
+            stats.pop_groups['Asla'] += population
+        elif alg_base == 'Va':
+            stats.pop_groups['Varg'] += population
+        else:
+            stats.pop_groups['Huma'] += population
+        
     def add_stats(self, stats, star):
         stats.population += star.population
 
         if star.tradeCode.sophonts is None:
-            stats.pop_groups['Huma'] += star.population
+            self.add_pop_to_alg(stats, star.alg_base, star.population)
         else:
             total_pct = 100
             for sophont in star.tradeCode.sophonts:
@@ -135,7 +145,7 @@ class StatCalculation(object):
             if total_pct < 0:
                 self.logger.warn ("{} has sophont percent over 100%: {}".format(star, total_pct))
             elif total_pct > 0:
-                stats.pop_groups['Huma'] += int(star.population * (total_pct/100.0))
+                self.add_pop_to_alg(stats, star.alg_base, int(star.population * (total_pct/100.0)))
 
         stats.economy += star.gwp
         stats.number += 1
@@ -191,11 +201,11 @@ class StatCalculation(object):
         self.logger.info('Charted population {:,d}'.format(self.galaxy.stats.population))
         
         for sector in self.galaxy.sectors.itervalues():
-            self.logger.debug('Sector ' + sector.name + ' star count: ' + str(sector.stats.number))
+            self.logger.debug(u'Sector {} star count: {:,d}'.format(sector.name, sector.stats.number))
             
         for code,aleg in self.galaxy.alg.iteritems():
             s = u'Allegiance {0} ({1}: base {3}) star count: {2:,d}'.format(aleg.name, code, aleg.stats.number, aleg.base)
-            self.logger.debug(s)
+            self.logger.info(s)
         
         self.logger.debug ("min count: {}, match: {}".format(ally_count, ally_match))
                            
