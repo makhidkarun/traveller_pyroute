@@ -44,7 +44,7 @@ class AllyGen(object):
         Constructor
         """
         self.galaxy = galaxy
-        self.borders = {} # 2D array using (q,r) as key, with flags for data
+        self.borders = {}  # 2D array using (q,r) as key, with flags for data
         self.allyMap = {}
         self.logger = logging.getLogger('PyRoute.AllyGen')
 
@@ -110,7 +110,7 @@ class AllyGen(object):
             alg = star.alg
             # Skip the non-entity worlds
             if alg in self.noOne:
-                continue;
+                continue
             # Collapse non-aligned into each their own 
             if alg in self.nonAligned:
                 alg = self.nonAligned[0]

@@ -113,18 +113,24 @@ class GraphicSubsectorMap (GraphicMap):
         # Draw holes in outer line for names
         line.color = ImageColor.getrgb ("black")
         # top line 
-        start.y = 29; end.y = 29
-        start.x = 254; end.x = 568 
+        start.y = 29
+        end.y = 29
+        start.x = 254
+        end.x = 568
         line._draw()
         # bottom line 
-        start.y = 1096; end.y = 1096
+        start.y = 1096
+        end.y = 1096
         line._draw()
         # Left Side
-        start.x = 29; end.x = 29
-        start.y = 400; end.y = 722
+        start.x = 29
+        end.x = 29
+        start.y = 400
+        end.y = 722
         line._draw()
         # Right Side
-        start.x = 786; end.x = 786  
+        start.x = 786
+        end.x = 786
         line._draw()
         
         # Draw small grid
@@ -132,20 +138,26 @@ class GraphicSubsectorMap (GraphicMap):
         line.width = 2
         # vertical lines
         
-        start.x = 792; start.y = 1120; start.set_deltas(-22, 34)
-        end.x   = 792; end.y = 1256; end.set_deltas(-22, 34)
+        start.x = 792
+        start.y = 1120
+        start.set_deltas(-22, 34)
+        end.x   = 792
+        end.y   = 1256
+        end.set_deltas(-22, 34)
         
         line._draw()
         for _ in xrange(1, 5, 1):
-            start.x_plus(); end.x_plus()
-            line._draw();
+            start.x_plus()
+            end.x_plus()
+            line._draw()
             
         # Horizontal lines
         start.x = 792; start.y = 1120; start.set_deltas(22, 34)
         end.x   = 704; end.y = 1120; end.set_deltas(22, 34)
         line._draw()
         for _ in xrange(1,5,1):
-            start.y_plus(); end.y_plus()
+            start.y_plus()
+            end.y_plus()
             line._draw()
 
         pos = self.positions[sector.position]

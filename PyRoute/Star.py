@@ -268,7 +268,7 @@ class Star (object):
             y2 += 1
         dy = y2 - y1
         if dy < 1:
-            dy = -dy;
+            dy = -dy
         dx = star.x - self.x
         if dx < 1:
             dx = -dx

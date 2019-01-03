@@ -74,7 +74,7 @@ def process():
     
     logger.info("starting processing")
     
-    galaxy = Galaxy(args.btn, args.max_jump, args.route_btn);
+    galaxy = Galaxy(args.btn, args.max_jump, args.route_btn)
     galaxy.output_path = args.output
     
     sectors_list = args.sector

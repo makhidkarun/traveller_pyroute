@@ -92,7 +92,8 @@ class GraphicSubsectorMap (GraphicMap):
         doc.rectangle([(start.x+2, start.y+2),(end.x-2, end.y-2)], outline=color, fill=None )
 
 
-        start.x = 15; start.y=15
+        start.x = 15
+        start.y=15
         end.x = 396; end.y = 548
         doc.rectangle([(start.x-1, start.y-1),(end.x+1, end.y+1)], outline=color, fill=None )
         doc.rectangle([(start.x, start.y),(end.x, end.y)], outline=color, fill=None )
@@ -104,15 +105,21 @@ class GraphicSubsectorMap (GraphicMap):
 
         # Draw holes in outer line for names
         line.color = ImageColor.getrgb ("black")
-        start.y = 15; end.y = 15
-        start.x = 127; end.x = 284 
+        start.y = 15
+        end.y = 15
+        start.x = 127
+        end.x = 284
         line._draw()
-        start.y = 548; end.y = 548
+        start.y = 548
+        end.y = 548
         line._draw()
-        start.x = 15; end.x = 15
-        start.y = 200; end.y = 361
+        start.x = 15
+        end.x = 15
+        start.y = 200
+        end.y = 361
         line._draw()
-        start.x = 396; end.x = 396
+        start.x = 396
+        end.x = 396
         line._draw()
         
         # Draw small grid
@@ -120,20 +127,30 @@ class GraphicSubsectorMap (GraphicMap):
         line.width = 1
         # vertical lines
         
-        start.x = 396; start.y = 560; start.set_deltas(-11, 17)
-        end.x   = 396; end.y = 628; end.set_deltas(-11, 17)
+        start.x = 396
+        start.y = 560
+        start.set_deltas(-11, 17)
+        end.x   = 396
+        end.y = 628
+        end.set_deltas(-11, 17)
         
         line._draw()
         for _ in xrange(1, 5, 1):
-            start.x_plus(); end.x_plus()
-            line._draw();
+            start.x_plus()
+            end.x_plus()
+            line._draw()
             
         # Horizontal lines
-        start.x = 396; start.y = 560; start.set_deltas(11, 17)
-        end.x   = 352; end.y = 560; end.set_deltas(11, 17)
+        start.x = 396
+        start.y = 560
+        start.set_deltas(11, 17)
+        end.x   = 352
+        end.y   = 560
+        end.set_deltas(11, 17)
         line._draw()
         for _ in xrange(1,5,1):
-            start.y_plus(); end.y_plus()
+            start.y_plus()
+            end.y_plus()
             line._draw()
 
         pos = self.positions[sector.position]

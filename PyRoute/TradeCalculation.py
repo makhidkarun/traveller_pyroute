@@ -480,7 +480,7 @@ class TradeCalculation(RouteCalculation):
         
         # Override the default setting for route-reuse from the base class
         # based upon program arguments. 
-        self.route_reuse = route_reuse;
+        self.route_reuse = route_reuse
 
     def base_route_filter (self, star, neighbor):
         if star.zone in ['R', 'F'] or neighbor.zone in ['R','F']:
@@ -842,7 +842,7 @@ class CommCalculation(RouteCalculation):
         routes = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges(data=True) if d['distance'] < 3]
         
         self.logger.info ("considering {} worlds for removal".format(len(routes)))
-        removed = 0;
+        removed = 0
         for route in routes:
             imp = self.galaxy.alg[route[0].alg_base].min_importance
             if (len(self.galaxy.alg[route[0].alg_base].worlds) < 100 and d['distance'] > 1 ) or \
