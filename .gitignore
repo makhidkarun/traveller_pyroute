@@ -7,6 +7,9 @@ Tests/*.class
 
 # ignore IDE-related detritus
 .idea/
+.project
+.pydevproject
+.settings/
 
 # ignore downloaded/generated files
 sectors/
