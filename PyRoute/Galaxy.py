@@ -147,10 +147,10 @@ class Galaxy(object):
 (.{15,}) +
 (\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?) +
 (.{15,}) +
-((\{ ?[+-]?[0-6] ?\}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]| -)|( ) ( ) ( )) +
+((\{ *[+-]?[0-6] ?\}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]| -)|( ) ( ) ( )) +
 (\w{1,5}|-| ) +
 (\w{1,3}|-|\*) +
-(\w|-) +
+(\w|-| ) +
 ([0-9X?][0-9A-FX?][0-9A-FX?]) +
 (\d{1,}| ) +
 ([A-Z0-9?-][A-Za-z0-9?-]{1,3}) 
@@ -202,6 +202,8 @@ class Galaxy(object):
                     algName = line[8:].split(':',1)[1].strip().strip('"')
                     
                     base = AllyGen.same_align(algCode)
+                    if base in self.alg:
+                        self.alg[base].name = algName
                     if base not in self.alg:
                         self.alg[base] = Allegiance(base, AllyGen.same_align_name(base,algName), base=True)
                     if algCode not in self.alg:
@@ -233,10 +235,9 @@ class Galaxy(object):
         full_alg = algs.get(star.alg, Allegiance(star.alg, 'Unknown Allegiance', base=False))
         base_alg = algs.get(star.alg_base, Allegiance(star.alg_base, 'Unknown Allegiance', base=True))
 
-        area.alg.setdefault(star.alg, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
-
-        if star.alg_base != star.alg:
-            area.alg.setdefault(star.alg_base, Allegiance(base_alg.code, base_alg.name, base=True)).worlds.append(star)
+        area.alg.setdefault(star.alg_base, Allegiance(base_alg.code, base_alg.name, base=True)).worlds.append(star)
+        if star.alg != star.alg_base:
+            area.alg.setdefault(star.alg, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
 
                 
     def set_positions(self):
