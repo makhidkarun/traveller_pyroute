@@ -13,7 +13,7 @@ Created on Apr 26, 2015
 from wikitools import api
 from wikitools.page import Page, NoPage
 
-from travellerwikitools import WikiReview
+from WikiReview import WikiReview
 
 import logging
 import argparse

@@ -8,7 +8,7 @@ import logging
 import argparse
 import os
 from Galaxy import Galaxy
-from travellerwikitools import WikiReview
+from WikiReview import WikiReview
 from wikitools.page import Page
 
 logger = logging.getLogger('WikiCreateWorlds')
