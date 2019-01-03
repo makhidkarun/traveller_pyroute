@@ -169,7 +169,7 @@ class TradeCodes(object):
                 self.ownedBy = 'Re'
             elif code.startswith(u'Px'):
                 self.ownedBy = 'Px'
-        if (star.gov == '6' and not self.ownedBy) or (star.gov != '6' and self.ownedBy != self):
+        if (star.gov == '6' and not self.ownedBy) or (star.gov != '6' and self.ownedBy != star):
             self.logger.debug (u"{} has incorrect government code {} - {}".format(star, star.gov, self.dcode))
         return self.ownedBy
 
