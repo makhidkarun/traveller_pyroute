@@ -36,6 +36,7 @@ class UWPCodes(object):
         for uwpCode in UWPCodes.uwpCodes:
             self.codes[uwpCode] = "X"
 
+
 class Nobles(object):
     def __init__ (self):
         self.nobles = {'Knights': 0, 
@@ -58,6 +59,7 @@ class Nobles(object):
                       'F': 'Sector Dukes',
                       'G': 'Archdukes',
                       'H': 'Emperor'}
+
     def __str__(self):
         nobility=""
         for rank, count in self.nobles.iteritems():
@@ -73,7 +75,8 @@ class Nobles(object):
     def accumulate(self, nobles):
         for rank, count in nobles.nobles.iteritems():
             self.nobles[rank] += count
-            
+
+
 class Star (object):
     def __init__ (self):
         self.logger = logging.getLogger('PyRoute.Star')
@@ -245,12 +248,10 @@ class Star (object):
     def hex_distance(self, star):
         return max(abs(self.x - star.x), abs(self.y - star.y), abs(self.z -star.z))
 
-        
     @staticmethod    
     def heuristicDistance(star1, star2):
         return max(abs(star1.x - star2.x), abs(star1.y - star2.y), abs(star1.z - star2.z))
 
-    
     @staticmethod
     def axial_distance(Hex1, Hex2):
         return (abs(Hex1[0] - Hex2[0]) + abs(Hex1[1] - Hex2[1])
@@ -272,15 +273,13 @@ class Star (object):
         if dx > dy:
             return dx
         return dx + dy / 2
-    
 
     def subsector(self):
         subsector = ["ABCD","EFGH","IJKL","MNOP"]
         indexy = (self.col - 1) / 8
         indexx = (self.row - 1) / 10
         return subsector[indexx][indexy]
-    
-    
+
     def calculate_gwp(self, pop_code):
         calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400, 24400, 39000, 39000]
         flatGWP = [229, 301, 396, 521, 685, 902, 1186, 1560, 2051,2698, 3548, 4667, 6138, 8072, 10617, 13964, 18365, 24155, 31769, 41783]
@@ -314,8 +313,7 @@ class Star (object):
         self.gwp = int(self.gwp)
         self.population = int(self.population)
         self.perCapita = int(self.perCapita)
- 
- 
+
     def calculate_mspr(self):
         self.mspr = 9
         
@@ -328,8 +326,7 @@ class Star (object):
             self.mspr -= 2 if self.hydro in ['0'] else 0
             self.mspr -= 1 if self.atmo in ['4','5','8','9'] else 0 # thin or dense
             self.mspr -= 1 if self.atmo in ['4','7','9'] else 0 # polluted
-        
-        
+
     def calculate_wtn(self):
         self.wtn = self.popCode
         self.wtn -= 1 if self.tl == 0 else 0
@@ -537,7 +534,6 @@ class Star (object):
         eti -= 2 if self.tradeCode.industrial else 0
         eti -= 1 if self.zone in ['A', 'U'] else 0
         self.eti_passenger = eti
-        
 
     def calculate_army(self):
         #       3, 4, 5, 6, 7, 8, 9, A

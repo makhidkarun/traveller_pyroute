@@ -8,6 +8,7 @@ import re
 import logging
 import sys
 
+
 class TradeCodes(object):
     '''
     Trade Codes manage the complete set of trade codes for a world
@@ -96,7 +97,6 @@ class TradeCodes(object):
             check = False
         return check
 
-
     def _check_pop_code(self, star, code, pop):
         check = True
         if star.pop in pop and code not in self.codeset:
@@ -106,7 +106,6 @@ class TradeCodes(object):
             self.logger.error(u'{} - Found invalid "{}" code on world with {} population: {}'.format(star, code, star.pop, self.codeset))
             check = False
         return check
-
 
     def _check_econ_code(self, star, code, atmo, hydro, pop):
         atmo = '0123456789ABCDEF' if atmo is None else atmo
@@ -122,7 +121,6 @@ class TradeCodes(object):
             self.logger.error(u'{}-{} Found invalid "{}" in trade codes: {}'.format(star, star.uwp, code, self.codeset))
             check = False
         return check
-
 
     def check_world_codes(self, star):
         check = True
@@ -172,7 +170,6 @@ class TradeCodes(object):
         if (star.gov == '6' and not self.ownedBy) or (star.gov != '6' and self.ownedBy != star):
             self.logger.debug (u"{} has incorrect government code {} - {}".format(star, star.gov, self.dcode))
         return self.ownedBy
-
 
     def owners(self, sector_name):
         if not sector_name:

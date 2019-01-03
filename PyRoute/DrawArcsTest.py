@@ -83,14 +83,12 @@ class DrawArcsTest (GraphicSubsectorMap):
         self.logger.info("Image size: {}, cropped size: {}".format(self.image.size, cropped.size))
         
         self.image = Image.alpha_composite(self.image, cropped)
-        
-            
+
     def draw_one_arc (self, doc, start, end):
         center = self.circle_center(start, end)
         #self.logger.info("Points are : start: {}, end: {}, and center {}".format(start,end,center))
         self.draw_arc(doc, center, start, end)
 
-        
     def centerpoint(self, row, col):
         xcol = self.xm * 3 * col
         if (col & 1):
@@ -139,7 +137,6 @@ class DrawArcsTest (GraphicSubsectorMap):
         
         return self.cursor(round(cx), round(cy))
 
-
     def draw_arc(self, doc, center, start, end):
         r = math.sqrt ((start.x - center.x) ** 2 + (start.y - center.y) ** 2)
         x1 = center.x - r 
@@ -161,7 +158,8 @@ class DrawArcsTest (GraphicSubsectorMap):
             
         #doc.ellipse([end.x-6, end.y-6, end.x+6, end.y+6], outline=self.fillWhite, fill=self.fillWhite)
         #doc.ellipse([center.x-6, center.y-6, center.x+6, center.y+6], outline=self.fillBlue, fill=self.fillBlue)
-        
+
+
 def set_logging(level):
     logging.getLogger('PyRoute').setLevel(level)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -170,6 +168,7 @@ def set_logging(level):
     ch.setLevel(level)
     ch.setFormatter(formatter)
     logging.getLogger('PyRoute').addHandler(ch)
+
 
 if __name__ == '__main__':
     
@@ -181,4 +180,3 @@ if __name__ == '__main__':
 
     graphMap = DrawArcsTest(galaxy, None)
     graphMap.write_maps()
-    

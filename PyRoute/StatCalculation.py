@@ -10,6 +10,7 @@ from collections import OrderedDict, defaultdict
 from AllyGen import AllyGen
 from Star import UWPCodes
 
+
 class ObjectStatistics(object):
     def __init__(self):
         self.population = 0
@@ -40,6 +41,7 @@ class ObjectStatistics(object):
         self.eti_cargo = 0
         self.eti_pass = 0
 
+
 class UWPCollection(object):
     def __init__(self):
         self.uwp = OrderedDict()
@@ -54,6 +56,7 @@ class UWPCollection(object):
 
     def __setitem__ (self, index, value):
         self.uwp[index] = value
+
 
 class StatCalculation(object):
     '''
@@ -116,7 +119,6 @@ class StatCalculation(object):
         algStats = area.alg[alg].stats
         self.add_stats(algStats, star)
         self.max_tl(algStats, star)
-
 
     def add_pop_to_alg (self, stats, alg_base, population):
         if alg_base == 'Hv':

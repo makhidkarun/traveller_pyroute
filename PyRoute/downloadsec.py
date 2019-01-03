@@ -10,7 +10,8 @@ import time
 import os
 import argparse
 
-def get_url (url, sector, suffix, output_dir):
+
+def get_url(url, sector, suffix, output_dir):
     try:
         f = urllib2.urlopen(url)
     except urllib2.HTTPError as ex:

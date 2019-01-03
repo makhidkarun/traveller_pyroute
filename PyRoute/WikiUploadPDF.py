@@ -1,9 +1,9 @@
 #!/usr/bin/python
-'''
+"""
 Created on Apr 26, 2015
 
 @author: tjoneslo
-'''
+"""
 
 # Requires wikitools and poster to run correctly
 # pip install wikitools
@@ -12,7 +12,6 @@ Created on Apr 26, 2015
 #
 from wikitools import api
 from wikitools.page import Page, NoPage
-
 from WikiReview import WikiReview
 
 import logging
@@ -25,6 +24,7 @@ import re
 from itertools import izip
 
 logger = logging.getLogger('WikiUpload')
+
 
 def uploadSummaryText(site, summaryFile, era):
     try:
@@ -71,7 +71,8 @@ def uploadSummaryText(site, summaryFile, era):
         if lines[index].startswith('|}'):
             break       
         index += 1
-        
+
+
 def uploadSec (site, filename, place, era):
     with codecs.open(filename, "r", 'utf-8') as f:
         text = f.read()
@@ -88,10 +89,13 @@ def uploadSec (site, filename, place, era):
 
 
 def pairwise(iterable):
-    "s -> (s0, s1), (s2, s3), (s4, s5), ..."
+    """
+    s -> (s0, s1), (s2, s3), (s4, s5), ...
+    """
     a = iter(iterable)
     return izip(a, a)
-    
+
+
 def uploadWorlds (site, sectorFile, economicFile, era):
     data_template=u'''
 {{{{StellarData
@@ -222,8 +226,7 @@ No information yet available.
         
         site.search_disambig = worldName
         target_page = site.get_page(worldPage)
-        
-        
+
         pages = [target_page] if not isinstance(target_page, (list, tuple)) else target_page
         
         for page in pages:
@@ -323,9 +326,11 @@ No information yet available.
             else:
                 logger.error(u"UploadSummary for page {} got exception {} ".format(worldPage, e))
 
+
 shortNames = {u'Dagudashaag': u'Da', u'Deneb': u'De', 
               u'Empty Quarter': u'EQ', u'Spinward Marches': u'SM',
               u'Knoellighz': u'Kn' }
+
 
 def set_logging(level):
     logger.setLevel(level)
@@ -335,6 +340,7 @@ def set_logging(level):
     ch.setLevel(level)
     ch.setFormatter(formatter)
     logger.addHandler(ch)
+
 
 def process():
     warnings.simplefilter("always")
@@ -391,6 +397,7 @@ def process():
             if sector in shortNames.keys():
                 sec = eco.replace('Sector.economic.wiki', 'Sector.sector.wiki')
                 uploadWorlds(wiki_review, sec, eco, args.era)
+
 
 if __name__ == '__main__':
     process()

@@ -138,7 +138,6 @@ class HexMap(object):
         text.text_rotate(-90)
         text._text(name)
         pdf.set_font (font=def_font)
-        
 
     def subsector_grid(self, pdf):
         color = pdf.get_color()
@@ -157,7 +156,6 @@ class HexMap(object):
             hlineStart.y = y
             hlineEnd.y = y
             pdf.add_line(cursor1=hlineStart, cursor2=hlineEnd)
-
 
     def _hline(self, pdf, width, colorname):
         hlineStart = PDFCursor(0,0)
@@ -454,8 +452,7 @@ class HexMap(object):
 
         line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, stroke='solid', color=color, size=3)
         line._draw()
-        
-        
+
     def zone(self, pdf, star, point):
         point.x_plus(self.ym)
         point.y_plus(self.ym)
@@ -471,8 +468,7 @@ class HexMap(object):
         
         circle = PDFEllipse(pdf.session, pdf.page, point, radius, color, size=2)
         circle._draw()
-        
-    
+
     def document(self, sector):
         path = os.path.join(self.galaxy.output_path, sector.sector_name()+" Sector.pdf")
         self.writer = PDFLite(path)
@@ -524,7 +520,8 @@ class HexMap(object):
         result = [(pt_1 + t*(pt_2-pt_1)) for t in (points_t[2],points_t[3]) for (pt_1, pt_2) in zip(line_pt_1, line_pt_2)]
         logging.getLogger("PyRoute.HexMap").debug (result)
         return (result[0],result[1]), (result[2], result[3])
-        
+
+
 if __name__ == '__main__':
     sector = Sector('# Core', '# 0,0')
     hexMap = HexMap(None)

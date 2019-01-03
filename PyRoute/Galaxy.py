@@ -17,6 +17,7 @@ from TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation,
 from StatCalculation import ObjectStatistics
 from AllyGen import AllyGen
 
+
 class AreaItem(object):
     def __init__(self, name):
         self.name=name
@@ -31,6 +32,7 @@ class AreaItem(object):
 
     def __str__(self):
         return u'{}'.format(self.name)
+
 
 class Allegiance(AreaItem):
     def __init__(self, code, name, base = False):
@@ -52,6 +54,7 @@ class Allegiance(AreaItem):
 
     def __str__(self):
         return u'{} ([{})'.format(self.name, self.code)
+
 
 class Subsector(AreaItem):
     def __init__(self, name, position, sector):
@@ -107,6 +110,7 @@ class Subsector(AreaItem):
         else:
             self.trailing = self.sector.subsectors[self.positions[posrow][pos + 1]]         
 
+
 class Sector (AreaItem):
     def __init__ (self, name, position):
         super(Sector, self).__init__(name[0:].strip())
@@ -157,7 +161,6 @@ class Galaxy(object):
 (.*)
 """
 
-    
     def __init__(self, min_btn, max_jump=4, route_btn=8):
         '''
        Constructor
@@ -230,7 +233,6 @@ class Galaxy(object):
         self.set_positions()
         self.logger.debug ("Allegiances: {}".format(self.alg))
 
-
     def set_area_alg(self, star, area, algs):
         full_alg = algs.get(star.alg, Allegiance(star.alg, 'Unknown Allegiance', base=False))
         base_alg = algs.get(star.alg_base, Allegiance(star.alg_base, 'Unknown Allegiance', base=True))
@@ -239,7 +241,6 @@ class Galaxy(object):
         if star.alg != star.alg_base:
             area.alg.setdefault(star.alg, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
 
-                
     def set_positions(self):
         for sector in self.sectors.itervalues():
             for star in sector.worlds:
@@ -247,7 +248,6 @@ class Galaxy(object):
                 self.ranges.add_node(star)
         self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
 
-        
     def set_bounding_sectors(self):
         for sector, neighbor in itertools.combinations(self.sectors.itervalues(),2):
             if sector.x - 1 == neighbor.x and sector.y == neighbor.y:
@@ -265,12 +265,10 @@ class Galaxy(object):
             elif sector.x == neighbor.x and sector.y == neighbor.y:
                 self.logger.error("Duplicate sector %s and %s" % (sector.name, neighbor.name))
 
-
     def set_bounding_subsectors(self):
         for sector in self.sectors.itervalues():
             for subsector in sector.subsectors.itervalues():
                 subsector.set_bounding_subsectors()
-
 
     def generate_routes(self, routes, reuse=10):
         if routes == 'trade':
@@ -286,7 +284,6 @@ class Galaxy(object):
 
         self.trade.generate_routes()
 
-        
     def set_borders(self, border_gen, match):
         self.logger.info('setting borders...')
         if border_gen == 'range':
@@ -297,7 +294,6 @@ class Galaxy(object):
             self.borders.create_erode_border(match)
         else:
             pass
-
 
     def write_routes(self, routes=None):
         path = os.path.join(self.output_path, 'ranges.txt')
@@ -339,9 +335,7 @@ class Galaxy(object):
             if PassTradeIndex > 0:
                 world.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
                 neighbor.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
-            
 
-    
     def read_routes (self, routes=None):
         route_regex = "^({1,}) \(({3,}) (\d\d\d\d)\) ({1,}) \(({3,}) (\d\d\d\d)\) (\{.*\})"    
         routeline = re.compile(route_regex)

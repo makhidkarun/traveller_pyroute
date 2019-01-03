@@ -11,6 +11,7 @@ from Galaxy import Galaxy
 from AllyGen import AllyGen
 from PIL import Image, ImageDraw, ImageColor, ImageFont
 
+
 class GraphicSubsectorMap (GraphicMap):
     positions={'A': (0,0), 'B': (-8, 0), 'C': (-16, 0), 'D': (-24, 0),
                'E': (0,-10), 'F': (-8,-10), 'G': (-16,-10), 'H': (-24, -10),
@@ -24,8 +25,7 @@ class GraphicSubsectorMap (GraphicMap):
     trailPos   = (784, 1108 / 2)
     x_count    = 9
     y_count    = 11
-    
-    
+
     def __init__(self, galaxy, routes, trade_version):
         super(GraphicSubsectorMap, self).__init__(galaxy, routes)
         self.x_start = 56
@@ -219,7 +219,6 @@ class GraphicSubsectorMap (GraphicMap):
                          (point.x - self.xm*2,   point.y)],
                          outline=None, fill = color )
 
-
     def draw_border(self, doc, pos, point):
         start = self.cursor(25,25)
         end = self.cursor(385,538)
@@ -261,7 +260,6 @@ class GraphicSubsectorMap (GraphicMap):
                         end.x = point.x + self.xm * 2; end.y = point.y
                         line._draw()
 
-
     def place_system(self, doc, star):
         point = self.get_world_centerpoint(star)
         self.zone(doc, star, point.copy())
@@ -288,7 +286,6 @@ class GraphicSubsectorMap (GraphicMap):
         pos = (point.x - (size[0] / 2) + 1, point.y - (2* size[1]) + 1)
         doc.text(pos, star.port, font=self.worldFont, fill= self.textFill)
 
-        
         if star.ggCount:
             self.print_base_char(u'\u25CF', self.worldFont, point, (1.75, -2), doc)
            
@@ -336,7 +333,6 @@ class GraphicSubsectorMap (GraphicMap):
         else:
             doc.text(pos, name, font=self.worldFont, fill=self.textFill)
 
-
     def _world_point(self, hex_row, hex_col):
         col = self.xm * 3 * hex_col
         if (hex_col & 1):
@@ -345,25 +341,21 @@ class GraphicSubsectorMap (GraphicMap):
             row = (self.y_start - self.ym) +  (hex_row * self.ym * 2)
         return self.cursor(col, row)
 
-
     # Get the center of the hex for writing a world
     def get_world_centerpoint(self, star):
         col = star.col + self.positions[star.subsector()][0]
         row = star.row + self.positions[star.subsector()][1]
         return self._world_point(row, col)
 
-
     def other_subsector_point(self, star, position):
         col_out = star.col + self.positions[position][0]
         row_out = star.row + self.positions[position][1]
         return self._world_point(row_out, col_out)
-        
 
     def print_base_char(self, baseCharacter, font, point, multiplier, doc, fill=GraphicMap.fillWhite):            
             size = font.getsize(baseCharacter)
             pos = (point.x + (multiplier[0] * size[0]), point.y + (multiplier[1] * size[1]))
             doc.text(pos, baseCharacter, font=font, fill=fill)
-
 
     def trade_lines(self, doc, subsector):
         self.image = self.image.convert("RGBA")
@@ -384,13 +376,11 @@ class GraphicSubsectorMap (GraphicMap):
         self.logger.debug (u"Completed trade_lines for {}".format(subsector.name))
         return ImageDraw.Draw(self.image)
 
-        
     def trade_color(self, trade):
         tcolor = {0: "#0500ff", 1: "#0012ff", 2: "#0094ff", 3: "#00ffa8",
                   4: "#8aff00", 5: "#FFd200", 6: "#FF8200", 7: "#FF3200",
                   9: "#FF0030", 9: "#FF00B0",10: "#FF04F0",11:"#FF0CF0"}  
         return tcolor.get(trade, "#000000")
-
 
     def centerpoint (self, star):
         point = self.get_world_centerpoint(star)
@@ -403,7 +393,6 @@ class GraphicSubsectorMap (GraphicMap):
         point.x_plus(self.xm)
         point.y_plus(self.ym)
         return point
-    
 
     def trade_line(self, doc, star, neighbor, data, position):
         if star.subsector() == neighbor.subsector():
@@ -450,7 +439,6 @@ class GraphicSubsectorMap (GraphicMap):
         cy = ym + (root3 * slope)
                
         return self.cursor(round(cx), round(cy))
-
 
     def draw_arc(self, doc, center, start, end, color):
         r = math.sqrt ((start.x - center.x) ** 2 + (start.y - center.y) ** 2)

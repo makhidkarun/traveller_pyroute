@@ -8,6 +8,7 @@ from operator import itemgetter
 from collections import defaultdict
 import os
 
+
 class AllyGen(object):
     '''
     classdocs
@@ -47,16 +48,13 @@ class AllyGen(object):
         self.allyMap = {}
         self.logger = logging.getLogger('PyRoute.AllyGen')
 
-
     @staticmethod
     def is_unclaimed(alg):
         return alg in AllyGen.noOne
 
-
     @staticmethod
     def is_nonaligned(alg):
         return alg in AllyGen.nonAligned or alg in AllyGen.noOne
-
 
     @staticmethod
     def same_align(alg):
@@ -65,11 +63,9 @@ class AllyGen(object):
                 return sameAlg[0]
         return alg
 
-
     @staticmethod
     def imperial_align(alg):
         return AllyGen.same_align(alg) == 'Im'
-
 
     @staticmethod
     def same_align_name(alg, alg_name):
@@ -101,7 +97,6 @@ class AllyGen(object):
             algs += base_algs if base_algs else []
         algs.sort(key=lambda alg : alg.stats.number, reverse = True)
         return algs
-
 
     def create_borders (self, match):
         """
@@ -247,8 +242,7 @@ class AllyGen(object):
             if alg1 in sameAlg and alg2 in sameAlg:
                 return True
         return False
-        
-    
+
     @staticmethod
     def are_allies(alg1, alg2):
         '''
@@ -268,8 +262,6 @@ class AllyGen(object):
                 return True
         return False
 
-
-    
     def create_ally_map(self, match):
         '''
             Create borders around various allegiances, Algorithm Two.

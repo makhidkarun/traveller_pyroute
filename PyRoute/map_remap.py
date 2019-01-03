@@ -20,10 +20,13 @@ import os
 import codecs
 import string
 
+
 def sort_key(aString):
     return aString[-8:-3]
 
+
 from xml.dom import minidom
+
 
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.
@@ -35,6 +38,7 @@ def prettify(elem):
     rough_string = string.replace(rough_string, '>  <','><')
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
+
 
 def output_link (start, end, color, routeType, sectorStart, sectorEnd):
     output = ET.Element('Route', {'Start': start, 'End': end, 'Color': color, 'Type': routeType})

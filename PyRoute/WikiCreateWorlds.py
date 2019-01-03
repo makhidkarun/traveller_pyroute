@@ -13,6 +13,7 @@ from wikitools.page import Page
 
 logger = logging.getLogger('WikiCreateWorlds')
 
+
 class WikiCreateWorld(object):
     '''
     classdocs
@@ -242,6 +243,7 @@ No information yet available.
         galaxy.read_sectors(sectors, 'fixed', 'scaled')
         return galaxy
 
+
 def get_category_list(category_files):
     category_list = {}
     for cat in category_files:
@@ -256,6 +258,7 @@ def get_category_list(category_files):
                 category_list[world.strip()] = [cat_name]
 
     return category_list
+
 
 def get_sources_list(sources_files):
     sources_list = {}
@@ -276,11 +279,13 @@ def get_skip_list(name):
         skip_list = f.read().splitlines()
     return skip_list
 
+
 def get_max_list():
     with open('Zar_max_present.txt') as f:
         max_list = f.read().splitlines()
 
     return max_list
+
 
 def set_logging(level):
     log = logging.getLogger()
@@ -291,6 +296,7 @@ def set_logging(level):
     ch.setLevel(level)
     ch.setFormatter(formatter)
     log.addHandler(ch)
+
 
 def process():
     parser = argparse.ArgumentParser(description='Traveller Wiki create world articles.', fromfile_prefix_chars='@')
@@ -345,6 +351,7 @@ def process():
             logger.info("Saving Page: %s", wiki_page.title)
             result = wiki_review.save_page(wiki_page, new_page, create=True)
             logger.info("Save result: %s", result)
+
 
 if __name__ == '__main__':
     process()

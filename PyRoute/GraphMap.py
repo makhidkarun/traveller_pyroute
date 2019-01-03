@@ -33,7 +33,6 @@ class GraphMap(object):
         
         self.logger.info("output size: {} x {}".format(self.sx, self.sy))
         self.image= Image.new("RGB", (64*self.sx + 1,80 * self.sy + 1), "black")
-        
 
     def write_dot_map(self):
         
@@ -133,6 +132,7 @@ class GraphMap(object):
             rlineStart.x_plus()
             rlineEnd.x_plus()
 
+
 if __name__ == '__main__':
     route.set_logging('INFO')
     galaxy = Galaxy (8)
@@ -142,7 +142,6 @@ if __name__ == '__main__':
     galaxy.set_borders('range', 'collapse')
     hexMap = GraphMap(galaxy, None)
     hexMap.write_dot_map()
-    
 
     pdfmap = HexMap(galaxy, 'none', '8')
     pdfmap.write_maps()

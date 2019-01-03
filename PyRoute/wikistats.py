@@ -421,7 +421,6 @@ class WikiStats(object):
                 f.write (' no charted worlds.')
         f.write('\n')
 
-
     def text_area_pop_tl (self, f, area_type, area):
         PopWorlds = [world for world in area.worlds if world.popCode == area.stats.maxPop]
         if len(PopWorlds) == 1:
@@ -611,8 +610,7 @@ class WikiStats(object):
         
     def write_count(self, f, count, text, is_are = True, lead_text=""):
         f.write (self.get_count(count, text, is_are, lead_text))
-           
-            
+
     def write_population(self, population):
             if population >= 1000 :
                 return '{:,d} billion'.format(population/1000)
@@ -620,6 +618,7 @@ class WikiStats(object):
                 return '{:,d} million'.format(population)
             else:
                 return 'less than 1 million'
+
 
 def baseN(num,b,numerals="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
     return ((num == 0) and numerals[0]) or (baseN(num // b, b, numerals).lstrip(numerals[0]) + numerals[num % b])

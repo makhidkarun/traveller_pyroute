@@ -6,6 +6,7 @@ Created on Jun 19, 2018
 
 import logging
 
+
 class SpeculativeTrade(object):
     t5_trade_table = {
             "Ag": {"Ag":1, "As":1, "De":1, "Hi":1, "In":1, "Ri":1, "Va":1},
@@ -127,4 +128,3 @@ class SpeculativeTrade(object):
         cost += 3 if 'E' in star.port else 0
         cost += 5 if 'X' in star.port else 0
         return cost
-        

@@ -18,6 +18,7 @@ from StatCalculation import StatCalculation
 
 logger = logging.getLogger('PyRoute')
 
+
 def process():
     parser = argparse.ArgumentParser(description='Traveller trade route generator.')
 
@@ -116,6 +117,7 @@ def process():
     
     logger.info("process complete")
 
+
 def get_sectors(sector, input_dir):
     try:
         lines = [line for line in codecs.open(sector,'r', 'utf-8')]
@@ -127,6 +129,7 @@ def get_sectors(sector, input_dir):
     logger.info(sector_list)
     return sector_list
 
+
 def set_logging(level):
     logger.setLevel(level)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -135,6 +138,7 @@ def set_logging(level):
     ch.setLevel(level)
     ch.setFormatter(formatter)
     logger.addHandler(ch)
+
 
 if __name__ == '__main__':
     process()

@@ -106,12 +106,16 @@ class Map(object):
     def sector_name(self,doc,name):
         '''Write name at the top of the document'''
         raise NotImplementedError ("Base Class")
+
     def coreward_sector(self, doc, name):
         raise NotImplementedError ("Base Class")
+
     def rimward_sector(self, doc, name):
         raise NotImplementedError ("Base Class")
+
     def spinward_sector(self, doc, name):
         raise NotImplementedError ("Base Class")
+
     def trailing_sector(self, doc, name):
         raise NotImplementedError ("Base Class")
         
@@ -188,7 +192,6 @@ class Map(object):
             self.spinward_sector(doc, sector.spinward.name)
         if sector.trailing:
             self.trailing_sector(doc, sector.trailing.name)
-
 
     def zone(self, doc, star, point):
         point.x_plus(self.xm)
@@ -342,6 +345,7 @@ class Map(object):
         else:
             rlineStart.y = self.y_start - 2 * self.ym
             rlineEnd.y = self.y_start - 3 * self.ym
+
 
 class PDFSectorMap(Map):
     def __init__(self, galaxy, routes):
@@ -497,7 +501,8 @@ class PDFSectorMap(Map):
         pdf.add_text(added, point)
         
         pdf.set_font(def_font)
-        
+
+
 class GraphicMap (Map):
     image_size = (612,792)
     corePos    = (image_size[0] / 2, 40)
@@ -560,6 +565,7 @@ class GraphicMap (Map):
         d.text((0,0), name, font=self.namesFont, fill=255)
         w = txt.rotate(-90, expand = 1)
         doc.bitmap((self.trailPos[0], self.trailPos[1] - w.size[1]/2), w, fill=self.textFill)
+
 
 class GraphicSectorMap(GraphicMap):
     def __init__(self, galaxy, routes):

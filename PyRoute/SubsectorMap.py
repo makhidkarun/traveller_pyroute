@@ -10,6 +10,7 @@ from Galaxy import Galaxy
 from AllyGen import AllyGen
 from PIL import Image, ImageDraw, ImageColor, ImageFont
 
+
 class GraphicSubsectorMap (GraphicMap):
     positions={'A': (0,0), 'B': (-8, 0), 'C': (-16, 0), 'D': (-24, 0),
                'E': (0,-10), 'F': (-8,-10), 'G': (-16,-10), 'H': (-24, -10),
@@ -23,8 +24,7 @@ class GraphicSubsectorMap (GraphicMap):
     trailPos   = (392, 554 / 2)
     x_count    = 9
     y_count    = 11
-    
-    
+
     def __init__(self, galaxy, routes):
         super(GraphicSubsectorMap, self).__init__(galaxy, routes)
         self.x_start = 28

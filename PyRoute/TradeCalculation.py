@@ -10,6 +10,7 @@ import networkx as nx
 from AllyGen import AllyGen
 from Star import Star
 
+
 class RouteCalculation (object):
     # How aggressive should the route finder be about reusing existing routes?
     # Set higher to make the route less likely to be reused, Set lower to make
@@ -78,7 +79,6 @@ class RouteCalculation (object):
                          (self.galaxy.stars.number_of_edges(), 
                           self.galaxy.ranges.number_of_edges()))
 
-
     def check_existing_routes(self, star, neighbor):
         for route in star.routes:
             if len(route) == 7:
@@ -91,7 +91,6 @@ class RouteCalculation (object):
                 elif route.startswith('Tr'):
                     self.galaxy.stars[star][neighbor]['comm'] = True
 
-    
     @staticmethod
     def get_btn (star1, star2, distance=None):
         '''
@@ -183,6 +182,7 @@ class NoneCalculation(RouteCalculation):
         weight = self.distance_weight[dist]
         return weight
 
+
 class OwnedWorldCalculation(RouteCalculation):
     def __init__(self, galaxy):
         super(OwnedWorldCalculation, self).__init__(galaxy)
@@ -210,13 +210,12 @@ class OwnedWorldCalculation(RouteCalculation):
         dist = star.hex_distance(target)
         weight = self.distance_weight[dist]
         return weight
-    
+
 class XRouteCalculation (RouteCalculation):
     distance_weight = [0, 95, 90, 85, 80, 75, 70  ]
     capSec_weight = [0, 95, 90, 85, 75, 75, 70]
     inSec_weight  = [0, 140, 110, 85, 70, 95, 140]
     impt_weight   = [0, 90, 80, 70, 70, 110, 140]
-    
 
     def __init__(self, galaxy):
         super(XRouteCalculation, self).__init__(galaxy)
@@ -365,8 +364,7 @@ class XRouteCalculation (RouteCalculation):
 
         self.logger.info('XRoute pass 3')
         self.routes_pass_3()
-        
-        
+
     def reweight_routes (self, weightList):
         self.distance_weight = weightList
         for (star, neighbor, data) in self.galaxy.stars.edges(data=True):
@@ -409,8 +407,7 @@ class XRouteCalculation (RouteCalculation):
 
         self.galaxy.ranges[route[0]][route[-1]]['actual distance'] = distance
         self.galaxy.ranges[route[0]][route[-1]]['jumps'] = len(route) - 1
-    
-   
+
     def route_weight (self, star, target):
         dist = star.hex_distance(target)
         weight = self.distance_weight[dist]
@@ -432,6 +429,7 @@ class XRouteCalculation (RouteCalculation):
         weight -= 6 if star.tradeCode.sector_capital or target.tradeCode.sector_capital else 0
         
         return weight
+
 
 class TradeCalculation(RouteCalculation):
     '''
@@ -468,7 +466,6 @@ class TradeCalculation(RouteCalculation):
 
     # Maximum WTN to process routes for
     max_wtn = 15
-
 
     def __init__(self, galaxy, min_btn=13, route_btn = 8, route_reuse=10):
         super(TradeCalculation, self).__init__(galaxy)
@@ -569,8 +566,7 @@ class TradeCalculation(RouteCalculation):
             counter += 1
             processed += 1
         self.logger.info('processed {} routes at BTN {}'.format(counter,base_btn))
-        
-    
+
     def get_trade_between(self, star, target):
         '''
         Calculate the route between star and target
@@ -614,9 +610,7 @@ class TradeCalculation(RouteCalculation):
             
         self.galaxy.stats.trade += tradeCr
         self.galaxy.stats.passengers += tradePass
-        
-    
-    
+
     def route_update_simple (self, route):
         '''
         Update the trade calculations based upon the route selected.
@@ -748,7 +742,6 @@ class TradeCalculation(RouteCalculation):
                 end.tradeOver += tradeCr if end != target else 0
                 start = end
 
-
     def route_weight (self, star, target):
         dist = star.hex_distance(target)
         weight = self.distance_weight[dist]
@@ -760,7 +753,8 @@ class TradeCalculation(RouteCalculation):
             weight += 25
         weight -= star.importance + target.importance
         return weight
-    
+
+
 class CommCalculation(RouteCalculation):
     # Weight for route over a distance. The relative cost for
     # moving between two worlds a given distance apart
@@ -888,7 +882,6 @@ class CommCalculation(RouteCalculation):
         active_graph.add_edges_from(active)
         #for (star, neighbor, data) in self.galaxy.stars.edges(data=True):
         #    pass
-        
 
     def route_weight (self, star, target):
         dist = star.hex_distance(target)
