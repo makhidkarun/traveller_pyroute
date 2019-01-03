@@ -41,7 +41,7 @@ def prettify(elem):
     return reparsed.toprettyxml(indent="  ")
 
 
-def output_link (start, end, color, routeType, sectorStart, sectorEnd):
+def output_link(start, end, color, routeType, sectorStart, sectorEnd):
     output = ET.Element('Route', {'Start': start, 'End': end, 'Color': color, 'Type': routeType})
 
     if sectorStart == sectorEnd:

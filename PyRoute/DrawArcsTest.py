@@ -7,7 +7,7 @@ from Galaxy import Galaxy
 from PIL import Image, ImageDraw, ImageFont
 
 
-class DrawArcsTest (GraphicSubsectorMap):
+class DrawArcsTest(GraphicSubsectorMap):
     positions={'A': (0,0), 'B': (-8, 0), 'C': (-16, 0), 'D': (-24, 0),
                'E': (0,-10), 'F': (-8,-10), 'G': (-16,-10), 'H': (-24, -10),
                'I': (0,-20), 'J': (-8,-20), 'K': (-16,-20), 'L': (-24, -20),
@@ -43,9 +43,9 @@ class DrawArcsTest (GraphicSubsectorMap):
         self.image= Image.new("RGB", self.image_size, "black")
         return ImageDraw.Draw(self.image)
     
-    def close (self, subsector_name):
+    def close(self, subsector_name):
         path = os.path.join(self.galaxy.output_path, subsector_name +".png")
-        self.image = self.image.resize ((413,636), Image.BICUBIC)
+        self.image = self.image.resize((413,636), Image.BICUBIC)
         self.image.save(path)
 
     def write_maps(self):
@@ -60,7 +60,7 @@ class DrawArcsTest (GraphicSubsectorMap):
         self.close("TestMap")
         
         
-    def draw_arcs (self, doc):
+    def draw_arcs(self, doc):
         self.image = self.image.convert("RGBA")
         img = Image.new("RGBA", self.image_size, 0)
         draw = ImageDraw.Draw(img)
@@ -84,7 +84,7 @@ class DrawArcsTest (GraphicSubsectorMap):
         
         self.image = Image.alpha_composite(self.image, cropped)
 
-    def draw_one_arc (self, doc, start, end):
+    def draw_one_arc(self, doc, start, end):
         center = self.circle_center(start, end)
         # self.logger.info("Points are : start: {}, end: {}, and center {}".format(start,end,center))
         self.draw_arc(doc, center, start, end)
@@ -138,7 +138,7 @@ class DrawArcsTest (GraphicSubsectorMap):
         return self.cursor(round(cx), round(cy))
 
     def draw_arc(self, doc, center, start, end):
-        r = math.sqrt ((start.x - center.x) ** 2 + (start.y - center.y) ** 2)
+        r = math.sqrt((start.x - center.x) ** 2 + (start.y - center.y) ** 2)
         x1 = center.x - r 
         y1 = center.y - r
         x2 = center.x + r

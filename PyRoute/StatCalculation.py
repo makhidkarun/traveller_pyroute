@@ -120,7 +120,7 @@ class StatCalculation(object):
         self.add_stats(algStats, star)
         self.max_tl(algStats, star)
 
-    def add_pop_to_alg (self, stats, alg_base, population):
+    def add_pop_to_alg(self, stats, alg_base, population):
         if alg_base == 'Hv':
             stats.pop_groups['Hive'] += population
         elif alg_base == 'As':
@@ -145,7 +145,7 @@ class StatCalculation(object):
                 stats.pop_groups[soph_code] += int(star.population * (soph_pct/100.0))
 
             if total_pct < 0:
-                self.logger.warn ("{} has sophont percent over 100%: {}".format(star, total_pct))
+                self.logger.warn("{} has sophont percent over 100%: {}".format(star, total_pct))
             elif total_pct > 0:
                 self.add_pop_to_alg(stats, star.alg_base, int(star.population * (total_pct/100.0)))
 
@@ -173,10 +173,10 @@ class StatCalculation(object):
         stats.eti_cargo += star.eti_cargo_volume
         stats.eti_pass += star.eti_pass_volume
    
-    def max_tl (self, stats, star):
+    def max_tl(self, stats, star):
         stats.maxTL = max(stats.maxTL, star.tl)
         stats.maxPort = 'ABCDEX?'[min('ABCDEX?'.index(star.uwpCodes['Starport']), 'ABCDEX?'.index(stats.maxPort))]
-        stats.maxPop = max (stats.maxPop, star.popCode)
+        stats.maxPop = max(stats.maxPop, star.popCode)
     
     def per_capita(self, stats):
         stats.percapita = stats.economy
@@ -209,7 +209,7 @@ class StatCalculation(object):
             s = u'Allegiance {0} ({1}: base {3}) star count: {2:,d}'.format(aleg.name, code, aleg.stats.number, aleg.base)
             self.logger.info(s)
         
-        self.logger.debug ("min count: {}, match: {}".format(ally_count, ally_match))
+        self.logger.debug("min count: {}, match: {}".format(ally_count, ally_match))
                            
         wiki = WikiStats(self.galaxy, self.all_uwp, ally_count, ally_match)
         wiki.write_statistics()

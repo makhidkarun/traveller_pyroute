@@ -81,9 +81,9 @@ def process():
     if args.sectors is not None:
         sectors_list.extend(get_sectors(args.sectors, args.input))
     
-    galaxy.read_sectors (sectors_list, args.pop_code, args.ru_calc)
+    galaxy.read_sectors(sectors_list, args.pop_code, args.ru_calc)
     
-    logger.info ("%s sectors read" % len(galaxy.sectors))
+    logger.info("%s sectors read" % len(galaxy.sectors))
     
     galaxy.generate_routes(args.routes, args.route_reuse)
     
@@ -95,7 +95,7 @@ def process():
     if args.trade:
         galaxy.trade.calculate_routes()
         galaxy.process_eti()
-        spectrade = SpeculativeTrade (args.speculative_version, galaxy.stars)
+        spectrade = SpeculativeTrade(args.speculative_version, galaxy.stars)
         spectrade.process_tradegoods()
 
     if args.routes:
@@ -110,7 +110,7 @@ def process():
         pdfmap.write_maps()
         
         if args.subsectors:
-            graphMap = GraphicSubsectorMap (galaxy, args.routes, args.speculative_version)
+            graphMap = GraphicSubsectorMap(galaxy, args.routes, args.speculative_version)
             graphMap.write_maps()
 
     logger.info("process complete")

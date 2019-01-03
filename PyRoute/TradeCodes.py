@@ -168,7 +168,7 @@ class TradeCodes(object):
             elif code.startswith(u'Px'):
                 self.ownedBy = 'Px'
         if (star.gov == '6' and not self.ownedBy) or (star.gov != '6' and self.ownedBy != star):
-            self.logger.debug (u"{} has incorrect government code {} - {}".format(star, star.gov, self.dcode))
+            self.logger.debug(u"{} has incorrect government code {} - {}".format(star, star.gov, self.dcode))
         return self.ownedBy
 
     def owners(self, sector_name):
@@ -210,11 +210,11 @@ class TradeCodes(object):
         return 'Po' in self.codeset
 
     @property
-    def nonagricultural (self):
+    def nonagricultural(self):
         return 'Na' in self.codeset
 
     @property
-    def barren (self):
+    def barren(self):
         return 'Ba' in self.codeset or 'Di' in self.codeset
 
     @property
@@ -226,11 +226,11 @@ class TradeCodes(object):
         return 'Ni' in self.codeset
 
     @property
-    def high (self):
+    def high(self):
         return 'Hi' in self.codeset
 
     @property
-    def asteroid (self):
+    def asteroid(self):
         return 'As' in self.codeset
 
     @property
@@ -250,27 +250,27 @@ class TradeCodes(object):
         return 'Wa' in self.codeset or 'Oc' in self.codeset
 
     @property
-    def extreme (self):
+    def extreme(self):
         return len(self.ex_codes & set(self.dcode)) > 0
 
     @property
-    def capital (self):
+    def capital(self):
         return 'Cp' in self.dcode or 'Cx' in self.dcode or 'Cs' in self.dcode
 
     @property
-    def subsector_capital (self):
+    def subsector_capital(self):
         return 'Cp' in self.dcode
 
     @property
-    def sector_capital (self):
+    def sector_capital(self):
         return 'Cs' in self.dcode
 
     @property
-    def other_capital (self):
+    def other_capital(self):
         return 'Cx' in self.dcode
 
     @property
-    def research_station (self):
+    def research_station(self):
         return set(self.research.keys()).intersection(self.dcode)
 
     @property

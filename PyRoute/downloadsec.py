@@ -28,7 +28,7 @@ def get_url(url, sector, suffix, output_dir):
     path = os.path.join(output_dir, '%s.%s' % (sector, suffix))
 
     with codecs.open(path, 'wb', 'utf-8') as out:
-        out.write (ucontent)
+        out.write(ucontent)
     f.close()
     
 
@@ -45,15 +45,16 @@ if __name__ == '__main__':
     for sector in sectorsList: 
         sector = sector.rstrip()
         print 'Downloading %s' % sector
-        params = {'sector':sector, 'type': 'SecondSurvey'}
+        params = {'sector': sector, 'type': 'SecondSurvey'}
         if args.routes:
             params['routes'] = '1'
         params = urllib.urlencode(params)
         url = 'http://www.travellermap.com/api/sec?%s' % params
-        get_url (url, sector, 'sec', args.output_dir)
+
+        get_url(url, sector, 'sec', args.output_dir)
         
         params = urllib.urlencode({'sector': sector, 'accept': 'text/xml'})
         url = 'http://travellermap.com/api/metadata?%s' % params
-        get_url (url, sector, 'xml', args.output_dir)
-        
+        get_url(url, sector, 'xml', args.output_dir)
+
         time.sleep(5)

@@ -37,7 +37,7 @@ class GraphMap(object):
     def write_dot_map(self):
         
         draw = ImageDraw.Draw(self.image)
-        for x,y in product (range(self.sx), range(self.sy)):
+        for x,y in product(range(self.sx), range(self.sy)):
             sx = x * 64
             sy = y * 80
             
@@ -110,7 +110,7 @@ class GraphMap(object):
         llineStart, llineEnd, lline = self._lline(pdf, width, colorname)
         rlineStart, rlineEnd, rline = self._rline(pdf, width, colorname)
         
-        for x in xrange (33):
+        for x in xrange(33):
             hlineStart.x_plus()
             hlineEnd.x_plus()
             self._hline_restart_y(x, hlineStart, hlineEnd)
@@ -128,16 +128,16 @@ class GraphMap(object):
                 draw(x, y, hline, lline, rline)
                 
             llineStart.x_plus()
-            llineEnd.x_plus ()
+            llineEnd.x_plus()
             rlineStart.x_plus()
             rlineEnd.x_plus()
 
 
 if __name__ == '__main__':
     route.set_logging('INFO')
-    galaxy = Galaxy (8)
+    galaxy = Galaxy(8)
     galaxy.output_path = '.'
-    galaxy.read_sectors (['../sectors_review/Spica.sec'], 
+    galaxy.read_sectors(['../sectors_review/Spica.sec'],
                          'fixed', 'collapse')
     galaxy.set_borders('range', 'collapse')
     hexMap = GraphMap(galaxy, None)

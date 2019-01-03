@@ -11,7 +11,7 @@ from AllyGen import AllyGen
 from PIL import Image, ImageDraw, ImageColor, ImageFont
 
 
-class GraphicSubsectorMap (GraphicMap):
+class GraphicSubsectorMap(GraphicMap):
     positions={'A': (0,0), 'B': (-8, 0), 'C': (-16, 0), 'D': (-24, 0),
                'E': (0,-10), 'F': (-8,-10), 'G': (-16,-10), 'H': (-24, -10),
                'I': (0,-20), 'J': (-8,-20), 'K': (-16,-20), 'L': (-24, -20),
@@ -47,7 +47,7 @@ class GraphicSubsectorMap (GraphicMap):
         self.image= Image.new("RGB", self.image_size, "black")
         return ImageDraw.Draw(self.image)
     
-    def close (self, subsector_name):
+    def close(self, subsector_name):
         path = os.path.join(self.galaxy.output_path, subsector_name +".png")
         self.image.save(path)
 
@@ -104,7 +104,7 @@ class GraphicSubsectorMap (GraphicMap):
         line = self.get_line(doc, start, end, color, radius * 2)
 
         # Draw holes in outer line for names
-        line.color = ImageColor.getrgb ("black")
+        line.color = ImageColor.getrgb("black")
         start.y = 15
         end.y = 15
         start.x = 127
@@ -158,7 +158,7 @@ class GraphicSubsectorMap (GraphicMap):
         start.y=560 + ((-pos[1] / 10) * 17)
         doc.rectangle([(start.x, start.y),(start.x+11, start.y+17)], outline=line.color, fill=line.color )
 
-    def _set_pos (self, x, y):
+    def _set_pos(self, x, y):
         location = (-self.positions[self.subsector.position][0]+x,
                 -self.positions[self.subsector.position][1]+y)
         
@@ -186,16 +186,16 @@ class GraphicSubsectorMap (GraphicMap):
                 self.fill_aleg_hex(doc, pos, point)
 
         # Draw the base hexes
-        super (GraphicSubsectorMap, self).hex_grid(doc, draw, width, colorname)
+        super(GraphicSubsectorMap, self).hex_grid(doc, draw, width, colorname)
         
         # Draw the borders and add the hex numbers
         for x in xrange(1,self.x_count,1):
             for y in xrange(1,self.y_count,1):
                 pos, point,location = self._set_pos(x, y)
-                self.draw_border (doc, pos, point)
+                self.draw_border(doc, pos, point)
                 
                 name = "{0:02d}{1:02d}".format(location[0], location[1])
-                point.y_plus (-self.ym + 1)
+                point.y_plus(-self.ym + 1)
                 size = self.hexFont.getsize(name)
                 pos = (point.x - size[0]/2, point.y)
                 
@@ -345,7 +345,7 @@ class GraphicSubsectorMap (GraphicMap):
         size = self.worldFont.getsize(name)
         pos = (point.x - (size[0] / 2) + 1, point.y + size[1])
         if star.capital:
-            doc.text (pos, name, font=self.worldFont, fill=self.fillRed)
+            doc.text(pos, name, font=self.worldFont, fill=self.fillRed)
         else:
             doc.text(pos, name, font=self.worldFont, fill=self.textFill)
 
@@ -420,7 +420,7 @@ if __name__ == '__main__':
     galaxy.read_sectors(['../sectors_tne/SpinwardMarches.sec'], 'fixed', 'collapse')
     galaxy.set_borders('erode', 'collapse')
     
-    graphMap = GraphicSubsectorMap (galaxy, None)
+    graphMap = GraphicSubsectorMap(galaxy, None)
     graphMap.write_maps()
     
     # img = graphMap.document(galaxy.sectors['Spinward Marches'])

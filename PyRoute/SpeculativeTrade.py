@@ -57,7 +57,7 @@ class SpeculativeTrade(object):
             self.stars[world][neighbor]['SourceMarketPrice'] = int(source_market * 1000)
             self.stars[world][neighbor]['TargetMarketPrice'] = int(target_market * 1000)
             
-    def get_market_price (self, source, market):
+    def get_market_price(self, source, market):
         price = 5.0
         actives_codes = ["Ag","As","Ba", "De", "Fl", "Hi", "Ic", "In", "Lo",
                           "Na", "Ni", "Po", "Ri", "Va", "Wa", "Oc"]

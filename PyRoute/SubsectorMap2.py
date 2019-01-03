@@ -12,7 +12,7 @@ from AllyGen import AllyGen
 from PIL import Image, ImageDraw, ImageColor, ImageFont
 
 
-class GraphicSubsectorMap (GraphicMap):
+class GraphicSubsectorMap(GraphicMap):
     positions={'A': (0,0), 'B': (-8, 0), 'C': (-16, 0), 'D': (-24, 0),
                'E': (0,-10), 'F': (-8,-10), 'G': (-16,-10), 'H': (-24, -10),
                'I': (0,-20), 'J': (-8,-20), 'K': (-16,-20), 'L': (-24, -20),
@@ -49,9 +49,9 @@ class GraphicSubsectorMap (GraphicMap):
         self.image= Image.new("RGB", self.image_size, "black")
         return ImageDraw.Draw(self.image)
     
-    def close (self, subsector_name):
+    def close(self, subsector_name):
         path = os.path.join(self.galaxy.output_path, subsector_name +".png")
-        self.image = self.image.resize ((413,636), Image.BICUBIC)
+        self.image = self.image.resize((413,636), Image.BICUBIC)
         self.image.save(path)
 
     def write_maps(self):
@@ -97,7 +97,7 @@ class GraphicSubsectorMap (GraphicMap):
         end = self.cursor(760,1067)
         color = "white"
 
-        for offset in range (-3,+3):
+        for offset in range(-3,+3):
             doc.rectangle([(start.x+offset, start.y+offset),(end.x-offset, end.y-offset)], outline=color, fill=None)
 
         start.x = 30; start.y=30
@@ -111,7 +111,7 @@ class GraphicSubsectorMap (GraphicMap):
         line = self.get_line(doc, start, end, color, radius * 2)
 
         # Draw holes in outer line for names
-        line.color = ImageColor.getrgb ("black")
+        line.color = ImageColor.getrgb("black")
         # top line 
         start.y = 29
         end.y = 29
@@ -165,7 +165,7 @@ class GraphicSubsectorMap (GraphicMap):
         start.y=1120 + ((-pos[1] / 10) * 34)
         doc.rectangle([(start.x, start.y),(start.x+22, start.y+34)], outline=line.color, fill=line.color )
 
-    def _set_pos (self, x, y):
+    def _set_pos(self, x, y):
         location = (-self.positions[self.subsector.position][0]+x,
                 -self.positions[self.subsector.position][1]+y)
         
@@ -193,16 +193,16 @@ class GraphicSubsectorMap (GraphicMap):
                 self.fill_aleg_hex(doc, pos, point)
 
         # Draw the base hexes
-        super (GraphicSubsectorMap, self).hex_grid(doc, draw, width, colorname)
+        super(GraphicSubsectorMap, self).hex_grid(doc, draw, width, colorname)
         
         # Draw the borders and add the hex numbers
         for x in xrange(1,self.x_count,1):
             for y in xrange(1,self.y_count,1):
                 pos, point,location = self._set_pos(x, y)
-                self.draw_border (doc, pos, point)
+                self.draw_border(doc, pos, point)
                 
                 name = "{0:02d}{1:02d}".format(location[0], location[1])
-                point.y_plus (-self.ym + 1)
+                point.y_plus(-self.ym + 1)
                 size = self.hexFont.getsize(name)
                 pos = (point.x - size[0]/2, point.y)
                 
@@ -341,7 +341,7 @@ class GraphicSubsectorMap (GraphicMap):
         size = self.worldFont.getsize(name)
         pos = (point.x - (size[0] / 2) + 1, point.y + size[1])
         if star.tradeCode.capital:
-            doc.text (pos, name, font=self.worldFont, fill=self.fillRed)
+            doc.text(pos, name, font=self.worldFont, fill=self.fillRed)
         else:
             doc.text(pos, name, font=self.worldFont, fill=self.textFill)
 
@@ -385,7 +385,7 @@ class GraphicSubsectorMap (GraphicMap):
         cropped = img.crop((53,53,760,1067))
         cropped = cropped.crop((-53,-53, 760+(826-760-53),1067 + (1272-1067-53)))
         self.image = Image.alpha_composite(self.image, cropped)
-        self.logger.debug (u"Completed trade_lines for {}".format(subsector.name))
+        self.logger.debug(u"Completed trade_lines for {}".format(subsector.name))
         return ImageDraw.Draw(self.image)
 
     def trade_color(self, trade):
@@ -394,7 +394,7 @@ class GraphicSubsectorMap (GraphicMap):
                   9: "#FF0030", 9: "#FF00B0",10: "#FF04F0",11:"#FF0CF0"}  
         return tcolor.get(trade, "#000000")
 
-    def centerpoint (self, star):
+    def centerpoint(self, star):
         point = self.get_world_centerpoint(star)
         point.x_plus(self.xm)
         point.y_plus(self.ym)
@@ -431,7 +431,7 @@ class GraphicSubsectorMap (GraphicMap):
                 color = self.trade_color(int(round(trade/1000)))
                 self.draw_one_arc(doc, star_end, star_start, color)
         
-    def draw_one_arc (self, doc, start, end, color):
+    def draw_one_arc(self, doc, start, end, color):
         center = self.circle_center(start, end)
         self.draw_arc(doc, center, start, end, color)
         
@@ -453,7 +453,7 @@ class GraphicSubsectorMap (GraphicMap):
         return self.cursor(round(cx), round(cy))
 
     def draw_arc(self, doc, center, start, end, color):
-        r = math.sqrt ((start.x - center.x) ** 2 + (start.y - center.y) ** 2)
+        r = math.sqrt((start.x - center.x) ** 2 + (start.y - center.y) ** 2)
         x1 = center.x - r 
         y1 = center.y - r
         x2 = center.x + r
@@ -517,7 +517,7 @@ if __name__ == '__main__':
     galaxy.read_sectors(['../sectors_tne/SpinwardMarches.sec'], 'fixed', 'collapse')
     galaxy.set_borders('erode', 'collapse')
     
-    graphMap = GraphicSubsectorMap (galaxy, None)
+    graphMap = GraphicSubsectorMap(galaxy, None)
     graphMap.write_maps()
     
     # img = graphMap.document(galaxy.sectors['Spinward Marches'])

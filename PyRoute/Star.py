@@ -79,7 +79,7 @@ class Nobles(object):
             self.nobles[rank] += count
 
 
-class Star (object):
+class Star(object):
     def __init__ (self):
         self.logger = logging.getLogger('PyRoute.Star')
         
@@ -97,7 +97,7 @@ class Star (object):
             star.logger.error(u"Unmatched line: {}".format(line))
             return None
         
-        star.logger.debug (data)
+        star.logger.debug(data)
         
         star.position = data[0].strip()
         star.set_location(sector.dx, sector.dy)
@@ -232,10 +232,10 @@ class Star (object):
         else:
             return self.sector.name[0:4] + u'-' + self.position
         
-    def set_location (self, dx, dy):
+    def set_location(self, dx, dy):
         # convert odd-q offset to cube
-        q = int (self.position[0:2]) + dx -1
-        r = int (self.position[2:4]) + dy -1
+        q = int(self.position[0:2]) + dx -1
+        r = int(self.position[2:4]) + dy -1
         self.x = q
         self.z = r - (q - (q & 1)) / 2
         self.y = -self.x - self.z
@@ -259,7 +259,7 @@ class Star (object):
         return (abs(Hex1[0] - Hex2[0]) + abs(Hex1[1] - Hex2[1])
             + abs(Hex1[0] + Hex1[1] - Hex2[0] - Hex2[1])) / 2
 
-    def distance (self, star):
+    def distance(self, star):
         y1 = self.y * 2
         if not self.x % 2:
             y1 += 1
@@ -301,7 +301,7 @@ class Star (object):
                 popM = popCodeM[self.popM]
             else:            
                 popM = (bisect.bisect(popCodeRange, random.random()) + 4) * 10
-            self.population = pow (10, self.popCode) * popM / 1e7
+            self.population = pow(10, self.popCode) * popM / 1e7
             self.uwpCodes['Pop Code'] = str(popM/10)
 
         self.perCapita = calcGWP[min(self.tl,19)] if self.population > 0 else 0
@@ -443,7 +443,7 @@ class Star (object):
         else:
             self.ru = resources * labor * infrastructure * efficiency
         
-        self.logger.debug ("RU = {0} * {1} * {2} * {3} = {4}".format(resources, labor, infrastructure, efficiency, self.ru) )
+        self.logger.debug("RU = {0} * {1} * {2} * {3} = {4}".format(resources, labor, infrastructure, efficiency, self.ru) )
         
     def calculate_TCS(self):
         tax_rate = {'0': 0.50, '1': 0.8, '2': 1.0, '3': 0.9, '4': 0.85, 
@@ -457,7 +457,7 @@ class Star (object):
                  'I': 1.0, 'P': 1.0, 'Q': 1.0, 'R': 1.0, 'S': 1.0,'T': 1.0, 
                  'U': 1.0, 'V': 1.0, 'W': 1.0, 'X': 1.0, '?': 0.0
                  }
-        self.ship_capacity = long (self.population * tax_rate[self.uwpCodes['Government']] * 1000)
+        self.ship_capacity = long(self.population * tax_rate[self.uwpCodes['Government']] * 1000)
         gwp_base = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 28, 32]
         if self.tl >= 5:
             self.tcs_gwp = self.population * gwp_base[min(self.tl - 5, 13)] * 1000
@@ -477,7 +477,7 @@ class Star (object):
         if self.tradeCode.nonagricultural:
             self.tcs_gwp = self.tcs_gwp * 8 / 10
             
-        budget = long (self.tcs_gwp * 0.03 * tax_rate[self.uwpCodes['Government']])
+        budget = long(self.tcs_gwp * 0.03 * tax_rate[self.uwpCodes['Government']])
         
         # if AllyGen.sameAligned('Im', self.alg):
         #    budget = budget * 0.3

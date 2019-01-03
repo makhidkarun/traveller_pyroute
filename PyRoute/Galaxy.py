@@ -42,7 +42,7 @@ class Allegiance(AreaItem):
 
     def wiki_name(self):
         if self.code.startswith('Na'):
-            names = self.name.split (',') if ',' in self.name else [self.name, '']
+            names = self.name.split(',') if ',' in self.name else [self.name, '']
             return u'[[{}]] {}'.format(names[0], names[1].strip())
         elif self.code.startswith('Cs'):
             names = self.name.split(',') if ',' in self.name else [self.name, '']
@@ -82,7 +82,7 @@ class Subsector(AreaItem):
     def wiki_title(self):
         return u'{0} - {1}'.format(self.wiki_name(), self.sector.wiki_name())
  
-    def set_bounding_subsectors (self):
+    def set_bounding_subsectors(self):
         posrow = 0
         for row in self.positions:
             if self.position in row:
@@ -111,8 +111,8 @@ class Subsector(AreaItem):
             self.trailing = self.sector.subsectors[self.positions[posrow][pos + 1]]         
 
 
-class Sector (AreaItem):
-    def __init__ (self, name, position):
+class Sector(AreaItem):
+    def __init__(self, name, position):
         super(Sector, self).__init__(name[0:].strip())
 
         self.x = int(position[1:].split(',')[0])
@@ -129,7 +129,7 @@ class Sector (AreaItem):
     def __str__(self):
         return u"{} ({},{})".format(self.name, str(self.x), str(self.y))
 
-    def sector_name (self):
+    def sector_name(self):
         return self.name[:-7] if self.name.endswith(u'Sector') else self.name
     
     def wiki_name(self):
@@ -180,7 +180,7 @@ class Galaxy(object):
         self.min_btn = min_btn
         self.route_btn = route_btn
         
-    def read_sectors (self, sectors, pop_code, ru_calc):
+    def read_sectors(self, sectors, pop_code, ru_calc):
         for sector in sectors:
             try:
                 lines = [line for line in codecs.open(sector,'r', 'utf-8')]
@@ -189,18 +189,18 @@ class Galaxy(object):
                 continue
             self.logger.debug('reading %s ' % sector)
             
-            sec = Sector (lines[3], lines[4])
+            sec = Sector(lines[3], lines[4])
             sec.filename = os.path.basename(sector)
             
             for lineno, line in enumerate(lines):
-                if line.startswith ('Hex'):
+                if line.startswith('Hex'):
                     break
-                if line.startswith ('# Subsector'):
+                if line.startswith('# Subsector'):
                     data = line[11:].split(':',1)
                     pos  = data[0].strip()
                     name = data[1].strip()
                     sec.subsectors[pos] = Subsector(name, pos, sec)
-                if line.startswith ('# Alleg:'):
+                if line.startswith('# Alleg:'):
                     algCode = line[8:].split(':',1)[0].strip()
                     algName = line[8:].split(':',1)[1].strip().strip('"')
                     
@@ -231,7 +231,7 @@ class Galaxy(object):
         self.set_bounding_sectors()
         self.set_bounding_subsectors()
         self.set_positions()
-        self.logger.debug ("Allegiances: {}".format(self.alg))
+        self.logger.debug("Allegiances: {}".format(self.alg))
 
     def set_area_alg(self, star, area, algs):
         full_alg = algs.get(star.alg, Allegiance(star.alg, 'Unknown Allegiance', base=False))
@@ -302,17 +302,17 @@ class Galaxy(object):
         path = os.path.join(self.output_path, 'stars.txt')
         with open(path, "wb") as f:
             nx.write_edgelist(self.stars, f, data=True)
-        path = os.path.join (self.output_path, 'borders.txt')
+        path = os.path.join(self.output_path, 'borders.txt')
         with codecs.open(path, "wb", "utf-8") as f:
             for key, value in self.borders.borders.iteritems():
                 f.write(u"{}-{}: border: {}\n".format(key[0],key[1], value))
 
         if routes == 'xroute':
-            path = os.path.join (self.output_path, 'stations.txt')
+            path = os.path.join(self.output_path, 'stations.txt')
             with codecs.open(path, "wb", 'utf-8') as f:
                 stars = [star for star in self.stars if star.tradeCount > 0]
                 for star in stars:
-                    f.write (u"{} - {}\n".format(star, star.tradeCount))
+                    f.write(u"{} - {}\n".format(star, star.tradeCount))
     
     def process_eti(self):
         self.logger.info("Processing ETI for worlds")
@@ -336,7 +336,7 @@ class Galaxy(object):
                 world.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
                 neighbor.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
 
-    def read_routes (self, routes=None):
+    def read_routes(self, routes=None):
         route_regex = "^({1,}) \(({3,}) (\d\d\d\d)\) ({1,}) \(({3,}) (\d\d\d\d)\) (\{.*\})"    
         routeline = re.compile(route_regex)
         path = os.path.join(self.output_path, 'ranges.txt')

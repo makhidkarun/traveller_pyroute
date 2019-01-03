@@ -99,7 +99,7 @@ class HexMap(object):
         pdf.set_font('times', size=30)
         width = pdf.get_font()._string_width(name)
         cursor.x = 306-(width/2)
-        pdf.add_text (name, cursor)
+        pdf.add_text(name, cursor)
         pdf.set_font(font=def_font)
 
     def coreward_sector(self, pdf, name):
@@ -109,7 +109,7 @@ class HexMap(object):
         width = pdf.get_font()._string_width(name)/2
         cursor.x = 306 - width
         pdf.add_text(name, cursor)
-        pdf.set_font (font=def_font)
+        pdf.set_font(font=def_font)
 
     def rimward_sector(self, pdf, name):
         cursor = PDFCursor(306 ,767, True)
@@ -117,34 +117,34 @@ class HexMap(object):
         pdf.set_font('times', size=10)
         cursor.x_plus(-pdf.get_font()._string_width(name)/2)
         pdf.add_text(name, cursor)
-        pdf.set_font (font=def_font)
+        pdf.set_font(font=def_font)
         
     def spinward_sector(self, pdf, name):
         cursor = PDFCursor(self.x_start - 5, 390, True)
         def_font = pdf.get_font()
         pdf.set_font('times', size=10)
         cursor.y_plus(pdf.get_font()._string_width(name)/2)
-        text = PDFText (pdf.session, pdf.page, None, cursor=cursor)
+        text = PDFText(pdf.session, pdf.page, None, cursor=cursor)
         text.text_rotate(90)
         text._text(name)
-        pdf.set_font (font=def_font)
+        pdf.set_font(font=def_font)
         
     def trailing_sector(self, pdf, name):
         cursor = PDFCursor(598, 390, True)
         def_font = pdf.get_font()
         pdf.set_font('times', size=10)
         cursor.y_plus(-(pdf.get_font()._string_width(name)/2))
-        text = PDFText (pdf.session, pdf.page, None, cursor=cursor)
+        text = PDFText(pdf.session, pdf.page, None, cursor=cursor)
         text.text_rotate(-90)
         text._text(name)
-        pdf.set_font (font=def_font)
+        pdf.set_font(font=def_font)
 
     def subsector_grid(self, pdf):
         color = pdf.get_color()
         color.set_color_by_name('lightgray')
         pdf.set_draw_color(color)
-        vlineStart = PDFCursor (0, self.y_start + self.xm)
-        vlineEnd = PDFCursor (0, self.y_start + self.xm + (180 * 4))
+        vlineStart = PDFCursor(0, self.y_start + self.xm)
+        vlineEnd = PDFCursor(0, self.y_start + self.xm + (180 * 4))
         for x in xrange(self.x_start, 595, 144):
             vlineStart.x = x
             vlineEnd.x = x
@@ -203,7 +203,7 @@ class HexMap(object):
        
         return (llineStart, llineEnd, lline)
 
-    def _lline_restart_y (self, x, llineStart, llineEnd):
+    def _lline_restart_y(self, x, llineStart, llineEnd):
         if (x & 1) :
             llineStart.y = self.y_start - 2 * self.ym
             llineEnd.y = self.y_start - self.ym
@@ -227,7 +227,7 @@ class HexMap(object):
 
         return (rlineStart, rlineEnd, rline)
 
-    def _rline_restart_y (self, x, rlineStart, rlineEnd):
+    def _rline_restart_y(self, x, rlineStart, rlineEnd):
         if (x & 1) :
             rlineStart.y = self.y_start - 3 *self.ym
             rlineEnd.y = self.y_start - 2 * self.ym
@@ -241,7 +241,7 @@ class HexMap(object):
         llineStart, llineEnd, lline = self._lline(pdf, width, colorname)
         rlineStart, rlineEnd, rline = self._rline(pdf, width, colorname)
         
-        for x in xrange (33):
+        for x in xrange(33):
             hlineStart.x_plus()
             hlineEnd.x_plus()
             self._hline_restart_y(x, hlineStart, hlineEnd)
@@ -259,7 +259,7 @@ class HexMap(object):
                 draw(x, y, hline, lline, rline)
                 
             llineStart.x_plus()
-            llineEnd.x_plus ()
+            llineEnd.x_plus()
             rlineStart.x_plus()
             rlineEnd.x_plus()
             
@@ -309,7 +309,7 @@ class HexMap(object):
         width = self.string_width(pdf.get_font(), star.uwp)
         point.y_plus(7)
         point.x_plus(self.ym -(width/2))
-        pdf.add_text (star.uwp.encode('ascii', 'replace'), point)
+        pdf.add_text(star.uwp.encode('ascii', 'replace'), point)
         
         if len(star.name) > 0:
             for chars in xrange(len(star.name), 0, -1):
@@ -329,7 +329,7 @@ class HexMap(object):
         else:
             added += ' '
         
-        added += '{:d}'.format (star.ggCount)
+        added += '{:d}'.format(star.ggCount)
         point.y_plus(3.5)
         point.x = col
         width = pdf.get_font()._string_width(added)
@@ -404,8 +404,8 @@ class HexMap(object):
             endy   = self.y_start + ( self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
             endx   = (self.xm * 3 * endCol) + self.ym
 
-        lineStart = PDFCursor (startx, starty)
-        lineEnd = PDFCursor (endx, endy)
+        lineStart = PDFCursor(startx, starty)
+        lineEnd = PDFCursor(endx, endy)
 
         line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, stroke='solid', color=color, size=1)
         line._draw()
@@ -447,8 +447,8 @@ class HexMap(object):
             endy   = self.y_start + ( self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
             endx   = (self.xm * 3 * endCol) + self.ym
 
-        lineStart = PDFCursor (startx, starty)
-        lineEnd = PDFCursor (endx, endy)
+        lineStart = PDFCursor(startx, starty)
+        lineEnd = PDFCursor(endx, endy)
 
         line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, stroke='solid', color=color, size=3)
         line._draw()
@@ -518,7 +518,7 @@ class HexMap(object):
          
         points_t.sort()
         result = [(pt_1 + t*(pt_2-pt_1)) for t in (points_t[2],points_t[3]) for (pt_1, pt_2) in zip(line_pt_1, line_pt_2)]
-        logging.getLogger("PyRoute.HexMap").debug (result)
+        logging.getLogger("PyRoute.HexMap").debug(result)
         return (result[0],result[1]), (result[2], result[3])
 
 
@@ -526,9 +526,9 @@ if __name__ == '__main__':
     sector = Sector('# Core', '# 0,0')
     hexMap = HexMap(None)
     pdf = hexMap.document(sector)
-    hexMap.write_base_map (pdf, sector)
+    hexMap.write_base_map(pdf, sector)
     
-    galaxy = Galaxy (0,0)
+    galaxy = Galaxy(0,0)
     
     star1 = Star("0102 Shana Ma             E551112-7 Lo Po                { -3 } (300-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
                  galaxy.starline, 0, 0)

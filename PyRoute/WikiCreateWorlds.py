@@ -151,7 +151,7 @@ No information yet available.
         elif len(star.star_list) == 2:
             star_template = self.binaryTemplate.format(star.name, star.star_list[0], star.star_list[1])
             star_category = '[[Category: Binary Star System]]'
-        elif len (star.star_list) == 3:
+        elif len(star.star_list) == 3:
             star_template = self.trinaryTemplate.format(star.name, star.star_list[0], star.star_list[1], star.star_list[2])
             star_category = '[[Category: Trinary Star System]]'
         else:
@@ -239,7 +239,7 @@ No information yet available.
         return page_text
 
     def read_sector(self, sectors):
-        galaxy = Galaxy (12)
+        galaxy = Galaxy(12)
         galaxy.read_sectors(sectors, 'fixed', 'scaled')
         return galaxy
 
@@ -249,7 +249,7 @@ def get_category_list(category_files):
     for cat in category_files:
         cat_name = '[[Category: {}]]'.format(os.path.splitext(os.path.basename(cat))[0].replace('_', ' '))
         cat_worlds = get_skip_list(cat)
-        logger.debug ("processing category: {} -> {} of {}".format(cat, cat_name, cat_worlds))
+        logger.debug("processing category: {} -> {} of {}".format(cat, cat_name, cat_worlds))
 
         for world in cat_worlds:
             if world.strip() in category_list:

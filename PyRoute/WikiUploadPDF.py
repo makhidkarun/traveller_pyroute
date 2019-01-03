@@ -73,7 +73,7 @@ def uploadSummaryText(site, summaryFile, era):
         index += 1
 
 
-def uploadSec (site, filename, place, era):
+def uploadSec(site, filename, place, era):
     with codecs.open(filename, "r", 'utf-8') as f:
         text = f.read()
     targetTitle = os.path.basename(filename).split('.')[0] + place   
@@ -96,7 +96,7 @@ def pairwise(iterable):
     return izip(a, a)
 
 
-def uploadWorlds (site, sectorFile, economicFile, era):
+def uploadWorlds(site, sectorFile, economicFile, era):
     data_template=u'''
 {{{{StellarData
  |world     = {0}
@@ -168,7 +168,7 @@ No information yet available.
 
     sectorName = economicLines[2][3:-15]
     logger.info( u"Uploading {}".format(sectorName))
-    for sec, eco in zip (sectorData, economicData):
+    for sec, eco in zip(sectorData, economicData):
         
         if not sec[0] == eco[0]:
             logger.error(u"{} is not equal to {}".format(sec[0], eco[0]))
@@ -208,7 +208,7 @@ No information yet available.
         starparts = sec[13].split()
         stars = []
 
-        for x,y in pairwise ( starparts ):
+        for x,y in pairwise( starparts ):
             if y in ['V', 'IV', 'Ia', 'Ib', 'II', 'III']:
                 stars.append(' '.join((x,y)))
             else:
@@ -300,7 +300,7 @@ No information yet available.
             target_page = Page(site,  worldPage + u'/data')
             if target_page.exists:
                 page_text = unicode(target_page.getWikiText(), 'utf-8')
-                templates = re.findall (ur"{{[^}]*}}", page_text, re.U)
+                templates = re.findall(ur"{{[^}]*}}", page_text, re.U)
                 era_name = u"|era       = {}".format(era)
                 newtemplates = [template if not era_name in template else data
                                 for template in templates]
@@ -376,10 +376,10 @@ def process():
     if args.secs:        
         path = os.path.join(args.input, "*Sector.economic.wiki")
         for f in glob.glob(path):
-            uploadSec (wiki_review, f, "/economic", args.era)
+            uploadSec(wiki_review, f, "/economic", args.era)
         path = os.path.join(args.input, "*Sector.sector.wiki")
         for f in glob.glob(path):
-            uploadSec (wiki_review, f, "/sector", args.era)
+            uploadSec(wiki_review, f, "/sector", args.era)
 
     if args.summary:
         path = os.path.join(args.input, "summary.wiki")

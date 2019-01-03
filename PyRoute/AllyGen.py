@@ -98,7 +98,7 @@ class AllyGen(object):
         algs.sort(key=lambda alg : alg.stats.number, reverse = True)
         return algs
 
-    def create_borders (self, match):
+    def create_borders(self, match):
         """
             Create borders around various allegiances, Algorithm one.
             From the nroute.c generation system. Every world controls a
@@ -171,7 +171,7 @@ class AllyGen(object):
                     self.borders[Hex] = self.borders.setdefault(Hex, 0) | 2
 
     @staticmethod
-    def _set_border (allyMap, Hex, direction):
+    def _set_border(allyMap, Hex, direction):
         """
         Determine if the allegiance is different in the direction,
         hence requiring adding a border to the map.
@@ -192,7 +192,7 @@ class AllyGen(object):
         return False
 
     @staticmethod
-    def _get_neighbor (Hex, direction, distance = 1):
+    def _get_neighbor(Hex, direction, distance = 1):
         """
         determine neighboring hex from the q,r position and direction
         """
@@ -221,7 +221,7 @@ class AllyGen(object):
                 newMap[neighbor] = allyMap[Hex]
                 
     def _output_map(self, allyMap, stage):
-        path = os.path.join (self.galaxy.output_path, 'allyMap%s.txt' % stage)
+        path = os.path.join(self.galaxy.output_path, 'allyMap%s.txt' % stage)
         with open(path, "wb") as f:
             for key, value in allyMap.iteritems():
                 f.write("{}-{}: border: {}\n".format(key[0],key[1], value))
@@ -311,7 +311,7 @@ class AllyGen(object):
                 maxRange = ['D','C','B','A'].index(star.port) + 2
             if alg in self.nonAligned:
                 maxRange = 2
-            for dist in xrange (maxRange):
+            for dist in xrange(maxRange):
                 neighbor = AllyGen._get_neighbor(Hex, 4, dist)
                 for direction in xrange(6):
                     for _ in xrange(dist):
@@ -328,7 +328,7 @@ class AllyGen(object):
         # 4: hexes claimed by two (or more) allies at the same distance
         #    are claimed by the larger empire. 
         for Hex in allyMap.iterkeys():
-            if len (allyMap[Hex]) == 1:
+            if len(allyMap[Hex]) == 1:
                 allyMap[Hex] = allyMap[Hex].pop()[0]
             else:
                 allyList = sorted([algs for algs in allyMap[Hex]], key=itemgetter(1))
@@ -461,7 +461,7 @@ class AllyGen(object):
 
         return changed,allyMap
 
-    def _check_aligned (self, starMap, edgeMap, Hex, direction, distance):
+    def _check_aligned(self, starMap, edgeMap, Hex, direction, distance):
         startAlleg = edgeMap[Hex]
         checkHex = AllyGen._get_neighbor(Hex, direction, distance)
         # Occupied hex does not count as aligned for this check
@@ -545,7 +545,7 @@ class AllyGen(object):
             if alg in self.nonAligned:
                 maxRange = 0
             # Walk the ring filling in the hexes around star with this neighbor
-            for dist in xrange (1, maxRange):
+            for dist in xrange(1, maxRange):
                 # Start in direction 0, at distance n
                 neighbor = self._get_neighbor(Hex, 4, dist)
                 # walk six sides
@@ -562,7 +562,7 @@ class AllyGen(object):
         # 4: hexes claimed by two (or more) allies at the same distance
         #    are claimed by the larger empire. 
         for Hex in allyMap.iterkeys():
-            if len (allyMap[Hex]) == 1:
+            if len(allyMap[Hex]) == 1:
                 allyMap[Hex] = allyMap[Hex].pop()[0]
             else:
                 allyList = sorted([algs for algs in allyMap[Hex]], key=itemgetter(1))
