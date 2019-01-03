@@ -1,8 +1,8 @@
-'''
+"""
 Created on Mar 15, 2014
 
 @author: tjoneslo
-'''
+"""
 import bisect
 import logging
 import itertools
@@ -42,21 +42,21 @@ class RouteCalculation (object):
         raise NotImplementedError ("Base Class")
 
     def base_route_filter (self, star, neighbor):
-        '''
+        """
             Used in the generate_base_routes to filter (i.e. skip making a route)
             between the star and neighbor. Used to remove un-helpful world links,
             links across borders, etc.
             Return True to filter (ie. skip) creating a link between these two worlds
             Return False to accept (i.e. create) a link between these two worlds.
-        '''
+        """
         raise NotImplementedError ("Base Class")
     
     def base_range_routes (self, star, neighbor):
-        '''
-            Add the route between the pair to the range collection 
+        """
+            Add the route between the pair to the range collection
             Called prior to the setting of the routes/stars based upon
-            jump distance. 
-        '''
+            jump distance.
+        """
         raise NotImplementedError ("Base Class")
     
     def generate_base_routes (self):
@@ -93,10 +93,10 @@ class RouteCalculation (object):
 
     @staticmethod
     def get_btn (star1, star2, distance=None):
-        '''
+        """
         Calculate the BTN between two stars, which is the sum of the worlds
-        WTNs plus a modifier for types, minus a modifier for distance. 
-        '''
+        WTNs plus a modifier for types, minus a modifier for distance.
+        """
         btn = star1.wtn + star2.wtn
         if (star1.tradeCode.agricultural and (star2.tradeCode.nonagricultural or star2.tradeCode.extreme)) or \
             ((star1.tradeCode.nonagricultural or star1.tradeCode.extreme) and star2.tradeCode.agricultural): 
@@ -133,9 +133,9 @@ class RouteCalculation (object):
         
     @staticmethod
     def calc_trade (btn):
-        '''
-        Convert the BTN trade number to a credit value. 
-        '''
+        """
+        Convert the BTN trade number to a credit value.
+        """
         if btn & 1:
             trade = (10 ** ((btn - 1)/2)) * 5
         else:
@@ -432,10 +432,10 @@ class XRouteCalculation (RouteCalculation):
 
 
 class TradeCalculation(RouteCalculation):
-    '''
+    """
     Perform the trade calculations by generating the routes
     between all the trade pairs
-    '''
+    """
     # Weight for route over a distance. The relative cost for
     # moving freight between two worlds a given distance apart
     # in a single jump.
@@ -502,12 +502,12 @@ class TradeCalculation(RouteCalculation):
                                                   passenger_btn=passBTN)
         
     def generate_routes(self):
-        ''' 
+        """
         Generate the basic routes between all the stars. This creates two sets
-        of routes. 
-        - Stars: The basic J4 (max-jump) routes for all pairs of stars. 
-        - Ranges: The set of trade routes needing to be calculated. 
-        '''
+        of routes.
+        - Stars: The basic J4 (max-jump) routes for all pairs of stars.
+        - Ranges: The set of trade routes needing to be calculated.
+        """
         self.generate_base_routes()
 
         self.logger.info('calculating routes...')
@@ -541,11 +541,11 @@ class TradeCalculation(RouteCalculation):
         self.logger.info('Final route count {}'.format(self.galaxy.stars.number_of_edges()))
     
     def calculate_routes(self):
-        '''
+        """
         The base calculate routes. Read through all the stars in WTN order.
         Do this order to allow the higher trade routes establish the basic routes
         for the lower routes to follow.
-        '''
+        """
         self.logger.info('sorting routes...')
         btn = [(s,n,d) for (s,n,d) in  self.galaxy.ranges.edges(data=True)]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
@@ -568,11 +568,11 @@ class TradeCalculation(RouteCalculation):
         self.logger.info('processed {} routes at BTN {}'.format(counter,base_btn))
 
     def get_trade_between(self, star, target):
-        '''
+        """
         Calculate the route between star and target
         If we can't find a route (no Jump 4 (or N) path), skip this pair
-        otherwise update the trade information. 
-        '''
+        otherwise update the trade information.
+        """
         try:
             route = nx.astar_path(self.galaxy.stars, star, target, Star.heuristicDistance)
         except  nx.NetworkXNoPath:
@@ -612,12 +612,12 @@ class TradeCalculation(RouteCalculation):
         self.galaxy.stats.passengers += tradePass
 
     def route_update_simple (self, route):
-        '''
+        """
         Update the trade calculations based upon the route selected.
-        - add the trade values for the worlds, and edges 
+        - add the trade values for the worlds, and edges
         - add a count for the worlds and edges
         - reduce the weight of routes used to allow more trade to flow
-        '''
+        """
         distance = 0
         start = route[0]
         for end in route[1:]:
@@ -653,13 +653,13 @@ class TradeCalculation(RouteCalculation):
         return (tradeCr, tradePass)
     
     def route_update_skip (self, route, tradeCr):
-        '''
-        Unused: This was an experiment in adding skip-routes, 
-        i.e. longer, already calculated routes, to allow the 
-        A* route finder to work faster. This needs better system 
+        """
+        Unused: This was an experiment in adding skip-routes,
+        i.e. longer, already calculated routes, to allow the
+        A* route finder to work faster. This needs better system
         for selecting these routes as too many got added and it
-        would slow the system down. 
-        '''
+        would slow the system down.
+        """
         dist = 0
         weight = 0
         start = route[0]
@@ -694,13 +694,13 @@ class TradeCalculation(RouteCalculation):
         return dist, weight
     
     def get_trade_to (self, star, trade):
-        ''' 
-        Unused: 
+        """
+        Unused:
         Calculate the trade route between starting star and all potential target.
         This was the direct copy algorithm from nroute for doing route calculation
-        It was replaced by the process above which works better with the 
-        pythonic data structures. It remains for historical purposes.  
-        '''
+        It was replaced by the process above which works better with the
+        pythonic data structures. It remains for historical purposes.
+        """
         
         # Loop through all the stars in the ranges list, i.e. all potential stars
         # within the range of the BTN route. 

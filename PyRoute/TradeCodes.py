@@ -1,8 +1,8 @@
-'''
+"""
 Created on Oct 3, 2017
 
 @author: tjoneslo
-'''
+"""
 
 import re
 import logging
@@ -10,9 +10,9 @@ import sys
 
 
 class TradeCodes(object):
-    '''
+    """
     Trade Codes manage the complete set of trade codes for a world
-    '''
+    """
     pcodes = ['As', 'De', 'Ga', 'Fl', 'He', 'Ic', 'Oc', 'Po', 'Va', 'Wa']
     dcodes = ['Cp', 'Cx', 'Cs', 'Mr', 'Da', 'Di', 'Pz', 'An', 'Ab', 'Fo', 'Px', 
               'Re', 'Rs', 'Sa', 'Tz', 'Lk', 
@@ -28,9 +28,9 @@ class TradeCodes(object):
     ext_codes = set(['Lt', 'Ht', 'Lg', 'Hg'])
     
     def __init__(self, initial_codes):
-        '''
+        """
         Constructor
-        '''
+        """
         self.logger = logging.getLogger('PyRoute.TradeCodes')
         self.codes = initial_codes.split()
         self.pcode = set(TradeCodes.pcodes) & set(self.codes)

@@ -1,8 +1,8 @@
-'''
+"""
 Created on Dec 27, 2017
 
 @author: tjoneslo
-'''
+"""
 
 import logging
 import argparse
@@ -15,9 +15,9 @@ logger = logging.getLogger('WikiCreateWorlds')
 
 
 class WikiCreateWorld(object):
-    '''
+    """
     classdocs
-    '''
+    """
     page_template = '''{{{{UWP
  |name    = {{{{World|{full name}|{sector}|{subsector}|{pos}}}}}
  |system  = 
@@ -140,9 +140,9 @@ No information yet available.
 '''
 
     def __init__(self):
-        '''
+        """
         Constructor
-        '''
+        """
 
     def get_star_template(self, star):
         if len(star.star_list) == 1:

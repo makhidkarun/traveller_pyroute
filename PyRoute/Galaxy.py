@@ -1,8 +1,8 @@
-'''
+"""
 Created on Mar 2, 2014
 
 @author: tjoneslo
-'''
+"""
 import logging
 import re
 import codecs
@@ -143,9 +143,9 @@ class Sector (AreaItem):
     
 
 class Galaxy(object):
-    '''
+    """
     classdocs
-    '''
+    """
     regex = """
 ^(\d\d\d\d) +
 (.{15,}) +
@@ -162,9 +162,9 @@ class Galaxy(object):
 """
 
     def __init__(self, min_btn, max_jump=4, route_btn=8):
-        '''
+        """
        Constructor
-        '''
+        """
         self.logger = logging.getLogger('PyRoute.Galaxy')
         star_regex = ''.join([line.rstrip('\n') for line in Galaxy.regex])
         self.logger.debug("Pattern: %s" % star_regex)

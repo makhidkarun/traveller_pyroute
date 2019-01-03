@@ -1,8 +1,8 @@
-'''
+"""
 Created on Mar 26, 2014
 
 @author: tjoneslo
-'''
+"""
 import logging
 from operator import itemgetter
 from collections import defaultdict
@@ -10,9 +10,9 @@ import os
 
 
 class AllyGen(object):
-    '''
+    """
     classdocs
-    '''
+    """
     noOne = [u'--', u'??']
     nonAligned = [u'Na', u'Ns', u'Va', u'Cs', u'Hc', u'NaHu', u'NaDr', u'NaVa', u'NaAs', u'NaXx', u'VaEx', u'NaSo',
                   u'CsCa', u'CsHv', u'CsIm', u'CsMP', u'CsVa', u'CsZh', u'CsRe', u'CsMo', u'CsRr',
@@ -40,9 +40,9 @@ class AllyGen(object):
                             u'ZhJp', u'ZhMe', u'ZhOb', u'ZhSh', u'ZhVQ')]
 
     def __init__(self, galaxy):
-        '''
+        """
         Constructor
-        '''
+        """
         self.galaxy = galaxy
         self.borders = {} # 2D array using (q,r) as key, with flags for data
         self.allyMap = {}
@@ -130,17 +130,17 @@ class AllyGen(object):
         self._generate_borders(self.allyMap)
 
     def _generate_borders(self, allyMap):
-        '''
+        """
         Convert the allyMap, which is a dict of (q,r) keys with allegiance codes
         as values, into the borders, which is a dict of (q.r) keys with flags
         indicating which side of the Hex needs to have a border drawn on:
-        1: top or bottom 
+        1: top or bottom
         2: upper left or upper right
         4: lower left or lower right
-        
+
         This is a bit of a mess because the line drawing in HexMap is a little strange,
-        So the complexity is here to make the draw portion quick. 
-        '''
+        So the complexity is here to make the draw portion quick.
+        """
         for Hex in allyMap.iterkeys():
             if self._set_border(allyMap, Hex, 2): # up
                 neighbor = AllyGen._get_neighbor(Hex, 2)
@@ -172,11 +172,11 @@ class AllyGen(object):
 
     @staticmethod
     def _set_border (allyMap, Hex, direction):
-        '''
+        """
         Determine if the allegiance is different in the direction,
         hence requiring adding a border to the map.
         returns True if border needed, False if not
-        '''
+        """
         neighbor = AllyGen._get_neighbor(Hex, direction)
         # if this is a non-aligned controlled hex, 
         # and the neighbor has no setting ,
@@ -193,9 +193,9 @@ class AllyGen(object):
 
     @staticmethod
     def _get_neighbor (Hex, direction, distance = 1):
-        '''
+        """
         determine neighboring hex from the q,r position and direction
-        '''
+        """
         neighbors = [
            [+1,  0], [+1, -1], [ 0, -1],
            [-1,  0], [-1, +1], [ 0, +1]
@@ -228,10 +228,10 @@ class AllyGen(object):
         
     @staticmethod
     def are_owned_allies(alg1, alg2):
-        '''
+        """
         public function to determine if the Allegiances of two
-        world are considered allied for the owned world checks. 
-        '''
+        world are considered allied for the owned world checks.
+        """
         if alg1 is None or alg2 is None:
             return False
         if alg1 in AllyGen.noOne or alg2 in AllyGen.noOne:
@@ -245,10 +245,10 @@ class AllyGen(object):
 
     @staticmethod
     def are_allies(alg1, alg2):
-        '''
-        Public function to determine if the Allegiance of two 
+        """
+        Public function to determine if the Allegiance of two
         worlds are considered allied for trade purposes or not.
-        '''
+        """
         if alg1 is None or alg2 is None:
             return False
         if alg1 in AllyGen.noOne or alg2 in AllyGen.noOne:
@@ -263,13 +263,13 @@ class AllyGen(object):
         return False
 
     def create_ally_map(self, match):
-        '''
+        """
             Create borders around various allegiances, Algorithm Two.
             From the AllyGen http://dotclue.org/t20/ code created by J. Greely.
             Each world is given a radius of area to claim based upon starport.
             Overlapping claims are resolved to a single claim
             Edges of the map are sliced down.
-        '''
+        """
         self.logger.info('Processing worlds for ally map drawing')
 
         self.allyMap = self._ally_map(match)
@@ -373,10 +373,10 @@ class AllyGen(object):
         return allyMap
         
     def create_erode_border(self, match):
-        '''
+        """
         Create borders around various allegiances, Algorithm Three.
         From TravellerMap http://travellermap.com/borders/doc.htm
-        '''
+        """
         self.logger.info('Processing worlds for erode map drawing')
         allyMap,starMap = self._erode_map(match)
         changed = True
@@ -397,9 +397,9 @@ class AllyGen(object):
         self._generate_borders(allyMap)
 
     def _erode(self, allyMap, starMap):
-        '''
+        """
         Remove edges.
-        '''
+        """
         newMap = {}
         changed = False
         
@@ -432,10 +432,10 @@ class AllyGen(object):
         return changed, newMap
 
     def _break_spans(self, allyMap, starMap):
-        ''''
+        """'
         BreakSpans - Find a span of four empty (edge) hexes
         and break the span by setting one to not aligned.
-        '''
+        """
         edgeMap = {}
         changed = False
         # Create the edge map, of hexes on the border
@@ -471,9 +471,10 @@ class AllyGen(object):
         return AllyGen.are_allies(startAlleg, checkAlleg)
 
     def _build_bridges(self, allyMap, starMap):
-        ''' Build a bridge between two worlds one hex apart as to avoid
-            disrupting contiguous empires. 
-        '''
+        """
+        Build a bridge between two worlds one hex apart as to avoid
+        disrupting contiguous empires.
+        """
         for Hex in starMap.iterkeys():
             self._search_range(Hex, allyMap, starMap)
 
@@ -505,10 +506,10 @@ class AllyGen(object):
             allyMap[newBridge] = starMap[Hex]
 
     def _erode_map(self, match):
-        '''
+        """
         Generate the initial map of allegiances for the erode map.
         Note: This does not match the original system.
-        '''
+        """
         # Create list of stars
         stars = [star for star in self.galaxy.stars]
         allyMap = defaultdict(set)

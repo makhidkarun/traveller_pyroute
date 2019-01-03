@@ -1,8 +1,8 @@
-'''
+"""
 Created on Mar 22, 2014
 
 @author: tjoneslo
-'''
+"""
 import os
 
 import logging
@@ -15,9 +15,9 @@ from Star import Nobles
 from AllyGen import AllyGen
 
 class WikiStats(object):
-    '''
+    """
     classdocs
-    '''
+    """
     stat_header='{| class=\"wikitable sortable\"\n!Sector!! X,Y !! Worlds ' + \
         '!! Population (millions) !! Economy (Bcr) !! Per Capita (Cr) ' + \
         '!! Trade Volume (BCr / year) !! Int. Trade (BCr / year) !! Ext. Trade (BCr/year) '+ \
@@ -25,9 +25,9 @@ class WikiStats(object):
         '!! Travellers (M / year) !! SPA Pop !! ETI worlds !! ETI Cargo (tons / year) !! ETI passengers (per year)\n'
 
     def __init__(self, galaxy, uwp, min_alg_count=10, match_alg = 'collapse'):
-        '''
+        """
         Constructor
-        '''
+        """
         self.galaxy = galaxy
         self.uwp  = uwp
         self.min_alg_count = min_alg_count

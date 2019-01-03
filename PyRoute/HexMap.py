@@ -1,8 +1,8 @@
-'''
+"""
 Created on Mar 8, 2014
 
 @author: tjoneslo
-'''
+"""
 import os
 import logging
 from pypdflite import PDFLite
@@ -17,10 +17,10 @@ from StatCalculation import StatCalculation
 
 
 class HexMap(object):
-    '''
+    """
     Draw the trade routes as calculated, sector by sector onto PDF files.
-    Used pypdflite to directly generate the PDF files. 
-    '''
+    Used pypdflite to directly generate the PDF files.
+    """
 
     def __init__(self, galaxy, routes, min_btn = 8):
         self.galaxy = galaxy
@@ -33,10 +33,10 @@ class HexMap(object):
         self.x_start = 15
 
     def write_maps(self):
-        '''
-        Starting point for writing PDF files. 
+        """
+        Starting point for writing PDF files.
         Call this to output the trade maps
-        '''
+        """
         logging.getLogger("PyRoute.HexMap").info("writing {:d} sector maps...".format(len(self.galaxy.sectors)))
         for sector in self.galaxy.sectors.itervalues():
             pdf = self.document(sector)

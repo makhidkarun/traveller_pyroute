@@ -1,15 +1,15 @@
 #!/usr/bin/python
-'''
+"""
 Created on Apr 12, 2014
 
 @author: tjoneslo
 
-Post-processor for the route generator to produce the needed output files 
+Post-processor for the route generator to produce the needed output files
 for Traveller Map. This produces a set of files (one per sector) of
-XML tags for the routes as specified by the TravellerMap conventions. 
+XML tags for the routes as specified by the TravellerMap conventions.
 
 
-'''
+"""
 
 import re
 import math
@@ -29,7 +29,8 @@ from xml.dom import minidom
 
 
 def prettify(elem):
-    """Return a pretty-printed XML string for the Element.
+    """
+    Return a pretty-printed XML string for the Element.
     """
     rough_string = ET.tostring(elem, 'utf-8')
     rough_string = string.replace(rough_string, '\r\n', '\n')

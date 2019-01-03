@@ -1,8 +1,8 @@
-'''
+"""
 Created on Aug 7, 2016
 
 @author: tjoneslo
-'''
+"""
 import os
 import logging
 from Map import GraphicMap

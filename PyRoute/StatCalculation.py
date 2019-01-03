@@ -1,8 +1,8 @@
-'''
+"""
 Created on Mar 17, 2014
 
 @author: tjoneslo
-'''
+"""
 import logging
 import math
 from wikistats import WikiStats
@@ -59,9 +59,9 @@ class UWPCollection(object):
 
 
 class StatCalculation(object):
-    '''
+    """
     Statistics calculations and output.
-    '''
+    """
 
     def __init__(self, galaxy):
         self.logger = logging.getLogger('PyRoute.StatCalculation')

@@ -1,9 +1,9 @@
 #!/usr/bin/pypy
-'''
+"""
 Created on Mar 2, 2014
 
 @author: tjoneslo
-'''
+"""
 
 
 import argparse
@@ -85,7 +85,6 @@ def process():
     
     logger.info ("%s sectors read" % len(galaxy.sectors))
     
-    
     galaxy.generate_routes(args.routes, args.route_reuse)
     
     galaxy.set_borders(args.borders, args.ally_match)
@@ -114,7 +113,6 @@ def process():
             graphMap = GraphicSubsectorMap (galaxy, args.routes, args.speculative_version)
             graphMap.write_maps()
 
-    
     logger.info("process complete")
 
 
