@@ -70,16 +70,15 @@ class WikiStats(object):
             
             area_type = "Sector"
             f.write('=== {} Statistics ===\n'.format(area_type))
-            f.write('{| class="wikitable sortable"\n')
-            f.write('! {} !! statistics\n'.format(area_type))
+            f.write('==== {} ===='.format(sector.wiki_name()))
             for sector in self.galaxy.sectors.itervalues():
                 self.text_area_long(f, "sector", sector)
-                f.write('\n\n=== Polity Listing ===')
+                f.write('\n\n;Polity Listing')
                 allegiances_sorted = AllyGen.sort_allegiances(sector.alg, self.match_alg)
+                self.logger.debug("Processing allegiance statistics for {} - {}\n Sorted: {}".format(sector.name, sector.alg, allegiances_sorted))
                 for allegiance in allegiances_sorted:
                     f.write('\n')
-                    self.text_area_statistics(f, "sector", allegiance, sector)
-            f.write('|}\n')
+                    self.text_alg_statistics(f, "allegiance", allegiance, sector)
 
         path = os.path.join(self.galaxy.output_path, 'sectors_list.txt')
         with open (path, 'w+') as f:
@@ -134,7 +133,7 @@ class WikiStats(object):
     def write_allegiances (self, alg):
         path = os.path.join(self.galaxy.output_path, 'alleg_summary.wiki')
         with codecs.open(path, "wb", 'utf_8') as f:
-            f.write('===[[Allegiance Code|Allegiance Information]]===\n')
+            f.write('===Allegiance Information===\n')
             allegiances_sorted = AllyGen.sort_allegiances(alg, self.match_alg)
             self.logger.debug("Allegiances:  {}".format(allegiances_sorted))
             f.write('{| class=\"wikitable sortable\"\n!Code !! Name !! Worlds !! Population (millions) ' + \
@@ -166,7 +165,7 @@ class WikiStats(object):
                 f.write('|-\n')
                 f.write(u'|{0}\n'.format(allegiance.wiki_title()))
                 f.write(u'|| ')
-                self.text_area_statistics(f, area_type, allegiance)
+                self.text_alg_statistics(f, "allegiance", allegiance)
             f.write('|}\n')
 
     def write_uwp_counts(self,f):
@@ -269,7 +268,7 @@ class WikiStats(object):
                     allegiances_sorted = AllyGen.sort_allegiances(subsector.alg, self.match_alg)
                     for allegiance in allegiances_sorted:
                         f.write('\n')
-                        self.text_area_statistics(f, "subsector", allegiance, subsector)
+                        self.text_alg_statistics(f, "subsector", allegiance, subsector)
             f.write('|}\n')
 
 # This sector has <N> worlds, of which <N> have native gas giants.
@@ -299,10 +298,9 @@ class WikiStats(object):
             f.write ('contains no charted worlds.\n')
             return
 
-        f.write(u'has {:d} worlds, of which {:d} have native gas giants. '.format(area.stats.number, area.stats.gg_count)) 
-        f.write(u'The estimated population for the {} is '.format(area_type))
-        f.write(self.write_population(area.stats.population))
-        f.write(u' sophonts (not necessarily humans). ')
+        f.write(u'has {:d} worlds, of which {:d} have native gas giants. The {} has an '.format(area.stats.number, area.stats.gg_count, area_type)) 
+
+        self.text_area_populations(f, area)
 
         worlds = []
         worlds.append(self.get_count(area.stats.code_counts.get('Hi', 0), 'world', True, ' High population (Hi)'))
@@ -378,8 +376,16 @@ class WikiStats(object):
         if area_type != 'subsector':
             self.text_area_capitals(f, area_type, area)
 
-    def text_area_statistics(self, f, area_type, area, contain=None):
-        
+    def text_area_populations(self, f, area):
+        f.write(u'estimated population of ')
+        f.write(self.write_population(area.stats.population))
+        sophonts = [u"{}: {}".format(code, self.write_population(pop)) for (code,pop)
+                                     in area.stats.pop_groups.iteritems()]
+        f.write(' (')
+        f.write(", ".join(sophonts))
+        f.write('). ')        
+    
+    def text_alg_statistics(self, f, area_type, area, contain=None):
         if AllyGen.is_unclaimed(area.code):
             outString = u'There '
             outString += self.get_count(area.stats.number, 'system', True, ' unclaimed or unexplored')
@@ -403,15 +409,8 @@ class WikiStats(object):
                 self.text_area_capitals(f, area_type, area)
             elif len(area.worlds) > 0:
                 self.write_count(f, area.stats.number, 'world', False)
-                f.write(u' with a population of ')
-                f.write(self.write_population(area.stats.population))
-                
-                f.write(' (')
-                sophonts = []
-                for (code, pop) in area.stats.pop_groups.iteritems():
-                    sophonts.append(u"{}: {}".format(code, self.write_population(pop)))
-                f.write(", ".join(sophonts))
-                f.write('). ')
+                f.write(' with an ')
+                self.text_area_populations(f, area)
                 
                 f.write('The economy is BCr{:,d} and a per capita income of Cr{:,d}. '.format(area.stats.economy, area.stats.percapita))
                 
@@ -421,6 +420,7 @@ class WikiStats(object):
             else:
                 f.write (' no charted worlds.')
         f.write('\n')
+
 
     def text_area_pop_tl (self, f, area_type, area):
         PopWorlds = [world for world in area.worlds if world.popCode == area.stats.maxPop]
