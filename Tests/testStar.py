@@ -6,9 +6,10 @@ Created on Mar 7, 2014
 import unittest
 import re
 import sys
+
 sys.path.append('../PyRoute')
 from Star import Star
-from Galaxy import Sector,Galaxy
+from Galaxy import Sector, Galaxy
 from TradeCalculation import TradeCalculation
 
 
@@ -21,8 +22,9 @@ class TestStar(unittest.TestCase):
 
     def testParseIrkigkhan(self):
         sector = Sector('Core', ' 0, 0')
-        star1 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-                     self.starline, sector, 'fixed',  None)
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            self.starline, sector, 'fixed', None)
 
         self.assertTrue(star1.sector.name == 'Core', star1.sector.name)
         self.assertTrue(star1.position == '0103')
@@ -41,8 +43,9 @@ class TestStar(unittest.TestCase):
 
     def testParseIrkigkhanRUCollapse(self):
         sector = Sector('Core', ' 0, 0')
-        star1 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-                     self.starline, sector, 'fixed',  'collapse')
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            self.starline, sector, 'fixed', 'collapse')
 
         expected = 756
         actual = star1.ru
@@ -51,8 +54,9 @@ class TestStar(unittest.TestCase):
 
     def testParseIrkigkhanRUScaled(self):
         sector = Sector('Core', ' 0, 0')
-        star1 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-                     self.starline, sector, 'fixed',  'scaled')
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            self.starline, sector, 'fixed', 'scaled')
 
         expected = 756
         actual = star1.ru
@@ -61,8 +65,9 @@ class TestStar(unittest.TestCase):
 
     def testParseShanaMa(self):
         sector = Sector('Core', ' 0, 0')
-        star1 = Star.parse_line_into_star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-                     self.starline,  sector, 'fixed',  None)
+        star1 = Star.parse_line_into_star(
+            "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+            self.starline, sector, 'fixed', None)
 
         self.assertTrue(star1.sector.name == 'Core', star1.sector.name)
         self.assertTrue(star1.position == '0104')
@@ -79,11 +84,12 @@ class TestStar(unittest.TestCase):
         self.assertTrue(star1.ggCount == 3)
         self.assertEqual(len(star1.star_list), 2)
         self.assertEqual(star1.star_list, ['K2 IV', 'M7 V'])
-        
+
     def testParseSyss(self):
         sector = Sector('Core', ' 0, 0')
-        star1 = Star.parse_line_into_star("2323 Syss                 C400746-8 Na Va Pi                   { -1 } (A67-2) [6647] BD   S  - 510 5  ImDv M9 III D M5 V",
-                     self.starline, sector, 'fixed',  None)
+        star1 = Star.parse_line_into_star(
+            "2323 Syss                 C400746-8 Na Va Pi                   { -1 } (A67-2) [6647] BD   S  - 510 5  ImDv M9 III D M5 V",
+            self.starline, sector, 'fixed', None)
 
         self.assertTrue(star1.sector.name == 'Core', star1.sector.name)
         self.assertEqual(star1.position, '2323')
@@ -93,52 +99,52 @@ class TestStar(unittest.TestCase):
         self.assertEqual(star1.star_list, ['M9 III', 'D', 'M5 V'])
 
     def testAPortModifier(self):
-        #cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
-        cwtn = [3,4,4,5,6,7,7,8,9,10,10,11,12,13,13,14]
+        # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
+        cwtn = [3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11, 12, 13, 13, 14]
         for uwtn in xrange(15):
             wtn = int(round(max(0, (uwtn * 3 + 13) / 4)))
-            self.assertTrue (wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
+            self.assertTrue(wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
     def testBPortModifier(self):
-        #cwtn =[2,3,4,5,5,6,7,8,8,9,10,11,11,12,12,13]
-        cwtn = [2,3,4,5,5,6,7,8,8,9,10,11,11,12,13,14]
+        # cwtn =[2,3,4,5,5,6,7,8,8,9,10,11,11,12,12,13]
+        cwtn = [2, 3, 4, 5, 5, 6, 7, 8, 8, 9, 10, 11, 11, 12, 13, 14]
         for uwtn in xrange(15):
             wtn = int(round(max(0, (uwtn * 3 + 11) / 4)))
-            self.assertTrue (wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
+            self.assertTrue(wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
     def testCPortModifier(self):
-        cwtn = [2,3,3,4,5,6,6,7,8,9,9,10,10,11,11,12]
+        cwtn = [2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 10, 11, 11, 12]
         for uwtn in xrange(15):
             if (uwtn > 9):
-                wtn = int(round(max(0, (uwtn + 9)/2)))
+                wtn = int(round(max(0, (uwtn + 9) / 2)))
             else:
-                wtn = int(round(max(0, (uwtn * 3 + 9)/4)))
-            self.assertTrue (wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
+                wtn = int(round(max(0, (uwtn * 3 + 9) / 4)))
+            self.assertTrue(wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
     def testDPortModifier(self):
-        cwtn = [1,2,3,4,4,5,6,7,7,8,8,9,9,10,10,11]
-        for uwtn in xrange(15):        
+        cwtn = [1, 2, 3, 4, 4, 5, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11]
+        for uwtn in xrange(15):
             if (uwtn > 7):
-                wtn =int(round(max(0, (uwtn + 7) / 2)))
+                wtn = int(round(max(0, (uwtn + 7) / 2)))
             else:
                 wtn = int(round(max(0, (uwtn * 3 + 7) / 4)))
-            self.assertTrue (wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
+            self.assertTrue(wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
     def testEPortModifier(self):
-        cwtn = [1,2,2,3,4,5,5,6,6,7,7,8,8,9,9,10]
-        for uwtn in xrange(15):        
+        cwtn = [1, 2, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10]
+        for uwtn in xrange(15):
             if (uwtn > 5):
-                wtn =int(round(max(0, (uwtn + 5) / 2)))
+                wtn = int(round(max(0, (uwtn + 5) / 2)))
             else:
                 wtn = int(round(max(0, (uwtn * 3 + 5) / 4)))
-            self.assertTrue (wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
+            self.assertTrue(wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
     def testXPortModifier(self):
-        #cwtn =[0,1,2,3,0,0,0,1,1,2,2,3,3,4,4,5]
-        cwtn = [0,0,0,0,0,0,0,1,1,2,2,3,3,4,4,5]
+        # cwtn =[0,1,2,3,0,0,0,1,1,2,2,3,3,4,4,5]
+        cwtn = [0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5]
         for uwtn in xrange(15):
             wtn = int(round(max(0, (uwtn - 5) / 2)))
-            self.assertTrue (wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
+            self.assertTrue(wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
     def testCalcTrade(self):
         self.assertEqual(TradeCalculation.calc_trade(0), 1)
@@ -158,25 +164,29 @@ class TestStar(unittest.TestCase):
         self.assertEqual(TradeCalculation.calc_passengers(15), 500)
 
     def testHashValueSameAfterCaching(self):
-        star1 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V  ",
-             self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
-    
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V  ",
+            self.starline, Sector('Core', ' 0, 0'), 'fixed', None)
+
         # Grabbing hash value twice, once to seed Star._hash, second to dig it out of that cache
         oldHash = star1.__hash__()
         newHash = star1.__hash__()
-        self.assertEqual(oldHash,  newHash)
+        self.assertEqual(oldHash, newHash)
 
     def TestEquals(self):
-        star1 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-             self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
-        star2 = Star.parse_line_into_star("0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-             self.starline, Sector('Core', ' 0, 0'), 'fixed',  None)
-        star3 = Star.parse_line_into_star("0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-                     self.starline,  Sector('Core', ' 0, 0'), 'fixed',  None)
-        
-        self.assertEqual(star1,  star2)
-        self.assertNotEqual(star1,  star3)
-        self.assertNotEqual(star2,  star3)
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            self.starline, Sector('Core', ' 0, 0'), 'fixed', None)
+        star2 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            self.starline, Sector('Core', ' 0, 0'), 'fixed', None)
+        star3 = Star.parse_line_into_star(
+            "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+            self.starline, Sector('Core', ' 0, 0'), 'fixed', None)
+
+        self.assertEqual(star1, star2)
+        self.assertNotEqual(star1, star3)
+        self.assertNotEqual(star2, star3)
 
 
 if __name__ == "__main__":
