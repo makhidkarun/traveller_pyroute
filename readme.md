@@ -25,67 +25,73 @@ Running the program
 
     $ python PyRoute/route.py --help
     usage: route.py [-h] [--borders {none,range,allygen,erode}]
-                    [--ally-match {collapse,separate}]
-                    [--routes {trade,comm,xroute,owned,none}] [--min-btn BTN]
-                    [--min-route-btn ROUTE_BTN] [--max-jump MAX_JUMP]
-                    [--pop-code {fixed,scaled,benford}]
-                    [--route-reuse ROUTE_REUSE] [--ru-calc {scaled,negative}]
-                    [--output OUTPUT] [--owned-worlds] [--no-trade] [--no-maps]
-                    [--no-subsector-maps] [--min-ally-count ALLY_COUNT]
-                    [--input INPUT] [--sectors SECTORS] [--version]
-                    [--log-level LOG_LEVEL]
-                    [sector [sector ...]]
-
+                [--ally-match {collapse,separate}]
+                [--routes {trade,comm,xroute,owned,none}] [--min-btn BTN]
+                [--min-route-btn ROUTE_BTN] [--max-jump MAX_JUMP]
+                [--pop-code {fixed,scaled,benford}]
+                [--route-reuse ROUTE_REUSE] [--ru-calc {scaled,negative}]
+                [--speculative-version {CT,T5,None}] [--output OUTPUT]
+                [--owned-worlds] [--no-trade] [--no-maps]
+                [--no-subsector-maps] [--min-ally-count ALLY_COUNT]
+                [--input INPUT] [--sectors SECTORS] [--version]
+                [--log-level LOG_LEVEL]
+                [sector [sector ...]]
+    
     Traveller trade route generator.
-
+    
     optional arguments:
-        -h, --help            show this help message and exit
-        --version             show program's version number and exit
-        --log-level LOG_LEVEL
-
+      -h, --help            show this help message and exit
+      --version             show program's version number and exit
+      --log-level LOG_LEVEL
+    
     Allegiance:
-        Alter processing of allegiances
-
-        --borders {none,range,allygen,erode}
+      Alter processing of allegiances
+    
+      --borders {none,range,allygen,erode}
                         Allegiance border generation, default [range]
-        --ally-match {collapse,separate}
+      --ally-match {collapse,separate}
                         Allegiance matching for borders, default [collapse]
-
+    
     Routes:
-        Route generation options
-
-        --routes {trade,comm,xroute,owned,none}
+      Route generation options
+    
+      --routes {trade,comm,xroute,owned,none}
                         Route type to be generated, default [trade]
-        --min-btn BTN         Minimum BTN used for route calculation, default [13]
-        --min-route-btn ROUTE_BTN
+      --min-btn BTN         Minimum BTN used for route calculation, default [13]
+      --min-route-btn ROUTE_BTN
                         Minimum btn for drawing on the map, default [8]
-        --max-jump MAX_JUMP   Maximum jump distance for trade routes, default [4]
-        --pop-code {fixed,scaled,benford}
+      --max-jump MAX_JUMP   Maximum jump distance for trade routes, default [4]
+      --pop-code {fixed,scaled,benford}
                         Interpretation of the population modifier code,
                         default [scaled]
-        --route-reuse ROUTE_REUSE
+      --route-reuse ROUTE_REUSE
                         Scale for reusing routes during route generation
-        --ru-calc {scaled,negative}
+      --ru-calc {scaled,negative}
                         RU calculation, default [scaled]
-
-    output:
-        Output options
-
-        --output OUTPUT       output directory for maps, statistics
-        --owned-worlds
-        --no-trade
-        --no-maps
-        --no-subsector-maps
-        --min-ally-count ALLY_COUNT
+      --speculative-version {CT,T5,None}
+                        version of the speculative trade calculations, default
+                        [CT]
+    
+    Output:
+      Output options
+    
+      --output OUTPUT       output directory for maps, statistics
+      --owned-worlds        Generate the owned worlds report, used for review
+                        purposes
+      --no-trade            Do not generate any trade data, only the default
+                        statistical data
+      --no-maps             Do not generate sector level trade maps
+      --no-subsector-maps   Do not generate subsector level maps
+      --min-ally-count ALLY_COUNT
                         Minimum number of worlds in an allegiance for output,
                         default [10]
-
-    input:
-        Source of data options
-
-        --input INPUT         input directory for sectors
-        --sectors SECTORS     file with list of sector names to process
-        sector                T5SS sector file(s) to process
+    
+    Input:
+      Source of data options
+    
+      --input INPUT         input directory for sectors
+      --sectors SECTORS     file with list of sector names to process
+    sector                T5SS sector file(s) to process
 
 The default values are scaled for the standards set by the Traveller world generation used in the T5 Second Survey and, by extension, the values used by most of the Traveller world generation systems. The parameters are present to allow generating routes in areas where the worlds don't conform to Imperial standards. 
 

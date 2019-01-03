@@ -45,17 +45,21 @@ def process():
     route.add_argument('--speculative-version', choices=['CT', 'T5', 'None'] ,default='CT',
                        help='version of the speculative trade calculations, default [CT]')
 
-    output = parser.add_argument_group('output', 'Output options')
+    output = parser.add_argument_group('Output', 'Output options')
     
     output.add_argument('--output', default='maps', help='output directory for maps, statistics')
-    output.add_argument('--owned-worlds', dest='owned', default=False, action='store_true')   
-    output.add_argument('--no-trade', dest='trade', default=True, action='store_false')
-    output.add_argument('--no-maps', dest='maps', default=True, action='store_false')
-    output.add_argument('--no-subsector-maps', dest='subsectors', default=True, action='store_false')
+    output.add_argument('--owned-worlds', dest='owned', default=False, action='store_true',
+                        help='Generate the owned worlds report, used for review purposes')   
+    output.add_argument('--no-trade', dest='trade', default=True, action='store_false',
+                        help='Do not generate any trade data, only the default statistical data')
+    output.add_argument('--no-maps', dest='maps', default=True, action='store_false',
+                        help='Do not generate sector level trade maps')
+    output.add_argument('--no-subsector-maps', dest='subsectors', default=True, action='store_false',
+                        help='Do not generate subsector level maps')
     output.add_argument('--min-ally-count', dest='ally_count', default=10, type=int,
                         help='Minimum number of worlds in an allegiance for output, default [10]')
     
-    source = parser.add_argument_group('input', 'Source of data options')
+    source = parser.add_argument_group('Input', 'Source of data options')
     source.add_argument('--input', default='sectors', help='input directory for sectors')
     source.add_argument('--sectors', default=None, help='file with list of sector names to process')
     source.add_argument('sector', nargs='*', help='T5SS sector file(s) to process')
