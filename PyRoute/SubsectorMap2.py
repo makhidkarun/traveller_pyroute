@@ -101,9 +101,9 @@ class GraphicSubsectorMap(GraphicMap):
             doc.rectangle([(start.x + offset, start.y + offset), (end.x - offset, end.y - offset)], outline=color,
                           fill=None)
 
-        start.x = 30;
+        start.x = 30
         start.y = 30
-        end.x = 786;
+        end.x = 786
         end.y = 1096
 
         for offset in range(-3, +3):

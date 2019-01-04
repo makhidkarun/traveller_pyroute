@@ -23,7 +23,7 @@ def get_url(url, sector, suffix, output_dir):
     if encoding == 'text/xml' or encoding == 'text/html':
         ucontent = unicode(content, 'utf-8').replace('\r\n', '\n')
     else:
-        ucontent = unicode(content, encoding).replace('\r\n','\n')
+        ucontent = unicode(content, encoding).replace('\r\n', '\n')
     
     path = os.path.join(output_dir, '%s.%s' % (sector, suffix))
 

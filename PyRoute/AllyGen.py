@@ -183,8 +183,7 @@ class AllyGen(object):
         # or the neighbor is aligned 
         # Then no border . 
         if (allyMap[Hex] in AllyGen.nonAligned or allyMap[Hex] is None) and \
-                (allyMap.get(neighbor, True) or \
-                 allyMap.get(neighbor, None) not in AllyGen.nonAligned):
+                (allyMap.get(neighbor, True) or allyMap.get(neighbor, None) not in AllyGen.nonAligned):
             return False
         # If not matched allegiance, need a border.
         elif allyMap[Hex] != allyMap.get(neighbor, None):
@@ -357,7 +356,8 @@ class AllyGen(object):
         # Do two passes through the data
         for _ in xrange(2):
             for Hex in allyMap.iterkeys():
-                if starMap.get(Hex, False): continue
+                if starMap.get(Hex, False):
+                    continue
                 neighborAlgs = defaultdict(int)
                 for direction in xrange(6):
                     neighborAlg = allyMap.get(AllyGen._get_neighbor(Hex, direction), None)

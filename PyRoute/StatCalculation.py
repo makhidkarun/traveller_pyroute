@@ -73,14 +73,13 @@ class StatCalculation(object):
     def calculate_statistics(self):
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
         for sector in self.galaxy.sectors.itervalues():
-            if sector is None: continue
+            if sector is None:
+                continue
             for star in sector.worlds:
                 star.starportSize = max(self.trade_to_btn(star.tradeIn + star.tradeOver) - 5, 0)
                 star.starportBudget = \
-                    ((star.tradeIn / 10000) * 150 + \
-                     (star.tradeOver / 10000) * 140 + \
-                     (star.passIn) * 500 + \
-                     (star.passOver) * 460) / 1000000
+                    ((star.tradeIn / 10000) * 150 + (star.tradeOver / 10000) * 140 +
+                     (star.passIn) * 500 + (star.passOver) * 460) / 1000000
 
                 star.starportPop = int(star.starportBudget / 0.2)
 

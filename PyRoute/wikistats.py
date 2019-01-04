@@ -137,7 +137,7 @@ class WikiStats(object):
             f.write('===Allegiance Information===\n')
             allegiances_sorted = AllyGen.sort_allegiances(alg, self.match_alg)
             self.logger.debug("Allegiances:  {}".format(allegiances_sorted))
-            f.write('{| class=\"wikitable sortable\"\n!Code !! Name !! Worlds !! Population (millions) ' + \
+            f.write('{| class=\"wikitable sortable\"\n!Code !! Name !! Worlds !! Population (millions) ' +
                     '!! Economy (BCr) !! Per Capita (Cr) !!  RU !! Shipyard Capacity (MTons) !! Armed Forces (BEs) !! SPA Population\n')
             for allegiance in allegiances_sorted:
                 if allegiance.stats.number < self.min_alg_count:
@@ -522,10 +522,10 @@ class WikiStats(object):
                 f.write('<section begin="header"/>\n')
                 f.write('{| class="wikitable sortable" width="90%"\n')
                 f.write(u'|+ {} economic data\n'.format(sector.sector_name()))
-                f.write(u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!MSPR!!RU!!Per Capita (Cr)!!GWP (BCr)!!Trade (MCr/year)' + \
-                        '!!Passengers (per year)!!Build!!Army!!Port!!SPA Population' + \
-                        '!!ETI Index!!ETI Pass Index!!ETI worlds!!ETI Cargo (tons/year)!!ETI Passengers (per year)' + \
-                        '!!Trade Goods' + \
+                f.write(u'!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!MSPR!!RU!!Per Capita (Cr)!!GWP (BCr)!!Trade (MCr/year)' +
+                        '!!Passengers (per year)!!Build!!Army!!Port!!SPA Population' +
+                        '!!ETI Index!!ETI Pass Index!!ETI worlds!!ETI Cargo (tons/year)!!ETI Passengers (per year)' +
+                        '!!Trade Goods' +
                         '!!Subsector\n')
                 f.write('<section end="header"/>')
                 for subsector in sector.subsectors.itervalues():

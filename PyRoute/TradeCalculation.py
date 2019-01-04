@@ -124,11 +124,12 @@ class RouteCalculation(object):
 
     @staticmethod
     def get_passenger_btn(btn, star, neighbor):
-        passBTN = btn + \
-                  1 if star.tradeCode.rich or neighbor.tradeCode.rich else 0 + \
-                                                                           1 if star.tradeCode.subsector_capital or neighbor.tradeCode.subsector_capital else 0 + \
-                                                                                                                                                              2 if star.tradeCode.sector_capital or neighbor.tradeCode.sector_capital else 0 + \
-                                                                                                                                                                                                                                           2 if star.tradeCode.other_capital or neighbor.tradeCode.other_capital else 0
+        rich = 1 if star.tradeCode.rich or neighbor.tradeCode.rich else 0
+        subsector_capital = 1 if star.tradeCode.subsector_capital or neighbor.tradeCode.subsector_capital else 0
+        sector_capital = 2 if star.tradeCode.sector_capital or neighbor.tradeCode.sector_capital else 0
+        other_capital = 2 if star.tradeCode.other_capital or neighbor.tradeCode.other_capital else 0
+
+        passBTN = btn + rich + subsector_capital + sector_capital + other_capital
         return passBTN
 
     @staticmethod
@@ -311,7 +312,8 @@ class XRouteCalculation(RouteCalculation):
                         self.get_route_between(capital[0], star, self.calc_trade(23), Star.heuristicDistance)
             else:
                 for star in subCap:
-                    if self.galaxy.ranges.has_edge(secCap[0], star): continue
+                    if self.galaxy.ranges.has_edge(secCap[0], star):
+                        continue
                     self.get_route_between(secCap[0], star, self.calc_trade(23), Star.heuristicDistance)
 
         for star in self.subCapitals:
@@ -326,8 +328,7 @@ class XRouteCalculation(RouteCalculation):
                      AllyGen.are_allies(u'Im', star.alg) and star.tradeCount == 0
                      and (star.importance >= 4 or 'D' in star.baseCode or 'W' in star.baseCode)]
 
-        jumpStations = [star for star in self.galaxy.ranges if \
-                        star.tradeCount > 0]
+        jumpStations = [star for star in self.galaxy.ranges if star.tradeCount > 0]
 
         self.logger.info('Important worlds: {}, jump stations: {}'.format(len(important), len(jumpStations)))
 
@@ -393,7 +394,7 @@ class XRouteCalculation(RouteCalculation):
     def get_route_between(self, star, target, trade, heuristic):
         try:
             route = nx.astar_path(self.galaxy.stars, star, target, heuristic)
-        except  nx.NetworkXNoPath:
+        except nx.NetworkXNoPath:
             return
         self.galaxy.ranges.add_edge(star, target, distance=star.hex_distance(target))
 
@@ -579,7 +580,7 @@ class TradeCalculation(RouteCalculation):
         """
         try:
             route = nx.astar_path(self.galaxy.stars, star, target, Star.heuristicDistance)
-        except  nx.NetworkXNoPath:
+        except nx.NetworkXNoPath:
             return
 
         # TODO: Generate the routes in both directions- A->B and B->A. 
@@ -722,7 +723,7 @@ class TradeCalculation(RouteCalculation):
             # If we can't find a route (no jump 4 path) skip this pair
             try:
                 route = nx.astar_path(self.galaxy.stars, star, target)
-            except  nx.NetworkXNoPath:
+            except nx.NetworkXNoPath:
                 continue
 
             # Gather basic statistics. 
@@ -933,7 +934,7 @@ class CommCalculation(RouteCalculation):
     def get_route_between(self, star, target):
         try:
             route = nx.astar_path(self.galaxy.stars, star, target, Star.heuristicDistance)
-        except  nx.NetworkXNoPath:
+        except nx.NetworkXNoPath:
             return
 
         trade = self.calc_trade(19) if AllyGen.are_allies(u'As', star.alg) else self.calc_trade(23)

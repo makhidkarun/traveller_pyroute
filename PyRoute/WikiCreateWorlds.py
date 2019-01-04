@@ -165,7 +165,7 @@ No information yet available.
         source_text = '{{Sources\n'
         index = 1
         for source in sources:
-            source_text += " |S{}={}\n".format(index,source)
+            source_text += " |S{}={}\n".format(index, source)
             index += 1
 
         source_text += "}}\n"
@@ -200,7 +200,7 @@ No information yet available.
         return bases
 
     def get_nobility(self, star):
-        if len(str(star.nobles)) :
+        if len(str(star.nobles)):
             nobility = '''
 === Imperial High / Landed Nobility ===
 {{{{Imperial Nobility|name= {}|Noble={} }}}}
