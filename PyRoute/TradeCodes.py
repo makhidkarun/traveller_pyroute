@@ -59,8 +59,8 @@ class TradeCodes(object):
             self.sophont_list.append(sophont)
             homeworlds_found.append(homeworld)
 
-        self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.sophont_list) - set(
-            homeworlds_found) - self.xcode
+        self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.sophont_list)\
+            - set(homeworlds_found) - self.xcode
         self.codeset = sorted(list(self.codeset))
 
         if len(self.pcode) > 0:
