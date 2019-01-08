@@ -1,15 +1,15 @@
 #!/usr/bin/python
-'''
+"""
 Created on Apr 12, 2014
 
 @author: tjoneslo
 
-Post-processor for the route generator to produce the needed output files 
+Post-processor for the route generator to produce the needed output files
 for Traveller Map. This produces a set of files (one per sector) of
-XML tags for the routes as specified by the TravellerMap conventions. 
+XML tags for the routes as specified by the TravellerMap conventions.
 
 
-'''
+"""
 
 import re
 import math
@@ -19,31 +19,34 @@ import xml.etree.ElementTree as ET
 import os
 import codecs
 import string
+from xml.dom import minidom
+
 
 def sort_key(aString):
     return aString[-8:-3]
 
-from xml.dom import minidom
 
 def prettify(elem):
-    """Return a pretty-printed XML string for the Element.
+    """
+    Return a pretty-printed XML string for the Element.
     """
     rough_string = ET.tostring(elem, 'utf-8')
     rough_string = string.replace(rough_string, '\r\n', '\n')
     rough_string = string.replace(rough_string, '\n', '')
     rough_string = string.replace(rough_string, '>    <', '><')
-    rough_string = string.replace(rough_string, '>  <','><')
+    rough_string = string.replace(rough_string, '>  <', '><')
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
-def output_link (start, end, color, routeType, sectorStart, sectorEnd):
+
+def output_link(start, end, color, routeType, sectorStart, sectorEnd):
     output = ET.Element('Route', {'Start': start, 'End': end, 'Color': color, 'Type': routeType})
 
     if sectorStart == sectorEnd:
         return (output, None)
 
     outStart = output
-    outEnd   = ET.Element('Route', {'Start': end, 'End': start, 'Color': color, 'Type': routeType})
+    outEnd = ET.Element('Route', {'Start': end, 'End': start, 'Color': color, 'Type': routeType})
     startx = int(start[0:2])
     starty = int(start[2:4])
     endx = int(end[0:2])
@@ -62,7 +65,7 @@ def output_link (start, end, color, routeType, sectorStart, sectorEnd):
         outStart.attrib['EndOffsetY'] = '1'
         outEnd.attrib['EndOffsetY'] = '-1'
 
-    return (outStart,outEnd)
+    return (outStart, outEnd)
 
 
 if __name__ == '__main__':
@@ -73,11 +76,11 @@ if __name__ == '__main__':
     parser.add_argument('output_dir', help='output directory for xml metadata')
     args = parser.parse_args()
 
-    tradeColors = ['#99FF0000','#BFFFFF00', '#8000BF00', '#9900FFFF', '#990000FF', '#BF800080', 'violet' ]
+    tradeColors = ['#99FF0000', '#BFFFFF00', '#8000BF00', '#9900FFFF', '#990000FF', '#BF800080', 'violet']
 
-    regex = ".*\((.*) (\d\d\d\d)\).*\((.*) (\d\d\d\d)\) .* 'trade': ([0-9]*[L]?)" 
+    regex = ".*\((.*) (\d\d\d\d)\).*\((.*) (\d\d\d\d)\) .* 'trade': ([0-9]*[L]?)"
     match = re.compile(regex)
-    #Kuunaa (Core 0304) Irkigkhan (Core 0103) {'distance': 2, 'btn': 13, 'weight': 41, 'trade': 1000000000}
+    # Kuunaa (Core 0304) Irkigkhan (Core 0103) {'distance': 2, 'btn': 13, 'weight': 41, 'trade': 1000000000}
     sectors = defaultdict(list)
 
     with open(args.route_file) as f:
@@ -88,17 +91,17 @@ if __name__ == '__main__':
             sectorEnd = data[2]
             end = data[3]
             trade = long(data[4])
-            
+
             if trade == 0:
                 continue
-            
-            btn = int(math.log(trade,10))
-            
+
+            btn = int(math.log(trade, 10))
+
             if btn - 8 < 0:
                 continue
-            color = tradeColors[btn-8]
-            routeType = 'btn%02d'%btn
-    
+            color = tradeColors[btn - 8]
+            routeType = 'btn%02d' % btn
+
             (outStart, outEnd) = output_link(start, end, color, routeType, sectorStart, sectorEnd)
 
             sectors[sectorStart].append(outStart)
@@ -110,7 +113,7 @@ if __name__ == '__main__':
         path = os.path.join(args.metadata_source, '%s.xml' % sector)
         tree.parse(path)
         routes = tree.find('Routes')
-        if routes is not None: 
+        if routes is not None:
             for route in routes.iter('Route'):
                 if route.attrib.get('Type', '').startswith('btn'):
                     routes.remove(route)

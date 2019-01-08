@@ -1,8 +1,8 @@
-'''
+"""
 Created on Dec 27, 2017
 
 @author: tjoneslo
-'''
+"""
 
 import logging
 import argparse
@@ -13,10 +13,11 @@ from wikitools.page import Page
 
 logger = logging.getLogger('WikiCreateWorlds')
 
+
 class WikiCreateWorld(object):
-    '''
+    """
     classdocs
-    '''
+    """
     page_template = '''{{{{UWP
  |name    = {{{{World|{full name}|{sector}|{subsector}|{pos}}}}}
  |system  = 
@@ -139,9 +140,9 @@ No information yet available.
 '''
 
     def __init__(self):
-        '''
+        """
         Constructor
-        '''
+        """
 
     def get_star_template(self, star):
         if len(star.star_list) == 1:
@@ -150,7 +151,7 @@ No information yet available.
         elif len(star.star_list) == 2:
             star_template = self.binaryTemplate.format(star.name, star.star_list[0], star.star_list[1])
             star_category = '[[Category: Binary Star System]]'
-        elif len (star.star_list) == 3:
+        elif len(star.star_list) == 3:
             star_template = self.trinaryTemplate.format(star.name, star.star_list[0], star.star_list[1], star.star_list[2])
             star_category = '[[Category: Trinary Star System]]'
         else:
@@ -164,7 +165,7 @@ No information yet available.
         source_text = '{{Sources\n'
         index = 1
         for source in sources:
-            source_text += " |S{}={}\n".format(index,source)
+            source_text += " |S{}={}\n".format(index, source)
             index += 1
 
         source_text += "}}\n"
@@ -172,7 +173,7 @@ No information yet available.
         return source_text
 
     def get_categories(self, star, categories):
-        #base_categories = ['[[Category: First Imperium worlds]]', '[[Category: Humaniti worlds]]', '[[Category: Rule of Man worlds]]',
+        # base_categories = ['[[Category: First Imperium worlds]]', '[[Category: Humaniti worlds]]', '[[Category: Rule of Man worlds]]',
         #                   '[[Category: Second Imperium worlds]]','[[Category: Ziru Sirka worlds]]']
         base_categories = []
         if star:
@@ -199,7 +200,7 @@ No information yet available.
         return bases
 
     def get_nobility(self, star):
-        if len(str(star.nobles)) :
+        if len(str(star.nobles)):
             nobility = '''
 === Imperial High / Landed Nobility ===
 {{{{Imperial Nobility|name= {}|Noble={} }}}}
@@ -238,16 +239,17 @@ No information yet available.
         return page_text
 
     def read_sector(self, sectors):
-        galaxy = Galaxy (12)
+        galaxy = Galaxy(12)
         galaxy.read_sectors(sectors, 'fixed', 'scaled')
         return galaxy
+
 
 def get_category_list(category_files):
     category_list = {}
     for cat in category_files:
         cat_name = '[[Category: {}]]'.format(os.path.splitext(os.path.basename(cat))[0].replace('_', ' '))
         cat_worlds = get_skip_list(cat)
-        logger.debug ("processing category: {} -> {} of {}".format(cat, cat_name, cat_worlds))
+        logger.debug("processing category: {} -> {} of {}".format(cat, cat_name, cat_worlds))
 
         for world in cat_worlds:
             if world.strip() in category_list:
@@ -256,6 +258,7 @@ def get_category_list(category_files):
                 category_list[world.strip()] = [cat_name]
 
     return category_list
+
 
 def get_sources_list(sources_files):
     sources_list = {}
@@ -276,11 +279,13 @@ def get_skip_list(name):
         skip_list = f.read().splitlines()
     return skip_list
 
+
 def get_max_list():
     with open('Zar_max_present.txt') as f:
         max_list = f.read().splitlines()
 
     return max_list
+
 
 def set_logging(level):
     log = logging.getLogger()
@@ -291,6 +296,7 @@ def set_logging(level):
     ch.setLevel(level)
     ch.setFormatter(formatter)
     log.addHandler(ch)
+
 
 def process():
     parser = argparse.ArgumentParser(description='Traveller Wiki create world articles.', fromfile_prefix_chars='@')
@@ -339,12 +345,13 @@ def process():
 
         new_page = worlds.create_page(star, categories, sources, title)
 
-        #print new_page
-        #print "=============================================="
+        # print new_page
+        # print "=============================================="
         if args.save:
             logger.info("Saving Page: %s", wiki_page.title)
             result = wiki_review.save_page(wiki_page, new_page, create=True)
             logger.info("Save result: %s", result)
+
 
 if __name__ == '__main__':
     process()

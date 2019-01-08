@@ -1,35 +1,36 @@
-'''
+"""
 Created on Oct 3, 2017
 
 @author: tjoneslo
-'''
+"""
 
 import re
 import logging
 import sys
 
+
 class TradeCodes(object):
-    '''
+    """
     Trade Codes manage the complete set of trade codes for a world
-    '''
+    """
     pcodes = ['As', 'De', 'Ga', 'Fl', 'He', 'Ic', 'Oc', 'Po', 'Va', 'Wa']
-    dcodes = ['Cp', 'Cx', 'Cs', 'Mr', 'Da', 'Di', 'Pz', 'An', 'Ab', 'Fo', 'Px', 
-              'Re', 'Rs', 'Sa', 'Tz', 'Lk', 
-              'RsA', 'RsB','RsG','RsD','RsE','RsZ', 'RsT', 'RsI', 'RsK',
+    dcodes = ['Cp', 'Cx', 'Cs', 'Mr', 'Da', 'Di', 'Pz', 'An', 'Ab', 'Fo', 'Px',
+              'Re', 'Rs', 'Sa', 'Tz', 'Lk',
+              'RsA', 'RsB', 'RsG', 'RsD', 'RsE', 'RsZ', 'RsT', 'RsI', 'RsK',
               'Fr', 'Co', 'Tp', 'Ho', 'Tr', 'Tu',
-              'Cm', 'Tw' ]
+              'Cm', 'Tw']
     ex_codes = set(['As', 'Fl', 'Ic', 'De', 'Na', 'Va', 'Wa', 'He', 'Oc'])
-    research = {'RsA': u'\u0391', 'RsB': u'\u0392', 'RsG': u'\u0393', 
+    research = {'RsA': u'\u0391', 'RsB': u'\u0392', 'RsG': u'\u0393',
                 'RsD': u'\u0394', 'RdE': u'\u0395', 'RsZ': u'\u0396',
                 'RsT': u'\u0398', 'RsI': u'\u0399', 'RsK': u'\u039A'}
-    pcolor = {'As': '#8E9397', 'De': '#d17533', 'Fl': '#e37dff', 'He': '#ff6f0c', 'Ic':'#A5F2F3',
+    pcolor = {'As': '#8E9397', 'De': '#d17533', 'Fl': '#e37dff', 'He': '#ff6f0c', 'Ic': '#A5F2F3',
               'Oc': '#0094ED', 'Po': '#6a986a', 'Va': '#c9c9c9', 'Wa': '#4abef4'}
     ext_codes = set(['Lt', 'Ht', 'Lg', 'Hg'])
-    
+
     def __init__(self, initial_codes):
-        '''
+        """
         Constructor
-        '''
+        """
         self.logger = logging.getLogger('PyRoute.TradeCodes')
         self.codes = initial_codes.split()
         self.pcode = set(TradeCodes.pcodes) & set(self.codes)
@@ -39,7 +40,7 @@ class TradeCodes(object):
         self.owned = [code for code in self.codes if code.startswith(u'O:') or code.startswith(u'C:')]
 
         self.homeworld_list = []
-        self.sophont_list= []
+        self.sophont_list = []
         homeworlds_found = []
 
         self.sophont_list = [code for code in self.codes if re.match(ur"\w{4}(\d|W)", code, re.U)]
@@ -47,7 +48,7 @@ class TradeCodes(object):
         for homeworld in re.findall(ur"[Di]*\([^)]+\)\d?", initial_codes, re.U):
             sophont = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
             self.homeworld_list.append(sophont)
-            match =  re.match(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W)?', homeworld)
+            match = re.match(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W)?', homeworld)
             if match is None:
                 self.logger.error("Unable to process %s", initial_codes)
                 sys.exit(1)
@@ -58,7 +59,8 @@ class TradeCodes(object):
             self.sophont_list.append(sophont)
             homeworlds_found.append(homeworld)
 
-        self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.sophont_list) - set(homeworlds_found) - self.xcode
+        self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.sophont_list)\
+            - set(homeworlds_found) - self.xcode
         self.codeset = sorted(list(self.codeset))
 
         if len(self.pcode) > 0:
@@ -87,15 +89,14 @@ class TradeCodes(object):
         hydro = '0123456789A' if hydro is None else hydro
         check = True
         if star.size in size and star.atmo in atmo and star.hydro in hydro \
-            and code not in self.codeset:
+                and code not in self.codeset:
             self.logger.error(u'{}-{} Calculated "{}" not in trade codes {}'.format(star, star.uwp, code, self.codeset))
             check = False
         if code in self.codeset and \
-            not (star.size in size and star.atmo in atmo and star.hydro in hydro):
+                not (star.size in size and star.atmo in atmo and star.hydro in hydro):
             self.logger.error(u'{}-{} Found invalid "{}" in trade codes: {}'.format(star, star.uwp, code, self.codeset))
             check = False
         return check
-
 
     def _check_pop_code(self, star, code, pop):
         check = True
@@ -103,10 +104,11 @@ class TradeCodes(object):
             self.logger.error(u'{} - Calculated "{}" not in trade codes {}'.format(star, code, self.codeset))
             check = False
         if code in self.codeset and star.pop not in pop:
-            self.logger.error(u'{} - Found invalid "{}" code on world with {} population: {}'.format(star, code, star.pop, self.codeset))
+            self.logger.error(
+                u'{} - Found invalid "{}" code on world with {} population: {}'.format(star, code, star.pop,
+                                                                                       self.codeset))
             check = False
         return check
-
 
     def _check_econ_code(self, star, code, atmo, hydro, pop):
         atmo = '0123456789ABCDEF' if atmo is None else atmo
@@ -114,15 +116,14 @@ class TradeCodes(object):
         pop = '0123456789ABCD' if pop is None else pop
         check = True
         if star.atmo in atmo and star.hydro in hydro and star.pop in pop \
-            and code not in self.codeset:
+                and code not in self.codeset:
             self.logger.error(u'{}-{} Calculated "{}" not in trade codes {}'.format(star, star.uwp, code, self.codeset))
             check = False
         if code in self.codeset and \
-            not (star.atmo in atmo and star.hydro in hydro and star.pop in pop):
+                not (star.atmo in atmo and star.hydro in hydro and star.pop in pop):
             self.logger.error(u'{}-{} Found invalid "{}" in trade codes: {}'.format(star, star.uwp, code, self.codeset))
             check = False
         return check
-
 
     def check_world_codes(self, star):
         check = True
@@ -137,7 +138,7 @@ class TradeCodes(object):
         check = self._check_planet_code(star, 'Va', None, '0', None) and check
         check = self._check_planet_code(star, 'Wa', '3456789', '3456789DEF', 'A') and check
 
-        #self._check_pop_code('Ba', '0')
+        # self._check_pop_code('Ba', '0')
         check = self._check_pop_code(star, 'Lo', '123') and check
         check = self._check_pop_code(star, 'Ni', '456') and check
         check = self._check_pop_code(star, 'Ph', '8') and check
@@ -148,13 +149,13 @@ class TradeCodes(object):
         check = self._check_econ_code(star, 'Na', '0123', '0123', '6789ABCD') and check
         check = self._check_econ_code(star, 'Pi', '012479', None, '78') and check
         check = self._check_econ_code(star, 'In', '012479ABC', None, '9ABCD') and check
-        check = self._check_econ_code(star, 'Pr', '68', None,'59') and check
+        check = self._check_econ_code(star, 'Pr', '68', None, '59') and check
         check = self._check_econ_code(star, 'Ri', '68', None, '678') and check
         return check
 
     def owned_by(self, star):
         self.ownedBy = star
-        if star.gov == '6': 
+        if star.gov == '6':
             self.ownedBy = None
         for code in self.dcode:
             if code.startswith(u'O:'):
@@ -170,23 +171,22 @@ class TradeCodes(object):
             elif code.startswith(u'Px'):
                 self.ownedBy = 'Px'
         if (star.gov == '6' and not self.ownedBy) or (star.gov != '6' and self.ownedBy != star):
-            self.logger.debug (u"{} has incorrect government code {} - {}".format(star, star.gov, self.dcode))
+            self.logger.debug(u"{} has incorrect government code {} - {}".format(star, star.gov, self.dcode))
         return self.ownedBy
-
 
     def owners(self, sector_name):
         if not sector_name:
             return [code for code in self.owned if code.startswith('O:')]
         else:
-            return [code if len(code) > 6 else u'O:'+ sector_name[0:4] + u'-' + code[2:]
-                  for code in self.owned if code.startswith(u'O:')]
+            return [code if len(code) > 6 else u'O:' + sector_name[0:4] + u'-' + code[2:]
+                    for code in self.owned if code.startswith(u'O:')]
 
-    def colonies(self,sector_name):
+    def colonies(self, sector_name):
         if not sector_name:
             return [code for code in self.owned if code.startswith(u'C:')]
-        else: 
-            return [code if len(code) > 6 else u'C:'+ sector_name[0:4] + u'-' + code[2:]
-                 for code in self.owned if code.startswith(u'C:')]
+        else:
+            return [code if len(code) > 6 else u'C:' + sector_name[0:4] + u'-' + code[2:]
+                    for code in self.owned if code.startswith(u'C:')]
 
     @property
     def homeworld(self):
@@ -213,11 +213,11 @@ class TradeCodes(object):
         return 'Po' in self.codeset
 
     @property
-    def nonagricultural (self):
+    def nonagricultural(self):
         return 'Na' in self.codeset
 
     @property
-    def barren (self):
+    def barren(self):
         return 'Ba' in self.codeset or 'Di' in self.codeset
 
     @property
@@ -229,11 +229,11 @@ class TradeCodes(object):
         return 'Ni' in self.codeset
 
     @property
-    def high (self):
+    def high(self):
         return 'Hi' in self.codeset
 
     @property
-    def asteroid (self):
+    def asteroid(self):
         return 'As' in self.codeset
 
     @property
@@ -253,27 +253,27 @@ class TradeCodes(object):
         return 'Wa' in self.codeset or 'Oc' in self.codeset
 
     @property
-    def extreme (self):
+    def extreme(self):
         return len(self.ex_codes & set(self.dcode)) > 0
 
     @property
-    def capital (self):
+    def capital(self):
         return 'Cp' in self.dcode or 'Cx' in self.dcode or 'Cs' in self.dcode
 
     @property
-    def subsector_capital (self):
+    def subsector_capital(self):
         return 'Cp' in self.dcode
 
     @property
-    def sector_capital (self):
+    def sector_capital(self):
         return 'Cs' in self.dcode
 
     @property
-    def other_capital (self):
+    def other_capital(self):
         return 'Cx' in self.dcode
 
     @property
-    def research_station (self):
+    def research_station(self):
         return set(self.research.keys()).intersection(self.dcode)
 
     @property
