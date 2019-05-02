@@ -41,6 +41,9 @@ class Allegiance(AreaItem):
         self.code = code
         self.base = base
 
+    def allegiance_name(self):
+        return self.name
+    
     def wiki_name(self):
         if self.code.startswith('Na'):
             names = self.name.split(',') if ',' in self.name else [self.name, '']
@@ -83,6 +86,9 @@ class Subsector(AreaItem):
     def wiki_title(self):
         return u'{0} - {1}'.format(self.wiki_name(), self.sector.wiki_name())
 
+    def sector_name(self):
+        return self.name[:-9] if self.name.endswith(u'Subsector') else self.name
+
     def set_bounding_subsectors(self):
         posrow = 0
         for row in self.positions:
@@ -114,10 +120,14 @@ class Subsector(AreaItem):
 
 class Sector(AreaItem):
     def __init__(self, name, position):
-        super(Sector, self).__init__(name[0:].strip())
+        # The name as passed from the Galaxy read include the comment marker at the start of the line
+        # So strip the comment marker, then strip spaces.
+        super(Sector, self).__init__(name[1:].strip())
 
+        # Same here, the position has a leading comment marker
         self.x = int(position[1:].split(',')[0])
         self.y = int(position[1:].split(',')[1])
+        
         self.dx = self.x * 32
         self.dy = self.y * 40
         self.subsectors = {}
@@ -147,29 +157,12 @@ class Galaxy(object):
     """
     classdocs
     """
-    regex = """
-^(\d\d\d\d) +
-(.{15,}) +
-(\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?) +
-(.{15,}) +
-((\{ *[+-]?[0-6] ?\}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]| -)|( ) ( ) ( )) +
-(\w{1,5}|-| ) +
-(\w{1,3}|-|\*) +
-(\w|-| ) +
-([0-9X?][0-9A-FX?][0-9A-FX?]) +
-(\d{1,}| ) +
-([A-Z0-9?-][A-Za-z0-9?-]{1,3}) 
-(.*)
-"""
-
+ 
     def __init__(self, min_btn, max_jump=4, route_btn=8):
         """
        Constructor
         """
         self.logger = logging.getLogger('PyRoute.Galaxy')
-        star_regex = ''.join([line.rstrip('\n') for line in Galaxy.regex])
-        self.logger.debug("Pattern: %s" % star_regex)
-        self.starline = re.compile(star_regex)
         self.stars = nx.Graph()
         self.ranges = nx.Graph()
         self.sectors = {}
@@ -216,7 +209,7 @@ class Galaxy(object):
             for line in lines[lineno + 2:]:
                 if line.startswith('#') or len(line) < 20:
                     continue
-                star = Star.parse_line_into_star(line, self.starline, sec, pop_code, ru_calc)
+                star = Star.parse_line_into_star(line, sec, pop_code, ru_calc)
                 if star:
                     sec.worlds.append(star)
                     sec.subsectors[star.subsector()].worlds.append(star)

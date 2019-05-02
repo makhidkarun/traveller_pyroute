@@ -71,17 +71,17 @@ class WikiStats(object):
 
             area_type = "Sector"
             f.write('=== {} Statistics ===\n'.format(area_type))
-            f.write('==== {} ===='.format(sector.wiki_name()))
             for sector in self.galaxy.sectors.itervalues():
+                f.write('==== {} Sector ====\n'.format(sector.sector_name()))
                 self.text_area_long(f, "sector", sector)
-                f.write('\n\n;Polity Listing')
+                f.write('\n\n===== Polity Listing =====')
                 allegiances_sorted = AllyGen.sort_allegiances(sector.alg, self.match_alg)
                 self.logger.debug(
                     "Processing allegiance statistics for {} - {}\n Sorted: {}".format(sector.name, sector.alg,
                                                                                        allegiances_sorted))
                 for allegiance in allegiances_sorted:
                     f.write('\n')
-                    self.text_alg_statistics(f, "allegiance", allegiance, sector)
+                    self.text_alg_statistics(f, "Allegiance", allegiance, sector)
 
         path = os.path.join(self.galaxy.output_path, 'sectors_list.txt')
         with open(path, 'w+') as f:
@@ -159,15 +159,11 @@ class WikiStats(object):
             f.write('|}\n')
 
             area_type = "Allegiance"
-            f.write('=== {} Statistics ===\n'.format(area_type))
-            f.write('{| class=\"wikitable sortable\"\n')
-            f.write(u'! {} !! statistics\n'.format(area_type))
+            f.write(u'=== {} Statistics ===\n'.format(area_type))
             for allegiance in allegiances_sorted:
-                f.write('|-\n')
-                f.write(u'|{0}\n'.format(allegiance.wiki_title()))
-                f.write(u'|| ')
-                self.text_alg_statistics(f, "allegiance", allegiance)
-            f.write('|}\n')
+                f.write(u'==== {} ====\n'.format(allegiance.allegiance_name()))
+                self.text_alg_statistics(f, area_type, allegiance)
+                f.write('\n')
 
     def write_uwp_counts(self, f):
         from StatCalculation import ObjectStatistics
@@ -257,21 +253,20 @@ class WikiStats(object):
                     f.write('|| {:d},{:d}: {}\n'.format(sector.x, sector.y, subsector.position))
                     self.write_stats(f, subsector.stats)
             f.write('|}\n')
+
             area_type = "Subsector"
             f.write('=== {} Statistics ===\n'.format(area_type))
-            f.write('{| class="wikitable sortable"\n')
-            f.write('! {} !! statistics\n'.format(area_type))
             for sector in self.galaxy.sectors.itervalues():
                 subsectors = [s for s in sector.subsectors.itervalues()]
                 subsectors.sort(key=lambda s: s.position)
                 for subsector in subsectors:
+                    f.write('\n==== {} Subsector ====\n'.format(subsector.sector_name()))
                     self.text_area_long(f, "subsector", subsector)
-                    f.write('\n=== Polity Listing ===')
+                    f.write('\n\n===== Polity Listing =====')
                     allegiances_sorted = AllyGen.sort_allegiances(subsector.alg, self.match_alg)
                     for allegiance in allegiances_sorted:
                         f.write('\n')
                         self.text_alg_statistics(f, "subsector", allegiance, subsector)
-            f.write('|}\n')
 
     # This sector has <N> worlds, of which <N> have native gas giants.
     # The estimated population for the sector is <N size> sapients (not necessarily humans).
@@ -288,13 +283,11 @@ class WikiStats(object):
     # The average tech level in the sector is 6 (most lie between 3 and 9).
 
     def text_area_long(self, f, area_type, area):
-        f.write('|-\n')
-        f.write(u'|{}\n'.format(area.wiki_title()))
         if area_type == 'subsector':
-            f.write(u'|| {}, {} {} of {} '.format(area.wiki_name(), area_type,
+            f.write(u'{}, {} {} of {} '.format(area.wiki_name(), area_type,
                                                   area.position, area.sector.wiki_name()))
         else:
-            f.write(u'|| The {} {} '.format(area.wiki_name(), area_type))
+            f.write(u'The {} {} '.format(area.wiki_name(), area_type))
 
         if len(area.worlds) == 0:
             f.write('contains no charted worlds.\n')
@@ -377,8 +370,6 @@ class WikiStats(object):
                 f.write('. ')
 
         self.text_area_pop_tl(f, area_type, area)
-        if area_type != 'subsector':
-            self.text_area_capitals(f, area_type, area)
 
     def text_area_populations(self, f, area):
         f.write(u'estimated population of ')

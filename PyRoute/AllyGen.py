@@ -13,7 +13,7 @@ class AllyGen(object):
     """
     classdocs
     """
-    noOne = [u'--', u'??']
+    noOne = [u'--', u'??', u'Xx']
     nonAligned = [u'Na', u'Ns', u'Va', u'Cs', u'Hc', u'NaHu', u'NaDr', u'NaVa', u'NaAs', u'NaXx', u'VaEx', u'NaSo',
                   u'CsCa', u'CsHv', u'CsIm', u'CsMP', u'CsVa', u'CsZh', u'CsRe', u'CsMo', u'CsRr',
                   u'Wild']
