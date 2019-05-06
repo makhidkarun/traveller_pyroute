@@ -13,7 +13,7 @@ import math
 import networkx as nx
 
 from Star import Star
-from TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation, XRouteCalculation, \
+from  TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation, XRouteCalculation, \
     OwnedWorldCalculation
 from StatCalculation import ObjectStatistics
 from AllyGen import AllyGen
@@ -29,10 +29,10 @@ class AreaItem(object):
         return self.wiki_name()
 
     def wiki_name(self):
-        return u'[[{}]]'.format(self.name)
+        return '[[{}]]'.format(self.name)
 
     def __str__(self):
-        return u'{}'.format(self.name)
+        return '{}'.format(self.name)
 
 
 class Allegiance(AreaItem):
@@ -47,17 +47,17 @@ class Allegiance(AreaItem):
     def wiki_name(self):
         if self.code.startswith('Na'):
             names = self.name.split(',') if ',' in self.name else [self.name, '']
-            return u'[[{}]] {}'.format(names[0], names[1].strip())
+            return '[[{}]] {}'.format(names[0], names[1].strip())
         elif self.code.startswith('Cs'):
             names = self.name.split(',') if ',' in self.name else [self.name, '']
-            return u'[[{}]]s of the [[{}]]'.format(names[0].strip(), names[1].strip())
+            return '[[{}]]s of the [[{}]]'.format(names[0].strip(), names[1].strip())
         elif ',' in self.name:
             names = self.name.split(',')
-            return u'[[{}]], [[{}]]'.format(names[0].strip(), names[1].strip())
-        return u'[[{}]]'.format(self.name)
+            return '[[{}]], [[{}]]'.format(names[0].strip(), names[1].strip())
+        return '[[{}]]'.format(self.name)
 
     def __str__(self):
-        return u'{} ([{})'.format(self.name, self.code)
+        return '{} ([{})'.format(self.name, self.code)
 
 
 class Subsector(AreaItem):
@@ -76,18 +76,18 @@ class Subsector(AreaItem):
 
     def wiki_name(self):
         if len(self.name) == 0:
-            return u'Position {0}'.format(self.position)
+            return 'Position {0}'.format(self.position)
         else:
             if "(" in self.name:
-                return u'[[{0} Subsector|{1}]]'.format(self.name, self.name[:-7])
+                return '[[{0} Subsector|{1}]]'.format(self.name, self.name[:-7])
             else:
-                return u'[[{0} Subsector|{0}]]'.format(self.name)
+                return '[[{0} Subsector|{0}]]'.format(self.name)
 
     def wiki_title(self):
-        return u'{0} - {1}'.format(self.wiki_name(), self.sector.wiki_name())
+        return '{0} - {1}'.format(self.wiki_name(), self.sector.wiki_name())
 
     def sector_name(self):
-        return self.name[:-9] if self.name.endswith(u'Subsector') else self.name
+        return self.name[:-9] if self.name.endswith('Subsector') else self.name
 
     def set_bounding_subsectors(self):
         posrow = 0
@@ -138,13 +138,13 @@ class Sector(AreaItem):
         self.rimward = None
 
     def __str__(self):
-        return u"{} ({},{})".format(self.name, str(self.x), str(self.y))
+        return '{} ({},{})'.format(self.name, str(self.x), str(self.y))
 
     def sector_name(self):
-        return self.name[:-7] if self.name.endswith(u'Sector') else self.name
+        return self.name[:-7] if self.name.endswith('Sector') else self.name
 
     def wiki_name(self):
-        return u'[[{0} Sector|{0}]]'.format(self.sector_name())
+        return '[[{0} Sector|{0}]]'.format(self.sector_name())
 
     def find_world_by_pos(self, pos):
         for world in self.worlds:
@@ -236,14 +236,14 @@ class Galaxy(object):
             area.alg.setdefault(star.alg, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
 
     def set_positions(self):
-        for sector in self.sectors.itervalues():
+        for sector in self.sectors.values():
             for star in sector.worlds:
                 self.stars.add_node(star)
                 self.ranges.add_node(star)
         self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
 
     def set_bounding_sectors(self):
-        for sector, neighbor in itertools.combinations(self.sectors.itervalues(), 2):
+        for sector, neighbor in itertools.combinations(self.sectors.values(), 2):
             if sector.x - 1 == neighbor.x and sector.y == neighbor.y:
                 sector.spinward = neighbor
                 neighbor.trailing = sector
@@ -260,8 +260,8 @@ class Galaxy(object):
                 self.logger.error("Duplicate sector %s and %s" % (sector.name, neighbor.name))
 
     def set_bounding_subsectors(self):
-        for sector in self.sectors.itervalues():
-            for subsector in sector.subsectors.itervalues():
+        for sector in self.sectors.values():
+            for subsector in sector.subsectors.values():
                 subsector.set_bounding_subsectors()
 
     def generate_routes(self, routes, reuse=10):
@@ -298,15 +298,15 @@ class Galaxy(object):
             nx.write_edgelist(self.stars, f, data=True)
         path = os.path.join(self.output_path, 'borders.txt')
         with codecs.open(path, "wb", "utf-8") as f:
-            for key, value in self.borders.borders.iteritems():
-                f.write(u"{}-{}: border: {}\n".format(key[0], key[1], value))
+            for key, value in self.borders.borders.items():
+                f.write("{}-{}: border: {}\n".format(key[0], key[1], value))
 
         if routes == 'xroute':
             path = os.path.join(self.output_path, 'stations.txt')
             with codecs.open(path, "wb", 'utf-8') as f:
                 stars = [star for star in self.stars if star.tradeCount > 0]
                 for star in stars:
-                    f.write(u"{} - {}\n".format(star, star.tradeCount))
+                    f.write("{} - {}\n".format(star, star.tradeCount))
 
     def process_eti(self):
         self.logger.info("Processing ETI for worlds")
@@ -380,7 +380,7 @@ class Galaxy(object):
                     ownedHex = world.ownedBy[5:]
                     owner = None
                     self.logger.debug(
-                        u"World {}@({},{}) owned by {} - {}".format(world, world.col, world.row, ownedSec, ownedHex))
+                        "World {}@({},{}) owned by {} - {}".format(world, world.col, world.row, ownedSec, ownedHex))
                     if world.col < 4 and world.sector.spinward:
                         owner = world.sector.spinward.find_world_by_pos(ownedHex)
                     elif world.col > 28 and world.sector.trailing:
@@ -397,18 +397,18 @@ class Galaxy(object):
                 elif len(world.ownedBy) == 4:
                     owner = world.sector.find_world_by_pos(world.ownedBy)
 
-                self.logger.debug(u"Worlds {} is owned by {}".format(world, owner))
+                self.logger.debug("Worlds {} is owned by {}".format(world, owner))
 
-                ow_path_items = [u'"{}"'.format(world), u'"{}"'.format(owner)]
-                ow_path_items.extend([u'"{}"'.format(item) for item in ownedBy[0:4]])
-                ow_path_world = u', '.join(ow_path_items)
-                f.write(ow_path_world + u'\n')
+                ow_path_items = ['"{}"'.format(world), '"{}"'.format(owner)]
+                ow_path_items.extend(['"{}"'.format(item) for item in ownedBy[0:4]])
+                ow_path_world = ', '.join(ow_path_items)
+                f.write(ow_path_world + '\n')
 
-                ow_list_items = [u'"{}"'.format(world.sector.name[0:4])]
-                ow_list_items.append(u'"{}"'.format(world.position))
-                ow_list_items.append(u'"{}"'.format(owner))
-                ow_list_items.extend([u'"O:{}"'.format(item.sec_pos(world.sector)) for item in ownedBy[0:4]])
-                ow_list_world = u', '.join(ow_list_items)
-                g.write(ow_list_world + u'\n')
+                ow_list_items = ['"{}"'.format(world.sector.name[0:4])]
+                ow_list_items.append('"{}"'.format(world.position))
+                ow_list_items.append('"{}"'.format(owner))
+                ow_list_items.extend(['"O:{}"'.format(item.sec_pos(world.sector)) for item in ownedBy[0:4]])
+                ow_list_world = ', '.join(ow_list_items)
+                g.write(ow_list_world + '\n')
 
                 world.ownedBy = (owner, ownedBy[0:4])

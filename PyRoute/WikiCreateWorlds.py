@@ -7,8 +7,8 @@ Created on Dec 27, 2017
 import logging
 import argparse
 import os
-from Galaxy import Galaxy
-from WikiReview import WikiReview
+from .Galaxy import Galaxy
+from .WikiReview import WikiReview
 from wikitools.page import Page
 
 logger = logging.getLogger('WikiCreateWorlds')
@@ -338,7 +338,7 @@ def process():
 
         # Alpha (world)
         title = wiki_page.title[:-8]
-        logger.info(u"Processing {} -> {}".format(star.name, wiki_page.title))
+        logger.info("Processing {} -> {}".format(star.name, wiki_page.title))
 
         categories = category_list[star.name] if star.name in category_list else None
         sources = sources_list[star.name] if star.name in sources_list else []

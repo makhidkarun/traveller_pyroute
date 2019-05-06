@@ -2,8 +2,8 @@ import os
 import logging
 import math
 import itertools
-from SubsectorMap2 import GraphicSubsectorMap
-from Galaxy import Galaxy
+from .SubsectorMap2 import GraphicSubsectorMap
+from .Galaxy import Galaxy
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -50,9 +50,9 @@ class DrawArcsTest(GraphicSubsectorMap):
 
     def write_maps(self):
         self.logger.info("writing test maps")
-        sector = self.galaxy.sectors.itervalues().next()
+        sector = next(iter(self.galaxy.sectors.values()))
         self.logger.info("Processing sector %s" % sector.name)
-        self.subsector = sector.subsectors.itervalues().next()
+        self.subsector = next(iter(sector.subsectors.values()))
         img = self.document(sector)
         self.write_base_map(img, self.subsector)
         self.draw_arcs(img)
@@ -65,15 +65,15 @@ class DrawArcsTest(GraphicSubsectorMap):
         draw = ImageDraw.Draw(img)
 
         start = self.centerpoint(1, 1)
-        for row, col in itertools.product(range(0, 4), range(0, 4)):
+        for row, col in itertools.product(list(range(0, 4)), list(range(0, 4))):
             self.draw_one_arc(draw, start, self.centerpoint(row, col))
 
         start = self.centerpoint(4, 4)
-        for row, col in itertools.product(range(3, 6), range(3, 6)):
+        for row, col in itertools.product(list(range(3, 6)), list(range(3, 6))):
             self.draw_one_arc(draw, start, self.centerpoint(row, col))
 
         start = self.centerpoint(8, 8)
-        for row, col in itertools.product(range(7, 12), range(7, 12)):
+        for row, col in itertools.product(list(range(7, 12)), list(range(7, 12))):
             self.draw_one_arc(draw, start, self.centerpoint(row, col))
 
         cropped = img.crop((53, 53, 760, 1067))

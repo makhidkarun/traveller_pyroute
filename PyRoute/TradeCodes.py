@@ -20,9 +20,9 @@ class TradeCodes(object):
               'Fr', 'Co', 'Tp', 'Ho', 'Tr', 'Tu',
               'Cm', 'Tw']
     ex_codes = set(['As', 'Fl', 'Ic', 'De', 'Na', 'Va', 'Wa', 'He', 'Oc'])
-    research = {'RsA': u'\u0391', 'RsB': u'\u0392', 'RsG': u'\u0393',
-                'RsD': u'\u0394', 'RdE': u'\u0395', 'RsZ': u'\u0396',
-                'RsT': u'\u0398', 'RsI': u'\u0399', 'RsK': u'\u039A'}
+    research = {'RsA': '\u0391', 'RsB': '\u0392', 'RsG': '\u0393',
+                'RsD': '\u0394', 'RdE': '\u0395', 'RsZ': '\u0396',
+                'RsT': '\u0398', 'RsI': '\u0399', 'RsK': '\u039A'}
     pcolor = {'As': '#8E9397', 'De': '#d17533', 'Fl': '#e37dff', 'He': '#ff6f0c', 'Ic': '#A5F2F3',
               'Oc': '#0094ED', 'Po': '#6a986a', 'Va': '#c9c9c9', 'Wa': '#4abef4'}
     ext_codes = set(['Lt', 'Ht', 'Lg', 'Hg'])
@@ -37,22 +37,22 @@ class TradeCodes(object):
         self.dcode = set(TradeCodes.dcodes) & set(self.codes)
         self.xcode = TradeCodes.ext_codes & set(self.codes)
 
-        self.owned = [code for code in self.codes if code.startswith(u'O:') or code.startswith(u'C:')]
+        self.owned = [code for code in self.codes if code.startswith('O:') or code.startswith('C:')]
 
         self.homeworld_list = []
         self.sophont_list = []
         homeworlds_found = []
 
-        self.sophont_list = [code for code in self.codes if re.match(ur"\w{4}(\d|W)", code, re.U)]
+        self.sophont_list = [code for code in self.codes if re.match(r"\w{4}(\d|W)", code, re.U)]
 
-        for homeworld in re.findall(ur"[Di]*\([^)]+\)\d?", initial_codes, re.U):
+        for homeworld in re.findall(r"[Di]*\([^)]+\)\d?", initial_codes, re.U):
             sophont = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
             self.homeworld_list.append(sophont)
             match = re.match(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W)?', homeworld)
             if match is None:
                 self.logger.error("Unable to process %s", initial_codes)
                 sys.exit(1)
-            if sophont.startswith(u"Di"):
+            if sophont.startswith("Di"):
                 sophont = "{code: <4}{pop}".format(code=match.group(1), pop='X')
             else:
                 sophont = "{code: <4}{pop}".format(code=match.group(1), pop=match.group(2) if match.group(2) else 'W')
@@ -75,10 +75,10 @@ class TradeCodes(object):
         self.dcode = sorted(self.dcode)
 
     def __str__(self):
-        return u" ".join(self.codeset + self.dcode)
+        return " ".join(self.codeset + self.dcode)
 
     def planet_codes(self):
-        return u" ".join(self.codeset)
+        return " ".join(self.codeset)
 
     def calculate_pcode(self):
         return self.pcode
@@ -90,22 +90,22 @@ class TradeCodes(object):
         check = True
         if star.size in size and star.atmo in atmo and star.hydro in hydro \
                 and code not in self.codeset:
-            self.logger.error(u'{}-{} Calculated "{}" not in trade codes {}'.format(star, star.uwp, code, self.codeset))
+            self.logger.error('{}-{} Calculated "{}" not in trade codes {}'.format(star, star.uwp, code, self.codeset))
             check = False
         if code in self.codeset and \
                 not (star.size in size and star.atmo in atmo and star.hydro in hydro):
-            self.logger.error(u'{}-{} Found invalid "{}" in trade codes: {}'.format(star, star.uwp, code, self.codeset))
+            self.logger.error('{}-{} Found invalid "{}" in trade codes: {}'.format(star, star.uwp, code, self.codeset))
             check = False
         return check
 
     def _check_pop_code(self, star, code, pop):
         check = True
         if star.pop in pop and code not in self.codeset:
-            self.logger.error(u'{} - Calculated "{}" not in trade codes {}'.format(star, code, self.codeset))
+            self.logger.error('{} - Calculated "{}" not in trade codes {}'.format(star, code, self.codeset))
             check = False
         if code in self.codeset and star.pop not in pop:
             self.logger.error(
-                u'{} - Found invalid "{}" code on world with {} population: {}'.format(star, code, star.pop,
+                '{} - Found invalid "{}" code on world with {} population: {}'.format(star, code, star.pop,
                                                                                        self.codeset))
             check = False
         return check
@@ -117,11 +117,11 @@ class TradeCodes(object):
         check = True
         if star.atmo in atmo and star.hydro in hydro and star.pop in pop \
                 and code not in self.codeset:
-            self.logger.error(u'{}-{} Calculated "{}" not in trade codes {}'.format(star, star.uwp, code, self.codeset))
+            self.logger.error('{}-{} Calculated "{}" not in trade codes {}'.format(star, star.uwp, code, self.codeset))
             check = False
         if code in self.codeset and \
                 not (star.atmo in atmo and star.hydro in hydro and star.pop in pop):
-            self.logger.error(u'{}-{} Found invalid "{}" in trade codes: {}'.format(star, star.uwp, code, self.codeset))
+            self.logger.error('{}-{} Found invalid "{}" in trade codes: {}'.format(star, star.uwp, code, self.codeset))
             check = False
         return check
 
@@ -158,35 +158,35 @@ class TradeCodes(object):
         if star.gov == '6':
             self.ownedBy = None
         for code in self.dcode:
-            if code.startswith(u'O:'):
+            if code.startswith('O:'):
                 if len(code) == 2:
                     self.ownedBy = 'XXXX'
                 else:
                     self.ownedBy = code[2:]
                 break
-            elif code.startswith(u'Mr'):
+            elif code.startswith('Mr'):
                 self.ownedBy = 'Mr'
-            elif code.startswith(u'Re'):
+            elif code.startswith('Re'):
                 self.ownedBy = 'Re'
-            elif code.startswith(u'Px'):
+            elif code.startswith('Px'):
                 self.ownedBy = 'Px'
         if (star.gov == '6' and not self.ownedBy) or (star.gov != '6' and self.ownedBy != star):
-            self.logger.debug(u"{} has incorrect government code {} - {}".format(star, star.gov, self.dcode))
+            self.logger.debug("{} has incorrect government code {} - {}".format(star, star.gov, self.dcode))
         return self.ownedBy
 
     def owners(self, sector_name):
         if not sector_name:
             return [code for code in self.owned if code.startswith('O:')]
         else:
-            return [code if len(code) > 6 else u'O:' + sector_name[0:4] + u'-' + code[2:]
-                    for code in self.owned if code.startswith(u'O:')]
+            return [code if len(code) > 6 else 'O:' + sector_name[0:4] + '-' + code[2:]
+                    for code in self.owned if code.startswith('O:')]
 
     def colonies(self, sector_name):
         if not sector_name:
-            return [code for code in self.owned if code.startswith(u'C:')]
+            return [code for code in self.owned if code.startswith('C:')]
         else:
-            return [code if len(code) > 6 else u'C:' + sector_name[0:4] + u'-' + code[2:]
-                    for code in self.owned if code.startswith(u'C:')]
+            return [code if len(code) > 6 else 'C:' + sector_name[0:4] + '-' + code[2:]
+                    for code in self.owned if code.startswith('C:')]
 
     @property
     def homeworld(self):
@@ -254,7 +254,7 @@ class TradeCodes(object):
 
     @property
     def extreme(self):
-        return len(self.ex_codes & set(self.dcode)) > 0
+        return len(self.ex_codes & set(self.codeset)) > 0
 
     @property
     def capital(self):

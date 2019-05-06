@@ -1,9 +1,9 @@
 from itertools import product
 import logging
 from PIL import Image, ImageDraw
-from Galaxy import Galaxy
-from HexMap import HexMap
-import route
+from PyRoute.Galaxy import Galaxy
+from PyRoute.HexMap import HexMap
+from PyRoute.route import route
 
 
 class GraphMap(object):
@@ -15,7 +15,7 @@ class GraphMap(object):
         self.min_btn = min_btn
         minx = miny = 20
         maxx = maxy = -20
-        for sector in self.galaxy.sectors.itervalues():
+        for sector in self.galaxy.sectors.values():
             if sector.x < minx:
                 self.dx = sector.x
                 self.gx = sector.dx
@@ -37,7 +37,7 @@ class GraphMap(object):
     def write_dot_map(self):
 
         draw = ImageDraw.Draw(self.image)
-        for x, y in product(range(self.sx), range(self.sy)):
+        for x, y in product(list(range(self.sx)), list(range(self.sy))):
             sx = x * 64
             sy = y * 80
 
@@ -59,7 +59,7 @@ class GraphMap(object):
         #    elif x % 16 == 0 or y % 20 == 0:
         #        self.image.putpixel((x,y), (0,0,128))
 
-        for x, y in product(range(self.sx * 32), range(self.sy * 40)):
+        for x, y in product(list(range(self.sx * 32)), list(range(self.sy * 40))):
             px = (x + 1) * 2 - 1
             py = (y + 1) * 2 - ((x + 1) & 1)
             self.image.putpixel((px, py), (0, 50, 0))
@@ -68,7 +68,7 @@ class GraphMap(object):
             self._draw_borders(wx, wy, px, py)
             # self._draw_borders(sector, world.col, world.row, x, y)
 
-        for sector in self.galaxy.sectors.itervalues():
+        for sector in self.galaxy.sectors.values():
             sx = (sector.x - self.dx) * 64
             sy = (sector.y - self.dy) * 80
 
@@ -110,14 +110,14 @@ class GraphMap(object):
         llineStart, llineEnd, lline = self._lline(pdf, width, colorname)
         rlineStart, rlineEnd, rline = self._rline(pdf, width, colorname)
 
-        for x in xrange(33):
+        for x in range(33):
             hlineStart.x_plus()
             hlineEnd.x_plus()
             self._hline_restart_y(x, hlineStart, hlineEnd)
             self._lline_restart_y(x, llineStart, llineEnd)
             self._rline_restart_y(x, rlineStart, rlineEnd)
 
-            for y in xrange(41):
+            for y in range(41):
                 hlineStart.y_plus()
                 hlineEnd.y_plus()
                 llineStart.y_plus()

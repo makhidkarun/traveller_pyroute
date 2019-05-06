@@ -72,7 +72,7 @@ class StatCalculation(object):
 
     def calculate_statistics(self):
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
-        for sector in self.galaxy.sectors.itervalues():
+        for sector in self.galaxy.sectors.values():
             if sector is None:
                 continue
             for star in sector.worlds:
@@ -100,18 +100,18 @@ class StatCalculation(object):
                     self.add_alg_stats(sector.subsectors[star.subsector()], star, star.alg_base)
 
                 if AllyGen.imperial_align(star.alg):
-                    for uwpCode, uwpValue in star.uwpCodes.iteritems():
+                    for uwpCode, uwpValue in star.uwpCodes.items():
                         self.add_stats(self.imp_uwp.stats(uwpCode, uwpValue), star)
 
-                for uwpCode, uwpValue in star.uwpCodes.iteritems():
+                for uwpCode, uwpValue in star.uwpCodes.items():
                     self.add_stats(self.all_uwp.stats(uwpCode, uwpValue), star)
 
             self.per_capita(sector.stats)  # Per capita sector stats
-            for subsector in sector.subsectors.itervalues():
+            for subsector in sector.subsectors.values():
                 self.per_capita(subsector.stats)
         self.per_capita(self.galaxy.stats)
 
-        for alg in self.galaxy.alg.itervalues():
+        for alg in self.galaxy.alg.values():
             self.per_capita(alg.stats)
 
     def add_alg_stats(self, area, star, alg):
@@ -202,11 +202,11 @@ class StatCalculation(object):
         self.logger.info('Charted star count: ' + str(self.galaxy.stats.number))
         self.logger.info('Charted population {:,d}'.format(self.galaxy.stats.population))
 
-        for sector in self.galaxy.sectors.itervalues():
-            self.logger.debug(u'Sector {} star count: {:,d}'.format(sector.name, sector.stats.number))
+        for sector in self.galaxy.sectors.values():
+            self.logger.debug('Sector {} star count: {:,d}'.format(sector.name, sector.stats.number))
 
-        for code, aleg in self.galaxy.alg.iteritems():
-            s = u'Allegiance {0} ({1}: base {3}) star count: {2:,d}'.format(aleg.name, code, aleg.stats.number,
+        for code, aleg in self.galaxy.alg.items():
+            s = 'Allegiance {0} ({1}: base {3}) star count: {2:,d}'.format(aleg.name, code, aleg.stats.number,
                                                                             aleg.base)
             self.logger.info(s)
 

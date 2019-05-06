@@ -108,7 +108,7 @@ class RouteCalculation(object):
         if not AllyGen.are_allies(star1.alg, star2.alg):
             btn -= 1
 
-        if star1.alg == u'Wild' or star2.alg == u'Wild':
+        if star1.alg == 'Wild' or star2.alg == 'Wild':
             btn -= 1
 
         if not distance:
@@ -229,7 +229,7 @@ class XRouteCalculation(RouteCalculation):
     def base_route_filter(self, star, neighbor):
         if not AllyGen.are_allies(star.alg, neighbor.alg):
             return True
-        if not AllyGen.are_allies(u'Im', star.alg):
+        if not AllyGen.are_allies('Im', star.alg):
             return True
         if star.zone in ['R', 'F'] or neighbor.zone in ['R', 'F']:
             return True
@@ -240,11 +240,11 @@ class XRouteCalculation(RouteCalculation):
         self.distance_weight = self.capSec_weight
         self.generate_base_routes()
         self.capital = [star for star in self.galaxy.ranges if \
-                        AllyGen.are_allies(u'Im', star.alg) and star.tradeCode.other_capital]
+                        AllyGen.are_allies('Im', star.alg) and star.tradeCode.other_capital]
         self.secCapitals = [star for star in self.galaxy.ranges if \
-                            AllyGen.are_allies(u'Im', star.alg) and star.tradeCode.sector_capital]
+                            AllyGen.are_allies('Im', star.alg) and star.tradeCode.sector_capital]
         self.subCapitals = [star for star in self.galaxy.ranges if \
-                            AllyGen.are_allies(u'Im', star.alg) and star.tradeCode.subsector_captial]
+                            AllyGen.are_allies('Im', star.alg) and star.tradeCode.subsector_captial]
 
     def routes_pass_1(self):
         # Pass 1: Get routes at J6  Capital and sector capitals 
@@ -287,7 +287,7 @@ class XRouteCalculation(RouteCalculation):
                     'rimtrail']:
                     localCapital['rimtrail'] = self.find_sector_capital(localCapital['trailing'].sector.rimward)
 
-            for neighbor in localCapital.itervalues():
+            for neighbor in localCapital.values():
                 if neighbor and not self.galaxy.ranges.has_edge(star, neighbor):
                     self.get_route_between(star, neighbor, self.calc_trade(25), Star.heuristicDistance)
 
@@ -296,7 +296,7 @@ class XRouteCalculation(RouteCalculation):
         self.reweight_routes(self.inSec_weight)
 
         secCapitals = self.secCapitals + self.capital
-        for sector in self.galaxy.sectors.itervalues():
+        for sector in self.galaxy.sectors.values():
 
             secCap = [star for star in secCapitals if star.sector == sector]
             self.logger.info(secCap)
@@ -325,7 +325,7 @@ class XRouteCalculation(RouteCalculation):
     def routes_pass_3(self):
         self.reweight_routes(self.impt_weight)
         important = [star for star in self.galaxy.ranges if \
-                     AllyGen.are_allies(u'Im', star.alg) and star.tradeCount == 0
+                     AllyGen.are_allies('Im', star.alg) and star.tradeCount == 0
                      and (star.importance >= 4 or 'D' in star.baseCode or 'W' in star.baseCode)]
 
         jumpStations = [star for star in self.galaxy.ranges if star.tradeCount > 0]
@@ -374,7 +374,7 @@ class XRouteCalculation(RouteCalculation):
         self.distance_weight = weightList
         for (star, neighbor, data) in self.galaxy.stars.edges(data=True):
             data['weight'] = self.route_weight(star, neighbor)
-            for _ in xrange(1, min(data['count'], 5)):
+            for _ in range(1, min(data['count'], 5)):
                 data['weight'] -= data['weight'] / self.route_reuse
 
     def find_nearest_capital(self, world, capitals):
@@ -684,7 +684,7 @@ class TradeCalculation(RouteCalculation):
                 dist += self.galaxy.stars[start][end]['distance']
                 weight += self.galaxy.stars[start][end]['weight']
             else:
-                print(start, end, self.galaxy.routes.has_edge(start, end))
+                print((start, end, self.galaxy.routes.has_edge(start, end)))
             start = end
 
         if len(route) > 6 and not usesJumpRoute:
@@ -819,7 +819,7 @@ class CommCalculation(RouteCalculation):
                self.important(star, min_importance) or self.is_rich(star)
 
     def generate_routes(self):
-        for alg in self.galaxy.alg.itervalues():
+        for alg in self.galaxy.alg.values():
             # No comm routes for the non-aligned worlds. 
             if AllyGen.is_nonaligned(alg):
                 continue
@@ -828,14 +828,14 @@ class CommCalculation(RouteCalculation):
                 self.logger.info("skipping Alg: {} with {} worlds".format(alg.name, len(alg.worlds)))
                 continue
             alg.min_importance = 4
-            self.logger.info(u"Alg {} has {} worlds".format(alg.name, len(alg.worlds)))
+            self.logger.info("Alg {} has {} worlds".format(alg.name, len(alg.worlds)))
             ix5_worlds = [star for star in alg.worlds if star.importance > alg.min_importance]
-            self.logger.info(u"Alg {} has {} ix 5 worlds".format(alg.name, len(ix5_worlds)))
+            self.logger.info("Alg {} has {} ix 5 worlds".format(alg.name, len(ix5_worlds)))
             if len(ix5_worlds) == 0 or len(ix5_worlds) < len(alg.worlds) / 1000:
                 alg.min_importance = 3
 
                 ix4_worlds = [star for star in alg.worlds if star.importance > 3]
-                self.logger.info(u"Alg {} has {} ix 5/4 worlds".format(alg.name, len(ix4_worlds)))
+                self.logger.info("Alg {} has {} ix 5/4 worlds".format(alg.name, len(ix4_worlds)))
                 if len(ix4_worlds) == 0 or len(ix4_worlds) < len(alg.worlds) / 100:
                     alg.min_importance = 2
                     self.logger.info("setting {} min importance to 2".format(alg.name))
@@ -860,7 +860,7 @@ class CommCalculation(RouteCalculation):
                 for neighbor in neighbors:
                     self.galaxy.ranges.remove_edge(star, neighbor)
             else:
-                self.logger.info(u"Route considered but not removed: {}".format(route))
+                self.logger.info("Route considered but not removed: {}".format(route))
 
         self.logger.info("Removed {} worlds".format(removed))
         self.logger.info("Routes: %s  -  connections: %s" %
@@ -895,7 +895,7 @@ class CommCalculation(RouteCalculation):
             weight += 25
         if star.port in 'DEX':
             weight += 25
-        # if star.zone in 'AU' or target.zone in 'AU':
+        # if star.zone in 'A' or target.zone in 'A':
         #    weight += 25
         if star.zone in 'RF' or target.zone in 'RF':
             weight += 50
@@ -937,7 +937,7 @@ class CommCalculation(RouteCalculation):
         except nx.NetworkXNoPath:
             return
 
-        trade = self.calc_trade(19) if AllyGen.are_allies(u'As', star.alg) else self.calc_trade(23)
+        trade = self.calc_trade(19) if AllyGen.are_allies('As', star.alg) else self.calc_trade(23)
         start = route[0]
         for end in route[1:]:
             end.tradeCount += 1 if end != route[-1] else 0

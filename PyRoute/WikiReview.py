@@ -37,9 +37,9 @@ class PageReviewSearch(PageReview):
 
     def review(self, page, formats):
         (s, r, t) = self.update_formats(formats)
-        logger.debug(u"searching for {} in {}".format(s, page.title))
+        logger.debug("searching for {} in {}".format(s, page.title))
         if re.search(s, page.getWikiText()):
-            logger.info(u"Article {} has match search {}".format(page.title, self.search))
+            logger.info("Article {} has match search {}".format(page.title, self.search))
         return page.getWikiText()
 
 
@@ -49,7 +49,7 @@ class PageReviewReplace(PageReview):
         super(PageReviewReplace, self).__init__(search, replace, text, replace_count)
 
     def review(self, page, formats):
-        logger.debug(u'Searching for replacements in {}'.format(page.title))
+        logger.debug('Searching for replacements in {}'.format(page.title))
         (s, r, t) = self.update_formats(formats)
         page_text = re.sub(s, r, page.getWikiText(), count=self.replace_count)
         return page_text
@@ -109,17 +109,17 @@ class WikiReview(object):
             target_page = Page(self.site, title)
         except api.APIError as e:
             if e.args[0] == 'missingtitle':
-                self.logger.error(u"Article {} does not exist, skipped".format(title))
+                self.logger.error("Article {} does not exist, skipped".format(title))
             else:
-                self.logger.error(u"review article for Article {} got exception {}".format(title, e))
+                self.logger.error("review article for Article {} got exception {}".format(title, e))
 
             return None
         except NoPage as e:
-            self.logger.error(u"Article {} page does not exist, skipped".format(title))
+            self.logger.error("Article {} page does not exist, skipped".format(title))
             return None
 
         if not target_page.exists:
-            self.logger.error(u"Article {} page does not exist, skipped".format(title))
+            self.logger.error("Article {} page does not exist, skipped".format(title))
             return None
 
         categories = target_page.getCategories(True)
@@ -142,20 +142,20 @@ class WikiReview(object):
                                    bot=True, skipmd5=True, nocreate=True)
 
             if result['edit']['result'] == 'Success':
-                self.logger.info(u'Saved: {}'.format(page.title))
+                self.logger.info('Saved: {}'.format(page.title))
                 return True
             else:
-                self.logger.error(u'Save failed {} - {}'.format(page.title, result))
+                self.logger.error('Save failed {} - {}'.format(page.title, result))
                 return False
 
         except api.APIError as e:
             if e.args[0] == 'missingtitle':
-                self.logger.error(u"Save Page for page {}, page does not exist".format(page.title))
+                self.logger.error("Save Page for page {}, page does not exist".format(page.title))
             else:
-                self.logger.error(u"Save Page for page {} got exception {} ".format(page.title, e))
+                self.logger.error("Save Page for page {} got exception {} ".format(page.title, e))
             return False
         except NoPage as e:
-            self.logger.error(u"Save Page for page {}, page does not exist, skipped".format(page.title))
+            self.logger.error("Save Page for page {}, page does not exist, skipped".format(page.title))
             return False
 
     def upload_file(self, filename):
@@ -164,9 +164,9 @@ class WikiReview(object):
                 page = File(self.site, os.path.basename(filename))
                 result = page.upload(f, "{{Trade map disclaimer}}", ignorewarnings=True)
                 if result['upload']['result'] == 'Success':
-                    self.logger.info(u'Saved: {}'.format(filename))
+                    self.logger.info('Saved: {}'.format(filename))
                 else:
-                    self.logger.error(u'Save failed {}'.format(filename))
+                    self.logger.error('Save failed {}'.format(filename))
             except Exception as e:
                 self.logger.error("UploadPDF for {} got exception: {}".format(filename, e))
                 traceback.print_exc()

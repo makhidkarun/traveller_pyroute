@@ -18,7 +18,6 @@ from collections import defaultdict
 import xml.etree.ElementTree as ET
 import os
 import codecs
-import string
 from xml.dom import minidom
 
 
@@ -31,10 +30,10 @@ def prettify(elem):
     Return a pretty-printed XML string for the Element.
     """
     rough_string = ET.tostring(elem, 'utf-8')
-    rough_string = string.replace(rough_string, '\r\n', '\n')
-    rough_string = string.replace(rough_string, '\n', '')
-    rough_string = string.replace(rough_string, '>    <', '><')
-    rough_string = string.replace(rough_string, '>  <', '><')
+    rough_string = rough_string.replace(rough_string, '\r\n', '\n')
+    rough_string = rough_string.replace(rough_string, '\n', '')
+    rough_string = rough_string.replace(rough_string, '>    <', '><')
+    rough_string = rough_string.replace(rough_string, '>  <', '><')
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
@@ -90,7 +89,7 @@ if __name__ == '__main__':
             start = data[1]
             sectorEnd = data[2]
             end = data[3]
-            trade = long(data[4])
+            trade = int(data[4])
 
             if trade == 0:
                 continue
@@ -108,7 +107,7 @@ if __name__ == '__main__':
             if outEnd is not None:
                 sectors[sectorEnd].append(outEnd)
 
-    for sector in sectors.iterkeys():
+    for sector in sectors.keys():
         tree = ET.ElementTree()
         path = os.path.join(args.metadata_source, '%s.xml' % sector)
         tree.parse(path)

@@ -12,7 +12,7 @@ Created on Apr 26, 2015
 #
 from wikitools import api
 from wikitools.page import Page, NoPage
-from WikiReview import WikiReview
+from .WikiReview import WikiReview
 
 import logging
 import argparse
@@ -21,7 +21,6 @@ import os
 import codecs
 import glob
 import re
-from itertools import izip
 
 logger = logging.getLogger('WikiUpload')
 
@@ -30,7 +29,7 @@ def uploadSummaryText(site, summaryFile, era):
     try:
         lines = [line for line in codecs.open(summaryFile, 'r', 'utf-8')]
     except (OSError, IOError):
-        logger.error(u"Summary file not found: {}".format(summaryFile))
+        logger.error("Summary file not found: {}".format(summaryFile))
         return
     index = [i for i, n in enumerate(lines) if 'Statistics' in n][0]
     lines = lines[index + 3:]
@@ -39,7 +38,7 @@ def uploadSummaryText(site, summaryFile, era):
     while True:
         baseTitle = lines[index].split('|')[1]
         if not baseTitle.startswith('[['):
-            logger.info(u"Upload Summary for {} not a page, skipped".format(baseTitle))
+            logger.info("Upload Summary for {} not a page, skipped".format(baseTitle))
             while (not (lines[index].startswith('|-') or lines[index].startswith('|}'))):
                 index += 1
             if lines[index].startswith('|}'):
@@ -48,7 +47,7 @@ def uploadSummaryText(site, summaryFile, era):
             continue
         else:
             baseTitle = baseTitle.strip('[')
-        targetTitle = u"{}/summary".format(baseTitle)
+        targetTitle = "{}/summary".format(baseTitle)
         index += 1
         text = lines[index][3:]
         index += 1
@@ -59,7 +58,7 @@ def uploadSummaryText(site, summaryFile, era):
         target_page = None
         target_page = site.get_page(targetTitle)
         if target_page and 'Category:Meta' in target_page.getCategories(True):
-            targetTitle += u'/{}'.format(era)
+            targetTitle += '/{}'.format(era)
             target_page = site.get_page(targetTitle)
 
         if not target_page:
@@ -79,7 +78,7 @@ def uploadSec(site, filename, place, era):
     targetTitle = os.path.basename(filename).split('.')[0] + place
     target_page = site.get_page(targetTitle)
     if target_page and 'Category:Meta' in target_page.getCategories(True):
-        targetTitle += u'/{}'.format(era)
+        targetTitle += '/{}'.format(era)
         target_page = site.get_page(targetTitle)
 
     if not target_page:
@@ -93,11 +92,11 @@ def pairwise(iterable):
     s -> (s0, s1), (s2, s3), (s4, s5), ...
     """
     a = iter(iterable)
-    return izip(a, a)
+    return list(zip(a, a))
 
 
 def uploadWorlds(site, sectorFile, economicFile, era):
-    data_template = u'''
+    data_template = '''
 {{{{StellarData
  |world     = {0}
  |sector    = {1}
@@ -134,7 +133,7 @@ def uploadWorlds(site, sectorFile, economicFile, era):
  |mspr      = {32}
 }}}}'''
 
-    page_template = u'''{{{{StellarDataQuery|name={{{{World|{0}|{1}|{2}|{3}}}}} }}}}
+    page_template = '''{{{{StellarDataQuery|name={{{{World|{0}|{1}|{2}|{3}}}}} }}}}
 
 == Astrography and planetology ==
 No information yet available. 
@@ -150,30 +149,30 @@ No information yet available.
     try:
         sectorLines = [line for line in codecs.open(sectorFile, 'r', 'utf-8')]
     except (OSError, IOError):
-        logger.error(u"Sector file not found: {}".format(sectorFile))
+        logger.error("Sector file not found: {}".format(sectorFile))
         return
 
-    sectorData = [line.split(u"||") for line in sectorLines[5:]
-                  if not (line.startswith(u'|-') or line.startswith(u'<section')
-                          or line.startswith(u'|}') or line.startswith(u'[[Category:'))]
+    sectorData = [line.split("||") for line in sectorLines[5:]
+                  if not (line.startswith('|-') or line.startswith('<section')
+                          or line.startswith('|}') or line.startswith('[[Category:'))]
 
     try:
         economicLines = [line for line in codecs.open(economicFile, 'r', 'utf-8')]
     except (OSError, IOError):
-        logger.error(u"Economic file not found: {}".format(economicFile))
+        logger.error("Economic file not found: {}".format(economicFile))
         return
-    economicData = [line.split(u"||") for line in economicLines[5:]
-                    if not (line.startswith(u'|-') or line.startswith(u'<section')
-                            or line.startswith(u'|}') or line.startswith(u'[[Category:'))]
+    economicData = [line.split("||") for line in economicLines[5:]
+                    if not (line.startswith('|-') or line.startswith('<section')
+                            or line.startswith('|}') or line.startswith('[[Category:'))]
 
     sectorName = economicLines[2][3:-15]
-    logger.info(u"Uploading {}".format(sectorName))
+    logger.info("Uploading {}".format(sectorName))
     for sec, eco in zip(sectorData, economicData):
 
         if not sec[0] == eco[0]:
-            logger.error(u"{} is not equal to {}".format(sec[0], eco[0]))
+            logger.error("{} is not equal to {}".format(sec[0], eco[0]))
             break
-        subsectorName = eco[14].split(u'|')[1].strip(u'\n').strip(u']')
+        subsectorName = eco[14].split('|')[1].strip('\n').strip(']')
         pcodes = ['As', 'De', 'Ga', 'Fl', 'He', 'Ic', 'Oc', 'Po', 'Va', 'Wa']
         dcodes = ['Cp', 'Cx', 'Cs', 'Mr', 'Da', 'Di', 'Pz', 'An', 'Ab', 'Fo', 'Px',
                   'Re', 'Rs', 'Sa', 'Tz', 'Lk',
@@ -184,8 +183,8 @@ No information yet available.
         pcode = set(pcodes) & set(codes)
         dcode = set(dcodes) & set(codes)
 
-        owned = [code for code in codes if code.startswith(u'O:') or code.startswith(u'C:')]
-        homeworlds = re.findall(ur"\([^)]+\)\S?", sec[3], re.U)
+        owned = [code for code in codes if code.startswith('O:') or code.startswith('C:')]
+        homeworlds = re.findall(r"\([^)]+\)\S?", sec[3], re.U)
 
         codeCheck = set(codes) - dcode - set(owned) - set(homeworlds)
         sophCodes = [code for code in codeCheck if len(code) > 4]
@@ -199,10 +198,10 @@ No information yet available.
         else:
             pcode = ''
 
-        colony = [code if len(code) > 6 else u'O:' + sectorName[0:4] + u'-' + code[2:]
-                  for code in owned if code.startswith(u'O:')]
-        parent = [code if len(code) > 6 else u'C:' + sectorName[0:4] + u'-' + code[2:]
-                  for code in owned if code.startswith(u'C:')]
+        colony = [code if len(code) > 6 else 'O:' + sectorName[0:4] + '-' + code[2:]
+                  for code in owned if code.startswith('O:')]
+        parent = [code if len(code) > 6 else 'C:' + sectorName[0:4] + '-' + code[2:]
+                  for code in owned if code.startswith('C:')]
         dcode = list(dcode) + colony + parent
 
         starparts = sec[13].split()
@@ -217,12 +216,12 @@ No information yet available.
         if len(starparts) % 2 == 1:
             stars.append(starparts[-1])
 
-        hexNo = sec[0].strip(u'|').strip()
-        worldPage = eco[1].strip() + u" (world)"
+        hexNo = sec[0].strip('|').strip()
+        worldPage = eco[1].strip() + " (world)"
 
-        worldName = worldPage.split(u'(')
+        worldName = worldPage.split('(')
         shortName = shortNames[sectorName]
-        worldPage = worldName[0] + u'(' + shortName + u' ' + hexNo + u') (' + worldName[1]
+        worldPage = worldName[0] + '(' + shortName + ' ' + hexNo + ') (' + worldName[1]
 
         site.search_disambig = worldName
         target_page = site.get_page(worldPage)
@@ -238,18 +237,18 @@ No information yet available.
             # the alternate (location) name
             categories = target_page.getCategories(True)
             if 'Category:Disambiguation pages' in categories:
-                worldName = worldPage.split(u'(')
+                worldName = worldPage.split('(')
                 shortName = shortNames[sectorName]
-                worldPage = worldName[0] + u'(' + shortName + u' ' + hexNo + u') (' + worldName[1]
+                worldPage = worldName[0] + '(' + shortName + ' ' + hexNo + ') (' + worldName[1]
                 target_page = Page(site, worldPage)
 
             # Second, check if this page was redirected to another page
             if target_page.title != worldPage:
-                logger.info(u"Redirect {} to {}".format(worldPage, target_page.title))
+                logger.info("Redirect {} to {}".format(worldPage, target_page.title))
                 worldPage = target_page.title
 
         except NoPage:
-            logger.info(u"Missing Page: {}".format(worldPage))
+            logger.info("Missing Page: {}".format(worldPage))
             page_data = page_template.format(eco[1].strip(), sectorName, subsectorName, hexNo)
             target_page = Page(site, worldPage)
             try:
@@ -257,9 +256,9 @@ No information yet available.
                                           bot=True, skipmd5=True)
 
                 if result['edit']['result'] == 'Success':
-                    logger.info(u'Saved: {}'.format(worldPage))
+                    logger.info('Saved: {}'.format(worldPage))
             except api.APIError as e:
-                logger.error(u"UploadSummary for page {} got exception {} ".format(worldPage, e))
+                logger.error("UploadSummary for page {} got exception {} ".format(worldPage, e))
                 continue
 
         data = data_template.format(eco[1].strip(),  # World
@@ -269,12 +268,12 @@ No information yet available.
                                     worldPage,  # Name
                                     sec[2].strip(),  # UWP
                                     pcode,  # pcode
-                                    u','.join(sorted(list(codeset))),  # codes
-                                    u','.join(sophonts),  # sophonts
-                                    u','.join(sorted(list(dcode))),  # details
-                                    sec[4].strip(u'{}'),  # ix (important)
-                                    sec[5].strip(u'()'),  # ex (economic)
-                                    sec[6].strip(u'[]'),  # cx (cultural)
+                                    ','.join(sorted(list(codeset))),  # codes
+                                    ','.join(sophonts),  # sophonts
+                                    ','.join(sorted(list(dcode))),  # details
+                                    sec[4].strip('{}'),  # ix (important)
+                                    sec[5].strip('()'),  # ex (economic)
+                                    sec[6].strip('[]'),  # cx (cultural)
                                     sec[7].strip(),  # nobility
                                     sec[8].strip(),  # bases
                                     sec[9].strip(),  # Zone
@@ -283,7 +282,7 @@ No information yet available.
                                     sec[10][2],  # GG Count
                                     sec[11],  # Worlds
                                     sec[12],  # Allegiance
-                                    u','.join(stars),  # stars
+                                    ','.join(stars),  # stars
                                     int(eco[5].strip()),  # wtn
                                     eco[6].strip(),  # RU
                                     eco[7].strip(),  # GWP
@@ -297,39 +296,39 @@ No information yet available.
                                     eco[14].strip()  # MSPR
                                     )
         try:
-            target_page = Page(site, worldPage + u'/data')
+            target_page = Page(site, worldPage + '/data')
             if target_page.exists:
-                page_text = unicode(target_page.getWikiText(), 'utf-8')
-                templates = re.findall(ur"{{[^}]*}}", page_text, re.U)
-                era_name = u"|era       = {}".format(era)
+                page_text = str(target_page.getWikiText(), 'utf-8')
+                templates = re.findall(r"{{[^}]*}}", page_text, re.U)
+                era_name = "|era       = {}".format(era)
                 newtemplates = [template if not era_name in template else data
                                 for template in templates]
-                newdata = u'\n'.join(newtemplates)
+                newdata = '\n'.join(newtemplates)
                 if era_name not in newdata:
                     newtemplates.insert(0, data)
-                    newdata = u'\n'.join(newtemplates)
+                    newdata = '\n'.join(newtemplates)
 
                 if newdata == page_text:
-                    logger.info(u'No changes to template: skipping {}'.format(worldPage))
+                    logger.info('No changes to template: skipping {}'.format(worldPage))
                     continue
                 data = newdata
             result = target_page.edit(text=data, summary='Trade Map update world data',
                                       bot=True, skipmd5=True)
 
             if result['edit']['result'] == 'Success':
-                logger.info(u'Saved: {}/data'.format(worldPage))
+                logger.info('Saved: {}/data'.format(worldPage))
             else:
-                logger.error(u'Save failed {}/data'.format(worldPage))
+                logger.error('Save failed {}/data'.format(worldPage))
         except api.APIError as e:
             if e.args[0] == 'missingtitle':
-                logger.error(u"UploadSummary for page {}, page does not exist".format(worldPage))
+                logger.error("UploadSummary for page {}, page does not exist".format(worldPage))
             else:
-                logger.error(u"UploadSummary for page {} got exception {} ".format(worldPage, e))
+                logger.error("UploadSummary for page {} got exception {} ".format(worldPage, e))
 
 
-shortNames = {u'Dagudashaag': u'Da', u'Deneb': u'De',
-              u'Empty Quarter': u'EQ', u'Spinward Marches': u'SM',
-              u'Knoellighz': u'Kn'}
+shortNames = {'Dagudashaag': 'Da', 'Deneb': 'De',
+              'Empty Quarter': 'EQ', 'Spinward Marches': 'SM',
+              'Knoellighz': 'Kn'}
 
 
 def set_logging(level):
@@ -401,7 +400,7 @@ def process():
 
         for eco in glob.glob(path):
             sector = args.worlds
-            if sector in shortNames.keys():
+            if sector in list(shortNames.keys()):
                 sec = eco.replace('Sector.economic.wiki', 'Sector.sector.wiki')
                 uploadWorlds(wiki_review, sec, eco, args.era)
 

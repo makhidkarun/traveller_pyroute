@@ -10,10 +10,9 @@ from pypdflite import PDFCursor
 from pypdflite.pdfobjects.pdfline import PDFLine
 from pypdflite.pdfobjects.pdfellipse import PDFEllipse
 from pypdflite.pdfobjects.pdftext import PDFText
-from Galaxy import Sector
-from Galaxy import Galaxy
-from Star import Star
-from StatCalculation import StatCalculation
+from Galaxy import Sector, Galaxy
+from PyRoute.Star import Star
+from PyRoute.StatCalculation import StatCalculation
 
 
 class HexMap(object):
@@ -38,7 +37,7 @@ class HexMap(object):
         Call this to output the trade maps
         """
         logging.getLogger("PyRoute.HexMap").info("writing {:d} sector maps...".format(len(self.galaxy.sectors)))
-        for sector in self.galaxy.sectors.itervalues():
+        for sector in self.galaxy.sectors.values():
             pdf = self.document(sector)
             self.write_base_map(pdf, sector)
 
@@ -144,14 +143,14 @@ class HexMap(object):
         pdf.set_draw_color(color)
         vlineStart = PDFCursor(0, self.y_start + self.xm)
         vlineEnd = PDFCursor(0, self.y_start + self.xm + (180 * 4))
-        for x in xrange(self.x_start, 595, 144):
+        for x in range(self.x_start, 595, 144):
             vlineStart.x = x
             vlineEnd.x = x
             pdf.add_line(cursor1=vlineStart, cursor2=vlineEnd)
 
         hlineStart = PDFCursor(self.x_start, 0)
         hlineEnd = PDFCursor(591, 0)
-        for y in xrange(self.y_start + self.xm, 780, 180):
+        for y in range(self.y_start + self.xm, 780, 180):
             hlineStart.y = y
             hlineEnd.y = y
             pdf.add_line(cursor1=hlineStart, cursor2=hlineEnd)
@@ -240,14 +239,14 @@ class HexMap(object):
         llineStart, llineEnd, lline = self._lline(pdf, width, colorname)
         rlineStart, rlineEnd, rline = self._rline(pdf, width, colorname)
 
-        for x in xrange(33):
+        for x in range(33):
             hlineStart.x_plus()
             hlineEnd.x_plus()
             self._hline_restart_y(x, hlineStart, hlineEnd)
             self._lline_restart_y(x, llineStart, llineEnd)
             self._rline_restart_y(x, rlineStart, rlineEnd)
 
-            for y in xrange(41):
+            for y in range(41):
                 hlineStart.y_plus()
                 hlineEnd.y_plus()
                 llineStart.y_plus()
@@ -311,7 +310,7 @@ class HexMap(object):
         pdf.add_text(star.uwp.encode('ascii', 'replace'), point)
 
         if len(star.name) > 0:
-            for chars in xrange(len(star.name), 0, -1):
+            for chars in range(len(star.name), 0, -1):
                 width = self.string_width(pdf.get_font(), star.name[:chars])
                 if width <= self.xm * 3.5:
                     break

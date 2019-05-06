@@ -3,8 +3,7 @@ Created on Jun 3, 2014
 
 @author: tjoneslo
 """
-import urllib2
-import urllib
+import urllib.request, urllib.error, urllib.parse
 import codecs
 import time
 import os
@@ -13,17 +12,17 @@ import argparse
 
 def get_url(url, sector, suffix, output_dir):
     try:
-        f = urllib2.urlopen(url)
-    except urllib2.HTTPError as ex:
-        print "get URL failed: {} -> {}".format(url, ex)
+        f = urllib.request.urlopen(url)
+    except urllib.error.HTTPError as ex:
+        print ("get URL failed: {} -> {}".format(url, ex))
         return
 
     encoding = f.headers['content-type'].split('charset=')[-1]
     content = f.read()
     if encoding == 'text/xml' or encoding == 'text/html':
-        ucontent = unicode(content, 'utf-8').replace('\r\n', '\n')
+        ucontent = str(content, 'utf-8').replace('\r\n', '\n')
     else:
-        ucontent = unicode(content, encoding).replace('\r\n', '\n')
+        ucontent = str(content, encoding).replace('\r\n', '\n')
     
     path = os.path.join(output_dir, '%s.%s' % (sector, suffix))
 
@@ -45,16 +44,16 @@ if __name__ == '__main__':
 
     for sector in sectorsList:
         sector = sector.rstrip()
-        print 'Downloading %s' % sector
+        print ('Downloading %s' % sector)
         params = {'sector': sector, 'type': 'SecondSurvey'}
         if args.routes:
             params['routes'] = '1'
-        params = urllib.urlencode(params)
+        params = urllib.parse.urlencode(params)
         url = 'http://www.travellermap.com/api/sec?%s' % params
 
         get_url(url, sector, 'sec', args.output_dir)
         
-        params = urllib.urlencode({'sector': sector, 'accept': 'text/xml'})
+        params = urllib.parse.urlencode({'sector': sector, 'accept': 'text/xml'})
         url = 'http://travellermap.com/api/metadata?%s' % params
         get_url(url, sector, 'xml', args.output_dir)
 

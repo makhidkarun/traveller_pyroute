@@ -12,7 +12,6 @@ import re
 from AllyGen import AllyGen
 from TradeCodes import TradeCodes
 from collections import OrderedDict
-from itertools import izip
 
 
 def pairwise(iterable):
@@ -20,7 +19,7 @@ def pairwise(iterable):
     s -> (s0, s1), (s2, s3), (s4, s5), ...
     """
     a = iter(iterable)
-    return izip(a, a)
+    return zip(a, a)
 
 
 class UWPCodes(object):
@@ -65,18 +64,18 @@ class Nobles(object):
 
     def __str__(self):
         nobility = ""
-        for rank, count in self.nobles.iteritems():
+        for rank, count in self.nobles.items():
             if count > 0:
                 nobility += self.codes.keys()[self.codes.values().index(rank)]
         return ''.join(sorted(nobility, key=lambda v: (v.lower(), v[0].isupper())))
 
     def count(self, nobility):
-        for code, rank in self.codes.iteritems():
+        for code, rank in self.codes.items():
             if code in nobility:
                 self.nobles[rank] += 1
 
     def accumulate(self, nobles):
-        for rank, count in nobles.nobles.iteritems():
+        for rank, count in nobles.nobles.items():
             self.nobles[rank] += count
 
 
@@ -95,7 +94,7 @@ class Star(object):
 ([A-Z0-9?-][A-Za-z0-9?-]{1,3})
 (.*)
 """
-    starline = re.compile(''.join([line.rstrip('\n') for line in Star.regex]))
+    starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
 
     def __init__(self):
         self.logger = logging.getLogger('PyRoute.Star')
@@ -111,7 +110,7 @@ class Star(object):
             star.logger.info("Found anomaly, skipping processing: {}".format(line))
             return None
         else:
-            star.logger.error(u"Unmatched line: {}".format(line))
+            star.logger.error("Unmatched line: {}".format(line))
             return None
 
         star.logger.debug(data)
@@ -137,8 +136,8 @@ class Star(object):
         star.tradeCode = TradeCodes(data[3].strip())
         star.ownedBy = star.tradeCode.owned_by(star)
 
-        star.economics = data[6].strip() if data[6] and data[6].strip() != u'-' else None
-        star.social = data[7].strip() if data[7] and data[7].strip() != u'-' else None
+        star.economics = data[6].strip() if data[6] and data[6].strip() != '-' else None
+        star.social = data[7].strip() if data[7] and data[7].strip() != '-' else None
 
         star.nobles = Nobles()
         star.nobles.count(data[11])
@@ -175,7 +174,7 @@ class Star(object):
             star.calculate_importance()
             if imp != star.importance:
                 star.logger.error(
-                    u'{}-{} Calculated importance {} does not match generated importance {}'.format(star, star.baseCode,
+                    '{}-{} Calculated importance {} does not match generated importance {}'.format(star, star.baseCode,
                                                                                                     star.importance,
                                                                                                     imp))
         else:
@@ -213,14 +212,14 @@ class Star(object):
         return star
 
     def __unicode__(self):
-        return u"{} ({} {})".format(self.name, self.sector.name, self.position)
+        return "{} ({} {})".format(self.name, self.sector.name, self.position)
 
     def __str__(self):
-        name = u"%s (%s %s)" % (self.name, self.sector.name, self.position)
+        name = "%s (%s %s)" % (self.name, self.sector.name, self.position)
         return name.encode('utf-8')
 
     def __repr__(self):
-        return u"{} ({} {})".format(self.name, self.sector.name, self.position)
+        return "{} ({} {})".format(self.name, self.sector.name, self.position)
 
     def __key(self):
         return (self.position, self.name, self.uwp, self.sector.name)
@@ -240,18 +239,18 @@ class Star(object):
 
     def wiki_name(self):
         # name = u" ".join(w.capitalize() for w in self.name.lower().split())
-        name = u'{{WorldS|' + self.name + u'|' + self.sector.sector_name() + u'|' + self.position + u'}}'
+        name = '{{WorldS|' + self.name + '|' + self.sector.sector_name() + '|' + self.position + '}}'
         return name
 
     def wiki_short_name(self):
         # name = u" ".join(w.capitalize() for w in self.name.lower().split())
-        return u'{} (world)'.format(self.name)
+        return '{} (world)'.format(self.name)
 
     def sec_pos(self, sector):
         if self.sector == sector:
             return self.position
         else:
-            return self.sector.name[0:4] + u'-' + self.position
+            return self.sector.name[0:4] + '-' + self.position
 
     def set_location(self, dx, dy):
         # convert odd-q offset to cube
@@ -393,25 +392,25 @@ class Star(object):
         infrastructure = self._ehex_to_int(self.economics[3])
 
         if labor != max(self.popCode - 1, 0):
-            self.logger.error(u'{} - EX Calculated labor {} does not match generated labor {}'.format(self, labor, max(
+            self.logger.error('{} - EX Calculated labor {} does not match generated labor {}'.format(self, labor, max(
                 self.popCode - 1, 0)))
 
         if self.tradeCode.barren and infrastructure != 0:
             self.logger.error(
-                u'{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self,
+                '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self,
                                                                                                           infrastructure,
                                                                                                           0))
         elif self.tradeCode.low and infrastructure != 1:
             self.logger.error(
-                u'{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self,
+                '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self,
                                                                                                           infrastructure,
                                                                                                           1))
         elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= 6 + self.importance:
             self.logger.error(
-                u'{} - EX Calculated infrastructure {} not in NI range 0 - {}'.format(self, infrastructure,
+                '{} - EX Calculated infrastructure {} not in NI range 0 - {}'.format(self, infrastructure,
                                                                                       6 + self.importance))
         elif not 0 <= infrastructure <= 12 + self.importance:
-            self.logger.error(u'{} - EX Calculated infrastructure {} not in range 0 - {}'.format(self, infrastructure,
+            self.logger.error('{} - EX Calculated infrastructure {} not in range 0 - {}'.format(self, infrastructure,
                                                                                                  12 + self.importance))
 
     def check_cx(self):
@@ -422,36 +421,36 @@ class Star(object):
         homogeneity = self._ehex_to_int(self.social[1])  # pop + flux, min 1
         if pop == 0 and homogeneity != 0:
             self.logger.error(
-                u'{} - CX calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity))
+                '{} - CX calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity))
         elif pop != 0 and not max(1, pop - 5) <= homogeneity <= pop + 5:
             self.logger.error(
-                u'{} - CX calculated homogeneity {} not in range {} - {}'.format(self, homogeneity, max(1, pop - 5),
+                '{} - CX calculated homogeneity {} not in range {} - {}'.format(self, homogeneity, max(1, pop - 5),
                                                                                  pop + 5))
 
         acceptance = self._ehex_to_int(self.social[2])  # pop + Ix, min 1
         if pop == 0 and acceptance != 0:
             self.logger.error(
-                u'{} - CX calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
+                '{} - CX calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
         elif pop != 0 and not max(1, pop + self.importance) == acceptance:
             self.logger.error(
-                u'{} - CX Calculated acceptance {} does not match generated acceptance {}'.format(self, acceptance,
+                '{} - CX Calculated acceptance {} does not match generated acceptance {}'.format(self, acceptance,
                                                                                                   max(1,
                                                                                                       pop + self.importance)))
 
         strangeness = self._ehex_to_int(self.social[3])  # flux + 5
         if pop == 0 and strangeness != 0:
             self.logger.error(
-                u'{} - CX calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness))
+                '{} - CX calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness))
         elif pop != 0 and not 1 <= strangeness <= 10:
             self.logger.error(
-                u'{} - CX calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10))
+                '{} - CX calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10))
 
         symbols = self._ehex_to_int(self.social[4])  # TL + flux, min 1
         if pop == 0 and symbols != 0:
-            self.logger.error(u'{} - CX calculated symbols {} should be 0 for barren worlds'.format(self, symbols))
+            self.logger.error('{} - CX calculated symbols {} should be 0 for barren worlds'.format(self, symbols))
         elif pop != 0 and not max(1, self.tl - 5) <= symbols <= self.tl + 5:
             self.logger.error(
-                u'{} - CX calculated symbols {} not in range {} - {}'.format(self, symbols, max(1, self.tl - 5),
+                '{} - CX calculated symbols {} not in range {} - {}'.format(self, symbols, max(1, self.tl - 5),
                                                                              self.tl + 5))
 
     def calculate_ru(self, ru_calc):
@@ -500,9 +499,9 @@ class Star(object):
                     'M': 1.1, 'N': 1.2,
                     # Unknown Gov Codes
                     'I': 1.0, 'P': 1.0, 'Q': 1.0, 'R': 1.0, 'S': 1.0, 'T': 1.0,
-                    'U': 1.0, 'V': 1.0, 'W': 1.0, 'X': 1.0, '?': 0.0
+                    '': 1.0, 'V': 1.0, 'W': 1.0, 'X': 1.0, '?': 0.0
                     }
-        self.ship_capacity = long(self.population * tax_rate[self.uwpCodes['Government']] * 1000)
+        self.ship_capacity = int(self.population * tax_rate[self.uwpCodes['Government']] * 1000)
         gwp_base = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 28, 32]
         if self.tl >= 5:
             self.tcs_gwp = self.population * gwp_base[min(self.tl - 5, 13)] * 1000
@@ -522,7 +521,7 @@ class Star(object):
         if self.tradeCode.nonagricultural:
             self.tcs_gwp = self.tcs_gwp * 8 / 10
 
-        budget = long(self.tcs_gwp * 0.03 * tax_rate[self.uwpCodes['Government']])
+        budget = int(self.tcs_gwp * 0.03 * tax_rate[self.uwpCodes['Government']])
 
         # if AllyGen.sameAligned('Im', self.alg):
         #    budget = budget * 0.3
@@ -542,7 +541,7 @@ class Star(object):
         if access <= 0:
             access = 0
 
-        self.budget = long(budget * access)
+        self.budget = int(budget * access)
 
     def calculate_importance(self):
         imp = 0
@@ -556,7 +555,7 @@ class Star(object):
         imp += 1 if self.tradeCode.agricultural else 0
         imp += 1 if self.tradeCode.rich else 0
         imp += 1 if self.tradeCode.industrial else 0
-        imp += 1 if self.baseCode in [u'NS', u'NW', u'W', u'D', u'X', u'KV', u'RT', u'CK', u'KM'] else 0
+        imp += 1 if self.baseCode in ['NS', 'NW', 'W', 'D', 'X', 'KV', 'RT', 'CK', 'KM'] else 0
         self.importance = imp
 
     def calculate_eti(self):
@@ -565,7 +564,7 @@ class Star(object):
         eti -= 1 if self.port in 'DEX' else 0
         eti += 1 if self.tl >= 10 else 0
         eti -= 1 if self.tl <= 7 else 0
-        eti += 1 if self.baseCode in [u'NS', u'NW', u'D', u'X', u'KV', u'RT', u'CK', u'KM'] else 0
+        eti += 1 if self.baseCode in ['NS', 'NW', 'D', 'X', 'KV', 'RT', 'CK', 'KM'] else 0
         eti += 1 if self.tradeCode.capital else 0
         eti += 1 if self.tradeCode.agricultural else 0
         eti += 1 if self.tradeCode.rich else 0
@@ -576,7 +575,7 @@ class Star(object):
         eti -= 1 if self.zone in ['A', 'U'] else 0
         eti -= 8 if self.zone in ['R', 'F'] else 0
         self.eti_cargo = eti
-        eti -= 1 if self.baseCode in [u'NS', u'NW', u'D', u'X', u'KV', u'RT', u'CK', u'KM'] else 0
+        eti -= 1 if self.baseCode in ['NS', 'NW', 'D', 'X', 'KV', 'RT', 'CK', 'KM'] else 0
         eti -= 1 if self.tradeCode.agricultural else 0
         eti -= 2 if self.tradeCode.industrial else 0
         eti -= 1 if self.zone in ['A', 'U'] else 0
@@ -614,7 +613,7 @@ class Star(object):
 
         self.col_be = self.raw_be * 0.1 if self.tl >= 9 else 0
 
-        if AllyGen.are_allies(u'Im', self.alg):
+        if AllyGen.are_allies('Im', self.alg):
             self.im_be = self.raw_be * 0.05
             if self.tl < 13:
                 mul = 1 - ((13 - self.tl) / 10.0)
