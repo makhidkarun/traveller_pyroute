@@ -11,8 +11,8 @@ from pypdflite.pdfobjects.pdfline import PDFLine
 from pypdflite.pdfobjects.pdfellipse import PDFEllipse
 from pypdflite.pdfobjects.pdftext import PDFText
 from Galaxy import Sector, Galaxy
-from PyRoute.Star import Star
-from PyRoute.StatCalculation import StatCalculation
+from Star import Star
+from StatCalculation import StatCalculation
 
 
 class HexMap(object):
@@ -306,8 +306,8 @@ class HexMap(object):
 
         width = self.string_width(pdf.get_font(), star.uwp)
         point.y_plus(7)
-        point.x_plus(self.ym - (width / 2))
-        pdf.add_text(star.uwp.encode('ascii', 'replace'), point)
+        point.x_plus(self.ym - (width // 2))
+        pdf.add_text(star.uwp, point)
 
         if len(star.name) > 0:
             for chars in range(len(star.name), 0, -1):
@@ -316,8 +316,8 @@ class HexMap(object):
                     break
             point.y_plus(3.5)
             point.x = col
-            point.x_plus(self.ym - (width / 2))
-            pdf.add_text(star.name[:chars].encode('ascii', 'replace'), point)
+            point.x_plus(self.ym - (width // 2))
+            pdf.add_text(star.name[:chars], point)
 
         added = star.alg
         if star.tradeCode.subsector_capital:
@@ -331,7 +331,7 @@ class HexMap(object):
         point.y_plus(3.5)
         point.x = col
         width = pdf.get_font()._string_width(added)
-        point.x_plus(self.ym - (width / 2))
+        point.x_plus(self.ym - (width // 2))
         pdf.add_text(added, point)
 
         added = ''
@@ -347,7 +347,7 @@ class HexMap(object):
         width = pdf.get_font()._string_width(added)
         point.y_plus(3.5)
         point.x = col
-        point.x_plus(self.ym - (width / 2))
+        point.x_plus(self.ym - (width // 2))
         pdf.add_text(added, point)
 
         pdf.set_font(def_font)
@@ -477,6 +477,7 @@ class HexMap(object):
         keywords = None
         creator = "PyPDFLite"
         self.writer.set_information(title, subject, author, keywords, creator)
+        self.writer.set_compression(False)
         document = self.writer.get_document()
         document.set_margins(4)
         return document

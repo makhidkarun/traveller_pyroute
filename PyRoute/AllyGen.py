@@ -479,7 +479,7 @@ class AllyGen(object):
             self._search_range(Hex, allyMap, starMap)
 
     def _search_range(self, Hex, allyMap, starMap):
-        from .Star import Star
+        from Star import Star
         newBridge = None
         checked = []
         for direction in range(6):

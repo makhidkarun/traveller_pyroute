@@ -6,9 +6,9 @@ Created on Aug 7, 2016
 import os
 import logging
 import math
-from .Map import GraphicMap
-from .Galaxy import Galaxy
-from .AllyGen import AllyGen
+from Map import GraphicMap
+from Galaxy import Galaxy
+from AllyGen import AllyGen
 from PIL import Image, ImageDraw, ImageColor, ImageFont
 
 
