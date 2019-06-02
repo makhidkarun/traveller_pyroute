@@ -2,7 +2,7 @@
 """
 Created on Mar 2, 2014
 
-@author: tjoneslo
+@author: tjoneslow
 """
 
 import argparse

@@ -78,8 +78,8 @@ class StatCalculation(object):
             for star in sector.worlds:
                 star.starportSize = max(self.trade_to_btn(star.tradeIn + star.tradeOver) - 5, 0)
                 star.starportBudget = \
-                    ((star.tradeIn / 10000) * 150 + (star.tradeOver / 10000) * 140 +
-                     (star.passIn) * 500 + (star.passOver) * 460) / 1000000
+                    ((star.tradeIn // 10000) * 150 + (star.tradeOver // 10000) * 140 +
+                     (star.passIn) * 500 + (star.passOver) * 460) // 1000000
 
                 star.starportPop = int(star.starportBudget / 0.2)
 
@@ -179,16 +179,15 @@ class StatCalculation(object):
         stats.maxPop = max(stats.maxPop, star.popCode)
 
     def per_capita(self, stats):
-        stats.percapita = stats.economy
         if stats.population > 100000:
-            stats.percapita = stats.economy / (stats.population / 1000)
+            stats.percapita = stats.economy // (stats.population // 1000)
         elif stats.population > 0:
-            stats.percapita = stats.economy * 1000 / stats.population
+            stats.percapita = stats.economy * 1000 // stats.population
         else:
             stats.percapita = 0
 
         if stats.shipyards > 1000000:
-            stats.shipyards /= 1000000
+            stats.shipyards //= 1000000
         else:
             stats.shipyards = 0
 

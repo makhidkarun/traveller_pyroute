@@ -98,6 +98,7 @@ class Star(object):
 
     def __init__(self):
         self.logger = logging.getLogger('PyRoute.Star')
+        self._hash = None
 
     @staticmethod
     def parse_line_into_star(line, sector, pop_code, ru_calc):
@@ -207,7 +208,6 @@ class Star(object):
         star.eti_worlds = 0
         star.calculate_eti()
 
-        star._hash = None
         star.trade_id = None # Used by the Speculative Trade
         return star
 
@@ -215,8 +215,7 @@ class Star(object):
         return "{} ({} {})".format(self.name, self.sector.name, self.position)
 
     def __str__(self):
-        name = "%s (%s %s)" % (self.name, self.sector.name, self.position)
-        return name.encode('utf-8')
+        return "%s (%s %s)" % (self.name, self.sector.name, self.position)
 
     def __repr__(self):
         return "{} ({} {})".format(self.name, self.sector.name, self.position)
@@ -239,8 +238,7 @@ class Star(object):
 
     def wiki_name(self):
         # name = u" ".join(w.capitalize() for w in self.name.lower().split())
-        name = '{{WorldS|' + self.name + '|' + self.sector.sector_name() + '|' + self.position + '}}'
-        return name
+        return '{{WorldS|' + self.name + '|' + self.sector.sector_name() + '|' + self.position + '}}'
 
     def wiki_short_name(self):
         # name = u" ".join(w.capitalize() for w in self.name.lower().split())
@@ -257,7 +255,7 @@ class Star(object):
         q = int(self.position[0:2]) + dx - 1
         r = int(self.position[2:4]) + dy - 1
         self.x = q
-        self.z = r - (q - (q & 1)) / 2
+        self.z = r - (q - (q & 1)) // 2
         self.y = -self.x - self.z
 
         # convert cube to axial
@@ -277,7 +275,7 @@ class Star(object):
     @staticmethod
     def axial_distance(Hex1, Hex2):
         return (abs(Hex1[0] - Hex2[0]) + abs(Hex1[1] - Hex2[1])
-                + abs(Hex1[0] + Hex1[1] - Hex2[0] - Hex2[1])) / 2
+                + abs(Hex1[0] + Hex1[1] - Hex2[0] - Hex2[1])) // 2
 
     def distance(self, star):
         y1 = self.y * 2
@@ -294,12 +292,12 @@ class Star(object):
             dx = -dx
         if dx > dy:
             return dx
-        return dx + dy / 2
+        return dx + dy // 2
 
     def subsector(self):
         subsector = ["ABCD", "EFGH", "IJKL", "MNOP"]
-        indexy = (self.col - 1) / 8
-        indexx = (self.row - 1) / 10
+        indexy = (self.col - 1) // 8
+        indexx = (self.row - 1) // 10
         return subsector[indexx][indexy]
 
     def calculate_gwp(self, pop_code):
@@ -310,11 +308,11 @@ class Star(object):
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
 
         if pop_code == 'scaled':
-            self.population = pow(10, self.popCode) * popCodeM[self.popM] / 1e7
-            self.uwpCodes['Pop Code'] = str(popCodeM[self.popM] / 10)
+            self.population = pow(10, self.popCode) * popCodeM[self.popM] // 1e7
+            self.uwpCodes['Pop Code'] = str(popCodeM[self.popM] // 10)
 
         elif pop_code == 'fixed':
-            self.population = pow(10, self.popCode) * self.popM / 1e6
+            self.population = pow(10, self.popCode) * self.popM // 1e6
 
         elif pop_code == 'benford':
             popCodeRange = [0.243529203, 0.442507049, 0.610740422, 0.756470797, 0.885014099, 1]
@@ -333,7 +331,7 @@ class Star(object):
         self.perCapita *= 0.8 if self.tradeCode.extreme or \
                                  self.tradeCode.poor or self.tradeCode.nonindustrial or self.tradeCode.low else 1
 
-        self.gwp = self.population * self.perCapita / 1000
+        self.gwp = self.population * self.perCapita // 1000
         self.gwp = int(self.gwp)
         self.population = int(self.population)
         self.perCapita = int(self.perCapita)
@@ -361,26 +359,26 @@ class Star(object):
         port = self.port
 
         if port == 'A':
-            self.wtn = (self.wtn * 3 + 13) / 4
+            self.wtn = (self.wtn * 3 + 13) // 4
         if port == 'B':
-            self.wtn = (self.wtn * 3 + 11) / 4
+            self.wtn = (self.wtn * 3 + 11) // 4
         if port == 'C':
             if (self.wtn > 9):
-                self.wtn = (self.wtn + 9) / 2
+                self.wtn = (self.wtn + 9) // 2
             else:
-                self.wtn = (self.wtn * 3 + 9) / 4
+                self.wtn = (self.wtn * 3 + 9) // 4
         if port == 'D':
             if (self.wtn > 7):
-                self.wtn = (self.wtn + 7) / 2
+                self.wtn = (self.wtn + 7) // 2
             else:
-                self.wtn = (self.wtn * 3 + 7) / 4
+                self.wtn = (self.wtn * 3 + 7) // 4
         if port == 'E':
             if (self.wtn > 5):
-                self.wtn = (self.wtn + 5) / 2
+                self.wtn = (self.wtn + 5) // 2
             else:
-                self.wtn = (self.wtn * 3 + 5) / 4
+                self.wtn = (self.wtn * 3 + 5) // 4
         if port == 'X':
-            self.wtn = (self.wtn - 5) / 2
+            self.wtn = (self.wtn - 5) // 2
 
         self.wtn = math.trunc(max(0, self.wtn))
 
@@ -509,17 +507,17 @@ class Star(object):
             self.tcs_gwp = 0
 
         if self.tradeCode.rich:
-            self.tcs_gwp = self.tcs_gwp * 16 / 10
+            self.tcs_gwp = self.tcs_gwp * 16 // 10
         if self.tradeCode.industrial:
-            self.tcs_gwp = self.tcs_gwp * 14 / 10
+            self.tcs_gwp = self.tcs_gwp * 14 // 10
         if self.tradeCode.agricultural:
-            self.tcs_gwp = self.tcs_gwp * 12 / 10
+            self.tcs_gwp = self.tcs_gwp * 12 // 10
         if self.tradeCode.poor:
-            self.tcs_gwp = self.tcs_gwp * 8 / 10
+            self.tcs_gwp = self.tcs_gwp * 8 // 10
         if self.tradeCode.nonindustrial:
-            self.tcs_gwp = self.tcs_gwp * 8 / 10
+            self.tcs_gwp = self.tcs_gwp * 8 // 10
         if self.tradeCode.nonagricultural:
-            self.tcs_gwp = self.tcs_gwp * 8 / 10
+            self.tcs_gwp = self.tcs_gwp * 8 // 10
 
         budget = int(self.tcs_gwp * 0.03 * tax_rate[self.uwpCodes['Government']])
 

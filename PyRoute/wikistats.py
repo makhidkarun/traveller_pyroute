@@ -13,7 +13,7 @@ import math
 import inflect
 from Star import Nobles
 from AllyGen import AllyGen
-
+from StatCalculation import ObjectStatistics
 
 class WikiStats(object):
     """
@@ -99,13 +99,13 @@ class WikiStats(object):
         f.write('|align="right"|{:,d}\n'.format(stats.population))
         f.write('|align="right"|{:,d}\n'.format(stats.economy))
         f.write('|align="right"|{:,d}\n'.format(stats.percapita))
-        f.write('|align="right"|{:,d}\n'.format(int(stats.tradeVol / 1e9)))
-        f.write('|align="right"|{:,d}\n'.format(int(stats.trade / 1e9)))
-        f.write('|align="right"|{:,d}\n'.format(int(stats.tradeExt / 1e9)))
+        f.write('|align="right"|{:,d}\n'.format(int(stats.tradeVol // 1e9)))
+        f.write('|align="right"|{:,d}\n'.format(int(stats.trade // 1e9)))
+        f.write('|align="right"|{:,d}\n'.format(int(stats.tradeExt // 1e9)))
         f.write('|align="right"|{:,d}\n'.format(stats.sum_ru))
         f.write('|align="right"|{:,d}\n'.format(stats.shipyards))
         f.write('|align="right"|{:,.2f}\n'.format(stats.col_be))
-        f.write('|align="right"|{:,d}\n'.format(stats.passengers / 1000000))
+        f.write('|align="right"|{:,d}\n'.format(stats.passengers // 1000000))
         f.write('|align="right"|{:,d}\n'.format(stats.spa_people))
         f.write('|align="right"|{:,d}\n'.format(stats.eti_worlds))
         f.write('|align="right"|{:,d}\n'.format(int(stats.eti_cargo * 50)))
@@ -126,6 +126,7 @@ class WikiStats(object):
             f.write('|-\n')
             f.write('|Trade || {:,d} billion\n'.format(int(self.galaxy.stats.trade / 1e9)))
             f.write('\n|}\n')
+            
             f.write('===Summary Report===\n')
             self.write_uwp_counts(f)
             f.write('|-\n|colspan=20 align=center|Percent by Population\n')
@@ -165,14 +166,17 @@ class WikiStats(object):
                 self.text_alg_statistics(f, area_type, allegiance)
                 f.write('\n')
 
+    def write_uwp_stats(self, f):
+        
+
     def write_uwp_counts(self, f):
-        from .StatCalculation import ObjectStatistics
+        from StatCalculation import ObjectStatistics
         default_stats = ObjectStatistics()
         f.write('{|\n!Component')
         for x in range(18):
             f.write('||{}'.format(baseN(x, 18)))
         f.write('||I-Z')
-        for name, values in self.uwp.uwp.item():
+        for name, values in self.uwp.uwp.items():
             f.write('\n|- \n| {}'.format(name))
             for x in range(18):
                 index = baseN(x, 18)
@@ -180,7 +184,7 @@ class WikiStats(object):
                 value = stats.number
                 f.write('||{}'.format(value))
             found = False
-            for index, stats in values.item():
+            for index, stats in values.items():
                 if index not in '0123456789ABCDEFGH':
                     f.write('||{:d}'.format(stats.number))
                     found = True
@@ -190,7 +194,7 @@ class WikiStats(object):
         f.write('\n')
 
     def write_uwp_populations(self, f):
-        from .StatCalculation import ObjectStatistics
+        from StatCalculation import ObjectStatistics
         population = self.galaxy.stats.population
         default_stats = ObjectStatistics()
         f.write('|-\n!Component')
@@ -203,13 +207,13 @@ class WikiStats(object):
             for x in range(18):
                 index = baseN(x, 18)
                 stats = self.uwp.uwp.get(name, {}).get(index, default_stats)
-                value = int(stats.population / (population / 100)) if population > 0 else 0
+                value = stats.population // (population // 100) if population > 0 else 0
                 f.write('||{:d}%'.format(value))
 
             found = False
             for index, stats in values.items():
                 if index not in '0123456789ABCDEFGH':
-                    value = int(stats.population / (population / 100)) if population > 0 else 0
+                    value = stats.population // (population // 100) if population > 0 else 0
                     f.write('||{:d}%'.format(value))
                     found = True
                     break
@@ -225,8 +229,8 @@ class WikiStats(object):
             f.write(
                 '{| class=\"wikitable sortable\"\n!Sector!!X,Y!!Worlds !! Budget (BCr) !! Shipyard Capacity (MTons)\n')
             for sector in self.galaxy.sectors.values():
-                budget = [star.budget / 1000 for star in sector.worlds]
-                capacity = [star.ship_capacity / 1000000 for star in sector.worlds]
+                budget = [star.budget // 1000 for star in sector.worlds]
+                capacity = [star.ship_capacity // 1000000 for star in sector.worlds]
                 budget_sum = sum(budget)
                 capacity_sum = sum(capacity)
 
@@ -375,7 +379,7 @@ class WikiStats(object):
         f.write('estimated population of ')
         f.write(self.write_population(area.stats.population))
         sophonts = ["{}: {}".format(code, self.write_population(pop)) for (code, pop)
-                    in area.stats.pop_groups.item()]
+                    in area.stats.pop_groups.items()]
         f.write(' (')
         f.write(", ".join(sophonts))
         f.write('). ')
@@ -428,7 +432,7 @@ class WikiStats(object):
             PopWorlds = PopWorlds[0:6]
 
             self.plural.num(len(PopWorlds))
-            f.write(self.plural.inflect("The highest population plural(world) plural_verb(is) {}. ".
+            f.write(self.plural.inflect("The highest population plural('world') plural_verb('is') {}. ".
                                         format(self.plural.join(PopWorlds))))
             self.plural.num()
 
@@ -533,7 +537,7 @@ class WikiStats(object):
                         f.write('||{:8,d}'.format(star.ru))
                         f.write('||{:10,d}'.format(star.perCapita))
                         f.write('||{:10,d}'.format(star.gwp))
-                        f.write('||{:10,d}'.format(star.tradeIn / 1000000))
+                        f.write('||{:10,d}'.format(star.tradeIn // 1000000))
                         f.write('||{:10,d}'.format(star.passIn))
                         f.write('||{:11,d}'.format(star.ship_capacity))
                         f.write('||{:8,d}'.format(star.raw_be))
@@ -587,7 +591,7 @@ class WikiStats(object):
                     f.write(onespace if star.importance < 0 else twospace)
                     f.write('{:3d}'.format(star.wtn))
                     f.write('{:10,d}'.format(star.gwp))
-                    f.write('{:10,d}'.format(star.tradeIn / 1000000))
+                    f.write('{:10,d}'.format(star.tradeIn // 1000000))
                     f.write('{:10,d}'.format(star.passIn))
                     f.write('{:8,d}'.format(star.ru))
                     f.write('{:11,d}'.format(star.ship_capacity))
@@ -601,9 +605,9 @@ class WikiStats(object):
         self.plural.num(count)
         c_text = self.plural.number_to_words(count, zero='no', threshold=10)
         if is_are:
-            string = self.plural.inflect("plural_verb(is) {0}{1} plural({2})".format(c_text, lead_text, text))
+            string = self.plural.inflect("plural_verb('is') {0}{1} plural('{2}')".format(c_text, lead_text, text))
         else:
-            string = self.plural.inflect("{0}{1} plural({2})".format(c_text, lead_text, text))
+            string = self.plural.inflect("{0}{1} plural('{2}')".format(c_text, lead_text, text))
 
         self.plural.num()
         return string
@@ -613,7 +617,7 @@ class WikiStats(object):
 
     def write_population(self, population):
         if population >= 1000:
-            return '{:,d} billion'.format(population / 1000)
+            return '{:,d} billion'.format(population // 1000)
         elif population >= 1:
             return '{:,d} million'.format(population)
         else:

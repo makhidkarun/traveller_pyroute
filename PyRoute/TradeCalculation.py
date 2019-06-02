@@ -138,9 +138,9 @@ class RouteCalculation(object):
         Convert the BTN trade number to a credit value.
         """
         if btn & 1:
-            trade = (10 ** ((btn - 1) / 2)) * 5
+            trade = (10 ** ((btn - 1) // 2)) * 5
         else:
-            trade = 10 ** (btn / 2)
+            trade = 10 ** (btn // 2)
 
         return trade
 
@@ -150,9 +150,9 @@ class RouteCalculation(object):
         if (btn <= 10):
             trade = 0
         elif btn & 1:
-            trade = (10 ** ((btn - 11) / 2)) * 5
+            trade = (10 ** ((btn - 11) // 2)) * 5
         else:
-            trade = 10 ** ((btn - 10) / 2)
+            trade = 10 ** ((btn - 10) // 2)
         return trade
 
 
@@ -375,7 +375,7 @@ class XRouteCalculation(RouteCalculation):
         for (star, neighbor, data) in self.galaxy.stars.edges(data=True):
             data['weight'] = self.route_weight(star, neighbor)
             for _ in range(1, min(data['count'], 5)):
-                data['weight'] -= data['weight'] / self.route_reuse
+                data['weight'] -= data['weight'] // self.route_reuse
 
     def find_nearest_capital(self, world, capitals):
         dist = (None, 9999)
@@ -407,7 +407,7 @@ class XRouteCalculation(RouteCalculation):
             self.galaxy.stars[start][end]['trade'] = max(trade, self.galaxy.stars[start][end]['trade'])
             self.galaxy.stars[start][end]['count'] += 1
             self.galaxy.stars[start][end]['weight'] -= \
-                self.galaxy.stars[start][end]['weight'] / self.route_reuse
+                self.galaxy.stars[start][end]['weight'] // self.route_reuse
             start = end
 
         self.galaxy.ranges[route[0]][route[-1]]['actual distance'] = distance
@@ -565,8 +565,8 @@ class TradeCalculation(RouteCalculation):
                     self.logger.info('processed {} routes at BTN {}'.format(counter, base_btn))
                 base_btn = data['btn']
                 counter = 0
-            if total > 100 and processed % (total / 20) == 0:
-                self.logger.info('processed {} routes, at {}%'.format(processed, processed / (total / 100)))
+            if total > 100 and processed % (total // 20) == 0:
+                self.logger.info('processed {} routes, at {}%'.format(processed, processed // (total // 100)))
             self.get_trade_between(star, neighbor)
             counter += 1
             processed += 1
@@ -589,29 +589,29 @@ class TradeCalculation(RouteCalculation):
         tradeCr, tradePass = self.route_update_simple(route)
 
         if star.sector != target.sector:
-            star.sector.stats.tradeExt += tradeCr / 2
-            target.sector.stats.tradeExt += tradeCr / 2
-            star.sector.subsectors[star.subsector()].stats.tradeExt += tradeCr / 2
-            target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr / 2
-            star.sector.stats.passengers += tradePass / 2
-            target.sector.stats.passengers += tradePass / 2
+            star.sector.stats.tradeExt += tradeCr // 2
+            target.sector.stats.tradeExt += tradeCr // 2
+            star.sector.subsectors[star.subsector()].stats.tradeExt += tradeCr // 2
+            target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr // 2
+            star.sector.stats.passengers += tradePass // 2
+            target.sector.stats.passengers += tradePass // 2
         else:
             star.sector.stats.trade += tradeCr
             star.sector.stats.passengers += tradePass
             if star.subsector() == target.subsector():
                 star.sector.subsectors[star.subsector()].stats.trade += tradeCr
             else:
-                star.sector.subsectors[star.subsector()].stats.tradeExt += tradeCr / 2
-                target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr / 2
+                star.sector.subsectors[star.subsector()].stats.tradeExt += tradeCr // 2
+                target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr // 2
 
         if AllyGen.are_allies(star.alg, target.alg):
             self.galaxy.alg[AllyGen.same_align(star.alg)].stats.trade += tradeCr
             self.galaxy.alg[AllyGen.same_align(star.alg)].stats.passengers += tradePass
         else:
-            self.galaxy.alg[AllyGen.same_align(star.alg)].stats.tradeExt += tradeCr / 2
-            self.galaxy.alg[AllyGen.same_align(target.alg)].stats.tradeExt += tradeCr / 2
-            self.galaxy.alg[AllyGen.same_align(star.alg)].stats.passengers += tradePass / 2
-            self.galaxy.alg[AllyGen.same_align(target.alg)].stats.passengers += tradePass / 2
+            self.galaxy.alg[AllyGen.same_align(star.alg)].stats.tradeExt += tradeCr // 2
+            self.galaxy.alg[AllyGen.same_align(target.alg)].stats.tradeExt += tradeCr // 2
+            self.galaxy.alg[AllyGen.same_align(star.alg)].stats.passengers += tradePass // 2
+            self.galaxy.alg[AllyGen.same_align(target.alg)].stats.passengers += tradePass // 2
 
         self.galaxy.stats.trade += tradeCr
         self.galaxy.stats.passengers += tradePass
@@ -636,8 +636,8 @@ class TradeCalculation(RouteCalculation):
         # Gather basic statistics. 
         tradeBTN = self.get_btn(route[0], route[-1], distance)
         tradeCr = self.calc_trade(tradeBTN)
-        route[0].tradeIn += tradeCr / 2
-        route[-1].tradeIn += tradeCr / 2
+        route[0].tradeIn += tradeCr // 2
+        route[-1].tradeIn += tradeCr // 2
         tradePassBTN = self.get_passenger_btn(tradeBTN, route[0], route[-1])
         tradePass = self.calc_passengers(tradePassBTN)
 
@@ -688,7 +688,7 @@ class TradeCalculation(RouteCalculation):
             start = end
 
         if len(route) > 6 and not usesJumpRoute:
-            weight -= weight / self.route_reuse
+            weight -= weight // self.route_reuse
             self.galaxy.routes.add_edge(route[0], route[-1], distance=dist,
                                         weight=weight, trade=0, route=route,
                                         btn=0)
@@ -836,7 +836,7 @@ class CommCalculation(RouteCalculation):
 
                 ix4_worlds = [star for star in alg.worlds if star.importance > 3]
                 self.logger.info("Alg {} has {} ix 5/4 worlds".format(alg.name, len(ix4_worlds)))
-                if len(ix4_worlds) == 0 or len(ix4_worlds) < len(alg.worlds) / 100:
+                if len(ix4_worlds) == 0 or len(ix4_worlds) < len(alg.worlds) // 100:
                     alg.min_importance = 2
                     self.logger.info("setting {} min importance to 2".format(alg.name))
                 else:
@@ -876,8 +876,8 @@ class CommCalculation(RouteCalculation):
         processed = 0
         self.logger.info('Routes: {}'.format(total))
         for (star, neighbor, data) in routes:
-            if total > 100 and processed % (total / 20) == 0:
-                self.logger.info('processed {} routes, at {}%'.format(processed, processed / (total / 100)))
+            if total > 100 and processed % (total // 20) == 0:
+                self.logger.info('processed {} routes, at {}%'.format(processed, processed // (total // 100)))
             self.get_route_between(star, neighbor)
             processed += 1
 
