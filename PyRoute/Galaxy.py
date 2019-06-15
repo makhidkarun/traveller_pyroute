@@ -59,6 +59,15 @@ class Allegiance(AreaItem):
     def __str__(self):
         return '{} ([{})'.format(self.name, self.code)
 
+    def is_unclaimed(self):
+        return AllyGen.is_unclaimed(self)
+
+    def is_wilds(self):
+        return AllyGen.is_wilds(self)
+
+    def is_client_state(self):
+        return AllyGen.is_client_state(self)
+
 
 class Subsector(AreaItem):
     def __init__(self, name, position, sector):
@@ -73,6 +82,19 @@ class Subsector(AreaItem):
         self.dx = sector.dx
         self.dy = sector.dy
         self.alg = {}
+        self.alg_sorted = []
+
+    # For the JSONPickel work
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['sector']
+        del state['spinward']
+        del state['trailing']
+        del state['coreward']
+        del state['rimward']
+        del state['alg_sorted']
+        del state['positions']
+        return state
 
     def wiki_name(self):
         if len(self.name) == 0:
@@ -131,11 +153,22 @@ class Sector(AreaItem):
         self.dx = self.x * 32
         self.dy = self.y * 40
         self.subsectors = {}
-        self.alg = {}
         self.spinward = None
         self.trailing = None
         self.coreward = None
         self.rimward = None
+        self.alg = {}
+        self.alg_sorted = []
+
+    # For the JSONPickel work
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['spinward']
+        del state['trailing']
+        del state['coreward']
+        del state['rimward']
+        del state['alg_sorted']
+        return state
 
     def __str__(self):
         return '{} ({},{})'.format(self.name, str(self.x), str(self.y))
@@ -167,12 +200,25 @@ class Galaxy(object):
         self.ranges = nx.Graph()
         self.sectors = {}
         self.alg = {}
+        self.alg_sorted = []
         self.stats = ObjectStatistics()
         self.borders = AllyGen(self)
         self.output_path = 'maps'
         self.max_jump_range = max_jump
         self.min_btn = min_btn
         self.route_btn = route_btn
+
+    # For the JSONPickel work
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['stars']
+        del state['ranges']
+        del state['borders']
+        del state['logger']
+        del state['trade']
+        del state['sectors']
+        del state['alg_sorted']
+        return state
 
     def read_sectors(self, sectors, pop_code, ru_calc):
         for sector in sectors:
