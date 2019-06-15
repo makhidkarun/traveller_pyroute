@@ -77,6 +77,12 @@ class TradeCodes(object):
     def __str__(self):
         return " ".join(self.codeset + self.dcode)
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['logger']
+        del state['ownedBy']
+        return state
+
     def planet_codes(self):
         return " ".join(self.codeset)
 
