@@ -1,0 +1,11 @@
+{% import 'statistics_table.wiki' as stats %}
+
+=== Sector statistics ===
+{% for sector in sectors.values() -%}
+==== {{sector.name}} statistics ====
+{{ stats.text_area_long('sector', sector, plural) }}
+===== Polity Listing =====
+{{ stats.allegiance_statistics(plural, sector) }}
+
+{%- endfor -%}
+

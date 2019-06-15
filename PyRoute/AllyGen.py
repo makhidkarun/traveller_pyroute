@@ -14,7 +14,8 @@ class AllyGen(object):
     classdocs
     """
     noOne = ['--', '??', 'Xx']
-    nonAligned = ['Na', 'Ns', 'Va', 'Cs', 'Hc', 'NaH', 'NaDr', 'NaVa', 'NaAs', 'NaXx', 'VaEx', 'NaSo',
+    nonAligned = ['Na', 'Ns', 'Va', 'Cs', 'Hc', 'NaHv', 'NaDr', 'NaVa', 'NaAs', 'NaXx', 'NaXX',
+                  'VaEx', 'NaSo',
                   'CsCa', 'CsHv', 'CsIm', 'CsMP', 'CsVa', 'CsZh', 'CsRe', 'CsMo', 'CsRr',
                   'Wild']
     sameAligned = [('Im', 'ImAp', 'ImDa', 'ImDc', 'ImDd', 'ImDg', 'ImDi', 'ImDs', 'ImDv',
@@ -55,6 +56,14 @@ class AllyGen(object):
     @staticmethod
     def is_nonaligned(alg):
         return alg in AllyGen.nonAligned or alg in AllyGen.noOne
+
+    @staticmethod
+    def is_wilds(alg):
+        return alg.code[0:2] == 'Na' or alg.code in ['Wild', 'VaEx', 'Va']
+
+    @staticmethod
+    def is_client_state(alg):
+        return alg.code[0:2] == 'Cs'
 
     @staticmethod
     def same_align(alg):

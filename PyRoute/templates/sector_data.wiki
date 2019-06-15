@@ -1,0 +1,27 @@
+<section begin="header"/>
+{| class="wikitable sortable" width="90%"
+|+ {{sector.sector_name()}} sector data
+!Hex!!Name!!UWP!!Remarks!!{Ix}!!(Ex)!![Cx]!!Noble!!Base!!Zone!!PBG!!Worlds!!Alg!!Stellar <section end="header"/>
+{%- for subsector in sector.subsectors.values() -%}
+<section begin="{{subsector.name}}"/>
+{%- for world in subsector.worlds %}
+|-
+| {{ world.position }}
+| [[{{ world.wiki_short_name() }}]]
+| {{ world.uwp }}
+| {{ world.tradeCode }}
+| { {{world.importance }} }
+| {{ world. economics }}
+| {{ world.social }}
+| {{ world.nobles }}
+| {{ world.baseCode }}
+| {{ world.zone }}
+| {{ world.popM}}{{world.belts}}{{world.ggCount}}
+| {{ world.worlds }}
+| {{ world.alg }}
+| {{ world.stars }}
+{% endfor -%}
+<section end="{{subsector.name}}" />
+{%- endfor %}
+|}
+[[Category: Sectors with sector data]]

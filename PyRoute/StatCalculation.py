@@ -40,7 +40,26 @@ class ObjectStatistics(object):
         self.eti_worlds = 0
         self.eti_cargo = 0
         self.eti_pass = 0
+        self.homeworlds = []
+        self.high_pop_worlds = []
+        self.high_tech_worlds = []
+        self.TLmean = 0
+        self.TLstddev = 0
 
+    def homeworld_count(self):
+        return len(self.homeworlds)
+
+    def high_pop_worlds_count(self):
+        return len(self.high_pop_worlds)
+
+    def high_pop_worlds_list(self):
+        return [world.wiki_name() for world in self.high_pop_worlds[0:6]]
+
+    def high_tech_worlds_count(self):
+        return len(self.high_tech_worlds)
+
+    def high_tech_worlds_list(self):
+        return [world.wiki_name() for world in self.high_tech_worlds[0:6]]
 
 class UWPCollection(object):
     def __init__(self):
@@ -70,7 +89,7 @@ class StatCalculation(object):
         self.all_uwp = UWPCollection()
         self.imp_uwp = UWPCollection()
 
-    def calculate_statistics(self):
+    def calculate_statistics(self, ally_match):
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
         for sector in self.galaxy.sectors.values():
             if sector is None:
@@ -106,13 +125,30 @@ class StatCalculation(object):
                 for uwpCode, uwpValue in star.uwpCodes.items():
                     self.add_stats(self.all_uwp.stats(uwpCode, uwpValue), star)
 
-            self.per_capita(sector.stats)  # Per capita sector stats
-            for subsector in sector.subsectors.values():
-                self.per_capita(subsector.stats)
-        self.per_capita(self.galaxy.stats)
+            self.per_capita(sector.worlds, sector.stats)  # Per capita sector stats
+            sector.alg_sorted = AllyGen.sort_allegiances(sector.alg, ally_match)
+            for alg in sector.alg_sorted:
+                self.per_capita(alg.worlds, alg.stats)
 
-        for alg in self.galaxy.alg.values():
-            self.per_capita(alg.stats)
+            for subsector in sector.subsectors.values():
+                self.per_capita(subsector.worlds, subsector.stats)
+                subsector.alg_sorted = AllyGen.sort_allegiances(subsector.alg, ally_match)
+                for alg in subsector.alg_sorted:
+                    self.per_capita(alg.worlds, alg.stats)
+
+        self.per_capita(None, self.galaxy.stats)
+
+        self.galaxy.alg_sorted = AllyGen.sort_allegiances(self.galaxy.alg, ally_match)
+        for alg in self.galaxy.alg_sorted:
+            self.per_capita(alg.worlds, alg.stats)
+
+        for uwpName in self.all_uwp.uwp.values():
+            for uwpStats in uwpName.values():
+                self.per_capita(None, uwpStats)
+
+        for uwpName in self.imp_uwp.uwp.values():
+            for uwpStats in uwpName.values():
+                self.per_capita(None, uwpStats)
 
     def add_alg_stats(self, area, star, alg):
         algStats = area.alg[alg].stats
@@ -131,6 +167,9 @@ class StatCalculation(object):
 
     def add_stats(self, stats, star):
         stats.population += star.population
+
+        if star.tradeCode.homeworld:
+            stats.homeworlds.append(star)
 
         if star.tradeCode.sophonts is None:
             self.add_pop_to_alg(stats, star.alg_base, star.population)
@@ -178,7 +217,7 @@ class StatCalculation(object):
         stats.maxPort = 'ABCDEX?'[min('ABCDEX?'.index(star.uwpCodes['Starport']), 'ABCDEX?'.index(stats.maxPort))]
         stats.maxPop = max(stats.maxPop, star.popCode)
 
-    def per_capita(self, stats):
+    def per_capita(self, worlds, stats):
         if stats.population > 100000:
             stats.percapita = stats.economy // (stats.population // 1000)
         elif stats.population > 0:
@@ -190,6 +229,15 @@ class StatCalculation(object):
             stats.shipyards //= 1000000
         else:
             stats.shipyards = 0
+        if worlds:
+            stats.high_pop_worlds = [world for world in worlds if world.popCode == stats.maxPop]
+            stats.high_pop_worlds.sort(key=lambda star: star.popM, reverse=True)
+            stats.high_tech_worlds = [world for world in worlds if world.tl == stats.maxTL]
+            TLList = [world.tl for world in worlds]
+            if len(TLList) > 3:
+                stats.TLmean = sum(TLList) / len(TLList)
+                TLVar = [math.pow(tl - stats.TLmean, 2) for tl in TLList]
+                stats.TLstddev = math.sqrt(sum(TLVar) / len(TLVar))
 
     def find_colonizer(self, world, owner_hex):
         for target in self.galaxy.ranges.neighbors_iter(world):
@@ -197,21 +245,26 @@ class StatCalculation(object):
                 target.tradeCode.append("C:{}-{}".format(world.sector[0:4], world.position))
                 pass
 
-    def write_statistics(self, ally_count, ally_match):
+    def write_statistics(self, ally_count, ally_match, json_data):
         self.logger.info('Charted star count: ' + str(self.galaxy.stats.number))
         self.logger.info('Charted population {:,d}'.format(self.galaxy.stats.population))
 
-        for sector in self.galaxy.sectors.values():
-            self.logger.debug('Sector {} star count: {:,d}'.format(sector.name, sector.stats.number))
+        if self.logger.isEnabledFor(logging.DEBUG):
+            for sector in self.galaxy.sectors.values():
+                self.logger.debug('Sector {} star count: {:,d}'.format(sector.name, sector.stats.number))
 
-        for code, aleg in self.galaxy.alg.items():
-            s = 'Allegiance {0} ({1}: base {3}) star count: {2:,d}'.format(aleg.name, code, aleg.stats.number,
-                                                                            aleg.base)
-            self.logger.info(s)
+            for code, aleg in self.galaxy.alg.items():
+                if aleg.base:
+                    s = 'Allegiance {0} ({1}: base {3}) star count: {2:,d}'.format(aleg.name, code, aleg.stats.number,
+                                                                                aleg.base)
+                else:
+                    s = 'Allegiance {0} ({1}: base {3} -> {4}) star count: {2:,d}'.format(aleg.name, code, aleg.stats.number,
+                                                                                aleg.base, AllyGen.same_align(aleg.code))
+                self.logger.debug(s)
 
-        self.logger.debug("min count: {}, match: {}".format(ally_count, ally_match))
+            self.logger.debug("min count: {}, match: {}".format(ally_count, ally_match))
 
-        wiki = WikiStats(self.galaxy, self.all_uwp, ally_count, ally_match)
+        wiki = WikiStats(self.galaxy, self.all_uwp, ally_count, ally_match, json_data)
         wiki.write_statistics()
 
     @staticmethod

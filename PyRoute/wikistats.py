@@ -11,9 +11,10 @@ import datetime
 import urllib.parse
 import math
 import inflect
+import jsonpickle
 from Star import Nobles
 from AllyGen import AllyGen
-from StatCalculation import ObjectStatistics
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 class WikiStats(object):
     """
@@ -25,7 +26,7 @@ class WikiStats(object):
                   '!! RU !! Shipyard Capacity (MTons) !! Colonial Army (BEs) ' + \
                   '!! Travellers (M / year) !! SPA Pop !! ETI worlds !! ETI Cargo (tons / year) !! ETI passengers (per year)\n'
 
-    def __init__(self, galaxy, uwp, min_alg_count=10, match_alg='collapse'):
+    def __init__(self, galaxy, uwp, min_alg_count=10, match_alg='collapse', json_data=False):
         """
         Constructor
         """
@@ -34,17 +35,84 @@ class WikiStats(object):
         self.min_alg_count = min_alg_count
         self.plural = inflect.engine()
         self.match_alg = match_alg == 'collapse'
+        self.json_data = json_data
         self.logger = logging.getLogger('PyRoute.WikiStats')
 
+        self.env = Environment(
+            loader=FileSystemLoader('PyRoute/templates'),
+            #loader=PackageLoader('PyRoute', 'templates'),
+            autoescape=select_autoescape(['html', 'xml'])
+            )
+
     def write_statistics(self):
-        self.summary_statistics()
-        self.top_summary()
-        self.tcs_statistics()
-        self.subsector_statistics()
-        self.write_allegiances(self.galaxy.alg)
-        self.write_worlds_wiki_stats()
-        self.write_sector_wiki()
-        self.write_world_statistics()
+        self.summary_statistics_template()
+        self.sector_statistics_template()
+        self.sector_data_template()
+
+        #self.top_summary()
+        #self.tcs_statistics()
+        #self.subsector_statistics()
+        #self.write_allegiances(self.galaxy.alg)
+        #self.write_worlds_wiki_stats()
+        #self.write_sector_wiki()
+        #self.write_world_statistics()
+
+        self.write_summary_lists()
+        if self.json_data:
+            self.write_json()
+
+
+    def output_template (self, template, filename, parameters):
+        template = self.env.get_template(template)
+        path = os.path.join(self.galaxy.output_path, filename)
+        with open(path, 'w+', encoding='utf-8') as f:
+            f.write(template.render(parameters))
+
+    def summary_statistics_template(self):
+        self.output_template('summary.wiki', 'summary.wiki',
+                             {'sectors': self.galaxy.sectors,
+                              'global_stats': self.galaxy.stats,
+                              'im_stats': self.galaxy.alg.get('Im', None),
+                              'uwp': self.uwp,
+                              'plural': self.plural,
+                              'global_alg': self.galaxy.alg_sorted})
+
+    def sector_statistics_template(self):
+        self.output_template('sectors.wiki', 'sectors.wiki',
+                             {'sectors': self.galaxy.sectors,
+                              'plural': self.plural})
+
+    def sector_data_template(self):
+        for sector in self.galaxy.sectors.values():
+            self.output_template('sector_data.wiki', sector.sector_name() + " Sector.sector.wiki",
+                                  {"sector": sector})
+            self.output_template('sector_econ.wiki', sector.sector_name() + " Sector.economic.wiki",
+                                 {'sector': sector})
+
+    def write_json(self):
+        path = os.path.join(self.galaxy.output_path, 'galaxy.json')
+        jsonpickle.set_encoder_options('simplejson', sort_keys=True, indent=2)
+        galaxy_json = jsonpickle.encode(self.galaxy, unpicklable=False, max_depth=14)
+        with open(path, 'w+', encoding='utf8') as f:
+            f.write(galaxy_json)
+        for sector in self.galaxy.sectors.values():
+            path = os.path.join(self.galaxy.output_path, sector.sector_name() + " Sector.sector.json")
+            sector_json = jsonpickle.encode(sector, unpicklable=False, max_depth=14)
+            with codecs.open(path, 'w+', encoding='utf8') as f:
+                f.write(sector_json)
+
+    def write_summary_lists(self):
+        path = os.path.join(self.galaxy.output_path, 'sectors_list.txt')
+        with open(path, 'w+') as f:
+            for sector in self.galaxy.sectors.values():
+                f.write('[[{} Sector/summary]]\n'.format(sector.sector_name()))
+
+        path = os.path.join(self.galaxy.output_path, 'subsector_list.txt')
+        with codecs.open(path, 'w+', 'utf-8') as f:
+            for sector in self.galaxy.sectors.values():
+                for subsector in sector.subsectors.values():
+                    f.write('[[{} Subsector/summary]]\n'.format(subsector.name))
+
 
     def summary_statistics(self):
         path = os.path.join(self.galaxy.output_path, 'summary.wiki')
@@ -165,9 +233,6 @@ class WikiStats(object):
                 f.write('==== {} ====\n'.format(allegiance.allegiance_name()))
                 self.text_alg_statistics(f, area_type, allegiance)
                 f.write('\n')
-
-    def write_uwp_stats(self, f):
-        
 
     def write_uwp_counts(self, f):
         from StatCalculation import ObjectStatistics
