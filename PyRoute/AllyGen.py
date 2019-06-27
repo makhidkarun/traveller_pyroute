@@ -25,7 +25,7 @@ class AllyGen(object):
                     'AsIf', 'AsMw', 'AsOf', 'AsSc', 'AsSF', 'AsT0', 'AsT1', 'AsT2',
                     'AsT3', 'AsT4', 'AsT5', 'AsT6', 'AsT7', 'AsT8', 'AsT9', 'AsTA',
                     'AsTv', 'AsTz', 'AsVc', 'AsWc', 'AsXX', 'GlEm', 'NaAs'),
-                   ('Hv', 'HvFd', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'Hf', 'H?'),
+                   ('Hv', 'HvFd', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H?', 'Hf'),
                    ('JP', 'J-', 'Jh', 'Hl', 'JuPr',
                     'JAOz', 'JAsi', 'JCoK', 'JHhk', 'JLum', 'JMen',
                     'JPSt', 'JRar', 'JUkh', 'JuHl', 'JuR', 'JVug'),
@@ -83,6 +83,20 @@ class AllyGen(object):
         else:
             return alg_name.split(',')[0].strip()
 
+    @staticmethod
+    def population_align(alg):
+        if AllyGen.same_align(alg)  == 'Hv' or alg in('CsHv', 'NaHv'):
+            return 'Hive'
+        elif AllyGen.same_align(alg) == 'As' or alg in ('CsAs', 'NaAs'):
+            return 'Asla'
+        elif alg in ('Va', 'NaVa', 'VaEx'):
+            return 'Varg'
+        elif alg in ('Kk', 'KkTw', 'KC', 'CsTw', 'Kc'):
+            return "KXkr"
+        else:
+            return 'Huma'
+
+         
     @staticmethod
     def sort_allegiances(alg_list, base_match_only):
         # The logic: 
