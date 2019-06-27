@@ -12,6 +12,7 @@ import urllib.parse
 import math
 import inflect
 import jsonpickle
+from networkx.readwrite import json_graph
 from Star import Nobles
 from AllyGen import AllyGen
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -26,7 +27,7 @@ class WikiStats(object):
                   '!! RU !! Shipyard Capacity (MTons) !! Colonial Army (BEs) ' + \
                   '!! Travellers (M / year) !! SPA Pop !! ETI worlds !! ETI Cargo (tons / year) !! ETI passengers (per year)\n'
 
-    def __init__(self, galaxy, uwp, min_alg_count=10, match_alg='collapse', json_data=False):
+    def __init__(self, galaxy, uwp, min_alg_count=10, match_alg='collapse', json_data=False, routes_generated=False):
         """
         Constructor
         """
@@ -47,6 +48,7 @@ class WikiStats(object):
     def write_statistics(self):
         self.summary_statistics_template()
         self.sector_statistics_template()
+        self.subsector_statistics_template()
         self.sector_data_template()
 
         #self.top_summary()
@@ -82,6 +84,11 @@ class WikiStats(object):
                              {'sectors': self.galaxy.sectors,
                               'plural': self.plural})
 
+    def subsector_statistics_template(self):
+        self.output_template('subsectors.wiki', 'subsectors.wiki',
+                             {'sectors': self.galaxy.sectors,
+                              'plural': self.plural})
+        
     def sector_data_template(self):
         for sector in self.galaxy.sectors.values():
             self.output_template('sector_data.wiki', sector.sector_name() + " Sector.sector.wiki",
@@ -98,9 +105,16 @@ class WikiStats(object):
         for sector in self.galaxy.sectors.values():
             path = os.path.join(self.galaxy.output_path, sector.sector_name() + " Sector.sector.json")
             sector_json = jsonpickle.encode(sector, unpicklable=False, max_depth=14)
-            with codecs.open(path, 'w+', encoding='utf8') as f:
+            with open(path, 'w+', encoding='utf8') as f:
                 f.write(sector_json)
+        path = os.path.join(self.galaxy.output_path, 'ranges.json')
+        with open(path, "w+", encoding='utf8') as f:
+            f.write(jsonpickle.encode(json_graph.node_link_data(self.galaxy.ranges)))
 
+        path = os.path.join(self.galaxy.output_path, 'stars.json')
+        with open(path, "w+", encoding='utf8') as f:
+            f.write(jsonpickle.encode(json_graph.node_link_data(self.galaxy.stars)))
+        
     def write_summary_lists(self):
         path = os.path.join(self.galaxy.output_path, 'sectors_list.txt')
         with open(path, 'w+') as f:
@@ -114,6 +128,9 @@ class WikiStats(object):
                     f.write('[[{} Subsector/summary]]\n'.format(subsector.name))
 
 
+#########################################################################################################
+# Unused functions
+#########################################################################################################
     def summary_statistics(self):
         path = os.path.join(self.galaxy.output_path, 'summary.wiki')
         with codecs.open(path, 'w+', 'utf-8') as f:
