@@ -66,7 +66,7 @@ class Nobles(object):
         nobility = ""
         for rank, count in self.nobles.items():
             if count > 0:
-                nobility += self.codes.keys()[self.codes.values().index(rank)]
+                nobility += list(self.codes.keys())[list(self.codes.values()).index(rank)]
         return ''.join(sorted(nobility, key=lambda v: (v.lower(), v[0].isupper())))
 
     def __getstate__(self):
@@ -335,7 +335,7 @@ class Star(object):
                 popM = popCodeM[self.popM]
             else:
                 popM = (bisect.bisect(popCodeRange, random.random()) + 4) * 10
-            self.population = pow(10, self.popCode) * popM / 1e7
+            self.population = pow(10, self.popCode) * popM // 1e7
             self.uwpCodes['Pop Code'] = str(popM / 10)
 
         self.perCapita = calcGWP[min(self.tl, 19)] if self.population > 0 else 0
