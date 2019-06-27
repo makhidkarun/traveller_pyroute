@@ -1,10 +1,8 @@
-
 <section begin="header"/>
 {| class="wikitable sortable" width="90%"
 |+ {{ sector.sector_name() }} economic data
 !Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!MSPR!!RU!!Per Capita (Cr)!!GWP (BCr)!!Trade (MCr/year)
 !Passengers (per year)!!Build!!Army!!Port!!SPA Population
-!ETI Index!!ETI Pass Index!!ETI worlds!!ETI Cargo (tons/year)!!ETI Passengers (per year)
 !Trade Goods!!Subsector <section end="header"/>
 {%- for subsector in sector.subsectors.values() -%}
 <section begin="{{subsector.name}}" />
@@ -26,11 +24,6 @@
 | {{"{:,d}".format(world.raw_be) }}
 | {{ world.starportSize }}
 | {{"{:,d}".format(world.starportPop) }}
-| {{ world.eti_cargo }}
-| {{ world.eti_passenger }}
-| {{ world.eit_worlds }}
-| {{ "{:,d}".format(world.eti_cargo_volume * 50) }}
-| {{ "{:,d}".format(world.eti_pass_volume * 50) }}
 | {{ world.trade_id }}
 | {{ subsector.wiki_name() }}
 {% endfor -%}
