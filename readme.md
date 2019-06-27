@@ -1,7 +1,7 @@
 PyRoute for Traveller
 =====================
 
-PyRoute is a trade route generation program for Traveller.
+PyRoute is a trade route generation program for Traveller. PyRoute has been ported to python3, there is a branch with the python2 version.
 
 The data for the maps comes from [Traveller Map](http://www.travellermap.com/) based upon the Traveller 5th edition second survey data plus many of the fan created sectors from around the Internet and across the years.
 
@@ -9,7 +9,7 @@ The trade rules are from [GURPS Traveller: Far trader](http://www.sjgames.com/tr
 
 The routes followed for trade are created by the shortest path algorithms from [NetworkX](http://networkx.github.io/), a library for managing graphs. You will need version 2.1 or later for the Unicode handling. 
 
-The final output, the map of trade routes, is created by [PyPDFLite](https://github.com/katerina7479/pypdflite). You will need version 0.1.35 or later to include the ellipse and text rotation features. 
+The final output, the map of trade routes, is created by [PyPDFLite](https://github.com/katerina7479/pypdflite). You will need the python3 branch version of this library. 
 
 You can install the required libraries using pip:
 

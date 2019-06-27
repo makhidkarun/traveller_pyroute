@@ -108,8 +108,11 @@ class Subsector(AreaItem):
     def wiki_title(self):
         return '{0} - {1}'.format(self.wiki_name(), self.sector.wiki_name())
 
-    def sector_name(self):
-        return self.name[:-9] if self.name.endswith('Subsector') else self.name
+    def subsector_name(self):
+        if len(self.name) == 0:
+            return "Position {}".format(self.position)
+        else:
+            return self.name[:-9] if self.name.endswith('Subsector') else self.name
 
     def set_bounding_subsectors(self):
         posrow = 0
