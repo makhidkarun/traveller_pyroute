@@ -11,10 +11,26 @@ from AllyGen import AllyGen
 from Star import UWPCodes
 
 
+class Populations(object):
+    def __init__(self):
+        self.code = ""
+        self.homeworlds = []
+        self.count = 0
+        self.population = 0
+        
+    def add_population(self, population, homeworld):
+        self.count += 1
+        self.population += population
+        if homeworld:
+            self.homeworlds.append(homeworld)
+
+    def __lt__(self, other):
+        return self.population < other.population
+
 class ObjectStatistics(object):
     def __init__(self):
         self.population = 0
-        self.pop_groups = defaultdict(int)
+        self.populations = defaultdict(Populations)
 
         self.economy = 0
         self.trade = 0
@@ -36,6 +52,7 @@ class ObjectStatistics(object):
         self.gg_count = 0
         self.naval_bases = 0
         self.scout_bases = 0
+        self.military_bases = 0
         self.way_stations = 0
         self.eti_worlds = 0
         self.eti_cargo = 0
@@ -45,7 +62,21 @@ class ObjectStatistics(object):
         self.high_tech_worlds = []
         self.TLmean = 0
         self.TLstddev = 0
+        self.subsectorCp = []
+        self.sectorCp = []
+        self.otherCp = []
 
+    # For the JSONPickel work
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['high_pop_worlds']
+        del state['high_tech_worlds']
+        del state['subsectorCp']
+        del state['sectorCp']
+        del state['otherCp']
+        del state['homeworlds']
+        return state
+    
     def homeworld_count(self):
         return len(self.homeworlds)
 
@@ -155,15 +186,26 @@ class StatCalculation(object):
         self.add_stats(algStats, star)
         self.max_tl(algStats, star)
 
-    def add_pop_to_alg(self, stats, alg_base, population):
-        if alg_base == 'Hv':
-            stats.pop_groups['Hive'] += population
-        elif alg_base == 'As':
-            stats.pop_groups['Asla'] += population
-        elif alg_base == 'Va':
-            stats.pop_groups['Varg'] += population
-        else:
-            stats.pop_groups['Huma'] += population
+    def add_pop_to_sophont(self, stats, sophont, star):
+        soph_code = sophont[0:4]
+        soph_pct = sophont[4:]
+        soph_pct = 100.0 if soph_pct == 'W' else 0.0 if soph_pct == 'X' else \
+            5.0 if soph_pct == '0' else 10.0 * int(soph_pct)
+
+        home = None
+        if star.tradeCode.homeworld and any([soph for soph in star.tradeCode.homeworld_list if soph.startswith(soph_code[:4])]):
+            home = star
+        
+        stats.populations[soph_code].add_population(int(star.population * (soph_pct / 100.0)), home)
+        # Soph_pct == 'X' is diback or extinct. 
+        if sophont[4:] == 'X':
+            stats.populations[soph_code].population = -1
+
+        return soph_pct
+    
+    def add_pop_to_alg(self, stats, alg, population):
+        stats.populations[AllyGen.population_align(alg)].add_population(population, None)
+        
 
     def add_stats(self, stats, star):
         stats.population += star.population
@@ -172,21 +214,16 @@ class StatCalculation(object):
             stats.homeworlds.append(star)
 
         if star.tradeCode.sophonts is None:
-            self.add_pop_to_alg(stats, star.alg_base, star.population)
+            self.add_pop_to_alg(stats, star.alg, star.population)
         else:
             total_pct = 100
             for sophont in star.tradeCode.sophonts:
-                soph_code = sophont[0:4]
-                soph_pct = sophont[4:]
-                soph_pct = 100.0 if soph_pct == 'W' else 0.0 if soph_pct == 'X' else 5.0 if soph_pct == '0' else 10.0 * int(
-                    soph_pct)
-                total_pct -= soph_pct
-                stats.pop_groups[soph_code] += int(star.population * (soph_pct / 100.0))
-
+                total_pct -= self.add_pop_to_sophont(stats, sophont, star)
+                
             if total_pct < 0:
                 self.logger.warn("{} has sophont percent over 100%: {}".format(star, total_pct))
             elif total_pct > 0:
-                self.add_pop_to_alg(stats, star.alg_base, int(star.population * (total_pct / 100.0)))
+                self.add_pop_to_alg(stats, star.alg, int(star.population * (total_pct / 100.0)))
 
         stats.economy += star.gwp
         stats.number += 1
@@ -207,6 +244,8 @@ class StatCalculation(object):
             stats.scout_bases += 1
         if 'W' in star.baseCode:
             stats.way_stations += 1
+        if 'M' in star.baseCode:
+            stats.military_bases += 1
         if star.eti_cargo_volume > 0 or star.eti_pass_volume > 0:
             stats.eti_worlds += 1
         stats.eti_cargo += star.eti_cargo_volume
@@ -233,6 +272,10 @@ class StatCalculation(object):
             stats.high_pop_worlds = [world for world in worlds if world.popCode == stats.maxPop]
             stats.high_pop_worlds.sort(key=lambda star: star.popM, reverse=True)
             stats.high_tech_worlds = [world for world in worlds if world.tl == stats.maxTL]
+            stats.subsectorCp = [world for world in worlds if world.tradeCode.subsector_capital]
+            stats.sectorCp = [world for world in worlds if world.tradeCode.sector_capital]
+            stats.otherCp = [world for world in worlds if world.tradeCode.other_capital]
+
             TLList = [world.tl for world in worlds]
             if len(TLList) > 3:
                 stats.TLmean = sum(TLList) / len(TLList)
