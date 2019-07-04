@@ -19,13 +19,13 @@ class TradeCodes(object):
               'RsA', 'RsB', 'RsG', 'RsD', 'RsE', 'RsZ', 'RsT', 'RsI', 'RsK',
               'Fr', 'Co', 'Tp', 'Ho', 'Tr', 'Tu',
               'Cm', 'Tw']
-    ex_codes = set(['As', 'Fl', 'Ic', 'De', 'Na', 'Va', 'Wa', 'He', 'Oc'])
+    ex_codes = {'As', 'Fl', 'Ic', 'De', 'Na', 'Va', 'Wa', 'He', 'Oc'}
     research = {'RsA': '\u0391', 'RsB': '\u0392', 'RsG': '\u0393',
                 'RsD': '\u0394', 'RdE': '\u0395', 'RsZ': '\u0396',
                 'RsT': '\u0398', 'RsI': '\u0399', 'RsK': '\u039A'}
     pcolor = {'As': '#8E9397', 'De': '#d17533', 'Fl': '#e37dff', 'He': '#ff6f0c', 'Ic': '#A5F2F3',
               'Oc': '#0094ED', 'Po': '#6a986a', 'Va': '#c9c9c9', 'Wa': '#4abef4'}
-    ext_codes = set(['Lt', 'Ht', 'Lg', 'Hg'])
+    ext_codes = {'Lt', 'Ht', 'Lg', 'Hg'}
 
     def __init__(self, initial_codes):
         """
@@ -46,18 +46,21 @@ class TradeCodes(object):
         self.sophont_list = [code for code in self.codes if re.match(r"\w{4}(\d|W)", code, re.U)]
 
         for homeworld in re.findall(r"[Di]*\([^)]+\)\d?", initial_codes, re.U):
-            sophont = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
-            self.homeworld_list.append(sophont)
+            full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
+            homeworlds_found.append(homeworld)
             match = re.match(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W)?', homeworld)
             if match is None:
                 self.logger.error("Unable to process %s", initial_codes)
                 sys.exit(1)
-            if sophont.startswith("Di"):
+            if full_name.startswith("Di"):
                 sophont = "{code: <4}{pop}".format(code=match.group(1), pop='X')
             else:
                 sophont = "{code: <4}{pop}".format(code=match.group(1), pop=match.group(2) if match.group(2) else 'W')
+
+            sophont = sophont.replace("'", "X")
+            sophont = sophont.replace("!", "X")
             self.sophont_list.append(sophont)
-            homeworlds_found.append(homeworld)
+            self.homeworld_list.append(sophont)
 
         self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.sophont_list)\
             - set(homeworlds_found) - self.xcode
@@ -76,6 +79,12 @@ class TradeCodes(object):
 
     def __str__(self):
         return " ".join(self.codeset + self.dcode)
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['logger']
+        del state['ownedBy']
+        return state
 
     def planet_codes(self):
         return " ".join(self.codeset)
@@ -190,7 +199,7 @@ class TradeCodes(object):
 
     @property
     def homeworld(self):
-        return self.homeworld_list if len(self.homeworld_list) > 0 else None
+        return self.homeworld_list if len(self.homeworld_list) > 0 else []
 
     @property
     def sophonts(self):
@@ -288,3 +297,4 @@ class TradeCodes(object):
     @property
     def pcode_color(self):
         return self.pcolor.get(self.pcode, '#44ff44')
+

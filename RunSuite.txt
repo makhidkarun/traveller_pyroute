@@ -38,5 +38,5 @@ python PyRoute/WikiCreateWorlds.py sectors/full/Zarushagar.sec --search-disambig
 
 python PyRoute/route.py --borders erode --min-btn 13 --pop-code fixed --routes trade --max-jump 10 --min-ally-count 0 --ally-match separate --output maps_m1900 sectors/1900/spinward\ marches.sec sectors/1900/gvurrdon.sec
 
-python PyRoute/route.py --borders erode --min-btn 13 --pop-code fixed --routes trade --max-jump 5 --min-ally-count 0 --ally-match separate --no-subsector-maps --owned-worlds  \
+python3 PyRoute/route.py --borders erode --min-btn 13 --pop-code fixed --routes trade --max-jump 5 --min-ally-count 0 --ally-match separate --no-subsector-maps --owned-worlds  \
 --output maps_federation --input sectors/Federation --sectors sectors/Federation/Federation.txt

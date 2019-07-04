@@ -14,7 +14,8 @@ class AllyGen(object):
     classdocs
     """
     noOne = ['--', '??', 'Xx']
-    nonAligned = ['Na', 'Ns', 'Va', 'Cs', 'Hc', 'NaH', 'NaDr', 'NaVa', 'NaAs', 'NaXx', 'VaEx', 'NaSo',
+    nonAligned = ['Na', 'Ns', 'Va', 'Cs', 'Hc', 'NaHv', 'NaDr', 'NaVa', 'NaAs', 'NaXx', 'NaXX',
+                  'VaEx', 'NaSo',
                   'CsCa', 'CsHv', 'CsIm', 'CsMP', 'CsVa', 'CsZh', 'CsRe', 'CsMo', 'CsRr',
                   'Wild']
     sameAligned = [('Im', 'ImAp', 'ImDa', 'ImDc', 'ImDd', 'ImDg', 'ImDi', 'ImDs', 'ImDv',
@@ -24,7 +25,7 @@ class AllyGen(object):
                     'AsIf', 'AsMw', 'AsOf', 'AsSc', 'AsSF', 'AsT0', 'AsT1', 'AsT2',
                     'AsT3', 'AsT4', 'AsT5', 'AsT6', 'AsT7', 'AsT8', 'AsT9', 'AsTA',
                     'AsTv', 'AsTz', 'AsVc', 'AsWc', 'AsXX', 'GlEm', 'NaAs'),
-                   ('Hv', 'HvFd', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'Hf', 'H?'),
+                   ('Hv', 'HvFd', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H?', 'Hf'),
                    ('JP', 'J-', 'Jh', 'Hl', 'JuPr',
                     'JAOz', 'JAsi', 'JCoK', 'JHhk', 'JLum', 'JMen',
                     'JPSt', 'JRar', 'JUkh', 'JuHl', 'JuR', 'JVug'),
@@ -57,6 +58,14 @@ class AllyGen(object):
         return alg in AllyGen.nonAligned or alg in AllyGen.noOne
 
     @staticmethod
+    def is_wilds(alg):
+        return alg.code[0:2] == 'Na' or alg.code in ['Wild', 'VaEx', 'Va']
+
+    @staticmethod
+    def is_client_state(alg):
+        return alg.code[0:2] == 'Cs'
+
+    @staticmethod
     def same_align(alg):
         for sameAlg in AllyGen.sameAligned:
             if alg in sameAlg:
@@ -74,6 +83,20 @@ class AllyGen(object):
         else:
             return alg_name.split(',')[0].strip()
 
+    @staticmethod
+    def population_align(alg):
+        if AllyGen.same_align(alg)  == 'Hv' or alg in('CsHv', 'NaHv'):
+            return 'Hive'
+        elif AllyGen.same_align(alg) == 'As' or alg in ('CsAs', 'NaAs'):
+            return 'Asla'
+        elif alg in ('Va', 'NaVa', 'VaEx'):
+            return 'Varg'
+        elif alg in ('Kk', 'KkTw', 'KC', 'CsTw', 'Kc'):
+            return "KXkr"
+        else:
+            return 'Huma'
+
+         
     @staticmethod
     def sort_allegiances(alg_list, base_match_only):
         # The logic: 

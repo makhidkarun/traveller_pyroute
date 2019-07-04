@@ -1,0 +1,12 @@
+{% import 'statistics_table.wiki' as stats %}
+
+{% for sector in sectors.values() -%}
+== {{sector.name}} statistics ==
+{{ stats.text_area_long('sector', sector, plural) }}
+
+{{ stats.population_groups(plural, sector) }}
+
+=== Polities ===
+{{ stats.allegiance_statistics(plural, sector) }}
+{%- endfor -%}
+

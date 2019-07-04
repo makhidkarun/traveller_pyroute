@@ -66,8 +66,13 @@ class Nobles(object):
         nobility = ""
         for rank, count in self.nobles.items():
             if count > 0:
-                nobility += self.codes.keys()[self.codes.values().index(rank)]
+                nobility += list(self.codes.keys())[list(self.codes.values()).index(rank)]
         return ''.join(sorted(nobility, key=lambda v: (v.lower(), v[0].isupper())))
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['codes']
+        return state
 
     def count(self, nobility):
         for code, rank in self.codes.items():
@@ -99,6 +104,15 @@ class Star(object):
     def __init__(self):
         self.logger = logging.getLogger('PyRoute.Star')
         self._hash = None
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['sector']
+        del state['logger']
+        del state['_hash']
+        if self.ownedBy == self:
+            del state['ownedBy']
+        return state
 
     @staticmethod
     def parse_line_into_star(line, sector, pop_code, ru_calc):
@@ -321,7 +335,7 @@ class Star(object):
                 popM = popCodeM[self.popM]
             else:
                 popM = (bisect.bisect(popCodeRange, random.random()) + 4) * 10
-            self.population = pow(10, self.popCode) * popM / 1e7
+            self.population = pow(10, self.popCode) * popM // 1e7
             self.uwpCodes['Pop Code'] = str(popM / 10)
 
         self.perCapita = calcGWP[min(self.tl, 19)] if self.population > 0 else 0
@@ -497,7 +511,7 @@ class Star(object):
                     'M': 1.1, 'N': 1.2,
                     # Unknown Gov Codes
                     'I': 1.0, 'P': 1.0, 'Q': 1.0, 'R': 1.0, 'S': 1.0, 'T': 1.0,
-                    '': 1.0, 'V': 1.0, 'W': 1.0, 'X': 1.0, '?': 0.0
+                    '': 1.0,  'U': 1.0, 'V': 1.0, 'W': 1.0, 'X': 1.0, '?': 0.0
                     }
         self.ship_capacity = int(self.population * tax_rate[self.uwpCodes['Government']] * 1000)
         gwp_base = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 28, 32]
