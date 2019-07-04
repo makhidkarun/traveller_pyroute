@@ -247,6 +247,13 @@ class Galaxy(object):
                     algCode = line[8:].split(':', 1)[0].strip()
                     algName = line[8:].split(':', 1)[1].strip().strip('"')
 
+                    # A work around for the base Na codes which may be empire dependent.
+                    if algCode == 'Na':
+                        if 'Hiver' in algName:
+                            algCode = 'NaHv'
+                        elif 'Vargr' in algName:
+                            algCode = 'NaVa'
+
                     base = AllyGen.same_align(algCode)
                     if base in self.alg:
                         self.alg[base].name = algName
