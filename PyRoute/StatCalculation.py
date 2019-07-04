@@ -28,6 +28,10 @@ class Populations(object):
         return self.population < other.population
 
 class ObjectStatistics(object):
+    base_mapping = {'C':'Corsair base', 'D':'Naval depot', 'E': 'Embassy', 'K': 'Naval base', 'M': 'Military base',
+                    'N': 'Naval base',
+                    'R': 'Clan base', 'S': 'Scout base', 'T':'Tlaukhu base', 'V': 'Scout base', 'W': 'Way station'}
+
     def __init__(self):
         self.population = 0
         self.populations = defaultdict(Populations)
@@ -50,10 +54,7 @@ class ObjectStatistics(object):
         self.spa_people = 0
         self.code_counts = defaultdict(int)
         self.gg_count = 0
-        self.naval_bases = 0
-        self.scout_bases = 0
-        self.military_bases = 0
-        self.way_stations = 0
+        self.bases = defaultdict(int)
         self.eti_worlds = 0
         self.eti_cargo = 0
         self.eti_pass = 0
@@ -193,7 +194,7 @@ class StatCalculation(object):
             5.0 if soph_pct == '0' else 10.0 * int(soph_pct)
 
         home = None
-        if star.tradeCode.homeworld and any([soph for soph in star.tradeCode.homeworld_list if soph.startswith(soph_code[:4])]):
+        if star.tradeCode.homeworld and any([soph for soph in star.tradeCode.homeworld if soph.startswith(soph_code[:4])]):
             home = star
         
         stats.populations[soph_code].add_population(int(star.population * (soph_pct / 100.0)), home)
@@ -238,14 +239,11 @@ class StatCalculation(object):
             stats.code_counts[code] += 1
         if star.ggCount:
             stats.gg_count += 1
-        if 'N' in star.baseCode or 'K' in star.baseCode:
-            stats.naval_bases += 1
-        if 'S' in star.baseCode or 'V' in star.baseCode:
-            stats.scout_bases += 1
-        if 'W' in star.baseCode:
-            stats.way_stations += 1
-        if 'M' in star.baseCode:
-            stats.military_bases += 1
+
+        for code in star.baseCode:
+            if code != '-':
+                stats.bases[ObjectStatistics.base_mapping[code]] += 1
+
         if star.eti_cargo_volume > 0 or star.eti_pass_volume > 0:
             stats.eti_worlds += 1
         stats.eti_cargo += star.eti_cargo_volume
