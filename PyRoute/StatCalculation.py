@@ -29,7 +29,7 @@ class Populations(object):
 
 class ObjectStatistics(object):
     base_mapping = {'C':'Corsair base', 'D':'Naval depot', 'E': 'Embassy', 'K': 'Naval base', 'M': 'Military base',
-                    'N': 'Naval base',
+                    'N': 'Naval base', 'O': 'Naval outpost',
                     'R': 'Clan base', 'S': 'Scout base', 'T':'Tlaukhu base', 'V': 'Scout base', 'W': 'Way station'}
 
     def __init__(self):
@@ -141,16 +141,16 @@ class StatCalculation(object):
                 self.max_tl(sector.stats, star)
                 self.max_tl(sector.subsectors[star.subsector()].stats, star)
 
-                self.add_alg_stats(self.galaxy, star, star.alg)
-                self.add_alg_stats(sector, star, star.alg)
-                self.add_alg_stats(sector.subsectors[star.subsector()], star, star.alg)
+                self.add_alg_stats(self.galaxy, star, star.alg_code)
+                self.add_alg_stats(sector, star, star.alg_code)
+                self.add_alg_stats(sector.subsectors[star.subsector()], star, star.alg_code)
 
-                if star.alg_base != star.alg:
-                    self.add_alg_stats(self.galaxy, star, star.alg_base)
-                    self.add_alg_stats(sector, star, star.alg_base)
-                    self.add_alg_stats(sector.subsectors[star.subsector()], star, star.alg_base)
+                if star.alg_base_code != star.alg_code:
+                    self.add_alg_stats(self.galaxy, star, star.alg_base_code)
+                    self.add_alg_stats(sector, star, star.alg_base_code)
+                    self.add_alg_stats(sector.subsectors[star.subsector()], star, star.alg_base_code)
 
-                if AllyGen.imperial_align(star.alg):
+                if AllyGen.imperial_align(star.alg_code):
                     for uwpCode, uwpValue in star.uwpCodes.items():
                         self.add_stats(self.imp_uwp.stats(uwpCode, uwpValue), star)
 
@@ -187,26 +187,37 @@ class StatCalculation(object):
         self.add_stats(algStats, star)
         self.max_tl(algStats, star)
 
-    def add_pop_to_sophont(self, stats, sophont, star):
-        soph_code = sophont[0:4]
-        soph_pct = sophont[4:]
-        soph_pct = 100.0 if soph_pct == 'W' else 0.0 if soph_pct == 'X' else \
-            5.0 if soph_pct == '0' else 10.0 * int(soph_pct)
+    def add_pop_to_sophont(self, stats, star):
 
+        total_pct = 100
+        default_soph = 'Huma'
         home = None
-        if star.tradeCode.homeworld and any([soph for soph in star.tradeCode.homeworld if soph.startswith(soph_code[:4])]):
-            home = star
-        
-        stats.populations[soph_code].add_population(int(star.population * (soph_pct / 100.0)), home)
-        # Soph_pct == 'X' is diback or extinct. 
-        if sophont[4:] == 'X':
-            stats.populations[soph_code].population = -1
+        for sophont in star.tradeCode.sophonts:
+            soph_code = sophont[0:4]
+            soph_pct = sophont[4:]
 
-        return soph_pct
-    
-    def add_pop_to_alg(self, stats, alg, population):
-        stats.populations[AllyGen.population_align(alg)].add_population(population, None)
-        
+            if soph_pct == 'A':
+                default_soph = soph_code
+                continue
+
+            soph_pct = 100.0 if soph_pct == 'W' else 0.0 if soph_pct in ['X', 'A'] else \
+                5.0 if soph_pct == '0' else 10.0 * int(soph_pct)
+
+            if any([soph for soph in star.tradeCode.homeworld if soph.startswith(soph_code)]):
+                home = star
+
+            # Soph_pct == 'X' is dieback or extinct.
+            if soph_pct == 'X':
+                stats.populations[soph_code].population = -1
+            else:
+                stats.populations[soph_code].add_population(int(star.population * (soph_pct / 100.0)), home)
+
+            total_pct -= soph_pct
+
+        if total_pct < 0:
+            self.logger.warn("{} has sophont percent over 100%: {}".format(star, total_pct))
+        else:
+            stats.populations[default_soph].add_population(int(star.population * (total_pct / 100.0)), None)
 
     def add_stats(self, stats, star):
         stats.population += star.population
@@ -214,17 +225,7 @@ class StatCalculation(object):
         if star.tradeCode.homeworld:
             stats.homeworlds.append(star)
 
-        if star.tradeCode.sophonts is None:
-            self.add_pop_to_alg(stats, star.alg, star.population)
-        else:
-            total_pct = 100
-            for sophont in star.tradeCode.sophonts:
-                total_pct -= self.add_pop_to_sophont(stats, sophont, star)
-                
-            if total_pct < 0:
-                self.logger.warn("{} has sophont percent over 100%: {}".format(star, total_pct))
-            elif total_pct > 0:
-                self.add_pop_to_alg(stats, star.alg, int(star.population * (total_pct / 100.0)))
+        self.add_pop_to_sophont(stats, star)
 
         stats.economy += star.gwp
         stats.number += 1

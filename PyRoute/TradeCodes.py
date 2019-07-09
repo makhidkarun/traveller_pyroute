@@ -199,11 +199,11 @@ class TradeCodes(object):
 
     @property
     def homeworld(self):
-        return self.homeworld_list if len(self.homeworld_list) > 0 else []
+        return self.homeworld_list
 
     @property
     def sophonts(self):
-        return self.sophont_list if len(self.sophont_list) > 0 else None
+        return self.sophont_list
 
     @property
     def rich(self):
