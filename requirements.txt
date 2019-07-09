@@ -1,5 +1,5 @@
 networkx
-pypdflite - fpdf
+pypdflite
 inflect
 Pillow
 wikitools==1.3
