@@ -40,8 +40,7 @@ There are {{get_count(plural, area.stats.code_counts.get('As', 0), 'belt',  ' [[
 {{ get_count(plural, area.stats.code_counts.get('Po', 0), 'world', ' [[Poor World|Poor]] (Po)') }}, 
 {{ get_count(plural, area.stats.code_counts.get('Va', 0), 'world', ' [[Vacuum World|Vacuum]] (Va)') }}, and
 {{ get_count(plural, area.stats.code_counts.get('Wa', 0) + area.stats.code_counts.get('Oc', 0), 'world', ' [[Water World|Water]] (Wa) or [[Ocean World|Ocean]] (Oc)') }}.
-{{ bases(plural, area.stats.bases, area) }}.
-Of the  {{ get_count(plural, area.stats.number, 'system') }}, {{area.stats.gg_count}} have native gas giants.
+{{ bases(plural, area.stats.bases, area) }} Of the  {{ get_count(plural, area.stats.number, 'system') }}, {{area.stats.gg_count}} have native gas giants.
 {%- endmacro -%}
 
 
@@ -198,7 +197,7 @@ The economy is BCr{{ '{:,d}'.format(area.stats.economy) }} with a per capita inc
 {%- if bases -%}
 The worlds in {{ area.name }} maintain
 {%- for base, count in bases | dictsort(by='value', reverse=True) -%}
-{%- if loop.last %} and{%- endif %} {{ get_count(plural, count, base) }}{%- if not loop.last -%},{%- endif -%}
-{%- endfor -%}
+{%- if loop.last and loop.length > 1 %} and{%- endif %} {{ get_count(plural, count, base) }}{%- if not loop.last -%},{%- endif -%}
+{%- endfor -%}.
 {%- endif -%}
 {%- endmacro -%}

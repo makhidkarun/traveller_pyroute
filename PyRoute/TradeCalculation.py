@@ -105,10 +105,10 @@ class RouteCalculation(object):
                 (star2.tradeCode.nonindustrial and star1.tradeCode.industrial):
             btn += 1
 
-        if not AllyGen.are_allies(star1.alg, star2.alg):
+        if not AllyGen.are_allies(star1.alg_code, star2.alg_code):
             btn -= 1
 
-        if star1.alg == 'Wild' or star2.alg == 'Wild':
+        if star1.alg_code == 'Wild' or star2.alg_code == 'Wild':
             btn -= 1
 
         if not distance:
@@ -171,7 +171,7 @@ class NoneCalculation(RouteCalculation):
         pass
 
     def base_route_filter(self, star, neighbor):
-        if not AllyGen.are_owned_allies(star.alg, neighbor.alg):
+        if not AllyGen.are_owned_allies(star.alg_code, neighbor.alg_code):
             return True
         return False
 
@@ -199,10 +199,7 @@ class OwnedWorldCalculation(RouteCalculation):
         pass
 
     def base_route_filter(self, star, neighbor):
-        return not AllyGen.are_owned_allies(star.alg, neighbor.alg)
-        # if not AllyGen.are_owned_allies(star.alg, neighbor.alg) :
-        #    return True
-        # return False
+        return not AllyGen.are_owned_allies(star.alg_code, neighbor.alg_code)
 
     def base_range_routes(self, star, neighbor):
         pass
@@ -227,9 +224,9 @@ class XRouteCalculation(RouteCalculation):
         pass
 
     def base_route_filter(self, star, neighbor):
-        if not AllyGen.are_allies(star.alg, neighbor.alg):
+        if not AllyGen.are_allies(star.alg_code, neighbor.alg_code):
             return True
-        if not AllyGen.are_allies('Im', star.alg):
+        if not AllyGen.imperial_align(star.alg_code):
             return True
         if star.zone in ['R', 'F'] or neighbor.zone in ['R', 'F']:
             return True
@@ -240,11 +237,11 @@ class XRouteCalculation(RouteCalculation):
         self.distance_weight = self.capSec_weight
         self.generate_base_routes()
         self.capital = [star for star in self.galaxy.ranges if \
-                        AllyGen.are_allies('Im', star.alg) and star.tradeCode.other_capital]
+                        AllyGen.imperial_align(star.alg_code) and star.tradeCode.other_capital]
         self.secCapitals = [star for star in self.galaxy.ranges if \
-                            AllyGen.are_allies('Im', star.alg) and star.tradeCode.sector_capital]
+                            AllyGen.imperial_align(star.alg_code) and star.tradeCode.sector_capital]
         self.subCapitals = [star for star in self.galaxy.ranges if \
-                            AllyGen.are_allies('Im', star.alg) and star.tradeCode.subsector_captial]
+                            AllyGen.imperial_align(star.alg_code) and star.tradeCode.subsector_captial]
 
     def routes_pass_1(self):
         # Pass 1: Get routes at J6  Capital and sector capitals 
@@ -325,7 +322,7 @@ class XRouteCalculation(RouteCalculation):
     def routes_pass_3(self):
         self.reweight_routes(self.impt_weight)
         important = [star for star in self.galaxy.ranges if \
-                     AllyGen.are_allies('Im', star.alg) and star.tradeCount == 0
+                     AllyGen.imperial_align(star.alg_code) and star.tradeCount == 0
                      and (star.importance >= 4 or 'D' in star.baseCode or 'W' in star.baseCode)]
 
         jumpStations = [star for star in self.galaxy.ranges if star.tradeCount > 0]
@@ -604,14 +601,14 @@ class TradeCalculation(RouteCalculation):
                 star.sector.subsectors[star.subsector()].stats.tradeExt += tradeCr // 2
                 target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr // 2
 
-        if AllyGen.are_allies(star.alg, target.alg):
-            self.galaxy.alg[AllyGen.same_align(star.alg)].stats.trade += tradeCr
-            self.galaxy.alg[AllyGen.same_align(star.alg)].stats.passengers += tradePass
+        if AllyGen.are_allies(star.alg_code, target.alg_code):
+            self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.trade += tradeCr
+            self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.passengers += tradePass
         else:
-            self.galaxy.alg[AllyGen.same_align(star.alg)].stats.tradeExt += tradeCr // 2
-            self.galaxy.alg[AllyGen.same_align(target.alg)].stats.tradeExt += tradeCr // 2
-            self.galaxy.alg[AllyGen.same_align(star.alg)].stats.passengers += tradePass // 2
-            self.galaxy.alg[AllyGen.same_align(target.alg)].stats.passengers += tradePass // 2
+            self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.tradeExt += tradeCr // 2
+            self.galaxy.alg[AllyGen.same_align(target.alg_code)].stats.tradeExt += tradeCr // 2
+            self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.passengers += tradePass // 2
+            self.galaxy.alg[AllyGen.same_align(target.alg_code)].stats.passengers += tradePass // 2
 
         self.galaxy.stats.trade += tradeCr
         self.galaxy.stats.passengers += tradePass
@@ -750,7 +747,7 @@ class TradeCalculation(RouteCalculation):
     def route_weight(self, star, target):
         dist = star.hex_distance(target)
         weight = self.distance_weight[dist]
-        if target.alg != star.alg:
+        if target.alg_code != star.alg_code:
             weight += 25
         if star.port in 'CDEX':
             weight += 25
@@ -774,18 +771,18 @@ class CommCalculation(RouteCalculation):
     def base_route_filter(self, star, neighbor):
         if star.zone in ['R', 'F'] or neighbor.zone in ['R', 'F']:
             return True
-        if not AllyGen.are_allies(star.alg, neighbor.alg):
+        if not AllyGen.are_allies(star.alg_code, neighbor.alg_code):
             return True
         return False
 
     def base_range_routes(self, star, neighbor):
-        if not getattr(self.galaxy.alg[star.alg_base], 'min_importance', False):
+        if not getattr(self.galaxy.alg[star.alg_base_code], 'min_importance', False):
             return
-        min_importance = self.galaxy.alg[star.alg_base].min_importance
+        min_importance = self.galaxy.alg[star.alg_base_code].min_importance
         if self.endpoint_selection(star, min_importance) and self.endpoint_selection(neighbor, min_importance):
             dist = star.hex_distance(neighbor)
 
-            if ((self.capitals(star) or self.bases(star)) and \
+            if ((self.capitals(star) or self.bases(star)) and
                 (self.capitals(neighbor) or self.bases(neighbor)) and dist < 100) or \
                     dist < 20:
                 flags = [self.capitals(star) and self.capitals(neighbor),
@@ -802,11 +799,11 @@ class CommCalculation(RouteCalculation):
     def bases(self, star):
         # if it has a Depot, Way station, or XBoat station,
         # or external naval base or (aslan) Tlaukhu base
-        return len(set(['D', 'W', 'K', 'T']) & set(star.baseCode)) > 0
+        return len({'D', 'W', 'K', 'T'} & set(star.baseCode)) > 0
 
     def comm_bases(self, star):
         # Imperial scout or naval base, external military base, or Aslan clan base
-        return len(set(['S', 'N', 'M', 'R']) & set(star.baseCode)) > 0
+        return len({'S', 'N', 'M', 'R'} & set(star.baseCode)) > 0
 
     def important(self, star, min_importance):
         return star.importance > min_importance
@@ -849,9 +846,9 @@ class CommCalculation(RouteCalculation):
         self.logger.info("considering {} worlds for removal".format(len(routes)))
         removed = 0
         for route in routes:
-            imp = self.galaxy.alg[route[0].alg_base].min_importance
-            if (len(self.galaxy.alg[route[0].alg_base].worlds) < 100 and d['distance'] > 1) or \
-                    len(self.galaxy.alg[route[0].alg_base].worlds) < 25:
+            imp = self.galaxy.alg[route[0].alg_base_code].min_importance
+            if (len(self.galaxy.alg[route[0].alg_base_code].worlds) < 100 and d['distance'] > 1) or \
+                    len(self.galaxy.alg[route[0].alg_base_code].worlds) < 25:
                 continue
             star = self.more_important(route[0], route[1], imp)
             if star is not None:
@@ -937,7 +934,7 @@ class CommCalculation(RouteCalculation):
         except nx.NetworkXNoPath:
             return
 
-        trade = self.calc_trade(19) if AllyGen.are_allies('As', star.alg) else self.calc_trade(23)
+        trade = self.calc_trade(19) if AllyGen.are_allies('As', star.alg_code) else self.calc_trade(23)
         start = route[0]
         for end in route[1:]:
             end.tradeCount += 1 if end != route[-1] else 0

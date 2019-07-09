@@ -36,10 +36,11 @@ class AreaItem(object):
 
 
 class Allegiance(AreaItem):
-    def __init__(self, code, name, base=False):
+    def __init__(self, code, name, base=False, population='Huma'):
         super(Allegiance, self).__init__(name)
         self.code = code
         self.base = base
+        self.population = population
 
     def allegiance_name(self):
         return self.name
@@ -68,6 +69,8 @@ class Allegiance(AreaItem):
     def is_client_state(self):
         return AllyGen.is_client_state(self)
 
+    def are_allies(self, other):
+        return AllyGen.are_allies(self.code, other.code)
 
 class Subsector(AreaItem):
     def __init__(self, name, position, sector):
@@ -244,23 +247,19 @@ class Galaxy(object):
                     name = data[1].strip()
                     sec.subsectors[pos] = Subsector(name, pos, sec)
                 if line.startswith('# Alleg:'):
-                    algCode = line[8:].split(':', 1)[0].strip()
-                    algName = line[8:].split(':', 1)[1].strip().strip('"')
+                    alg_code = line[8:].split(':', 1)[0].strip()
+                    alg_name = line[8:].split(':', 1)[1].strip().strip('"')
 
                     # A work around for the base Na codes which may be empire dependent.
-                    if algCode == 'Na':
-                        if 'Hiver' in algName:
-                            algCode = 'NaHv'
-                        elif 'Vargr' in algName:
-                            algCode = 'NaVa'
+                    alg_race = AllyGen.population_align(alg_code, alg_name)
 
-                    base = AllyGen.same_align(algCode)
+                    base = AllyGen.same_align(alg_code)
                     if base in self.alg:
-                        self.alg[base].name = algName
+                        self.alg[base].name = alg_name
                     if base not in self.alg:
-                        self.alg[base] = Allegiance(base, AllyGen.same_align_name(base, algName), base=True)
-                    if algCode not in self.alg:
-                        self.alg[algCode] = Allegiance(algCode, algName, base=False)
+                        self.alg[base] = Allegiance(base, AllyGen.same_align_name(base, alg_name), base=True, population=alg_race)
+                    if alg_code not in self.alg:
+                        self.alg[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)
 
             for line in lines[lineno + 2:]:
                 if line.startswith('#') or len(line) < 20:
@@ -269,11 +268,13 @@ class Galaxy(object):
                 if star:
                     sec.worlds.append(star)
                     sec.subsectors[star.subsector()].worlds.append(star)
-                    star.alg_base = AllyGen.same_align(star.alg)
+                    star.alg_base_code = AllyGen.same_align(star.alg_code)
 
                     self.set_area_alg(star, self, self.alg)
                     self.set_area_alg(star, sec, self.alg)
                     self.set_area_alg(star, sec.subsectors[star.subsector()], self.alg)
+
+                    star.tradeCode.sophont_list.append("{}A".format(self.alg[star.alg_code].population))
 
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds)))
@@ -284,12 +285,12 @@ class Galaxy(object):
         self.logger.debug("Allegiances: {}".format(self.alg))
 
     def set_area_alg(self, star, area, algs):
-        full_alg = algs.get(star.alg, Allegiance(star.alg, 'Unknown Allegiance', base=False))
-        base_alg = algs.get(star.alg_base, Allegiance(star.alg_base, 'Unknown Allegiance', base=True))
+        full_alg = algs.get(star.alg_code, Allegiance(star.alg_code, 'Unknown Allegiance', base=False))
+        base_alg = algs.get(star.alg_base_code, Allegiance(star.alg_base_code, 'Unknown Allegiance', base=True))
 
-        area.alg.setdefault(star.alg_base, Allegiance(base_alg.code, base_alg.name, base=True)).worlds.append(star)
-        if star.alg != star.alg_base:
-            area.alg.setdefault(star.alg, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
+        area.alg.setdefault(star.alg_base_code, Allegiance(base_alg.code, base_alg.name, base=True)).worlds.append(star)
+        if star.alg_code != star.alg_base_code:
+            area.alg.setdefault(star.alg_code, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
 
     def set_positions(self):
         for sector in self.sectors.values():
@@ -415,7 +416,7 @@ class Galaxy(object):
                 ownedBy = [star for star in self.stars.neighbors(world) \
                            if star.tl >= 9 and star.popCode >= 6 and \
                            star.port in 'ABC' and star.ownedBy == star and \
-                           AllyGen.are_owned_allies(star.alg, world.alg)]
+                           AllyGen.are_owned_allies(star.alg_code, world.alg_code)]
 
                 ownedBy.sort(reverse=True,
                              key=lambda star: star.popCode)

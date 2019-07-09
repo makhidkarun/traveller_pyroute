@@ -165,8 +165,8 @@ class Star(object):
 
         star.worlds = int(data[15]) if data[15].strip().isdigit() else 0
 
-        star.alg = data[16].strip()
-        star.alg_base = star.alg
+        star.alg_code = data[16].strip()
+        star.alg_base_code = star.alg_code
 
         star.stars = data[17].strip()
         star.extract_routes()
@@ -625,7 +625,7 @@ class Star(object):
 
         self.col_be = self.raw_be * 0.1 if self.tl >= 9 else 0
 
-        if AllyGen.are_allies('Im', self.alg):
+        if AllyGen.imperial_align(self.alg_code):
             self.im_be = self.raw_be * 0.05
             if self.tl < 13:
                 mul = 1 - ((13 - self.tl) / 10.0)

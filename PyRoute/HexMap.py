@@ -319,7 +319,7 @@ class HexMap(object):
             point.x_plus(self.ym - (width // 2))
             pdf.add_text(star.name[:chars], point)
 
-        added = star.alg
+        added = star.alg_code
         if star.tradeCode.subsector_capital:
             added += '+'
         elif star.tradeCode.sector_capital or star.tradeCode.other_capital:

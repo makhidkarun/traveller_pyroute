@@ -14,9 +14,10 @@ class AllyGen(object):
     classdocs
     """
     noOne = ['--', '??', 'Xx']
-    nonAligned = ['Na', 'Ns', 'Va', 'Cs', 'Hc', 'NaHv', 'NaDr', 'NaVa', 'NaAs', 'NaXx', 'NaXX',
-                  'VaEx', 'NaSo',
-                  'CsCa', 'CsHv', 'CsIm', 'CsMP', 'CsVa', 'CsZh', 'CsRe', 'CsMo', 'CsRr',
+    nonAligned = ['Na', 'Ns', 'Va', 'Cs', 'Hc',
+                  'NaHv', 'NaDr', 'NaVa', 'NaAs', 'NaXx', 'NaXX', "NaSo",
+                  'VaEx',
+                  'CsCa', 'CsHv', 'CsIm', 'CsMP', 'CsVa', 'CsZh', 'CsRe', 'CsMo', 'CsRr', "CsTw",
                   'Wild']
     sameAligned = [('Im', 'ImAp', 'ImDa', 'ImDc', 'ImDd', 'ImDg', 'ImDi', 'ImDs', 'ImDv',
                     'ImLa', 'ImLc', 'ImL', 'ImSy', 'ImVd'),
@@ -30,6 +31,7 @@ class AllyGen(object):
                     'JAOz', 'JAsi', 'JCoK', 'JHhk', 'JLum', 'JMen',
                     'JPSt', 'JRar', 'JUkh', 'JuHl', 'JuR', 'JVug'),
                    ('Ke', 'KoEm'),
+                   ("Kk", "KkTw", "Kc", "KC"),
                    ('So', 'SoCf', 'SoBF', 'SoCT', 'SoFr', 'SoHn', 'SoKv', 'SoNS',
                     'SoQ', 'SoRD', 'SoW'),
                    ('Lp', 'CoLp'),
@@ -39,6 +41,45 @@ class AllyGen(object):
                    ('V9', 'VInL'),
                    ('Zh', 'ZhAx', 'ZhCa', 'ZhCh', 'ZhCo', 'ZhIa', 'ZhIN',
                     'ZhJp', 'ZhMe', 'ZhOb', 'ZhSh', 'ZhVQ')]
+
+    default_population = {
+        "As": "Asla",
+        "Hv": "Hive",
+        "JP": "Huma",
+        "Kk": "KXKr",
+        "Va": "Varg",
+        "Zh": "Zhod",
+        "AkUn": "Akee",
+        "AlCo": "Muri",
+        "CAEM": "Esly",
+        "CAKT": "Varg",
+        "CoLp": "Jend",
+        "DaCf": "Dary",
+        "FlLe": "Flor",
+        "GeOr": "Ormi",
+        "GlEm": "Asla",
+        "GnCl": "Gnii",
+        "IHPr": "Sred",
+        "ImLu": "Luri",
+        "ImVd": "Vega",
+        "IsDo": "Ysla",
+        "KaWo": "Karh",
+        "KhLe": "Sydi",
+        "KoEm": "Jaib",
+        "MaEm": "Mask",
+        "MaPr": "MalX",
+        "NaAs": "Asla",
+        "NaHv": "Hive",
+        "NaVa": "Varg",
+        "OcWs": "Stal",
+        "SaCo": "Vlaz",
+        "Sark": "Varg",
+        "SwFW": "Swan",
+        "VaEx": "Varg",
+        "ZhAx": "Adda",
+        "ZhCa": "Vlaz"
+    }
+
 
     def __init__(self, galaxy):
         """
@@ -84,17 +125,26 @@ class AllyGen(object):
             return alg_name.split(',')[0].strip()
 
     @staticmethod
-    def population_align(alg):
-        if AllyGen.same_align(alg)  == 'Hv' or alg in('CsHv', 'NaHv'):
-            return 'Hive'
-        elif AllyGen.same_align(alg) == 'As' or alg in ('CsAs', 'NaAs'):
-            return 'Asla'
-        elif alg in ('Va', 'NaVa', 'VaEx'):
-            return 'Varg'
-        elif alg in ('Kk', 'KkTw', 'KC', 'CsTw', 'Kc'):
-            return "KXkr"
-        else:
-            return 'Huma'
+    def population_align(alg, name):
+        # Try get the default cases
+        code = AllyGen.default_population.get(alg, AllyGen.default_population.get(AllyGen.same_align(alg), None))
+
+        # Handle the special cases.
+        if code is None:
+            if alg[0] == 'V':
+                code = "Varg"
+            elif alg == 'Na':
+                if 'Hiver' in name:
+                    code = 'Hive'
+                elif 'Vargr' in name:
+                    code = 'Varg'
+            elif alg == 'CsHv':
+                code = "Hive"
+            elif alg == "CsAs":
+                code = "Asla"
+            else:
+                code = "Huma"
+        return code
 
          
     @staticmethod
@@ -130,7 +180,7 @@ class AllyGen(object):
         """
         self.logger.info('Processing worlds for border drawing')
         for star in self.galaxy.stars:
-            alg = star.alg
+            alg = star.alg_code
             # Skip the non-entity worlds
             if alg in self.noOne:
                 continue
@@ -305,7 +355,7 @@ class AllyGen(object):
         starMap = {}
         # Mark the map with all the stars        
         for star in stars:
-            alg = star.alg
+            alg = star.alg_code
             # Collapse non-aligned into one value
             if alg in self.nonAligned or alg in self.noOne:
                 alg = self.nonAligned[0]
@@ -539,7 +589,7 @@ class AllyGen(object):
         starMap = {}
         # Mark the map with all the stars        
         for star in stars:
-            alg = star.alg
+            alg = star.alg_code
             # Collapse non-aligned into one value
             if alg in self.nonAligned or alg in self.noOne:
                 alg = self.nonAligned[0]
