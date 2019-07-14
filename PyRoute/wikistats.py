@@ -50,6 +50,7 @@ class WikiStats(object):
         self.sector_statistics_template()
         self.subsector_statistics_template()
         self.sector_data_template()
+        self.allegiance_statistics_template()
 
         #self.top_summary()
         #self.tcs_statistics()
@@ -72,9 +73,8 @@ class WikiStats(object):
 
     def summary_statistics_template(self):
         self.output_template('summary.wiki', 'summary.wiki',
-                             {'sectors': self.galaxy.sectors,
-                              'global_stats': self.galaxy.stats,
-                              'im_stats': self.galaxy.alg.get('Im', None),
+                             {'global_stats': self.galaxy.stats,
+                              'sectors': self.galaxy.sectors,
                               'uwp': self.uwp,
                               'plural': self.plural,
                               'global_alg': self.galaxy.alg_sorted})
@@ -82,6 +82,8 @@ class WikiStats(object):
     def sector_statistics_template(self):
         self.output_template('sectors.wiki', 'sectors.wiki',
                              {'sectors': self.galaxy.sectors,
+                              'global_stats': self.galaxy.stats,
+                              'im_stats': self.galaxy.alg.get('Im', None),
                               'plural': self.plural})
 
     def subsector_statistics_template(self):
@@ -95,6 +97,13 @@ class WikiStats(object):
                                   {"sector": sector})
             self.output_template('sector_econ.wiki', sector.sector_name() + " Sector.economic.wiki",
                                  {'sector': sector})
+
+    def allegiance_statistics_template(self):
+        self.output_template('allegiances.wiki', 'allegiances.wiki',
+                             {"global_alg": self.galaxy.alg_sorted,
+                              "global_stats": self.galaxy.stats,
+                              "plural": self.plural,
+                              "area": self.galaxy})
 
     def write_json(self):
         path = os.path.join(self.galaxy.output_path, 'galaxy.json')
