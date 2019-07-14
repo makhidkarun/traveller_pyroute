@@ -138,6 +138,10 @@ class AllyGen(object):
                     code = 'Hive'
                 elif 'Vargr' in name:
                     code = 'Varg'
+                elif 'Human' in name:
+                    code = 'Huma'
+                else:
+                    code = 'Huma'
             elif alg == 'CsHv':
                 code = "Hive"
             elif alg == "CsAs":
