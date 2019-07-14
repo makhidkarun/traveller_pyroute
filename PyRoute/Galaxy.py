@@ -24,6 +24,8 @@ class AreaItem(object):
         self.name = name
         self.worlds = []
         self.stats = ObjectStatistics()
+        self.alg = {}
+        self.alg_sorted = []
 
     def wiki_title(self):
         return self.wiki_name()
@@ -41,6 +43,12 @@ class Allegiance(AreaItem):
         self.code = code
         self.base = base
         self.population = population
+
+    # For the JSONPickel work
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['alg_sorted']
+        return state
 
     def allegiance_name(self):
         return self.name
@@ -84,8 +92,6 @@ class Subsector(AreaItem):
         self.rimward = None
         self.dx = sector.dx
         self.dy = sector.dy
-        self.alg = {}
-        self.alg_sorted = []
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -163,8 +169,6 @@ class Sector(AreaItem):
         self.trailing = None
         self.coreward = None
         self.rimward = None
-        self.alg = {}
-        self.alg_sorted = []
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -192,7 +196,7 @@ class Sector(AreaItem):
         return None
 
 
-class Galaxy(object):
+class Galaxy(AreaItem):
     """
     classdocs
     """
@@ -201,13 +205,11 @@ class Galaxy(object):
         """
        Constructor
         """
+        super(Galaxy, self).__init__('Charted Space')
         self.logger = logging.getLogger('PyRoute.Galaxy')
         self.stars = nx.Graph()
         self.ranges = nx.Graph()
         self.sectors = {}
-        self.alg = {}
-        self.alg_sorted = []
-        self.stats = ObjectStatistics()
         self.borders = AllyGen(self)
         self.output_path = 'maps'
         self.max_jump_range = max_jump
