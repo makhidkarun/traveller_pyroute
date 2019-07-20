@@ -52,8 +52,8 @@ class ObjectStatistics(object):
         self.im_be = 0
         self.passengers = 0
         self.spa_people = 0
+        self.port_size = defaultdict(int)
         self.code_counts = defaultdict(int)
-        self.gg_count = 0
         self.bases = defaultdict(int)
         self.eti_worlds = 0
         self.eti_cargo = 0
@@ -66,6 +66,10 @@ class ObjectStatistics(object):
         self.subsectorCp = []
         self.sectorCp = []
         self.otherCp = []
+        self.gg_count = 0
+        self.stars = 0
+        self.star_count = defaultdict(int)
+        self.primary_count = defaultdict(int)
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -209,14 +213,15 @@ class StatCalculation(object):
             # Soph_pct == 'X' is dieback or extinct.
             if soph_pct == 'X':
                 stats.populations[soph_code].population = -1
-            else:
+            # skip the empty worlds
+            elif not star.tradeCode.barren:
                 stats.populations[soph_code].add_population(int(star.population * (soph_pct / 100.0)), home)
 
             total_pct -= soph_pct
 
         if total_pct < 0:
             self.logger.warn("{} has sophont percent over 100%: {}".format(star, total_pct))
-        else:
+        elif not star.tradeCode.barren:
             stats.populations[default_soph].add_population(int(star.population * (total_pct / 100.0)), None)
 
     def add_stats(self, stats, star):
@@ -236,10 +241,16 @@ class StatCalculation(object):
         stats.im_be += star.im_be
         stats.passengers += star.passIn
         stats.spa_people += star.starportPop
+        stats.port_size[star.starportSize] += 1
         for code in star.tradeCode.codes:
             stats.code_counts[code] += 1
         if star.ggCount:
             stats.gg_count += 1
+
+        if star.star_list:
+            stats.stars += len(star.star_list)
+            stats.star_count[len(star.star_list)] += 1
+            stats.primary_count[star.star_list[0][0]] += 1
 
         for code in star.baseCode:
             if code != '-':

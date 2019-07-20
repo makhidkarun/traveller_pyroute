@@ -21,8 +21,7 @@
 {{area.wiki_name()}}, {{area_type}} {{area.position}} of {{area.sector.wiki_name()}}
 {%- else -%}
 The {{area.wiki_name()}} {{area_type}}
-{%- endif %} has {{area.stats.number}} worlds {{ text_area_population(plural, area) }}
-{{ economy (plural, area) }} {{ homeworlds (plural, area) }}
+{%- endif %} has {{area.stats.number}} worlds {{ text_area_population(plural, area) }} {{ economy (plural, area) }} {{ homeworlds (plural, area) }}
 There are {{ get_count(plural, area.stats.code_counts.get('Hi', 0), 'world', ' High population (Hi)') }}, 
 {{ get_count(plural, area.stats.code_counts.get('Ph', 0), 'world', ' Moderate population (Ph)') }},
 {{ get_count(plural, area.stats.code_counts.get('Ni', 0), 'world', ' Non-industrial (Ni)') }},
@@ -40,7 +39,12 @@ There are {{get_count(plural, area.stats.code_counts.get('As', 0), 'belt',  ' [[
 {{ get_count(plural, area.stats.code_counts.get('Po', 0), 'world', ' [[Poor World|Poor]] (Po)') }}, 
 {{ get_count(plural, area.stats.code_counts.get('Va', 0), 'world', ' [[Vacuum World|Vacuum]] (Va)') }}, and
 {{ get_count(plural, area.stats.code_counts.get('Wa', 0) + area.stats.code_counts.get('Oc', 0), 'world', ' [[Water World|Water]] (Wa) or [[Ocean World|Ocean]] (Oc)') }}.
-{{ bases(plural, area.stats.bases, area) }}Of the  {{ get_count(plural, area.stats.number, 'system') }}, {{area.stats.gg_count}} have native gas giants.
+{{ bases(plural, area.stats.bases, area) }}
+
+In {{area.wiki_name()}} {{area_type}} {{area.stats.gg_count}} of the {{ get_count(plural, area.stats.number, 'system') }} ({{((area.stats.gg_count/area.stats.number)*100)|int}}%) have native gas giants.
+The {{area_type}} contains {{ get_count(plural, area.stats.stars, 'star') }}; {{get_count(plural, area.stats.star_count.get(1, 0), 'monostellar system') }},
+{{ get_count(plural, area.stats.star_count.get(2,0), 'binary system') }}, {{get_count(plural, area.stats.star_count.get(3, 0), 'trinary system') }}, and
+{{get_count(plural, area.stats.star_count.get(4, 0) + area.stats.star_count.get(5, 0) + area.stats.star_count.get(6,0), 'system')}} with four or more stars.
 {%- endmacro -%}
 
 
@@ -139,11 +143,12 @@ The highest technology level is {{area.stats.maxTL}} at {{plural.join(area.stats
 {%- endmacro -%}
 
 {%- macro economy (plural, area) -%}
-The economy is BCr{{ '{:,d}'.format(area.stats.economy) }} with a per capita income of Cr{{ '{:,d}'.format(area.stats.percapita ) }}. 
-{% if area.stats.population > 0 -%}
-{{ high_pop_worlds(plural, area) }}
+{%- if area.stats.economy > 0 -%}The economy is BCr{{ '{:,d}'.format(area.stats.economy) }}
+{%- if area.stats.tradeVol > 0 %} supporting an interstellar trade of BCr{{ '{:,d}'.format(area.stats.tradeVol // (10**9)) }} and giving {% else %} with {% endif -%}
+a per capita income of Cr{{ '{:,d}'.format(area.stats.percapita ) }}.
+{%- if area.stats.population > 0 %} {{ high_pop_worlds(plural, area) }}
 {%- if area.stats.TLmean > 0 %} The average [[Technology Level|technology level]] is {{area.stats.TLmean|int}} (with most between {{(area.stats.TLmean - area.stats.TLstddev)|int}} and {{(area.stats.TLmean + area.stats.TLstddev)|int}}). {{ high_tech_worlds(plural, area) }}
-{%- endif -%}{%- endif -%}
+{%- endif -%}{%- endif -%}{%- endif -%}
 {%- endmacro -%}
 
 {%- macro uwp_table(table_name, uwp_code, global_stats) -%}
@@ -198,6 +203,5 @@ The economy is BCr{{ '{:,d}'.format(area.stats.economy) }} with a per capita inc
 The worlds in {{ area.name }} maintain
 {%- for base, count in bases | dictsort(by='value', reverse=True) -%}
 {%- if loop.last and loop.length > 1 %} and{%- endif %} {{ get_count(plural, count, base) }}{%- if not loop.last -%},{%- endif -%}
-{%- endfor -%}.&nbsp;
-{%- endif -%}
+{%- endfor %}. {% endif -%}
 {%- endmacro -%}
