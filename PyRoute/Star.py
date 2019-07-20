@@ -14,14 +14,6 @@ from TradeCodes import TradeCodes
 from collections import OrderedDict
 
 
-def pairwise(iterable):
-    """
-    s -> (s0, s1), (s2, s3), (s4, s5), ...
-    """
-    a = iter(iterable)
-    return zip(a, a)
-
-
 class UWPCodes(object):
     uwpCodes = ['Starport',
                 'Size',
@@ -322,11 +314,11 @@ class Star(object):
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
 
         if pop_code == 'scaled':
-            self.population = pow(10, self.popCode) * popCodeM[self.popM] // 1e7
+            self.population = (pow(10, self.popCode) * popCodeM[self.popM]) // 1e7
             self.uwpCodes['Pop Code'] = str(popCodeM[self.popM] // 10)
 
         elif pop_code == 'fixed':
-            self.population = pow(10, self.popCode) * self.popM // 1e6
+            self.population = (pow(10, self.popCode) * self.popM) // 1e6
 
         elif pop_code == 'benford':
             popCodeRange = [0.243529203, 0.442507049, 0.610740422, 0.756470797, 0.885014099, 1]
@@ -335,7 +327,7 @@ class Star(object):
                 popM = popCodeM[self.popM]
             else:
                 popM = (bisect.bisect(popCodeRange, random.random()) + 4) * 10
-            self.population = pow(10, self.popCode) * popM // 1e7
+            self.population = (pow(10, self.popCode) * popM) // 1e7
             self.uwpCodes['Pop Code'] = str(popM / 10)
 
         self.perCapita = calcGWP[min(self.tl, 19)] if self.population > 0 else 0
@@ -345,8 +337,7 @@ class Star(object):
         self.perCapita *= 0.8 if self.tradeCode.extreme or \
                                  self.tradeCode.poor or self.tradeCode.nonindustrial or self.tradeCode.low else 1
 
-        self.gwp = self.population * self.perCapita // 1000
-        self.gwp = int(self.gwp)
+        self.gwp = int((self.population * self.perCapita) // 1000)
         self.population = int(self.population)
         self.perCapita = int(self.perCapita)
 
