@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
-from wikitools import wiki
-from wikitools import api
-from wikitools.wikifile import File
-from wikitools.page import Page, NoPage
+from wikitools_py3 import wiki
+from wikitools_py3.api import APIRequest
+from wikitools_py3.exceptions import WikiError, NoPage
+from wikitools_py3.wikifile import File
+from wikitools_py3.page import Page
 import logging
 import traceback
 import re
@@ -99,7 +100,7 @@ class WikiReview(object):
     @staticmethod
     def get_site(user='AB-101', api_site='http://wiki.travellerrpg.com/api.php', password=False):
         site = wiki.Wiki(api_site)
-        access = site.login(user, password=password, remember=True)
+        access = site.login(user, password=password)
         if not access:
             logger.error('Unable to log in')
         return site
@@ -107,15 +108,15 @@ class WikiReview(object):
     def get_page(self, title):
         try:
             target_page = Page(self.site, title)
-        except api.APIError as e:
+        except NoPage as e:
+            self.logger.error("Article {} page does not exist, skipped".format(title))
+            return None
+        except WikiError as e:
             if e.args[0] == 'missingtitle':
                 self.logger.error("Article {} does not exist, skipped".format(title))
             else:
                 self.logger.error("review article for Article {} got exception {}".format(title, e))
 
-            return None
-        except NoPage as e:
-            self.logger.error("Article {} page does not exist, skipped".format(title))
             return None
 
         if not target_page.exists:
@@ -148,14 +149,14 @@ class WikiReview(object):
                 self.logger.error('Save failed {} - {}'.format(page.title, result))
                 return False
 
-        except api.APIError as e:
+        except NoPage as e:
+            self.logger.error("Save Page for page {}, page does not exist, skipped".format(page.title))
+            return False
+        except WikiError as e:
             if e.args[0] == 'missingtitle':
                 self.logger.error("Save Page for page {}, page does not exist".format(page.title))
             else:
                 self.logger.error("Save Page for page {} got exception {} ".format(page.title, e))
-            return False
-        except NoPage as e:
-            self.logger.error("Save Page for page {}, page does not exist, skipped".format(page.title))
             return False
 
     def upload_file(self, filename):
@@ -192,7 +193,7 @@ class WikiReview(object):
     def search_disambiguation_page(self, title):
         search_title = title + self.search_disambig
         args = {'action': 'query', 'list': 'search', 'srsearch': search_title, 'srprop': 'size|wordcount'}
-        request = api.APIRequest(self.site, args)
+        request = APIRequest(self.site, args)
         results = request.queryGen()
         titles = []
         for r in results:
@@ -203,7 +204,7 @@ class WikiReview(object):
     def get_linked_here(self, page):
         args = {'action': 'query', 'prop': 'linkshere', 'titles': page}
         logger.debug("processing Links Here list")
-        request = api.APIRequest(self.site, args)
+        request = APIRequest(self.site, args)
         results = request.queryGen()
         titles = []
         for r in results:

@@ -10,9 +10,9 @@ Created on Apr 26, 2015
 # pip install poster 
 #
 #
-from wikitools import api
-from wikitools.page import Page, NoPage
-from .WikiReview import WikiReview
+from wikitools_py3.exceptions import WikiError, NoPage
+from wikitools_py3.page import Page
+from WikiReview import WikiReview
 
 import logging
 import argparse
@@ -25,51 +25,33 @@ import re
 logger = logging.getLogger('WikiUpload')
 
 
-def uploadSummaryText(site, summaryFile, era):
-    try:
-        lines = [line for line in codecs.open(summaryFile, 'r', 'utf-8')]
-    except (OSError, IOError):
-        logger.error("Summary file not found: {}".format(summaryFile))
-        return
-    index = [i for i, n in enumerate(lines) if 'Statistics' in n][0]
-    lines = lines[index + 3:]
-    index = 1
+def uploadSummaryText(site, summaryFile, era, area_name):
+    with codecs.open(summaryFile, 'r', 'utf-8') as f:
+        lines = f.readlines()
 
-    while True:
-        baseTitle = lines[index].split('|')[1]
-        if not baseTitle.startswith('[['):
-            logger.info("Upload Summary for {} not a page, skipped".format(baseTitle))
-            while (not (lines[index].startswith('|-') or lines[index].startswith('|}'))):
-                index += 1
-            if lines[index].startswith('|}'):
-                break
-            index += 1
-            continue
+    name = 'initial table'
+    stats_text = {name:[]}
+
+    for line in lines:
+        if "statistics ===" in line:
+            name = line.strip().strip('=').replace('statistics', '').strip()
+            stats_text[name] = []
         else:
-            baseTitle = baseTitle.strip('[')
-        targetTitle = "{}/summary".format(baseTitle)
-        index += 1
-        text = lines[index][3:]
-        index += 1
-        while (not (lines[index].startswith('|-') or lines[index].startswith('|}'))):
-            text += lines[index]
-            index += 1
+            stats_text[name].append(line)
 
-        target_page = None
+    logger.info("uploading summary articles: %s", " ".join(stats_text.keys()))
+
+    for name, lines in stats_text.items():
+        targetTitle = "{} {}/summary".format(name, area_name)
         target_page = site.get_page(targetTitle)
         if target_page and 'Category:Meta' in target_page.getCategories(True):
             targetTitle += '/{}'.format(era)
             target_page = site.get_page(targetTitle)
 
         if not target_page:
-            index += 1
             continue
-
+        text = "".join(lines)
         site.save_page(target_page, text, 'Trade Map update summary')
-
-        if lines[index].startswith('|}'):
-            break
-        index += 1
 
 
 def uploadSec(site, filename, place, era):
@@ -257,7 +239,7 @@ No information yet available.
 
                 if result['edit']['result'] == 'Success':
                     logger.info('Saved: {}'.format(worldPage))
-            except api.APIError as e:
+            except WikiError as e:
                 logger.error("UploadSummary for page {} got exception {} ".format(worldPage, e))
                 continue
 
@@ -319,7 +301,7 @@ No information yet available.
                 logger.info('Saved: {}/data'.format(worldPage))
             else:
                 logger.error('Save failed {}/data'.format(worldPage))
-        except api.APIError as e:
+        except WikiError as e:
             if e.args[0] == 'missingtitle':
                 logger.error("UploadSummary for page {}, page does not exist".format(worldPage))
             else:
@@ -367,7 +349,7 @@ def process():
     set_logging(args.log_level)
 
     site = WikiReview.get_site(args.user, args.site)
-    wiki_review = WikiReview(site, None, False)
+    wiki_review = WikiReview(site, None, False, None)
 
     # create a Wiki object
     # site = wiki.Wiki(args.site)
@@ -388,11 +370,11 @@ def process():
             uploadSec(wiki_review, f, "/sector", args.era)
 
     if args.summary:
-        path = os.path.join(args.input, "summary.wiki")
-        uploadSummaryText(wiki_review, path, args.era)
+        path = os.path.join(args.input, "sectors.wiki")
+        uploadSummaryText(wiki_review, path, args.era, "Sector")
     if args.subsector:
-        path = os.path.join(args.input, "subsector_summary.wiki")
-        uploadSummaryText(wiki_review, path, args.era)
+        path = os.path.join(args.input, "subsectors.wiki")
+        uploadSummaryText(wiki_review, path, args.era, "Subsector")
 
     if args.worlds:
         path = os.path.join(args.input, "{0} Sector.economic.wiki".format(args.worlds))
