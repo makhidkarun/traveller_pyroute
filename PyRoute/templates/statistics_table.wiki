@@ -40,11 +40,13 @@ There are {{get_count(plural, area.stats.code_counts.get('As', 0), 'belt',  ' [[
 {{ get_count(plural, area.stats.code_counts.get('Va', 0), 'world', ' [[Vacuum World|Vacuum]] (Va)') }}, and
 {{ get_count(plural, area.stats.code_counts.get('Wa', 0) + area.stats.code_counts.get('Oc', 0), 'world', ' [[Water World|Water]] (Wa) or [[Ocean World|Ocean]] (Oc)') }}.
 {{ bases(plural, area.stats.bases, area) }}
+{%- if area.stats.number > 0 %}
 
-In {{area.wiki_name()}} {{area_type}} {{area.stats.gg_count}} of the {{ get_count(plural, area.stats.number, 'system') }} ({{((area.stats.gg_count/area.stats.number)*100)|int}}%) have native gas giants.
-The {{area_type}} contains {{ get_count(plural, area.stats.stars, 'star') }}; {{get_count(plural, area.stats.star_count.get(1, 0), 'monostellar system') }},
+{{area.wiki_name()}} {{area_type}} contains {{ get_count(plural, area.stats.stars, 'star') }} and {{ get_count(plural, area.stats.worlds, 'identified planet') }}; {{get_count(plural, area.stats.star_count.get(1, 0), 'monostellar system') }},
 {{ get_count(plural, area.stats.star_count.get(2,0), 'binary system') }}, {{get_count(plural, area.stats.star_count.get(3, 0), 'trinary system') }}, and
 {{get_count(plural, area.stats.star_count.get(4, 0) + area.stats.star_count.get(5, 0) + area.stats.star_count.get(6,0), 'system')}} with four or more stars.
+{{area.stats.gg_count}} of the {{ get_count(plural, area.stats.number, 'system') }} ({{((area.stats.gg_count/area.stats.number)*100)|int}}%) have native gas giants.
+{%- endif -%}
 {%- endmacro -%}
 
 
