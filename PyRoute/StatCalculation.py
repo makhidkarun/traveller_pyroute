@@ -67,6 +67,7 @@ class ObjectStatistics(object):
         self.sectorCp = []
         self.otherCp = []
         self.gg_count = 0
+        self.worlds = 0
         self.stars = 0
         self.star_count = defaultdict(int)
         self.primary_count = defaultdict(int)
@@ -132,10 +133,13 @@ class StatCalculation(object):
                 continue
             for star in sector.worlds:
                 star.starportSize = max(self.trade_to_btn(star.tradeIn + star.tradeOver) - 5, 0)
+                star.uwpCodes['Starport Size'] = star.starportSize
+                # Budget in MCr
                 star.starportBudget = \
                     ((star.tradeIn // 10000) * 150 + (star.tradeOver // 10000) * 140 +
                      (star.passIn) * 500 + (star.passOver) * 460) // 1000000
 
+                # Population in people employed.
                 star.starportPop = int(star.starportBudget / 0.2)
 
                 self.add_stats(sector.stats, star)
@@ -246,6 +250,8 @@ class StatCalculation(object):
             stats.code_counts[code] += 1
         if star.ggCount:
             stats.gg_count += 1
+
+        stats.worlds += star.worlds
 
         if star.star_list:
             stats.stars += len(star.star_list)

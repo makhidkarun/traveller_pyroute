@@ -23,7 +23,11 @@ class UWPCodes(object):
                 'Government',
                 'Law Level',
                 'Tech Level',
-                'Pop Code']
+                'Pop Code',
+                'Starport Size',
+                'Primary Type',
+                'Importance',
+                'Resources']
 
     def __init__(self):
         self.codes = OrderedDict()
@@ -164,15 +168,14 @@ class Star(object):
         star.extract_routes()
         star.split_stellar_data()
 
-        star.uwpCodes = {'Starport': star.port,
-                         'Size': star.size,
-                         'Atmosphere': star.atmo,
-                         'Hydrographics': star.hydro,
-                         'Population': star.pop,
-                         'Government': star.gov,
-                         'Law Level': star.law,
-                         'Tech Level': star.uwp[8],
-                         'Pop Code': str(star.popM)}
+        star.tradeIn = 0
+        star.tradeOver = 0
+        star.tradeCount = 0
+        star.passIn = 0
+        star.passOver = 0
+        star.starportSize = 0
+        star.starportBudget = 0
+        star.starportPop = 0
 
         star.tradeCode.check_world_codes(star)
 
@@ -187,6 +190,21 @@ class Star(object):
         else:
             star.calculate_importance()
 
+        star.uwpCodes = {'Starport': star.port,
+                         'Size': star.size,
+                         'Atmosphere': star.atmo,
+                         'Hydrographics': star.hydro,
+                         'Population': star.pop,
+                         'Government': star.gov,
+                         'Law Level': star.law,
+                         'Tech Level': star.uwp[8],
+                         'Pop Code': str(star.popM),
+                         'Starport Size': star.starportSize,
+                         'Primary Type': star.star_list[0][0] if star.star_list else 'X',
+                         'Importance': star.importance,
+                         'Resources': star._ehex_to_int(star.economics[1]) if star.economics else 0
+                         }
+
         star.check_ex()
         star.check_cx()
 
@@ -197,15 +215,6 @@ class Star(object):
         star.calculate_TCS()
         star.calculate_army()
         star.calculate_ru(ru_calc)
-
-        star.tradeIn = 0
-        star.tradeOver = 0
-        star.tradeCount = 0
-        star.passIn = 0
-        star.passOver = 0
-        star.starportSize = 0
-        star.starportBudget = 0
-        star.starportPop = 0
 
         star.eti_cargo_volume = 0
         star.eti_pass_volume = 0
