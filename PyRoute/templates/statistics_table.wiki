@@ -40,8 +40,10 @@ There are {{get_count(plural, area.stats.code_counts.get('As', 0), 'belt',  ' [[
 {{ get_count(plural, area.stats.code_counts.get('Va', 0), 'world', ' [[Vacuum World|Vacuum]] (Va)') }}, and
 {{ get_count(plural, area.stats.code_counts.get('Wa', 0) + area.stats.code_counts.get('Oc', 0), 'world', ' [[Water World|Water]] (Wa) or [[Ocean World|Ocean]] (Oc)') }}.
 {{ bases(plural, area.stats.bases, area) }}
-{%- if area.stats.number > 0 %}
 
+{{ population_groups(plural, area) }}
+
+{%- if area.stats.number > 0 %}
 {{area.wiki_name()}} {{area_type}} contains {{ get_count(plural, area.stats.stars, 'star') }} and {{ get_count(plural, area.stats.worlds, 'identified planet') }}; {{get_count(plural, area.stats.star_count.get(1, 0), 'monostellar system') }},
 {{ get_count(plural, area.stats.star_count.get(2,0), 'binary system') }}, {{get_count(plural, area.stats.star_count.get(3, 0), 'trinary system') }}, and
 {{get_count(plural, area.stats.star_count.get(4, 0) + area.stats.star_count.get(5, 0) + area.stats.star_count.get(6,0), 'system')}} with four or more stars.
@@ -52,17 +54,18 @@ There are {{get_count(plural, area.stats.code_counts.get('As', 0), 'belt',  ' [[
 
 {# The top level statistics for the allegiances, similar to above #}
 {%- macro allegiance_statistics(plural, area) -%}
-{%- for allegiance in area.alg_sorted -%}
-    {%- if allegiance.is_unclaimed() -%}
+{%- for allegiance in area.alg_sorted %}
+=== {{ allegiance.name }} ===
+{% if allegiance.is_unclaimed() -%}
 There are {{ get_count(plural, allegiance.stats.number, 'system', 'unclaimed or unexplored') }} in {{ area.wiki_name() }}.
-    {% elif allegiance.is_wilds() -%}
-There are {{ get_count (plural, allegiance.stats.number, '') }} {{ allegiance.wiki_name() }} worlds in {{ area.wiki_name() }} with an {{ text_area_population(plural, allegiance) }}
-    {% elif allegiance.is_client_state() -%}
-The {{ allegiance.wiki_name() }} in the {{ area.wiki_name() }} encompasses {{ world_counts(plural, allegiance, area)}}
-    {%  else -%}
+{% elif allegiance.is_wilds() -%}
+There are {{ get_count (plural, allegiance.stats.number, '') }} {{ allegiance.wiki_name() }} worlds in {{ area.wiki_name() }} with an {{ text_area_population(plural, allegiance) }}.
+{% elif allegiance.is_client_state() -%}
+The {{ allegiance.wiki_name() }} in the {{ area.wiki_name() }} encompasses {{ world_counts(plural, allegiance, area)}}.
+{%  else -%}
 The {{ allegiance.wiki_name() }} in {{ area.wiki_name() }} has jurisdiction over {{ world_counts(plural, allegiance, area) }} {{ economy(plural, allegiance) }} {{ bases(plural, allegiance.stats.bases, allegiance) }}
 {{ allegiance_capitals_text (allegiance) }}
-    {% endif %}
+ {% endif %}
 {% endfor -%}
 {%- endmacro -%}
 
