@@ -5,7 +5,8 @@ PyRoute is a trade route generation program for Traveller. PyRoute has been port
 the python2 version.
 
 The data for the maps comes from [Traveller Map](http://www.travellermap.com/) based upon the Traveller 5th edition 
-second survey data plus many of the fan created sectors from around the Internet and across the years.
+second survey data plus many of the fan created sectors from around the Internet and across the years. Traveller Map 
+presents the sector data in a consistent format, making the input processing considerably easier. 
 
 The trade rules are from [GURPS Traveller: Far trader](http://www.sjgames.com/traveller/fartrader/). These rules are 
 based on a gravity trade model. Each world is given a weight called the World Trade Number (WTN) calculated from 
@@ -160,7 +161,7 @@ Input format
 PyRoute assumes the input files are the generated raw data files from [Traveller Map](http://www.travellermap.com).
 The raw data format is described [here](http://travellermap.com/doc/secondsurvey.html). PyRoute requires the header 
 information, especially the sector name, location, subsectors list, and the _Alleg_ information. The parser is not
-especially robust and will failure or produce unexpected results if the data is incorrectly formatted. 
+especially robust and will fail or produce unexpected results if the data is incorrectly formatted. 
 
 Output files
 ------------
@@ -177,11 +178,12 @@ each star. This list is trimmed of the longer, or unused routes. This list holds
 
 1) The wiki summary formatted for putting into the Traveller wiki in the
 [Trade map summary](http://wiki.travellerrpg.com/Trade_map_summary) page, and consisting of the following files:
-    * `summary.wiki` contains a summary breakdown of the UWP components, 
-    an economic breakdown by sector, and an economic breakdown by Allegiance code
-    * `sectors.wiki` contains a detailed analysis for each sector. 
+    * `summary.wiki` contains a summary table of the analysis and a summary breakdown of the UWP components.
+    * `sectors.wiki` contains an economic breakdown by sector and detailed analysis for each sector. 
     * `subsectors.wiki` contains a detailed analysis for each subsector, ordered by sector, 
     and by position in the sector. 
+    * `allegiance.wiki` contains an economic breakdown by Allegiance code and a detailed analysis of each interstellar
+    government.
 
 1) The per sector generated data. PyRoute generates a fair amount of data including the
     trade information, economic data, passenger information, and armed forces numbers for each world. These files 
@@ -223,4 +225,4 @@ The four systems for determining how borders are drawn are:
 * `none` - draw no borders on the map. 
 * `range` - This is a simple system from the original nroute.c code. This is a two pass process. The first pass sets the alignment of each empty hex around each world to that of the world. The second pass extends the empty hex alignment selection to the next circle of hexes. If a hex already has an alignment, either because there is a world there or selected by earlier step, the previous selection is kept. 
 * `allygen` - This is a partial re-implementation of the system presented in [allygen](http://dotclue.org/t20/) code created by J. Greely. As implemented here, this is a three pass process. The first pass marks each hex around every world as aligned with that world. The distance of selected hexes depends upon the center world's starport (E,X ports have none, A ports have range of 4). If there is more than one world claiming an empty hex, the list of claimants is kept. The second pass, the alignments of the empty hexes is resolved by selecting (in order) the single claimant, the closer world, or the larger empire. In a third pass, some of the hexes at the edge of each empire are set back to unaligned to avoid having odd protuberances.
-*  `erode` is based upon the border drawing system from [TravellerMap](http://travellermap.com/borders/doc.htm). The page has an excellent description of the reason for borders and the algorithm. This is a multi-pass system. The first step is to mark some of the empty hexes with an allegiance code. As described (and implemented) the original system picks one allegiance code and marks every hex on the map. The PyRoute implementation uses slightly modified version of the allygen selection process to perform the initial marking of the empty hexes. This uses the first two steps of the allygen process to mark empty hexes in a radius around each world, then uses a system to select one allegiance for each empty hex. The third pass uses the alternating erode and span breaking system from the border drawing system to reset alignments of empty hexes outside the empire. The fourth step, bridge building, is mention in the article and implemented in code, re-establishes the alignments of some empty hexes between aligned worlds otherwise separated by the third step. 
+*  `erode` - Based upon the border drawing system from [TravellerMap](http://travellermap.com/borders/doc.htm). The page has an excellent description of the reason for borders and the algorithm. This is a multi-pass system. The first step is to mark some of the empty hexes with an allegiance code. As described (and implemented) the original system picks one allegiance code and marks every hex on the map. The PyRoute implementation uses slightly modified version of the allygen selection process to perform the initial marking of the empty hexes. This uses the first two steps of the allygen process to mark empty hexes in a radius around each world, then uses a system to select one allegiance for each empty hex. The third pass uses the alternating erode and span breaking system from the border drawing system to reset alignments of empty hexes outside the empire. The fourth step, bridge building, is mention in the article and implemented in code, re-establishes the alignments of some empty hexes between aligned worlds otherwise separated by the third step. 
