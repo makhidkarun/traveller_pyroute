@@ -477,7 +477,7 @@ class HexMap(object):
         keywords = None
         creator = "PyPDFLite"
         self.writer.set_information(title, subject, author, keywords, creator)
-        self.writer.set_compression(False)
+        self.writer.set_compression(True)
         document = self.writer.get_document()
         document.set_margins(4)
         return document
