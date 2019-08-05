@@ -22,10 +22,10 @@
 
 
 {% for sector in sectors.values() -%}
-=== {{sector.name}} statistics ===
+== {{sector.name}} statistics ==
 {{ stats.text_area_long('sector', sector, plural) }}
 
-==== Polities ====
+=== Polities ===
 {{ stats.allegiance_statistics(plural, sector) }}
 {%- endfor -%}
 

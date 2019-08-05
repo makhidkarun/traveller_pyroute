@@ -33,7 +33,7 @@ def uploadSummaryText(site, summaryFile, era, area_name):
     stats_text = {name:[]}
 
     for line in lines:
-        if "statistics ===" in line:
+        if "statistics ==" in line:
             name = line.strip().strip('=').replace('statistics', '').strip()
             stats_text[name] = []
         else:
