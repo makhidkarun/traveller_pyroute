@@ -107,7 +107,7 @@ class Subsector(AreaItem):
 
     def wiki_name(self):
         if len(self.name) == 0:
-            return 'Position {0}'.format(self.position)
+            return "{0} location {1}".format(self.sector.name, self.position)
         else:
             if "(" in self.name:
                 return '[[{0} Subsector|{1}]]'.format(self.name, self.name[:-7])
@@ -119,7 +119,7 @@ class Subsector(AreaItem):
 
     def subsector_name(self):
         if len(self.name) == 0:
-            return "Position {}".format(self.position)
+            return "Location {}".format(self.position)
         else:
             return self.name[:-9] if self.name.endswith('Subsector') else self.name
 
