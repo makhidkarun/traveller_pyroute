@@ -17,40 +17,29 @@
 
 {# The basic long text description of the area (galaxy, subsector, sector) #}
 {% macro text_area_long(area_type, area, plural) -%}
-{%- if area_type == 'subsector' -%}
+{{ economy(plural, area, area_type, None) }}
+{%- if area.stats.number > 0 %}
+
+{% if area_type == 'subsector' -%}
 {{area.wiki_name()}}, {{area_type}} {{area.position}} of {{area.sector.wiki_name()}}
 {%- else -%}
 The {{area.wiki_name()}} {{area_type}}
-{%- endif %} has {{area.stats.number}} worlds {{ text_area_population(plural, area) }} {{ economy (plural, area) }} {{ homeworlds (plural, area) }}
-There are {{ get_count(plural, area.stats.code_counts.get('Hi', 0), 'world', ' High population (Hi)') }}, 
-{{ get_count(plural, area.stats.code_counts.get('Ph', 0), 'world', ' Moderate population (Ph)') }},
-{{ get_count(plural, area.stats.code_counts.get('Ni', 0), 'world', ' Non-industrial (Ni)') }},
-{{ get_count(plural, area.stats.code_counts.get('Lo', 0), 'world', ' Low population (Lo)') }}, and
-{{ get_count(plural, area.stats.code_counts.get('Ba', 0), 'world', ' Barren (Ba)') }}.
-There are {{ get_count(plural, area.stats.code_counts.get('Ag', 0), 'world', ' [[Agricultural World|Agricultural]] (Ag)') }} versus
-{{ get_count(plural, area.stats.code_counts.get('Pa', 0), 'world', ' Pre-Agricultural (Pa)') }} and 
-{{ get_count(plural, area.stats.code_counts.get('Na', 0), 'world', ' [[Nonagricultural World|Non-Agricultural]] (Na)')  }}.
-There are {{ get_count(plural, area.stats.code_counts.get('Ri', 0), 'world', ' [[Rich World|Rich]] (Ri)') }} versus
-{{ get_count(plural, area.stats.code_counts.get('In', 0), 'world', ' [[Industrial World|Industrial]] (In)') }}.
+{%- endif %} contains {{ get_count(plural, area.stats.stars, 'star') }} and {{ get_count(plural, area.stats.worlds, 'identified planet') }};
+{{get_count(plural, area.stats.star_count.get(1, 0), 'monostellar system') }}, {{ get_count(plural, area.stats.star_count.get(2,0), 'binary system') }}, {{get_count(plural, area.stats.star_count.get(3, 0), 'trinary system') }}, and
+{{get_count(plural, area.stats.star_count.get(4, 0) + area.stats.star_count.get(5, 0) + area.stats.star_count.get(6,0), 'system')}} with four or more stars.
+{{area.stats.gg_count}} of the {{ get_count(plural, area.stats.number, 'system') }} ({{((area.stats.gg_count/area.stats.number)*100)|int}}%) have native gas giants.
 There are {{get_count(plural, area.stats.code_counts.get('As', 0), 'belt',  ' [[Asteroid Belt World|Asteroid]] (As)') }},
 {{ get_count(plural, area.stats.code_counts.get('De', 0), 'world', ' [[Desert World|Desert]] (De)') }},
 {{ get_count(plural, area.stats.code_counts.get('Ga', 0), 'world', ' [[Garden World|Garden]] (Ga)') }},
 {{ get_count(plural, area.stats.code_counts.get('Ic', 0), 'world', ' [[Ice World|Ice-capped]] (Ic)') }},
-{{ get_count(plural, area.stats.code_counts.get('Po', 0), 'world', ' [[Poor World|Poor]] (Po)') }}, 
+{{ get_count(plural, area.stats.code_counts.get('Po', 0), 'world', ' [[Poor World|Poor]] (Po)') }},
 {{ get_count(plural, area.stats.code_counts.get('Va', 0), 'world', ' [[Vacuum World|Vacuum]] (Va)') }}, and
 {{ get_count(plural, area.stats.code_counts.get('Wa', 0) + area.stats.code_counts.get('Oc', 0), 'world', ' [[Water World|Water]] (Wa) or [[Ocean World|Ocean]] (Oc)') }}.
-{{ bases(plural, area.stats.bases, area) }}
+{%- endif %}
 
+{{area.wiki_name()}} {{ population_text(plural, area) }}
 {{ population_groups(plural, area) }}
-
-{%- if area.stats.number > 0 %}
-{{area.wiki_name()}} {{area_type}} contains {{ get_count(plural, area.stats.stars, 'star') }} and {{ get_count(plural, area.stats.worlds, 'identified planet') }}; {{get_count(plural, area.stats.star_count.get(1, 0), 'monostellar system') }},
-{{ get_count(plural, area.stats.star_count.get(2,0), 'binary system') }}, {{get_count(plural, area.stats.star_count.get(3, 0), 'trinary system') }}, and
-{{get_count(plural, area.stats.star_count.get(4, 0) + area.stats.star_count.get(5, 0) + area.stats.star_count.get(6,0), 'system')}} with four or more stars.
-{{area.stats.gg_count}} of the {{ get_count(plural, area.stats.number, 'system') }} ({{((area.stats.gg_count/area.stats.number)*100)|int}}%) have native gas giants.
-{%- endif -%}
 {%- endmacro -%}
-
 
 {# The top level statistics for the allegiances, similar to above #}
 {%- macro allegiance_statistics(plural, area) -%}
@@ -59,16 +48,17 @@ There are {{get_count(plural, area.stats.code_counts.get('As', 0), 'belt',  ' [[
 {% if allegiance.is_unclaimed() -%}
 There are {{ get_count(plural, allegiance.stats.number, 'system', 'unclaimed or unexplored') }} in {{ area.wiki_name() }}.
 {% elif allegiance.is_wilds() -%}
-There are {{ get_count (plural, allegiance.stats.number, '') }} {{ allegiance.wiki_name() }} worlds in {{ area.wiki_name() }} with an {{ text_area_population(plural, allegiance) }}
+There are {{ get_count (plural, allegiance.stats.number, '') }} {{ allegiance.wiki_name() }} worlds in {{ area.wiki_name() }} {{ text_area_population(plural, allegiance) }}.
 {% elif allegiance.is_client_state() -%}
-The {{ allegiance.wiki_name() }} in the {{ area.wiki_name() }} encompasses {{ world_counts(plural, allegiance, area)}}.
+The {{ allegiance.wiki_name() }} in {{ area.wiki_name() }} encompasses {{ world_counts(plural, allegiance, area)}} {{ text_area_population(plural, allegiance) }}.
 {%  else -%}
-The {{ allegiance.wiki_name() }} in {{ area.wiki_name() }} has jurisdiction over {{ world_counts(plural, allegiance, area) }} {{ economy(plural, allegiance) }} {{ bases(plural, allegiance.stats.bases, allegiance) }}
-{{ allegiance_capitals_text (allegiance) }}
- {% endif %}
-{% endfor -%}
-{%- endmacro -%}
+{{ economy(plural, allegiance, 'allegiance', area) }}
 
+The {{ allegiance.wiki_name() }} {{ population_text(plural, allegiance) }}
+{{ allegiance_capitals_text (allegiance) }}
+{%- endif -%}
+{%- endfor -%}
+{%- endmacro -%}
 
 {%- macro top_level_summary(global_stats, sectors) -%}
 {| class="wikitable"
@@ -88,6 +78,8 @@ The {{ allegiance.wiki_name() }} in {{ area.wiki_name() }} has jurisdiction over
 
 
 {% macro allegiance_capitals_text(aleg) -%}
+{%- set capital_count = (aleg.stats.otherCp + aleg.stats.sectorCp + aleg.stats.subsectorCp) | count -%}
+{%- if capital_count < 4 -%}
 {%- for world in aleg.stats.otherCp %}
 * The capital of {{ aleg.wiki_name() }} is {{ world.wiki_name() }}.
 {%- endfor -%}
@@ -97,19 +89,29 @@ The {{ allegiance.wiki_name() }} in {{ area.wiki_name() }} has jurisdiction over
 {%- for world in aleg.stats.subsectorCp %}
 * The {{aleg.wiki_name() }} subsector capital of {{ world.sector.subsectors[world.subsector()].wiki_name() }} is {{ world.wiki_name() }}
 {%- endfor -%}
+{%- else -%}
+{{'{{'}}NavigationBox
+ |Title={{aleg.wiki_name()}} capitals
+ |Image=
+ |Category=
+ |List = <div style="text-align: left;font-size: 90%; padding: 0.5em 1em; -webkit-column-count: 2; -moz-column-count: 2; column-count: 2;">
+{%- for world in aleg.stats.otherCp %}
+* Capital {{ world.wiki_name() }}.
+{%- endfor -%}
+{%- for world in aleg.stats.sectorCp %}
+* Sector capital is {{ world.wiki_name() }}.
+{%- endfor -%}
+{%- for world in aleg.stats.subsectorCp %}
+* {{ world.sector.subsectors[world.subsector()].wiki_name() }} subsector capital is {{ world.wiki_name() }}
+{%- endfor -%}
+</div>{{'}}'}}
+{%- endif -%}
 {%- endmacro -%}
 
 {# Macros to aid in the processing above #}
 
 {%- macro text_area_population(plural, area) -%}
-with an estimated population of {{ population(area.stats.population) }}. 
-{%- endmacro -%}
-
-{%- macro homeworlds(plural, area) -%}
-{%- if area.stats.homeworld_count() > 0 -%}
-{%- set count = plural.num(area.stats.homeworld_count()) -%}
-There {{plural.inflect("plural_verb('is')") }} {{ get_count(plural, area.stats.homeworld_count(), 'homeworld') }}. 
-{%- endif -%}
+with an estimated population of {{ population(area.stats.population) }}
 {%- endmacro -%}
 
 {%- macro population (population) -%}
@@ -142,19 +144,36 @@ The highest technology level is {{area.stats.maxTL}} at {{plural.join(area.stats
 
 {%- macro world_counts(plural, area, contain) -%}
 {%- if contain and contain.stats.number == area.stats.number -%}all of the worlds
-{%- elif area.worlds -%}{{ get_count(plural, area.stats.number, 'world') }} {{ text_area_population(plural, area) }}
+{%- elif area.worlds -%}{{ get_count(plural, area.stats.number, 'world') }}
 {%- else -%}no charted worlds
 {%- endif -%}
 {%- endmacro -%}
 
-{%- macro economy (plural, area) -%}
-{%- if area.stats.economy > 0 -%}The economy is BCr{{ '{:,d}'.format(area.stats.economy) }}
-{%- if area.stats.tradeVol > 0 %} supporting an interstellar trade of BCr{{ '{:,d}'.format(area.stats.tradeVol // (10**9)) }} and giving {% else %} with {% endif -%}
-a per capita income of Cr{{ '{:,d}'.format(area.stats.percapita ) }}.
-{%- if area.stats.population > 0 %} {{ high_pop_worlds(plural, area) }}
-{%- if area.stats.TLmean > 0 %} The average [[Technology Level|technology level]] is {{area.stats.TLmean|int}} (with most between {{[area.stats.TLmean - area.stats.TLstddev,0]|max|int}} and {{(area.stats.TLmean + area.stats.TLstddev)|int}}). {{ high_tech_worlds(plural, area) }}
-{%- endif -%}{%- endif -%}{%- endif -%}
-{%- endmacro -%}
+
+{%- macro economy(plural, area, area_type, contain) -%}
+{%- if area_type == 'allegiance' -%}
+The {{ area.wiki_name() }} has jurisdiction over {{ world_counts(plural, area, contain) }}
+{%- elif area_type == 'subsector' -%}
+{{area.wiki_name()}}, {{area_type}} {{area.position}} of {{area.sector.wiki_name()}} contains {{ world_counts(plural, area) }}
+{%- else -%}
+The {{area.wiki_name()}} {{area_type}} has {{ world_counts(plural, area) }}
+{%- endif -%}
+{%- if area.worlds %} {{ text_area_population(plural, area) }}, a per capita income of Cr{{ '{:,d}'.format(area.stats.percapita ) }}, and a total economy is BCr{{ '{:,d}'.format(area.stats.economy) }}.
+{%- if area.stats.tradeVol > 0 %} These worlds originate an interstellar trade of BCr{{ '{:,d}'.format(area.stats.tradeVol // (10**9)) }} through
+{{area.stats.port_size['A'] + area.stats.port_size['B'] + area.stats.port_size['C'] + area.stats.port_size['D']}} [[starport]]s
+({{area.stats.port_size['A']}} [[Class A Starport|Class A]], {{area.stats.port_size['B']}} [[Class B Starport|Class B]], {{area.stats.port_size['C']}} [[Class C Starport|Class C]], {{area.stats.port_size['D']}} [[Class D Starport|Class D]])
+employing {{'{:,d}'.format(area.stats.spa_people)}} people. Driving this interstellar trade {% else %} Driving this economy
+{%- endif %} are
+{{ get_count(plural, area.stats.code_counts.get('Ag', 0), 'world', ' [[Agricultural World|Agricultural]] (Ag)') }},
+{{ get_count(plural, area.stats.code_counts.get('Na', 0), 'world', ' [[Nonagricultural World|Non-Agricultural]] (Na)') }},
+{{ get_count(plural, area.stats.code_counts.get('Pa', 0), 'world', ' Pre-Agricultural (Pa)') }},
+{{ get_count(plural, area.stats.code_counts.get('Pi', 0), 'world', ' Pre-Industrial (Pi)') }},
+{{ get_count(plural, area.stats.code_counts.get('Ri', 0), 'world', ' [[Rich World|Rich]] (Ri)') }}, and
+{{ get_count(plural, area.stats.code_counts.get('In', 0), 'world', ' [[Industrial World|Industrial]] (In)') }}. {{ bases(plural, area.stats.bases, area) }}
+{%- if area.stats.TLmean > 0 %} The average [[Technology Level|technology level]] is {{area.stats.TLmean|int}} (with most between {{[area.stats.TLmean - area.stats.TLstddev,0]|max|int}} and {{(area.stats.TLmean + area.stats.TLstddev)|int}}).
+{{ high_tech_worlds(plural, area) }}
+{%- endif -%}{%-else-%}.{%- endif -%}
+{%- endmacro %}
 
 {%- macro uwp_table(table_name, uwp_code, global_stats) -%}
 {| class="wikitable"
@@ -169,6 +188,19 @@ a per capita income of Cr{{ '{:,d}'.format(area.stats.percapita ) }}.
 |}
 {%- endmacro -%}
 
+{%- macro population_text(plural, area) -%}
+{% if area.stats.population > 0 %}has an estimated population of {{population(area.stats.population)}} distributed across
+{{ get_count(plural, area.stats.code_counts.get('Hi', 0), 'world', ' High population (Hi)') }},
+{{ get_count(plural, area.stats.code_counts.get('Ph', 0), 'world', ' Moderate population (Ph)') }},
+{{ get_count(plural, area.stats.code_counts.get('Ni', 0), 'world', ' Non-industrial (Ni)') }},
+{{ get_count(plural, area.stats.code_counts.get('Lo', 0), 'world', ' Low population (Lo)') }}, and
+{{ get_count(plural, area.stats.code_counts.get('Ba', 0), 'world', ' Barren (Ba)') }}.
+{{ high_pop_worlds(plural, area) }} The population consists of {{area.stats.populations | count}} sophont groups
+{%- if area.stats.homeworld_count() > 0 %} including {{ get_count(plural, area.stats.homeworld_count(), 'sophont', ' [[Native Intelligent Life|native]]') }}{%- endif -%}.
+{%- else -%}
+has no inhabitants.
+{%- endif -%}
+{%- endmacro %}
 
 {%- macro population_groups(plural, area) -%}
 {%- if area.stats.populations -%}
@@ -205,7 +237,7 @@ a per capita income of Cr{{ '{:,d}'.format(area.stats.percapita ) }}.
 
 {%- macro bases(plural, bases, area) -%}
 {%- if bases -%}
-The worlds in {{ area.name }} maintain
+The governments in {{ area.name }} maintain
 {%- for base, count in bases | dictsort(by='value', reverse=True) -%}
 {%- if loop.last and loop.length > 1 %} and{%- endif %} {{ get_count(plural, count, base) }}{%- if not loop.last -%},{%- endif -%}
 {%- endfor %}. {% endif -%}

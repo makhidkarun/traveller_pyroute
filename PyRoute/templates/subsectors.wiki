@@ -3,10 +3,11 @@ __NOTOC__
 {% for sector in sectors.values() -%}
 == {{sector.name}} statistics ==
 {{ stats.text_area_long('sector', sector, plural) }}
+
 === Polities ===
 {{ stats.allegiance_statistics(plural, sector) }}
 
-{% for subsector in sector.subsectors.values() | sort (attribute="position") %}
+{%- for subsector in sector.subsectors.values() | sort (attribute="position") %}
 === {{ subsector.subsector_name() }} statistics ===
 {{ stats.text_area_long('subsector', subsector, plural) }}
 
