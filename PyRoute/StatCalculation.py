@@ -246,6 +246,7 @@ class StatCalculation(object):
         stats.passengers += star.passIn
         stats.spa_people += star.starportPop
         stats.port_size[star.starportSize] += 1
+        stats.port_size[star.port] += 1
         for code in star.tradeCode.codes:
             stats.code_counts[code] += 1
         if star.ggCount:
