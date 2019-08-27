@@ -38,7 +38,7 @@ There are {{get_count(plural, area.stats.code_counts.get('As', 0), 'belt',  ' [[
 {%- endif %}
 
 {{area.wiki_name()}} {{ population_text(plural, area) }}
-{{ population_groups(plural, area) }}
+{%- if area_type == 'subsector' -%}{{ population_groups(plural, area, area.sector.name) }}{%- else -%}{{ population_groups(plural, area, area.name) }}{%- endif -%}
 {%- endmacro -%}
 
 {# The top level statistics for the allegiances, similar to above #}
@@ -202,7 +202,7 @@ has no inhabitants.
 {%- endif -%}
 {%- endmacro %}
 
-{%- macro population_groups(plural, area) -%}
+{%- macro population_groups(plural, area, sophont_sector) -%}
 {%- if area.stats.populations -%}
 {{'{{'}}NavigationBox
  |Title={{area.stats.populations | count}} identified sophont populations in {{ area.name }}
@@ -210,30 +210,13 @@ has no inhabitants.
  |Category=
  |List = <div style="text-align: left;font-size: 90%; padding: 0.5em 1em; -webkit-column-count: 2; -moz-column-count: 2; column-count: 2;">
 {%- for code, pop in area.stats.populations | dictsort(by='value', reverse=True) %}
-* {{'{{'}}SophontCode|{{code}}{%- if pop.homeworlds -%}|{{area.name}}{%- endif -%}{{'}}'}}: {{population(pop.population)}} on
+* {{'{{'}}SophontCode|{{code}}{%- if pop.homeworlds -%}|{{sophont_sector}}{%- endif -%}{{'}}'}}: {{population(pop.population)}} on
 {%- if pop.homeworlds %} their homeworld{% if pop.count > 1 %} and {{ get_count(plural, pop.count - 1, 'world') }}{%- endif -%}
 {%- else %} {{ get_count(plural, pop.count, 'world') }}{% endif -%}.
 {%- endfor -%}
 </div>{{'}}'}}
 {%- endif -%}
 {%- endmacro -%}
-
-
-{%- macro homeworld_list(plural, area) -%}
-<div class="toccolours inlineb" style="clear: left; margin: 0.5em auto; text-align: left; padding: 0em; border-radius: 4px; max-width: 94%; overflow: hidden">
-<div style="padding-top: 0.2em; padding-bottom: 0.2em; background:#ccccff; font-weight:bold; text-align: center"> 
-{{ area.stats.homeworlds | count }} identified homeworlds in {{ area.name }}</div>
-<div style="font-size: 90%; padding: 0.5em 1em; -webkit-column-count: 2; -moz-column-count: 2; column-count: 2;"><ul style="margin-top: 0;">
-{%- for homeworld in area.stats.homeworlds -%}
-{%- if homeworld.name -%}
-<li>{{'{{'}}SophontHomeWorld|{{homeworld.wiki_short_name()}}{{'}}'}}</li>
-{%- else -%}
-<li>{{ homeworld.wiki_name() }} </li>
-{%- endif -%}
-{%- endfor -%}
-</ul></div></div>
-{%- endmacro -%}
-
 
 {%- macro bases(plural, bases, area) -%}
 {%- if bases -%}
