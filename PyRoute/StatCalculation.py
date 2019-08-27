@@ -30,7 +30,12 @@ class Populations(object):
 class ObjectStatistics(object):
     base_mapping = {'C':'Corsair base', 'D':'Naval depot', 'E': 'Embassy', 'K': 'Naval base', 'M': 'Military base',
                     'N': 'Naval base', 'O': 'Naval outpost',
-                    'R': 'Clan base', 'S': 'Scout base', 'T':'Tlaukhu base', 'V': 'Scout base', 'W': 'Way station'}
+                    'R': 'Clan base', 'S': 'Scout base', 'T':'Tlaukhu base', 'V': 'Scout base', 'W': 'Way station',
+                    '*': 'Unknown',
+                    'G': 'Vargr Naval base',  'J': 'Naval base',
+                    'L': 'Hiver naval base', 'P': 'Droyne Naval base', 'Q': 'Droyne military garrison',
+                    'X': 'Zhodani relay station', 'Y': 'Zhodani depot',
+                    'A': 'Split', 'B': 'Split', 'F': 'Split','H': 'Split', 'U': 'Split', 'Z': 'Split' }
 
     def __init__(self):
         self.population = 0
@@ -261,7 +266,27 @@ class StatCalculation(object):
 
         for code in star.baseCode:
             if code != '-':
-                stats.bases[ObjectStatistics.base_mapping[code]] += 1
+                if code == 'A':
+                    stats.bases[ObjectStatistics.base_mapping['N']] += 1
+                    stats.bases[ObjectStatistics.base_mapping['S']] += 1
+                elif code == 'B':
+                    stats.bases[ObjectStatistics.base_mapping['N']] += 1
+                    stats.bases[ObjectStatistics.base_mapping['W']] += 1
+                elif code == 'F':
+                    stats.bases[ObjectStatistics.base_mapping['K']] += 1
+                    stats.bases[ObjectStatistics.base_mapping['M']] += 1
+                elif code == 'H':
+                    stats.bases[ObjectStatistics.base_mapping['C']] += 1
+                    stats.bases[ObjectStatistics.base_mapping['K']] += 1
+                elif code == 'U':
+                    stats.bases[ObjectStatistics.base_mapping['T']] += 1
+                    stats.bases[ObjectStatistics.base_mapping['R']] += 1
+                elif code == 'Z':
+                    stats.bases[ObjectStatistics.base_mapping['K']] += 1
+                    stats.bases[ObjectStatistics.base_mapping['M']] += 1
+                else:
+                    stats.bases[ObjectStatistics.base_mapping[code]] += 1
+
 
         if star.eti_cargo_volume > 0 or star.eti_pass_volume > 0:
             stats.eti_worlds += 1
