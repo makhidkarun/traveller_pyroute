@@ -32,14 +32,14 @@ class GraphicSubsectorMap(GraphicMap):
         self.ym = 24  # half a hex height
         self.xm = 14  # half the length of one side
         self.textFill = self.fillWhite
-        self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf', 16)
-        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf', 24)
+        self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf', 16)
+        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf', 24)
         self.hexFont = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 8)
         self.worldFont = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 11)
         self.hexFont2 = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 12)
         self.hexFont3 = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 18)
-        self.hexFont4 = ImageFont.truetype("/home/tjoneslo/.local/share/fonts/Symbola.ttf", 12)
-        self.hexFont5 = ImageFont.truetype("/home/tjoneslo/.local/share/fonts/Symbola.ttf", 18)
+        self.hexFont4 = ImageFont.truetype("/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf", 22)
+        self.hexFont5 = ImageFont.truetype("/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf", 36)
         self.logger = logging.getLogger('PyRoute.GraphicSubsectorMap')
 
     def document(self, sector):

@@ -94,7 +94,7 @@ if __name__ == '__main__':
             if trade == 0:
                 continue
 
-            btn = int(math.log(trade, 10))
+             btn = int(math.log(trade, 10))
 
             if btn - 8 < 0:
                 continue

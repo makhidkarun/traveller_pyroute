@@ -543,8 +543,8 @@ class GraphicMap(Map):
 
     def __init__(self, galaxy, routes):
         super(GraphicMap, self).__init__(galaxy, routes)
-        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf', 30)
-        self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf', 10)
+        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf', 30)
+        self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf', 10)
         self.textFill = GraphicMap.fillBlack
 
     def close(self):

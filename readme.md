@@ -23,6 +23,10 @@ You can install the required libraries using pip:
 
     pip install -r requirements.txt
 
+The map generation requires several fonts not normally installed in the system:
+
+    apt-get install fonts-dejavu fonts-liberation fonts-freefont-ttf fonts-ancient-scripts fonts-symbola
+
 For the math and layout of hex maps, I recommend the [Hexagonal Grids](http://www.redblobgames.com/grids/hexagons/) 
 page which contains every item you will need to draw and manage hexagon maps.I recommend all the articles on the Red 
 Blob Games site.

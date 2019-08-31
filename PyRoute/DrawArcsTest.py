@@ -28,14 +28,14 @@ class DrawArcsTest(GraphicSubsectorMap):
         self.ym = 48  # half a hex height
         self.xm = 28  # half the length of one side
         self.textFill = self.fillWhite
-        self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf', 32)
-        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf', 48)
+        self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf', 32)
+        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf', 48)
         self.hexFont = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 15)
         self.worldFont = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 22)
         self.hexFont2 = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 22)
         self.hexFont3 = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 36)
-        self.hexFont4 = ImageFont.truetype("/home/tjoneslo/.local/share/fonts/Symbola.ttf", 22)
-        self.hexFont5 = ImageFont.truetype("/home/tjoneslo/.local/share/fonts/Symbola.ttf", 36)
+        self.hexFont4 = ImageFont.truetype("/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf", 22)
+        self.hexFont5 = ImageFont.truetype("/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf", 36)
         self.logger = logging.getLogger('PyRoute.DrawArcsTest')
 
     def document(self, sector):
