@@ -183,7 +183,7 @@ class Star(object):
             imp = int(data[5][1:-1].strip())
             star.calculate_importance()
             if imp != star.importance:
-                star.logger.error(
+                star.logger.warning(
                     '{}-{} Calculated importance {} does not match generated importance {}'.format(star, star.baseCode,
                                                                                                     star.importance,
                                                                                                     imp))
@@ -404,25 +404,25 @@ class Star(object):
         infrastructure = self._ehex_to_int(self.economics[3])
 
         if labor != max(self.popCode - 1, 0):
-            self.logger.error('{} - EX Calculated labor {} does not match generated labor {}'.format(self, labor, max(
+            self.logger.warning('{} - EX Calculated labor {} does not match generated labor {}'.format(self, labor, max(
                 self.popCode - 1, 0)))
 
         if self.tradeCode.barren and infrastructure != 0:
-            self.logger.error(
+            self.logger.warning(
                 '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self,
                                                                                                           infrastructure,
                                                                                                           0))
         elif self.tradeCode.low and infrastructure != 1:
-            self.logger.error(
+            self.logger.warning(
                 '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self,
                                                                                                           infrastructure,
                                                                                                           1))
         elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= 6 + self.importance:
-            self.logger.error(
+            self.logger.warning(
                 '{} - EX Calculated infrastructure {} not in NI range 0 - {}'.format(self, infrastructure,
                                                                                       6 + self.importance))
         elif not 0 <= infrastructure <= 12 + self.importance:
-            self.logger.error('{} - EX Calculated infrastructure {} not in range 0 - {}'.format(self, infrastructure,
+            self.logger.warning('{} - EX Calculated infrastructure {} not in range 0 - {}'.format(self, infrastructure,
                                                                                                  12 + self.importance))
 
     def check_cx(self):
@@ -432,36 +432,36 @@ class Star(object):
 
         homogeneity = self._ehex_to_int(self.social[1])  # pop + flux, min 1
         if pop == 0 and homogeneity != 0:
-            self.logger.error(
+            self.logger.warning(
                 '{} - CX calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity))
         elif pop != 0 and not max(1, pop - 5) <= homogeneity <= pop + 5:
-            self.logger.error(
+            self.logger.warning(
                 '{} - CX calculated homogeneity {} not in range {} - {}'.format(self, homogeneity, max(1, pop - 5),
                                                                                  pop + 5))
 
         acceptance = self._ehex_to_int(self.social[2])  # pop + Ix, min 1
         if pop == 0 and acceptance != 0:
-            self.logger.error(
+            self.logger.warning(
                 '{} - CX calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
         elif pop != 0 and not max(1, pop + self.importance) == acceptance:
-            self.logger.error(
+            self.logger.warning(
                 '{} - CX Calculated acceptance {} does not match generated acceptance {}'.format(self, acceptance,
                                                                                                   max(1,
                                                                                                       pop + self.importance)))
 
         strangeness = self._ehex_to_int(self.social[3])  # flux + 5
         if pop == 0 and strangeness != 0:
-            self.logger.error(
+            self.logger.warning(
                 '{} - CX calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness))
         elif pop != 0 and not 1 <= strangeness <= 10:
-            self.logger.error(
+            self.logger.warning(
                 '{} - CX calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10))
 
         symbols = self._ehex_to_int(self.social[4])  # TL + flux, min 1
         if pop == 0 and symbols != 0:
-            self.logger.error('{} - CX calculated symbols {} should be 0 for barren worlds'.format(self, symbols))
+            self.logger.warning('{} - CX calculated symbols {} should be 0 for barren worlds'.format(self, symbols))
         elif pop != 0 and not max(1, self.tl - 5) <= symbols <= self.tl + 5:
-            self.logger.error(
+            self.logger.warning(
                 '{} - CX calculated symbols {} not in range {} - {}'.format(self, symbols, max(1, self.tl - 5),
                                                                              self.tl + 5))
 
