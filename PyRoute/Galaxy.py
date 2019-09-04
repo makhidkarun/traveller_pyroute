@@ -36,6 +36,9 @@ class AreaItem(object):
     def __str__(self):
         return '{}'.format(self.name)
 
+    def world_count(self):
+        return len(self.worlds)
+
 
 class Allegiance(AreaItem):
     def __init__(self, code, name, base=False, population='Huma'):

@@ -4,7 +4,7 @@
 {| class="wikitable sortable" width="90%"
 |+ Analysis per Polity
 ! Name !! Code !! Worlds !! Population (millions) !! % of Population !! Economy (Bcr) !! Per Capita (Cr) !! RU !! Trade Volume (BCr / year) !! Int. Trade (BCr / year) !! Ext. Trade (BCr/year) !! Shipyard Capacity (MTons) !! Colonial Army (BEs) !! Travellers (M / year) !! SPA Pop
-{% for alleg in global_alg -%}
+{% for alleg in global_alg if alleg.worlds.world_count() >= min_alg_count | -%}
 |-
 | {{alleg.wiki_name()}}
 | {{alleg.code}}

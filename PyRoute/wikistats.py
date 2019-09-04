@@ -103,7 +103,8 @@ class WikiStats(object):
                              {"global_alg": self.galaxy.alg_sorted,
                               "global_stats": self.galaxy.stats,
                               "plural": self.plural,
-                              "area": self.galaxy})
+                              "area": self.galaxy,
+                              "min_alg_count": self.min_alg_count})
 
     def write_json(self):
         path = os.path.join(self.galaxy.output_path, 'galaxy.json')
