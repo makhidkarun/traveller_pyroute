@@ -9,7 +9,7 @@
 {%- for world in subsector.worlds %}
 |-
 | {{ world.position }}
-| {{ world.wiki_short_name() }}
+| {{ "[[:s|]]".format(world.wiki_short_name()) }}
 | {{ world.uwp }}
 | {{ world.popM }}{{world.belts}}{{world.ggCount}}
 | { {{world.importance}} }

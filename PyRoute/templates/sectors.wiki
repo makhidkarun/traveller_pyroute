@@ -22,6 +22,7 @@
 
 
 {% for sector in sectors.values() -%}
+
 == {{sector.name}} statistics ==
 {{ stats.text_area_long('sector', sector, plural) }}
 
