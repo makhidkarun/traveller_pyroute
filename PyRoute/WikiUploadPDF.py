@@ -341,7 +341,7 @@ def process():
     parser.add_argument('--era', dest='era', default='Milieu 1116',
                         help="Set the era for the world upload data, default [Milieu 1116]")
     parser.add_argument('--log-level', default='INFO')
-    parser.add_argument('--site', dest='site', default='http://wiki.travellerrpg.com/api.php')
+    parser.add_argument('--site', dest='site', default='https://wiki.travellerrpg.com/api.php')
     parser.add_argument('--user', default='AB-101',
                         help="(Bot) user to connect to the wiki and perform the uploads, default [AB-101]")
 
