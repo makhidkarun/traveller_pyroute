@@ -1,0 +1,33 @@
+{% import 'statistics_table.wiki' as stats %}
+== Top Level Summary ==
+{{ stats.top_level_summary(global_stats, sectors) }}
+
+{|
+|-  style="vertical-align:top;text-align:center;" 
+| 
+{{ stats.uwp_table ('Starport', uwp.uwp['Starport'], global_stats) }}
+|
+{{ stats.uwp_table ('Size', uwp.uwp['Size'], global_stats) }}
+| 
+{{ stats.uwp_table ('Atmosphere', uwp.uwp['Atmosphere'], global_stats) }}
+| 
+{{ stats.uwp_table ('Hydrographics', uwp.uwp['Hydrographics'], global_stats) }}
+|-  style="vertical-align:top;text-align:center;"
+|
+{{ stats.uwp_table ('Population', uwp.uwp['Population'], global_stats) }}
+|
+{{ stats.uwp_table ('Government', uwp.uwp['Government'], global_stats) }}
+|
+{{ stats.uwp_table ('Law Level', uwp.uwp['Law Level'], global_stats) }}
+|
+{{ stats.uwp_table ('Tech Level', uwp.uwp['Tech Level'], global_stats) }}
+|- style="vertical-align:top;text-align:center;"
+|
+{{ stats.uwp_table ('Importance', uwp.uwp['Importance'], global_stats) }}
+|
+{{ stats.uwp_table ('Resources', uwp.uwp['Resources'], global_stats) }}
+|
+{{ stats.uwp_table ('Starport Size', uwp.uwp['Starport Size'], global_stats) }}
+|
+{{ stats.uwp_table ('Primary Type', uwp.uwp['Primary Type'], global_stats) }}
+|}

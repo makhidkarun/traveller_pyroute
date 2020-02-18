@@ -13,7 +13,7 @@ import math
 import networkx as nx
 
 from Star import Star
-from TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation, XRouteCalculation, \
+from  TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation, XRouteCalculation, \
     OwnedWorldCalculation
 from StatCalculation import ObjectStatistics
 from AllyGen import AllyGen
@@ -24,22 +24,34 @@ class AreaItem(object):
         self.name = name
         self.worlds = []
         self.stats = ObjectStatistics()
+        self.alg = {}
+        self.alg_sorted = []
 
     def wiki_title(self):
         return self.wiki_name()
 
     def wiki_name(self):
-        return u'[[{}]]'.format(self.name)
+        return '[[{}]]'.format(self.name)
 
     def __str__(self):
-        return u'{}'.format(self.name)
+        return '{}'.format(self.name)
+
+    def world_count(self):
+        return len(self.worlds)
 
 
 class Allegiance(AreaItem):
-    def __init__(self, code, name, base=False):
+    def __init__(self, code, name, base=False, population='Huma'):
         super(Allegiance, self).__init__(name)
         self.code = code
         self.base = base
+        self.population = population
+
+    # For the JSONPickel work
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['alg_sorted']
+        return state
 
     def allegiance_name(self):
         return self.name
@@ -47,18 +59,29 @@ class Allegiance(AreaItem):
     def wiki_name(self):
         if self.code.startswith('Na'):
             names = self.name.split(',') if ',' in self.name else [self.name, '']
-            return u'[[{}]] {}'.format(names[0], names[1].strip())
+            return '[[{}]] {}'.format(names[0], names[1].strip())
         elif self.code.startswith('Cs'):
             names = self.name.split(',') if ',' in self.name else [self.name, '']
-            return u'[[{}]]s of the [[{}]]'.format(names[0].strip(), names[1].strip())
+            return '[[{}]]s of the [[{}]]'.format(names[0].strip(), names[1].strip())
         elif ',' in self.name:
             names = self.name.split(',')
-            return u'[[{}]], [[{}]]'.format(names[0].strip(), names[1].strip())
-        return u'[[{}]]'.format(self.name)
+            return '[[{}]], [[{}]]'.format(names[0].strip(), names[1].strip())
+        return '[[{}]]'.format(self.name)
 
     def __str__(self):
-        return u'{} ([{})'.format(self.name, self.code)
+        return '{} ([{})'.format(self.name, self.code)
 
+    def is_unclaimed(self):
+        return AllyGen.is_unclaimed(self)
+
+    def is_wilds(self):
+        return AllyGen.is_wilds(self)
+
+    def is_client_state(self):
+        return AllyGen.is_client_state(self)
+
+    def are_allies(self, other):
+        return AllyGen.are_allies(self.code, other.code)
 
 class Subsector(AreaItem):
     def __init__(self, name, position, sector):
@@ -72,22 +95,36 @@ class Subsector(AreaItem):
         self.rimward = None
         self.dx = sector.dx
         self.dy = sector.dy
-        self.alg = {}
+
+    # For the JSONPickel work
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['sector']
+        del state['spinward']
+        del state['trailing']
+        del state['coreward']
+        del state['rimward']
+        del state['alg_sorted']
+        del state['positions']
+        return state
 
     def wiki_name(self):
         if len(self.name) == 0:
-            return u'Position {0}'.format(self.position)
+            return "{0} location {1}".format(self.sector.name, self.position)
         else:
             if "(" in self.name:
-                return u'[[{0} Subsector|{1}]]'.format(self.name, self.name[:-7])
+                return '[[{0} Subsector|{1}]]'.format(self.name, self.name[:-7])
             else:
-                return u'[[{0} Subsector|{0}]]'.format(self.name)
+                return '[[{0} Subsector|{0}]]'.format(self.name)
 
     def wiki_title(self):
-        return u'{0} - {1}'.format(self.wiki_name(), self.sector.wiki_name())
+        return '{0} - {1}'.format(self.wiki_name(), self.sector.wiki_name())
 
-    def sector_name(self):
-        return self.name[:-9] if self.name.endswith(u'Subsector') else self.name
+    def subsector_name(self):
+        if len(self.name) == 0:
+            return "Location {}".format(self.position)
+        else:
+            return self.name[:-9] if self.name.endswith('Subsector') else self.name
 
     def set_bounding_subsectors(self):
         posrow = 0
@@ -131,20 +168,29 @@ class Sector(AreaItem):
         self.dx = self.x * 32
         self.dy = self.y * 40
         self.subsectors = {}
-        self.alg = {}
         self.spinward = None
         self.trailing = None
         self.coreward = None
         self.rimward = None
 
+    # For the JSONPickel work
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['spinward']
+        del state['trailing']
+        del state['coreward']
+        del state['rimward']
+        del state['alg_sorted']
+        return state
+
     def __str__(self):
-        return u"{} ({},{})".format(self.name, str(self.x), str(self.y))
+        return '{} ({},{})'.format(self.name, str(self.x), str(self.y))
 
     def sector_name(self):
-        return self.name[:-7] if self.name.endswith(u'Sector') else self.name
+        return self.name[:-7] if self.name.endswith('Sector') else self.name
 
     def wiki_name(self):
-        return u'[[{0} Sector|{0}]]'.format(self.sector_name())
+        return '[[{0} Sector|{0}]]'.format(self.sector_name())
 
     def find_world_by_pos(self, pos):
         for world in self.worlds:
@@ -153,7 +199,7 @@ class Sector(AreaItem):
         return None
 
 
-class Galaxy(object):
+class Galaxy(AreaItem):
     """
     classdocs
     """
@@ -162,17 +208,28 @@ class Galaxy(object):
         """
        Constructor
         """
+        super(Galaxy, self).__init__('Charted Space')
         self.logger = logging.getLogger('PyRoute.Galaxy')
         self.stars = nx.Graph()
         self.ranges = nx.Graph()
         self.sectors = {}
-        self.alg = {}
-        self.stats = ObjectStatistics()
         self.borders = AllyGen(self)
         self.output_path = 'maps'
         self.max_jump_range = max_jump
         self.min_btn = min_btn
         self.route_btn = route_btn
+
+    # For the JSONPickel work
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['stars']
+        del state['ranges']
+        del state['borders']
+        del state['logger']
+        del state['trade']
+        del state['sectors']
+        del state['alg_sorted']
+        return state
 
     def read_sectors(self, sectors, pop_code, ru_calc):
         for sector in sectors:
@@ -195,16 +252,19 @@ class Galaxy(object):
                     name = data[1].strip()
                     sec.subsectors[pos] = Subsector(name, pos, sec)
                 if line.startswith('# Alleg:'):
-                    algCode = line[8:].split(':', 1)[0].strip()
-                    algName = line[8:].split(':', 1)[1].strip().strip('"')
+                    alg_code = line[8:].split(':', 1)[0].strip()
+                    alg_name = line[8:].split(':', 1)[1].strip().strip('"')
 
-                    base = AllyGen.same_align(algCode)
+                    # A work around for the base Na codes which may be empire dependent.
+                    alg_race = AllyGen.population_align(alg_code, alg_name)
+
+                    base = AllyGen.same_align(alg_code)
                     if base in self.alg:
-                        self.alg[base].name = algName
+                        self.alg[base].name = alg_name
                     if base not in self.alg:
-                        self.alg[base] = Allegiance(base, AllyGen.same_align_name(base, algName), base=True)
-                    if algCode not in self.alg:
-                        self.alg[algCode] = Allegiance(algCode, algName, base=False)
+                        self.alg[base] = Allegiance(base, AllyGen.same_align_name(base, alg_name), base=True, population=alg_race)
+                    if alg_code not in self.alg:
+                        self.alg[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)
 
             for line in lines[lineno + 2:]:
                 if line.startswith('#') or len(line) < 20:
@@ -213,11 +273,13 @@ class Galaxy(object):
                 if star:
                     sec.worlds.append(star)
                     sec.subsectors[star.subsector()].worlds.append(star)
-                    star.alg_base = AllyGen.same_align(star.alg)
+                    star.alg_base_code = AllyGen.same_align(star.alg_code)
 
                     self.set_area_alg(star, self, self.alg)
                     self.set_area_alg(star, sec, self.alg)
                     self.set_area_alg(star, sec.subsectors[star.subsector()], self.alg)
+
+                    star.tradeCode.sophont_list.append("{}A".format(self.alg[star.alg_code].population))
 
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds)))
@@ -228,22 +290,22 @@ class Galaxy(object):
         self.logger.debug("Allegiances: {}".format(self.alg))
 
     def set_area_alg(self, star, area, algs):
-        full_alg = algs.get(star.alg, Allegiance(star.alg, 'Unknown Allegiance', base=False))
-        base_alg = algs.get(star.alg_base, Allegiance(star.alg_base, 'Unknown Allegiance', base=True))
+        full_alg = algs.get(star.alg_code, Allegiance(star.alg_code, 'Unknown Allegiance', base=False))
+        base_alg = algs.get(star.alg_base_code, Allegiance(star.alg_base_code, 'Unknown Allegiance', base=True))
 
-        area.alg.setdefault(star.alg_base, Allegiance(base_alg.code, base_alg.name, base=True)).worlds.append(star)
-        if star.alg != star.alg_base:
-            area.alg.setdefault(star.alg, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
+        area.alg.setdefault(star.alg_base_code, Allegiance(base_alg.code, base_alg.name, base=True)).worlds.append(star)
+        if star.alg_code != star.alg_base_code:
+            area.alg.setdefault(star.alg_code, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
 
     def set_positions(self):
-        for sector in self.sectors.itervalues():
+        for sector in self.sectors.values():
             for star in sector.worlds:
                 self.stars.add_node(star)
                 self.ranges.add_node(star)
         self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
 
     def set_bounding_sectors(self):
-        for sector, neighbor in itertools.combinations(self.sectors.itervalues(), 2):
+        for sector, neighbor in itertools.combinations(self.sectors.values(), 2):
             if sector.x - 1 == neighbor.x and sector.y == neighbor.y:
                 sector.spinward = neighbor
                 neighbor.trailing = sector
@@ -260,8 +322,8 @@ class Galaxy(object):
                 self.logger.error("Duplicate sector %s and %s" % (sector.name, neighbor.name))
 
     def set_bounding_subsectors(self):
-        for sector in self.sectors.itervalues():
-            for subsector in sector.subsectors.itervalues():
+        for sector in self.sectors.values():
+            for subsector in sector.subsectors.values():
                 subsector.set_bounding_subsectors()
 
     def generate_routes(self, routes, reuse=10):
@@ -298,15 +360,15 @@ class Galaxy(object):
             nx.write_edgelist(self.stars, f, data=True)
         path = os.path.join(self.output_path, 'borders.txt')
         with codecs.open(path, "wb", "utf-8") as f:
-            for key, value in self.borders.borders.iteritems():
-                f.write(u"{}-{}: border: {}\n".format(key[0], key[1], value))
+            for key, value in self.borders.borders.items():
+                f.write("{}-{}: border: {}\n".format(key[0], key[1], value))
 
         if routes == 'xroute':
             path = os.path.join(self.output_path, 'stations.txt')
             with codecs.open(path, "wb", 'utf-8') as f:
                 stars = [star for star in self.stars if star.tradeCount > 0]
                 for star in stars:
-                    f.write(u"{} - {}\n".format(star, star.tradeCount))
+                    f.write("{} - {}\n".format(star, star.tradeCount))
 
     def process_eti(self):
         self.logger.info("Processing ETI for worlds")
@@ -359,7 +421,7 @@ class Galaxy(object):
                 ownedBy = [star for star in self.stars.neighbors(world) \
                            if star.tl >= 9 and star.popCode >= 6 and \
                            star.port in 'ABC' and star.ownedBy == star and \
-                           AllyGen.are_owned_allies(star.alg, world.alg)]
+                           AllyGen.are_owned_allies(star.alg_code, world.alg_code)]
 
                 ownedBy.sort(reverse=True,
                              key=lambda star: star.popCode)
@@ -380,7 +442,7 @@ class Galaxy(object):
                     ownedHex = world.ownedBy[5:]
                     owner = None
                     self.logger.debug(
-                        u"World {}@({},{}) owned by {} - {}".format(world, world.col, world.row, ownedSec, ownedHex))
+                        "World {}@({},{}) owned by {} - {}".format(world, world.col, world.row, ownedSec, ownedHex))
                     if world.col < 4 and world.sector.spinward:
                         owner = world.sector.spinward.find_world_by_pos(ownedHex)
                     elif world.col > 28 and world.sector.trailing:
@@ -397,18 +459,18 @@ class Galaxy(object):
                 elif len(world.ownedBy) == 4:
                     owner = world.sector.find_world_by_pos(world.ownedBy)
 
-                self.logger.debug(u"Worlds {} is owned by {}".format(world, owner))
+                self.logger.debug("Worlds {} is owned by {}".format(world, owner))
 
-                ow_path_items = [u'"{}"'.format(world), u'"{}"'.format(owner)]
-                ow_path_items.extend([u'"{}"'.format(item) for item in ownedBy[0:4]])
-                ow_path_world = u', '.join(ow_path_items)
-                f.write(ow_path_world + u'\n')
+                ow_path_items = ['"{}"'.format(world), '"{}"'.format(owner)]
+                ow_path_items.extend(['"{}"'.format(item) for item in ownedBy[0:4]])
+                ow_path_world = ', '.join(ow_path_items)
+                f.write(ow_path_world + '\n')
 
-                ow_list_items = [u'"{}"'.format(world.sector.name[0:4])]
-                ow_list_items.append(u'"{}"'.format(world.position))
-                ow_list_items.append(u'"{}"'.format(owner))
-                ow_list_items.extend([u'"O:{}"'.format(item.sec_pos(world.sector)) for item in ownedBy[0:4]])
-                ow_list_world = u', '.join(ow_list_items)
-                g.write(ow_list_world + u'\n')
+                ow_list_items = ['"{}"'.format(world.sector.name[0:4])]
+                ow_list_items.append('"{}"'.format(world.position))
+                ow_list_items.append('"{}"'.format(owner))
+                ow_list_items.extend(['"O:{}"'.format(item.sec_pos(world.sector)) for item in ownedBy[0:4]])
+                ow_list_world = ', '.join(ow_list_items)
+                g.write(ow_list_world + '\n')
 
                 world.ownedBy = (owner, ownedBy[0:4])

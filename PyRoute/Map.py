@@ -68,7 +68,7 @@ class Cursor(object):
         return new_cursor
 
     def __str__(self):
-        return u"({:f}, {:f})".format(self.x, self.y)
+        return "({:f}, {:f})".format(self.x, self.y)
 
 
 class GraphicLine(object):
@@ -163,7 +163,7 @@ class Map(object):
         Call this to output the trade maps
         """
         logging.getLogger("PyRoute.Map").info("writing {:d} sector maps...".format(len(self.galaxy.sectors)))
-        for sector in self.galaxy.sectors.itervalues():
+        for sector in self.galaxy.sectors.values():
             doc = self.document(sector)
             self.write_base_map(doc, sector)
 
@@ -226,7 +226,7 @@ class Map(object):
     def subsector_grid(self, doc, sector):
         vlineStart = self.cursor(0, self.y_start)
         vlineEnd = self.cursor(0, self.y_start + (180 * 4))
-        for x in xrange(self.x_start, 598, 144):
+        for x in range(self.x_start, 598, 144):
             if x >= self.x_start + 144:
                 x += 3
             vlineStart.x = x
@@ -234,7 +234,7 @@ class Map(object):
             self.add_line(doc, vlineStart, vlineEnd, 'darkgray')
         hlineStart = self.cursor(self.x_start, 0)
         hlineEnd = self.cursor(594, 0)
-        for y in xrange(self.y_start, 780, 180):
+        for y in range(self.y_start, 780, 180):
             hlineStart.y = y
             hlineEnd.y = y
             self.add_line(doc, hlineStart, hlineEnd, 'darkgray')
@@ -245,14 +245,14 @@ class Map(object):
         llineStart, llineEnd, lline = self._lline(doc, width, colorname)
         rlineStart, rlineEnd, rline = self._rline(doc, width, colorname)
 
-        for x in xrange(self.x_count):
+        for x in range(self.x_count):
             hlineStart.x_plus()
             hlineEnd.x_plus()
             self._hline_restart_y(x, hlineStart, hlineEnd)
             self._lline_restart_y(x, llineStart, llineEnd)
             self._rline_restart_y(x, rlineStart, rlineEnd)
 
-            for y in xrange(self.y_count):
+            for y in range(self.y_count):
                 hlineStart.y_plus()
                 hlineEnd.y_plus()
                 llineStart.y_plus()
@@ -487,7 +487,7 @@ class PDFSectorMap(Map):
         pdf.add_text(star.uwp.encode('ascii', 'replace'), point)
 
         if len(star.name) > 0:
-            for chars in xrange(len(star.name), 0, -1):
+            for chars in range(len(star.name), 0, -1):
                 width = self.string_width(pdf.get_font(), star.name[:chars])
                 if width <= self.xm * 3.5:
                     break
@@ -543,8 +543,8 @@ class GraphicMap(Map):
 
     def __init__(self, galaxy, routes):
         super(GraphicMap, self).__init__(galaxy, routes)
-        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf', 30)
-        self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf', 10)
+        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf', 30)
+        self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf', 10)
         self.textFill = GraphicMap.fillBlack
 
     def close(self):

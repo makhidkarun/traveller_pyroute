@@ -2,7 +2,7 @@
 """
 Created on Mar 2, 2014
 
-@author: tjoneslo
+@author: tjoneslow
 """
 
 import argparse
@@ -58,6 +58,8 @@ def process():
                         help='Do not generate subsector level maps')
     output.add_argument('--min-ally-count', dest='ally_count', default=10, type=int,
                         help='Minimum number of worlds in an allegiance for output, default [10]')
+    output.add_argument('--json-data', dest='json_data', default=False, action='store_true',
+                        help='Dump internal data structures as json for later further processing ')
 
     source = parser.add_argument_group('Input', 'Source of data options')
     source.add_argument('--input', default='sectors', help='input directory for sectors')
@@ -101,8 +103,8 @@ def process():
         galaxy.write_routes(args.routes)
 
     stats = StatCalculation(galaxy)
-    stats.calculate_statistics()
-    stats.write_statistics(args.ally_count, args.ally_match)
+    stats.calculate_statistics(args.ally_match)
+    stats.write_statistics(args.ally_count, args.ally_match, args.json_data)
 
     if args.maps:
         pdfmap = HexMap(galaxy, args.routes, args.route_btn)

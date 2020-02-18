@@ -13,31 +13,78 @@ class AllyGen(object):
     """
     classdocs
     """
-    noOne = [u'--', u'??', u'Xx']
-    nonAligned = [u'Na', u'Ns', u'Va', u'Cs', u'Hc', u'NaHu', u'NaDr', u'NaVa', u'NaAs', u'NaXx', u'VaEx', u'NaSo',
-                  u'CsCa', u'CsHv', u'CsIm', u'CsMP', u'CsVa', u'CsZh', u'CsRe', u'CsMo', u'CsRr',
-                  u'Wild']
-    sameAligned = [(u'Im', u'ImAp', u'ImDa', u'ImDc', u'ImDd', u'ImDg', u'ImDi', u'ImDs', u'ImDv',
-                    u'ImLa', u'ImLc', u'ImLu', u'ImSy', u'ImVd'),
-                   (u'As', u'A0', u'A1', u'A2', u'A3', u'A4', u'A5', u'A6', u'A7', u'A8',
-                    u'A9', u'TE', u'Of', u'If',
-                    u'AsIf', u'AsMw', u'AsOf', u'AsSc', u'AsSF', u'AsT0', u'AsT1', u'AsT2',
-                    u'AsT3', u'AsT4', u'AsT5', u'AsT6', u'AsT7', u'AsT8', u'AsT9', u'AsTA',
-                    u'AsTv', u'AsTz', u'AsVc', u'AsWc', u'AsXX', u'GlEm', u'NaAs'),
-                   (u'Hv', u'HvFd', u'H1', u'H2', u'H3', u'H4', u'H5', u'H6', u'Hf', u'H?'),
-                   (u'JP', u'J-', u'Jh', u'Hl', u'JuPr',
-                    u'JAOz', u'JAsi', u'JCoK', u'JHhk', u'JLum', u'JMen',
-                    u'JPSt', u'JRar', u'JUkh', u'JuHl', u'JuRu', u'JVug'),
-                   (u'Ke', u'KoEm'),
-                   (u'So', u'SoCf', u'SoBF', u'SoCT', u'SoFr', u'SoHn', u'SoKv', u'SoNS',
-                    u'SoQu', u'SoRD', u'SoWu'),
-                   (u'Lp', u'CoLp'),
-                   (u'Vd', u'VDeG'),
-                   (u'Vo', u'VOpA'),
-                   (u'Vx', u'VAsP'),
-                   (u'V9', u'VInL'),
-                   (u'Zh', u'ZhAx', u'ZhCa', u'ZhCh', u'ZhCo', u'ZhIa', u'ZhIN',
-                    u'ZhJp', u'ZhMe', u'ZhOb', u'ZhSh', u'ZhVQ')]
+    noOne = ['--', '??', 'Xx']
+    nonAligned = ['Na', 'Ns', 'Va', 'Cs', 'Hc',
+                  'NaHv', 'NaDr', 'NaVa', 'NaAs', 'NaXx', 'NaXX', "NaSo",
+                  'VaEx',
+                  'CsCa', 'CsHv', 'CsIm', 'CsMP', 'CsVa', 'CsZh', 'CsRe', 'CsMo', 'CsRr', "CsTw",
+                  'Wild']
+    sameAligned = [('Im', 'ImAp', 'ImDa', 'ImDc', 'ImDd', 'ImDg', 'ImDi', 'ImDs', 'ImDv',
+                    'ImLa', 'ImLc', 'ImLu', 'ImSy', 'ImVd'),
+                   ('As', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8',
+                    'A9', 'TE', 'Of', 'If',
+                    'AsIf', 'AsMw', 'AsOf', 'AsSc', 'AsSF', 'AsT0', 'AsT1', 'AsT2',
+                    'AsT3', 'AsT4', 'AsT5', 'AsT6', 'AsT7', 'AsT8', 'AsT9', 'AsTA',
+                    'AsTv', 'AsTz', 'AsVc', 'AsWc', 'AsXX', 'GlEm'),
+                   ('Hv', 'HvFd', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H?', 'Hf'),
+                   ('JP', 'J-', 'Jh', 'Hl', 'JuPr',
+                    'JAOz', 'JAsi', 'JCoK', 'JHhk', 'JLum', 'JMen',
+                    'JPSt', 'JRar', 'JUkh', 'JuHl', 'JuRu', 'JVug'),
+                   ('Ke', 'KoEm'),
+                   ("Kk", "KkTw", "Kc", "KC"),
+                   ('So', 'SoCf', 'SoBF', 'SoCT', 'SoFr', 'SoHn', 'SoKv', 'SoNS',
+                    'SoQu', 'SoRD', 'SoRz', 'SoWu' ),
+                   ('Lp', 'CoLp'),
+                   ('Vd', 'VDeG'),
+                   ('Vo', 'VOpA'),
+                   ('Vx', 'VAsP'),
+                   ('V9', 'VInL'),
+                   ('Zh', 'ZhAx', 'ZhCa', 'ZhCh', 'ZhCo', 'ZhIa', 'ZhIN',
+                    'ZhJp', 'ZhMe', 'ZhOb', 'ZhSh', 'ZhVQ')]
+
+    default_population = {
+        "As": "Asla",
+        "Hv": "Hive",
+        "JP": "Huma",
+        "Kk": "KXKr",
+        "Pd": "Piri",
+        "Te": "Piri",
+        "Tk": "Piri",
+        "Va": "Varg",
+        "Wc": "Droy",
+        "Yt": "Yask",
+        "Zh": "Zhod",
+        "AkUn": "Akee",
+        "AlCo": "Muri",
+        "CAEM": "Esly",
+        "CAKT": "Varg",
+        "CoLp": "Jend",
+        "DaCf": "Dary",
+        "FlLe": "Flor",
+        "GeOr": "Ormi",
+        "GlEm": "Asla",
+        "GnCl": "Gnii",
+        "IHPr": "Sred",
+        "ImLu": "Luri",
+        "ImVd": "Vega",
+        "IsDo": "Ysla",
+        "KaWo": "Karh",
+        "KhLe": "Sydi",
+        "KoEm": "Jaib",
+        "MaEm": "Mask",
+        "MaPr": "MalX",
+        "NaAs": "Asla",
+        "NaHv": "Hive",
+        "NaVa": "Varg",
+        "OcWs": "Stal",
+        "SaCo": "Vlaz",
+        "Sark": "Varg",
+        "SwFW": "Swan",
+        "VaEx": "Varg",
+        "ZhAx": "Adda",
+        "ZhCa": "Vlaz"
+    }
+
 
     def __init__(self, galaxy):
         """
@@ -55,6 +102,14 @@ class AllyGen(object):
     @staticmethod
     def is_nonaligned(alg):
         return alg in AllyGen.nonAligned or alg in AllyGen.noOne
+
+    @staticmethod
+    def is_wilds(alg):
+        return alg.code[0:2] == 'Na' or alg.code in ['Wild', 'VaEx', 'Va']
+
+    @staticmethod
+    def is_client_state(alg):
+        return alg.code[0:2] == 'Cs'
 
     @staticmethod
     def same_align(alg):
@@ -75,6 +130,33 @@ class AllyGen(object):
             return alg_name.split(',')[0].strip()
 
     @staticmethod
+    def population_align(alg, name):
+        # Try get the default cases
+        code = AllyGen.default_population.get(alg, AllyGen.default_population.get(AllyGen.same_align(alg), None))
+
+        # Handle the special cases.
+        if code is None:
+            if alg[0] == 'V':
+                code = "Varg"
+            elif alg == 'Na':
+                if 'Hiver' in name:
+                    code = 'Hive'
+                elif 'Vargr' in name:
+                    code = 'Varg'
+                elif 'Human' in name:
+                    code = 'Huma'
+                else:
+                    code = 'Huma'
+            elif alg == 'CsHv':
+                code = "Hive"
+            elif alg == "CsAs":
+                code = "Asla"
+            else:
+                code = "Huma"
+        return code
+
+         
+    @staticmethod
     def sort_allegiances(alg_list, base_match_only):
         # The logic: 
         # base_match_only == true -> --ally-match=collapse
@@ -83,10 +165,10 @@ class AllyGen(object):
         # want the non-base code or the base codes for single code allegiances. 
 
         if base_match_only:
-            algs = [alg for alg in alg_list.itervalues() if alg.base]
+            algs = [alg for alg in list(alg_list.values()) if alg.base]
         else:
-            base_algs = [alg for alg in alg_list.itervalues() if alg.base]
-            detail_algs = [alg for alg in alg_list.itervalues() if not alg.base]
+            base_algs = [alg for alg in list(alg_list.values()) if alg.base]
+            detail_algs = [alg for alg in list(alg_list.values()) if not alg.base]
 
             for alg in detail_algs:
                 base_alg = alg_list[AllyGen.same_align(alg.code)]
@@ -107,7 +189,7 @@ class AllyGen(object):
         """
         self.logger.info('Processing worlds for border drawing')
         for star in self.galaxy.stars:
-            alg = star.alg
+            alg = star.alg_code
             # Skip the non-entity worlds
             if alg in self.noOne:
                 continue
@@ -141,7 +223,7 @@ class AllyGen(object):
         This is a bit of a mess because the line drawing in HexMap is a little strange,
         So the complexity is here to make the draw portion quick.
         """
-        for Hex in allyMap.iterkeys():
+        for Hex in list(allyMap.keys()):
             if self._set_border(allyMap, Hex, 2):  # up
                 neighbor = AllyGen._get_neighbor(Hex, 2)
                 self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | 1
@@ -207,14 +289,14 @@ class AllyGen(object):
     @staticmethod
     def step_map(allyMap):
         newMap = {}
-        for Hex in allyMap.iterkeys():
+        for Hex in allyMap.keys():
             AllyGen._check_direction(allyMap, Hex, newMap)
         return newMap
 
     @staticmethod
     def _check_direction(allyMap, Hex, newMap):
         newMap[Hex] = allyMap[Hex]
-        for direction in xrange(6):
+        for direction in range(6):
             neighbor = AllyGen._get_neighbor(Hex, direction)
             if not allyMap.get(neighbor, False):
                 newMap[neighbor] = allyMap[Hex]
@@ -222,7 +304,7 @@ class AllyGen(object):
     def _output_map(self, allyMap, stage):
         path = os.path.join(self.galaxy.output_path, 'allyMap%s.txt' % stage)
         with open(path, "wb") as f:
-            for key, value in allyMap.iteritems():
+            for key, value in allyMap.items():
                 f.write("{}-{}: border: {}\n".format(key[0], key[1], value))
 
     @staticmethod
@@ -282,7 +364,7 @@ class AllyGen(object):
         starMap = {}
         # Mark the map with all the stars        
         for star in stars:
-            alg = star.alg
+            alg = star.alg_code
             # Collapse non-aligned into one value
             if alg in self.nonAligned or alg in self.noOne:
                 alg = self.nonAligned[0]
@@ -310,10 +392,10 @@ class AllyGen(object):
                 maxRange = ['D', 'C', 'B', 'A'].index(star.port) + 2
             if alg in self.nonAligned:
                 maxRange = 2
-            for dist in xrange(maxRange):
+            for dist in range(maxRange):
                 neighbor = AllyGen._get_neighbor(Hex, 4, dist)
-                for direction in xrange(6):
-                    for _ in xrange(dist):
+                for direction in range(6):
+                    for _ in range(dist):
                         allyMap[neighbor].add((alg, star.axial_distance(Hex, neighbor)))
                         neighbor = AllyGen._get_neighbor(neighbor, direction)
 
@@ -326,7 +408,7 @@ class AllyGen(object):
         # 3: hexes claimed by two (or more) allies are pushed to the closest world
         # 4: hexes claimed by two (or more) allies at the same distance
         #    are claimed by the larger empire. 
-        for Hex in allyMap.iterkeys():
+        for Hex in allyMap.keys():
             if len(allyMap[Hex]) == 1:
                 allyMap[Hex] = allyMap[Hex].pop()[0]
             else:
@@ -354,16 +436,16 @@ class AllyGen(object):
 
         # Pass 3: find lonely claimed hexes and remove them
         # Do two passes through the data
-        for _ in xrange(2):
-            for Hex in allyMap.iterkeys():
+        for _ in range(2):
+            for Hex in allyMap.keys():
                 if starMap.get(Hex, False):
                     continue
                 neighborAlgs = defaultdict(int)
-                for direction in xrange(6):
+                for direction in range(6):
                     neighborAlg = allyMap.get(AllyGen._get_neighbor(Hex, direction), None)
                     neighborAlgs[neighborAlg] += 1
 
-                algList = sorted(neighborAlgs.iteritems(), key=itemgetter(1), reverse=True)
+                algList = sorted(iter(neighborAlgs.iteritems()), key=itemgetter(1), reverse=True)
                 if len(algList) == 0:
                     allyMap[Hex] = None
                 elif algList[0][1] >= 1:
@@ -405,7 +487,7 @@ class AllyGen(object):
 
         # Erode, remove empty hex from polity 
         # if three contiguous hexes are not aligned
-        for Hex in allyMap.iterkeys():
+        for Hex in allyMap.keys():
             # Worlds keep their allegiances.
             if starMap.get(Hex, False):
                 newMap[Hex] = starMap[Hex]
@@ -415,9 +497,9 @@ class AllyGen(object):
                 continue
 
             # Check for three continuous empty hexes around this hex
-            for direction in xrange(6):
+            for direction in range(6):
                 notCount = 0
-                for check in xrange(3):
+                for check in range(3):
                     checkHex = AllyGen._get_neighbor(Hex, (direction + check) % 6)
                     neighborAlg = allyMap.get(checkHex, None)
                     if not AllyGen.are_allies(allyMap[Hex], neighborAlg):
@@ -439,17 +521,17 @@ class AllyGen(object):
         edgeMap = {}
         changed = False
         # Create the edge map, of hexes on the border
-        for Hex in allyMap.iterkeys():
-            for direction in xrange(6):
+        for Hex in allyMap.keys():
+            for direction in range(6):
                 checkHex = AllyGen._get_neighbor(Hex, direction)
                 neighborAlg = allyMap.get(checkHex, None)
                 if not AllyGen.are_allies(allyMap[Hex], neighborAlg):
                     edgeMap[Hex] = allyMap[Hex]
 
-        for Hex in edgeMap.iterkeys():
+        for Hex in edgeMap.keys():
             if starMap.get(Hex, False):
                 continue
-            for direction in xrange(6):
+            for direction in range(6):
                 if self._check_aligned(starMap, edgeMap, Hex, direction, 1) and \
                         self._check_aligned(starMap, edgeMap, Hex, direction, 2) and \
                         self._check_aligned(starMap, edgeMap, Hex, direction, 3):
@@ -475,14 +557,14 @@ class AllyGen(object):
         Build a bridge between two worlds one hex apart as to avoid
         disrupting contiguous empires.
         """
-        for Hex in starMap.iterkeys():
+        for Hex in starMap.keys():
             self._search_range(Hex, allyMap, starMap)
 
     def _search_range(self, Hex, allyMap, starMap):
         from Star import Star
         newBridge = None
         checked = []
-        for direction in xrange(6):
+        for direction in range(6):
             checkHex = AllyGen._get_neighbor(Hex, direction)
             if starMap.get(checkHex, False):
                 if self.are_allies(starMap[Hex], starMap[checkHex]):
@@ -491,7 +573,7 @@ class AllyGen(object):
             if self.are_allies(starMap[Hex], allyMap.get(checkHex, None)):
                 checked.append(checkHex)
                 continue
-            for second in xrange(6):
+            for second in range(6):
                 searchHex = AllyGen._get_neighbor(checkHex, second)
                 if searchHex in checked:
                     newBridge = None
@@ -516,7 +598,7 @@ class AllyGen(object):
         starMap = {}
         # Mark the map with all the stars        
         for star in stars:
-            alg = star.alg
+            alg = star.alg_code
             # Collapse non-aligned into one value
             if alg in self.nonAligned or alg in self.noOne:
                 alg = self.nonAligned[0]
@@ -545,12 +627,12 @@ class AllyGen(object):
             if alg in self.nonAligned:
                 maxRange = 0
             # Walk the ring filling in the hexes around star with this neighbor
-            for dist in xrange(1, maxRange):
+            for dist in range(1, maxRange):
                 # Start in direction 0, at distance n
                 neighbor = self._get_neighbor(Hex, 4, dist)
                 # walk six sides
-                for side in xrange(6):
-                    for _ in xrange(dist):
+                for side in range(6):
+                    for _ in range(dist):
                         allyMap[neighbor].add((alg, star.axial_distance(Hex, neighbor)))
                         neighbor = self._get_neighbor(neighbor, side)
         # self._output_map(allyMap, 1)
@@ -561,7 +643,7 @@ class AllyGen(object):
         # 3: hexes claimed by two (or more) allies are pushed to the closest world
         # 4: hexes claimed by two (or more) allies at the same distance
         #    are claimed by the larger empire. 
-        for Hex in allyMap.iterkeys():
+        for Hex in allyMap.keys():
             if len(allyMap[Hex]) == 1:
                 allyMap[Hex] = allyMap[Hex].pop()[0]
             else:

@@ -1,0 +1,34 @@
+<section begin="header"/>
+{| class="wikitable sortable" width="90%"
+|+ {{ sector.sector_name() }} economic data
+!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!MSPR!!RU!!Per Capita (Cr)!!GWP (BCr)!!Trade (MCr/year)
+!Passengers (per year)!!Build!!Army!!Port!!SPA Population
+!Trade Goods!!Subsector <section end="header"/>
+{%- for subsector in sector.subsectors.values() -%}
+<section begin="{{subsector.name}}" />
+{%- for world in subsector.worlds %}
+|-
+| {{ world.position }}
+| {{ "[[:s|]]".format(world.wiki_short_name()) }}
+| {{ world.uwp }}
+| {{ world.popM }}{{world.belts}}{{world.ggCount}}
+| { {{world.importance}} }
+| {{world.wtn}}
+| {{world.mspr}}
+| {{"{:,d}".format(world.ru)}}
+| {{"{:,d}".format(world.perCapita)}}
+| {{"{:,d}".format(world.gwp)}}
+| {{"{:,d}".format(world.tradeIn // 10000000) }}
+| {{"{:,d}".format(world.passIn) }}
+| {{"{:,d}".format(world.ship_capacity) }}
+| {{"{:,d}".format(world.raw_be) }}
+| {{ world.starportSize }}
+| {{"{:,d}".format(world.starportPop) }}
+| {{ world.trade_id }}
+| {{ subsector.wiki_name() }}
+{% endfor -%}
+<section end="{{subsector.name}}" />
+{%- endfor %}
+|}
+
+[[Category: Sectors with sector economic data]]

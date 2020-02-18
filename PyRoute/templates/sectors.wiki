@@ -1,0 +1,32 @@
+{% import 'statistics_table.wiki' as stats %}
+
+== Sectors ==
+{| class="wikitable sortable" width="90%"
+|+ Analysis per Sector
+!Sector!! X,Y !! Worlds !! Population (millions) !! % of Population !! Economy (Bcr) !! Per Capita (Cr) !! RU !! Trade Volume (BCr / year) !! Int. Trade (BCr / year) !! Ext. Trade (BCr/year) !! Shipyard Capacity (MTons) !! Colonial Army (BEs) !! Travellers (M / year) !! SPA Pop
+{% for sector in sectors.values() -%}
+|-
+| {{sector.wiki_name()}}
+| {{sector.x}},{{sector.y}}
+{{ stats.stats_table(sector.stats, global_stats) }}
+{%- endfor -%}
+{%- if im_stats %}
+|-
+| Imperial Totals ||
+{{ stats.stats_table(im_stats.stats, global_stats) }}
+{%- endif -%}
+|-
+| Global Totals ||
+{{ stats.stats_table(global_stats, global_stats) }}
+|}
+
+
+{% for sector in sectors.values() -%}
+
+== {{sector.name}} statistics ==
+{{ stats.text_area_long('sector', sector, plural) }}
+
+=== Polities ===
+{{ stats.allegiance_statistics(plural, sector) }}
+{%- endfor -%}
+

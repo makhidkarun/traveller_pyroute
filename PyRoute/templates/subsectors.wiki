@@ -1,0 +1,17 @@
+__NOTOC__
+{% import 'statistics_table.wiki' as stats %}
+{% for sector in sectors.values() -%}
+== {{sector.name}} statistics ==
+{{ stats.text_area_long('sector', sector, plural) }}
+
+=== Polities ===
+{{ stats.allegiance_statistics(plural, sector) }}
+
+{%- for subsector in sector.subsectors.values() | sort (attribute="position") %}
+=== {{ subsector.subsector_name() }} statistics ===
+{{ stats.text_area_long('subsector', subsector, plural) }}
+
+{{ stats.allegiance_statistics(plural, subsector) }}
+{%- endfor -%}
+{%- endfor -%}
+

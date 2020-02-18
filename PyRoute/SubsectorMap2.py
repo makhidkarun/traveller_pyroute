@@ -58,8 +58,8 @@ class GraphicSubsectorMap(GraphicMap):
         maps = len(self.galaxy.sectors) * 16
         logging.getLogger("PyRoute.SubsectorMap").info("writing {:d} subsector maps...".format(maps))
 
-        for sector in self.galaxy.sectors.itervalues():
-            for subsector in sector.subsectors.itervalues():
+        for sector in self.galaxy.sectors.values():
+            for subsector in sector.subsectors.values():
                 self.subsector = subsector
                 img = self.document(sector)
                 self.write_base_map(img, subsector)
@@ -149,7 +149,7 @@ class GraphicSubsectorMap(GraphicMap):
         end.set_deltas(-22, 34)
 
         line._draw()
-        for _ in xrange(1, 5, 1):
+        for _ in range(1, 5, 1):
             start.x_plus()
             end.x_plus()
             line._draw()
@@ -162,7 +162,7 @@ class GraphicSubsectorMap(GraphicMap):
         end.y = 1120
         end.set_deltas(22, 34)
         line._draw()
-        for _ in xrange(1, 5, 1):
+        for _ in range(1, 5, 1):
             start.y_plus()
             end.y_plus()
             line._draw()
@@ -194,8 +194,8 @@ class GraphicSubsectorMap(GraphicMap):
 
         # Fill each hex with color (if needed)
 
-        for x in xrange(1, self.x_count, 1):
-            for y in xrange(1, self.y_count, 1):
+        for x in range(1, self.x_count, 1):
+            for y in range(1, self.y_count, 1):
                 pos, point, _ = self._set_pos(x, y)
                 self.fill_aleg_hex(doc, pos, point)
 
@@ -203,8 +203,8 @@ class GraphicSubsectorMap(GraphicMap):
         super(GraphicSubsectorMap, self).hex_grid(doc, draw, width, colorname)
 
         # Draw the borders and add the hex numbers
-        for x in xrange(1, self.x_count, 1):
-            for y in xrange(1, self.y_count, 1):
+        for x in range(1, self.x_count, 1):
+            for y in range(1, self.y_count, 1):
                 pos, point, location = self._set_pos(x, y)
                 self.draw_border(doc, pos, point)
 
@@ -248,7 +248,7 @@ class GraphicSubsectorMap(GraphicMap):
 
             if AllyGen.is_nonaligned(aleg):
                 return
-            for n in xrange(6):
+            for n in range(6):
                 next_hex = AllyGen._get_neighbor(pos, n)
                 next_aleg = self.galaxy.borders.allyMap[next_hex] \
                     if next_hex in self.galaxy.borders.allyMap \
@@ -303,7 +303,7 @@ class GraphicSubsectorMap(GraphicMap):
         radius = (self.xm / 2) - 1
 
         if star.tradeCode.asteroid:
-            worldCharacter = u'\u2059'
+            worldCharacter = '\u2059'
             size = self.hexFont3.getsize(worldCharacter)
             pos = (point.x - size[0] / 2, point.y - size[1] * 0.6)
             doc.text(pos, worldCharacter, font=self.hexFont3, fill=self.textFill)
@@ -319,32 +319,32 @@ class GraphicSubsectorMap(GraphicMap):
         doc.text(pos, star.port, font=self.worldFont, fill=self.textFill)
 
         if star.ggCount:
-            self.print_base_char(u'\u25CF', self.worldFont, point, (1.75, -2), doc)
+            self.print_base_char('\u25CF', self.worldFont, point, (1.75, -2), doc)
 
         if 'N' in star.baseCode or 'K' in star.baseCode:
-            self.print_base_char(u'\u066D', self.hexFont3, point, (-1.25, -1.5), doc)
-            self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
+            self.print_base_char('\u066D', self.hexFont3, point, (-1.25, -1.5), doc)
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         if 'S' in star.baseCode:
-            self.print_base_char(u'\u25B2', self.hexFont4, point, (-2.25, -1.5), doc)
-            self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
+            self.print_base_char('\u25B2', self.hexFont4, point, (-2.25, -1.5), doc)
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         if 'D' in star.baseCode:
-            self.print_base_char(u'\u25A0', self.hexFont4, point, (-2, -0.5), doc)
-            self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
+            self.print_base_char('\u25A0', self.hexFont4, point, (-2, -0.5), doc)
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         if 'W' in star.baseCode:
-            self.print_base_char(u'\u25B2', self.hexFont4, point, (-2.25, -1.5), doc, GraphicMap.fillRed)
-            self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
+            self.print_base_char('\u25B2', self.hexFont4, point, (-2.25, -1.5), doc, GraphicMap.fillRed)
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         if 'I' in star.baseCode:
-            self.print_base_char(u'\u2316', self.hexFont5, point, (-2.5, -0.5), doc)
-            self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
+            self.print_base_char('\u2316', self.hexFont5, point, (-2.5, -0.5), doc)
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         station_code = star.tradeCode.research_station_char
         if station_code:
             self.print_base_char(station_code, self.hexFont4, point, (-2.4, -0.5), doc, GraphicMap.fillRed)
-            self.logger.debug(u"Research station for {} : {}".format(star.name, star.tradeCode))
+            self.logger.debug("Research station for {} : {}".format(star.name, star.tradeCode))
 
     # Write the name of the world on the map (last).
     def write_name(self, doc, star):
@@ -398,14 +398,14 @@ class GraphicSubsectorMap(GraphicMap):
                  if pair[2]['distance'] < 3 and \
                  (pair[2]['SourceMarketPrice'] > 0 or pair[2]['TargetMarketPrice'] > 0)]
 
-        self.logger.info(u"Generating routes in {} for {} worlds".format(subsector.name, len(trade)))
+        self.logger.info("Generating routes in {} for {} worlds".format(subsector.name, len(trade)))
         for (star, neighbor, data) in trade:
             self.trade_line(draw, star, neighbor, data, subsector.position)
 
         cropped = img.crop((53, 53, 760, 1067))
         cropped = cropped.crop((-53, -53, 760 + (826 - 760 - 53), 1067 + (1272 - 1067 - 53)))
         self.image = Image.alpha_composite(self.image, cropped)
-        self.logger.debug(u"Completed trade_lines for {}".format(subsector.name))
+        self.logger.debug("Completed trade_lines for {}".format(subsector.name))
         return ImageDraw.Draw(self.image)
 
     def trade_color(self, trade):

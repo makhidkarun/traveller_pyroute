@@ -10,8 +10,7 @@ from pypdflite import PDFCursor
 from pypdflite.pdfobjects.pdfline import PDFLine
 from pypdflite.pdfobjects.pdfellipse import PDFEllipse
 from pypdflite.pdfobjects.pdftext import PDFText
-from Galaxy import Sector
-from Galaxy import Galaxy
+from Galaxy import Sector, Galaxy
 from Star import Star
 from StatCalculation import StatCalculation
 
@@ -38,7 +37,7 @@ class HexMap(object):
         Call this to output the trade maps
         """
         logging.getLogger("PyRoute.HexMap").info("writing {:d} sector maps...".format(len(self.galaxy.sectors)))
-        for sector in self.galaxy.sectors.itervalues():
+        for sector in self.galaxy.sectors.values():
             pdf = self.document(sector)
             self.write_base_map(pdf, sector)
 
@@ -144,14 +143,14 @@ class HexMap(object):
         pdf.set_draw_color(color)
         vlineStart = PDFCursor(0, self.y_start + self.xm)
         vlineEnd = PDFCursor(0, self.y_start + self.xm + (180 * 4))
-        for x in xrange(self.x_start, 595, 144):
+        for x in range(self.x_start, 595, 144):
             vlineStart.x = x
             vlineEnd.x = x
             pdf.add_line(cursor1=vlineStart, cursor2=vlineEnd)
 
         hlineStart = PDFCursor(self.x_start, 0)
         hlineEnd = PDFCursor(591, 0)
-        for y in xrange(self.y_start + self.xm, 780, 180):
+        for y in range(self.y_start + self.xm, 780, 180):
             hlineStart.y = y
             hlineEnd.y = y
             pdf.add_line(cursor1=hlineStart, cursor2=hlineEnd)
@@ -240,14 +239,14 @@ class HexMap(object):
         llineStart, llineEnd, lline = self._lline(pdf, width, colorname)
         rlineStart, rlineEnd, rline = self._rline(pdf, width, colorname)
 
-        for x in xrange(33):
+        for x in range(33):
             hlineStart.x_plus()
             hlineEnd.x_plus()
             self._hline_restart_y(x, hlineStart, hlineEnd)
             self._lline_restart_y(x, llineStart, llineEnd)
             self._rline_restart_y(x, rlineStart, rlineEnd)
 
-            for y in xrange(41):
+            for y in range(41):
                 hlineStart.y_plus()
                 hlineEnd.y_plus()
                 llineStart.y_plus()
@@ -307,20 +306,20 @@ class HexMap(object):
 
         width = self.string_width(pdf.get_font(), star.uwp)
         point.y_plus(7)
-        point.x_plus(self.ym - (width / 2))
-        pdf.add_text(star.uwp.encode('ascii', 'replace'), point)
+        point.x_plus(self.ym - (width // 2))
+        pdf.add_text(star.uwp, point)
 
         if len(star.name) > 0:
-            for chars in xrange(len(star.name), 0, -1):
+            for chars in range(len(star.name), 0, -1):
                 width = self.string_width(pdf.get_font(), star.name[:chars])
                 if width <= self.xm * 3.5:
                     break
             point.y_plus(3.5)
             point.x = col
-            point.x_plus(self.ym - (width / 2))
-            pdf.add_text(star.name[:chars].encode('ascii', 'replace'), point)
+            point.x_plus(self.ym - (width // 2))
+            pdf.add_text(star.name[:chars], point)
 
-        added = star.alg
+        added = star.alg_code
         if star.tradeCode.subsector_capital:
             added += '+'
         elif star.tradeCode.sector_capital or star.tradeCode.other_capital:
@@ -332,7 +331,7 @@ class HexMap(object):
         point.y_plus(3.5)
         point.x = col
         width = pdf.get_font()._string_width(added)
-        point.x_plus(self.ym - (width / 2))
+        point.x_plus(self.ym - (width // 2))
         pdf.add_text(added, point)
 
         added = ''
@@ -348,7 +347,7 @@ class HexMap(object):
         width = pdf.get_font()._string_width(added)
         point.y_plus(3.5)
         point.x = col
-        point.x_plus(self.ym - (width / 2))
+        point.x_plus(self.ym - (width // 2))
         pdf.add_text(added, point)
 
         pdf.set_font(def_font)
@@ -478,6 +477,7 @@ class HexMap(object):
         keywords = None
         creator = "PyPDFLite"
         self.writer.set_information(title, subject, author, keywords, creator)
+        self.writer.set_compression(True)
         document = self.writer.get_document()
         document.set_margins(4)
         return document

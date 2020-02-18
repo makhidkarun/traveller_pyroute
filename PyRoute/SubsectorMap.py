@@ -5,9 +5,9 @@ Created on Aug 7, 2016
 """
 import os
 import logging
-from Map import GraphicMap
-from Galaxy import Galaxy
-from AllyGen import AllyGen
+from .Map import GraphicMap
+from .Galaxy import Galaxy
+from .AllyGen import AllyGen
 from PIL import Image, ImageDraw, ImageColor, ImageFont
 
 
@@ -32,14 +32,14 @@ class GraphicSubsectorMap(GraphicMap):
         self.ym = 24  # half a hex height
         self.xm = 14  # half the length of one side
         self.textFill = self.fillWhite
-        self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf', 16)
-        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf', 24)
+        self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf', 16)
+        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf', 24)
         self.hexFont = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 8)
         self.worldFont = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 11)
         self.hexFont2 = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 12)
         self.hexFont3 = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 18)
-        self.hexFont4 = ImageFont.truetype("/home/tjoneslo/.local/share/fonts/Symbola.ttf", 12)
-        self.hexFont5 = ImageFont.truetype("/home/tjoneslo/.local/share/fonts/Symbola.ttf", 18)
+        self.hexFont4 = ImageFont.truetype("/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf", 22)
+        self.hexFont5 = ImageFont.truetype("/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf", 36)
         self.logger = logging.getLogger('PyRoute.GraphicSubsectorMap')
 
     def document(self, sector):
@@ -55,8 +55,8 @@ class GraphicSubsectorMap(GraphicMap):
         maps = len(self.galaxy.sectors) * 16
         logging.getLogger("PyRoute.SubsectorMap").info("writing {:d} subsector maps...".format(maps))
 
-        for sector in self.galaxy.sectors.itervalues():
-            for subsector in sector.subsectors.itervalues():
+        for sector in self.galaxy.sectors.values():
+            for subsector in sector.subsectors.values():
                 self.subsector = subsector
                 img = self.document(sector)
                 self.write_base_map(img, subsector)
@@ -135,7 +135,7 @@ class GraphicSubsectorMap(GraphicMap):
         end.set_deltas(-11, 17)
 
         line._draw()
-        for _ in xrange(1, 5, 1):
+        for _ in range(1, 5, 1):
             start.x_plus()
             end.x_plus()
             line._draw()
@@ -148,7 +148,7 @@ class GraphicSubsectorMap(GraphicMap):
         end.y = 560
         end.set_deltas(11, 17)
         line._draw()
-        for _ in xrange(1, 5, 1):
+        for _ in range(1, 5, 1):
             start.y_plus()
             end.y_plus()
             line._draw()
@@ -180,8 +180,8 @@ class GraphicSubsectorMap(GraphicMap):
 
         # Fill each hex with color (if needed)
 
-        for x in xrange(1, self.x_count, 1):
-            for y in xrange(1, self.y_count, 1):
+        for x in range(1, self.x_count, 1):
+            for y in range(1, self.y_count, 1):
                 pos, point, _ = self._set_pos(x, y)
                 self.fill_aleg_hex(doc, pos, point)
 
@@ -189,8 +189,8 @@ class GraphicSubsectorMap(GraphicMap):
         super(GraphicSubsectorMap, self).hex_grid(doc, draw, width, colorname)
 
         # Draw the borders and add the hex numbers
-        for x in xrange(1, self.x_count, 1):
-            for y in xrange(1, self.y_count, 1):
+        for x in range(1, self.x_count, 1):
+            for y in range(1, self.y_count, 1):
                 pos, point, location = self._set_pos(x, y)
                 self.draw_border(doc, pos, point)
 
@@ -234,7 +234,7 @@ class GraphicSubsectorMap(GraphicMap):
 
             if AllyGen.is_nonaligned(aleg):
                 return
-            for n in xrange(6):
+            for n in range(6):
                 next_hex = AllyGen._get_neighbor(pos, n)
                 next_aleg = self.galaxy.borders.allyMap[next_hex] \
                     if next_hex in self.galaxy.borders.allyMap \
@@ -296,7 +296,7 @@ class GraphicSubsectorMap(GraphicMap):
             color = ImageColor.getrgb('#C0FFC0')
 
         if star.pcode == 'As':
-            worldCharacter = u'\u2059'
+            worldCharacter = '\\u2059'
             size = self.hexFont3.getsize(worldCharacter)
             pos = (point.x - size[0] / 2, point.y - size[1] * 0.6)
             doc.text(pos, worldCharacter, font=self.hexFont3, fill=self.textFill)
@@ -311,36 +311,36 @@ class GraphicSubsectorMap(GraphicMap):
         doc.text(pos, star.port, font=self.worldFont, fill=self.textFill)
 
         if star.ggCount:
-            self.print_base_char(u'\u25CF', self.worldFont, point, (1.75, -2), doc)
+            self.print_base_char('\u25CF', self.worldFont, point, (1.75, -2), doc)
 
         if 'N' in star.baseCode or 'K' in star.baseCode:
-            self.print_base_char(u'\u066D', self.hexFont3, point, (-1.25, -1.5), doc)
-            self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
+            self.print_base_char('\u066D', self.hexFont3, point, (-1.25, -1.5), doc)
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         if 'S' in star.baseCode:
-            self.print_base_char(u'\u25B2', self.hexFont4, point, (-2.25, -1.5), doc)
-            self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
+            self.print_base_char('\u25B2', self.hexFont4, point, (-2.25, -1.5), doc)
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         if 'D' in star.baseCode:
-            self.print_base_char(u'\u25A0', self.hexFont4, point, (-2, -0.5), doc)
-            self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
+            self.print_base_char('\u25A0', self.hexFont4, point, (-2, -0.5), doc)
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         if 'W' in star.baseCode:
-            self.print_base_char(u'\u25B2', self.hexFont4, point, (-2.25, -1.5), doc, GraphicMap.fillRed)
-            self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
+            self.print_base_char('\u25B2', self.hexFont4, point, (-2.25, -1.5), doc, GraphicMap.fillRed)
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         if 'I' in star.baseCode:
-            self.print_base_char(u'\u2316', self.hexFont5, point, (-2.5, -0.5), doc)
-            self.logger.debug(u"Base for {} : {}".format(star.name, star.baseCode))
+            self.print_base_char('\u2316', self.hexFont5, point, (-2.5, -0.5), doc)
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
-        research = {'RsA': u'\u0391', 'RsB': u'\u0392', 'RsG': u'\u0393',
-                    'RsD': u'\u0394', 'RdE': u'\u0395', 'RsZ': u'\u0396',
-                    'RsT': u'\u0398', 'RsI': u'\u0399', 'RsK': u'\u039A'}
+        research = {'RsA': '\u0391', 'RsB': '\u0392', 'RsG': '\u0393',
+                    'RsD': '\u0394', 'RdE': '\u0395', 'RsZ': '\u0396',
+                    'RsT': '\u0398', 'RsI': '\u0399', 'RsK': '\u039A'}
         keys = set(research.keys()).intersection(star.tradeCode)
         if len(keys) == 1:
             station = next(iter(keys))
             self.print_base_char(research[station], self.hexFont4, point, (-2, -0.5), doc, GraphicMap.fillRed)
-            self.logger.debug(u"Research station for {} : {}".format(star.name, " ".join(star.tradeCode)))
+            self.logger.debug("Research station for {} : {}".format(star.name, " ".join(star.tradeCode)))
 
     # Write the name of the world on the map (last).
     def write_name(self, doc, star):
