@@ -59,6 +59,7 @@ class TradeCodes(object):
 
             sophont = sophont.replace("'", "X")
             sophont = sophont.replace("!", "X")
+            sophont = sophont.replace(" ", "X")
             self.sophont_list.append(sophont)
             self.homeworld_list.append(sophont)
 
