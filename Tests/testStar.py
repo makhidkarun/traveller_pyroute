@@ -173,7 +173,7 @@ class TestStar(unittest.TestCase):
         newHash = star1.__hash__()
         self.assertEqual(oldHash, newHash)
 
-    def TestEquals(self):
+    def testEquals(self):
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
             self.starline, Sector('Core', ' 0, 0'), 'fixed', None)
@@ -187,6 +187,12 @@ class TestStar(unittest.TestCase):
         self.assertEqual(star1, star2)
         self.assertNotEqual(star1, star3)
         self.assertNotEqual(star2, star3)
+
+
+    def testStarSize(self):
+        star1 = Star.parse_line_into_star(
+            "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+            self.starline, Sector('Core', ' 0, 0'), 'fixed', None)
 
 
 if __name__ == "__main__":
