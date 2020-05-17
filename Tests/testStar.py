@@ -99,20 +99,20 @@ class TestStar(unittest.TestCase):
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
         cwtn = [3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11, 12, 13, 13, 14]
-        for uwtn in xrange(15):
+        for uwtn in range(15):
             wtn = int(round(max(0, (uwtn * 3 + 13) / 4)))
             self.assertTrue(wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
     def testBPortModifier(self):
         # cwtn =[2,3,4,5,5,6,7,8,8,9,10,11,11,12,12,13]
         cwtn = [2, 3, 4, 5, 5, 6, 7, 8, 8, 9, 10, 11, 11, 12, 13, 14]
-        for uwtn in xrange(15):
+        for uwtn in range(15):
             wtn = int(round(max(0, (uwtn * 3 + 11) / 4)))
             self.assertTrue(wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
     def testCPortModifier(self):
         cwtn = [2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 10, 11, 11, 12]
-        for uwtn in xrange(15):
+        for uwtn in range(15):
             if (uwtn > 9):
                 wtn = int(round(max(0, (uwtn + 9) / 2)))
             else:
@@ -121,7 +121,7 @@ class TestStar(unittest.TestCase):
 
     def testDPortModifier(self):
         cwtn = [1, 2, 3, 4, 4, 5, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11]
-        for uwtn in xrange(15):
+        for uwtn in range(15):
             if (uwtn > 7):
                 wtn = int(round(max(0, (uwtn + 7) / 2)))
             else:
@@ -130,7 +130,7 @@ class TestStar(unittest.TestCase):
 
     def testEPortModifier(self):
         cwtn = [1, 2, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10]
-        for uwtn in xrange(15):
+        for uwtn in range(15):
             if (uwtn > 5):
                 wtn = int(round(max(0, (uwtn + 5) / 2)))
             else:
@@ -140,7 +140,7 @@ class TestStar(unittest.TestCase):
     def testXPortModifier(self):
         # cwtn =[0,1,2,3,0,0,0,1,1,2,2,3,3,4,4,5]
         cwtn = [0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5]
-        for uwtn in xrange(15):
+        for uwtn in range(15):
             wtn = int(round(max(0, (uwtn - 5) / 2)))
             self.assertTrue(wtn == cwtn[uwtn], "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
