@@ -29,7 +29,7 @@ class TestStar(unittest.TestCase):
         self.assertTrue(star1.q == 0 and star1.r == 2, "%s, %s" % (star1.q, star1.r))
         self.assertTrue(star1.name == 'Irkigkhan')
         self.assertTrue(star1.uwp == 'C9C4733-9')
-        self.assertTrue(star1.alg == 'Im')
+        self.assertTrue(star1.alg_code == 'Im')
         self.assertTrue(star1.population == 10, "Population %s" % star1.population)
         self.assertTrue(star1.wtn == 9, "wtn %s" % star1.wtn)
         self.assertFalse(star1.tradeCode.industrial)
@@ -40,7 +40,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(star1.star_list, ['M2 V'])
 
     def testParseIrkigkhanRUCollapse(self):
-        sector = Sector('Core', ' 0, 0')
+        sector = Sector(' Core', ' 0, 0')
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
             sector, 'fixed', 'fixed')
@@ -51,7 +51,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def testParseIrkigkhanRUScaled(self):
-        sector = Sector('Core', ' 0, 0')
+        sector = Sector(' Core', ' 0, 0')
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
             sector, 'fixed', 'fixed')
@@ -62,7 +62,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def testParseShanaMa(self):
-        sector = Sector('Core', ' 0, 0')
+        sector = Sector(' Core', ' 0, 0')
         star1 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
             sector, 'fixed', 'fixed')
@@ -72,7 +72,7 @@ class TestStar(unittest.TestCase):
         self.assertTrue(star1.q == 0 and star1.r == 3, "%s, %s" % (star1.q, star1.r))
         self.assertTrue(star1.name == 'Shana Ma')
         self.assertTrue(star1.uwp == 'E551112-7')
-        self.assertTrue(star1.alg == 'Im')
+        self.assertTrue(star1.alg_code == 'Im')
         self.assertTrue(star1.population == 0, "Population %s" % star1.population)
         self.assertTrue(star1.wtn == 2, "wtn %s" % star1.wtn)
         self.assertFalse(star1.tradeCode.industrial)
@@ -84,7 +84,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(star1.star_list, ['K2 IV', 'M7 V'])
 
     def testParseSyss(self):
-        sector = Sector('Core', ' 0, 0')
+        sector = Sector(' Core', ' 0, 0')
         star1 = Star.parse_line_into_star(
             "2323 Syss                 C400746-8 Na Va Pi                   { -1 } (A67-2) [6647] BD   S  - 510 5  ImDv M9 III D M5 V",
             sector, 'fixed', 'fixed')
@@ -164,7 +164,7 @@ class TestStar(unittest.TestCase):
     def testHashValueSameAfterCaching(self):
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V  ",
-            Sector('Core', ' 0, 0'), 'fixed', 'fixed')
+            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
 
         # Grabbing hash value twice, once to seed Star._hash, second to dig it out of that cache
         oldHash = star1.__hash__()
@@ -174,13 +174,13 @@ class TestStar(unittest.TestCase):
     def testEquals(self):
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-            Sector('Core', ' 0, 0'), 'fixed', 'fixed')
+            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
         star2 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-            Sector('Core', ' 0, 0'), 'fixed', 'fixed')
+            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
         star3 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-            Sector('Core', ' 0, 0'), 'fixed', 'fixed')
+            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
 
         self.assertEqual(star1, star2)
         self.assertNotEqual(star1, star3)
