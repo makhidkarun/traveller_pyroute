@@ -25,7 +25,7 @@ class AllyGen(object):
                     'A9', 'TE', 'Of', 'If',
                     'AsIf', 'AsMw', 'AsOf', 'AsSc', 'AsSF', 'AsT0', 'AsT1', 'AsT2',
                     'AsT3', 'AsT4', 'AsT5', 'AsT6', 'AsT7', 'AsT8', 'AsT9', 'AsTA',
-                    'AsTv', 'AsTz', 'AsVc', 'AsWc', 'AsXX', 'GlEm'),
+                    'AsTv', 'AsTz', 'AsVc', 'AsWc', 'AsXX'),
                    ('Hv', 'HvFd', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H?', 'Hf'),
                    ('JP', 'J-', 'Jh', 'Hl', 'JuPr',
                     'JAOz', 'JAsi', 'JCoK', 'JHhk', 'JLum', 'JMen',
