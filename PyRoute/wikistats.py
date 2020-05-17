@@ -257,7 +257,7 @@ class WikiStats(object):
             area_type = "Allegiance"
             f.write('=== {} Statistics ===\n'.format(area_type))
             for allegiance in allegiances_sorted:
-                f.write('==== {} ====\n'.format(allegiance.allegiance_name()))
+                f.write('==== {} ====\n'.format(allegiance.name))
                 self.text_alg_statistics(f, area_type, allegiance)
                 f.write('\n')
 

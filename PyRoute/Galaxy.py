@@ -26,15 +26,16 @@ class AreaItem(object):
         self.stats = ObjectStatistics()
         self.alg = {}
         self.alg_sorted = []
+        self._wiki_name = '[[{}]]'.format(name)
 
     def wiki_title(self):
         return self.wiki_name()
 
     def wiki_name(self):
-        return '[[{}]]'.format(self.name)
+        return self._wiki_name
 
     def __str__(self):
-        return '{}'.format(self.name)
+        return self.name
 
     def world_count(self):
         return len(self.worlds)
@@ -42,10 +43,11 @@ class AreaItem(object):
 
 class Allegiance(AreaItem):
     def __init__(self, code, name, base=False, population='Huma'):
-        super(Allegiance, self).__init__(name)
+        super(Allegiance, self).__init__(Allegiance.allegiance_name(name, code, base))
         self.code = code
         self.base = base
         self.population = population
+        self._wiki_name = Allegiance.set_wiki_name(name, code, base)
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -53,20 +55,33 @@ class Allegiance(AreaItem):
         del state['alg_sorted']
         return state
 
-    def allegiance_name(self):
-        return self.name
-    
-    def wiki_name(self):
-        if self.code.startswith('Na'):
-            names = self.name.split(',') if ',' in self.name else [self.name, '']
-            return '[[{}]] {}'.format(names[0], names[1].strip())
-        elif self.code.startswith('Cs'):
-            names = self.name.split(',') if ',' in self.name else [self.name, '']
+    @staticmethod
+    def allegiance_name(name, code, base):
+        if base:
+            return name
+        names = name.split(',') if ',' in name else [name, '']
+        if code.startswith('Na'):
+            return '{} {}'.format(names[0], names[1].strip())
+        elif code.startswith('Cs'):
+            return '{}s of the {}'.format(names[0].strip(), names[1].strip())
+        elif ',' in name:
+            return '{}, {}'.format(names[0].strip(), names[1].strip())
+        return '{}'.format(name.strip())
+
+
+    @staticmethod
+    def set_wiki_name(name, code, base):
+        names = name.split(',') if ',' in name else [name, '']
+        if code.startswith('Na'):
+            return '[[{}]] {}'.format(names[0].strip(), names[1].strip())
+        elif code.startswith('Cs'):
             return '[[{}]]s of the [[{}]]'.format(names[0].strip(), names[1].strip())
-        elif ',' in self.name:
-            names = self.name.split(',')
-            return '[[{}]], [[{}]]'.format(names[0].strip(), names[1].strip())
-        return '[[{}]]'.format(self.name)
+        elif ',' in name:
+            if base:
+                return '[[{}]]'.format(names[0].strip())
+            else:
+                return '[[{}]], [[{}]]'.format(names[0].strip(), names[1].strip())
+        return '[[{}]]'.format(name.strip())
 
     def __str__(self):
         return '{} ([{})'.format(self.name, self.code)
@@ -95,7 +110,7 @@ class Subsector(AreaItem):
         self.rimward = None
         self.dx = sector.dx
         self.dy = sector.dy
-
+        self._wiki_name = Subsector.set_wiki_name(name, sector.name, position)
     # For the JSONPickel work
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -108,14 +123,15 @@ class Subsector(AreaItem):
         del state['positions']
         return state
 
-    def wiki_name(self):
-        if len(self.name) == 0:
-            return "{0} location {1}".format(self.sector.name, self.position)
+    @staticmethod
+    def set_wiki_name(name, sector_name, position):
+        if len(name) == 0:
+            return "{0} location {1}".format(sector_name, position)
         else:
-            if "(" in self.name:
-                return '[[{0} Subsector|{1}]]'.format(self.name, self.name[:-7])
+            if "(" in name:
+                return '[[{0} Subsector|{1}]]'.format(name, name[:-7])
             else:
-                return '[[{0} Subsector|{0}]]'.format(self.name)
+                return '[[{0} Subsector|{0}]]'.format(name)
 
     def wiki_title(self):
         return '{0} - {1}'.format(self.wiki_name(), self.sector.wiki_name())
@@ -160,6 +176,7 @@ class Sector(AreaItem):
         # The name as passed from the Galaxy read include the comment marker at the start of the line
         # So strip the comment marker, then strip spaces.
         super(Sector, self).__init__(name[1:].strip())
+        self._wiki_name = '[[{0} Sector|{0}]]'.format(self.sector_name())
 
         # Same here, the position has a leading comment marker
         self.x = int(position[1:].split(',')[0])
@@ -188,9 +205,6 @@ class Sector(AreaItem):
 
     def sector_name(self):
         return self.name[:-7] if self.name.endswith('Sector') else self.name
-
-    def wiki_name(self):
-        return '[[{0} Sector|{0}]]'.format(self.sector_name())
 
     def find_world_by_pos(self, pos):
         for world in self.worlds:
@@ -259,8 +273,6 @@ class Galaxy(AreaItem):
                     alg_race = AllyGen.population_align(alg_code, alg_name)
 
                     base = AllyGen.same_align(alg_code)
-                    if base in self.alg:
-                        self.alg[base].name = alg_name
                     if base not in self.alg:
                         self.alg[base] = Allegiance(base, AllyGen.same_align_name(base, alg_name), base=True, population=alg_race)
                     if alg_code not in self.alg:
@@ -466,9 +478,11 @@ class Galaxy(AreaItem):
                 ow_path_world = ', '.join(ow_path_items)
                 f.write(ow_path_world + '\n')
 
-                ow_list_items = ['"{}"'.format(world.sector.name[0:4])]
-                ow_list_items.append('"{}"'.format(world.position))
-                ow_list_items.append('"{}"'.format(owner))
+                ow_list_items = [
+                    '"{}"'.format(world.sector.name[0:4]),
+                    '"{}"'.format(world.position),
+                    '"{}"'.format(owner)
+                ]
                 ow_list_items.extend(['"O:{}"'.format(item.sec_pos(world.sector)) for item in ownedBy[0:4]])
                 ow_list_world = ', '.join(ow_list_items)
                 g.write(ow_list_world + '\n')

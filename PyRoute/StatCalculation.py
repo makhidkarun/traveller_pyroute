@@ -103,6 +103,10 @@ class ObjectStatistics(object):
     def high_tech_worlds_list(self):
         return [world.wiki_name() for world in self.high_tech_worlds[0:6]]
 
+    def populations_count(self):
+        return len(self.populations)
+
+
 class UWPCollection(object):
     def __init__(self):
         self.uwp = OrderedDict()

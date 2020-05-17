@@ -195,7 +195,7 @@ employing {{'{:,d}'.format(area.stats.spa_people)}} people. Driving this interst
 {{ get_count(plural, area.stats.code_counts.get('Ni', 0), 'world', ' Non-industrial (Ni)') }},
 {{ get_count(plural, area.stats.code_counts.get('Lo', 0), 'world', ' Low population (Lo)') }}, and
 {{ get_count(plural, area.stats.code_counts.get('Ba', 0), 'world', ' Barren (Ba)') }}.
-{{ high_pop_worlds(plural, area) }} The population consists of {{area.stats.populations | count}} sophont groups
+{{ high_pop_worlds(plural, area) }} The population consists of {{ get_count(plural, area.stats.populations_count(), 'sophont group') }}
 {%- if area.stats.homeworld_count() > 0 %} including {{ get_count(plural, area.stats.homeworld_count(), 'sophont', ' [[Native Intelligent Life|native]]') }}{%- endif -%}.
 {%- else -%}
 has no inhabitants.
