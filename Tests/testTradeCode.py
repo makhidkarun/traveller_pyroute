@@ -12,15 +12,12 @@ from Galaxy import Sector, Galaxy
 class TestTradeCode(unittest.TestCase):
 
     def setUp(self):
-        star_regex = ''.join([line.rstrip('\n') for line in Galaxy.regex])
-
-        self.starline = re.compile(star_regex)
         self.star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-            self.starline, Sector('Core', ' 0, 0'), 'fixed', None)
+            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
         self.star2 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-            self.starline, Sector('Core', ' 0, 0'), 'fixed', None)
+            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
 
         self.logger = logging.getLogger("PyRoute")
 
