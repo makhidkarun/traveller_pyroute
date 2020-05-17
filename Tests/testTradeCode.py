@@ -37,8 +37,8 @@ class TestTradeCode(unittest.TestCase):
 
     def testOrdering(self):
         code = TradeCodes("Wa Ag Ni")
-        self.assertTrue(code.pcode == 'Wa')
-        self.assertTrue(str(code) == u'Ag Ni Wa')
+        self.assertEqual('Wa', code.pcode)
+        self.assertEqual(u'Ag Ni Wa', str(code))
         self.assertTrue(code.agricultural)
         self.assertTrue(code.nonindustrial)
 
@@ -56,12 +56,12 @@ class TestTradeCode(unittest.TestCase):
 
     def testSophonts(self):
         code = TradeCodes(u"(Wiki)")
-        self.assertTrue(code.homeworld == [u'Wiki'], code.homeworld)
-        self.assertTrue(code.sophonts == [u'WikiW'], code.sophonts)
+        self.assertEqual([u'WikiW'], code.homeworld, code.homeworld)
+        self.assertEqual([u'WikiW'], code.sophonts, code.sophonts)
 
     def testSophontsPartial(self):
         code = TradeCodes(u"(Wiki)4")
-        self.assertTrue(code.homeworld == [u'Wiki'], code.homeworld)
+        self.assertTrue(code.homeworld == [u'Wiki4'], code.homeworld)
         self.assertTrue(code.sophonts == [u'Wiki4'])
 
     def testWorldSophont(self):
@@ -79,8 +79,8 @@ class TestTradeCode(unittest.TestCase):
     def testSophontCombined(self):
         code = TradeCodes("Ri (Wiki) Huma4 Alph2 (Deneb)2")
         self.assertTrue(len(code.homeworld) > 0)
-        self.assertTrue(code.sophonts == ['Huma4', 'Alph2', 'WikiW', 'Dene2'], msg=code.sophonts)
-        self.assertTrue(code.homeworld == ['Wiki', 'Deneb'], msg=code.homeworld)
+        self.assertEqual(['Huma4', 'Alph2', 'WikiW', 'Dene2'], code.sophonts, msg=code.sophonts)
+        self.assertEqual(['WikiW', 'Dene2'], code.homeworld, msg=code.homeworld)
         self.assertTrue(code.codeset == ['Ri'], code.codeset)
 
     def testCodeCheck(self):
