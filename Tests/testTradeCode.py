@@ -95,8 +95,28 @@ class TestTradeCode(unittest.TestCase):
 
     def testCodeCheckFails(self):
         code = TradeCodes("Wa")
-        self.assertFalse(code.check_world_codes(self.star1))
-        self.assertFalse(code.check_world_codes(self.star2))
+        with self.assertLogs(self.logger, level='ERROR') as log:
+            self.assertFalse(code.check_world_codes(self.star1))
+            # assert that what we expected was logged
+            self.assertEqual(2, len(log.output))
+            self.assertEqual(
+                [
+                    'ERROR:PyRoute.TradeCodes:Irkigkhan (Core 0103)-C9C4733-9 Calculated "Fl" not in trade codes [\'Wa\']',
+                    'ERROR:PyRoute.TradeCodes:Irkigkhan (Core 0103)-C9C4733-9 Found invalid "Wa" in trade codes: [\'Wa\']'
+                ],
+                log.output)
+        with self.assertLogs(self.logger, level='ERROR') as log:
+            self.assertFalse(code.check_world_codes(self.star2))
+            # assert that what we expected was logged
+            self.assertEqual(3, len(log.output))
+            self.assertEqual(
+                [
+                    'ERROR:PyRoute.TradeCodes:Shana Ma (Core 0104)-E551112-7 Calculated "Po" not in trade codes [\'Wa\']',
+                    'ERROR:PyRoute.TradeCodes:Shana Ma (Core 0104)-E551112-7 Found invalid "Wa" in trade codes: [\'Wa\']',
+                    'ERROR:PyRoute.TradeCodes:Shana Ma (Core 0104) - Calculated "Lo" not in trade codes [\'Wa\']',
+                ],
+                log.output
+            )
 
 
 if __name__ == "__main__":
