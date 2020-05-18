@@ -31,7 +31,7 @@ class TestTradeCode(unittest.TestCase):
     def testLo(self):
         code = TradeCodes("Lo")
         self.assertTrue(code.pcode is None)
-        self.assertTrue(str(code) == u'Lo')
+        self.assertEqual(u'Lo', str(code))
         self.assertTrue(code.low)
         self.assertFalse(code.high)
 
@@ -44,15 +44,15 @@ class TestTradeCode(unittest.TestCase):
 
     def testColony(self):
         code = TradeCodes(u"Ph C:0404")
-        self.assertTrue(code.owned == [u'C:0404'], code.owned)
-        self.assertTrue(code.colonies("Spinward Marches") == [u'C:Spin-0404'], code.colonies("Spinward Marches"))
-        self.assertTrue(code.owners('Spinward Marches') == [])
+        self.assertEqual([u'C:0404'], code.owned, code.owned)
+        self.assertEqual([u'C:Spin-0404'], code.colonies("Spinward Marches"), code.colonies("Spinward Marches"))
+        self.assertEqual([], code.owners('Spinward Marches'))
 
     def testOwned(self):
         code = TradeCodes(u"Ag O:1011")
-        self.assertTrue(code.owned == [u'O:1011'], code.owned)
-        self.assertTrue(code.owners('Deneb') == [u'O:Dene-1011'])
-        self.assertTrue(code.colonies('Deneb') == [])
+        self.assertEqual([u'O:1011'], code.owned, code.owned)
+        self.assertEqual([u'O:Dene-1011'], code.owners('Deneb'))
+        self.assertEqual([], code.colonies('Deneb'))
 
     def testSophonts(self):
         code = TradeCodes(u"(Wiki)")
@@ -61,27 +61,27 @@ class TestTradeCode(unittest.TestCase):
 
     def testSophontsPartial(self):
         code = TradeCodes(u"(Wiki)4")
-        self.assertTrue(code.homeworld == [u'Wiki4'], code.homeworld)
-        self.assertTrue(code.sophonts == [u'Wiki4'])
+        self.assertEqual([u'Wiki4'], code.homeworld, code.homeworld)
+        self.assertEqual([u'Wiki4'], code.sophonts)
 
     def testWorldSophont(self):
         code = TradeCodes("Ag Huma4")
         self.assertFalse(code.homeworld)
-        self.assertTrue(code.sophonts == ['Huma4'])
-        self.assertTrue(code.codeset == ['Ag'])
+        self.assertEqual(['Huma4'], code.sophonts)
+        self.assertEqual(['Ag'], code.codeset)
 
     def testWorldSophontsMultiple(self):
         code = TradeCodes("Ag Wiki4 Huma2")
         self.assertFalse(code.homeworld)
-        self.assertTrue(code.sophonts == ['Wiki4', 'Huma2'])
-        self.assertTrue(code.codeset == ['Ag'])
+        self.assertEqual(['Wiki4', 'Huma2'], code.sophonts)
+        self.assertEqual(['Ag'], code.codeset)
 
     def testSophontCombined(self):
         code = TradeCodes("Ri (Wiki) Huma4 Alph2 (Deneb)2")
         self.assertTrue(len(code.homeworld) > 0)
         self.assertEqual(['Huma4', 'Alph2', 'WikiW', 'Dene2'], code.sophonts, msg=code.sophonts)
         self.assertEqual(['WikiW', 'Dene2'], code.homeworld, msg=code.homeworld)
-        self.assertTrue(code.codeset == ['Ri'], code.codeset)
+        self.assertEqual(['Ri'], code.codeset, code.codeset)
 
     def testCodeCheck(self):
         code = TradeCodes("Fl")

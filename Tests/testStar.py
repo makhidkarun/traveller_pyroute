@@ -24,19 +24,19 @@ class TestStar(unittest.TestCase):
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
             sector, 'fixed', 'fixed')
 
-        self.assertTrue(star1.sector.name == 'Core', star1.sector.name)
-        self.assertTrue(star1.position == '0103')
+        self.assertEqual('Core', star1.sector.name, star1.sector.name)
+        self.assertEqual('0103', star1.position)
         self.assertTrue(star1.q == 0 and star1.r == 2, "%s, %s" % (star1.q, star1.r))
-        self.assertTrue(star1.name == 'Irkigkhan')
-        self.assertTrue(star1.uwp == 'C9C4733-9')
-        self.assertTrue(star1.alg_code == 'Im')
-        self.assertTrue(star1.population == 10, "Population %s" % star1.population)
-        self.assertTrue(star1.wtn == 9, "wtn %s" % star1.wtn)
+        self.assertEqual('Irkigkhan', star1.name)
+        self.assertEqual('C9C4733-9', star1.uwp)
+        self.assertEqual('Im', star1.alg_code)
+        self.assertEqual(10, star1.population, "Population %s" % star1.population)
+        self.assertEqual(9, star1.wtn, "wtn %s" % star1.wtn)
         self.assertFalse(star1.tradeCode.industrial)
         self.assertFalse(star1.tradeCode.agricultural)
         self.assertFalse(star1.tradeCode.poor)
         self.assertFalse(star1.tradeCode.rich)
-        self.assertTrue(star1.ggCount == 3)
+        self.assertEqual(3, star1.ggCount)
         self.assertEqual(star1.star_list, ['M2 V'])
 
     def testParseIrkigkhanRUCollapse(self):
@@ -67,21 +67,21 @@ class TestStar(unittest.TestCase):
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
             sector, 'fixed', 'fixed')
 
-        self.assertTrue(star1.sector.name == 'Core', star1.sector.name)
-        self.assertTrue(star1.position == '0104')
+        self.assertEqual('Core', star1.sector.name, star1.sector.name)
+        self.assertEqual('0104', star1.position)
         self.assertTrue(star1.q == 0 and star1.r == 3, "%s, %s" % (star1.q, star1.r))
-        self.assertTrue(star1.name == 'Shana Ma')
-        self.assertTrue(star1.uwp == 'E551112-7')
-        self.assertTrue(star1.alg_code == 'Im')
-        self.assertTrue(star1.population == 0, "Population %s" % star1.population)
-        self.assertTrue(star1.wtn == 2, "wtn %s" % star1.wtn)
+        self.assertEqual('Shana Ma', star1.name)
+        self.assertEqual('E551112-7', star1.uwp)
+        self.assertEqual('Im', star1.alg_code)
+        self.assertEqual(0, star1.population, "Population %s" % star1.population)
+        self.assertEqual(2, star1.wtn, "wtn %s" % star1.wtn)
         self.assertFalse(star1.tradeCode.industrial)
         self.assertFalse(star1.tradeCode.agricultural)
         self.assertTrue(star1.tradeCode.poor)
         self.assertFalse(star1.tradeCode.rich)
-        self.assertTrue(star1.ggCount == 3)
-        self.assertEqual(len(star1.star_list), 2)
-        self.assertEqual(star1.star_list, ['K2 IV', 'M7 V'])
+        self.assertEqual(3, star1.ggCount)
+        self.assertEqual(2, len(star1.star_list))
+        self.assertEqual(['K2 IV', 'M7 V'], star1.star_list)
 
     def testParseSyss(self):
         sector = Sector(' Core', ' 0, 0')
@@ -89,7 +89,7 @@ class TestStar(unittest.TestCase):
             "2323 Syss                 C400746-8 Na Va Pi                   { -1 } (A67-2) [6647] BD   S  - 510 5  ImDv M9 III D M5 V",
             sector, 'fixed', 'fixed')
 
-        self.assertTrue(star1.sector.name == 'Core', star1.sector.name)
+        self.assertEqual('Core', star1.sector.name, star1.sector.name)
         self.assertEqual(star1.position, '2323')
         self.assertEqual(star1.name, 'Syss')
         self.assertEqual(star1.uwp, 'C400746-8')
