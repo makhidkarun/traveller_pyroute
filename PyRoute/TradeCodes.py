@@ -79,7 +79,7 @@ class TradeCodes(object):
         self.dcode = sorted(self.dcode)
 
     def __str__(self):
-        return " ".join(self.codes)
+        return " ".join(sorted(self.codes))
 
     def __getstate__(self):
         state = self.__dict__.copy()

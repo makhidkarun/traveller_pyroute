@@ -12,15 +12,12 @@ from Galaxy import Sector, Galaxy
 class TestTradeCode(unittest.TestCase):
 
     def setUp(self):
-        star_regex = ''.join([line.rstrip('\n') for line in Galaxy.regex])
-
-        self.starline = re.compile(star_regex)
         self.star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-            self.starline, Sector('Core', ' 0, 0'), 'fixed', None)
+            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
         self.star2 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-            self.starline, Sector('Core', ' 0, 0'), 'fixed', None)
+            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
 
         self.logger = logging.getLogger("PyRoute")
 
@@ -34,57 +31,57 @@ class TestTradeCode(unittest.TestCase):
     def testLo(self):
         code = TradeCodes("Lo")
         self.assertTrue(code.pcode is None)
-        self.assertTrue(str(code) == u'Lo')
+        self.assertEqual(u'Lo', str(code))
         self.assertTrue(code.low)
         self.assertFalse(code.high)
 
     def testOrdering(self):
         code = TradeCodes("Wa Ag Ni")
-        self.assertTrue(code.pcode == 'Wa')
-        self.assertTrue(str(code) == u'Ag Ni Wa')
+        self.assertEqual('Wa', code.pcode)
+        self.assertEqual(u'Ag Ni Wa', str(code))
         self.assertTrue(code.agricultural)
         self.assertTrue(code.nonindustrial)
 
     def testColony(self):
         code = TradeCodes(u"Ph C:0404")
-        self.assertTrue(code.owned == [u'C:0404'], code.owned)
-        self.assertTrue(code.colonies("Spinward Marches") == [u'C:Spin-0404'], code.colonies("Spinward Marches"))
-        self.assertTrue(code.owners('Spinward Marches') == [])
+        self.assertEqual([u'C:0404'], code.owned, code.owned)
+        self.assertEqual([u'C:Spin-0404'], code.colonies("Spinward Marches"), code.colonies("Spinward Marches"))
+        self.assertEqual([], code.owners('Spinward Marches'))
 
     def testOwned(self):
         code = TradeCodes(u"Ag O:1011")
-        self.assertTrue(code.owned == [u'O:1011'], code.owned)
-        self.assertTrue(code.owners('Deneb') == [u'O:Dene-1011'])
-        self.assertTrue(code.colonies('Deneb') == [])
+        self.assertEqual([u'O:1011'], code.owned, code.owned)
+        self.assertEqual([u'O:Dene-1011'], code.owners('Deneb'))
+        self.assertEqual([], code.colonies('Deneb'))
 
     def testSophonts(self):
         code = TradeCodes(u"(Wiki)")
-        self.assertTrue(code.homeworld == [u'Wiki'], code.homeworld)
-        self.assertTrue(code.sophonts == [u'WikiW'], code.sophonts)
+        self.assertEqual([u'WikiW'], code.homeworld, code.homeworld)
+        self.assertEqual([u'WikiW'], code.sophonts, code.sophonts)
 
     def testSophontsPartial(self):
         code = TradeCodes(u"(Wiki)4")
-        self.assertTrue(code.homeworld == [u'Wiki'], code.homeworld)
-        self.assertTrue(code.sophonts == [u'Wiki4'])
+        self.assertEqual([u'Wiki4'], code.homeworld, code.homeworld)
+        self.assertEqual([u'Wiki4'], code.sophonts)
 
     def testWorldSophont(self):
         code = TradeCodes("Ag Huma4")
         self.assertFalse(code.homeworld)
-        self.assertTrue(code.sophonts == ['Huma4'])
-        self.assertTrue(code.codeset == ['Ag'])
+        self.assertEqual(['Huma4'], code.sophonts)
+        self.assertEqual(['Ag'], code.codeset)
 
     def testWorldSophontsMultiple(self):
         code = TradeCodes("Ag Wiki4 Huma2")
         self.assertFalse(code.homeworld)
-        self.assertTrue(code.sophonts == ['Wiki4', 'Huma2'])
-        self.assertTrue(code.codeset == ['Ag'])
+        self.assertEqual(['Wiki4', 'Huma2'], code.sophonts)
+        self.assertEqual(['Ag'], code.codeset)
 
     def testSophontCombined(self):
         code = TradeCodes("Ri (Wiki) Huma4 Alph2 (Deneb)2")
         self.assertTrue(len(code.homeworld) > 0)
-        self.assertTrue(code.sophonts == ['Huma4', 'Alph2', 'WikiW', 'Dene2'], msg=code.sophonts)
-        self.assertTrue(code.homeworld == ['Wiki', 'Deneb'], msg=code.homeworld)
-        self.assertTrue(code.codeset == ['Ri'], code.codeset)
+        self.assertEqual(['Huma4', 'Alph2', 'WikiW', 'Dene2'], code.sophonts, msg=code.sophonts)
+        self.assertEqual(['WikiW', 'Dene2'], code.homeworld, msg=code.homeworld)
+        self.assertEqual(['Ri'], code.codeset, code.codeset)
 
     def testCodeCheck(self):
         code = TradeCodes("Fl")
@@ -98,8 +95,28 @@ class TestTradeCode(unittest.TestCase):
 
     def testCodeCheckFails(self):
         code = TradeCodes("Wa")
-        self.assertFalse(code.check_world_codes(self.star1))
-        self.assertFalse(code.check_world_codes(self.star2))
+        with self.assertLogs(self.logger, level='ERROR') as log:
+            self.assertFalse(code.check_world_codes(self.star1))
+            # assert that what we expected was logged
+            self.assertEqual(2, len(log.output))
+            self.assertEqual(
+                [
+                    'ERROR:PyRoute.TradeCodes:Irkigkhan (Core 0103)-C9C4733-9 Calculated "Fl" not in trade codes [\'Wa\']',
+                    'ERROR:PyRoute.TradeCodes:Irkigkhan (Core 0103)-C9C4733-9 Found invalid "Wa" in trade codes: [\'Wa\']'
+                ],
+                log.output)
+        with self.assertLogs(self.logger, level='ERROR') as log:
+            self.assertFalse(code.check_world_codes(self.star2))
+            # assert that what we expected was logged
+            self.assertEqual(3, len(log.output))
+            self.assertEqual(
+                [
+                    'ERROR:PyRoute.TradeCodes:Shana Ma (Core 0104)-E551112-7 Calculated "Po" not in trade codes [\'Wa\']',
+                    'ERROR:PyRoute.TradeCodes:Shana Ma (Core 0104)-E551112-7 Found invalid "Wa" in trade codes: [\'Wa\']',
+                    'ERROR:PyRoute.TradeCodes:Shana Ma (Core 0104) - Calculated "Lo" not in trade codes [\'Wa\']',
+                ],
+                log.output
+            )
 
 
 if __name__ == "__main__":
