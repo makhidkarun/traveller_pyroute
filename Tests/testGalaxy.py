@@ -57,3 +57,45 @@ class testGalaxy(unittest.TestCase):
         self.assertIsNone(galaxy.sectors[reft.name].trailing, "Nothing should be trailing of Reft")
         self.assertIsNone(galaxy.sectors[reft.name].spinward, "Nothing should be spinward of Reft")
         self.assertEqual(galaxy.sectors[verge.name], galaxy.sectors[reft.name].rimward, "Verge should be rimward of Reft")
+
+    """
+    A very simple, barebones test to check that Dagudashaag and Core end up in their correct relative positions
+    - Dagudashaag being immediately spinward of Core
+    """
+    def testHorizontalOrdering(self):
+        galaxy = Galaxy(0)
+
+        core = Sector("Core", "# 0, 0")
+        self.assertEqual(0, core.x)
+        self.assertEqual(0, core.y)
+
+        dagudashaag = Sector("Dagudashaag", "# -1, 0")
+        self.assertEqual(-1, dagudashaag.x)
+        self.assertEqual(0, dagudashaag.y)
+
+        galaxy.sectors[core.name] = core
+        galaxy.sectors[dagudashaag.name] = dagudashaag
+
+        # verify, before bounding sectors gets run, nothing is hooked up
+        self.assertIsNone(galaxy.sectors[core.name].coreward)
+        self.assertIsNone(galaxy.sectors[core.name].rimward)
+        self.assertIsNone(galaxy.sectors[core.name].spinward)
+        self.assertIsNone(galaxy.sectors[core.name].trailing)
+        self.assertIsNone(galaxy.sectors[dagudashaag.name].coreward)
+        self.assertIsNone(galaxy.sectors[dagudashaag.name].rimward)
+        self.assertIsNone(galaxy.sectors[dagudashaag.name].spinward)
+        self.assertIsNone(galaxy.sectors[dagudashaag.name].trailing)
+
+        # set bounding sectors
+        galaxy.set_bounding_sectors()
+
+        # now assert that Dagudashaag is spinward from Core, Core is trailing of Dagudashaag, and nothing else
+        # got set
+        self.assertEqual(galaxy.sectors[dagudashaag.name], galaxy.sectors[core.name].spinward, "Dagudashaag should be spinward of core")
+        self.assertIsNone(galaxy.sectors[core.name].coreward, "Nothing should be coreward of Core")
+        self.assertIsNone(galaxy.sectors[core.name].rimward, "Nothing should be rimward of Core")
+        self.assertIsNone(galaxy.sectors[core.name].trailing, "Nothing should be trailing of core")
+        self.assertIsNone(galaxy.sectors[dagudashaag.name].coreward, "Nothing should be coreward of Dagudashaag")
+        self.assertIsNone(galaxy.sectors[dagudashaag.name].rimward, "Nothing should be rimward of Dagudashaag")
+        self.assertIsNone(galaxy.sectors[dagudashaag.name].spinward, "Nothing should be spinward of Dagudashaag")
+        self.assertEqual(galaxy.sectors[core.name], galaxy.sectors[dagudashaag.name].trailing, "Core should be trailing of Dagudashaag")
