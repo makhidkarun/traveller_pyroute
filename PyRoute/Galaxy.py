@@ -325,11 +325,11 @@ class Galaxy(AreaItem):
                 sector.trailing = neighbor
                 neighbor.spinward = sector
             elif sector.x == neighbor.x and sector.y - 1 == neighbor.y:
-                sector.coreward = neighbor
-                neighbor.rimward = sector
-            elif sector.x == neighbor.x and sector.y + 1 == neighbor.y:
                 sector.rimward = neighbor
                 neighbor.coreward = sector
+            elif sector.x == neighbor.x and sector.y + 1 == neighbor.y:
+                sector.coreward = neighbor
+                neighbor.rimward = sector
             elif sector.x == neighbor.x and sector.y == neighbor.y:
                 self.logger.error("Duplicate sector %s and %s" % (sector.name, neighbor.name))
 
