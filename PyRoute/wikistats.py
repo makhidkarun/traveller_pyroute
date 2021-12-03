@@ -39,8 +39,11 @@ class WikiStats(object):
         self.json_data = json_data
         self.logger = logging.getLogger('PyRoute.WikiStats')
 
+        cwd = os.path.dirname(__file__)
+        templatedir = cwd + "/templates"
+
         self.env = Environment(
-            loader=FileSystemLoader('PyRoute/templates'),
+            loader=FileSystemLoader(templatedir),
             #loader=PackageLoader('PyRoute', 'templates'),
             autoescape=select_autoescape(['html', 'xml'])
             )
