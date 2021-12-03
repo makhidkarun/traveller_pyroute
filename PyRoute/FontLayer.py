@@ -8,7 +8,7 @@ store their font files away from the rest of the project
 """
 
 from os import path
-
+import functools
 
 class FontLayer(object):
     fontdict = {}
@@ -31,6 +31,7 @@ class FontLayer(object):
             '/usr/share/fonts/gdouros-symbola/Symbola.ttf'
         ]
 
+    @functools.cache
     def getpath(self, filename):
         # Deliberately lean on dictionaries blowing up on accessing absent keys to make it obvious
         # that we don't know how to handle what's being asked for
