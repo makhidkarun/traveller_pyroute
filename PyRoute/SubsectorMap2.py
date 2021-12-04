@@ -9,6 +9,7 @@ import math
 from Map import GraphicMap
 from Galaxy import Galaxy
 from AllyGen import AllyGen
+from PyRoute.FontLayer import FontLayer
 from PIL import Image, ImageDraw, ImageColor, ImageFont
 
 
@@ -25,6 +26,7 @@ class GraphicSubsectorMap(GraphicMap):
     trailPos = (784, 1108 / 2)
     x_count = 9
     y_count = 11
+    font_layer = None
 
     def __init__(self, galaxy, routes, trade_version):
         super(GraphicSubsectorMap, self).__init__(galaxy, routes)
@@ -33,14 +35,15 @@ class GraphicSubsectorMap(GraphicMap):
         self.ym = 48  # half a hex height
         self.xm = 28  # half the length of one side
         self.textFill = self.fillWhite
-        self.namesFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf', 32)
-        self.titleFont = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf', 48)
-        self.hexFont = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 15)
-        self.worldFont = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf', 22)
-        self.hexFont2 = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 22)
-        self.hexFont3 = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 36)
-        self.hexFont4 = ImageFont.truetype("/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf", 22)
-        self.hexFont5 = ImageFont.truetype("/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf", 36)
+        self.font_layer = FontLayer()
+        self.namesFont = ImageFont.truetype(self.font_layer.getpath('DejaVuSerifCondensed.ttf'), 32)
+        self.titleFont = ImageFont.truetype(self.font_layer.getpath('DejaVuSerifCondensed.ttf'), 48)
+        self.hexFont = ImageFont.truetype(self.font_layer.getpath('LiberationMono-Bold.ttf'), 15)
+        self.worldFont = ImageFont.truetype(self.font_layer.getpath('LiberationMono-Bold.ttf'), 22)
+        self.hexFont2 = ImageFont.truetype(self.font_layer.getpath('FreeMono.ttf'), 22)
+        self.hexFont3 = ImageFont.truetype(self.font_layer.getpath('FreeMono.ttf'), 36)
+        self.hexFont4 = ImageFont.truetype(self.font_layer.getpath('Symbola-hint.ttf'), 22)
+        self.hexFont5 = ImageFont.truetype(self.font_layer.getpath('Symbola-hint.ttf'), 36)
         self.logger = logging.getLogger('PyRoute.GraphicSubsectorMap')
         self.trade_version = trade_version
 
