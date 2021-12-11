@@ -472,6 +472,9 @@ class TradeCalculation(RouteCalculation):
     # Stars that have been excluded, for whatever reason, from route generation
     redzone = set()
 
+    # List of connected components of galaxy.stars
+    components = list()
+
     def __init__(self, galaxy, min_btn=13, route_btn=8, route_reuse=10):
         super(TradeCalculation, self).__init__(galaxy)
 
@@ -565,6 +568,16 @@ class TradeCalculation(RouteCalculation):
         self.logger.info('sorting routes...')
         btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+
+        # Filter out pathfinding attempts that can never return a route, as they're between two different
+        # connected components in the underlying galaxy.stars graph - such pathfinding attempts are doomed
+        # to failure.
+        self.calculate_components()
+        # The extra major component is the residual one implied by the contents of self.components.
+        self.logger.info('filtering routes over {} major components...'.format(len(self.components)+1))
+        for i in range(0, len(self.components)):
+            btn = [(s, n, d) for (s, n, d) in btn if (s in self.components[i]) == (n in self.components[i])]
+        self.logger.info('Filtered route count {}'.format(len(btn)))
 
         base_btn = 0
         counter = 0
@@ -769,6 +782,30 @@ class TradeCalculation(RouteCalculation):
             weight += 25
         weight -= star.importance + target.importance
         return weight
+
+    def calculate_components(self):
+        bitz = nx.connected_components(self.galaxy.stars)
+        raw_components = []
+        total_stars = 0
+
+        for bit in bitz:
+            if 1 == len(bit):
+                self.redzone.union(bit)
+            else:
+                raw_components.append(bit)
+                total_stars += len(bit)
+
+        # now that we have the list of all multi-star components, sort them in descending order and pick the top N
+        # such that the last selected element is not smaller than the un-selected components taken together.
+        # this seems to give a reasonable trade-off between effort and results.
+        raw_components.sort(key=lambda i: len(i), reverse=True)
+
+        for component in raw_components:
+            self.components.append(set(component))
+            size = len(component)
+            total_stars -= size
+            if size >= total_stars:
+                break
 
 
 class CommCalculation(RouteCalculation):
