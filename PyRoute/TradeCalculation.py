@@ -642,11 +642,7 @@ class TradeCalculation(RouteCalculation):
         - add a count for the worlds and edges
         - reduce the weight of routes used to allow more trade to flow
         """
-        distance = 0
-        start = route[0]
-        for end in route[1:]:
-            distance += start.hex_distance(end)
-            start = end
+        distance = self.route_distance(route)
 
         # Internal statistics
         self.galaxy.ranges[route[0]][route[-1]]['actual distance'] = distance
@@ -675,6 +671,18 @@ class TradeCalculation(RouteCalculation):
             start = end
 
         return (tradeCr, tradePass)
+
+    @staticmethod
+    def route_distance(route):
+        """
+        Given a route, return its line length in parsec
+        """
+        distance = 0
+        start = route[0]
+        for end in route[1:]:
+            distance += start.hex_distance(end)
+            start = end
+        return distance
 
     def route_update_skip(self, route, tradeCr):
         """
