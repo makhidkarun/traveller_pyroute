@@ -573,8 +573,8 @@ class TradeCalculation(RouteCalculation):
         # connected components in the underlying galaxy.stars graph - such pathfinding attempts are doomed
         # to failure.
         self.calculate_components()
-        # The extra major component is the residual one implied by the contents of self.components.
-        self.logger.info('filtering routes over {} major components...'.format(len(self.components)+1))
+        # The extra component is the residual one implied by the contents of self.components.
+        self.logger.info('filtering routes over {} components...'.format(len(self.components)+1))
         for i in range(0, len(self.components)):
             btn = [(s, n, d) for (s, n, d) in btn if (s in self.components[i]) == (n in self.components[i])]
         self.logger.info('Filtered route count {}'.format(len(btn)))
@@ -802,11 +802,6 @@ class TradeCalculation(RouteCalculation):
 
         for component in raw_components:
             self.components.append(set(component))
-            size = len(component)
-            total_stars -= size
-            if size >= total_stars:
-                break
-
 
 class CommCalculation(RouteCalculation):
     # Weight for route over a distance. The relative cost for
