@@ -593,10 +593,14 @@ class TradeCalculation(RouteCalculation):
         If we can't find a route (no Jump 4 (or N) path), skip this pair
         otherwise update the trade information.
         """
+        assert 'actual distance' not in self.galaxy.ranges[target][star],\
+            "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
+
         try:
             route = nx.astar_path(self.galaxy.stars, star, target, Star.heuristicDistance)
         except nx.NetworkXNoPath:
             return
+
 
         # TODO: Generate the routes in both directions- A->B and B->A. 
         # if they produce different routes (they might), select the the lower cost one
