@@ -469,6 +469,9 @@ class TradeCalculation(RouteCalculation):
     # Maximum WTN to process routes for
     max_wtn = 15
 
+    # Stars that have been excluded, for whatever reason, from route generation
+    redzone = set()
+
     def __init__(self, galaxy, min_btn=13, route_btn=8, route_reuse=10):
         super(TradeCalculation, self).__init__(galaxy)
 
@@ -484,10 +487,21 @@ class TradeCalculation(RouteCalculation):
         # based upon program arguments. 
         self.route_reuse = route_reuse
 
+
     def base_route_filter(self, star, neighbor):
-        if star.zone in ['R', 'F'] or neighbor.zone in ['R', 'F']:
+        if star in self.redzone or neighbor in self.redzone:
             return True
-        if star.tradeCode.barren or neighbor.tradeCode.barren:
+        if star.zone in ['R', 'F']:
+            self.redzone.add(star)
+            return True
+        if neighbor.zone in ['R', 'F']:
+            self.redzone.add(neighbor)
+            return True
+        if star.tradeCode.barren:
+            self.redzone.add(star)
+            return True
+        if neighbor.tradeCode.barren:
+            self.redzone.add(neighbor)
             return True
         return False
 
