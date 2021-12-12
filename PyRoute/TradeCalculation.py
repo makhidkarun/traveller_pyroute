@@ -472,9 +472,6 @@ class TradeCalculation(RouteCalculation):
     # Stars that have been excluded, for whatever reason, from route generation
     redzone = set()
 
-    # List of connected components of galaxy.stars
-    components = list()
-
     # Minimum size for component to be retained in components list
     min_component_size = 1
 
@@ -573,15 +570,8 @@ class TradeCalculation(RouteCalculation):
         # connected components in the underlying galaxy.stars graph - such pathfinding attempts are doomed
         # to failure.
         self.calculate_components()
-        btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
+        btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True) if s.component == n.component]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
-
-
-        # The extra component is the residual one implied by the contents of self.components.
-        self.logger.info('filtering routes over {} components...'.format(len(self.components)+1))
-        for i in range(0, len(self.components)):
-            btn = [(s, n, d) for (s, n, d) in btn if (s in self.components[i]) == (n in self.components[i])]
-        self.logger.info('Filtered route count {}'.format(len(btn)))
 
         base_btn = 0
         counter = 0
@@ -789,21 +779,14 @@ class TradeCalculation(RouteCalculation):
 
     def calculate_components(self):
         bitz = nx.connected_components(self.galaxy.stars)
-        raw_components = []
+        counter = -1
 
-        for bit in bitz:
-            if self.min_component_size >= len(bit):
-                self.redzone.union(bit)
-            else:
-                raw_components.append(bit)
+        for component in bitz:
+            counter += 1
+            for star in component:
+                star.component = counter
+        return
 
-        # now that we have the list of all multi-star components, sort them in descending order and pick the top N
-        # such that the last selected element is not smaller than the un-selected components taken together.
-        # this seems to give a reasonable trade-off between effort and results.
-        raw_components.sort(key=lambda i: len(i), reverse=True)
-
-        for component in raw_components:
-            self.components.append(set(component))
 
 class CommCalculation(RouteCalculation):
     # Weight for route over a distance. The relative cost for

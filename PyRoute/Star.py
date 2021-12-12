@@ -100,6 +100,7 @@ class Star(object):
     def __init__(self):
         self.logger = logging.getLogger('PyRoute.Star')
         self._hash = None
+        self.component = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
