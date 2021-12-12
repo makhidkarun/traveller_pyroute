@@ -472,9 +472,6 @@ class TradeCalculation(RouteCalculation):
     # Stars that have been excluded, for whatever reason, from route generation
     redzone = set()
 
-    # Minimum size for component to be retained in components list
-    min_component_size = 1
-
     def __init__(self, galaxy, min_btn=13, route_btn=8, route_reuse=10):
         super(TradeCalculation, self).__init__(galaxy)
 
