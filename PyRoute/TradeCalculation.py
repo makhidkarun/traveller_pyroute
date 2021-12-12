@@ -475,6 +475,9 @@ class TradeCalculation(RouteCalculation):
     # List of connected components of galaxy.stars
     components = list()
 
+    # Minimum size for component to be retained in components list
+    min_component_size = 1
+
     def __init__(self, galaxy, min_btn=13, route_btn=8, route_reuse=10):
         super(TradeCalculation, self).__init__(galaxy)
 
@@ -789,7 +792,7 @@ class TradeCalculation(RouteCalculation):
         total_stars = 0
 
         for bit in bitz:
-            if 1 == len(bit):
+            if self.min_component_size >= len(bit):
                 self.redzone.union(bit)
             else:
                 raw_components.append(bit)
