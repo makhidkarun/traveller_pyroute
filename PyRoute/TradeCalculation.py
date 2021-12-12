@@ -569,13 +569,14 @@ class TradeCalculation(RouteCalculation):
         for the lower routes to follow.
         """
         self.logger.info('sorting routes...')
-        btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
-        btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
-
         # Filter out pathfinding attempts that can never return a route, as they're between two different
         # connected components in the underlying galaxy.stars graph - such pathfinding attempts are doomed
         # to failure.
         self.calculate_components()
+        btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
+        btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+
+
         # The extra component is the residual one implied by the contents of self.components.
         self.logger.info('filtering routes over {} components...'.format(len(self.components)+1))
         for i in range(0, len(self.components)):
