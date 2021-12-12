@@ -790,14 +790,12 @@ class TradeCalculation(RouteCalculation):
     def calculate_components(self):
         bitz = nx.connected_components(self.galaxy.stars)
         raw_components = []
-        total_stars = 0
 
         for bit in bitz:
             if self.min_component_size >= len(bit):
                 self.redzone.union(bit)
             else:
                 raw_components.append(bit)
-                total_stars += len(bit)
 
         # now that we have the list of all multi-star components, sort them in descending order and pick the top N
         # such that the last selected element is not smaller than the un-selected components taken together.
