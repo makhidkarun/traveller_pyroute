@@ -64,6 +64,9 @@ class GraphicSubsectorMap(GraphicMap):
         for sector in self.galaxy.sectors.values():
             for subsector in sector.subsectors.values():
                 self.subsector = subsector
+                if subsector.name is None or '' == subsector.name:
+                    # Assign a default name to stop file writes blowing up
+                    subsector.name = sector.name + "-" + subsector.position
                 img = self.document(sector)
                 self.write_base_map(img, subsector)
                 if self.trade_version != 'None':
