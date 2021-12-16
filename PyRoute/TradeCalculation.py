@@ -786,6 +786,8 @@ class TradeCalculation(RouteCalculation):
         if star.port in 'DEX':
             weight += 25
         weight -= star.importance + target.importance
+        # Per https://www.baeldung.com/cs/dijkstra-vs-a-pathfinding , to ensure termination in finite time:
+        # "the edges have strictly positive costs"
         assert 0 < weight, "Weight of edge between " + str(star) + " and " + str(
             target) + " must be positive"
         return weight
