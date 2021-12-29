@@ -363,13 +363,13 @@ class Galaxy(AreaItem):
         else:
             pass
 
-    def write_routes(self, routes=None):
+    def write_routes(self, routes=None, delimiter=' '):
         path = os.path.join(self.output_path, 'ranges.txt')
         with open(path, "wb") as f:
-            nx.write_edgelist(self.ranges, f, data=True)
+            nx.write_edgelist(self.ranges, f, data=True, delimiter=delimiter)
         path = os.path.join(self.output_path, 'stars.txt')
         with open(path, "wb") as f:
-            nx.write_edgelist(self.stars, f, data=True)
+            nx.write_edgelist(self.stars, f, data=True, delimiter=delimiter)
         path = os.path.join(self.output_path, 'borders.txt')
         with codecs.open(path, "wb", "utf-8") as f:
             for key, value in self.borders.borders.items():
@@ -488,3 +488,16 @@ class Galaxy(AreaItem):
                 g.write(ow_list_world + '\n')
 
                 world.ownedBy = (owner, ownedBy[0:4])
+
+    def reset_stars(self):
+        self.stars = nx.Graph()
+        self.ranges = nx.Graph()
+        self.worlds = []
+        self.stats = ObjectStatistics()
+
+        for sec in self.sectors:
+            self.sectors[sec].worlds = []
+            self.sectors[sec].stats = ObjectStatistics()
+            for subsec in self.sectors[sec].subsectors:
+                self.sectors[sec].subsectors[subsec].worlds = []
+                self.sectors[sec].subsectors[subsec].stats = ObjectStatistics()
