@@ -207,6 +207,19 @@ def process_delta(args, galaxy, lines, sec, interesting_stars):
                 num_chunks = len(lines)
                 singleton_not_run = False
 
+    print("Base reduction complete - verifying 1-minimality")
+    i = 0
+    while i < len(lines):
+        raw_lines = lines.copy()
+        del raw_lines[i]
+        interesting, msg, temp_stars = process_lines(args, galaxy, raw_lines, sec)
+        if interesting:
+            lines = raw_lines
+            interesting_stars = temp_stars
+            print("Reduction found: new input has " + str(len(lines)) + " lines")
+        else:
+            i += 1
+
     assert interesting_stars is not None, "Interesting-star edge list must be set by time reduction is complete"
     # now reduction is complete, borrow wikistats to dump out galaxy.stars
     galaxy.stars = interesting_stars
