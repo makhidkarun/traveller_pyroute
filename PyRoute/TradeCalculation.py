@@ -429,6 +429,8 @@ class XRouteCalculation(RouteCalculation):
         weight -= 6 if star.tradeCode.subsecor_capital or target.tradeCode.subsector_capital else 0
         weight -= 6 if star.tradeCode.other_capital or target.tradeCode.other_capital else 0
         weight -= 6 if star.tradeCode.sector_capital or target.tradeCode.sector_capital else 0
+        assert 0 < weight, "Weight of edge between " + str(star) + " and " + str(
+            target) + " must be positive"
 
         return weight
 
@@ -593,10 +595,14 @@ class TradeCalculation(RouteCalculation):
         If we can't find a route (no Jump 4 (or N) path), skip this pair
         otherwise update the trade information.
         """
+        assert 'actual distance' not in self.galaxy.ranges[target][star],\
+            "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
+
         try:
             route = nx.astar_path(self.galaxy.stars, star, target, Star.heuristicDistance)
         except nx.NetworkXNoPath:
             return
+
 
         # TODO: Generate the routes in both directions- A->B and B->A. 
         # if they produce different routes (they might), select the the lower cost one
@@ -638,11 +644,7 @@ class TradeCalculation(RouteCalculation):
         - add a count for the worlds and edges
         - reduce the weight of routes used to allow more trade to flow
         """
-        distance = 0
-        start = route[0]
-        for end in route[1:]:
-            distance += start.hex_distance(end)
-            start = end
+        distance = self.route_distance(route)
 
         # Internal statistics
         self.galaxy.ranges[route[0]][route[-1]]['actual distance'] = distance
@@ -671,6 +673,18 @@ class TradeCalculation(RouteCalculation):
             start = end
 
         return (tradeCr, tradePass)
+
+    @staticmethod
+    def route_distance(route):
+        """
+        Given a route, return its line length in parsec
+        """
+        distance = 0
+        start = route[0]
+        for end in route[1:]:
+            distance += start.hex_distance(end)
+            start = end
+        return distance
 
     def route_update_skip(self, route, tradeCr):
         """
@@ -772,6 +786,10 @@ class TradeCalculation(RouteCalculation):
         if star.port in 'DEX':
             weight += 25
         weight -= star.importance + target.importance
+        # Per https://www.baeldung.com/cs/dijkstra-vs-a-pathfinding , to ensure termination in finite time:
+        # "the edges have strictly positive costs"
+        assert 0 < weight, "Weight of edge between " + str(star) + " and " + str(
+            target) + " must be positive"
         return weight
 
     def calculate_components(self):
@@ -931,6 +949,8 @@ class CommCalculation(RouteCalculation):
         weight -= 6 if self.capitals(star) or self.capitals(target) else 0
         weight -= 6 if self.bases(star) or self.bases(target) else 0
         weight -= 3 if self.is_rich(star) or self.is_rich(target) else 0
+        assert 0 < weight, "Weight of edge between " + str(star) + " and " + str(
+            target) + " must be positive"
         return weight
 
     def more_important(self, star, neighbor, imp):
