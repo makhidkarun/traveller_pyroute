@@ -60,7 +60,5 @@ class testTradeCalculation(unittest.TestCase):
 
             self.assertEqual(2, tradecalc.route_weight(star1, star1))
 
-
-
 if __name__ == '__main__':
     unittest.main()
