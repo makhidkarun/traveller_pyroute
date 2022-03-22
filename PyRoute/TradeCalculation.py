@@ -124,12 +124,17 @@ class RouteCalculation(object):
 
     @staticmethod
     def get_passenger_btn(btn, star, neighbor):
-        rich = 1 if star.tradeCode.rich or neighbor.tradeCode.rich else 0
-        subsector_capital = 1 if star.tradeCode.subsector_capital or neighbor.tradeCode.subsector_capital else 0
-        sector_capital = 2 if star.tradeCode.sector_capital or neighbor.tradeCode.sector_capital else 0
-        other_capital = 2 if star.tradeCode.other_capital or neighbor.tradeCode.other_capital else 0
+        rich = 1 if star.tradeCode.rich else 0
+        rich += 1 if neighbor.tradeCode.rich else 0
+        # Only apply the modifier corresponding to the highest-level capital - other_capital beats sector_capital,
+        # which in turn beats subsector_capital.  The current approach makes adding a different value for other_capital
+        # (eg 3) very easy.
+        capital = 2 if star.tradeCode.sector_capital or star.tradeCode.other_capital else 1 if \
+            star.tradeCode.subsector_capital else 0
+        capital += 2 if neighbor.tradeCode.sector_capital or neighbor.tradeCode.other_capital else 1 if \
+            neighbor.tradeCode.subsector_capital else 0
 
-        passBTN = btn + rich + subsector_capital + sector_capital + other_capital
+        passBTN = btn + rich + capital
         return passBTN
 
     @staticmethod
