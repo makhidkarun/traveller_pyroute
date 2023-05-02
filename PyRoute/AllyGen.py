@@ -3,6 +3,7 @@ Created on Mar 26, 2014
 
 @author: tjoneslo
 """
+import functools
 import logging
 from operator import itemgetter
 from collections import defaultdict
@@ -325,6 +326,7 @@ class AllyGen(object):
         return False
 
     @staticmethod
+    @functools.cache
     def are_allies(alg1, alg2):
         """
         Public function to determine if the Allegiance of two
