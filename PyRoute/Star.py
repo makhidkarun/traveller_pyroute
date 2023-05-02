@@ -3,7 +3,7 @@ Created on Mar 5, 2014
 
 @author: tjoneslo
 """
-
+import functools
 import logging
 import bisect
 import random
@@ -284,11 +284,16 @@ class Star(object):
         self.row = r - dy + 1
 
     def hex_distance(self, star):
-        return max(abs(self.x - star.x), abs(self.y - star.y), abs(self.z - star.z))
+        return Star._heuristic_core(self.x - star.x, self.y - star.y, self.z - star.z)
 
     @staticmethod
     def heuristicDistance(star1, star2):
-        return max(abs(star1.x - star2.x), abs(star1.y - star2.y), abs(star1.z - star2.z))
+        return Star._heuristic_core(star1.x - star2.x, star1.y - star2.y, star1.z - star2.z)
+
+    @staticmethod
+    @functools.cache
+    def _heuristic_core(dx, dy, dz):
+        return max(abs(dx), abs(dy), abs(dz))
 
     @staticmethod
     def axial_distance(Hex1, Hex2):
