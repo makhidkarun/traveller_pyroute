@@ -285,9 +285,9 @@ class Star(object):
         return (self.position, self.name, self.uwp, self.sector.name)
 
     def __eq__(self, y):
+        if self.__hash__() != y.__hash__():
+            return False
         if isinstance(y, Star):
-            if self.__hash__() != y.__hash__():
-                return False
             return self.__key() == y.__key()
         else:
             return False
