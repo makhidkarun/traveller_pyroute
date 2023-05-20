@@ -160,8 +160,10 @@ class Star(object):
         star = Star()
         star.sector = sector
         star.logger.debug(line)
-        if Star.starline.match(line):
-            data = Star.starline.match(line).groups()
+        # Cache regex lookup to avoid doing it once for check, and again to extract data
+        matches = Star.starline.match(line)
+        if matches:
+            data = matches.groups()
         elif '{Anomaly}' in line:
             star.logger.info("Found anomaly, skipping processing: {}".format(line))
             return None
