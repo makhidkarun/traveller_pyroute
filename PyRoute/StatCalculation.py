@@ -5,10 +5,10 @@ Created on Mar 17, 2014
 """
 import logging
 import math
-from wikistats import WikiStats
+from PyRoute.wikistats import WikiStats
 from collections import OrderedDict, defaultdict
-from AllyGen import AllyGen
-from Star import UWPCodes
+from PyRoute.AllyGen import AllyGen
+from PyRoute.Star import UWPCodes
 
 
 class Populations(object):

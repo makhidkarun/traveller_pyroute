@@ -9,8 +9,8 @@ import bisect
 import random
 import math
 import re
-from AllyGen import AllyGen
-from TradeCodes import TradeCodes
+from PyRoute.AllyGen import AllyGen
+from PyRoute.TradeCodes import TradeCodes
 from collections import OrderedDict
 
 

@@ -12,11 +12,11 @@ import itertools
 import math
 import networkx as nx
 
-from Star import Star
-from  TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation, XRouteCalculation, \
+from PyRoute.Star import Star
+from PyRoute.TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation, XRouteCalculation, \
     OwnedWorldCalculation
-from StatCalculation import ObjectStatistics
-from AllyGen import AllyGen
+from PyRoute.StatCalculation import ObjectStatistics
+from PyRoute.AllyGen import AllyGen
 
 
 class AreaItem(object):

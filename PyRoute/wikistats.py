@@ -13,8 +13,8 @@ import math
 import inflect
 import jsonpickle
 from networkx.readwrite import json_graph
-from Star import Nobles
-from AllyGen import AllyGen
+from PyRoute.Star import Nobles
+from PyRoute.AllyGen import AllyGen
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 class WikiStats(object):

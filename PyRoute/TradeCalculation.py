@@ -7,8 +7,8 @@ import bisect
 import logging
 import itertools
 import networkx as nx
-from AllyGen import AllyGen
-from Star import Star
+from PyRoute.AllyGen import AllyGen
+from PyRoute.Star import Star
 
 
 class RouteCalculation(object):
