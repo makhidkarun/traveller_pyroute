@@ -79,7 +79,7 @@ class testSectorDictionary(unittest.TestCase):
 
     def test_add_good_item_by_index(self):
         foo = SectorDictionary('name', 'filename')
-        subsector = SubsectorDictionary('name')
+        subsector = SubsectorDictionary('name', 'A')
         self.assertEqual(0, len(subsector.keys()), 'Subsector dictionary should be empty')
         self.assertEqual('name', subsector.name)
 
@@ -90,7 +90,7 @@ class testSectorDictionary(unittest.TestCase):
 
     def test_add_good_item_by_update(self):
         foo = SectorDictionary('name', 'filename')
-        subsector = SubsectorDictionary('name')
+        subsector = SubsectorDictionary('name', 'A')
         self.assertEqual(0, len(subsector.keys()), 'Subsector dictionary should be empty')
         self.assertEqual('name', subsector.name)
 
@@ -119,6 +119,9 @@ class testSectorDictionary(unittest.TestCase):
         sub_sizes = {'Mimu': 37, 'Old Suns': 32, 'Arnakhish': 37, 'Iiradu': 33, 'Shallows': 40, 'Ushra': 31,
                      'Khandi': 28, 'Kuriishe': 33, 'Zeda': 38, 'Remnants': 38, 'Pact': 40, 'Gadde': 37, 'Bolivar': 29,
                      'Argi': 34, 'Sapphyre': 37, 'Laraa': 37}
+        sub_positions = {'Mimu': 'A', 'Old Suns': 'B', 'Arnakhish': 'C', 'Iiradu': 'D', 'Shallows': 'E', 'Ushra': 'F',
+                     'Khandi': 'G', 'Kuriishe': 'H', 'Zeda': 'I', 'Remnants': 'J', 'Pact': 'K', 'Gadde': 'L',
+                     'Bolivar': 'M', 'Argi': 'N', 'Sapphyre': 'O', 'Laraa': 'P'}
 
         for subname in sub_sizes:
             self.assertEqual(
@@ -126,6 +129,14 @@ class testSectorDictionary(unittest.TestCase):
                 len(sector[subname].lines),
                 "Unexpected number of star lines in " + subname + " subsector after load"
             )
+            self.assertEqual(
+                sub_positions[subname],
+                sector[subname].position,
+                'Unexpected position for ' + subname + ' subsector after load'
+            )
+
+        # verify allegiances got read in and derived allegiances calculated
+        self.assertEqual(4, len(sector.allegiances), "Unexpected number of allegiances after load")
 
 if __name__ == '__main__':
     unittest.main()

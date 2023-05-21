@@ -9,7 +9,8 @@ import os
 import string
 from pathlib import Path
 
-from PyRoute.Galaxy import Sector
+from PyRoute.AllyGen import AllyGen
+from PyRoute.Galaxy import Sector, Allegiance
 from PyRoute.Star import Star
 
 
@@ -32,6 +33,7 @@ class SectorDictionary(dict):
         self.name = name
         self.filename = filename
         self.position = None
+        self.allegiances = dict()
 
     def update(self, __m, **kwargs):
         for key in __m:
@@ -68,6 +70,19 @@ class SectorDictionary(dict):
         sector.headers = headers
         sector.position = position.strip()
 
+        # dig out allegiances
+        allegiances = [line for line in headers if '# Alleg:' in line]
+        for line in allegiances:
+            alg_code = line[8:].split(':', 1)[0].strip()
+            alg_name = line[8:].split(':', 1)[1].strip().strip('"')
+            alg_race = AllyGen.population_align(alg_code, alg_name)
+            base = AllyGen.same_align(alg_code)
+            if base not in sector.allegiances:
+                sector.allegiances[base] = Allegiance(base, AllyGen.same_align_name(base, alg_name), base=True,
+                                                      population=alg_race)
+            if alg_code not in sector.allegiances:
+                sector.allegiances[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)
+
         # dig out subsector names, and use them to seed the dict entries
         sublines = [line for line in headers if '# Subsector ' in line]
         subsector_names = dict()
@@ -77,7 +92,7 @@ class SectorDictionary(dict):
             alpha = bitz[0][-1]
             subname = bitz[1].strip()
             subsector_names[alpha] = subname
-            subsec = SubsectorDictionary(subname)
+            subsec = SubsectorDictionary(subname, alpha)
             sector[subname] = subsec
 
         # now subsectors are seeded, run thru the elements of starlines and deal them out to their respective subsector
@@ -116,9 +131,10 @@ class SectorDictionary(dict):
 
 class SubsectorDictionary(dict):
 
-    def __init__(self, name):
+    def __init__(self, name, position):
         self.name = name
         self.items = list()
+        self.position = position
         super().__init__()
 
     @property
