@@ -4,6 +4,7 @@ Created on May 21, 2023
 @author: CyberiaResurrection
 """
 import codecs
+import copy
 import logging
 import os
 import string
@@ -25,6 +26,53 @@ class DeltaDictionary(dict):
         assert isinstance(value, SectorDictionary), "Values must be SectorDictionary objects"
         super().__setitem__(item, value)
 
+    def sector_subset(self, sectors):
+        overlap = list()
+        for sector_name in sectors:
+            if sector_name in self:
+                overlap.append(sector_name)
+
+        new_dict = DeltaDictionary()
+        for sector_name in overlap:
+            new_dict[sector_name] = copy.deepcopy(self[sector_name])
+            pass
+
+        return new_dict
+
+    def subsector_subset(self, subsectors):
+        overlap = dict()
+        # Not sure if duplicate subsector names are a real problem to worry about,
+        # as a reducer doesn't have to be perfect.  If a same-named subsector is
+        # redundantly picked up from another sector, so be it - it will get cleaned
+        # up during line-level reduction.
+        for sector_name in self:
+            for subsector_name in self[sector_name]:
+                if subsector_name in subsectors:
+                    if sector_name not in overlap:
+                        overlap[sector_name] = list()
+                    overlap[sector_name].append(subsector_name)
+
+        new_dict = DeltaDictionary()
+        for sector_name in overlap:
+            new_dict[sector_name] = self[sector_name].subsector_subset(overlap[sector_name])
+
+        return new_dict
+
+    def sector_list(self):
+        result = list(self.keys())
+        result.sort()
+
+        return result
+
+    def subsector_list(self):
+        result = list()
+
+        for sector_name in self:
+            keys = self[sector_name].keys()
+            result.extend(list(keys))
+
+        return result
+
 
 class SectorDictionary(dict):
 
@@ -43,6 +91,19 @@ class SectorDictionary(dict):
     def __setitem__(self, item, value):
         assert isinstance(value, SubsectorDictionary), "Values must be SubsectorDictionary objects"
         super().__setitem__(item, value)
+
+    def subsector_subset(self, subsectors):
+        overlap = list()
+        for subsector_name in subsectors:
+            if subsector_name in self:
+                overlap.append(subsector_name)
+
+        new_dict = SectorDictionary(self.name, self.position)
+        for subsector_name in overlap:
+            new_dict[subsector_name] = copy.deepcopy(self[subsector_name])
+            pass
+
+        return new_dict
 
     @property
     def lines(self):
@@ -140,3 +201,9 @@ class SubsectorDictionary(dict):
     @property
     def lines(self):
         return self.items
+
+    def __deepcopy__(self, memodict={}):
+        foo = SubsectorDictionary(self.name, self.position)
+        for item in self.items:
+            foo.items.append(copy.deepcopy(item))
+        return foo
