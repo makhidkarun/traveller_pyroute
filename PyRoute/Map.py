@@ -11,7 +11,7 @@ from pypdflite.pdfobjects.pdfline import PDFLine
 from pypdflite.pdfobjects.pdftext import PDFText
 
 from PIL import Image, ImageDraw, ImageColor, ImageFont
-from StatCalculation import StatCalculation
+from PyRoute.StatCalculation import StatCalculation
 
 
 class Cursor(object):

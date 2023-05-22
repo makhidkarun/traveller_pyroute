@@ -9,11 +9,11 @@ import argparse
 import logging
 import codecs
 import os
-from Galaxy import Galaxy
-from SpeculativeTrade import SpeculativeTrade
-from HexMap import HexMap
-from SubsectorMap2 import GraphicSubsectorMap
-from StatCalculation import StatCalculation
+from PyRoute.Galaxy import Galaxy
+from PyRoute.SpeculativeTrade import SpeculativeTrade
+from PyRoute.HexMap import HexMap
+from PyRoute.SubsectorMap2 import GraphicSubsectorMap
+from PyRoute.StatCalculation import StatCalculation
 
 logger = logging.getLogger('PyRoute')
 
