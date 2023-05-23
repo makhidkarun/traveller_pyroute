@@ -81,6 +81,13 @@ class DeltaDictionary(dict):
 
         return result
 
+    def drop_lines(self, lines_to_drop):
+        foo = copy.deepcopy(self)
+        for sector_name in foo:
+            foo[sector_name] = foo[sector_name].drop_lines(lines_to_drop)
+
+        return foo
+
 
 class SectorDictionary(dict):
 
@@ -129,6 +136,13 @@ class SectorDictionary(dict):
                 result.append(subsector_name)
 
         return result
+
+    def drop_lines(self, lines_to_drop):
+        foo = copy.deepcopy(self)
+        for subsector_name in foo:
+            foo[subsector_name] = foo[subsector_name].drop_lines(lines_to_drop)
+
+        return foo
 
     @property
     def lines(self):
@@ -230,5 +244,13 @@ class SubsectorDictionary(dict):
     def __deepcopy__(self, memodict={}):
         foo = SubsectorDictionary(self.name, self.position)
         for item in self.items:
+            foo.items.append(copy.deepcopy(item))
+        return foo
+
+    def drop_lines(self, lines_to_drop):
+        foo = SubsectorDictionary(self.name, self.position)
+        for item in self.items:
+            if item in lines_to_drop:
+                continue
             foo.items.append(copy.deepcopy(item))
         return foo

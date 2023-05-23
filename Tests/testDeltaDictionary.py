@@ -253,5 +253,53 @@ class testSectorDictionary(unittest.TestCase):
         # verify allegiances got read in and derived allegiances calculated
         self.assertEqual(4, len(sector.allegiances), "Unexpected number of allegiances after load")
 
+    def test_drop_lines(self):
+        foo = SectorDictionary('name', 'filename')
+        sub1 = SubsectorDictionary('Mimu', 'A')
+        sub1.items.append('foo')
+        sub1.items.append('bar')
+        sub2 = SubsectorDictionary('Khiira', 'B')
+        sub2.items.append('baz')
+        sub2.items.append('tree')
+
+        foo[sub1.name] = sub1
+        foo[sub2.name] = sub2
+
+        expected = list()
+        expected.append('foo')
+        expected.append('bar')
+        expected.append('baz')
+        expected.append('tree')
+        actual = foo.lines
+        self.assertEqual(expected, actual)
+
+        lines_to_drop = ['bar', 'tree']
+        remix = foo.drop_lines(lines_to_drop)
+
+        actual = foo.lines
+        self.assertEqual(expected, actual)
+        expected = list()
+        expected.append('foo')
+        expected.append('baz')
+        actual = remix.lines
+        self.assertEqual(expected, actual, 'Unexpected lines in new dictionary after line removal')
+
+class testSubsectorDictionary(unittest.TestCase):
+    def test_drop_lines(self):
+        foo = SubsectorDictionary('Mimu', 'A')
+        foo.items.append('foo')
+        foo.items.append('bar')
+        foo.items.append('baz')
+        self.assertEqual(3, len(foo.items))
+
+        lines_to_drop = ['bar']
+
+        remix = foo.drop_lines(lines_to_drop)
+        self.assertEqual(3, len(foo.items))
+        self.assertEqual(2, len(remix.items))
+        self.assertEqual('Mimu', remix.name)
+        self.assertEqual('A', remix.position)
+
+
 if __name__ == '__main__':
     unittest.main()
