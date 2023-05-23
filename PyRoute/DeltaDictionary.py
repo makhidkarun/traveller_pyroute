@@ -97,6 +97,7 @@ class SectorDictionary(dict):
         self.filename = filename
         self.position = None
         self.allegiances = dict()
+        self.headers = list()
 
     def update(self, __m, **kwargs):
         for key in __m:
@@ -120,6 +121,8 @@ class SectorDictionary(dict):
 
         new_dict = SectorDictionary(self.name, self.filename)
         new_dict.position = self.position
+        new_dict.headers = self.headers
+        new_dict.allegiances = self.allegiances
         for subsector_name in overlap:
             new_dict[subsector_name] = copy.deepcopy(self[subsector_name])
             pass

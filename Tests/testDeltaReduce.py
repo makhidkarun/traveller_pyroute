@@ -47,7 +47,14 @@ class testDeltaReduce(unittest.TestCase):
             if subsector_name == 'Pact':
                 expected = 40
             self.assertEqual(expected, len(reducer.sectors['Dagudashaag'][subsector_name].items), subsector_name + " not empty")
-
+        # verify sector headers got taken across
+        self.assertEqual(len(sector.headers), len(reducer.sectors['Dagudashaag'].headers), "Unexpected headers length")
+        # verify sector allegiances got taken across
+        self.assertEqual(
+            len(sector.allegiances),
+            len(reducer.sectors['Dagudashaag'].allegiances),
+            "Unexpected allegiances length"
+        )
 
 if __name__ == '__main__':
     unittest.main()
