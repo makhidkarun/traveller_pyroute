@@ -83,8 +83,8 @@ class DeltaDictionary(dict):
 
     def drop_lines(self, lines_to_drop):
         foo = copy.deepcopy(self)
-        for sector_name in foo:
-            foo[sector_name] = foo[sector_name].drop_lines(lines_to_drop)
+        for sector_name in self:
+            foo[sector_name] = self[sector_name].drop_lines(lines_to_drop)
 
         return foo
 
@@ -141,11 +141,14 @@ class SectorDictionary(dict):
         return result
 
     def drop_lines(self, lines_to_drop):
-        foo = copy.deepcopy(self)
-        for subsector_name in foo:
-            foo[subsector_name] = foo[subsector_name].drop_lines(lines_to_drop)
+        new_dict = SectorDictionary(self.name, self.filename)
+        new_dict.position = self.position
+        new_dict.headers = self.headers
+        new_dict.allegiances = self.allegiances
+        for subsector_name in self:
+            new_dict[subsector_name] = self[subsector_name].drop_lines(lines_to_drop)
 
-        return foo
+        return new_dict
 
     @property
     def lines(self):

@@ -93,6 +93,68 @@ class DeltaReduce:
         # now that the pass is done, update self.sectors with best reduction found
         self.sectors = best_sectors
 
+    def reduce_line_pass(self, singleton_only=False):
+        segment = self.sectors.lines
+
+        # An interesting single-element list is 1-minimal by definition
+        if 2 > len(segment):
+            return
+
+        num_chunks = len(segment) if singleton_only else 2
+        short_msg = None
+        best_sectors = self.sectors
+        singleton_run = singleton_only
+
+        while num_chunks <= len(segment):
+            chunks = self.chunk_lines(segment, num_chunks)
+            remove = []
+            msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks)
+            self.logger.info(msg)
+
+            for i in range(0, num_chunks):
+                threshold = i + (len(remove) if 2 == num_chunks else 0)
+                if threshold >= len(chunks):
+                    continue
+                raw_lines = []
+                # Assemble all _but_ the ith chunk
+                for j in range(0, num_chunks):
+                    if i == j:
+                        continue
+                    if j >= len(chunks):
+                        continue
+                    raw_lines.extend(chunks[j])
+                if 0 == len(raw_lines):
+                    # nothing to do, move on
+                    continue
+
+                temp_sectors = best_sectors.drop_lines(chunks[i])
+
+                interesting, msg = self._check_interesting(self.args, temp_sectors)
+                # We've found a chunk of input and have _demonstrated_ its irrelevance,
+                # empty that chunk, update best so far, and continue
+                if interesting:
+                    short_msg = self.update_short_msg(msg, short_msg)
+                    chunks[i] = []
+                    remove.append(i)
+                    best_sectors = temp_sectors
+                    msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines"
+                    self.logger.info(msg)
+
+            if 0 < len(remove):
+                num_chunks -= len(remove)
+
+            num_chunks *= 2
+            # if we're about to bust our loop condition, make sure we verify 1-minimality as our last hurrah
+            if num_chunks > len(segment) and not singleton_run:
+                singleton_run = True
+                num_chunks = len(segment)
+
+            segment = best_sectors.lines
+
+        # now that the pass is done, update self.sectors with best reduction found
+        self.sectors = best_sectors
+
+
     @staticmethod
     def update_short_msg(msg, short_msg):
         if msg is not None:
