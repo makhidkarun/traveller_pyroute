@@ -68,7 +68,7 @@ class DeltaDictionary(dict):
         result = list()
 
         for sector_name in self:
-            keys = self[sector_name].keys()
+            keys = self[sector_name].subsector_list()
             result.extend(list(keys))
 
         return result
@@ -121,6 +121,14 @@ class SectorDictionary(dict):
             new_dict[subsector_name] = SubsectorDictionary(self[subsector_name].name, self[subsector_name].position)
 
         return new_dict
+
+    def subsector_list(self):
+        result = list()
+        for subsector_name in self:
+            if 0 < len(self[subsector_name].items):
+                result.append(subsector_name)
+
+        return result
 
     @property
     def lines(self):
