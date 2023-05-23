@@ -89,6 +89,7 @@ class testDeltaDictionary(unittest.TestCase):
         gusA.items.append('foo')
         self.assertEqual(1, len(gusA.items))
         gusB = SubsectorDictionary('Khiira', 'B')
+        gusB.items.append('bar')
         gus[gusA.name] = gusA
         gus[gusB.name] = gusB
         gus.position = '# -2,0'
@@ -104,9 +105,11 @@ class testDeltaDictionary(unittest.TestCase):
         self.assertEqual('Gushemege', remix['Gushemege'].name)
         self.assertEqual('# -2,0', remix['Gushemege'].position)
         self.assertEqual('filename', remix['Gushemege'].filename)
-        self.assertEqual(1, len(remix['Gushemege']),
-                         'Subsetted delta dict should have one subsector in Gushemege')
+        self.assertEqual(2, len(remix['Gushemege']),
+                         'Subsetted delta dict should two one subsector in Gushemege')
         self.assertEqual('Khiira', remix['Gushemege']['Khiira'].name)
+        self.assertEqual('Riften', remix['Gushemege']['Riften'].name)
+        self.assertEqual(0, len(remix['Gushemege']['Riften'].items), 'Skipped subsector should be empty')
         self.assertEqual('Dagudashaag', remix['Dagudashaag'].name)
         self.assertEqual('# -1,0', remix['Dagudashaag'].position)
         self.assertEqual(1, len(remix['Dagudashaag']),

@@ -102,15 +102,23 @@ class SectorDictionary(dict):
 
     def subsector_subset(self, subsectors):
         overlap = list()
+        missed = list()
         for subsector_name in subsectors:
             if subsector_name in self:
                 overlap.append(subsector_name)
+
+        for subsector_name in self:
+            if subsector_name not in overlap:
+                missed.append(subsector_name)
 
         new_dict = SectorDictionary(self.name, self.filename)
         new_dict.position = self.position
         for subsector_name in overlap:
             new_dict[subsector_name] = copy.deepcopy(self[subsector_name])
             pass
+
+        for subsector_name in missed:
+            new_dict[subsector_name] = SubsectorDictionary(self[subsector_name].name, self[subsector_name].position)
 
         return new_dict
 
