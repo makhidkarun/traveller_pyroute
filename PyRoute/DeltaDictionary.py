@@ -73,6 +73,14 @@ class DeltaDictionary(dict):
 
         return result
 
+    @property
+    def lines(self):
+        result = list()
+        for sub_name in self.keys():
+            result.extend(self[sub_name].lines)
+
+        return result
+
 
 class SectorDictionary(dict):
 
@@ -98,7 +106,8 @@ class SectorDictionary(dict):
             if subsector_name in self:
                 overlap.append(subsector_name)
 
-        new_dict = SectorDictionary(self.name, self.position)
+        new_dict = SectorDictionary(self.name, self.filename)
+        new_dict.position = self.position
         for subsector_name in overlap:
             new_dict[subsector_name] = copy.deepcopy(self[subsector_name])
             pass

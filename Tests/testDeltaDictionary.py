@@ -53,6 +53,7 @@ class testDeltaDictionary(unittest.TestCase):
         foo = DeltaDictionary()
         dag = SectorDictionary('Dagudashaag', 'filename')
         gus = SectorDictionary('Gushemege', 'filename')
+        gus.position = '# -2,0'
         gusA = SubsectorDictionary('Riften', 'A')
         gusA.items.append('foo')
         self.assertEqual(1, len(gusA.items))
@@ -69,6 +70,7 @@ class testDeltaDictionary(unittest.TestCase):
         self.assertTrue(isinstance(remix, DeltaDictionary))
         self.assertEqual(1, len(remix), 'Subsetted delta dict should have one element')
         self.assertEqual('Gushemege', remix['Gushemege'].name)
+        self.assertEqual('# -2,0', remix['Gushemege'].position)
         self.assertEqual(2, len(remix['Gushemege']), 'Subsetted delta dict should have two subsectors in single element')
         self.assertEqual(
             1,
@@ -81,6 +83,7 @@ class testDeltaDictionary(unittest.TestCase):
         dag = SectorDictionary('Dagudashaag', 'filename')
         dagA = SubsectorDictionary('Mimu', 'A')
         dag[dagA.name] = dagA
+        dag.position = '# -1,0'
         gus = SectorDictionary('Gushemege', 'filename')
         gusA = SubsectorDictionary('Riften', 'A')
         gusA.items.append('foo')
@@ -88,6 +91,7 @@ class testDeltaDictionary(unittest.TestCase):
         gusB = SubsectorDictionary('Khiira', 'B')
         gus[gusA.name] = gusA
         gus[gusB.name] = gusB
+        gus.position = '# -2,0'
 
         foo[dag.name] = dag
         foo[gus.name] = gus
@@ -98,13 +102,17 @@ class testDeltaDictionary(unittest.TestCase):
         self.assertTrue(isinstance(remix, DeltaDictionary))
         self.assertEqual(2, len(remix), 'Subsetted delta dict should have two element')
         self.assertEqual('Gushemege', remix['Gushemege'].name)
+        self.assertEqual('# -2,0', remix['Gushemege'].position)
+        self.assertEqual('filename', remix['Gushemege'].filename)
         self.assertEqual(1, len(remix['Gushemege']),
                          'Subsetted delta dict should have one subsector in Gushemege')
         self.assertEqual('Khiira', remix['Gushemege']['Khiira'].name)
         self.assertEqual('Dagudashaag', remix['Dagudashaag'].name)
+        self.assertEqual('# -1,0', remix['Dagudashaag'].position)
         self.assertEqual(1, len(remix['Dagudashaag']),
                          'Subsetted delta dict should have one subsector in Dagudashaag')
         self.assertEqual('Mimu', remix['Dagudashaag']['Mimu'].name)
+        self.assertEqual('A', remix['Dagudashaag']['Mimu'].position)
 
     def test_sector_list(self):
         foo = DeltaDictionary()
