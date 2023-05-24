@@ -109,7 +109,7 @@ class testDeltaDictionary(unittest.TestCase):
                          'Subsetted delta dict should two one subsector in Gushemege')
         self.assertEqual('Khiira', remix['Gushemege']['Khiira'].name)
         self.assertEqual('Riften', remix['Gushemege']['Riften'].name)
-        self.assertEqual(0, len(remix['Gushemege']['Riften'].items), 'Skipped subsector should be empty')
+        self.assertEqual(None, remix['Gushemege']['Riften'].items, 'Skipped subsector should have None for items')
         self.assertEqual('Dagudashaag', remix['Dagudashaag'].name)
         self.assertEqual('# -1,0', remix['Dagudashaag'].position)
         self.assertEqual(1, len(remix['Dagudashaag']),
@@ -161,6 +161,15 @@ class testDeltaDictionary(unittest.TestCase):
         expected.append('Mimu')
         expected.append('Riften')
         expected.append('Khiira')
+        actual = foo.subsector_list()
+
+        self.assertEqual(expected, actual, "Unexpected subsector list")
+
+        gusB.items = None
+
+        expected = list()
+        expected.append('Mimu')
+        expected.append('Riften')
         actual = foo.subsector_list()
 
         self.assertEqual(expected, actual, "Unexpected subsector list")

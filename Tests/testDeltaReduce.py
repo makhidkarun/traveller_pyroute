@@ -21,7 +21,8 @@ class testDeltaReduce(unittest.TestCase):
         args.route_reuse = 10
         args.interestingline = None
         args.interestingtype = None
-        args.maps = None
+        args.maps = False
+        args.subsectors = False
         args.borders = 'range'
         args.ally_match = 'collapse'
         args.owned = False
@@ -46,7 +47,8 @@ class testDeltaReduce(unittest.TestCase):
             expected = 0
             if subsector_name == 'Pact':
                 expected = 40
-            self.assertEqual(expected, len(reducer.sectors['Dagudashaag'][subsector_name].items), subsector_name + " not empty")
+            actual = 0 if reducer.sectors['Dagudashaag'][subsector_name].items is None else len(reducer.sectors['Dagudashaag'][subsector_name].items)
+            self.assertEqual(expected, actual, subsector_name + " not empty")
         # verify sector headers got taken across
         self.assertEqual(len(sector.headers), len(reducer.sectors['Dagudashaag'].headers), "Unexpected headers length")
         # verify sector allegiances got taken across

@@ -129,13 +129,14 @@ class SectorDictionary(dict):
 
         for subsector_name in missed:
             new_dict[subsector_name] = SubsectorDictionary(self[subsector_name].name, self[subsector_name].position)
+            new_dict[subsector_name].items = None
 
         return new_dict
 
     def subsector_list(self):
         result = list()
         for subsector_name in self:
-            if 0 < len(self[subsector_name].items):
+            if self[subsector_name].items is not None:
                 result.append(subsector_name)
 
         return result
@@ -154,7 +155,8 @@ class SectorDictionary(dict):
     def lines(self):
         result = list()
         for sub_name in self.keys():
-            result.extend(self[sub_name].items)
+            if self[sub_name].items is not None:
+                result.extend(self[sub_name].items)
 
         return result
 
