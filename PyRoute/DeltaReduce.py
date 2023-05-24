@@ -6,6 +6,7 @@ Modify this class to add different reduction passes.
 
 @author: CyberiaResurrection
 """
+import functools
 import logging
 import math
 
@@ -62,14 +63,10 @@ class DeltaReduce:
                 threshold = i + (len(remove) if 2 == num_chunks else 0)
                 if threshold >= len(chunks):
                     continue
-                raw_lines = []
                 # Assemble all _but_ the ith chunk
-                for j in range(0, num_chunks):
-                    if i == j:
-                        continue
-                    if j >= len(chunks):
-                        continue
-                    raw_lines.extend(chunks[j])
+                nulines = [item for ind, item in enumerate(chunks) if ind != i and ind < len(chunks)]
+                # pythonically flatten nulines (list of lists) into single list
+                raw_lines = [item for sublist in nulines for item in sublist]
                 if 0 == len(raw_lines):
                     # nothing to do, move on
                     continue
@@ -120,14 +117,10 @@ class DeltaReduce:
             for i in range(0, num_chunks):
                 if i + len(remove) >= len(chunks):
                     continue
-                raw_lines = []
                 # Assemble all _but_ the ith chunk
-                for j in range(0, num_chunks):
-                    if i == j:
-                        continue
-                    if j >= len(chunks):
-                        continue
-                    raw_lines.extend(chunks[j])
+                nulines = [item for ind, item in enumerate(chunks) if ind != i and ind < len(chunks)]
+                # pythonically flatten nulines (list of lists) into single list
+                raw_lines = [item for sublist in nulines for item in sublist]
                 if 0 == len(raw_lines):
                     # nothing to do, move on
                     continue
@@ -176,14 +169,10 @@ class DeltaReduce:
                 threshold = i + (len(remove) if 2 == num_chunks else 0)
                 if threshold >= len(chunks):
                     continue
-                raw_lines = []
                 # Assemble all _but_ the ith chunk
-                for j in range(0, num_chunks):
-                    if i == j:
-                        continue
-                    if j >= len(chunks):
-                        continue
-                    raw_lines.extend(chunks[j])
+                nulines = [item for ind, item in enumerate(chunks) if ind != i and ind < len(chunks)]
+                # pythonically flatten nulines (list of lists) into single list
+                raw_lines = [item for sublist in nulines for item in sublist]
                 if 0 == len(raw_lines):
                     # nothing to do, move on
                     continue
