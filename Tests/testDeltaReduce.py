@@ -116,5 +116,45 @@ class testDeltaReduce(unittest.TestCase):
             "Unexpected allegiances length"
         )
 
+    def test_sector_reduction(self):
+        sourcefile = 'DeltaFiles/Dagudashaag-spiked.sec'
+
+        args = argparse.ArgumentParser(description='PyRoute input minimiser.')
+        args.btn = 8
+        args.max_jump = 2
+        args.route_btn = 13
+        args.pop_code = 'scaled'
+        args.ru_calc = 'scaled'
+        args.routes = 'trade'
+        args.route_reuse = 10
+        args.interestingline = "Weight of edge"
+        args.interestingtype = None
+        args.maps = None
+        args.borders = 'range'
+        args.ally_match = 'collapse'
+        args.owned = False
+        args.trade = True
+        args.speculative_version = 'CT'
+        args.ally_count = 10
+        args.json_data = False
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        sourcefile = 'DeltaFiles/Zarushagar.sec'
+        zarusector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,-1', zarusector.position, "Unexpected position value for Zarushagar")
+        delta[zarusector.name] = zarusector
+
+        reducer = DeltaReduce(delta, args)
+
+        reducer.is_initial_state_interesting()
+        reducer.reduce_sector_pass()
+
+        self.assertEqual(1, len(reducer.sectors))
+        self.assertEqual('Dagudashaag', reducer.sectors['Dagudashaag'].name)
+
 if __name__ == '__main__':
     unittest.main()
