@@ -147,6 +147,8 @@ class SectorDictionary(dict):
         new_dict.headers = self.headers
         new_dict.allegiances = self.allegiances
         for subsector_name in self:
+            if self[subsector_name].skipped:
+                continue
             new_dict[subsector_name] = self[subsector_name].drop_lines(lines_to_drop)
 
         return new_dict
@@ -249,6 +251,10 @@ class SubsectorDictionary(dict):
     def lines(self):
         return self.items
 
+    @property
+    def skipped(self):
+        return self.items is None
+
     def __deepcopy__(self, memodict={}):
         foo = SubsectorDictionary(self.name, self.position)
         for item in self.items:
@@ -256,6 +262,9 @@ class SubsectorDictionary(dict):
         return foo
 
     def drop_lines(self, lines_to_drop):
+        if self.skipped:
+            return
+
         foo = SubsectorDictionary(self.name, self.position)
         for item in self.items:
             if item in lines_to_drop:

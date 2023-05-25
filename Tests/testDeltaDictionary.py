@@ -270,9 +270,12 @@ class testSectorDictionary(unittest.TestCase):
         sub2 = SubsectorDictionary('Khiira', 'B')
         sub2.items.append('baz')
         sub2.items.append('tree')
+        sub3 = SubsectorDictionary('Old Suns', 'C')
+        sub3.items = None
 
         foo[sub1.name] = sub1
         foo[sub2.name] = sub2
+        foo[sub3.name] = sub3
 
         expected = list()
         expected.append('foo')
@@ -292,6 +295,7 @@ class testSectorDictionary(unittest.TestCase):
         expected.append('baz')
         actual = remix.lines
         self.assertEqual(expected, actual, 'Unexpected lines in new dictionary after line removal')
+        self.assertNotIn(sub3.name, remix, "Skipped subsector should be excluded from line drop")
 
 class testSubsectorDictionary(unittest.TestCase):
     def test_drop_lines(self):
