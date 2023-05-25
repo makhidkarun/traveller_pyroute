@@ -297,6 +297,36 @@ class testSectorDictionary(unittest.TestCase):
         self.assertEqual(expected, actual, 'Unexpected lines in new dictionary after line removal')
         self.assertNotIn(sub3.name, remix, "Skipped subsector should be excluded from line drop")
 
+    def test_empty_sector_dictionary_is_skipped(self):
+        foo = SectorDictionary('name', 'filename')
+        self.assertEqual(0, len(foo))
+        self.assertEqual(0, len(foo.lines))
+
+        self.assertTrue(foo.skipped)
+
+    def test_sector_dictionary_with_one_unskipped_subsector_is_not_skipped(self):
+        foo = SectorDictionary('name', 'filename')
+        sub1 = SubsectorDictionary('Mimu', 'A')
+        foo[sub1.name] = sub1
+
+        self.assertFalse(sub1.skipped)
+        self.assertEqual(1, len(foo))
+        self.assertEqual(0, len(foo.lines))
+
+        self.assertFalse(foo.skipped)
+
+    def test_sector_dictionary_with_one_skipped_subsector_is_skipped(self):
+        foo = SectorDictionary('name', 'filename')
+        sub1 = SubsectorDictionary('Mimu', 'A')
+        sub1.items = None
+        foo[sub1.name] = sub1
+
+        self.assertTrue(sub1.skipped)
+        self.assertEqual(1, len(foo))
+        self.assertEqual(0, len(foo.lines))
+
+        self.assertTrue(foo.skipped)
+
 class testSubsectorDictionary(unittest.TestCase):
     def test_drop_lines(self):
         foo = SubsectorDictionary('Mimu', 'A')

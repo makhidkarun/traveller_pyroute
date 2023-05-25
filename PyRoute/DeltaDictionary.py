@@ -162,6 +162,13 @@ class SectorDictionary(dict):
 
         return result
 
+    @property
+    def skipped(self):
+        for sub_name in self.keys():
+            if self[sub_name].skipped is False:
+                return False
+        return True
+
     @staticmethod
     def load_traveller_map_file(filename):
         basename = os.path.basename(filename)
