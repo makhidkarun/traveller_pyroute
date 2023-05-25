@@ -84,7 +84,10 @@ class DeltaDictionary(dict):
     def drop_lines(self, lines_to_drop):
         foo = copy.deepcopy(self)
         for sector_name in self:
-            foo[sector_name] = self[sector_name].drop_lines(lines_to_drop)
+            if foo[sector_name].skipped:
+                del foo[sector_name]
+            else:
+                foo[sector_name] = self[sector_name].drop_lines(lines_to_drop)
 
         return foo
 
@@ -147,9 +150,9 @@ class SectorDictionary(dict):
         new_dict.headers = self.headers
         new_dict.allegiances = self.allegiances
         for subsector_name in self:
-            if self[subsector_name].skipped:
-                continue
             new_dict[subsector_name] = self[subsector_name].drop_lines(lines_to_drop)
+            if self[subsector_name].skipped:
+                new_dict[subsector_name].items = None
 
         return new_dict
 
@@ -264,17 +267,28 @@ class SubsectorDictionary(dict):
 
     def __deepcopy__(self, memodict={}):
         foo = SubsectorDictionary(self.name, self.position)
+        if self.skipped:
+            foo.items = None
+            return foo
+
         for item in self.items:
             foo.items.append(copy.deepcopy(item))
         return foo
 
     def drop_lines(self, lines_to_drop):
-        if self.skipped:
-            return
-
         foo = SubsectorDictionary(self.name, self.position)
+        if self.skipped:
+            foo.items = None
+            return foo
+
+        nonempty = 0 < len(self.items)
+
         for item in self.items:
             if item in lines_to_drop:
                 continue
             foo.items.append(copy.deepcopy(item))
+
+        if nonempty and 0 == len(foo.items):
+            foo.items = None
+
         return foo

@@ -72,6 +72,7 @@ class testDeltaReduce(unittest.TestCase):
             if subsector_name == 'Pact':
                 expected = 2
             self.assertEqual(expected, len(reducer.sectors['Dagudashaag'][subsector_name].items), subsector_name + " not empty")
+        self.assertEqual(2, len(reducer.sectors.lines), "Unexpected line count after singleton pass")
 
         # verify sector headers got taken across
         self.assertEqual(len(sector.headers), len(reducer.sectors['Dagudashaag'].headers), "Unexpected headers length")
@@ -103,6 +104,32 @@ class testDeltaReduce(unittest.TestCase):
         reducer.reduce_sector_pass()
 
         self.assertEqual(1, len(reducer.sectors))
+        self.assertEqual('Dagudashaag', reducer.sectors['Dagudashaag'].name)
+
+    def test_line_reduction_can_skip_sectors(self):
+        sourcefile = 'DeltaFiles/Dagudashaag-subsector-spiked.sec'
+
+        args = self._make_args()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        sourcefile = 'DeltaFiles/Zarushagar.sec'
+        zarusector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,-1', zarusector.position, "Unexpected position value for Zarushagar")
+        delta[zarusector.name] = zarusector
+
+        self.assertEqual(536, len(delta.lines), "Unexpected pre-reduction line count")
+
+        reducer = DeltaReduce(delta, args)
+
+        reducer.is_initial_state_interesting()
+        reducer.reduce_line_pass()
+
+        self.assertEqual(2, len(reducer.sectors.lines), "Unexpected post-reduction line count")
+        self.assertEqual(1, len(reducer.sectors), 'Unexpected post-reduction sector count')
         self.assertEqual('Dagudashaag', reducer.sectors['Dagudashaag'].name)
 
     def _make_args(self):
