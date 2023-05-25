@@ -63,10 +63,7 @@ class DeltaReduce:
                 threshold = i + (len(remove) if 2 == num_chunks else 0)
                 if threshold >= len(chunks):
                     continue
-                # Assemble all _but_ the ith chunk
-                nulines = [item for ind, item in enumerate(chunks) if ind != i and ind < len(chunks)]
-                # pythonically flatten nulines (list of lists) into single list
-                raw_lines = [item for sublist in nulines for item in sublist]
+                raw_lines = self._assemble_all_but_ith_chunk(chunks, i)
                 if 0 == len(raw_lines):
                     # nothing to do, move on
                     continue
@@ -117,10 +114,7 @@ class DeltaReduce:
             for i in range(0, num_chunks):
                 if i + len(remove) >= len(chunks):
                     continue
-                # Assemble all _but_ the ith chunk
-                nulines = [item for ind, item in enumerate(chunks) if ind != i and ind < len(chunks)]
-                # pythonically flatten nulines (list of lists) into single list
-                raw_lines = [item for sublist in nulines for item in sublist]
+                raw_lines = self._assemble_all_but_ith_chunk(chunks, i)
                 if 0 == len(raw_lines):
                     # nothing to do, move on
                     continue
@@ -169,10 +163,7 @@ class DeltaReduce:
                 threshold = i + (len(remove) if 2 == num_chunks else 0)
                 if threshold >= len(chunks):
                     continue
-                # Assemble all _but_ the ith chunk
-                nulines = [item for ind, item in enumerate(chunks) if ind != i and ind < len(chunks)]
-                # pythonically flatten nulines (list of lists) into single list
-                raw_lines = [item for sublist in nulines for item in sublist]
+                raw_lines = self._assemble_all_but_ith_chunk(chunks, i)
                 if 0 == len(raw_lines):
                     # nothing to do, move on
                     continue
@@ -204,6 +195,12 @@ class DeltaReduce:
         # now that the pass is done, update self.sectors with best reduction found
         self.sectors = best_sectors
 
+    def _assemble_all_but_ith_chunk(self, chunks, i):
+        # Assemble all _but_ the ith chunk
+        nulines = [item for ind, item in enumerate(chunks) if ind != i and ind < len(chunks)]
+        # pythonically flatten nulines (list of lists) into single list
+        raw_lines = [item for sublist in nulines for item in sublist]
+        return raw_lines
 
     @staticmethod
     def update_short_msg(msg, short_msg):
