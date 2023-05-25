@@ -1,4 +1,5 @@
 import argparse
+import tempfile
 import unittest
 import logging
 
@@ -11,25 +12,7 @@ class testDeltaReduce(unittest.TestCase):
     def test_subsector_reduction(self):
         sourcefile = 'DeltaFiles/Dagudashaag-spiked.sec'
 
-        args = argparse.ArgumentParser(description='PyRoute input minimiser.')
-        args.btn = 8
-        args.max_jump = 2
-        args.route_btn = 13
-        args.pop_code = 'scaled'
-        args.ru_calc = 'scaled'
-        args.routes = 'trade'
-        args.route_reuse = 10
-        args.interestingline = None
-        args.interestingtype = None
-        args.maps = False
-        args.subsectors = False
-        args.borders = 'range'
-        args.ally_match = 'collapse'
-        args.owned = False
-        args.trade = True
-        args.speculative_version = 'CT'
-        args.ally_count = 10
-        args.json_data = False
+        args = self._make_args_no_line()
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
@@ -61,24 +44,7 @@ class testDeltaReduce(unittest.TestCase):
     def test_line_reduction(self):
         sourcefile = 'DeltaFiles/Dagudashaag-subsector-spiked.sec'
 
-        args = argparse.ArgumentParser(description='PyRoute input minimiser.')
-        args.btn = 8
-        args.max_jump = 2
-        args.route_btn = 13
-        args.pop_code = 'scaled'
-        args.ru_calc = 'scaled'
-        args.routes = 'trade'
-        args.route_reuse = 10
-        args.interestingline = "Weight of edge"
-        args.interestingtype = None
-        args.maps = None
-        args.borders = 'range'
-        args.ally_match = 'collapse'
-        args.owned = False
-        args.trade = True
-        args.speculative_version = 'CT'
-        args.ally_count = 10
-        args.json_data = False
+        args = self._make_args()
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
@@ -119,24 +85,7 @@ class testDeltaReduce(unittest.TestCase):
     def test_sector_reduction(self):
         sourcefile = 'DeltaFiles/Dagudashaag-spiked.sec'
 
-        args = argparse.ArgumentParser(description='PyRoute input minimiser.')
-        args.btn = 8
-        args.max_jump = 2
-        args.route_btn = 13
-        args.pop_code = 'scaled'
-        args.ru_calc = 'scaled'
-        args.routes = 'trade'
-        args.route_reuse = 10
-        args.interestingline = "Weight of edge"
-        args.interestingtype = None
-        args.maps = None
-        args.borders = 'range'
-        args.ally_match = 'collapse'
-        args.owned = False
-        args.trade = True
-        args.speculative_version = 'CT'
-        args.ally_count = 10
-        args.json_data = False
+        args = self._make_args()
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
@@ -155,6 +104,35 @@ class testDeltaReduce(unittest.TestCase):
 
         self.assertEqual(1, len(reducer.sectors))
         self.assertEqual('Dagudashaag', reducer.sectors['Dagudashaag'].name)
+
+    def _make_args(self):
+        args = argparse.ArgumentParser(description='PyRoute input minimiser.')
+        args.btn = 8
+        args.max_jump = 2
+        args.route_btn = 13
+        args.pop_code = 'scaled'
+        args.ru_calc = 'scaled'
+        args.routes = 'trade'
+        args.route_reuse = 10
+        args.interestingline = "Weight of edge"
+        args.interestingtype = None
+        args.maps = None
+        args.borders = 'range'
+        args.ally_match = 'collapse'
+        args.owned = False
+        args.trade = True
+        args.speculative_version = 'CT'
+        args.ally_count = 10
+        args.json_data = False
+        args.output = tempfile.gettempdir()
+        return args
+
+    def _make_args_no_line(self):
+        args = self._make_args()
+        args.interestingline = None
+
+        return args
+
 
 if __name__ == '__main__':
     unittest.main()
