@@ -64,6 +64,30 @@ class testDeltaReduce(unittest.TestCase):
                 expected = 4
             self.assertEqual(expected, len(reducer.sectors['Dagudashaag'][subsector_name].items), subsector_name + " not empty")
 
+        # verify sector headers got taken across
+        self.assertEqual(len(sector.headers), len(reducer.sectors['Dagudashaag'].headers), "Unexpected headers length")
+        # verify sector allegiances got taken across
+        self.assertEqual(
+            len(sector.allegiances),
+            len(reducer.sectors['Dagudashaag'].allegiances),
+            "Unexpected allegiances length"
+        )
+
+    def test_line_reduction_singleton_only(self):
+        sourcefile = 'DeltaFiles/Dagudashaag-subsector-reduced.sec'
+
+        args = self._make_args()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+
+        reducer.is_initial_state_interesting()
+        reducer.reduce_line_pass()
+
         # now verify 1-minimality by removing only one line of input at a time
         reducer.reduce_line_pass(singleton_only=True)
         # only one subsector should be non-empty after reduction
@@ -73,15 +97,6 @@ class testDeltaReduce(unittest.TestCase):
                 expected = 2
             self.assertEqual(expected, len(reducer.sectors['Dagudashaag'][subsector_name].items), subsector_name + " not empty")
         self.assertEqual(2, len(reducer.sectors.lines), "Unexpected line count after singleton pass")
-
-        # verify sector headers got taken across
-        self.assertEqual(len(sector.headers), len(reducer.sectors['Dagudashaag'].headers), "Unexpected headers length")
-        # verify sector allegiances got taken across
-        self.assertEqual(
-            len(sector.allegiances),
-            len(reducer.sectors['Dagudashaag'].allegiances),
-            "Unexpected allegiances length"
-        )
 
     def test_sector_reduction(self):
         sourcefile = 'DeltaFiles/Dagudashaag-spiked.sec'
