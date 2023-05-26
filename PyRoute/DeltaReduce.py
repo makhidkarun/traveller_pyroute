@@ -185,12 +185,12 @@ class DeltaReduce:
                 num_chunks -= len(remove)
 
             num_chunks *= 2
+
+            segment = best_sectors.lines
             # if we're about to bust our loop condition, make sure we verify 1-minimality as our last hurrah
             if num_chunks > len(segment) and not singleton_run:
                 singleton_run = True
                 num_chunks = len(segment)
-
-            segment = best_sectors.lines
 
         # now that the pass is done, update self.sectors with best reduction found
         self.sectors = best_sectors

@@ -61,7 +61,7 @@ class testDeltaReduce(unittest.TestCase):
         for subsector_name in reducer.sectors['Dagudashaag']:
             expected = 0
             if subsector_name == 'Pact':
-                expected = 4
+                expected = 2
             self.assertEqual(expected, len(reducer.sectors['Dagudashaag'][subsector_name].items), subsector_name + " not empty")
 
         # verify sector headers got taken across
@@ -86,7 +86,6 @@ class testDeltaReduce(unittest.TestCase):
         reducer = DeltaReduce(delta, args)
 
         reducer.is_initial_state_interesting()
-        reducer.reduce_line_pass()
 
         # now verify 1-minimality by removing only one line of input at a time
         reducer.reduce_line_pass(singleton_only=True)
