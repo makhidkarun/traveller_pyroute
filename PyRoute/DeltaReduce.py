@@ -30,7 +30,8 @@ class DeltaReduce:
         # If both are defined, they both have to match for the result to be interesting
         self.interesting_line = interesting_line
         self.interesting_type = interesting_type
-        self.logger = logging.getLogger('PyRoute.DeltaReduce')
+        self.logger = logging.getLogger('PyRoute.Star')
+        logging.disable(logging.WARNING)
 
     def is_initial_state_interesting(self):
         sectors = self.sectors
@@ -57,7 +58,7 @@ class DeltaReduce:
             chunks = self.chunk_lines(segment, num_chunks)
             remove = []
             msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks)
-            self.logger.info(msg)
+            self.logger.error(msg)
 
             for i in range(0, num_chunks):
                 threshold = i + (len(remove) if 2 == num_chunks else 0)
@@ -79,7 +80,7 @@ class DeltaReduce:
                     remove.append(i)
                     best_sectors = temp_sectors
                     msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines"
-                    self.logger.info(msg)
+                    self.logger.error(msg)
 
             if 0 < len(remove):
                 num_chunks -= len(remove)
@@ -110,7 +111,7 @@ class DeltaReduce:
             chunks = self.chunk_lines(segment, num_chunks)
             remove = []
             msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks)
-            self.logger.info(msg)
+            self.logger.error(msg)
             for i in range(0, num_chunks):
                 if i + len(remove) >= len(chunks):
                     continue
@@ -130,7 +131,7 @@ class DeltaReduce:
                     remove.append(i)
                     best_sectors = temp_sectors
                     msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines"
-                    self.logger.info(msg)
+                    self.logger.error(msg)
 
             if 0 < len(remove):
                 num_chunks -= len(remove)
@@ -157,7 +158,7 @@ class DeltaReduce:
             chunks = self.chunk_lines(segment, num_chunks)
             remove = []
             msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks)
-            self.logger.info(msg)
+            self.logger.error(msg)
 
             for i in range(0, num_chunks):
                 threshold = i + (len(remove) if 2 == num_chunks else 0)
@@ -179,7 +180,7 @@ class DeltaReduce:
                     remove.append(i)
                     best_sectors = temp_sectors
                     msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines"
-                    self.logger.info(msg)
+                    self.logger.error(msg)
 
             if 0 < len(remove):
                 num_chunks -= len(remove)
@@ -191,6 +192,43 @@ class DeltaReduce:
             if num_chunks > len(segment) and not singleton_run:
                 singleton_run = True
                 num_chunks = len(segment)
+
+        # now that the pass is done, update self.sectors with best reduction found
+        self.sectors = best_sectors
+
+    def reduce_line_two_minimal(self):
+        segment = self.sectors.lines
+
+        # An interesting less-than-4-element list is 2-minimal by definition
+        if 4 > len(segment):
+            return
+
+        best_sectors = self.sectors
+        gap = 1
+        while gap < len(segment):
+            msg = "# of lines: " + str(len(best_sectors.lines))
+            self.logger.error(msg)
+
+            i = 0
+            j = i + gap
+            while j < len(segment):
+                lines_to_remove = [segment[i], segment[j]]
+                temp_sectors = best_sectors.drop_lines(lines_to_remove)
+
+                interesting, msg = self._check_interesting(self.args, temp_sectors)
+
+                # We've found a chunk of input and have _demonstrated_ its irrelevance,
+                # empty that chunk, update best so far, and continue
+                if interesting:
+                    best_sectors = temp_sectors
+                    segment = best_sectors.lines
+                    msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines"
+                    self.logger.error(msg)
+                else:
+                    i += 1
+                j = i + gap
+
+            gap += 1
 
         # now that the pass is done, update self.sectors with best reduction found
         self.sectors = best_sectors

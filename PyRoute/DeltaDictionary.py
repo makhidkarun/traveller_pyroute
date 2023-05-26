@@ -219,6 +219,7 @@ class SectorDictionary(dict):
         # dicts
         dummy = Sector('', '# 0,0')
         logging.disable(logging.WARNING)
+
         for line in starlines:
             # Re-use the existing, battle-tested, validation logic rather than scraping something new and buggy together
             star = Star.parse_line_into_star(line, dummy, 'scaled', 'scaled')

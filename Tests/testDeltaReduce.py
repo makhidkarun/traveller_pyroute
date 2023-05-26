@@ -97,6 +97,30 @@ class testDeltaReduce(unittest.TestCase):
             self.assertEqual(expected, len(reducer.sectors['Dagudashaag'][subsector_name].items), subsector_name + " not empty")
         self.assertEqual(2, len(reducer.sectors.lines), "Unexpected line count after singleton pass")
 
+    def test_line_reduction_two_minimality(self):
+        sourcefile = 'DeltaFiles/Dagudashaag-subsector-reduced.sec'
+
+        args = self._make_args()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+
+        reducer.is_initial_state_interesting()
+
+        # now verify 2-minimality by removing two lines of input at a time
+        reducer.reduce_line_two_minimal()
+        # only one subsector should be non-empty after reduction
+        for subsector_name in reducer.sectors['Dagudashaag']:
+            expected = 0
+            if subsector_name == 'Pact':
+                expected = 3
+            self.assertEqual(expected, len(reducer.sectors['Dagudashaag'][subsector_name].items), subsector_name + " not empty")
+        self.assertEqual(3, len(reducer.sectors.lines), "Unexpected line count after doubleton pass")
+
     def test_sector_reduction(self):
         sourcefile = 'DeltaFiles/Dagudashaag-spiked.sec'
 
