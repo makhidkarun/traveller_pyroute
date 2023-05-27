@@ -82,14 +82,18 @@ class DeltaDictionary(dict):
         return result
 
     def drop_lines(self, lines_to_drop):
-        foo = copy.deepcopy(self)
+        foo = DeltaDictionary()
         for sector_name in self:
-            if foo[sector_name].skipped:
-                del foo[sector_name]
+            if self[sector_name].skipped:
+                continue
             else:
                 foo[sector_name] = self[sector_name].drop_lines(lines_to_drop)
 
         return foo
+
+    def write_files(self, output_dir):
+        for sector_name in self:
+            self[sector_name].write_file(output_dir)
 
 
 class SectorDictionary(dict):
@@ -110,6 +114,21 @@ class SectorDictionary(dict):
     def __setitem__(self, item, value):
         assert isinstance(value, SubsectorDictionary), "Values must be SubsectorDictionary objects"
         super().__setitem__(item, value)
+
+    def __deepcopy__(self, memodict={}):
+        foo = SectorDictionary(self.name, self.filename)
+        foo.allegiances = copy.deepcopy(self.allegiances)
+        for alg in foo.allegiances:
+            foo.allegiances[alg].homeworlds = []
+            foo.allegiances[alg].stats.homeworlds = []
+
+        foo.headers = copy.deepcopy(self.headers)
+        foo.position = self.position
+
+        for subsector_name in self:
+            foo[subsector_name] = copy.deepcopy(self[subsector_name])
+
+        return foo
 
     def subsector_subset(self, subsectors):
         overlap = list()
@@ -171,6 +190,22 @@ class SectorDictionary(dict):
             if self[sub_name].skipped is False:
                 return False
         return True
+
+    def write_file(self, output_dir):
+        exists = os.path.exists(output_dir)
+        if not exists:
+            os.makedirs(output_dir)
+
+        out_name = os.path.join(output_dir, self.filename) + "-min"
+
+        handle = codecs.open(out_name, 'w', 'utf-8')
+        for line in self.headers:
+            handle.write(line)
+
+        for line in self.lines:
+            handle.write(line)
+
+        handle.close()
 
     @staticmethod
     def load_traveller_map_file(filename):
