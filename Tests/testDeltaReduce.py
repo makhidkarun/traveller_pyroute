@@ -170,6 +170,27 @@ class testDeltaReduce(unittest.TestCase):
         self.assertEqual(1, len(reducer.sectors), 'Unexpected post-reduction sector count')
         self.assertEqual('Dagudashaag', reducer.sectors['Dagudashaag'].name)
 
+    def test_route_costs_balanced_should_be_uninteresting(self):
+        sourcefile = 'DeltaFiles/Zarushagar-imbalanced-routes.sec'
+
+        args = self._make_args()
+
+        delta = DeltaDictionary()
+        zarusector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,-1', zarusector.position, "Unexpected position value for Zarushagar")
+        delta[zarusector.name] = zarusector
+
+        expected = "Original input not interesting - aborting"
+        actual = None
+
+        reducer = DeltaReduce(delta, args)
+        try:
+            reducer.is_initial_state_interesting()
+        except AssertionError as e:
+            actual = str(e)
+
+        self.assertEqual(expected, actual)
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
