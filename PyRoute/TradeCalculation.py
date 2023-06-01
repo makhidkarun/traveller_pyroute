@@ -616,7 +616,6 @@ class TradeCalculation(RouteCalculation):
         assert 1e-16 > delta * delta,\
             "Route weight between " + str(star) + " and " + str(target) + " should not be direction sensitive.  Forward weight " + str(fwd_weight) + ", rev weight " + str(rev_weight) +", delta " + str(abs(delta))
 
-
         # Update the trade route (edges)
         tradeCr, tradePass = self.route_update_simple(route)
 
