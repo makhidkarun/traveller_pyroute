@@ -3,7 +3,7 @@ Created on Mar 5, 2014
 
 @author: tjoneslo
 """
-
+import functools
 import logging
 import bisect
 import random
@@ -101,6 +101,50 @@ class Star(object):
         self.logger = logging.getLogger('PyRoute.Star')
         self._hash = None
         self.component = None
+        self.x = None
+        self.y = None
+        self.z = None
+        self.q = None
+        self.r = None
+        self.col = None
+        self.row = None
+        self.gwp = None
+        self.population = None
+        self.perCapita = None
+        self.mspr = None
+        self.wtn = None
+        self.ru = None
+        self.ownedBy = None
+        self.name = None
+        self.sector = None
+        self.position = None
+        self.uwp = None
+        self.popCode = None
+        self.popM = None
+        self.uwpCodes = None
+        self.tradeCode = None
+        self.tl = None
+        self.atmo = None
+        self.size = None
+        self.hydro = None
+        self.port = None
+        self.economics = None
+        self.social = None
+        self.baseCode = None
+        self.zone = None
+        self.alg_code = None
+        self.ship_capacity = None
+        self.tcs_gwp = None
+        self.budget = None
+        self.importance = None
+        self.eti_cargo = None
+        self.eti_passenger = None
+        self.raw_be = None
+        self.im_be = None
+        self.col_be = None
+        self.star_list = None
+        self.routes = None
+        self.stars = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -241,9 +285,9 @@ class Star(object):
         return (self.position, self.name, self.uwp, self.sector.name)
 
     def __eq__(self, y):
+        if self.__hash__() != y.__hash__():
+            return False
         if isinstance(y, Star):
-            if self.__hash__() != y.__hash__():
-                return False
             return self.__key() == y.__key()
         else:
             return False
@@ -284,11 +328,16 @@ class Star(object):
         self.row = r - dy + 1
 
     def hex_distance(self, star):
-        return max(abs(self.x - star.x), abs(self.y - star.y), abs(self.z - star.z))
+        return Star._heuristic_core(self.x - star.x, self.y - star.y, self.z - star.z)
 
     @staticmethod
     def heuristicDistance(star1, star2):
-        return max(abs(star1.x - star2.x), abs(star1.y - star2.y), abs(star1.z - star2.z))
+        return Star._heuristic_core(star1.x - star2.x, star1.y - star2.y, star1.z - star2.z)
+
+    @staticmethod
+    @functools.cache
+    def _heuristic_core(dx, dy, dz):
+        return max(abs(dx), abs(dy), abs(dz))
 
     @staticmethod
     def axial_distance(Hex1, Hex2):
