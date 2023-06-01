@@ -608,9 +608,6 @@ class TradeCalculation(RouteCalculation):
         except nx.NetworkXNoPath:
             return
 
-
-        # TODO: Generate the routes in both directions- A->B and B->A. 
-        # if they produce different routes (they might), select the the lower cost one
         fwd_weight = self.route_cost(route)
         route.reverse()
         rev_weight = self.route_cost(route)
