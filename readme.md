@@ -2,7 +2,7 @@ PyRoute for Traveller
 =====================
 
 PyRoute is a trade route generation program for Traveller. PyRoute has been ported to python3, there is a branch with 
-the python2 version.  The python3 branch needs Python 3.9+ (or PyPy 7.3).
+the python2 version (no longer maintained).  The released version requires Python 3.9+ (or PyPy 7.3).
 
 The data for the maps comes from [Traveller Map](http://www.travellermap.com/) based upon the Traveller 5th edition 
 second survey data plus many of the fan created sectors from around the Internet and across the years. Traveller Map 
