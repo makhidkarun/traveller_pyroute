@@ -93,6 +93,10 @@ def process():
                        help="Exception type required to classify run output as interesting")
     delta.add_argument('--two-minimise', dest="two_min", default=False, action='store_true',
                        help="Try all pairs of star lines to see if any can be removed")
+    delta.add_argument('--no-sector', dest="run_sector", default=True, action='store_false',
+                       help="Skip sector-level reduction")
+    delta.add_argument('--no-subsector', dest="run_subsector", default=True, action='store_false',
+                       help="Skip subsector-level reduction")
 
     args = parser.parse_args()
 
@@ -117,10 +121,14 @@ def process():
     reducer.is_initial_state_interesting()
 
     # do the reduction passes
-    logger.error("Reducing by sector")
-    reducer.reduce_sector_pass()
-    logger.error("Reducing by subsector")
-    reducer.reduce_subsector_pass()
+    if args.run_sector:
+        logger.error("Reducing by sector")
+        reducer.reduce_sector_pass()
+
+    if args.run_subsector:
+        logger.error("Reducing by subsector")
+        reducer.reduce_subsector_pass()
+
     logger.error("Reducing by line")
     reducer.reduce_line_pass()
 
