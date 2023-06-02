@@ -57,7 +57,7 @@ class DeltaReduce:
         while num_chunks <= len(segment):
             chunks = self.chunk_lines(segment, num_chunks)
             remove = []
-            msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks)
+            msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks) + ", # of sectors: " + str(len(segment))
             self.logger.error(msg)
 
             for i in range(0, num_chunks):
@@ -79,7 +79,7 @@ class DeltaReduce:
                     chunks[i] = []
                     remove.append(i)
                     best_sectors = temp_sectors
-                    msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines"
+                    msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines and " + str(len(best_sectors)) + " sectors"
                     self.logger.error(msg)
 
             if 0 < len(remove):
@@ -112,7 +112,7 @@ class DeltaReduce:
         while num_chunks <= len(segment):
             chunks = self.chunk_lines(segment, num_chunks)
             remove = []
-            msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks)
+            msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks) + ", # of subsectors: " + str(len(segment))
             self.logger.error(msg)
             for i in range(0, num_chunks):
                 if i + len(remove) >= len(chunks):
@@ -132,7 +132,7 @@ class DeltaReduce:
                     chunks[i] = []
                     remove.append(i)
                     best_sectors = temp_sectors
-                    msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines"
+                    msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines and " + str(len(raw_lines)) + " subsectors"
                     self.logger.error(msg)
 
             if 0 < len(remove):
