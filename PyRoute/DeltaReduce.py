@@ -95,6 +95,8 @@ class DeltaReduce:
 
         # now that the pass is done, update self.sectors with best reduction found
         self.sectors = best_sectors
+        if short_msg is not None:
+            self.logger.error("Shortest error message: " + short_msg)
 
     def reduce_subsector_pass(self):
         segment = self.sectors.subsector_list()
@@ -141,6 +143,8 @@ class DeltaReduce:
 
         # now that the pass is done, update self.sectors with best reduction found
         self.sectors = best_sectors
+        if short_msg is not None:
+            self.logger.error("Shortest error message: " + short_msg)
 
     def reduce_line_pass(self, singleton_only=False):
         segment = self.sectors.lines
@@ -195,6 +199,8 @@ class DeltaReduce:
 
         # now that the pass is done, update self.sectors with best reduction found
         self.sectors = best_sectors
+        if short_msg is not None:
+            self.logger.error("Shortest error message: " + short_msg)
 
     def reduce_line_two_minimal(self):
         segment = self.sectors.lines
