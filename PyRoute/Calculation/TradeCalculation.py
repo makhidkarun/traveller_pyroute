@@ -165,6 +165,8 @@ class TradeCalculation(RouteCalculation):
             counter += 1
             processed += 1
         self.logger.info('processed {} routes at BTN {}'.format(counter, base_btn))
+        self.is_sector_trade_balanced()
+        self.is_sector_pass_balanced()
 
     def get_trade_between(self, star, target):
         """
@@ -223,7 +225,6 @@ class TradeCalculation(RouteCalculation):
 
         self.galaxy.stats.trade += tradeCr
         self.galaxy.stats.passengers += tradePass
-        self.is_sector_trade_balanced()
 
     def route_update_simple(self, route):
         """
@@ -428,6 +429,20 @@ class TradeCalculation(RouteCalculation):
             sector_total += sector.stats.trade + sector.stats.tradeExt
 
         galaxy_total = self.galaxy.stats.trade
-        delta = galaxy_total - sector_total
+        delta = abs(galaxy_total - sector_total)
 
         assert delta <= max_delta, "Allowed galaxy-to-total-sector trade diff " + str(max_delta) + ", actual diff " + str(delta)
+
+    def is_sector_pass_balanced(self):
+        num_sector = len(self.galaxy.sectors)
+        max_delta = (num_sector * (num_sector-1)) // 2
+
+        sector_total = 0
+        for sec in self.galaxy.sectors:
+            sector = self.galaxy.sectors[sec]
+            sector_total += sector.stats.passengers
+
+        galaxy_total = self.galaxy.stats.passengers
+        delta = abs(galaxy_total - sector_total)
+
+        assert delta <= max_delta, "Allowed galaxy-to-total-sector passenger diff " + str(max_delta) + ", actual diff " + str(delta)

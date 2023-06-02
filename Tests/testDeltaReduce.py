@@ -269,6 +269,19 @@ class testDeltaReduce(unittest.TestCase):
 
         reducer.is_initial_state_uninteresting()
 
+    def test_star_having_no_sector_attribute(self):
+        sourcefile = 'DeltaFiles/Dagudashaag-star-object-no-sector-attribute.sec'
+
+        args = self._make_args()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_interesting()
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
