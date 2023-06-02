@@ -155,6 +155,16 @@ class Star(object):
             del state['ownedBy']
         return state
 
+    def __deepcopy__(self, memodict={}):
+        state = self.__dict__.copy()
+
+        foo = Star()
+        for key in state:
+            item = state[key]
+            setattr(foo, key, item)
+
+        return foo
+
     @staticmethod
     def parse_line_into_star(line, sector, pop_code, ru_calc):
         star = Star()
@@ -727,4 +737,5 @@ class Star(object):
 
     def is_well_formed(self):
         assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
+        assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         return True
