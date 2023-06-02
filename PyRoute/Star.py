@@ -724,3 +724,7 @@ class Star(object):
         self.stars = self.stars[0:star_end].strip()
         if len(self.routes) > 0:
             self.logger.debug("{} - routes: {}".format(self, self.routes))
+
+    def is_well_formed(self):
+        assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
+        return True

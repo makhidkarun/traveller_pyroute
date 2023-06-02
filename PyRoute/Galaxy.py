@@ -488,3 +488,7 @@ class Galaxy(AreaItem):
                 g.write(ow_list_world + '\n')
 
                 world.ownedBy = (owner, ownedBy[0:4])
+
+    def is_well_formed(self):
+        for star in self.stars:
+            star.is_well_formed()
