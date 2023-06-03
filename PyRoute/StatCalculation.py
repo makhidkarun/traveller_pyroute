@@ -145,6 +145,9 @@ class StatCalculation(object):
         self.imp_uwp = UWPCollection()
 
     def calculate_statistics(self, ally_match):
+        self.galaxy.trade.is_sector_trade_balanced()
+        self.galaxy.trade.is_sector_pass_balanced()
+
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
         for sector in self.galaxy.sectors.values():
             if sector is None:
@@ -207,6 +210,10 @@ class StatCalculation(object):
         for uwpName in self.imp_uwp.uwp.values():
             for uwpStats in uwpName.values():
                 self.per_capita(None, uwpStats)
+
+        self.galaxy.trade.is_sector_trade_balanced()
+        self.galaxy.trade.is_sector_pass_balanced()
+
 
     def add_alg_stats(self, area, star, alg):
         algStats = area.alg[alg].stats
