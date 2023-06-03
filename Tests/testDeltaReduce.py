@@ -7,6 +7,8 @@ from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
+from PyRoute.SpeculativeTrade import SpeculativeTrade
+from PyRoute.StatCalculation import StatCalculation
 from PyRoute.route import set_logging
 
 
@@ -280,6 +282,24 @@ class testDeltaReduce(unittest.TestCase):
         delta[sector.name] = sector
 
         reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_interesting()
+
+    def test_population_balance_over_two_sectors(self):
+        args = self._make_args_no_line()
+        args.interestingline = "imbalance"
+        sourcefile = 'DeltaFiles/two-sector-pop-balance/Dagudashaag.sec'
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        sourcefile = 'DeltaFiles/two-sector-pop-balance/Zarushagar.sec'
+
+        zarusector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta[zarusector.name] = zarusector
+        self.assertEqual(2, len(delta), "Should only be two sectors in dictionary")
+
+        reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
         reducer.is_initial_state_interesting()
 
     def _make_args(self):

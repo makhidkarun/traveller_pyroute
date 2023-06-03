@@ -3,7 +3,10 @@ Created on Mar 15, 2014
 
 @author: tjoneslo
 """
-
+import bisect
+import functools
+import logging
+import itertools
 import networkx as nx
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
@@ -65,6 +68,10 @@ class TradeCalculation(RouteCalculation):
 
         # Are debugging gubbins turned on?
         self.debug_flag = debug_flag
+
+        self.shortest_path_tree = None
+        # Track inter-sector passenger imbalances
+        self.passenger_balance = dict()
 
     def base_route_filter(self, star, neighbor):
         # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
@@ -165,8 +172,6 @@ class TradeCalculation(RouteCalculation):
             counter += 1
             processed += 1
         self.logger.info('processed {} routes at BTN {}'.format(counter, base_btn))
-        self.is_sector_trade_balanced()
-        self.is_sector_pass_balanced()
 
     def get_trade_between(self, star, target):
         """
@@ -205,6 +210,8 @@ class TradeCalculation(RouteCalculation):
             target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr // 2
             star.sector.stats.passengers += tradePass // 2
             target.sector.stats.passengers += tradePass // 2
+            if 1 == (tradePass - 2 * (tradePass // 2)):
+                self._log_odd_sector_passenger(star, target)
         else:
             star.sector.stats.trade += tradeCr
             star.sector.stats.passengers += tradePass
@@ -225,6 +232,19 @@ class TradeCalculation(RouteCalculation):
 
         self.galaxy.stats.trade += tradeCr
         self.galaxy.stats.passengers += tradePass
+
+    def _log_odd_sector_passenger(self, star, target):
+        sector_tuple = self._balance_tuple(star.sector.name, target.sector.name)
+        if sector_tuple not in self.passenger_balance:
+            self.passenger_balance[sector_tuple] = 0
+        self.passenger_balance[sector_tuple] += 1
+
+    @staticmethod
+    @functools.cache
+    def _balance_tuple(name_from, name_to):
+        if name_from <= name_to:
+            return (name_from, name_to)
+        return (name_to, name_from)
 
     def route_update_simple(self, route):
         """
@@ -434,6 +454,11 @@ class TradeCalculation(RouteCalculation):
         assert delta <= max_delta, "Allowed galaxy-to-total-sector trade diff " + str(max_delta) + ", actual diff " + str(delta)
 
     def is_sector_pass_balanced(self):
+        max_balance = 0
+        if 0 < len(self.passenger_balance):
+            max_balance = max(self.passenger_balance.values())
+        assert 2 > max_balance, "Uncompensated passenger imbalance present"
+
         num_sector = len(self.galaxy.sectors)
         max_delta = (num_sector * (num_sector-1)) // 2
 
