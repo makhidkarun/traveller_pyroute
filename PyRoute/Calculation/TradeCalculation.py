@@ -238,6 +238,10 @@ class TradeCalculation(RouteCalculation):
         if sector_tuple not in self.passenger_balance:
             self.passenger_balance[sector_tuple] = 0
         self.passenger_balance[sector_tuple] += 1
+        if 1 < self.passenger_balance[sector_tuple]:
+            star.sector.stats.passengers += 1
+            target.sector.stats.passengers += 1
+            self.passenger_balance[sector_tuple] -= 2
 
     @staticmethod
     @functools.cache

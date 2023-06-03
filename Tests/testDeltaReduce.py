@@ -286,7 +286,6 @@ class testDeltaReduce(unittest.TestCase):
 
     def test_population_balance_over_two_sectors(self):
         args = self._make_args_no_line()
-        args.interestingline = "imbalance"
         sourcefile = 'DeltaFiles/two-sector-pop-balance/Dagudashaag.sec'
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -300,7 +299,7 @@ class testDeltaReduce(unittest.TestCase):
         self.assertEqual(2, len(delta), "Should only be two sectors in dictionary")
 
         reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
-        reducer.is_initial_state_interesting()
+        reducer.is_initial_state_uninteresting()
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
