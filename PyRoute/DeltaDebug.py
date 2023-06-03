@@ -97,8 +97,14 @@ def process():
                        help="Skip sector-level reduction")
     delta.add_argument('--no-subsector', dest="run_subsector", default=True, action='store_false',
                        help="Skip subsector-level reduction")
+    delta.add_argument('--no-line', dest="run_line", default=True, action='store_false',
+                       help="Skip line-level reduction.  At least one of sector, subsector, line and two-minimisation must be selected")
 
     args = parser.parse_args()
+
+    # sanity check run arguments
+    if not (args.two_min or args.run_sector or args.run_subsector or args.run_line):
+        raise ValueError("Must select at least one reduction pass to run")
 
     galaxy = Galaxy(args.btn, args.max_jump, args.route_btn)
     galaxy.output_path = args.output
@@ -129,8 +135,9 @@ def process():
         logger.error("Reducing by subsector")
         reducer.reduce_subsector_pass()
 
-    logger.error("Reducing by line")
-    reducer.reduce_line_pass()
+    if args.run_line:
+        logger.error("Reducing by line")
+        reducer.reduce_line_pass()
 
     # enforce 2-minimality
     if args.two_min:
