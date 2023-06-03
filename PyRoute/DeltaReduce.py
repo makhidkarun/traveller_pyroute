@@ -42,6 +42,15 @@ class DeltaReduce:
         if not interesting:
             raise AssertionError("Original input not interesting - aborting")
 
+    def is_initial_state_uninteresting(self):
+        sectors = self.sectors
+        args = self.args
+
+        interesting, msg = self._check_interesting(args, sectors)
+
+        if interesting:
+            raise AssertionError(msg)
+
     def reduce_sector_pass(self, singleton_only=False):
         segment = self.sectors.sector_list()
 
