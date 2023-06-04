@@ -72,6 +72,8 @@ class TradeCalculation(RouteCalculation):
         self.shortest_path_tree = None
         # Track inter-sector passenger imbalances
         self.passenger_balance = dict()
+        # Track inter-sector trade imbalances
+        self.trade_balance = dict()
 
     def base_route_filter(self, star, neighbor):
         # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
@@ -210,6 +212,8 @@ class TradeCalculation(RouteCalculation):
             target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr // 2
             star.sector.stats.passengers += tradePass // 2
             target.sector.stats.passengers += tradePass // 2
+            if 1 == (tradeCr - 2 * (tradeCr // 2)):
+                self._log_odd_sector_trade(star, target)
             if 1 == (tradePass - 2 * (tradePass // 2)):
                 self._log_odd_sector_passenger(star, target)
         else:
@@ -232,6 +236,16 @@ class TradeCalculation(RouteCalculation):
 
         self.galaxy.stats.trade += tradeCr
         self.galaxy.stats.passengers += tradePass
+
+    def _log_odd_sector_trade(self, star, target):
+        sector_tuple = self._balance_tuple(star.sector.name, target.sector.name)
+        if sector_tuple not in self.trade_balance:
+            self.trade_balance[sector_tuple] = 0
+        self.trade_balance[sector_tuple] += 1
+        if 1 < self.trade_balance[sector_tuple]:
+            star.sector.stats.tradeExt += 1
+            target.sector.stats.tradeExt += 1
+            self.trade_balance[sector_tuple] -= 2
 
     def _log_odd_sector_passenger(self, star, target):
         sector_tuple = self._balance_tuple(star.sector.name, target.sector.name)
@@ -444,6 +458,11 @@ class TradeCalculation(RouteCalculation):
         return False
 
     def is_sector_trade_balanced(self):
+        max_balance = 0
+        if 0 < len(self.trade_balance):
+            max_balance = max(self.trade_balance.values())
+        assert 1 > max_balance, "Uncompensated trade imbalance present"
+
         num_sector = len(self.galaxy.sectors)
         max_delta = (num_sector * (num_sector-1)) // 2
 
