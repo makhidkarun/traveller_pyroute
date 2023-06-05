@@ -175,6 +175,7 @@ class TradeCalculation(RouteCalculation):
             self.get_trade_between(star, neighbor)
             counter += 1
             processed += 1
+        self.multilateral_balance_pass()
         self.logger.info('processed {} routes at BTN {}'.format(counter, base_btn))
 
     def get_trade_between(self, star, target):
@@ -500,3 +501,51 @@ class TradeCalculation(RouteCalculation):
         delta = abs(galaxy_total - sector_total)
 
         assert delta <= max_delta, "Allowed galaxy-to-total-sector passenger diff " + str(max_delta) + ", actual diff " + str(delta)
+
+    def multilateral_balance_pass(self):
+        if 0 == len(self.passenger_balance):
+            return
+
+        # assemble per-sector pax imbalances
+        sector_balance = self._per_sector_pax_imbalance()
+
+        # if no sector has 2 or more half-pax against it, return
+        if 0 == len(sector_balance) or 2 > max(sector_balance.values()):
+            return
+
+        for key in sector_balance:
+            if 2 > sector_balance[key]:
+                continue
+
+            # find two connected items in passenger_balance - _which_ two are not really relevant
+            comp = [k for k in self.passenger_balance.keys() if k[0] == key or k[1] == key]
+            self.galaxy.sectors[key].stats.passengers += 1
+            self.passenger_balance[comp[0]] -= 1
+            self.passenger_balance[comp[1]] -= 1
+            left = comp[0][0] if comp[0][1] == key else comp[0][1]
+            right = comp[1][0] if comp[1][1] == key else comp[1][1]
+            adjkey = self._balance_tuple(left, right)
+
+            self.passenger_balance[adjkey] += 1
+            if 1 < self.passenger_balance[adjkey]:
+                self.galaxy.sectors[left].stats.passengers += 1
+                self.galaxy.sectors[right].stats.passengers += 1
+                self.passenger_balance[adjkey] -= 2
+
+            sector_balance = self._per_sector_pax_imbalance()
+
+    def _per_sector_pax_imbalance(self):
+        sector_balance = dict()
+        for key in self.passenger_balance:
+            left = key[0]
+            right = key[1]
+            if left not in sector_balance:
+                sector_balance[left] = 0
+            if right not in sector_balance:
+                sector_balance[right] = 0
+
+            balance = self.passenger_balance[key]
+            sector_balance[left] += balance
+            sector_balance[right] += balance
+
+        return sector_balance

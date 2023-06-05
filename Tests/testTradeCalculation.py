@@ -9,7 +9,6 @@ from Star import Star
 from Galaxy import Sector, Galaxy
 
 
-
 class testTradeCalculation(unittest.TestCase):
     def test_negative_route_weight_trips_assertion(self):
         expected = 'Weight of edge between Irkigkhan (Core 0103) and Irkigkhan (Core 0103) must be positive'
@@ -114,6 +113,8 @@ class testTradeCalculation(unittest.TestCase):
 
         self.assertEqual(expected, actual, "AssertionError should be thrown")
 
+        tradecalc.multilateral_balance_pass()
+        tradecalc.is_sector_pass_balanced()
 
 if __name__ == '__main__':
     unittest.main()
