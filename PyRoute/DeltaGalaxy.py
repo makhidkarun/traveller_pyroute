@@ -25,6 +25,8 @@ class DeltaGalaxy(Galaxy):
 
     def read_sectors(self, sectors, pop_code, ru_calc):
         sector: SectorDictionary
+
+        sectors.skip_void_subsectors_if_half()
         for sector_name in sectors:
             sector = sectors[sector_name]
             sec = Sector(" " + sector.name, sector.position)
