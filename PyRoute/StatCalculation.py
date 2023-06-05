@@ -96,6 +96,11 @@ class ObjectStatistics(object):
 
         return foo
 
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
 
     def homeworld_count(self):
         return len(self.homeworlds)
