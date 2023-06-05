@@ -1,13 +1,11 @@
 import unittest
 
-from PyRoute.Galaxy import AreaItem
 from PyRoute.TradeBalance import TradeBalance
 
 
 class testTradeBalance(unittest.TestCase):
     def test_trade_balance_add_success(self):
-        item = AreaItem('name')
-        foo = TradeBalance(area_item=item, stat_field='passengers')
+        foo = TradeBalance(stat_field='passengers')
         self.assertEqual(0, len(foo), "Empty TradeBalance should have zero elements")
         key = ('foo', 'bar')
         foo[key] = 1

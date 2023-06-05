@@ -1,17 +1,14 @@
 import functools
 
-from PyRoute.Galaxy import AreaItem
 from PyRoute.Star import Star
 
 
 class TradeBalance(dict):
 
-    def __init__(self, area_item=None, stat_field=None):
-        assert isinstance(area_item, AreaItem), "AreaItem parm must be an instance of AreaItem"
+    def __init__(self, stat_field=None):
         assert isinstance(stat_field, str), "Stat_field must be a string"
         super().__init__()
-
-        self.area_item = area_item
+        self.stat_field = stat_field
         pass
 
     def update(self, __m, **kwargs):

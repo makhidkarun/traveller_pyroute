@@ -15,6 +15,7 @@ from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
 from PyRoute.Pathfinding.astar import astar_path, astar_path_indexes
 from PyRoute.Star import Star
+from PyRoute.TradeBalance import TradeBalance
 
 
 class TradeCalculation(RouteCalculation):
@@ -73,7 +74,7 @@ class TradeCalculation(RouteCalculation):
 
         self.shortest_path_tree = None
         # Track inter-sector passenger imbalances
-        self.passenger_balance = dict()
+        self.passenger_balance = TradeBalance(stat_field="passengers")
         # Track inter-sector trade imbalances
         self.trade_balance = dict()
 
