@@ -442,15 +442,10 @@ class TradeCalculation(RouteCalculation):
         return False
 
     def is_sector_trade_balanced(self):
-        max_balance = 0
         num_sector = len(self.galaxy.sectors)
-        if 0 < len(self.trade_balance):
-            max_balance = max(self.trade_balance.values())
-        assert 2 > max_balance, "Uncompensated trade imbalance present"
+        assert 2 > self.trade_balance.maximum, "Uncompensated trade imbalance present"
 
-        if 0 < max_balance:
-            sum_balance = sum(self.trade_balance.values())
-            assert sum_balance <= ceil(num_sector / 2), "Uncompensated multilateral trade imbalance present"
+        assert self.trade_balance.sum <= ceil(num_sector / 2), "Uncompensated multilateral trade imbalance present"
 
         max_delta = (num_sector * (num_sector-1)) // 2
 
@@ -465,15 +460,10 @@ class TradeCalculation(RouteCalculation):
         assert delta <= max_delta, "Allowed galaxy-to-total-sector trade diff " + str(max_delta) + ", actual diff " + str(delta)
 
     def is_sector_pass_balanced(self):
-        max_balance = 0
         num_sector = len(self.galaxy.sectors)
-        if 0 < len(self.passenger_balance):
-            max_balance = max(self.passenger_balance.values())
-        assert 2 > max_balance, "Uncompensated passenger imbalance present"
+        assert 2 > self.passenger_balance.maximum, "Uncompensated passenger imbalance present"
 
-        if 0 < max_balance:
-            sum_balance = sum(self.passenger_balance.values())
-            assert sum_balance <= ceil(num_sector / 2), "Uncompensated multilateral passenger imbalance present"
+        assert self.passenger_balance.sum <= ceil(num_sector / 2), "Uncompensated multilateral passenger imbalance present"
 
         max_delta = (num_sector * (num_sector-1)) // 2
 

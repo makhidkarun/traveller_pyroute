@@ -30,6 +30,18 @@ class TradeBalance(dict):
             target.sector.stats[self.stat_field] += 1
             self[sector_tuple] -= 2
 
+    @property
+    def maximum(self):
+        if 0 == len(self):
+            return 0
+        return max(self.values())
+
+    @property
+    def sum(self):
+        if 0 == len(self):
+            return 0
+        return sum(self.values())
+
     @staticmethod
     def _check(key: tuple, value: int):
         assert isinstance(key, tuple), "Key must be tuple"
