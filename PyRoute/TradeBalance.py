@@ -26,8 +26,8 @@ class TradeBalance(dict):
             self[sector_tuple] = 0
         self[sector_tuple] += 1
         if 1 < self[sector_tuple]:
-            star.sector.stats.passengers += 1
-            target.sector.stats.passengers += 1
+            star.sector.stats[self.stat_field] += 1
+            target.sector.stats[self.stat_field] += 1
             self[sector_tuple] -= 2
 
     @staticmethod
