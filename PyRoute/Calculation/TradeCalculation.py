@@ -219,7 +219,7 @@ class TradeCalculation(RouteCalculation):
             if 1 == (tradeCr - 2 * (tradeCr // 2)):
                 self._log_odd_sector_trade(star, target)
             if 1 == (tradePass - 2 * (tradePass // 2)):
-                self._log_odd_sector_passenger(star, target)
+                self.passenger_balance.log_odd_unit(star, target)
         else:
             star.sector.stats.trade += tradeCr
             star.sector.stats.passengers += tradePass
@@ -250,16 +250,6 @@ class TradeCalculation(RouteCalculation):
             star.sector.stats.tradeExt += 1
             target.sector.stats.tradeExt += 1
             self.trade_balance[sector_tuple] -= 2
-
-    def _log_odd_sector_passenger(self, star, target):
-        sector_tuple = self._balance_tuple(star.sector.name, target.sector.name)
-        if sector_tuple not in self.passenger_balance:
-            self.passenger_balance[sector_tuple] = 0
-        self.passenger_balance[sector_tuple] += 1
-        if 1 < self.passenger_balance[sector_tuple]:
-            star.sector.stats.passengers += 1
-            target.sector.stats.passengers += 1
-            self.passenger_balance[sector_tuple] -= 2
 
     @staticmethod
     @functools.cache
