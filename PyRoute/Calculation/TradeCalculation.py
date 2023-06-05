@@ -76,7 +76,7 @@ class TradeCalculation(RouteCalculation):
         # Track inter-sector passenger imbalances
         self.passenger_balance = TradeBalance(stat_field="passengers")
         # Track inter-sector trade imbalances
-        self.trade_balance = dict()
+        self.trade_balance = TradeBalance(stat_field="tradeExt")
 
     def base_route_filter(self, star, neighbor):
         # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
@@ -217,7 +217,7 @@ class TradeCalculation(RouteCalculation):
             star.sector.stats.passengers += tradePass // 2
             target.sector.stats.passengers += tradePass // 2
             if 1 == (tradeCr - 2 * (tradeCr // 2)):
-                self._log_odd_sector_trade(star, target)
+                self.trade_balance.log_odd_unit(star, target)
             if 1 == (tradePass - 2 * (tradePass // 2)):
                 self.passenger_balance.log_odd_unit(star, target)
         else:
@@ -240,16 +240,6 @@ class TradeCalculation(RouteCalculation):
 
         self.galaxy.stats.trade += tradeCr
         self.galaxy.stats.passengers += tradePass
-
-    def _log_odd_sector_trade(self, star, target):
-        sector_tuple = self._balance_tuple(star.sector.name, target.sector.name)
-        if sector_tuple not in self.trade_balance:
-            self.trade_balance[sector_tuple] = 0
-        self.trade_balance[sector_tuple] += 1
-        if 1 < self.trade_balance[sector_tuple]:
-            star.sector.stats.tradeExt += 1
-            target.sector.stats.tradeExt += 1
-            self.trade_balance[sector_tuple] -= 2
 
     @staticmethod
     @functools.cache
