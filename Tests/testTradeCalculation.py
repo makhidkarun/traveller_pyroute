@@ -88,5 +88,32 @@ class testTradeCalculation(unittest.TestCase):
         actual_weight = tradecalc.route_cost(route)
         self.assertEqual(expected_weight, actual_weight, "Route cost unexpected")
 
+    def test_passenger_balance_over_multiple_sectors(self):
+        core = Sector(' Core', ' 0, 0')
+        dagu = Sector(' Dagudashaag', ' -1, 0')
+        gush = Sector(' Gushemege', ' -2, 0')
+
+        galaxy = Galaxy(min_btn=13)
+        galaxy.stats.passengers = 3
+        galaxy.sectors[core.name] = core
+        galaxy.sectors[dagu.name] = dagu
+        galaxy.sectors[gush.name] = gush
+
+        tradecalc = TradeCalculation(galaxy)
+        tradecalc.passenger_balance[(core.name, dagu.name)] = 1
+        tradecalc.passenger_balance[(core.name, gush.name)] = 1
+        tradecalc.passenger_balance[(dagu.name, gush.name)] = 1
+
+        expected = "Uncompensated multilateral passenger imbalance present"
+        actual = None
+
+        try:
+            tradecalc.is_sector_pass_balanced()
+        except AssertionError as e:
+            actual = str(e)
+
+        self.assertEqual(expected, actual, "AssertionError should be thrown")
+
+
 if __name__ == '__main__':
     unittest.main()

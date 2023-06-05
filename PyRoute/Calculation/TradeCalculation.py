@@ -7,6 +7,8 @@ import bisect
 import functools
 import logging
 import itertools
+from math import ceil
+
 import networkx as nx
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
@@ -478,11 +480,15 @@ class TradeCalculation(RouteCalculation):
 
     def is_sector_pass_balanced(self):
         max_balance = 0
+        num_sector = len(self.galaxy.sectors)
         if 0 < len(self.passenger_balance):
             max_balance = max(self.passenger_balance.values())
         assert 2 > max_balance, "Uncompensated passenger imbalance present"
 
-        num_sector = len(self.galaxy.sectors)
+        if 0 < max_balance:
+            sum_balance = sum(self.passenger_balance.values())
+            assert sum_balance <= ceil(num_sector / 2), "Uncompensated multilateral passenger imbalance present"
+
         max_delta = (num_sector * (num_sector-1)) // 2
 
         sector_total = 0
