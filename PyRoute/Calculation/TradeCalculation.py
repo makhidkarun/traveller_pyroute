@@ -542,33 +542,7 @@ class TradeCalculation(RouteCalculation):
             sector_balance = self._per_sector_pax_imbalance()
 
     def _per_sector_trade_imbalance(self):
-        sector_balance = dict()
-        for key in self.trade_balance:
-            left = key[0]
-            right = key[1]
-            if left not in sector_balance:
-                sector_balance[left] = 0
-            if right not in sector_balance:
-                sector_balance[right] = 0
-
-            balance = self.trade_balance[key]
-            sector_balance[left] += balance
-            sector_balance[right] += balance
-
-        return sector_balance
+        return self.trade_balance.single_unit_imbalance()
 
     def _per_sector_pax_imbalance(self):
-        sector_balance = dict()
-        for key in self.passenger_balance:
-            left = key[0]
-            right = key[1]
-            if left not in sector_balance:
-                sector_balance[left] = 0
-            if right not in sector_balance:
-                sector_balance[right] = 0
-
-            balance = self.passenger_balance[key]
-            sector_balance[left] += balance
-            sector_balance[right] += balance
-
-        return sector_balance
+        return self.passenger_balance.single_unit_imbalance()

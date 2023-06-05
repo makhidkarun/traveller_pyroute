@@ -30,6 +30,23 @@ class TradeBalance(dict):
             target.sector.stats[self.stat_field] += 1
             self[sector_tuple] -= 2
 
+    def single_unit_imbalance(self):
+        sector_balance = dict()
+
+        for key in self:
+            left = key[0]
+            right = key[1]
+            if left not in sector_balance:
+                sector_balance[left] = 0
+            if right not in sector_balance:
+                sector_balance[right] = 0
+
+            balance = self[key]
+            sector_balance[left] += balance
+            sector_balance[right] += balance
+
+        return sector_balance
+
     @property
     def maximum(self):
         if 0 == len(self):
