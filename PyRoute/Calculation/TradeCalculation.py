@@ -462,11 +462,15 @@ class TradeCalculation(RouteCalculation):
 
     def is_sector_trade_balanced(self):
         max_balance = 0
+        num_sector = len(self.galaxy.sectors)
         if 0 < len(self.trade_balance):
             max_balance = max(self.trade_balance.values())
-        assert 1 > max_balance, "Uncompensated trade imbalance present"
+        assert 2 > max_balance, "Uncompensated trade imbalance present"
 
-        num_sector = len(self.galaxy.sectors)
+        if 0 < max_balance:
+            sum_balance = sum(self.trade_balance.values())
+            assert sum_balance <= ceil(num_sector / 2), "Uncompensated multilateral trade imbalance present"
+
         max_delta = (num_sector * (num_sector-1)) // 2
 
         sector_total = 0
@@ -502,6 +506,38 @@ class TradeCalculation(RouteCalculation):
 
         assert delta <= max_delta, "Allowed galaxy-to-total-sector passenger diff " + str(max_delta) + ", actual diff " + str(delta)
 
+    def multilateral_balance_trade(self):
+        if 0 == len(self.trade_balance):
+            return
+
+        # assemble per-sector pax imbalances
+        sector_balance = self._per_sector_trade_imbalance()
+
+        # if no sector has 2 or more half-unit against it, return
+        if 0 == len(sector_balance) or 2 > max(sector_balance.values()):
+            return
+
+        for key in sector_balance:
+            if 2 > sector_balance[key]:
+                continue
+
+            # find two connected items in passenger_balance - _which_ two are not really relevant
+            comp = [k for k in self.trade_balance.keys() if k[0] == key or k[1] == key]
+            self.galaxy.sectors[key].stats.tradeExt += 1
+            self.trade_balance[comp[0]] -= 1
+            self.trade_balance[comp[1]] -= 1
+            left = comp[0][0] if comp[0][1] == key else comp[0][1]
+            right = comp[1][0] if comp[1][1] == key else comp[1][1]
+            adjkey = self._balance_tuple(left, right)
+
+            self.trade_balance[adjkey] += 1
+            if 1 < self.trade_balance[adjkey]:
+                self.galaxy.sectors[left].stats.tradeExt += 1
+                self.galaxy.sectors[right].stats.tradeExt += 1
+                self.trade_balance[adjkey] -= 2
+
+            sector_balance = self._per_sector_trade_imbalance()
+
     def multilateral_balance_pass(self):
         if 0 == len(self.passenger_balance):
             return
@@ -533,6 +569,22 @@ class TradeCalculation(RouteCalculation):
                 self.passenger_balance[adjkey] -= 2
 
             sector_balance = self._per_sector_pax_imbalance()
+
+    def _per_sector_trade_imbalance(self):
+        sector_balance = dict()
+        for key in self.trade_balance:
+            left = key[0]
+            right = key[1]
+            if left not in sector_balance:
+                sector_balance[left] = 0
+            if right not in sector_balance:
+                sector_balance[right] = 0
+
+            balance = self.trade_balance[key]
+            sector_balance[left] += balance
+            sector_balance[right] += balance
+
+        return sector_balance
 
     def _per_sector_pax_imbalance(self):
         sector_balance = dict()
