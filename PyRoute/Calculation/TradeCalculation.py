@@ -76,7 +76,7 @@ class TradeCalculation(RouteCalculation):
         # Track inter-sector passenger imbalances
         self.passenger_balance = TradeBalance(stat_field="passengers", region=galaxy)
         # Track inter-sector trade imbalances
-        self.trade_balance = TradeBalance(stat_field="tradeExt", region=galaxy)
+        self.trade_balance = TradeBalance(stat_field="tradeExt", region=galaxy, target="trade")
 
     def base_route_filter(self, star, neighbor):
         # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
@@ -442,49 +442,13 @@ class TradeCalculation(RouteCalculation):
         return False
 
     def is_sector_trade_balanced(self):
-        num_sector = len(self.galaxy.sectors)
-        assert 2 > self.trade_balance.maximum, "Uncompensated trade imbalance present"
-
-        assert self.trade_balance.sum <= ceil(num_sector / 2), "Uncompensated multilateral trade imbalance present"
-
-        max_delta = (num_sector * (num_sector-1)) // 2
-
-        sector_total = 0
-        for sec in self.galaxy.sectors:
-            sector = self.galaxy.sectors[sec]
-            sector_total += sector.stats.trade + sector.stats.tradeExt
-
-        galaxy_total = self.galaxy.stats.trade
-        delta = abs(galaxy_total - sector_total)
-
-        assert delta <= max_delta, "Allowed galaxy-to-total-sector trade diff " + str(max_delta) + ", actual diff " + str(delta)
+        self.trade_balance.is_balanced()
 
     def is_sector_pass_balanced(self):
-        num_sector = len(self.galaxy.sectors)
-        assert 2 > self.passenger_balance.maximum, "Uncompensated passenger imbalance present"
-
-        assert self.passenger_balance.sum <= ceil(num_sector / 2), "Uncompensated multilateral passenger imbalance present"
-
-        max_delta = (num_sector * (num_sector-1)) // 2
-
-        sector_total = 0
-        for sec in self.galaxy.sectors:
-            sector = self.galaxy.sectors[sec]
-            sector_total += sector.stats.passengers
-
-        galaxy_total = self.galaxy.stats.passengers
-        delta = abs(galaxy_total - sector_total)
-
-        assert delta <= max_delta, "Allowed galaxy-to-total-sector passenger diff " + str(max_delta) + ", actual diff " + str(delta)
+        self.passenger_balance.is_balanced()
 
     def multilateral_balance_trade(self):
         self.trade_balance.multilateral_balance()
 
     def multilateral_balance_pass(self):
         self.passenger_balance.multilateral_balance()
-
-    def _per_sector_trade_imbalance(self):
-        return self.trade_balance.single_unit_imbalance()
-
-    def _per_sector_pax_imbalance(self):
-        return self.passenger_balance.single_unit_imbalance()

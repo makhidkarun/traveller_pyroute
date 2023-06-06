@@ -1,17 +1,20 @@
 import functools
+from math import ceil
 
 from PyRoute.Star import Star
 
 
 class TradeBalance(dict):
 
-    def __init__(self, stat_field=None, region=None):
+    def __init__(self, stat_field=None, region=None, target="passenger"):
         assert isinstance(stat_field, str), "Stat_field must be a string"
         from PyRoute.Galaxy import Galaxy
         assert isinstance(type(region), type(Galaxy)), "Region must be an Galaxy"
+        assert isinstance(target, str)
         super().__init__()
         self.stat_field = stat_field
         self.region = region
+        self.target = target
         pass
 
     def update(self, __m, **kwargs):
@@ -80,6 +83,13 @@ class TradeBalance(dict):
                 self[adjkey] -= 2
 
             sector_balance = self.single_unit_imbalance()
+
+    def is_balanced(self):
+        num_sector = len(self.region.sectors)
+
+        assert 2 > self.maximum, "Uncompensated " + str(self.target) + " imbalance present"
+
+        assert self.sum <= ceil(num_sector / 2), "Uncompensated multilateral " + str(self.target) +" imbalance present"
 
     @property
     def maximum(self):
