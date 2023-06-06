@@ -74,9 +74,9 @@ class TradeCalculation(RouteCalculation):
 
         self.shortest_path_tree = None
         # Track inter-sector passenger imbalances
-        self.passenger_balance = TradeBalance(stat_field="passengers")
+        self.passenger_balance = TradeBalance(stat_field="passengers", region=self.galaxy)
         # Track inter-sector trade imbalances
-        self.trade_balance = TradeBalance(stat_field="tradeExt")
+        self.trade_balance = TradeBalance(stat_field="tradeExt", region=self.galaxy)
 
     def base_route_filter(self, star, neighbor):
         # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering

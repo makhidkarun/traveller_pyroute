@@ -5,10 +5,13 @@ from PyRoute.Star import Star
 
 class TradeBalance(dict):
 
-    def __init__(self, stat_field=None):
+    def __init__(self, stat_field=None, region=None):
         assert isinstance(stat_field, str), "Stat_field must be a string"
+        from PyRoute.Galaxy import AreaItem
+        assert isinstance(region, AreaItem), "Region must be an AreaItem"
         super().__init__()
         self.stat_field = stat_field
+        self.region = region
         pass
 
     def update(self, __m, **kwargs):
