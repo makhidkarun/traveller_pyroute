@@ -478,68 +478,10 @@ class TradeCalculation(RouteCalculation):
         assert delta <= max_delta, "Allowed galaxy-to-total-sector passenger diff " + str(max_delta) + ", actual diff " + str(delta)
 
     def multilateral_balance_trade(self):
-        if 0 == len(self.trade_balance):
-            return
-
-        # assemble per-sector pax imbalances
-        sector_balance = self._per_sector_trade_imbalance()
-
-        # if no sector has 2 or more half-unit against it, return
-        if 0 == len(sector_balance) or 2 > max(sector_balance.values()):
-            return
-
-        for key in sector_balance:
-            if 2 > sector_balance[key]:
-                continue
-
-            # find two connected items in passenger_balance - _which_ two are not really relevant
-            comp = [k for k in self.trade_balance.keys() if k[0] == key or k[1] == key]
-            self.galaxy.sectors[key].stats.tradeExt += 1
-            self.trade_balance[comp[0]] -= 1
-            self.trade_balance[comp[1]] -= 1
-            left = comp[0][0] if comp[0][1] == key else comp[0][1]
-            right = comp[1][0] if comp[1][1] == key else comp[1][1]
-            adjkey = self._balance_tuple(left, right)
-
-            self.trade_balance[adjkey] += 1
-            if 1 < self.trade_balance[adjkey]:
-                self.galaxy.sectors[left].stats.tradeExt += 1
-                self.galaxy.sectors[right].stats.tradeExt += 1
-                self.trade_balance[adjkey] -= 2
-
-            sector_balance = self._per_sector_trade_imbalance()
+        self.trade_balance.multilateral_balance()
 
     def multilateral_balance_pass(self):
-        if 0 == len(self.passenger_balance):
-            return
-
-        # assemble per-sector pax imbalances
-        sector_balance = self._per_sector_pax_imbalance()
-
-        # if no sector has 2 or more half-pax against it, return
-        if 0 == len(sector_balance) or 2 > max(sector_balance.values()):
-            return
-
-        for key in sector_balance:
-            if 2 > sector_balance[key]:
-                continue
-
-            # find two connected items in passenger_balance - _which_ two are not really relevant
-            comp = [k for k in self.passenger_balance.keys() if k[0] == key or k[1] == key]
-            self.galaxy.sectors[key].stats.passengers += 1
-            self.passenger_balance[comp[0]] -= 1
-            self.passenger_balance[comp[1]] -= 1
-            left = comp[0][0] if comp[0][1] == key else comp[0][1]
-            right = comp[1][0] if comp[1][1] == key else comp[1][1]
-            adjkey = self._balance_tuple(left, right)
-
-            self.passenger_balance[adjkey] += 1
-            if 1 < self.passenger_balance[adjkey]:
-                self.galaxy.sectors[left].stats.passengers += 1
-                self.galaxy.sectors[right].stats.passengers += 1
-                self.passenger_balance[adjkey] -= 2
-
-            sector_balance = self._per_sector_pax_imbalance()
+        self.passenger_balance.multilateral_balance()
 
     def _per_sector_trade_imbalance(self):
         return self.trade_balance.single_unit_imbalance()

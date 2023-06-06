@@ -50,6 +50,37 @@ class TradeBalance(dict):
 
         return sector_balance
 
+    def multilateral_balance(self):
+        if 0 == len(self):
+            return
+
+        # assemble per-sector imbalances
+        sector_balance = self.single_unit_imbalance()
+
+        # if no sector has 2 or more half-unit against it, return
+        if 0 == len(sector_balance) or 2 > max(sector_balance.values()):
+            return
+
+        for key in sector_balance:
+            if 2 > sector_balance[key]:
+                continue
+
+            comp = [k for k in self.keys() if k[0] == key or k[1] == key]
+            self.region.sectors[key].stats[self.stat_field] += 1
+            self[comp[0]] -= 1
+            self[comp[1]] -= 1
+            left = comp[0][0] if comp[0][1] == key else comp[0][1]
+            right = comp[1][0] if comp[1][1] == key else comp[1][1]
+            adjkey = self._balance_tuple(left, right)
+
+            self[adjkey] += 1
+            if 1 < self[adjkey]:
+                self.region.sectors[left].stats[self.stat_field] += 1
+                self.region.sectors[right].stats[self.stat_field] += 1
+                self[adjkey] -= 2
+
+            sector_balance = self.single_unit_imbalance()
+
     @property
     def maximum(self):
         if 0 == len(self):
