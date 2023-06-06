@@ -274,7 +274,7 @@ class testDeltaReduce(unittest.TestCase):
     def test_star_having_no_sector_attribute(self):
         sourcefile = 'DeltaFiles/Dagudashaag-star-object-no-sector-attribute.sec'
 
-        args = self._make_args()
+        args = self._make_args_no_line()
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
@@ -282,7 +282,7 @@ class testDeltaReduce(unittest.TestCase):
         delta[sector.name] = sector
 
         reducer = DeltaReduce(delta, args)
-        reducer.is_initial_state_interesting()
+        reducer.is_initial_state_uninteresting()
 
     def test_population_balance_over_two_sectors(self):
         args = self._make_args_no_line()

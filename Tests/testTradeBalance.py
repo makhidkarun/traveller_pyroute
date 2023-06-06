@@ -1,13 +1,13 @@
 import unittest
 
-from PyRoute.Galaxy import Sector
+from PyRoute.Galaxy import Sector, AreaItem
 from PyRoute.Star import Star
 from PyRoute.TradeBalance import TradeBalance
 
 
 class testTradeBalance(unittest.TestCase):
     def test_trade_balance_add_success(self):
-        foo = TradeBalance(stat_field='passengers')
+        foo = TradeBalance(stat_field='passengers', region=AreaItem('name'))
         self.assertEqual(0, len(foo), "Empty TradeBalance should have zero elements")
         key = ('foo', 'bar')
         foo[key] = 1
@@ -24,7 +24,7 @@ class testTradeBalance(unittest.TestCase):
         star2 = Star()
         star2.sector = dagu
 
-        foo = TradeBalance(stat_field='tradeExt')
+        foo = TradeBalance(stat_field='tradeExt', region=AreaItem('name'))
         foo.log_odd_unit(star1, star2)
         self.assertEqual(1, len(foo), 'TradeBalance should have one element')
         self.assertEqual(1, sum(foo.values()), 'TradeBalance should have unit sum')
