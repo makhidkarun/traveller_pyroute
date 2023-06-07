@@ -15,6 +15,7 @@ class TradeBalance(dict):
         self.stat_field = stat_field
         self.region = region
         self.target = target
+        self.field = 'sectors'
         pass
 
     def update(self, __m, **kwargs):
@@ -69,7 +70,7 @@ class TradeBalance(dict):
                 continue
 
             comp = [k for k in self.keys() if k[0] == key or k[1] == key]
-            self.region.sectors[key].stats[self.stat_field] += 1
+            self.region[self.field][key].stats[self.stat_field] += 1
             self[comp[0]] -= 1
             self[comp[1]] -= 1
             left = comp[0][0] if comp[0][1] == key else comp[0][1]
@@ -78,14 +79,14 @@ class TradeBalance(dict):
 
             self[adjkey] += 1
             if 1 < self[adjkey]:
-                self.region.sectors[left].stats[self.stat_field] += 1
-                self.region.sectors[right].stats[self.stat_field] += 1
+                self.region[self.field][left].stats[self.stat_field] += 1
+                self.region[self.field][right].stats[self.stat_field] += 1
                 self[adjkey] -= 2
 
             sector_balance = self.single_unit_imbalance()
 
     def is_balanced(self):
-        num_sector = len(self.region.sectors)
+        num_sector = len(self.region[self.field])
 
         assert 2 > self.maximum, "Uncompensated " + str(self.target) + " imbalance present"
 
