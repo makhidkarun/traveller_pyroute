@@ -46,6 +46,12 @@ class AreaItem(object):
     def world_count(self):
         return len(self.worlds)
 
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+
 
 class Allegiance(AreaItem):
     def __init__(self, code, name, base=False, population='Huma'):
