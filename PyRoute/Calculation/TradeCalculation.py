@@ -452,3 +452,14 @@ class TradeCalculation(RouteCalculation):
 
     def multilateral_balance_pass(self):
         self.sector_passenger_balance.multilateral_balance()
+
+    def cross_check_totals(self):
+        total_sector_pax = 0
+        total_sector_trade = 0
+
+        for sector in self.galaxy.sectors.values():
+            total_sector_pax += sector.stats.passengers
+            total_sector_trade += sector.stats.trade + sector.stats.tradeExt
+
+        assert self.galaxy.stats.passengers == total_sector_pax + self.sector_passenger_balance.sum, "Sector total pax not balanced with galaxy pax"
+        assert self.galaxy.stats.trade == total_sector_trade + self.sector_trade_balance.sum, "Sector total trade not balanced with galaxy trade"

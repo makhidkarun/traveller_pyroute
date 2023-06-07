@@ -152,6 +152,7 @@ class StatCalculation(object):
     def calculate_statistics(self, ally_match):
         self.galaxy.trade.is_sector_trade_balanced()
         self.galaxy.trade.is_sector_pass_balanced()
+        self.galaxy.trade.cross_check_totals()
 
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
         for sector in self.galaxy.sectors.values():
