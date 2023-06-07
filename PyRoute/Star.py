@@ -177,6 +177,12 @@ class Star(object):
 
         return foo
 
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+
     @staticmethod
     def parse_line_into_star(line, sector, pop_code, ru_calc):
         star = Star()

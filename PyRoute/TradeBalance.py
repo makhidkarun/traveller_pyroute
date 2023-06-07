@@ -6,7 +6,7 @@ from PyRoute.Star import Star
 
 class TradeBalance(dict):
 
-    def __init__(self, stat_field=None, region=None, target="passenger", field="sectors"):
+    def __init__(self, stat_field=None, region=None, target="passenger", field="sectors", star_field="sector"):
         assert isinstance(stat_field, str), "Stat_field must be a string"
         from PyRoute.Galaxy import Galaxy
         assert isinstance(type(region), type(Galaxy)), "Region must be an Galaxy"
@@ -17,6 +17,7 @@ class TradeBalance(dict):
         self.region = region
         self.target = target
         self.field = field
+        self.star_field = star_field
         pass
 
     def update(self, __m, **kwargs):
@@ -29,13 +30,13 @@ class TradeBalance(dict):
         super().__setitem__(item, value)
 
     def log_odd_unit(self, star: Star, target: Star):
-        sector_tuple = self._balance_tuple(star.sector.name, target.sector.name)
+        sector_tuple = self._balance_tuple(star[self.star_field].name, target[self.star_field].name)
         if sector_tuple not in self:
             self[sector_tuple] = 0
         self[sector_tuple] += 1
         if 1 < self[sector_tuple]:
-            star.sector.stats[self.stat_field] += 1
-            target.sector.stats[self.stat_field] += 1
+            star[self.star_field].stats[self.stat_field] += 1
+            target[self.star_field].stats[self.stat_field] += 1
             self[sector_tuple] -= 2
 
     def single_unit_imbalance(self):

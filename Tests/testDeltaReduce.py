@@ -293,6 +293,17 @@ class testDeltaReduce(unittest.TestCase):
         reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
         reducer.is_initial_state_uninteresting()
 
+    def test_pax_balance_over_reft_sector(self):
+        args = self._make_args_no_line()
+        sourcefile = 'DeltaFiles/reft-allegiance-pax-balance/Reft Sector.sec'
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
+        reducer.is_initial_state_uninteresting()
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
