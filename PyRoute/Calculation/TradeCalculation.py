@@ -74,9 +74,9 @@ class TradeCalculation(RouteCalculation):
 
         self.shortest_path_tree = None
         # Track inter-sector passenger imbalances
-        self.passenger_balance = TradeBalance(stat_field="passengers", region=galaxy)
+        self.sector_passenger_balance = TradeBalance(stat_field="passengers", region=galaxy)
         # Track inter-sector trade imbalances
-        self.trade_balance = TradeBalance(stat_field="tradeExt", region=galaxy, target="trade")
+        self.sector_trade_balance = TradeBalance(stat_field="tradeExt", region=galaxy, target="trade")
 
     def base_route_filter(self, star, neighbor):
         # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
@@ -217,9 +217,9 @@ class TradeCalculation(RouteCalculation):
             star.sector.stats.passengers += tradePass // 2
             target.sector.stats.passengers += tradePass // 2
             if 1 == (tradeCr - 2 * (tradeCr // 2)):
-                self.trade_balance.log_odd_unit(star, target)
+                self.sector_trade_balance.log_odd_unit(star, target)
             if 1 == (tradePass - 2 * (tradePass // 2)):
-                self.passenger_balance.log_odd_unit(star, target)
+                self.sector_passenger_balance.log_odd_unit(star, target)
         else:
             star.sector.stats.trade += tradeCr
             star.sector.stats.passengers += tradePass
@@ -442,13 +442,13 @@ class TradeCalculation(RouteCalculation):
         return False
 
     def is_sector_trade_balanced(self):
-        self.trade_balance.is_balanced()
+        self.sector_trade_balance.is_balanced()
 
     def is_sector_pass_balanced(self):
-        self.passenger_balance.is_balanced()
+        self.sector_passenger_balance.is_balanced()
 
     def multilateral_balance_trade(self):
-        self.trade_balance.multilateral_balance()
+        self.sector_trade_balance.multilateral_balance()
 
     def multilateral_balance_pass(self):
-        self.passenger_balance.multilateral_balance()
+        self.sector_passenger_balance.multilateral_balance()

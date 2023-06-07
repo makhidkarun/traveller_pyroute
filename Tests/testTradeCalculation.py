@@ -99,9 +99,9 @@ class testTradeCalculation(unittest.TestCase):
         galaxy.sectors[gush.name] = gush
 
         tradecalc = TradeCalculation(galaxy)
-        tradecalc.passenger_balance[(core.name, dagu.name)] = 1
-        tradecalc.passenger_balance[(core.name, gush.name)] = 1
-        tradecalc.passenger_balance[(dagu.name, gush.name)] = 1
+        tradecalc.sector_passenger_balance[(core.name, dagu.name)] = 1
+        tradecalc.sector_passenger_balance[(core.name, gush.name)] = 1
+        tradecalc.sector_passenger_balance[(dagu.name, gush.name)] = 1
 
         expected = "Uncompensated multilateral passenger imbalance present"
         actual = None
@@ -128,9 +128,9 @@ class testTradeCalculation(unittest.TestCase):
         galaxy.sectors[gush.name] = gush
 
         tradecalc = TradeCalculation(galaxy)
-        tradecalc.trade_balance[(core.name, dagu.name)] = 1
-        tradecalc.trade_balance[(core.name, gush.name)] = 1
-        tradecalc.trade_balance[(dagu.name, gush.name)] = 1
+        tradecalc.sector_trade_balance[(core.name, dagu.name)] = 1
+        tradecalc.sector_trade_balance[(core.name, gush.name)] = 1
+        tradecalc.sector_trade_balance[(dagu.name, gush.name)] = 1
 
         expected = "Uncompensated multilateral trade imbalance present"
         actual = None
