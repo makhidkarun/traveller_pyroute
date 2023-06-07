@@ -334,6 +334,7 @@ class Galaxy(AreaItem):
 
                     star.tradeCode.sophont_list.append("{}A".format(self.alg[star.alg_code].population))
                     star.is_redzone = self.trade.unilateral_filter(star)
+                    star.is_well_formed()
 
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds)))
