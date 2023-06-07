@@ -6,16 +6,17 @@ from PyRoute.Star import Star
 
 class TradeBalance(dict):
 
-    def __init__(self, stat_field=None, region=None, target="passenger"):
+    def __init__(self, stat_field=None, region=None, target="passenger", field="sectors"):
         assert isinstance(stat_field, str), "Stat_field must be a string"
         from PyRoute.Galaxy import Galaxy
         assert isinstance(type(region), type(Galaxy)), "Region must be an Galaxy"
         assert isinstance(target, str)
+        assert isinstance(field, str), "Target field must be a string"
         super().__init__()
         self.stat_field = stat_field
         self.region = region
         self.target = target
-        self.field = 'sectors'
+        self.field = field
         pass
 
     def update(self, __m, **kwargs):
