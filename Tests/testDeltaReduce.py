@@ -179,23 +179,15 @@ class testDeltaReduce(unittest.TestCase):
     def test_route_costs_balanced_should_be_uninteresting(self):
         sourcefile = 'DeltaFiles/Zarushagar-imbalanced-routes.sec'
 
-        args = self._make_args()
+        args = self._make_args_no_line()
 
         delta = DeltaDictionary()
         zarusector = SectorDictionary.load_traveller_map_file(sourcefile)
         self.assertEqual('# -1,-1', zarusector.position, "Unexpected position value for Zarushagar")
         delta[zarusector.name] = zarusector
 
-        expected = "Original input not interesting - aborting"
-        actual = None
-
         reducer = DeltaReduce(delta, args)
-        try:
-            reducer.is_initial_state_interesting()
-        except AssertionError as e:
-            actual = str(e)
-
-        self.assertEqual(expected, actual)
+        reducer.is_initial_state_uninteresting()
 
     def test_verify_stars_and_shadow_bijection(self):
         sourcefile = 'DeltaFiles/final_result_should_be_independently_interesting/Gushemege.sec'

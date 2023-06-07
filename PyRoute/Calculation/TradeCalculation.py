@@ -77,6 +77,8 @@ class TradeCalculation(RouteCalculation):
         self.sector_passenger_balance = TradeBalance(stat_field="passengers", region=galaxy)
         # Track inter-sector trade imbalances
         self.sector_trade_balance = TradeBalance(stat_field="tradeExt", region=galaxy, target="trade")
+        # Track inter-allegiance passenger imbalances
+        self.allegiance_passenger_balance = TradeBalance(stat_field="passengers", region="galaxy", field="allegiances")
 
     def base_route_filter(self, star, neighbor):
         # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
@@ -233,10 +235,14 @@ class TradeCalculation(RouteCalculation):
             self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.trade += tradeCr
             self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.passengers += tradePass
         else:
-            self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.tradeExt += tradeCr // 2
-            self.galaxy.alg[AllyGen.same_align(target.alg_code)].stats.tradeExt += tradeCr // 2
-            self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.passengers += tradePass // 2
-            self.galaxy.alg[AllyGen.same_align(target.alg_code)].stats.passengers += tradePass // 2
+            starcode = AllyGen.same_align(star.alg_code)
+            targcode = AllyGen.same_align(target.alg_code)
+            self.galaxy.alg[starcode].stats.tradeExt += tradeCr // 2
+            self.galaxy.alg[targcode].stats.tradeExt += tradeCr // 2
+            self.galaxy.alg[starcode].stats.passengers += tradePass // 2
+            self.galaxy.alg[targcode].stats.passengers += tradePass // 2
+            if 1 == (tradePass - 2 * (tradePass // 2)):
+                self.allegiance_passenger_balance.log_odd_unit(star, target)
 
         self.galaxy.stats.trade += tradeCr
         self.galaxy.stats.passengers += tradePass
@@ -456,10 +462,17 @@ class TradeCalculation(RouteCalculation):
     def cross_check_totals(self):
         total_sector_pax = 0
         total_sector_trade = 0
+        total_allegiance_pax = 0
+        grand_total_pax = self.galaxy.stats.passengers
+        grand_total_trade = self.galaxy.stats.trade
 
         for sector in self.galaxy.sectors.values():
             total_sector_pax += sector.stats.passengers
             total_sector_trade += sector.stats.trade + sector.stats.tradeExt
 
-        assert self.galaxy.stats.passengers == total_sector_pax + self.sector_passenger_balance.sum, "Sector total pax not balanced with galaxy pax"
-        assert self.galaxy.stats.trade == total_sector_trade + self.sector_trade_balance.sum, "Sector total trade not balanced with galaxy trade"
+        for base_alg in self.galaxy.alg.values():
+            total_allegiance_pax += base_alg.stats.passengers
+
+        assert grand_total_pax == total_sector_pax + self.sector_passenger_balance.sum, "Sector total pax not balanced with galaxy pax"
+        assert grand_total_trade == total_sector_trade + self.sector_trade_balance.sum, "Sector total trade not balanced with galaxy trade"
+        assert grand_total_pax == total_allegiance_pax + self.allegiance_passenger_balance.sum, "Allegiance total pax not balanced with galaxy pax"
