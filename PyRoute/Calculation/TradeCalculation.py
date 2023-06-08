@@ -476,11 +476,18 @@ class TradeCalculation(RouteCalculation):
             total_sector_pax += sector.stats.passengers
             total_sector_trade += sector.stats.trade + sector.stats.tradeExt
 
-        for base_alg in self.galaxy.alg.values():
-            total_allegiance_pax += base_alg.stats.passengers
-            total_allegiance_trade += base_alg.stats.trade + base_alg.stats.tradeExt
+        base_allegiances = dict()
+        for raw_alg in self.galaxy.alg:
+            base_alg = AllyGen.same_align(raw_alg)
+            if base_alg not in base_allegiances:
+                base_allegiances[base_alg] = 0
+
+        for base_alg in base_allegiances:
+            alg = self.galaxy.alg[base_alg]
+            total_allegiance_pax += alg.stats.passengers
+            total_allegiance_trade += alg.stats.trade + alg.stats.tradeExt
 
         assert grand_total_pax == total_sector_pax + self.sector_passenger_balance.sum, "Sector total pax not balanced with galaxy pax"
         assert grand_total_trade == total_sector_trade + self.sector_trade_balance.sum, "Sector total trade not balanced with galaxy trade"
-        assert grand_total_pax == total_allegiance_pax + self.allegiance_passenger_balance.sum, "Allegiance total pax not balanced with galaxy pax"
+        assert grand_total_pax == total_allegiance_pax + self.allegiance_passenger_balance.sum, "Allegiance total pax " + str(grand_total_pax) + " not balanced with galaxy pax " + str(total_allegiance_pax + self.allegiance_passenger_balance.sum)
         assert grand_total_trade == total_allegiance_trade + self.allegiance_trade_balance.sum, "Allegiance total trade not balanced with galaxy trade"

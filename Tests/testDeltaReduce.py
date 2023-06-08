@@ -32,10 +32,12 @@ class testDeltaReduce(unittest.TestCase):
         # only one subsector should be non-empty after reduction
         for subsector_name in reducer.sectors['Dagudashaag']:
             expected = 0
+            affix = " not empty after subsector reduction"
             if subsector_name == 'Pact':
                 expected = 40
+                affix = " empty after subsector reduction"
             actual = 0 if reducer.sectors['Dagudashaag'][subsector_name].items is None else len(reducer.sectors['Dagudashaag'][subsector_name].items)
-            self.assertEqual(expected, actual, subsector_name + " not empty")
+            self.assertEqual(expected, actual, subsector_name + affix)
         # verify sector headers got taken across
         self.assertEqual(len(sector.headers), len(reducer.sectors['Dagudashaag'].headers), "Unexpected headers length")
         # verify sector allegiances got taken across
