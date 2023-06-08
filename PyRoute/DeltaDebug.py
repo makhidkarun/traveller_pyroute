@@ -99,6 +99,8 @@ def process():
                        help="Skip subsector-level reduction")
     delta.add_argument('--no-line', dest="run_line", default=True, action='store_false',
                        help="Skip line-level reduction.  At least one of sector, subsector, line and two-minimisation must be selected")
+    delta.add_argument('--assume-interesting', dest="run_init", default=True, action='store_false',
+                       help="Assume initial input is interesting.")
 
     args = parser.parse_args()
 
@@ -124,7 +126,8 @@ def process():
     reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
 
     # check original input is interesting
-    reducer.is_initial_state_interesting()
+    if args.run_init:
+        reducer.is_initial_state_interesting()
 
     # do the reduction passes
     if args.run_sector:
