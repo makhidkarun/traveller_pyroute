@@ -47,6 +47,26 @@ class testDeltaReduce(unittest.TestCase):
             "Unexpected allegiances length"
         )
 
+    def test_subsector_reduction_allegiance_balance(self):
+        sourcefile = 'DeltaFiles/dagudashaag-allegiance-pax-balance/Dagudashaag.sec'
+
+        args = self._make_args_no_line()
+        args.interestingline = ": Allegiance total"
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+
+        # reducer.is_initial_state_interesting()
+        # reducer.reduce_subsector_pass()
+        reducer.reduce_line_pass()
+        reducer.is_initial_state_interesting()
+
+        foo = 1
+
     def test_line_reduction(self):
         sourcefile = 'DeltaFiles/Dagudashaag-subsector-spiked.sec'
 
