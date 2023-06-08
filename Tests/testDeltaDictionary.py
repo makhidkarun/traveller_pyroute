@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 from PyRoute.DeltaDictionary import DeltaDictionary, SectorDictionary, SubsectorDictionary
+from PyRoute.Galaxy import Allegiance
 
 sys.path.append('../PyRoute')
 
@@ -52,8 +53,13 @@ class testDeltaDictionary(unittest.TestCase):
     def test_sector_subset(self):
         foo = DeltaDictionary()
         dag = SectorDictionary('Dagudashaag', 'filename')
+        alg = Allegiance('fo', 'foo')
+        alg.stats.passengers = 10
+        alg.stats.trade = 11
+        alg.stats.tradeExt = 42
         gus = SectorDictionary('Gushemege', 'filename')
         gus.position = '# -2,0'
+        gus.allegiances[alg.code] = alg
         gusA = SubsectorDictionary('Riften', 'A')
         gusA.items.append('foo')
         self.assertEqual(1, len(gusA.items))
@@ -77,10 +83,21 @@ class testDeltaDictionary(unittest.TestCase):
             len(remix['Gushemege']['Riften'].items),
             'Riften subsector in subsetted dict should have 1 element'
         )
+        # check allegiances got cleared
+        self.assertEqual(1, len(remix['Gushemege'].allegiances), "Unexpected allegiance count for Dagudashaag")
+        nu_alg = remix['Gushemege'].allegiances['fo']
+        self.assertEqual(0, nu_alg.stats.passengers, "Allegiance pax not cleared during sector_list")
+        self.assertEqual(0, nu_alg.stats.trade, "Allegiance trade not cleared during sector_list")
+        self.assertEqual(0, nu_alg.stats.tradeExt, "Allegiance tradeExt not cleared during sector_list")
 
     def test_subsector_subset(self):
         foo = DeltaDictionary()
         dag = SectorDictionary('Dagudashaag', 'filename')
+        alg = Allegiance('fo', 'foo')
+        alg.stats.passengers = 10
+        alg.stats.trade = 11
+        alg.stats.tradeExt = 42
+        dag.allegiances[alg.code] = alg
         dagA = SubsectorDictionary('Mimu', 'A')
         dag[dagA.name] = dagA
         dag.position = '# -1,0'
@@ -116,6 +133,12 @@ class testDeltaDictionary(unittest.TestCase):
                          'Subsetted delta dict should have one subsector in Dagudashaag')
         self.assertEqual('Mimu', remix['Dagudashaag']['Mimu'].name)
         self.assertEqual('A', remix['Dagudashaag']['Mimu'].position)
+        # check allegiances got cleared
+        self.assertEqual(1, len(remix['Dagudashaag'].allegiances), "Unexpected allegiance count for Dagudashaag")
+        nu_alg = remix['Dagudashaag'].allegiances['fo']
+        self.assertEqual(0, nu_alg.stats.passengers, "Allegiance pax not cleared during subsector_list")
+        self.assertEqual(0, nu_alg.stats.trade, "Allegiance trade not cleared during subsector_list")
+        self.assertEqual(0, nu_alg.stats.tradeExt, "Allegiance tradeExt not cleared during subsector_list")
 
     def test_sector_list(self):
         foo = DeltaDictionary()
@@ -263,7 +286,14 @@ class testSectorDictionary(unittest.TestCase):
         self.assertEqual(4, len(sector.allegiances), "Unexpected number of allegiances after load")
 
     def test_drop_lines(self):
+        alg = Allegiance('fo', 'foo')
+        alg.stats.passengers = 10
+        alg.stats.trade = 11
+        alg.stats.tradeExt = 42
+
         foo = SectorDictionary('name', 'filename')
+        foo.allegiances[alg.code] = alg
+
         sub1 = SubsectorDictionary('Mimu', 'A')
         sub1.items.append('foo')
         sub1.items.append('bar')
@@ -296,6 +326,11 @@ class testSectorDictionary(unittest.TestCase):
         expected.append('baz')
         actual = remix.lines
         self.assertEqual(expected, actual, 'Unexpected lines in new dictionary after line removal')
+        self.assertEqual(1, len(remix.allegiances))
+        nu_alg = remix.allegiances['fo']
+        self.assertEqual(0, nu_alg.stats.passengers, "Allegiance pax not cleared during drop_lines")
+        self.assertEqual(0, nu_alg.stats.trade, "Allegiance trade not cleared during drop_lines")
+        self.assertEqual(0, nu_alg.stats.tradeExt, "Allegiance tradeExt not cleared during drop_lines")
 
     def test_empty_sector_dictionary_is_skipped(self):
         foo = SectorDictionary('name', 'filename')

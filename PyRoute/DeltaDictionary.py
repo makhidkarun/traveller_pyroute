@@ -132,6 +132,9 @@ class SectorDictionary(dict):
         for alg in foo.allegiances:
             foo.allegiances[alg].homeworlds = []
             foo.allegiances[alg].stats.homeworlds = []
+            foo.allegiances[alg].stats.passengers = 0
+            foo.allegiances[alg].stats.trade = 0
+            foo.allegiances[alg].stats.tradeExt = 0
 
         foo.headers = copy.deepcopy(self.headers)
         foo.position = self.position
@@ -156,6 +159,13 @@ class SectorDictionary(dict):
         new_dict.position = self.position
         new_dict.headers = self.headers
         new_dict.allegiances = self.allegiances
+        for alg in new_dict.allegiances:
+            new_dict.allegiances[alg].homeworlds = []
+            new_dict.allegiances[alg].stats.homeworlds = []
+            new_dict.allegiances[alg].stats.passengers = 0
+            new_dict.allegiances[alg].stats.trade = 0
+            new_dict.allegiances[alg].stats.tradeExt = 0
+
         for subsector_name in overlap:
             new_dict[subsector_name] = copy.deepcopy(self[subsector_name])
             pass
@@ -179,6 +189,13 @@ class SectorDictionary(dict):
         new_dict.position = self.position
         new_dict.headers = self.headers
         new_dict.allegiances = self.allegiances
+        for alg in new_dict.allegiances:
+            new_dict.allegiances[alg].homeworlds = []
+            new_dict.allegiances[alg].stats.homeworlds = []
+            new_dict.allegiances[alg].stats.passengers = 0
+            new_dict.allegiances[alg].stats.trade = 0
+            new_dict.allegiances[alg].stats.tradeExt = 0
+
         for subsector_name in self:
             new_dict[subsector_name] = self[subsector_name].drop_lines(lines_to_drop)
             if self[subsector_name].skipped:
