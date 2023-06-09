@@ -170,7 +170,6 @@ class SectorDictionary(dict):
 
         for subsector_name in overlap:
             new_dict[subsector_name] = copy.deepcopy(self[subsector_name])
-            pass
 
         for subsector_name in missed:
             new_dict[subsector_name] = SubsectorDictionary(self[subsector_name].name, self[subsector_name].position)
