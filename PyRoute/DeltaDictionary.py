@@ -71,6 +71,8 @@ class DeltaDictionary(dict):
             keys = self[sector_name].subsector_list()
             result.extend(list(keys))
 
+        result.sort()
+
         return result
 
     @property
