@@ -180,7 +180,7 @@ class SectorDictionary(dict):
     def subsector_list(self):
         result = list()
         for subsector_name in self:
-            if self[subsector_name].items is not None:
+            if not self[subsector_name].skipped:
                 result.append(subsector_name)
 
         return result
@@ -199,8 +199,6 @@ class SectorDictionary(dict):
 
         for subsector_name in self:
             new_dict[subsector_name] = self[subsector_name].drop_lines(lines_to_drop)
-            if self[subsector_name].skipped:
-                new_dict[subsector_name].items = None
 
         return new_dict
 
