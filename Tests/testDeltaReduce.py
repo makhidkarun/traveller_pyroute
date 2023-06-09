@@ -62,7 +62,7 @@ class testDeltaReduce(unittest.TestCase):
             expected = 0
             if subsector_name == 'Pact':
                 expected = 2
-            self.assertEqual(expected, len(reducer.sectors['Dagudashaag'][subsector_name].items), subsector_name + " not empty")
+            self.assertEqual(expected, reducer.sectors['Dagudashaag'][subsector_name].num_lines, subsector_name + " not empty")
 
         # verify sector headers got taken across
         self.assertEqual(len(sector.headers), len(reducer.sectors['Dagudashaag'].headers), "Unexpected headers length")
@@ -94,7 +94,7 @@ class testDeltaReduce(unittest.TestCase):
             expected = 0
             if subsector_name == 'Pact':
                 expected = 2
-            self.assertEqual(expected, len(reducer.sectors['Dagudashaag'][subsector_name].items), subsector_name + " not empty")
+            self.assertEqual(expected, reducer.sectors['Dagudashaag'][subsector_name].num_lines, subsector_name + " not empty")
         self.assertEqual(2, len(reducer.sectors.lines), "Unexpected line count after singleton pass")
 
     def test_line_reduction_two_minimality(self):
@@ -118,7 +118,7 @@ class testDeltaReduce(unittest.TestCase):
             expected = 0
             if subsector_name == 'Pact':
                 expected = 3
-            self.assertEqual(expected, len(reducer.sectors['Dagudashaag'][subsector_name].items), subsector_name + " not empty")
+            self.assertEqual(expected, reducer.sectors['Dagudashaag'][subsector_name].num_lines, subsector_name + " not empty")
         self.assertEqual(3, len(reducer.sectors.lines), "Unexpected line count after doubleton pass")
 
     def test_sector_reduction(self):

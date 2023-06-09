@@ -181,9 +181,9 @@ class testDeltaDictionary(unittest.TestCase):
         foo[gus.name] = gus
 
         expected = list()
+        expected.append('Khiira')
         expected.append('Mimu')
         expected.append('Riften')
-        expected.append('Khiira')
         actual = foo.subsector_list()
 
         self.assertEqual(expected, actual, "Unexpected subsector list")

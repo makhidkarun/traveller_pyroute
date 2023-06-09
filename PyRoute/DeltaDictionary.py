@@ -344,6 +344,12 @@ class SubsectorDictionary(dict):
     def skipped(self):
         return self.items is None
 
+    @property
+    def num_lines(self):
+        if self.skipped:
+            return 0
+        return len(self.items)
+
     def __deepcopy__(self, memodict={}):
         foo = SubsectorDictionary(self.name, self.position)
         if self.skipped:
