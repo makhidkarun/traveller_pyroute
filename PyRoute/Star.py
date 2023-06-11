@@ -302,6 +302,23 @@ class Star(object):
         star.calc_passenger_btn_mod()
         return star
 
+    def parse_to_line(self):
+        result = str(self.position) + " "
+        result += self.name.ljust(20) + " "
+
+        uwp = str(self.port) + str(self.size) + str(self.atmo) + str(self.hydro) + str(self.pop) + str(self.gov) + str(self.law)
+        tl = self.tl
+        str_tl = self._int_to_ehex(tl)
+        result += uwp + "-" + str(str_tl)
+        imp_chunk = "{ " + str(self.importance) + " }"
+        result += " " + str(self.tradeCode).ljust(38) + imp_chunk.ljust(6) + " "
+        result += str(self.economics) + " " + str(self.social) + " " + str(self.nobles).ljust(4) + " "
+        result += str(self.baseCode).ljust(2) + " " + str(self.zone) + " " + str(self.popM) + str(self.belts) + str(self.ggCount) + " "
+        result += str(self.worlds).ljust(2) + " " + str(self.alg_code).ljust(4) + " "
+        result += str(self.stars).ljust(15) + " " + " ".join(self.routes).ljust(41)
+
+        return result
+
     def __unicode__(self):
         return "{} ({} {})".format(self.name, self.sector.name, self.position)
 

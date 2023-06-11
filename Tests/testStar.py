@@ -394,6 +394,27 @@ class TestStar(unittest.TestCase):
                 act_ehex = star._int_to_ehex(act_int)
                 self.assertEqual(ehex, act_ehex, "Int-to-ehex mapping failed for TL " + str(ehex))
 
+    def test_parse_to_line(self):
+        line_list = [
+            "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+            "3030 Khaammumlar          E430761-6 De Na Po O:3032                       { -2 } (965-5) [3512] B    -  - 520 6  ImDv M0 V M5 V                                                ",
+            "1840 Mashuu               D725413-8 Ni                                    { -3 } (731-5) [1125] B    -  - 401 14 ImDv M0 V                                                     "
+        ]
+        for line in line_list:
+            with self.subTest():
+                star1 = Star.parse_line_into_star(line, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                star1.index = 0
+                star1.allegiance_base = star1.alg_code
+                star1.is_well_formed()
+
+                mid_line = star1.parse_to_line()
+                # Not comparing mid_line to original because trade codes are re-ordered
+                self.assertEqual(len(line), len(mid_line), "Line length mismatch between original and regenerated line for " + star1.name)
+                star2 = Star.parse_line_into_star(mid_line, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                self.assertEqual(star1, star2, "Regenerated star does not equal original star")
+                nu_line = star2.parse_to_line()
+                self.assertEqual(mid_line, nu_line, "Regenerated star line does not match round-trip star line")
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
