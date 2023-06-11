@@ -348,6 +348,53 @@ class TestStar(unittest.TestCase):
         distance = star1.distance(star2)
         self.assertEqual(hex_dist, distance, "Unexpected distance")
 
+    def test_ehex_to_int_and_back(self):
+        tech_list = [
+            (0, 0),
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+            (5, 5),
+            (6, 6),
+            (7, 7),
+            (8, 8),
+            (9, 9),
+            ('A', 10),
+            ('B', 11),
+            ('C', 12),
+            ('D', 13),
+            ('E', 14),
+            ('F', 15),
+            ('G', 16),
+            ('H', 17),
+            ('J', 18),
+            ('K', 19),
+            ('L', 20),
+            ('M', 21),
+            ('N', 22),
+            ('P', 23),
+            ('Q', 24),
+            ('R', 25),
+            ('S', 26),
+            ('T', 27),
+            ('U', 28),
+            ('V', 29),
+            ('W', 30),
+            ('X', 31),
+            ('Y', 32),
+            ('Z', 33)
+        ]
+
+        for ehex, intvalue in tech_list:
+            with self.subTest():
+                star = Star()
+                act_int = star._ehex_to_int(str(ehex))
+                self.assertEqual(intvalue, act_int, "Ehex-to-int mapping failed for TL " + str(ehex))
+                act_ehex = star._int_to_ehex(act_int)
+                self.assertEqual(ehex, act_ehex, "Int-to-ehex mapping failed for TL " + str(ehex))
+
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
