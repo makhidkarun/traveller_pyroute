@@ -103,6 +103,13 @@ class Star(object):
     __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code', 'hex'
 
     def __init__(self):
+        self.worlds = None
+        self.ggCount = None
+        self.belts = None
+        self.nobles = None
+        self.law = None
+        self.gov = None
+        self.pop = None
         self.logger = logging.getLogger('PyRoute.Star')
         self._hash = None
         self._key = None
