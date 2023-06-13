@@ -193,6 +193,10 @@ class Star(object):
     @staticmethod
     def parse_line_into_star(line, sector, pop_code, ru_calc):
         star = Star()
+        return Star._parse_line_into_star_core(star, line, sector, pop_code, ru_calc)
+
+    @staticmethod
+    def _parse_line_into_star_core(star, line, sector, pop_code, ru_calc):
         star.sector = sector
         star.logger.debug(line)
         # Cache regex lookup to avoid doing it once for check, and again to extract data
@@ -320,9 +324,9 @@ class Star(object):
         imp_chunk = "{ " + str(self.importance) + " }"
         result += " " + str(self.tradeCode).ljust(38) + imp_chunk.ljust(6) + " "
         result += str(self.economics) + " " + str(self.social) + " " + str(self.nobles).ljust(4) + " "
-        result += str(self.baseCode).ljust(2) + " " + str(self.zone) + " " + str(self.popM) + str(self.belts) + str(self.ggCount) + " "
+        result += str(self.baseCode).ljust(2) + " " + str(self.zone).ljust(1) + " " + str(self.popM) + str(self.belts) + str(self.ggCount) + " "
         result += str(self.worlds).ljust(2) + " " + str(self.alg_code).ljust(4) + " "
-        result += str(self.stars).ljust(15) + " " + " ".join(self.routes).ljust(41)
+        result += str(" ".join(self.star_list)).ljust(15) + " " + " ".join(self.routes).ljust(41)
 
         return result
 
