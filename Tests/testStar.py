@@ -179,6 +179,12 @@ class TestStar(unittest.TestCase):
         self.assertEqual(20, star1.row)
         self.assertEqual(28, star1.col)
 
+    def testParseUnchin(self):
+        sector = Sector(' Zarushagar', ' -1, -1')
+        line = '0522 Unchin               A437743-E                            { 2 }  (B6D-1) [492B] B     N  - 620 9  ImDi K0 III                                                       '
+        star1 = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
+        self.assertIsInstance(star1, Star)
+
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
         cwtn = [3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11, 12, 13, 13, 14]

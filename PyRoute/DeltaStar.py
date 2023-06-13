@@ -60,10 +60,10 @@ class DeltaStar(Star):
         self.nobles = Nobles()
 
     def reduce_base_codes(self):
-        self.baseCode = ''
+        self.baseCode = '-'
 
     def reduce_trade_zone(self):
-        self.zone = ''
+        self.zone = '-'
 
     def reduce_extra_stars(self):
         if 0 < len(self.star_list):
