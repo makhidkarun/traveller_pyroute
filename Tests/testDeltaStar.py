@@ -1,6 +1,7 @@
 import unittest
 
 from PyRoute.DeltaStar import DeltaStar
+from PyRoute.Galaxy import Sector
 
 
 class testDeltaStar(unittest.TestCase):
@@ -104,6 +105,10 @@ class testDeltaStar(unittest.TestCase):
         expected = "0240 Bolivar              C78699D-8                                       { 0 }  (G8G+5) [DD9J]           100 0  ImDv K1 V                                                     "
         self.assertEqual(len(expected), len(actual), "Reduce-all reduction unexpected length")
         self.assertEqual(expected, actual, "Reduce-all reduction unexpected result")
+        # check if actual can be parsed back into a star
+        remix_star = DeltaStar.parse_line_into_star(actual, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+        self.assertIsInstance(remix_star, DeltaStar)
+
 
 
 if __name__ == '__main__':
