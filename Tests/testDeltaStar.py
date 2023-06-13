@@ -99,27 +99,23 @@ class testDeltaStar(unittest.TestCase):
         self.assertEqual(len(expected), len(actual), "Reset-TL reduction unexpected length")
         self.assertEqual(expected, actual, "Reset-TL reduction unexpected result")
 
-    def test_reduce_all_with_trade_codes(self):
-        original = "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
-        actual = DeltaStar.reduce_all(original)
+    def test_reduce_all(self):
+        check_list = [
+            ("0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ", "0240 Bolivar              C78699D-8                                       { 0 }  (G8G+5) [DD9J]      -  - 100 0  ImDv K1 V                                                     "),
+            ('0522 Unchin               A437743-E                            { 2 }  (B6D-1) [492B] B     N  - 620 9  ImDi K0 III                                                       ', '0522 Unchin               C437743-8                                       { -1 } (B6D-1) [492B]      -  - 100 0  ImDi K0 III                                                   ')
+        ]
 
-        expected = "0240 Bolivar              C78699D-8                                       { 0 }  (G8G+5) [DD9J]      -  - 100 0  ImDv K1 V                                                     "
-        self.assertEqual(len(expected), len(actual), "Reduce-all reduction unexpected length")
-        self.assertEqual(expected, actual, "Reduce-all reduction unexpected result")
-        # check if actual can be parsed back into a star
-        remix_star = Star.parse_line_into_star(actual, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
-        self.assertIsInstance(remix_star, Star)
+        for chunk in check_list:
+            with self.subTest():
+                original = chunk[0]
+                actual = DeltaStar.reduce_all(original)
+                expected = chunk[1]
 
-    def test_reduce_all_without_trade_codes(self):
-        original = '0522 Unchin               A437743-E                            { 2 }  (B6D-1) [492B] B     N  - 620 9  ImDi K0 III                                                       '
-        actual = DeltaStar.reduce_all(original)
-
-        expected = '0522 Unchin               C437743-8                                       { -1 } (B6D-1) [492B]      -  - 100 0  ImDi K0 III                                                   '
-        self.assertEqual(len(expected), len(actual), "Reduce-all reduction unexpected length")
-        self.assertEqual(expected, actual, "Reduce-all reduction unexpected result")
-        # check if actual can be parsed back into a star
-        remix_star = Star.parse_line_into_star(actual, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
-        self.assertIsInstance(remix_star, Star)
+                self.assertEqual(len(expected), len(actual), "Reduce-all reduction unexpected length")
+                self.assertEqual(expected, actual, "Reduce-all reduction unexpected result")
+                # check if actual can be parsed back into a star
+                remix_star = Star.parse_line_into_star(actual, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                self.assertIsInstance(remix_star, Star)
 
 
 if __name__ == '__main__':
