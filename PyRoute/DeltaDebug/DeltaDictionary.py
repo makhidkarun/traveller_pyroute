@@ -91,6 +91,16 @@ class DeltaDictionary(dict):
 
         return foo
 
+    def switch_lines(self, lines_to_drop):
+        foo = DeltaDictionary()
+        for sector_name in self:
+            if self[sector_name].skipped:
+                continue
+            else:
+                foo[sector_name] = self[sector_name].switch_lines(lines_to_drop)
+
+        return foo
+
     def write_files(self, output_dir):
         for sector_name in self:
             self[sector_name].write_file(output_dir)
@@ -197,6 +207,23 @@ class SectorDictionary(dict):
 
         for subsector_name in self:
             new_dict[subsector_name] = self[subsector_name].drop_lines(lines_to_drop)
+
+        return new_dict
+
+    def switch_lines(self, lines_to_switch):
+        new_dict = SectorDictionary(self.name, self.filename)
+        new_dict.position = self.position
+        new_dict.headers = self.headers
+        new_dict.allegiances = self.allegiances
+        for alg in new_dict.allegiances:
+            new_dict.allegiances[alg].homeworlds = []
+            new_dict.allegiances[alg].stats.homeworlds = []
+            new_dict.allegiances[alg].stats.passengers = 0
+            new_dict.allegiances[alg].stats.trade = 0
+            new_dict.allegiances[alg].stats.tradeExt = 0
+
+        for subsector_name in self:
+            new_dict[subsector_name] = self[subsector_name].switch_lines(lines_to_switch)
 
         return new_dict
 
@@ -373,5 +400,29 @@ class SubsectorDictionary(dict):
 
         if nonempty and 0 == len(foo.items):
             foo.items = None
+
+        return foo
+
+    def switch_lines(self, lines_to_switch):
+        foo = SubsectorDictionary(self.name, self.position)
+        if self.skipped:
+            foo.items = None
+            return foo
+
+        # assemble shortlist
+        shortlist = []
+        switchlist = []
+        # assuming lines_to_switch is a list of 2-element tuples
+        for line in lines_to_switch:
+            if line[0] in self.items:
+                shortlist.append(line[0])
+                switchlist.append(line[1])
+
+        for line in self.items:
+            if line not in shortlist:
+                foo.items.append(line)
+
+        for line in switchlist:
+            foo.items.append(line)
 
         return foo

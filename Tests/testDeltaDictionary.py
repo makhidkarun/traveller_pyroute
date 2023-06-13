@@ -7,6 +7,7 @@ from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Galaxy import Allegiance, Galaxy
 from Tests.baseTest import baseTest
+from PyRoute.DeltaStar import DeltaStar
 
 sys.path.append('../PyRoute')
 
@@ -438,6 +439,29 @@ class testSubsectorDictionary(baseTest):
         lines_to_drop = ['foo', 'bar', 'baz']
         remix = foo.drop_lines(lines_to_drop)
         self.assertTrue(remix.skipped)
+
+    def test_replace_lines(self):
+        star1 = "2123 Medurma              A9D7954-C Hi An Cs Di(Miyavine) Asla1 S'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V            Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322  "
+        star2 = "2123 Kediiga              B778411-8 Ni Pa                                 { -1 } (832-5) [1314] Bc   -  - 920 9  ImDv G6 V                                                     "
+        # star3 doesn't start in the dictionary, so it shouldn't be added
+        star3 = "3111 Luramsum             A7A7325-D Fl Lo                                 { 1 }  (A21-1) [143B] B    N  - 805 13 ImDv M3 V            Xb:3008 Xb:3014 Xb:Core-0112             "
+
+        star1reduce = DeltaStar.reduce_all(star1)
+        star3reduce = DeltaStar.reduce_all(star3)
+
+        foo = SubsectorDictionary('Mimu', 'A')
+        foo.items.append(star1)
+        foo.items.append(star2)
+
+        lines_to_switch = [(star3, star3reduce), (star1, star1reduce)]
+
+        remix = foo.switch_lines(lines_to_switch)
+        self.assertEqual(2, len(remix.lines), "Unexpected items count after line switch")
+        self.assertNotIn(star1, remix.items, "First starline not replaced in remix")
+        self.assertIn(star2, remix.items, "Second starline not retained in remix")
+        self.assertNotIn(star3, remix.items, "Third starline added to remix")
+        self.assertIn(star1reduce, remix.items, "First reduced line not added to remix")
+        self.assertNotIn(star3reduce, remix.items, "Third reduced line added to remix")
 
 
 if __name__ == '__main__':
