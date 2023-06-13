@@ -43,6 +43,7 @@ class testDeltaPasses(baseTest):
         old_count = len(delta.lines)
 
         reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_interesting()
 
         reduction_pass = FullLineReduce(reducer)
 

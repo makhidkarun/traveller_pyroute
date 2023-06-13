@@ -23,7 +23,7 @@ class FullLineReduce(object):
         # build substitution list - reduce _everything_
         subs_list = []
         for line in self.reducer.sectors.lines:
-            canon = DeltaStar.reduce_all(line)
+            canon = DeltaStar.reduce_all(line.strip())
             assert isinstance(canon, str), "Candidate line " + line + " was not reduced to a string.  Got " + canon + " instead."
             subs_list.append((line, canon))
 
