@@ -223,6 +223,8 @@ class testDeltaDictionary(baseTest):
 
         remix = foo.sector_subset(['Spinward Marches', 'Deneb', 'Trojan Reach'])
         self.assertEqual(1, len(remix))
+        remix_stats = remix['Spinward Marches'].allegiances['CsIm'].stats
+        self.assertTrue('high_pop_worlds' in remix_stats.__dict__, "Missing high_pop_worlds attribute not restored")
         self.assertListEqual([], remix['Spinward Marches'].allegiances['CsIm'].stats.high_pop_worlds, "Missing high_pop_worlds list not restored")
 
 class testSectorDictionary(baseTest):

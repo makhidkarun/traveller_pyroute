@@ -137,20 +137,18 @@ class SectorDictionary(dict):
         super().__setitem__(item, value)
 
     def __deepcopy__(self, memodict={}):
-        foo = SectorDictionary(self.name, self.filename)
-        foo.allegiances = copy.deepcopy(self.allegiances)
-        for alg in foo.allegiances:
-            foo.allegiances[alg].homeworlds = []
-            foo.allegiances[alg].stats.homeworlds = []
-            foo.allegiances[alg].stats.passengers = 0
-            foo.allegiances[alg].stats.trade = 0
-            foo.allegiances[alg].stats.tradeExt = 0
+        foo = self._setup_clone_sector_dict()
 
         foo.headers = copy.deepcopy(self.headers)
         foo.position = self.position
 
         for subsector_name in self:
             foo[subsector_name] = copy.deepcopy(self[subsector_name])
+
+        for label in foo.allegiances:
+            allegiance = foo.allegiances[label]
+            if not hasattr(allegiance.stats, 'high_pop_worlds'):
+                allegiance.stats.high_pop_worlds = []
 
         return foo
 
@@ -165,16 +163,7 @@ class SectorDictionary(dict):
             if subsector_name not in overlap:
                 missed.append(subsector_name)
 
-        new_dict = SectorDictionary(self.name, self.filename)
-        new_dict.position = self.position
-        new_dict.headers = self.headers
-        new_dict.allegiances = self.allegiances
-        for alg in new_dict.allegiances:
-            new_dict.allegiances[alg].homeworlds = []
-            new_dict.allegiances[alg].stats.homeworlds = []
-            new_dict.allegiances[alg].stats.passengers = 0
-            new_dict.allegiances[alg].stats.trade = 0
-            new_dict.allegiances[alg].stats.tradeExt = 0
+        new_dict = self._setup_clone_sector_dict()
 
         for subsector_name in overlap:
             new_dict[subsector_name] = copy.deepcopy(self[subsector_name])
@@ -194,33 +183,30 @@ class SectorDictionary(dict):
         return result
 
     def drop_lines(self, lines_to_drop):
-        new_dict = SectorDictionary(self.name, self.filename)
-        new_dict.position = self.position
-        new_dict.headers = self.headers
-        new_dict.allegiances = self.allegiances
-        for alg in new_dict.allegiances:
-            new_dict.allegiances[alg].homeworlds = []
-            new_dict.allegiances[alg].stats.homeworlds = []
-            new_dict.allegiances[alg].stats.passengers = 0
-            new_dict.allegiances[alg].stats.trade = 0
-            new_dict.allegiances[alg].stats.tradeExt = 0
+        new_dict = self._setup_clone_sector_dict()
 
         for subsector_name in self:
             new_dict[subsector_name] = self[subsector_name].drop_lines(lines_to_drop)
 
         return new_dict
 
-    def switch_lines(self, lines_to_switch):
+    def _setup_clone_sector_dict(self):
         new_dict = SectorDictionary(self.name, self.filename)
         new_dict.position = self.position
         new_dict.headers = self.headers
         new_dict.allegiances = self.allegiances
         for alg in new_dict.allegiances:
             new_dict.allegiances[alg].homeworlds = []
-            new_dict.allegiances[alg].stats.homeworlds = []
-            new_dict.allegiances[alg].stats.passengers = 0
-            new_dict.allegiances[alg].stats.trade = 0
-            new_dict.allegiances[alg].stats.tradeExt = 0
+            stats = new_dict.allegiances[alg].stats
+            stats.homeworlds = []
+            stats.passengers = 0
+            stats.trade = 0
+            stats.tradeExt = 0
+
+        return new_dict
+
+    def switch_lines(self, lines_to_switch):
+        new_dict = self._setup_clone_sector_dict()
 
         for subsector_name in self:
             new_dict[subsector_name] = self[subsector_name].switch_lines(lines_to_switch)
