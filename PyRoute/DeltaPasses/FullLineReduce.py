@@ -21,7 +21,7 @@ class FullLineReduce(WithinLineReducer):
 
         if interesting:
             self.reducer.sectors = best_sectors
-            msg = "Reduction found with full star line reduction"
+            msg = "Reduction found"
             self.reducer.logger.error(msg)
             return
 

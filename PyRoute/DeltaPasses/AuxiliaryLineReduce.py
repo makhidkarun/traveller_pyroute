@@ -21,7 +21,7 @@ class AuxiliaryLineReduce(WithinLineReducer):
 
         if interesting:
             self.reducer.sectors = best_sectors
-            msg = "Reduction found with auxiliary star line reduction"
+            msg = "Reduction found"
             self.reducer.logger.error(msg)
             return
 
