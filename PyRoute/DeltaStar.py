@@ -46,6 +46,10 @@ class DeltaStar(Star):
         return DeltaStar.reduce(original, drop_routes=True, drop_trade_codes=True, drop_noble_codes=True, drop_base_codes=True, drop_trade_zone=True, drop_extra_stars=True, reset_pbg=True, reset_worlds=True, reset_port=True, reset_tl=True)
 
     @staticmethod
+    def reduce_auxiliary(original):
+        return DeltaStar.reduce(original, drop_routes=True, drop_noble_codes=True, drop_trade_zone=True, drop_extra_stars=True, reset_pbg=True, reset_worlds=True)
+
+    @staticmethod
     def parse_line_into_star(line, sector, pop_code, ru_calc):
         star = DeltaStar()
         return Star._parse_line_into_star_core(star, line, sector, pop_code, ru_calc)

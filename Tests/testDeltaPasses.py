@@ -2,6 +2,7 @@ import argparse
 import unittest.main
 
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
 from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
 from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
 from PyRoute.DeltaPasses.FullLineReduce import FullLineReduce
@@ -57,6 +58,31 @@ class testDeltaPasses(baseTest):
         for line in reducer.sectors.lines:
             if not line.startswith('2123 Medurma'):
                 self.assertEqual(line, DeltaStar.reduce_all(line), "Line not full-line-reduced")
+
+    def test_auxiliary_line_reduction_of_subsector(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Passes/Dagudashaag-subsector-full-reduce.sec')
+        args = self._make_args_no_line()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+        old_count = len(delta.lines)
+
+        reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_interesting()
+
+        reduction_pass = AuxiliaryLineReduce(reducer)
+
+        self.assertTrue(reduction_pass.preflight(), "Input should be reducible")
+        reduction_pass.run()
+
+        reducer.is_initial_state_interesting()
+        new_count = len(reducer.sectors.lines)
+        self.assertEqual(old_count, new_count, "At least one line not mapped")
+        # verify each line got reduced
+        for line in reducer.sectors.lines:
+            self.assertEqual(line, DeltaStar.reduce_auxiliary(line), "Line not auxiliary-line-reduced")
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')

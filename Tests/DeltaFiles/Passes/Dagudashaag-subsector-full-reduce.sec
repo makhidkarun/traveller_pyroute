@@ -39,10 +39,7 @@
 
 Hex  Name                 UWP       Remarks                               {Ix}   (Ex)    [Cx]   N    B  Z PBG W  A    Stellar         Routes
 ---- -------------------- --------- ------------------------------------- ------ ------- ------ ---- -- - --- -- ---- --------------- -----------------------------------------
-1728 Ekhugush             A63698A-D Hi                                    { 3 }  (E8F+5) [BC7F] BE   N  - 312 8  ImDv M2 V M9 V
-1729 Ushmegili            D86A204-A Lo Wa                                 { -1 } (810-3) [1138] B    S  - 722 14 ImDv G1 V
-2123 Medurma              A9D7954-C Hi An Cs Di(Miyavine) Asla1 S'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V            Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322
-2122 Chandra's World      C9966AA-7 Ag Ni Da                              { -1 } (853+1) [8579] BC   -  A 803 8  ImDv K4 V
+1722 Campbell             B99A200-E Lo Wa                                 { 2 }  (812-2) [1419] B    W  - 204 7  ImDv M1 V            Xb:1420 Xb:1823 Xb:2020
 2123 Kediiga              B778411-8 Ni Pa                                 { -1 } (832-5) [1314] Bc   -  - 920 9  ImDv G6 V
-2127 Thalassa             D56A557-9 Ni Wa Pr                              { -2 } (C42-2) [5359] Bc   -  - 423 11 ImDv K8 V
-2130 Maiden               B43069B-C De Na Ni Po Da                        { 1 }  (D55+3) [877E] B    N  A 814 13 ImDv M0 V M7 V       Xb:2028 Xb:2531
+2124 Medurma              A9D7954-C Hi An Cs Di(Miyavine) Asla1 S'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V            Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322
+2123 Medurma              A9D7954-C Hi An Cs Di(Miyavine) Asla1 S'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V            Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322
