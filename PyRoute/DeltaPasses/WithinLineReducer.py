@@ -21,6 +21,9 @@ class WithinLineReducer(object):
     def run(self):
         raise NotImplementedError
 
+    def _build_subs_list(self):
+        raise NotImplementedError
+
     def _assemble_segment(self, unreduced_lines, subs_list):
         nu_list = []
 

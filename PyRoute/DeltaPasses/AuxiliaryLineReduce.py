@@ -13,14 +13,7 @@ class AuxiliaryLineReduce(WithinLineReducer):
     reducer: DeltaReduce
 
     def run(self):
-        # build substitution list - reduce _everything_
-        subs_list = []
-        segment = []
-        for line in self.reducer.sectors.lines:
-            canon = DeltaStar.reduce_auxiliary(line.strip())
-            assert isinstance(canon, str), "Candidate line " + line + " was not reduced to a string.  Got " + canon + " instead."
-            subs_list.append((line, canon))
-            segment.append(line)
+        segment, subs_list = self._build_subs_list()
 
         best_sectors = self.reducer.sectors.switch_lines(subs_list)
 
@@ -73,3 +66,15 @@ class AuxiliaryLineReduce(WithinLineReducer):
                 segment.extend(chunk)
 
         self.reducer.sectors = best_sectors
+
+    def _build_subs_list(self):
+        # build substitution list - reduce _everything_
+        subs_list = []
+        segment = []
+        for line in self.reducer.sectors.lines:
+            canon = DeltaStar.reduce_auxiliary(line.strip())
+            assert isinstance(canon,
+                              str), "Candidate line " + line + " was not reduced to a string.  Got " + canon + " instead."
+            subs_list.append((line, canon))
+            segment.append(line)
+        return segment, subs_list
