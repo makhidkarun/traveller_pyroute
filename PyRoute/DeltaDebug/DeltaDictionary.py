@@ -335,7 +335,7 @@ class SectorDictionary(dict):
                 if line.startswith('----'):
                     isheader = False
             else:
-                starlines.append(line)
+                starlines.append(line.strip())
         return headers, starlines
 
 
