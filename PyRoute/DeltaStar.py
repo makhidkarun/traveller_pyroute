@@ -45,11 +45,11 @@ class DeltaStar(Star):
 
     @staticmethod
     def reduce_all(original):
-        return DeltaStar.reduce(original, drop_routes=True, drop_trade_codes=True, drop_noble_codes=True, drop_base_codes=True, drop_trade_zone=True, drop_extra_stars=True, reset_pbg=True, reset_worlds=True, reset_port=True, reset_tl=True)
+        return DeltaStar.reduce(original, drop_routes=True, drop_trade_codes=True, drop_noble_codes=True, drop_base_codes=True, drop_trade_zone=True, drop_extra_stars=True, reset_pbg=True, reset_worlds=True, reset_port=True, reset_tl=True, reset_sophont=True)
 
     @staticmethod
     def reduce_auxiliary(original):
-        return DeltaStar.reduce(original, drop_routes=True, drop_noble_codes=True, drop_trade_zone=True, drop_extra_stars=True, reset_pbg=True, reset_worlds=True)
+        return DeltaStar.reduce(original, drop_routes=True, drop_noble_codes=True, drop_trade_zone=True, drop_extra_stars=True, reset_pbg=True, reset_worlds=True, reset_sophont=True)
 
     @staticmethod
     def reduce_importance(original):
@@ -94,12 +94,10 @@ class DeltaStar(Star):
         self.tl = 8
 
     def reduce_sophonts(self):
-        soph_list = self.tradeCode.sophont_list
         nu_codes = []
 
         for code in self.tradeCode.codes:
-            if code not in soph_list and not code.startswith('Di('):
+            if code not in self.tradeCode.sophont_list and not code.startswith('Di('):
                 nu_codes.append(code)
 
-        self.tradeCode.sophont_list = []
-        self.tradeCode.codes = nu_codes
+        self.tradeCode = TradeCodes(' '.join(nu_codes))
