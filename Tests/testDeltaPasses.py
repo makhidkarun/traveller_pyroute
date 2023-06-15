@@ -111,6 +111,32 @@ class testDeltaPasses(baseTest):
             if not line.startswith('2123 Medurma'):
                 self.assertEqual(line, DeltaStar.reduce_importance(line), "Line not importance-line-reduced")
 
+    def test_full_and_auxiliary_line_reduction_of_pre_reduced_lines(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Passes/Dagudashaag-auxiliary-reduction-two-lines.sec')
+        args = self._make_args_no_line()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_interesting()
+
+        full_pass = FullLineReduce(reducer)
+        reduction_pass = AuxiliaryLineReduce(reducer)
+
+        self.assertTrue(full_pass.preflight(), "Input should be reducible")
+        full_pass.run()
+
+        self.assertTrue(reduction_pass.preflight(), "Input should be reducible")
+        reduction_pass.run()
+
+        reducer.is_initial_state_interesting()
+        # verify each line got aux-reduced
+        for line in reducer.sectors.lines:
+            self.assertEqual(line, DeltaStar.reduce_auxiliary(line), "Line not auxiliary-line-reduced")
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
