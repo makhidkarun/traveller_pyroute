@@ -85,7 +85,7 @@ class DeltaStar(Star):
         self.belts = 0
 
     def reduce_worlds(self):
-        self.worlds = 0
+        self.worlds = 1
 
     def reduce_port(self):
         self.port = 'C'

@@ -79,7 +79,7 @@ class testDeltaStar(unittest.TestCase):
         original = "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
         actual = DeltaStar.reduce(original, reset_worlds=True)
 
-        expected = "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 0  ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+        expected = "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 1  ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
         self.assertEqual(len(expected), len(actual), "Reset-worlds reduction unexpected length")
         self.assertEqual(expected, actual, "Reset-worlds reduction unexpected result")
 
@@ -101,9 +101,9 @@ class testDeltaStar(unittest.TestCase):
 
     def test_reduce_all(self):
         check_list = [
-            ("0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ", "0240 Bolivar              C78699D-8                                       { 0 }  (G8G+5) [DD9J]      -  - 100 0  ImDv K1 V                                                     "),
-            ('0522 Unchin               A437743-E                            { 2 }  (B6D-1) [492B] B     N  - 620 9  ImDi K0 III                                                       ', '0522 Unchin               C437743-8                                       { -1 } (B6D-1) [492B]      -  - 100 0  ImDi K0 III                                                   '),
-            ('1722 Campbell             B99A200-E Lo Wa                                 { 2 }  (812-2) [1419] B    W  - 204 7  ImDv M1 V            Xb:1420 Xb:1823 Xb:2020', '1722 Campbell             C99A200-8                                       { -2 } (812-2) [1419]      -  - 100 0  ImDv M1 V                                                     ')
+            ("0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ", "0240 Bolivar              C78699D-8                                       { 0 }  (G8G+5) [DD9J]      -  - 100 1  ImDv K1 V                                                     "),
+            ('0522 Unchin               A437743-E                            { 2 }  (B6D-1) [492B] B     N  - 620 9  ImDi K0 III                                                       ', '0522 Unchin               C437743-8                                       { -1 } (B6D-1) [492B]      -  - 100 1  ImDi K0 III                                                   '),
+            ('1722 Campbell             B99A200-E Lo Wa                                 { 2 }  (812-2) [1419] B    W  - 204 7  ImDv M1 V            Xb:1420 Xb:1823 Xb:2020', '1722 Campbell             C99A200-8                                       { -2 } (812-2) [1419]      -  - 100 1  ImDv M1 V                                                     ')
 
         ]
 
