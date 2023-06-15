@@ -11,7 +11,7 @@ from PyRoute.TradeCodes import TradeCodes
 class DeltaStar(Star):
 
     @staticmethod
-    def reduce(starline, drop_routes=False, drop_trade_codes=False, drop_noble_codes=False, drop_base_codes=False, drop_trade_zone=False, drop_extra_stars=False, reset_pbg=False, reset_worlds=False, reset_port=False, reset_tl=False):
+    def reduce(starline, drop_routes=False, drop_trade_codes=False, drop_noble_codes=False, drop_base_codes=False, drop_trade_zone=False, drop_extra_stars=False, reset_pbg=False, reset_worlds=False, reset_port=False, reset_tl=False, reset_sophont=False):
         sector = Sector("dummy", " 0, 0")
         star = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
         if not isinstance(star, DeltaStar):
@@ -37,6 +37,8 @@ class DeltaStar(Star):
             star.reduce_port()
         if reset_tl:
             star.reduce_tl()
+        if reset_sophont:
+            star.reduce_sophonts()
 
         star.calculate_importance()
         return star.parse_to_line()
@@ -90,3 +92,14 @@ class DeltaStar(Star):
 
     def reduce_tl(self):
         self.tl = 8
+
+    def reduce_sophonts(self):
+        soph_list = self.tradeCode.sophont_list
+        nu_codes = []
+
+        for code in self.tradeCode.codes:
+            if code not in soph_list and not code.startswith('Di('):
+                nu_codes.append(code)
+
+        self.tradeCode.sophont_list = []
+        self.tradeCode.codes = nu_codes

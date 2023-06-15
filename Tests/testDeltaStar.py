@@ -119,6 +119,23 @@ class testDeltaStar(unittest.TestCase):
                 remix_star = Star.parse_line_into_star(actual, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
                 self.assertIsInstance(remix_star, Star)
 
+    def test_reduce_sophont_codes(self):
+        check_list = [
+            ("0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ", "0240 Bolivar              A78699D-E Cp Ga Hi Pr Pz                        { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "),
+            ("2123 Medurma              A9D7954-C An Asla1 Cs Di(Miyavine) Hi S'mr0     { 3 }  (G8E+1) [7C3A]      -  - 100 0  ImDv G0 V", "2123 Medurma              A9D7954-C An Cs Hi                              { 3 }  (G8E+1) [7C3A]      -  - 100 0  ImDv G0 V                                                     ")
+        ]
+
+        for chunk in check_list:
+            with self.subTest():
+                original = chunk[0]
+                actual = DeltaStar.reduce(original, reset_sophont=True)
+                expected = chunk[1]
+
+                self.assertEqual(len(expected), len(actual), "Reset-sophont reduction unexpected length")
+                self.assertEqual(expected, actual, "Reset-sophont reduction unexpected result")
+                # check if actual can be parsed back into a star
+                remix_star = Star.parse_line_into_star(actual, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                self.assertIsInstance(remix_star, Star)
 
 if __name__ == '__main__':
     unittest.main()
