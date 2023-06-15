@@ -85,8 +85,6 @@ class TestTradeCode(unittest.TestCase):
                 self.assertEqual([soph], code.sophonts, 'Sophont code ' + soph + " not in sophont-list")
                 self.assertEqual([], code.codeset, 'Codeset should be empty')
 
-
-
     def testWorldSophontsMultiple(self):
         code = TradeCodes("Ag Wiki4 Huma2")
         self.assertFalse(code.homeworld)
