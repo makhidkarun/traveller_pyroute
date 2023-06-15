@@ -255,6 +255,7 @@ class SectorDictionary(dict):
             handle.write(line)
 
         for line in self.lines:
+            line = line.strip() + '\n'
             handle.write(line)
 
         handle.close()

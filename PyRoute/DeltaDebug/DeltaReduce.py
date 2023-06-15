@@ -12,6 +12,10 @@ import math
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.HexMap import HexMap
+from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
+from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
+from PyRoute.DeltaPasses.FullLineReduce import FullLineReduce
+from PyRoute.DeltaPasses.ImportanceLineReduce import ImportanceLineReduce
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.StatCalculation import StatCalculation
 from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap
@@ -31,6 +35,7 @@ class DeltaReduce:
         self.interesting_type = interesting_type
         self.logger = logging.getLogger('PyRoute.Star')
         logging.disable(logging.WARNING)
+        self.withinline = [Canonicalisation(self), FullLineReduce(self), ImportanceLineReduce(self), AuxiliaryLineReduce(self)]
 
     def is_initial_state_interesting(self):
         sectors = self.sectors
@@ -248,6 +253,16 @@ class DeltaReduce:
 
         # now that the pass is done, update self.sectors with best reduction found
         self.sectors = best_sectors
+
+    def reduce_within_line(self):
+        # we're going to be deliberately mangling lines in the process of reducing them, so shut up loggers,
+        # such as the TradeCodes logger, that will complain, to stop flooding stdout.
+        logger = logging.getLogger('PyRoute.TradeCodes')
+        logger.setLevel(logging.CRITICAL)
+
+        for reducer in self.withinline:
+            if reducer.preflight():
+                reducer.run()
 
     def _assemble_all_but_ith_chunk(self, chunks, i):
         # Assemble all _but_ the ith chunk
