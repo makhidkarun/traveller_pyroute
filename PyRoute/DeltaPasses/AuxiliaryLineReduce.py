@@ -15,12 +15,13 @@ class AuxiliaryLineReduce(WithinLineReducer):
         # build substitution list - reduce _everything_
         subs_list = []
         segment = []
+        num_lines = len(self.reducer.sectors.lines)
         for line in self.reducer.sectors.lines:
             canon = DeltaStar.reduce_auxiliary(line.strip())
             assert isinstance(canon,
                               str), "Candidate line " + line + " was not reduced to a string.  Got " + canon + " instead."
             # Skip already-reduced lines
-            if line == canon:
+            if 2 < num_lines and line == canon:
                 continue
             subs_list.append((line, canon))
             segment.append(line)
