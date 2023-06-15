@@ -9,8 +9,6 @@ from PyRoute.DeltaStar import DeltaStar
 
 class Canonicalisation(object):
 
-    reducer: DeltaReduce
-
     def __init__(self, reducer):
         self.reducer = reducer
 

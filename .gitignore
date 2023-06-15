@@ -10,6 +10,7 @@ PyRoute/DeltaDebug/*.pyc
 PyRoute/Pathfinding/*.pyc
 PyRoute/Calculation/*.pyc
 PyRoute/Position/*.pyc
+PyRoute/DeltaPasses/*.pyc
 Tests/*.pyc
 PyRoute/*.class
 PyRoute/DeltaDebug/*.class

@@ -8,8 +8,6 @@ from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
 
 class WithinLineReducer(object):
 
-    reducer: DeltaReduce
-
     def __init__(self, reducer):
         self.reducer = reducer
 

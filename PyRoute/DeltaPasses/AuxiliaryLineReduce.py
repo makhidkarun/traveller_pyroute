@@ -10,8 +10,6 @@ from PyRoute.DeltaStar import DeltaStar
 
 class AuxiliaryLineReduce(WithinLineReducer):
 
-    reducer: DeltaReduce
-
     def _build_subs_list(self):
         # build substitution list - reduce _everything_
         subs_list = []
