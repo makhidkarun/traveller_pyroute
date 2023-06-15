@@ -10,6 +10,8 @@ from PyRoute.DeltaStar import DeltaStar
 class FullLineReduce(WithinLineReducer):
 
     def _build_subs_list(self):
+        self.full_msg = "Reduction found with full line reduction"
+        self.start_msg = "Commencing full within-line reduction"
         # build substitution list - reduce _everything_
         subs_list = []
         segment = []
@@ -17,6 +19,9 @@ class FullLineReduce(WithinLineReducer):
             canon = DeltaStar.reduce_all(line.strip())
             assert isinstance(canon,
                               str), "Candidate line " + line + " was not reduced to a string.  Got " + canon + " instead."
+            # Skip already-reduced lines
+            if line == canon:
+                continue
             subs_list.append((line, canon))
             segment.append(line)
         return segment, subs_list
