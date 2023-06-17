@@ -479,7 +479,7 @@ class TradeCalculation(RouteCalculation):
     # Stars that have been excluded, for whatever reason, from route generation
     redzone = set()
 
-    def __init__(self, galaxy, min_btn=13, route_btn=8, route_reuse=10):
+    def __init__(self, galaxy, min_btn=13, route_btn=8, route_reuse=10, debug_flag=False):
         super(TradeCalculation, self).__init__(galaxy)
 
         # Minimum BTN to calculate routes for. BTN between two worlds less than
@@ -494,6 +494,8 @@ class TradeCalculation(RouteCalculation):
         # based upon program arguments. 
         self.route_reuse = route_reuse
 
+        # Are debugging gubbins turned on?
+        self.debug_flag = debug_flag
 
     def base_route_filter(self, star, neighbor):
         if star in self.redzone or neighbor in self.redzone:
@@ -608,13 +610,14 @@ class TradeCalculation(RouteCalculation):
         except nx.NetworkXNoPath:
             return
 
-        fwd_weight = self.route_cost(route)
-        route.reverse()
-        rev_weight = self.route_cost(route)
-        route.reverse()
-        delta = fwd_weight - rev_weight
-        assert 1e-16 > delta * delta,\
-            "Route weight between " + str(star) + " and " + str(target) + " should not be direction sensitive.  Forward weight " + str(fwd_weight) + ", rev weight " + str(rev_weight) +", delta " + str(abs(delta))
+        if self.debug_flag:
+            fwd_weight = self.route_cost(route)
+            route.reverse()
+            rev_weight = self.route_cost(route)
+            route.reverse()
+            delta = fwd_weight - rev_weight
+            assert 1e-16 > delta * delta,\
+                "Route weight between " + str(star) + " and " + str(target) + " should not be direction sensitive.  Forward weight " + str(fwd_weight) + ", rev weight " + str(rev_weight) +", delta " + str(abs(delta))
 
         # Update the trade route (edges)
         tradeCr, tradePass = self.route_update_simple(route)

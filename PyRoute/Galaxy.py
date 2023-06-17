@@ -27,6 +27,7 @@ class AreaItem(object):
         self.alg = {}
         self.alg_sorted = []
         self._wiki_name = '[[{}]]'.format(name)
+        self.debug_flag = False
 
     def wiki_title(self):
         return self.wiki_name()
@@ -218,7 +219,7 @@ class Galaxy(AreaItem):
     classdocs
     """
  
-    def __init__(self, min_btn, max_jump=4, route_btn=8):
+    def __init__(self, min_btn, max_jump=4, route_btn=8, debug_flag=False):
         """
        Constructor
         """
@@ -232,6 +233,7 @@ class Galaxy(AreaItem):
         self.max_jump_range = max_jump
         self.min_btn = min_btn
         self.route_btn = route_btn
+        self.debug_flag = debug_flag
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -340,7 +342,7 @@ class Galaxy(AreaItem):
 
     def generate_routes(self, routes, reuse=10):
         if routes == 'trade':
-            self.trade = TradeCalculation(self, self.min_btn, self.route_btn, reuse)
+            self.trade = TradeCalculation(self, self.min_btn, self.route_btn, reuse, self.debugflag)
         elif routes == 'comm':
             self.trade = CommCalculation(self, reuse)
         elif routes == 'xroute':
