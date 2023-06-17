@@ -688,6 +688,7 @@ class Star(object):
     def _ehex_to_int(self, value):
         val = int(value, 36) if value in '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ' else 0
         val -= 1 if val > 18 else 0
+        val -= 1 if val > 22 else 0
         return val
 
     def split_stellar_data(self):
