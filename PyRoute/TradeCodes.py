@@ -43,7 +43,7 @@ class TradeCodes(object):
         self.sophont_list = []
         homeworlds_found = []
 
-        self.sophont_list = [code for code in self.codes if re.match(r"\w{4}(\d|W)", code, re.U)]
+        self.sophont_list = [code for code in self.codes if re.match(r"[\w\']{4}(\d|W)", code, re.U)]
 
         for homeworld in re.findall(r"[Di]*\([^)]+\)\d?", initial_codes, re.U):
             full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
