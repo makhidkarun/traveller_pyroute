@@ -3,6 +3,7 @@ Created on Mar 7, 2014
 
 @author: tjoneslo
 """
+import logging
 import unittest
 import re
 import sys
@@ -192,18 +193,28 @@ class TestStar(unittest.TestCase):
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
             Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
 
-    def test_ehex_to_numeric_mapping_for_TL_N_and_P(self):
-        star1 = Star.parse_line_into_star(
-            "0104 Shana Ma             E551112-N Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+    def test_ehex_to_numeric_mapping_for_TL_A_and_up(self):
+        # shut up log output - is completely irrelevant
+        logger = logging.getLogger('PyRoute.Star')
+        logger.setLevel(logging.CRITICAL)
 
-        self.assertEqual(22, star1.tl, "Unexpected mapping for TL N")
+        # taken from https://travellermap.com/doc/secondsurvey#ehex
+        ehex_map = [
+            ('A', 10), ('B', 11), ('C', 12), ('D', 13), ('E', 14), ('F', 15), ('G', 16), ('H', 17), ('J', 18), ('K', 19),
+            ('L', 20), ('M', 21), ('N', 22), ('P', 23), ('Q', 24), ('R', 25), ('S', 26), ('T', 27), ('U', 28), ('V', 29),
+            ('W', 30), ('X', 31), ('Y', 32), ('Z', 33)
+        ]
 
-        star2 = Star.parse_line_into_star(
-            "0103 Irkigkhan            C9C4733-P Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+        for chunk in ehex_map:
+            with self.subTest():
+                letter = chunk[0]
+                target = chunk[1]
 
-        self.assertEqual(23, star1.tl, "Unexpected mapping for TL P")
+                star1 = Star.parse_line_into_star(
+                    "0104 Shana Ma             E551112-"+letter+" Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+
+                self.assertEqual(target, star1.tl, "Unexpected mapping for TL " + letter)
 
 
 if __name__ == "__main__":
