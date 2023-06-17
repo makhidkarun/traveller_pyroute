@@ -216,6 +216,25 @@ class TestStar(unittest.TestCase):
 
                 self.assertEqual(target, star1.tl, "Unexpected mapping for TL " + letter)
 
+    def test_document_ehex_to_numeric_mapping_for_TL_I_and_O(self):
+        # shut up log output - is completely irrelevant
+        logger = logging.getLogger('PyRoute.Star')
+        logger.setLevel(logging.CRITICAL)
+
+        ehex_map = [
+            ('I', 18), ('O', 22)
+        ]
+
+        for chunk in ehex_map:
+            with self.subTest():
+                letter = chunk[0]
+                target = chunk[1]
+
+                star1 = Star.parse_line_into_star(
+                    "0104 Shana Ma             E551112-"+letter+" Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+
+                self.assertEqual(target, star1.tl, "Unexpected mapping for TL " + letter)
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
