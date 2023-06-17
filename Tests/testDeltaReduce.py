@@ -3,8 +3,8 @@ import tempfile
 import unittest
 import logging
 
-from PyRoute.DeltaDictionary import SectorDictionary, DeltaDictionary
-from PyRoute.DeltaReduce import DeltaReduce
+from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
 from PyRoute.route import set_logging
 
 

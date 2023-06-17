@@ -10,8 +10,8 @@ import functools
 import logging
 import math
 
-from PyRoute.DeltaDictionary import DeltaDictionary
-from PyRoute.DeltaGalaxy import DeltaGalaxy
+from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
+from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.HexMap import HexMap
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.StatCalculation import StatCalculation

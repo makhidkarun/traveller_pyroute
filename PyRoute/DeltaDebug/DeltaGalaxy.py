@@ -12,7 +12,7 @@ import itertools
 import math
 import networkx as nx
 
-from PyRoute.DeltaDictionary import SectorDictionary, SubsectorDictionary
+from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, SubsectorDictionary
 from PyRoute.Galaxy import Galaxy, Sector, Subsector, Allegiance
 from PyRoute.Star import Star
 from PyRoute.TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation, XRouteCalculation, \

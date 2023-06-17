@@ -1,7 +1,7 @@
 import unittest
 
-from PyRoute.DeltaDictionary import SectorDictionary, DeltaDictionary
-from PyRoute.DeltaGalaxy import DeltaGalaxy
+from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 
 
 class testDeltaGalaxy(unittest.TestCase):

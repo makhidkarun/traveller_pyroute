@@ -1,2 +1,2 @@
 
-__all__ = ["Galaxy", "Star", "SpeculativeTrade", "HexMap", "SubsectorMap2", "StatCalculation", "DeltaDictionary"]
+__all__ = ["Galaxy", "Star", "SpeculativeTrade", "HexMap", "SubsectorMap2", "StatCalculation"]

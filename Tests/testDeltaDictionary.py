@@ -3,7 +3,7 @@ import unittest
 import sys
 from pathlib import Path
 
-from PyRoute.DeltaDictionary import DeltaDictionary, SectorDictionary, SubsectorDictionary
+from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary, SubsectorDictionary
 from PyRoute.Galaxy import Allegiance
 
 sys.path.append('../PyRoute')
