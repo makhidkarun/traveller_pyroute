@@ -11,7 +11,7 @@ from PyRoute.TradeCodes import TradeCodes
 class DeltaStar(Star):
 
     @staticmethod
-    def reduce(starline, drop_routes=False, drop_trade_codes=False, drop_noble_codes=False, drop_base_codes=False, drop_trade_zone=False, drop_extra_stars=False, reset_pbg=False, reset_worlds=False, reset_port=False, reset_tl=False, reset_sophont=False):
+    def reduce(starline, drop_routes=False, drop_trade_codes=False, drop_noble_codes=False, drop_base_codes=False, drop_trade_zone=False, drop_extra_stars=False, reset_pbg=False, reset_worlds=False, reset_port=False, reset_tl=False, reset_sophont=False, reset_capitals=False):
         sector = Sector("dummy", " 0, 0")
         star = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
         if not isinstance(star, DeltaStar):
@@ -39,6 +39,8 @@ class DeltaStar(Star):
             star.reduce_tl()
         if reset_sophont:
             star.reduce_sophonts()
+        if reset_capitals:
+            star.reduce_capitals()
 
         star.calculate_importance()
         return star.parse_to_line()
@@ -98,6 +100,16 @@ class DeltaStar(Star):
 
         for code in self.tradeCode.codes:
             if code not in self.tradeCode.sophont_list and not code.startswith('Di('):
+                nu_codes.append(code)
+
+        self.tradeCode = TradeCodes(' '.join(nu_codes))
+
+    def reduce_capitals(self):
+        cap_codes = ['Cs', 'Cp', 'Cx']
+
+        nu_codes = []
+        for code in self.tradeCode.codes:
+            if code not in cap_codes:
                 nu_codes.append(code)
 
         self.tradeCode = TradeCodes(' '.join(nu_codes))
