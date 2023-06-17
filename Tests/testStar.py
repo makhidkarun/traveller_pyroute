@@ -192,6 +192,19 @@ class TestStar(unittest.TestCase):
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
             Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
 
+    def test_ehex_to_numeric_mapping_for_TL_N_and_P(self):
+        star1 = Star.parse_line_into_star(
+            "0104 Shana Ma             E551112-N Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+
+        self.assertEqual(22, star1.tl, "Unexpected mapping for TL N")
+
+        star2 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-P Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+
+        self.assertEqual(23, star1.tl, "Unexpected mapping for TL P")
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
