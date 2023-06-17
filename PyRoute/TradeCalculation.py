@@ -708,6 +708,8 @@ class TradeCalculation(RouteCalculation):
             t = total_weight + y
             c = (t - total_weight) - y
 
+            total_weight = t
+
             start = end
         return total_weight
 
