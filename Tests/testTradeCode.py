@@ -70,6 +70,23 @@ class TestTradeCode(unittest.TestCase):
         self.assertEqual(['Huma4'], code.sophonts)
         self.assertEqual(['Ag'], code.codeset)
 
+    def testAllSophontCodesAreBelongToUs(self):
+        soph_codes = ['Adda', 'Aezo', 'Akee', 'Aqua', 'Asla', 'Bhun', 'Grin', 'Gruh', 'Buru', 'Bwap', 'Chir', 'Clot',
+                      'Darm', 'Dary', 'Dolp', 'Droy', 'Dync', 'Esly', 'Flor', 'Geon', 'Gnii', 'Gray', 'Guru', 'Gurv',
+                      'Hama', 'Hive', 'Huma', 'Ithk', 'Jaib', 'Jala', 'Jend', 'Jonk', 'Kafo', 'Kagg', 'Karh', 'Kiak',
+                      'K\'kr', 'Lamu', 'Lanc', 'Libe', 'Llel', 'Luri', 'Mal\'', 'Mask', 'Mitz', 'Muri', 'Ocra', 'Ormi',
+                      'Scan', "Sele", 'S\'mr', 'Sred', 'Stal', 'Suer', 'Sull', 'Swan', 'Sydi', 'Syle', 'Tapa', 'Taur',
+                      'Tent', 'Tlye', 'UApe', 'Ulan', 'Ursa', 'Urun', 'Varg', 'Vega', 'Yile', 'Za\'t', 'Zhod', 'Ziad']
+
+        for soph in soph_codes:
+            with self.subTest():
+                soph += '1'
+                code = TradeCodes(soph)
+                self.assertEqual([soph], code.sophonts, 'Sophont code ' + soph + " not in sophont-list")
+                self.assertEqual([], code.codeset, 'Codeset should be empty')
+
+
+
     def testWorldSophontsMultiple(self):
         code = TradeCodes("Ag Wiki4 Huma2")
         self.assertFalse(code.homeworld)
