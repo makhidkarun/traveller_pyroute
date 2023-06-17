@@ -79,6 +79,10 @@ def process():
     output.add_argument('--json-data', dest='json_data', default=False, action='store_true',
                         help='Dump internal data structures as json for later further processing ')
 
+    debugging = parser.add_argument_group('Debug', "Debugging flags")
+    debugging.add_argument('--debug', dest="debug_flag", default=False, action='store_true',
+                           help="Turn on trade-route debugging")
+
     delta = parser.add_argument_group('Debugging', 'Parameters for the delta-debugging procedure itself')
     delta.add_argument('--input', default='sectors', help='input directory for sectors')
     delta.add_argument('--sectors', default=None, help='file with list of sector names to process')
@@ -108,7 +112,7 @@ def process():
     if not (args.two_min or args.run_sector or args.run_subsector or args.run_line):
         raise ValueError("Must select at least one reduction pass to run")
 
-    galaxy = Galaxy(args.btn, args.max_jump, args.route_btn)
+    galaxy = Galaxy(args.btn, args.max_jump, args.route_btn, args.debug_flag)
     galaxy.output_path = args.output
 
     sectors_list = args.sector

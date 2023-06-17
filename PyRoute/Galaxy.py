@@ -342,7 +342,7 @@ class Galaxy(AreaItem):
 
     def generate_routes(self, routes, reuse=10):
         if routes == 'trade':
-            self.trade = TradeCalculation(self, self.min_btn, self.route_btn, reuse, self.debugflag)
+            self.trade = TradeCalculation(self, self.min_btn, self.route_btn, reuse, self.debug_flag)
         elif routes == 'comm':
             self.trade = CommCalculation(self, reuse)
         elif routes == 'xroute':
