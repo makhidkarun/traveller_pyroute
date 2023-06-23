@@ -3,6 +3,7 @@ Created on Mar 2, 2014
 
 @author: tjoneslo
 """
+import copy
 import logging
 import re
 import codecs
@@ -55,6 +56,15 @@ class Allegiance(AreaItem):
         state = self.__dict__.copy()
         del state['alg_sorted']
         return state
+
+    def __deepcopy__(self, memodict={}):
+        foo = Allegiance(self.code, self.name, self.base, self.population)
+        foo._wiki_name = self._wiki_name
+        foo.alg_sorted = []
+        foo.debug_flag = self.debug_flag
+        foo.stats = copy.deepcopy(self.stats)
+
+        return foo
 
     @staticmethod
     def allegiance_name(name, code, base):
