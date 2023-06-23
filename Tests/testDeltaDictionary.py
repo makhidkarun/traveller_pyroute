@@ -197,6 +197,17 @@ class testDeltaDictionary(unittest.TestCase):
 
         self.assertEqual(expected, actual, "Unexpected subsector list")
 
+    def test_sector_subset_blowup_on_vland_empty(self):
+        vland = 'DeltaFiles/sector_subset_blowup_on_vland_empty/Vland.sec'
+
+        vland_sec = SectorDictionary.load_traveller_map_file(vland)
+
+        foo = DeltaDictionary()
+        foo[vland_sec.name] = vland_sec
+
+        remix = foo.sector_subset(['Vland'])
+        self.assertEqual(1, len(remix))
+
 class testSectorDictionary(unittest.TestCase):
     def test_add_bad_item_by_index(self):
         expected = 'Values must be SubsectorDictionary objects'
