@@ -4,7 +4,8 @@ import sys
 from pathlib import Path
 
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary, SubsectorDictionary
-from PyRoute.Galaxy import Allegiance
+from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.Galaxy import Allegiance, Galaxy
 
 sys.path.append('../PyRoute')
 
@@ -206,6 +207,19 @@ class testDeltaDictionary(unittest.TestCase):
         foo[vland_sec.name] = vland_sec
 
         remix = foo.sector_subset(['Vland'])
+        self.assertEqual(1, len(remix))
+
+    def test_sector_subset_blowup_on_spinward_marches(self):
+        spinward = 'DeltaFiles/high_pop_worlds_blowup/Spinward Marches.sec'
+
+        spinward_sec = SectorDictionary.load_traveller_map_file(spinward)
+
+        del spinward_sec.allegiances['CsIm'].stats.high_pop_worlds
+
+        foo = DeltaDictionary()
+        foo[spinward_sec.name] = spinward_sec
+
+        remix = foo.sector_subset(['Spinward Marches', 'Deneb', 'Trojan Reach'])
         self.assertEqual(1, len(remix))
 
 class testSectorDictionary(unittest.TestCase):
