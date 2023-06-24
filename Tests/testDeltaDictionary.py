@@ -221,6 +221,7 @@ class testDeltaDictionary(unittest.TestCase):
 
         remix = foo.sector_subset(['Spinward Marches', 'Deneb', 'Trojan Reach'])
         self.assertEqual(1, len(remix))
+        self.assertListEqual([], remix['Spinward Marches'].allegiances['CsIm'].stats.high_pop_worlds, "Missing high_pop_worlds list not restored")
 
 class testSectorDictionary(unittest.TestCase):
     def test_add_bad_item_by_index(self):
