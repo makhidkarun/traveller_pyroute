@@ -3,6 +3,7 @@ Created on Mar 2, 2014
 
 @author: tjoneslo
 """
+import copy
 import logging
 import re
 import codecs
@@ -12,11 +13,11 @@ import itertools
 import math
 import networkx as nx
 
-from Star import Star
-from  TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation, XRouteCalculation, \
+from PyRoute.Star import Star
+from PyRoute.TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation, XRouteCalculation, \
     OwnedWorldCalculation
-from StatCalculation import ObjectStatistics
-from AllyGen import AllyGen
+from PyRoute.StatCalculation import ObjectStatistics
+from PyRoute.AllyGen import AllyGen
 
 
 class AreaItem(object):
@@ -27,6 +28,7 @@ class AreaItem(object):
         self.alg = {}
         self.alg_sorted = []
         self._wiki_name = '[[{}]]'.format(name)
+        self.debug_flag = False
 
     def wiki_title(self):
         return self.wiki_name()
@@ -54,6 +56,15 @@ class Allegiance(AreaItem):
         state = self.__dict__.copy()
         del state['alg_sorted']
         return state
+
+    def __deepcopy__(self, memodict={}):
+        foo = Allegiance(self.code, self.name, self.base, self.population)
+        foo._wiki_name = self._wiki_name
+        foo.alg_sorted = []
+        foo.debug_flag = self.debug_flag
+        foo.stats = copy.deepcopy(self.stats)
+
+        return foo
 
     @staticmethod
     def allegiance_name(name, code, base):
@@ -218,7 +229,7 @@ class Galaxy(AreaItem):
     classdocs
     """
  
-    def __init__(self, min_btn, max_jump=4, route_btn=8):
+    def __init__(self, min_btn, max_jump=4, route_btn=8, debug_flag=False):
         """
        Constructor
         """
@@ -232,6 +243,7 @@ class Galaxy(AreaItem):
         self.max_jump_range = max_jump
         self.min_btn = min_btn
         self.route_btn = route_btn
+        self.debug_flag = debug_flag
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -340,7 +352,7 @@ class Galaxy(AreaItem):
 
     def generate_routes(self, routes, reuse=10):
         if routes == 'trade':
-            self.trade = TradeCalculation(self, self.min_btn, self.route_btn, reuse)
+            self.trade = TradeCalculation(self, self.min_btn, self.route_btn, reuse, self.debug_flag)
         elif routes == 'comm':
             self.trade = CommCalculation(self, reuse)
         elif routes == 'xroute':
@@ -488,3 +500,7 @@ class Galaxy(AreaItem):
                 g.write(ow_list_world + '\n')
 
                 world.ownedBy = (owner, ownedBy[0:4])
+
+    def is_well_formed(self):
+        for star in self.stars:
+            star.is_well_formed()

@@ -10,9 +10,9 @@ from pypdflite import PDFCursor
 from pypdflite.pdfobjects.pdfline import PDFLine
 from pypdflite.pdfobjects.pdfellipse import PDFEllipse
 from pypdflite.pdfobjects.pdftext import PDFText
-from Galaxy import Sector, Galaxy
-from Star import Star
-from StatCalculation import StatCalculation
+from PyRoute.Galaxy import Sector, Galaxy
+from PyRoute.Star import Star
+from PyRoute.StatCalculation import StatCalculation
 
 
 class HexMap(object):

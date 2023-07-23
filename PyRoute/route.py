@@ -9,11 +9,11 @@ import argparse
 import logging
 import codecs
 import os
-from Galaxy import Galaxy
-from SpeculativeTrade import SpeculativeTrade
-from HexMap import HexMap
-from SubsectorMap2 import GraphicSubsectorMap
-from StatCalculation import StatCalculation
+from PyRoute.Galaxy import Galaxy
+from PyRoute.SpeculativeTrade import SpeculativeTrade
+from PyRoute.HexMap import HexMap
+from PyRoute.SubsectorMap2 import GraphicSubsectorMap
+from PyRoute.StatCalculation import StatCalculation
 
 logger = logging.getLogger('PyRoute')
 
@@ -66,6 +66,10 @@ def process():
     source.add_argument('--sectors', default=None, help='file with list of sector names to process')
     source.add_argument('sector', nargs='*', help='T5SS sector file(s) to process')
 
+    debugging = parser.add_argument_group('Debug', "Debugging flags")
+    debugging.add_argument('--debug', dest="debug_flag", default=False, action='store_true',
+                           help="Turn on trade-route debugging")
+
     parser.add_argument('--version', action='version', version='%(prog)s 0.3')
     parser.add_argument('--log-level', default='INFO')
 
@@ -75,7 +79,7 @@ def process():
 
     logger.info("starting processing")
 
-    galaxy = Galaxy(args.btn, args.max_jump, args.route_btn)
+    galaxy = Galaxy(args.btn, args.max_jump, args.route_btn, args.debug_flag)
     galaxy.output_path = args.output
 
     sectors_list = args.sector

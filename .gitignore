@@ -1,8 +1,12 @@
 PyRoute/__pycache__/
+PyRoute/DeltaPasses/__pycache__/
+PyRoute/DeltaDebug/__pycache__/
 Tests/__pycache__/
 PyRoute/*.pyc
+PyRoute/DeltaDebug/*.pyc
 Tests/*.pyc
 PyRoute/*.class
+PyRoute/DeltaDebug/*.class
 Tests/*.class
 
 # ignore IDE-related detritus

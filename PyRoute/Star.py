@@ -9,8 +9,8 @@ import bisect
 import random
 import math
 import re
-from AllyGen import AllyGen
-from TradeCodes import TradeCodes
+from PyRoute.AllyGen import AllyGen
+from PyRoute.TradeCodes import TradeCodes
 from collections import OrderedDict
 
 
@@ -155,13 +155,25 @@ class Star(object):
             del state['ownedBy']
         return state
 
+    def __deepcopy__(self, memodict={}):
+        state = self.__dict__.copy()
+
+        foo = Star()
+        for key in state:
+            item = state[key]
+            setattr(foo, key, item)
+
+        return foo
+
     @staticmethod
     def parse_line_into_star(line, sector, pop_code, ru_calc):
         star = Star()
         star.sector = sector
         star.logger.debug(line)
-        if Star.starline.match(line):
-            data = Star.starline.match(line).groups()
+        # Cache regex lookup to avoid doing it once for check, and again to extract data
+        matches = Star.starline.match(line)
+        if matches:
+            data = matches.groups()
         elif '{Anomaly}' in line:
             star.logger.info("Found anomaly, skipping processing: {}".format(line))
             return None
@@ -722,3 +734,8 @@ class Star(object):
         self.stars = self.stars[0:star_end].strip()
         if len(self.routes) > 0:
             self.logger.debug("{} - routes: {}".format(self, self.routes))
+
+    def is_well_formed(self):
+        assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
+        assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
+        return True

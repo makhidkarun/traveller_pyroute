@@ -3,12 +3,13 @@ Created on Mar 17, 2014
 
 @author: tjoneslo
 """
+import copy
 import logging
 import math
-from wikistats import WikiStats
+from PyRoute.wikistats import WikiStats
 from collections import OrderedDict, defaultdict
-from AllyGen import AllyGen
-from Star import UWPCodes
+from PyRoute.AllyGen import AllyGen
+from PyRoute.Star import UWPCodes
 
 
 class Populations(object):
@@ -87,7 +88,15 @@ class ObjectStatistics(object):
         del state['otherCp']
         del state['homeworlds']
         return state
-    
+
+    def __deepcopy__(self, memodict={}):
+        state = self.__dict__.copy()
+        foo = ObjectStatistics()
+        foo.__dict__.update(state)
+
+        return foo
+
+
     def homeworld_count(self):
         return len(self.homeworlds)
 

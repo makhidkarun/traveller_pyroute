@@ -4,6 +4,7 @@ Created on Mar 7, 2014
 @author: tjoneslo
 """
 import logging
+import copy
 import unittest
 import re
 import sys
@@ -192,6 +193,17 @@ class TestStar(unittest.TestCase):
         star1 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
             Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+
+    def test_deep_copy(self):
+        star1 = Star.parse_line_into_star(
+            "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+        star1.is_well_formed()
+
+        starcopy = copy.deepcopy(star1)
+        starcopy.is_well_formed()
+
+        self.assertEqual(star1, starcopy)
 
     def test_ehex_to_numeric_mapping_for_TL_A_and_up(self):
         # shut up log output - is completely irrelevant
