@@ -476,11 +476,11 @@ class Star(object):
                 '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self,
                                                                                                           infrastructure,
                                                                                                           0))
-        elif self.tradeCode.low and infrastructure != 1:
+        elif self.tradeCode.low and infrastructure != max(self.importance, 0):
             self.logger.warning(
                 '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self,
                                                                                                           infrastructure,
-                                                                                                          1))
+                                                                                                          max(self.importance, 0)))
         elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= 6 + self.importance:
             self.logger.warning(
                 '{} - EX Calculated infrastructure {} not in NI range 0 - {}'.format(self, infrastructure,
