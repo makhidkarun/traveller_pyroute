@@ -19,7 +19,7 @@ logger = logging.getLogger('PyRoute')
 
 
 def process():
-    parser = argparse.ArgumentParser(description='Traveller trade route generator.')
+    parser = argparse.ArgumentParser(description='Traveller trade route generator.', fromfile_prefix_chars='@')
 
     alleg = parser.add_argument_group('Allegiance', 'Alter processing of allegiances')
     alleg.add_argument('--borders', choices=['none', 'range', 'allygen', 'erode'], default='range',
