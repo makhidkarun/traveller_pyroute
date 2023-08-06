@@ -149,9 +149,13 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
         # Pre-filter neighbours
         # Remove neighbour nodes that are already enqueued and won't result in shorter paths to them
         neighbours = [(k, v) for (k, v) in G_succ[curnode].items() if not (k.is_enqueued and k in enqueued and dist + v['weight'] >= enqueued[k][0])]
-        if upbound != float('inf'):
+        if upbound != float('inf') and 0 < len(neighbours):
             # Remove neighbour nodes who will bust the upper bound as it currently stands
             neighbours = [(k, v) for (k, v) in neighbours if v['weight'] <= delta]
+
+        # if neighbours list is empty, go around
+        if 0 == len(neighbours):
+            continue
 
         for neighbor, w in neighbours:
             ncost = dist + w['weight']
