@@ -167,6 +167,14 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
         if 0 == len(neighbours):
             continue
 
+        # if neighbours list has at least 2 elements, sort it, putting the target node first, then by ascending
+        if 1 < len(neighbours):
+            neighbours.sort(key=lambda item: item[1]['weight'])
+            neighbours.sort(key=lambda item: item[0].is_target, reverse=True)
+            if neighbours[0][0].is_target:  # If first item is the target node, drop all neighbours with higher weights
+                targ_weight = neighbours[0][1]['weight']
+                neighbours = [(k, v) for (k, v) in neighbours if v['weight'] <= targ_weight]
+
         for neighbor, w in neighbours:
             ncost = dist + w['weight']
             if neighbor.is_enqueued and neighbor in enqueued:
