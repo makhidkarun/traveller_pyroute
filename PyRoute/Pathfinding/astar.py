@@ -141,6 +141,8 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
             qcost, h = enqueued[curnode]
             if qcost < dist:
                 continue
+            # If we've found a better path, update
+            enqueued[curnode] = dist, h
 
         explored[curnode] = parent
 
@@ -167,6 +169,9 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
                 # to the queue
                 if qcost <= ncost:
                     continue
+                # if qcost > ncost, we've found a less-costly
+                # path from neighbour to the source, so update enqueued value
+                enqueued[neighbor] = ncost, h
             else:
                 h = heuristic(neighbor, target)
 
