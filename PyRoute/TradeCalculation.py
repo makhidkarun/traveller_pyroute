@@ -407,10 +407,10 @@ class XRouteCalculation(RouteCalculation):
         for end in route[1:]:
             distance += start.hex_distance(end)
             end.tradeCount += 1
-            self.galaxy.stars[start][end]['trade'] = max(trade, self.galaxy.stars[start][end]['trade'])
-            self.galaxy.stars[start][end]['count'] += 1
-            self.galaxy.stars[start][end]['weight'] -= \
-                self.galaxy.stars[start][end]['weight'] // self.route_reuse
+            data = self.galaxy.stars[start][end]
+            data['trade'] = max(trade, data[start][end]['trade'])
+            data['count'] += 1
+            data['weight'] -= data['weight'] // self.route_reuse
             start = end
 
         self.galaxy.ranges[route[0]][route[-1]]['actual distance'] = distance
@@ -680,10 +680,10 @@ class TradeCalculation(RouteCalculation):
             end.tradeOver += tradeCr if end != route[-1] else 0
             end.tradeCount += 1 if end != route[-1] else 0
             end.passOver += tradePass if end != route[-1] else 0
-            self.galaxy.stars[start][end]['trade'] += tradeCr
-            self.galaxy.stars[start][end]['count'] += 1
-            self.galaxy.stars[start][end]['weight'] -= \
-                self.galaxy.stars[start][end]['weight'] / self.route_reuse
+            data = self.galaxy.stars[start][end]
+            data['trade'] += tradeCr
+            data['count'] += 1
+            data['weight'] -= data['weight'] / self.route_reuse
             start = end
 
         return (tradeCr, tradePass)
@@ -798,12 +798,12 @@ class TradeCalculation(RouteCalculation):
             for end in route:
                 if end == start:
                     continue
-                self.galaxy.stars[start][end]['trade'] += tradeCr
+                data = self.galaxy.stars[start][end]
+                data['trade'] += tradeCr
                 # Reduce the weight of this route. 
                 # As the higher trade routes create established routes 
                 # which are more likely to be followed by lower trade routes
-                self.galaxy.stars[start][end]['weight'] -= \
-                    self.galaxy.stars[start][end]['weight'] / self.route_reuse
+                data['weight'] -= data['weight'] / self.route_reuse
                 end.tradeOver += tradeCr if end != target else 0
                 start = end
 
@@ -1017,13 +1017,13 @@ class CommCalculation(RouteCalculation):
         start = route[0]
         for end in route[1:]:
             end.tradeCount += 1 if end != route[-1] else 0
-            self.galaxy.stars[start][end]['trade'] = trade
-            self.galaxy.stars[start][end]['count'] += 1
+            data = self.galaxy.stars[start][end]
+            data['trade'] = trade
+            data['count'] += 1
             if start == route[0] or end == route[-1]:
-                self.galaxy.stars[start][end]['weight'] = \
-                    max(self.galaxy.stars[start][end]['weight'] - 2,
+                data['weight'] = \
+                    max(data['weight'] - 2,
                         self.route_reuse)
             else:
-                self.galaxy.stars[start][end]['weight'] -= \
-                    self.galaxy.stars[start][end]['weight'] / self.route_reuse
+                data['weight'] -= data['weight'] / self.route_reuse
             start = end
