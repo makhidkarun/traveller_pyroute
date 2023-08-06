@@ -247,6 +247,7 @@ class Galaxy(AreaItem):
         self.min_btn = min_btn
         self.route_btn = route_btn
         self.debug_flag = debug_flag
+        self.landmarks = dict()
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -509,6 +510,9 @@ class Galaxy(AreaItem):
             star.is_well_formed()
 
     def heuristic_distance(self, star, target):
+        item = (star, target)
+        if item in self.landmarks:
+            return self.landmarks[item]
         return Star.heuristicDistance(star, target)
 
     def route_cost(self, route):

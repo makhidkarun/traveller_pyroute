@@ -234,6 +234,9 @@ class TradeCalculation(RouteCalculation):
         self.galaxy.ranges[route[0]][route[-1]]['actual distance'] = distance
         self.galaxy.ranges[route[0]][route[-1]]['jumps'] = len(route) - 1
 
+        self.galaxy.landmarks[(route[0], route[-1])] = distance
+        self.galaxy.landmarks[(route[-1], route[0])] = distance
+
         # Gather basic statistics. 
         tradeBTN = self.get_btn(route[0], route[-1], distance)
         tradeCr = self.calc_trade(tradeBTN)
