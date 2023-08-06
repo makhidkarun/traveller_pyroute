@@ -172,6 +172,8 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
             if neighbor.is_target and targ_hash == neighbor.__hash__() and neighbor == target:
                 upbound = min(upbound, ncost)
                 queue = [item for item in queue if item[0] <= upbound]
+                # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
+                queue = [item for item in queue if not (item[2] in enqueued and item[3] > enqueued[item[2]][0])]
                 heapify(queue)
                 delta = upbound - dist
 
