@@ -150,7 +150,8 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
         delta = upbound - dist
         # Pre-filter neighbours
         # Remove neighbour nodes that are already enqueued and won't result in shorter paths to them
-        neighbours = [(k, v) for (k, v) in G_succ[curnode].items() if not (k.is_enqueued and k in enqueued and dist + v['weight'] >= enqueued[k][0])]
+        # Explicitly retain target node (if present) to give a chance of finding a better upper bound
+        neighbours = [(k, v) for (k, v) in G_succ[curnode].items() if not (k.is_enqueued and k in enqueued and dist + v['weight'] >= enqueued[k][0] and not k.is_target)]
         if upbound != float('inf') and 0 < len(neighbours):
             # Remove neighbour nodes who will bust the upper bound as it currently stands
             neighbours = [(k, v) for (k, v) in neighbours if v['weight'] <= delta]
@@ -178,13 +179,14 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
             # if this completes a path (no matter how _bad_), update the upper bound.
             # We hold the is_target checks until _after_ we've checked we're enqueueing
             # a cheaper path
-            if neighbor.is_target and targ_hash == neighbor.__hash__() and neighbor == target:
-                upbound = min(upbound, ncost)
-                queue = [item for item in queue if item[0] <= upbound]
-                # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
-                queue = [item for item in queue if not (item[2] in enqueued and item[3] > enqueued[item[2]][0])]
-                heapify(queue)
-                delta = upbound - dist
+            if neighbor.is_target:
+                if targ_hash == neighbor.__hash__() and neighbor == target:
+                    upbound = min(upbound, ncost)
+                    queue = [item for item in queue if item[0] <= upbound]
+                    # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
+                    queue = [item for item in queue if not (item[2] in enqueued and item[3] > enqueued[item[2]][0])]
+                    heapify(queue)
+                    delta = upbound - dist
 
             # if ncost + heuristic would bust the _upper_ bound, there's no point queueing the neighbour
             # If neighbour is the target, h should be zero
