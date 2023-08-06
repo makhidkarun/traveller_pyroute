@@ -8,6 +8,7 @@ import logging
 import itertools
 import networkx as nx
 from PyRoute.AllyGen import AllyGen
+from PyRoute.Pathfinding.astar import astar_path
 from PyRoute.Star import Star
 
 
@@ -606,7 +607,7 @@ class TradeCalculation(RouteCalculation):
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
-            route = nx.astar_path(self.galaxy.stars, star, target, Star.heuristicDistance)
+            route = astar_path(self.galaxy.stars, star, target, self.galaxy.heuristic_distance)
         except nx.NetworkXNoPath:
             return
 
