@@ -97,7 +97,8 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
 
     push = heappush
     pop = heappop
-    weight = _weight_function(G, weight)
+    # weight = _weight_function(G, weight)
+    weight = weight_function(weight)
 
     G_succ = G._adj  # For speed-up (and works for both directed and undirected graphs)
 
@@ -224,6 +225,10 @@ def astar_path_length(G, source, target, heuristic=None, weight="weight"):
         msg = f"Either source {source} or target {target} is not in G"
         raise nx.NodeNotFound(msg)
 
-    weight = _weight_function(G, weight)
-    path = astar_path(G, source, target, heuristic, weight)
+    weight_fn = weight_function(G, weight)
+    path = astar_path(G, source, target, heuristic, weight_fn)
     return sum(weight(u, v, G[u][v]) for u, v in zip(path[:-1], path[1:]))
+
+
+def weight_function(weight):
+    return lambda u, v, data: data.get(weight, 1)
