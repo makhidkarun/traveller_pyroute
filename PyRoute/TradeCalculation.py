@@ -683,7 +683,7 @@ class TradeCalculation(RouteCalculation):
             data = self.galaxy.stars[start][end]
             data['trade'] += tradeCr
             data['count'] += 1
-            data['weight'] -= data['weight'] / self.route_reuse
+            data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
             start = end
 
         return (tradeCr, tradePass)
