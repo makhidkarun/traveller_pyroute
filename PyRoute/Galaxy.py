@@ -527,3 +527,17 @@ class Galaxy(AreaItem):
 
             start = end
         return total_weight
+
+    '''
+    Check that route doesn't revisit any stars
+    '''
+    def route_no_revisit(self, route):
+        visited = set()
+
+        for item in route:
+            name = str(item)
+            if name in visited:
+                return False
+            visited.add(name)
+
+        return True

@@ -179,6 +179,8 @@ class TradeCalculation(RouteCalculation):
         except nx.NetworkXNoPath:
             return
 
+        assert self.galaxy.route_no_revisit(route), "Route between " + str(star) + " and " + str(target) + " revisits at least one star"
+
         if self.debug_flag:
             fwd_weight = self.route_cost(route)
             route.reverse()
