@@ -13,7 +13,6 @@ from networkx.algorithms.shortest_paths.weighted import _weight_function
 
 __all__ = ["astar_path"]
 
-
 def astar_path(G, source, target, heuristic=None, weight="weight"):
     """Returns a list of nodes in a shortest path between source and target
     using the A* ("A-star") algorithm.
@@ -112,11 +111,18 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
     # Tracks shortest _complete_ path found so far
     upbound = float('inf')
 
+    # set target node flag
+    target.is_target = True
+    targ_hash = target.__hash__()
+
     while queue:
         # Pop the smallest item from queue.
         _, __, curnode, dist, parent = pop(queue)
 
-        if curnode == target:
+        if curnode.is_target and targ_hash == curnode.__hash__() and curnode == target:
+            target.is_target = False
+            for node in enqueued:
+                node.is_enqueued = False
             path = [curnode]
             node = parent
             while node is not None:
@@ -137,18 +143,21 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
 
         explored[curnode] = parent
 
+        # gap between dist and current upper bound - if a neighbour's connecting weight exceeds this, skip it
+        delta = upbound - dist
         for neighbor, w in G_succ[curnode].items():
             cost = w['weight']
-            ncost = dist + cost
             # if just _adding_ the neighbour busts the upper bound, move on
-            if ncost > upbound:
+            if cost > delta:
                 continue
+            ncost = dist + cost
             # if this completes a path (no matter how _bad_), update the upper bound
-            if neighbor == target:
+            if neighbor.is_target and targ_hash == neighbor.__hash__() and neighbor == target:
                 upbound = min(upbound, ncost)
                 queue = [item for item in queue if item[0] <= upbound]
                 heapify(queue)
-            if neighbor in enqueued:
+                delta = upbound - dist
+            if neighbor.is_enqueued and neighbor in enqueued:
                 qcost, h = enqueued[neighbor]
                 # if qcost <= ncost, a less costly path from the
                 # neighbor to the source was already determined.
@@ -161,6 +170,7 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
             # if ncost + heuristic would bust the _upper_ bound, there's no point queueing the neighbour
             # If neighbour is the target, h should be zero
             if ncost + h <= upbound:
+                neighbor.is_enqueued = True
                 enqueued[neighbor] = ncost, h
                 push(queue, (ncost + h, next(c), neighbor, ncost, curnode))
 
