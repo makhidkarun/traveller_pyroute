@@ -146,8 +146,13 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
 
         # gap between dist and current upper bound - if a neighbour's connecting weight exceeds this, skip it
         delta = upbound - dist
-        # Pre-filter neighbours who will bust the upper bound as it currently stands
-        neighbours = [(k, v) for (k, v) in G_succ[curnode].items() if v['weight'] <= delta]
+        # Pre-filter neighbours
+        # Remove neighbour nodes that are already enqueued and won't result in shorter paths to them
+        neighbours = [(k, v) for (k, v) in G_succ[curnode].items() if not (k.is_enqueued and k in enqueued and dist + v['weight'] >= enqueued[k][0])]
+        if upbound != float('inf'):
+            # Remove neighbour nodes who will bust the upper bound as it currently stands
+            neighbours = [(k, v) for (k, v) in neighbours if v['weight'] <= delta]
+
         for neighbor, w in neighbours:
             ncost = dist + w['weight']
             if neighbor.is_enqueued and neighbor in enqueued:
@@ -168,6 +173,7 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
                 upbound = min(upbound, ncost)
                 queue = [item for item in queue if item[0] <= upbound]
                 heapify(queue)
+                delta = upbound - dist
 
             # if ncost + heuristic would bust the _upper_ bound, there's no point queueing the neighbour
             # If neighbour is the target, h should be zero
