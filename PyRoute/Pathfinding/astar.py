@@ -143,13 +143,17 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
                 continue
 
         explored[curnode] = parent
+        delta = upbound - dist
 
-        for neighbor, w in G_succ[curnode].items():
-            cost = weight(curnode, neighbor, w)
-            if cost is None:
-                continue
+        # Filter out neighbours who will already bust upper bound, before a better one is found
+        pre_filter_dict = {key: value for key, value in G_succ[curnode].items() if value['weight'] is not None and value['weight'] <= delta}
+
+        for neighbor in pre_filter_dict:
+            cost = pre_filter_dict[neighbor]['weight']
             ncost = dist + cost
             # if just _adding_ the neighbour busts the upper bound, move on
+            # This is still needed despite the pre-filtering - say prefiltering was against an upper bound of 2000
+            # and upper bound has now dropped to 1800
             if ncost > upbound:
                 continue
             # if this completes a path (no matter how _bad_), update the upper bound
