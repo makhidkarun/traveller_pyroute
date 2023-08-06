@@ -115,10 +115,17 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
     # set target node flag
     target.is_target = True
     targ_hash = target.__hash__()
+    node_counter = 0
 
     while queue:
         # Pop the smallest item from queue.
         _, __, curnode, dist, parent = pop(queue)
+        node_counter += 1
+
+        if 0 == node_counter % 49:
+            # Trim queue items that can not result in a shorter path
+            queue = [item for item in queue if not (item[2] in enqueued and item[3] > enqueued[item[2]][0])]
+            heapify(queue)
 
         if curnode.is_target and targ_hash == curnode.__hash__() and curnode == target:
             target.is_target = False
