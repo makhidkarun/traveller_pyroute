@@ -13,6 +13,7 @@ from networkx.algorithms.shortest_paths.weighted import _weight_function
 
 __all__ = ["astar_path"]
 
+
 def astar_path(G, source, target, heuristic=None, weight="weight"):
     """Returns a list of nodes in a shortest path between source and target
     using the A* ("A-star") algorithm.
@@ -145,18 +146,10 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
 
         # gap between dist and current upper bound - if a neighbour's connecting weight exceeds this, skip it
         delta = upbound - dist
-        for neighbor, w in G_succ[curnode].items():
-            cost = w['weight']
-            # if just _adding_ the neighbour busts the upper bound, move on
-            if cost > delta:
-                continue
-            ncost = dist + cost
-            # if this completes a path (no matter how _bad_), update the upper bound
-            if neighbor.is_target and targ_hash == neighbor.__hash__() and neighbor == target:
-                upbound = min(upbound, ncost)
-                queue = [item for item in queue if item[0] <= upbound]
-                heapify(queue)
-                delta = upbound - dist
+        # Pre-filter neighbours who will bust the upper bound as it currently stands
+        neighbours = [(k, v) for (k, v) in G_succ[curnode].items() if v['weight'] <= delta]
+        for neighbor, w in neighbours:
+            ncost = dist + w['weight']
             if neighbor.is_enqueued and neighbor in enqueued:
                 qcost, h = enqueued[neighbor]
                 # if qcost <= ncost, a less costly path from the
@@ -167,6 +160,15 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
                     continue
             else:
                 h = heuristic(neighbor, target)
+
+            # if this completes a path (no matter how _bad_), update the upper bound.
+            # We hold the is_target checks until _after_ we've checked we're enqueueing
+            # a cheaper path
+            if neighbor.is_target and targ_hash == neighbor.__hash__() and neighbor == target:
+                upbound = min(upbound, ncost)
+                queue = [item for item in queue if item[0] <= upbound]
+                heapify(queue)
+
             # if ncost + heuristic would bust the _upper_ bound, there's no point queueing the neighbour
             # If neighbour is the target, h should be zero
             if ncost + h <= upbound:
