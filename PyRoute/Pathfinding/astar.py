@@ -167,7 +167,7 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
         if 0 == len(neighbours):
             continue
 
-        # if neighbours list has at least 2 elements, sort it, putting the target node first, then by ascending
+        # if neighbours list has at least 2 elements, sort it, putting the target node first, then by ascending weight
         if 1 < len(neighbours):
             neighbours.sort(key=lambda item: item[1]['weight'])
             neighbours.sort(key=lambda item: item[0].is_target, reverse=True)
@@ -201,7 +201,6 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
                     # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
                     queue = [item for item in queue if not (item[2] in enqueued and item[3] > enqueued[item[2]][0])]
                     heapify(queue)
-                    delta = upbound - dist
 
             # if ncost + heuristic would bust the _upper_ bound, there's no point queueing the neighbour
             # If neighbour is the target, h should be zero
