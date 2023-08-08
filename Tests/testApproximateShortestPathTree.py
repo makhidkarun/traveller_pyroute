@@ -11,6 +11,7 @@ import unittest
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
+from PyRoute.Pathfinding.relaxed_single_source_dijkstra import relaxed_single_source_dijkstra
 
 
 class MyTestCase(unittest.TestCase):
@@ -126,7 +127,7 @@ class MyTestCase(unittest.TestCase):
 
         dropnodes = [item for item in stars if item.component != source.component]
 
-        distances, paths, parent = approx.drop_nodes(dropnodes)
+        distances, paths, parent, _, _ = approx.drop_nodes(dropnodes)
         self.assertEqual(old_distances, distances)
         self.assertEqual(old_paths, paths)
         self.assertEqual(old_parent, parent)
@@ -154,7 +155,7 @@ class MyTestCase(unittest.TestCase):
 
         leaves = [item for item in stars if -1 != str(item).find('Dorsiki')]
 
-        distances, paths, parent, kids = approx.drop_nodes(leaves)
+        distances, paths, parent, kids, restart = approx.drop_nodes(leaves)
         self.assertEqual(481, len(distances))
         self.assertEqual(481, len(paths))
         self.assertEqual(481, len(parent))
@@ -193,7 +194,7 @@ class MyTestCase(unittest.TestCase):
 
         dropnodes = [inter]
 
-        distances, paths, parent, kids = approx.drop_nodes(dropnodes)
+        distances, paths, parent, kids, restart = approx.drop_nodes(dropnodes)
         self.assertEqual(479, len(distances))
         self.assertEqual(479, len(paths))
         self.assertEqual(479, len(parent))
@@ -205,7 +206,7 @@ class MyTestCase(unittest.TestCase):
             self.assertNotIn(node, parent, "Node " + str(node) + " not removed from parent")
             self.assertNotIn(node, kids, "Node " + str(node) + " not removed from kids")
 
-    def test_drop_third_level_intermediate_nodes_in_same_component(self):
+    def test_drop_third_level_intermediate_nodes_in_same_component_and_regenerate(self):
         sourcefile = 'DeltaFiles/Zarushagar.sec'
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -236,6 +237,7 @@ class MyTestCase(unittest.TestCase):
         num_check = 0
 
         while num_check != len(check):
+            num_check = len(check)
             scratch = set()
             for item in check:
                 for kid in approx._kids[item]:
@@ -246,17 +248,54 @@ class MyTestCase(unittest.TestCase):
 
         dropnodes = [inter]
 
-        distances, paths, parent, kids = approx.drop_nodes(dropnodes)
+        distances, paths, parent, kids, restart = approx.drop_nodes(dropnodes)
         self.assertEqual(475, len(distances))
         self.assertEqual(475, len(paths))
         self.assertEqual(475, len(parent))
         self.assertEqual(475, len(kids))
+        self.assertEqual(1, len(restart))
 
         for node in check:
             self.assertNotIn(node, distances, "Node " + str(node) + " not removed from distances")
             self.assertNotIn(node, paths, "Node " + str(node) + " not removed from paths")
             self.assertNotIn(node, parent, "Node " + str(node) + " not removed from parent")
             self.assertNotIn(node, kids, "Node " + str(node) + " not removed from kids")
+
+        distances = relaxed_single_source_dijkstra(graph, source, 'weight', parent=parent, paths=paths, restart=restart, distances=distances)
+        self.assertEqual(482, len(distances), "Removed node distances should be added by restart")
+        self.assertEqual(482, len(paths), "Removed node paths should be added by restart")
+        self.assertEqual(482, len(parent), "Removed node parents should be added by restart")
+
+    def test_recurrently_dropped_nodes_dont_turn_up_in_restart(self):
+        sourcefile = 'DeltaFiles/Zarushagar.sec'
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+
+        graph = galaxy.stars
+        stars = list(graph.nodes)
+        source = stars[0]
+
+        approx = ApproximateShortestPathTree(source, graph, 0.2)
+
+        leaf = [item for item in stars if -1 != str(item).find('Dorsiki')][0]
+        mid = approx._parent[leaf]
+        hi = approx._parent[mid]
+        inter = approx._parent[hi]
+
+        dropnodes = [inter, hi, mid, leaf]
+
+        _, _, _, _, restart = approx.drop_nodes(dropnodes)
+        self.assertEqual(1, len(restart), "Restart nodes shouldn't be parents of other restart nodes")
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
