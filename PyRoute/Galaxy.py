@@ -248,6 +248,7 @@ class Galaxy(AreaItem):
         self.route_btn = route_btn
         self.debug_flag = debug_flag
         self.landmarks = dict()
+        self.big_component = None
 
     # For the JSONPickel work
     def __getstate__(self):

@@ -400,8 +400,12 @@ class TradeCalculation(RouteCalculation):
         bitz = nx.connected_components(self.galaxy.stars)
         counter = -1
 
+        maxsize = 0
+
         for component in bitz:
             counter += 1
+            if len(component) > maxsize:
+                self.galaxy.big_component = counter - 1
             for star in component:
                 star.component = counter
         return
