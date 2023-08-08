@@ -504,3 +504,23 @@ class Galaxy(AreaItem):
     def is_well_formed(self):
         for star in self.stars:
             star.is_well_formed()
+
+    def heuristic_distance(self, star, target):
+        return Star.heuristicDistance(star, target)
+
+    def route_cost(self, route):
+        """
+        Given a route, return its total cost via _compensated_ summation
+        """
+        total_weight = 0
+        c = 0
+        start = route[0]
+        for end in route[1:]:
+            y = float(self.stars[start][end]['weight']) - c
+            t = total_weight + y
+            c = (t - total_weight) - y
+
+            total_weight = t
+
+            start = end
+        return total_weight

@@ -145,6 +145,8 @@ class Star(object):
         self.star_list = None
         self.routes = None
         self.stars = None
+        self.is_enqueued = False
+        self.is_target = False
 
     def __getstate__(self):
         state = self.__dict__.copy()
