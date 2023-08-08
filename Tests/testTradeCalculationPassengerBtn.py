@@ -1,9 +1,10 @@
 import unittest
 import sys
 
+from PyRoute.Calculation.TradeCalculation import TradeCalculation
+
 sys.path.append('../PyRoute')
 from Star import Star
-from TradeCalculation import TradeCalculation
 from TradeCodes import TradeCodes
 
 param_list = [
