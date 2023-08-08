@@ -148,6 +148,11 @@ class TradeCalculation(RouteCalculation):
         btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True) if s.component == n.component]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
+        # Pick landmark - biggest WTN system in the biggest graph component
+        stars = [item for item in self.galaxy.stars if item.component == self.galaxy.big_component]
+        stars.sort(key=lambda item: item.wtn, reverse=True)
+        stars[0].is_landmark = True
+
         base_btn = 0
         counter = 0
         processed = 0

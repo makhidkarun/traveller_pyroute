@@ -147,6 +147,7 @@ class Star(object):
         self.stars = None
         self.is_enqueued = False
         self.is_target = False
+        self.is_landmark = False
 
     def __getstate__(self):
         state = self.__dict__.copy()
