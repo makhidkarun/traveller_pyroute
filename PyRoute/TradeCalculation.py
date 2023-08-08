@@ -410,7 +410,7 @@ class XRouteCalculation(RouteCalculation):
             data = self.galaxy.stars[start][end]
             data['trade'] = max(trade, data[start][end]['trade'])
             data['count'] += 1
-            data['weight'] -= data['weight'] // self.route_reuse
+            data['weight'] -= (data['weight'] - data['distance']) // self.route_reuse
             start = end
 
         self.galaxy.ranges[route[0]][route[-1]]['actual distance'] = distance
@@ -803,7 +803,7 @@ class TradeCalculation(RouteCalculation):
                 # Reduce the weight of this route. 
                 # As the higher trade routes create established routes 
                 # which are more likely to be followed by lower trade routes
-                data['weight'] -= data['weight'] / self.route_reuse
+                data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
                 end.tradeOver += tradeCr if end != target else 0
                 start = end
 
@@ -1025,5 +1025,5 @@ class CommCalculation(RouteCalculation):
                     max(data['weight'] - 2,
                         self.route_reuse)
             else:
-                data['weight'] -= data['weight'] / self.route_reuse
+                data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
             start = end
