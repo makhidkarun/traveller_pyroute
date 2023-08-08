@@ -242,6 +242,16 @@ class TradeCalculation(RouteCalculation):
         self.galaxy.landmarks[(route[0], route[-1])] = distance
         self.galaxy.landmarks[(route[-1], route[0])] = distance
 
+        if route[0].is_landmark != route[-1].is_landmark:
+            if route[0].is_landmark:
+                landmark = route[0]
+                other = route[-1]
+            else:
+                landmark = route[-1]
+                other = route[0]
+
+            self.galaxy.distance_alt_tracking[other] = distance
+
         # Gather basic statistics. 
         tradeBTN = self.get_btn(route[0], route[-1], distance)
         tradeCr = self.calc_trade(tradeBTN)
