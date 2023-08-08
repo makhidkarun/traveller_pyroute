@@ -3,6 +3,8 @@ Created on Aug 08, 2023
 
 @author: CyberiaResurrection
 """
+import copy
+
 import networkx as nx
 
 
@@ -21,6 +23,7 @@ class ApproximateShortestPathTree:
             for i in range(1, len(route)):
                 if route[i] not in self._parent:
                     self._parent[route[i]] = route[i-1]
+        self._kids = ApproximateShortestPathTree._build_children(self._parent)
 
     def lower_bound(self, source, target):
         left = self._distances[source]
@@ -30,3 +33,49 @@ class ApproximateShortestPathTree:
 
         bound = max(0, big / (1 + self._epsilon) - little)
         return bound
+
+    def drop_nodes(self, nodes_to_drop):
+        nodedrop = {item for item in nodes_to_drop if item.component == self._source.component}
+        parent = nodedrop.copy()
+        extend = set()
+
+        for node in parent:
+            for item in self._kids[node]:
+                extend.add(item)
+
+        while 0 < len(extend):
+            for item in extend:
+                nodedrop.add(item)
+            parent = extend
+            extend = set()
+            for node in parent:
+                for item in self._kids[node]:
+                    extend.add(item)
+
+        distances = copy.deepcopy(self._distances)
+        paths = copy.deepcopy(self._paths)
+        parent = copy.deepcopy(self._parent)
+
+        for node in nodedrop:
+            del distances[node]
+            del paths[node]
+            del parent[node]
+
+        kids = self._build_children(parent)
+
+        return distances, paths, parent, kids
+
+    @staticmethod
+    def _build_children(parents):
+        kids = dict()
+        for parent in parents:
+            kid = parents[parent]
+            if kid is None:
+                continue
+            if kid not in kids:
+                kids[kid] = set()
+            if parent not in kids:
+                kids[parent] = set()
+            kids[kid].add(parent)
+
+        return kids
