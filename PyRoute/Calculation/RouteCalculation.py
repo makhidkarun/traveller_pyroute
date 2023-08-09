@@ -4,6 +4,7 @@ Created on Aug 09, 2023
 @author: CyberiaResurrection
 """
 import bisect
+import functools
 import itertools
 import logging
 
@@ -138,6 +139,7 @@ class RouteCalculation(object):
         return passBTN
 
     @staticmethod
+    @functools.cache
     def calc_trade(btn):
         """
         Convert the BTN trade number to a credit value.
@@ -150,6 +152,7 @@ class RouteCalculation(object):
         return trade
 
     @staticmethod
+    @functools.cache
     def calc_passengers(btn):
         trade = 0
         if (btn <= 10):

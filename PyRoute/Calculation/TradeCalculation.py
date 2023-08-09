@@ -239,8 +239,9 @@ class TradeCalculation(RouteCalculation):
         target = route[-1]
 
         # Internal statistics
-        self.galaxy.ranges[source][target]['actual distance'] = distance
-        self.galaxy.ranges[source][target]['jumps'] = len(route) - 1
+        rangedata = self.galaxy.ranges[source][target]
+        rangedata['actual distance'] = distance
+        rangedata['jumps'] = len(route) - 1
 
         if source.is_landmark != target.is_landmark:
             if source.is_landmark:
@@ -296,10 +297,9 @@ class TradeCalculation(RouteCalculation):
         Given a route, return its line length in parsec
         """
         distance = 0
-        start = route[0]
-        for end in route[1:]:
-            distance += start.hex_distance(end)
-            start = end
+        links = zip(route[0:-1], route[1:])
+        for item in links:
+            distance += item[0].hex_distance(item[1])
         return distance
 
     def route_cost(self, route):
