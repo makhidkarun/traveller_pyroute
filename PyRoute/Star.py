@@ -742,3 +742,15 @@ class Star(object):
         assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         return True
+
+    @functools.cached_property
+    def passenger_btn_mod(self):
+        rich = 1 if self.tradeCode.rich else 0
+
+        # Only apply the modifier corresponding to the highest-level capital - other_capital beats sector_capital,
+        # which in turn beats subsector_capital.  The current approach makes adding a different value for other_capital
+        # (eg 3) very easy.
+        capital = 2 if self.tradeCode.sector_capital or self.tradeCode.other_capital else 1 if \
+            self.tradeCode.subsector_capital else 0
+
+        return rich + capital
