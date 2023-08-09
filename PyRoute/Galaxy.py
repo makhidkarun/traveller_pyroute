@@ -14,8 +14,11 @@ import math
 import networkx as nx
 
 from PyRoute.Star import Star
-from PyRoute.TradeCalculation import TradeCalculation, NoneCalculation, CommCalculation, XRouteCalculation, \
-    OwnedWorldCalculation
+from PyRoute.Calculation.TradeCalculation import TradeCalculation
+from PyRoute.Calculation.CommCalculation import CommCalculation
+from PyRoute.Calculation.OwnedWorldCalculation import OwnedWorldCalculation
+from PyRoute.Calculation.NoneCalculation import NoneCalculation
+from PyRoute.Calculation.XRouteCalculation import XRouteCalculation
 from PyRoute.StatCalculation import ObjectStatistics
 from PyRoute.AllyGen import AllyGen
 
