@@ -235,39 +235,42 @@ class TradeCalculation(RouteCalculation):
         """
         distance = self.route_distance(route)
 
+        source = route[0]
+        target = route[-1]
+
         # Internal statistics
-        self.galaxy.ranges[route[0]][route[-1]]['actual distance'] = distance
-        self.galaxy.ranges[route[0]][route[-1]]['jumps'] = len(route) - 1
+        self.galaxy.ranges[source][target]['actual distance'] = distance
+        self.galaxy.ranges[source][target]['jumps'] = len(route) - 1
 
-        self.galaxy.landmarks[(route[0], route[-1])] = distance
-        self.galaxy.landmarks[(route[-1], route[0])] = distance
+        self.galaxy.landmarks[(source, target)] = distance
+        self.galaxy.landmarks[(target, source)] = distance
 
-        if route[0].is_landmark != route[-1].is_landmark:
-            if route[0].is_landmark:
-                landmark = route[0]
-                other = route[-1]
+        if source.is_landmark != target.is_landmark:
+            if source.is_landmark:
+                landmark = source
+                other = target
             else:
-                landmark = route[-1]
-                other = route[0]
+                landmark = target
+                other = source
 
             self.galaxy.distance_alt_tracking[other] = distance
 
         # Gather basic statistics. 
-        tradeBTN = self.get_btn(route[0], route[-1], distance)
+        tradeBTN = self.get_btn(source, target, distance)
         tradeCr = self.calc_trade(tradeBTN)
-        route[0].tradeIn += tradeCr // 2
-        route[-1].tradeIn += tradeCr // 2
-        tradePassBTN = self.get_passenger_btn(tradeBTN, route[0], route[-1])
+        source.tradeIn += tradeCr // 2
+        target.tradeIn += tradeCr // 2
+        tradePassBTN = self.get_passenger_btn(tradeBTN, source, target)
         tradePass = self.calc_passengers(tradePassBTN)
 
-        route[0].passIn += tradePass
-        route[-1].passIn += tradePass
+        source.passIn += tradePass
+        target.passIn += tradePass
 
-        start = route[0]
+        start = source
         for end in route[1:]:
-            end.tradeOver += tradeCr if end != route[-1] else 0
-            end.tradeCount += 1 if end != route[-1] else 0
-            end.passOver += tradePass if end != route[-1] else 0
+            end.tradeOver += tradeCr if end != target else 0
+            end.tradeCount += 1 if end != target else 0
+            end.passOver += tradePass if end != target else 0
             data = self.galaxy.stars[start][end]
             data['trade'] += tradeCr
             data['count'] += 1
