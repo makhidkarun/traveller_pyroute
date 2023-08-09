@@ -122,7 +122,7 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
         _, __, curnode, dist, parent = pop(queue)
         node_counter += 1
 
-        if 0 == node_counter % 49:
+        if 0 == node_counter % 49 and 0 < len(queue):
             # Trim queue items that can not result in a shorter path
             queue = [item for item in queue if not (item[2] in enqueued and item[3] > enqueued[item[2]][0])]
             heapify(queue)
@@ -197,10 +197,12 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
             if neighbor.is_target:
                 if targ_hash == neighbor.__hash__() and neighbor == target:
                     upbound = min(upbound, ncost)
-                    queue = [item for item in queue if item[0] <= upbound]
-                    # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
-                    queue = [item for item in queue if not (item[2] in enqueued and item[3] > enqueued[item[2]][0])]
-                    heapify(queue)
+                    # only trim the queue if it's not empty
+                    if 0 < len(queue):
+                        queue = [item for item in queue if item[0] <= upbound]
+                        # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
+                        queue = [item for item in queue if not (item[2] in enqueued and item[3] > enqueued[item[2]][0])]
+                        heapify(queue)
 
             # if ncost + heuristic would bust the _upper_ bound, there's no point queueing the neighbour
             # If neighbour is the target, h should be zero
