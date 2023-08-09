@@ -251,20 +251,10 @@ class TradeCalculation(RouteCalculation):
                 # landmark = target
                 other = source
 
-            self.galaxy.distance_alt_tracking[str(other)] = distance
+            self.galaxy.distance_alt_tracking[other] = distance
 
-        # Store resulting distance if it exceeds the straight-line distance
-        if str(source) in self.galaxy.distance_alt_tracking:
-            if str(target) in self.galaxy.distance_alt_tracking:
-                left = self.galaxy.distance_alt_tracking[str(source)]
-                right = self.galaxy.distance_alt_tracking[str(target)]
-                bound = abs(left - right)
-                if bound > distance:
-                    distance = bound
-
-        if distance > source.hex_distance(target):
-            self.galaxy.landmarks[(source, target)] = distance
-            self.galaxy.landmarks[(target, source)] = distance
+        self.galaxy.landmarks[(source, target)] = distance
+        self.galaxy.landmarks[(target, source)] = distance
 
         # Gather basic statistics.
         tradeBTN = self.get_btn(source, target, distance)
