@@ -242,8 +242,10 @@ class TradeCalculation(RouteCalculation):
         self.galaxy.ranges[source][target]['actual distance'] = distance
         self.galaxy.ranges[source][target]['jumps'] = len(route) - 1
 
-        self.galaxy.landmarks[(source, target)] = distance
-        self.galaxy.landmarks[(target, source)] = distance
+        # Store resulting distance if it exceeds the straight-line distance
+        if distance > source.hex_distance(target):
+            self.galaxy.landmarks[(source, target)] = distance
+            self.galaxy.landmarks[(target, source)] = distance
 
         if source.is_landmark != target.is_landmark:
             if source.is_landmark:
