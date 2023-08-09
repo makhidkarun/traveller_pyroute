@@ -244,10 +244,10 @@ class TradeCalculation(RouteCalculation):
 
         if source.is_landmark != target.is_landmark:
             if source.is_landmark:
-                landmark = source
+                # landmark = source
                 other = target
             else:
-                landmark = target
+                # landmark = target
                 other = source
 
             self.galaxy.distance_alt_tracking[other] = distance
@@ -278,9 +278,10 @@ class TradeCalculation(RouteCalculation):
 
         start = source
         for end in route[1:]:
-            end.tradeOver += tradeCr if end != target else 0
-            end.tradeCount += 1 if end != target else 0
-            end.passOver += tradePass if end != target else 0
+            if end != target:
+                end.tradeOver += tradeCr
+                end.tradeCount += 1
+                end.passOver += tradePass
             data = self.galaxy.stars[start][end]
             data['trade'] += tradeCr
             data['count'] += 1
