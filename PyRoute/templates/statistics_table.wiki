@@ -129,7 +129,11 @@ less than 1 million
 {%- macro get_count(plural, count, text, lead_text="") -%}
 {%- set count = plural.num(count) -%}
 {%- set c_text = plural.number_to_words(count, zero='no', threshold=10) -%}
+{%- if text -%}
 {{ plural.inflect("{0}{1} plural('{2}')".format(c_text, lead_text, text)) }}
+{%- else -%}
+{{ plural.inflect("{0}{1}".format(c_text, lead_text)) }}
+{%- endif -%}
 {%- endmacro -%}
 
 {%- macro high_pop_worlds(plural, area)-%}
