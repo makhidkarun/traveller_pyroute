@@ -4,7 +4,8 @@ Restarted single-source all-target Dijkstra shortest paths.
 Lifted from networkx repo (https://github.com/networkx/networkx/blob/main/networkx/algorithms/shortest_paths/weighted.py)
 as at Add note about using latex formatting in docstring in the contributor…  (commit a63c8bd).
 
-Major modifications here are ripping out gubbins unrelated to the single-source all-targets case.
+Major modifications here are ripping out gubbins unrelated to the single-source all-targets case, and handling cases
+where less than the entire shortest path tree needs to be regenerated due to a link weight change.
 
 """
 from heapq import heappush, heappop
@@ -14,7 +15,7 @@ import networkx as nx
 from networkx.algorithms.shortest_paths.weighted import _weight_function
 
 
-def single_source_dijkstra(G, source, weight="weight", cutoff=None):
+def single_source_dijkstra(G, source, weight="weight", cutoff=None, distances=None, paths=None, frontier=None):
     """Find shortest weighted paths and lengths from a source node.
 
     Compute the shortest path length between source and all other
@@ -46,6 +47,21 @@ def single_source_dijkstra(G, source, weight="weight", cutoff=None):
         positional arguments: the two endpoints of an edge and the
         dictionary of edge attributes for that edge. The function must
         return a number or None to indicate a hidden edge.
+
+    distances : dict of nodes, optional
+        If provided, is assumed to be a dictionary of node-numeric pairs,
+        reflecting the SPT distance from the node to source.
+        Required with paths and/or frontier.
+
+    paths : dict of nodes, optional
+        If provided, is assumed to be a dictionary of node-list pairs,
+        reflecting the already-found paths from the key node to the tree source.
+        Required with distances and/or frontier.
+
+    frontier : iterable of nodes, optional
+        If provided, is assumed to be an iterable of nodes in distances to re-start
+        the shortest-path search from.
+        Required with distances and/or paths.
 
     Returns
     -------
@@ -79,16 +95,19 @@ def single_source_dijkstra(G, source, weight="weight", cutoff=None):
         raise ValueError("source must not be empty")
     if source not in G:
         raise nx.NodeNotFound(f"Node {source} not found in graph")
+    if (distances is None) != (paths is None) or (distances is None) != (frontier is None):
+        raise nx.NetworkXException("Provide all of distances, paths and frontier, or none of them")
+
 
     weight = _weight_function(G, weight)
-    paths = {source: [source]}  # dictionary of paths
+    paths = {source: [source]} if paths is None else paths  # dictionary of paths
 
-    dist = _dijkstra_core(G, source, weight, paths=paths)
+    dist, diagnostics = _dijkstra_core(G, source, weight, paths=paths, distances=distances, frontier=frontier)
 
-    return (dist, paths)
+    return (dist, paths, diagnostics)
 
 
-def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None):
+def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None, distances=None, frontier=None):
     """Uses Dijkstra's algorithm to find shortest weighted paths
 
      Parameters
@@ -116,11 +135,26 @@ def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None):
          Length (sum of edge weights) at which the search is stopped.
          If cutoff is provided, only return paths with summed weight <= cutoff.
 
+    distances : dict of nodes, optional
+        If provided, is assumed to be a dictionary of node-numeric pairs,
+        reflecting the SPT distance from the node to source.
+
+    frontier : iterable of nodes, optional
+        If provided, is assumed to be an iterable of nodes in distances to re-start
+        the shortest-path search from.
+
+
      Returns
      -------
      distance : dictionary
          A mapping from node to shortest distance to that node from one
          of the source nodes.
+
+    diagnostics : dictionary
+        A dictionary containing the following entries:
+        nodes_expanded : Number of nodes expanded during search
+        nodes_queued : Number of nodes queued during search
+        neighbours_checked : Number of node neighbours considered during search
 
      Raises
      ------
@@ -141,6 +175,15 @@ def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None):
 
     dist = {}  # dictionary of final distances
     seen = {}
+    diagnostics = { 'nodes_expanded': 0, 'nodes_queued': 0, 'neighbours_checked': 0}
+
+    if frontier is not None:
+        for node in distances:
+            act_distance = distances[node]
+            if node in frontier:
+                seen[node] = act_distance
+            else:
+                dist[node] = act_distance
 
     # fringe is heapq with 3-tuples (distance,c,node)
     # use the count c to avoid comparing nodes (may not be able to)
@@ -148,15 +191,23 @@ def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None):
     fringe = []
 
     # set up the source
-    seen[source] = 0
-    push(fringe, (0, next(c), source))
+    if frontier is None:
+        seen[source] = 0
+        push(fringe, (0, next(c), source))
+        diagnostics['nodes_queued'] += 1
+    else:
+        for node in frontier:
+            push(fringe, (distances[node], next(c), node))
+            diagnostics['nodes_queued'] += 1
 
     while fringe:
         (d, _, v) = pop(fringe)
+        diagnostics['nodes_expanded'] += 1
         if v in dist:
             continue  # already searched this node.
         dist[v] = d
         for u, e in G_succ[v].items():
+            diagnostics['neighbours_checked'] += 1
             cost = weight(v, u, e)
             # if u is not connected to v, move on
             if cost is None:
@@ -179,6 +230,7 @@ def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None):
                 seen[u] = vu_dist
                 # queue u for processing
                 push(fringe, (vu_dist, next(c), u))
+                diagnostics['nodes_queued'] += 1
                 # if we're recording paths, record the path from source to u via v:
                 if paths is not None:
                     paths[u] = paths[v] + [u]
@@ -192,4 +244,4 @@ def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None):
 
     # The optional predecessor and path dictionaries can be accessed
     # by the caller via the pred and paths objects passed as arguments.
-    return dist
+    return dist, diagnostics
