@@ -149,7 +149,7 @@ class TradeCalculation(RouteCalculation):
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmark - biggest WTN system in the biggest graph component
-        stars = [item for item in self.galaxy.stars if item.component == self.galaxy.big_component]
+        stars = [item for item in self.galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
@@ -243,13 +243,23 @@ class TradeCalculation(RouteCalculation):
         rangedata['actual distance'] = distance
         rangedata['jumps'] = len(route) - 1
 
-        if source.is_landmark != target.is_landmark:
+        if False and source.is_landmark != target.is_landmark:
             if source.is_landmark:
                 # landmark = source
                 other = target
             else:
                 # landmark = target
                 other = source
+
+            items = self.galaxy.distance_alt_tracking.items()
+            #combos = [(k, v) for (k, v) in items if 4 < abs(v - distance)]
+
+            for item in items:
+                straight = other.hex_distance(item[0])
+                bound = abs(distance - item[1])
+                if bound > straight:
+                    self.galaxy.landmarks[(other, item[0])] = bound
+                    self.galaxy.landmarks[(item[0], other)] = bound
 
             self.galaxy.distance_alt_tracking[other] = distance
 
@@ -419,12 +429,8 @@ class TradeCalculation(RouteCalculation):
         bitz = nx.connected_components(self.galaxy.stars)
         counter = -1
 
-        maxsize = 0
-
         for component in bitz:
             counter += 1
-            if len(component) > maxsize:
-                self.galaxy.big_component = counter - 1
             for star in component:
                 star.component = counter
         return
