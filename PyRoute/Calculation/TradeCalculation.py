@@ -223,6 +223,7 @@ class TradeCalculation(RouteCalculation):
 
         self.galaxy.stats.trade += tradeCr
         self.galaxy.stats.passengers += tradePass
+        self.is_sector_trade_balanced()
 
     def route_update_simple(self, route):
         """
@@ -323,7 +324,7 @@ class TradeCalculation(RouteCalculation):
                 weight += routeWeight
                 usesJumpRoute = True
                 # Reduce the weight of this route. 
-                # As the higher trade routes create established routes 
+                # As the higher trade routes create established routes
                 # which are more likely to be followed by lower trade routes
             elif self.galaxy.stars.has_edge(start, end):
                 self.galaxy.stars[start][end]['trade'] += tradeCr
@@ -409,9 +410,24 @@ class TradeCalculation(RouteCalculation):
             target) + " must be positive"
         return weight
 
+
     def unilateral_filter(self, star):
         if star.zone in ['R', 'F']:
             return True
         if star.tradeCode.barren:
             return True
         return False
+
+    def is_sector_trade_balanced(self):
+        num_sector = len(self.galaxy.sectors)
+        max_delta = (num_sector * (num_sector-1)) // 2
+
+        sector_total = 0
+        for sec in self.galaxy.sectors:
+            sector = self.galaxy.sectors[sec]
+            sector_total += sector.stats.trade + sector.stats.tradeExt
+
+        galaxy_total = self.galaxy.stats.trade
+        delta = galaxy_total - sector_total
+
+        assert delta <= max_delta, "Allowed galaxy-to-total-sector trade diff " + str(max_delta) + ", actual diff " + str(delta)
