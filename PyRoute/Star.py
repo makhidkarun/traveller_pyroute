@@ -148,6 +148,7 @@ class Star(object):
         self.is_enqueued = False
         self.is_target = False
         self.is_landmark = False
+        self._pax_btn_mod = 0
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -285,6 +286,7 @@ class Star(object):
 
         star.trade_id = None # Used by the Speculative Trade
         star.calc_hash()
+        star.calc_passenger_btn_mod()
         return star
 
     def __unicode__(self):
@@ -743,14 +745,15 @@ class Star(object):
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         return True
 
-    @functools.cached_property
+    @property
     def passenger_btn_mod(self):
-        rich = 1 if self.tradeCode.rich else 0
+        return self._pax_btn_mod
 
+    def calc_passenger_btn_mod(self):
+        rich = 1 if self.tradeCode.rich else 0
         # Only apply the modifier corresponding to the highest-level capital - other_capital beats sector_capital,
         # which in turn beats subsector_capital.  The current approach makes adding a different value for other_capital
         # (eg 3) very easy.
         capital = 2 if self.tradeCode.sector_capital or self.tradeCode.other_capital else 1 if \
             self.tradeCode.subsector_capital else 0
-
-        return rich + capital
+        self._pax_btn_mod = rich + capital
