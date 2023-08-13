@@ -16,7 +16,7 @@ from PyRoute.Pathfinding.relaxed_single_source_dijkstra import relaxed_single_so
 
 class MyTestCase(unittest.TestCase):
     def test_lower_bound_doesnt_overlap(self):
-        sourcefile = 'DeltaFiles/Zarushagar.sec'
+        sourcefile = '../DeltaFiles/Zarushagar.sec'
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -47,7 +47,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected, actual, "Unexpected lower bound value")
 
     def test_lower_bound_does_overlap(self):
-        sourcefile = 'DeltaFiles/Zarushagar.sec'
+        sourcefile = '../DeltaFiles/Zarushagar.sec'
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -75,7 +75,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected, actual, "Unexpected lower bound value")
 
     def test_lower_bound_self_to_self(self):
-        sourcefile = 'DeltaFiles/Zarushagar.sec'
+        sourcefile = '../DeltaFiles/Zarushagar.sec'
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -102,7 +102,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected, actual, "Unexpected lower bound value")
 
     def test_drop_nodes_not_in_same_component(self):
-        sourcefile = 'DeltaFiles/Zarushagar.sec'
+        sourcefile = '../DeltaFiles/Zarushagar.sec'
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -133,7 +133,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(old_parent, parent)
 
     def test_drop_nodes_leaf_in_same_component(self):
-        sourcefile = 'DeltaFiles/Zarushagar.sec'
+        sourcefile = '../DeltaFiles/Zarushagar.sec'
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -166,7 +166,7 @@ class MyTestCase(unittest.TestCase):
         self.assertNotIn(leaves[0], kids, "Leaf node not removed from kids")
 
     def test_drop_first_level_intermediate_nodes_in_same_component(self):
-        sourcefile = 'DeltaFiles/Zarushagar.sec'
+        sourcefile = '../DeltaFiles/Zarushagar.sec'
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -207,7 +207,7 @@ class MyTestCase(unittest.TestCase):
             self.assertNotIn(node, kids, "Node " + str(node) + " not removed from kids")
 
     def test_drop_third_level_intermediate_nodes_in_same_component_and_regenerate(self):
-        sourcefile = 'DeltaFiles/Zarushagar.sec'
+        sourcefile = '../DeltaFiles/Zarushagar.sec'
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -267,7 +267,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(482, len(parent), "Removed node parents should be added by restart")
 
     def test_recurrently_dropped_nodes_dont_turn_up_in_restart(self):
-        sourcefile = 'DeltaFiles/Zarushagar.sec'
+        sourcefile = '../DeltaFiles/Zarushagar.sec'
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
