@@ -5,6 +5,7 @@ Created on Aug 08, 2023
 """
 import argparse
 import copy
+import json
 import tempfile
 import unittest
 
@@ -12,9 +13,10 @@ from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
 from PyRoute.Pathfinding.relaxed_single_source_dijkstra import relaxed_single_source_dijkstra
+from PyRoute.Pathfinding.single_source_dijkstra import single_source_dijkstra
 
 
-class MyTestCase(unittest.TestCase):
+class testApproximateShortestPathTree(unittest.TestCase):
     def test_lower_bound_doesnt_overlap(self):
         sourcefile = '../DeltaFiles/Zarushagar.sec'
 
@@ -261,10 +263,10 @@ class MyTestCase(unittest.TestCase):
             self.assertNotIn(node, parent, "Node " + str(node) + " not removed from parent")
             self.assertNotIn(node, kids, "Node " + str(node) + " not removed from kids")
 
-        distances = relaxed_single_source_dijkstra(graph, source, 'weight', parent=parent, paths=paths, restart=restart, distances=distances)
-        self.assertEqual(482, len(distances), "Removed node distances should be added by restart")
-        self.assertEqual(482, len(paths), "Removed node paths should be added by restart")
-        self.assertEqual(482, len(parent), "Removed node parents should be added by restart")
+        new_distances, new_paths, new_diagnostics = single_source_dijkstra(graph, source, distances=distances,
+                                                                           paths=paths, frontier=restart)
+        self.assertEqual(482, len(new_distances), "Removed node distances should be added by restart")
+        self.assertEqual(482, len(new_paths), "Removed node paths should be added by restart")
 
     def test_recurrently_dropped_nodes_dont_turn_up_in_restart(self):
         sourcefile = '../DeltaFiles/Zarushagar.sec'
@@ -296,6 +298,118 @@ class MyTestCase(unittest.TestCase):
 
         _, _, _, _, restart = approx.drop_nodes(dropnodes)
         self.assertEqual(1, len(restart), "Restart nodes shouldn't be parents of other restart nodes")
+
+    def test_verify_changed_leaf_edge_trip_update(self):
+        sourcefile = '../DeltaFiles/Zarushagar-Ibara.sec'
+        jsonfile = '../PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json'
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+
+        graph = galaxy.stars
+        stars = list(graph.nodes)
+        source = stars[0]
+        leafnode = stars[30]
+        subnode = stars[23]
+
+        approx = ApproximateShortestPathTree(source, graph, 0)
+        expected_diag = {'neighbours_checked': 115, 'nodes_expanded': 43, 'nodes_queued': 43}
+        self.assertEqual(expected_diag, approx._diag, "Unexpected diagnostics dict")
+
+        # seed expected distances
+        with open(jsonfile, 'r') as file:
+            expected_string = json.load(file)
+
+        expected_distances = dict()
+        component = [item for item in stars if item.component == source.component]
+        for item in component:
+            exp_dist = 0
+            if str(item) in expected_string:
+                exp_dist = expected_string[str(item)]
+            expected_distances[item] = exp_dist
+
+        self.assertEqual(expected_distances, approx._distances, "Unexpected distances after SPT creation")
+
+        # adjust weight
+        galaxy.stars[subnode][leafnode]['weight'] -= 1
+
+        # tell SPT weight has changed
+        edge = (subnode, leafnode)
+        approx.update_edges([edge])
+
+        # verify update tripped
+        self.assertNotEqual(expected_diag, approx._diag, "Diagnostics dict did not change")
+        self.assertEqual(expected_distances[leafnode] - 1, approx._distances[leafnode], "Leaf node distance not updated")
+        expected_diag = {'neighbours_checked': 1, 'nodes_expanded': 2, 'nodes_queued': 2}
+        self.assertEqual(expected_diag, approx._diag, "Unexpected diagnostics dict")
+
+    def test_verify_near_root_edge_propagates(self):
+        sourcefile = '../DeltaFiles/Zarushagar-Ibara.sec'
+        jsonfile = '../PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json'
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+
+        graph = galaxy.stars
+        stars = list(graph.nodes)
+        source = stars[0]
+        leafnode = stars[30]
+
+        approx = ApproximateShortestPathTree(source, graph, 0)
+
+        right = approx._paths[leafnode][1]
+
+        # seed expected distances
+        with open(jsonfile, 'r') as file:
+            expected_string = json.load(file)
+
+        expected_distances = dict()
+        component = [item for item in stars if item.component == source.component]
+        for item in component:
+            exp_dist = 0
+            if str(item) in expected_string:
+                exp_dist = expected_string[str(item)]
+            expected_distances[item] = exp_dist
+
+        self.assertEqual(expected_distances, approx._distances, "Unexpected distances after SPT creation")
+
+        # adjust weight
+        galaxy.stars[source][right]['weight'] -= 1
+
+        # tell SPT weight has changed
+        edge = (source, right)
+        dropnodes = [right]
+
+        for item in expected_distances:
+            if expected_distances[item] > 0 and 'Selsinia (Zarushagar 0201)' != str(item):
+                expected_distances[item] -= 1
+
+        # verify frontier generation
+        _, _, _, kids, frontier = approx.drop_nodes(dropnodes)
+        self.assertEqual(4, len(frontier), "Unexpected frontier set size")
+
+        approx.update_edges([edge])
+
+        self.assertEqual(expected_distances, approx._distances, "Unexpected distances after SPT restart")
+
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
