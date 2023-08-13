@@ -515,7 +515,9 @@ class Galaxy(AreaItem):
         item = (star, target)
         if item in self.landmarks:
             return self.landmarks[item]
-        return Star.heuristicDistance(star, target)
+        base = Star.heuristicDistance(star, target)
+        sp_bound = self.trade.shortest_path_tree.lower_bound(star, target)
+        return max(base, sp_bound)
 
     def route_cost(self, route):
         """

@@ -6,6 +6,7 @@ Created on Mar 15, 2014
 import networkx as nx
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
+from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
 from PyRoute.Pathfinding.astar import astar_path
 
 
@@ -65,6 +66,8 @@ class TradeCalculation(RouteCalculation):
 
         # Are debugging gubbins turned on?
         self.debug_flag = debug_flag
+
+        self.shortest_path_tree = None
 
     def base_route_filter(self, star, neighbor):
         if star in self.redzone or neighbor in self.redzone:
@@ -152,6 +155,7 @@ class TradeCalculation(RouteCalculation):
         stars = [item for item in self.galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
+        self.shortest_path_tree = ApproximateShortestPathTree(stars[0], self.galaxy.stars, 0)
 
         base_btn = 0
         counter = 0
@@ -277,6 +281,7 @@ class TradeCalculation(RouteCalculation):
         source.passIn += tradePass
         target.passIn += tradePass
 
+        edges = []
         start = source
         for end in route[1:]:
             if end != target:
@@ -287,7 +292,10 @@ class TradeCalculation(RouteCalculation):
             data['trade'] += tradeCr
             data['count'] += 1
             data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
+            edges.append((start, end))
             start = end
+
+        self.shortest_path_tree.update_edges(edges)
 
         return (tradeCr, tradePass)
 
