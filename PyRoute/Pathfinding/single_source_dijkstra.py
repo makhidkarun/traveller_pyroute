@@ -206,7 +206,7 @@ def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None, distan
         if v in dist:
             continue  # already searched this node.
         dist[v] = d
-        neighbours = ((u, e) for (u, e) in G_succ[v].items())
+        neighbours = ((u, e) for (u, e) in G_succ[v].items() if ((u not in dist) or (d + e['weight'] <= dist[u])))
         for u, e in neighbours:
             diagnostics['neighbours_checked'] += 1
             cost = e['weight']

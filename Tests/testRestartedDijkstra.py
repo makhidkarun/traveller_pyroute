@@ -90,7 +90,7 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(43, diagnostics['nodes_expanded'])
         self.assertEqual(43, diagnostics['nodes_queued'])
-        self.assertEqual(230, diagnostics['neighbours_checked'])
+        self.assertEqual(115, diagnostics['neighbours_checked'])
 
         # select node and trim inputs to set up for regeneration
         leafnode = stars[30]
@@ -110,7 +110,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_distances, new_distances)
         self.assertEqual(4, new_diagnostics['nodes_expanded'])
         self.assertEqual(4, new_diagnostics['nodes_queued'])
-        self.assertEqual(10, new_diagnostics['neighbours_checked'])
+        self.assertEqual(2, new_diagnostics['neighbours_checked'])
 
     def test_regenerate_first_level_intermediate_node(self):
         sourcefile = 'DeltaFiles/Zarushagar-Ibara.sec'
@@ -152,7 +152,7 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(43, diagnostics['nodes_expanded'])
         self.assertEqual(43, diagnostics['nodes_queued'])
-        self.assertEqual(230, diagnostics['neighbours_checked'])
+        self.assertEqual(115, diagnostics['neighbours_checked'])
 
         # select node and trim inputs to set up for regeneration
         subnode = stars[30]
@@ -178,7 +178,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_distances, new_distances)
         self.assertEqual(6, new_diagnostics['nodes_expanded'])
         self.assertEqual(6, new_diagnostics['nodes_queued'])
-        self.assertEqual(22, new_diagnostics['neighbours_checked'])
+        self.assertEqual(6, new_diagnostics['neighbours_checked'])
 
 
     def _make_args(self):
