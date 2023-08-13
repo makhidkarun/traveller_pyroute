@@ -206,12 +206,10 @@ def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None, distan
         if v in dist:
             continue  # already searched this node.
         dist[v] = d
-        for u, e in G_succ[v].items():
+        neighbours = ((u, e) for (u, e) in G_succ[v].items())
+        for u, e in neighbours:
             diagnostics['neighbours_checked'] += 1
-            cost = weight(v, u, e)
-            # if u is not connected to v, move on
-            if cost is None:
-                continue
+            cost = e['weight']
             # since we have a cost from v to u, _and_ a shortest-cost-so-far from source to v, that
             # gives an upper bound on the SPT cost from source to u
             vu_dist = dist[v] + cost
