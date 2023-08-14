@@ -62,6 +62,38 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
 
         single_source_dijkstra(galaxy.stars, stars[0], distances=distances, frontier=frontier, paths=paths)
 
+    def test_restart_blowup_on_jump_4(self):
+        sourcefile = '../DeltaFiles/dijkstra_restart_blowup/Lishun-jump4.sec'
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
+
+        btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
+        btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+
+        # Pick landmark - biggest WTN system in the biggest graph component
+        stars = [item for item in galaxy.stars]
+        stars.sort(key=lambda item: item.wtn, reverse=True)
+        stars[0].is_landmark = True
+
+        #testrun = btn[7]
+        #btn = btn[0:13]
+
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0], galaxy.stars, 0)
+        for (star, neighbour, data) in btn:
+            galaxy.trade.get_trade_between(star, neighbour)
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
