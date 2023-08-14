@@ -31,6 +31,8 @@ class ApproximateShortestPathTree:
         return bound
 
     def drop_nodes(self, nodes_to_drop):
+        # need to verify partition
+
         nodedrop = {item for item in nodes_to_drop if item.component == self._source.component}
         parent = nodedrop.copy()
         extend = set()
@@ -54,7 +56,7 @@ class ApproximateShortestPathTree:
 
         # now nodedrop is populated, properly populate restart
         for node in nodedrop:
-            nodes_to_add = (k for k in self._graph[node].keys() if k not in nodedrop and k not in extend)
+            nodes_to_add = (k for k in self._graph[node].keys() if k not in nodedrop and k not in restart)
             for item in nodes_to_add:
                 restart.add(item)
 
