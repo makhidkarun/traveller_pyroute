@@ -60,6 +60,14 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         distances, paths, parent, kids, frontier = galaxy.trade.shortest_path_tree.drop_nodes(dropnodes)
         self.assertEqual(5, len(frontier))
 
+        # Check no non-frontier nodes have frontier parents
+        for node in distances.keys():
+            if node not in frontier and parent[node] is not None:
+                self.assertFalse(
+                    parent[node] not in frontier,
+                    "Non-frontier node " + str(node) + " has frontier parent " + str(parent[node])
+                )
+
         single_source_dijkstra(galaxy.stars, stars[0], distances=distances, frontier=frontier, paths=paths)
 
     def test_restart_blowup_on_jump_4(self):
@@ -87,12 +95,41 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
-        #testrun = btn[7]
-        #btn = btn[0:13]
+        testrun = btn[65]
+        btn = btn[0:65]
 
         galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0], galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
+
+        star = testrun[0]
+        neighbour = testrun[1]
+
+        route = astar_path(galaxy.stars, star, neighbour, galaxy.heuristic_distance)
+
+        galaxy.route_no_revisit(route)
+
+        # manually land the route updates
+        edges = list(zip(route[0:-1], route[1:]))
+
+        for item in edges:
+            galaxy.stars[item[0]][item[1]]['weight'] *= 0.9
+
+        # galaxy.trade.shortest_path_tree.update_edges(edges)
+
+        dropnodes = [route[0]]
+
+        distances, paths, parent, kids, frontier = galaxy.trade.shortest_path_tree.drop_nodes(dropnodes)
+
+        # Check no non-frontier nodes have frontier parents
+        for node in distances.keys():
+            if node not in frontier and parent[node] is not None:
+                self.assertFalse(
+                    parent[node] not in frontier,
+                    "Non-frontier node " + str(node) + " has frontier parent " + str(parent[node])
+                )
+
+        single_source_dijkstra(galaxy.stars, stars[0], distances=distances, frontier=frontier, paths=paths)
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
