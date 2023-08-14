@@ -20,6 +20,7 @@ class ApproximateShortestPathTree:
         self._distances, self._paths, self._diag = single_source_dijkstra(self._graph, self._source)
         self._build_parents(source)
         self._kids = ApproximateShortestPathTree._build_children(self._parent)
+        self.is_well_formed()
 
     def lower_bound(self, source, target):
         left = self._distances[source]
@@ -146,3 +147,10 @@ class ApproximateShortestPathTree:
             for i in range(1, len(route)):
                 if route[i] not in self._parent:
                     self._parent[route[i]] = route[i - 1]
+
+    def is_well_formed(self):
+        # for each node, all of its children should have it as parent
+        for parent in self._parent:
+            for kid in self._kids[parent]:
+                assert parent == self._parent[kid], "Parent-child mismatch between " + str(parent) + " and " + str(kid)
+        return True

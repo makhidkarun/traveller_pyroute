@@ -410,6 +410,36 @@ class testApproximateShortestPathTree(unittest.TestCase):
 
         self.assertEqual(expected_distances, approx._distances, "Unexpected distances after SPT restart")
 
+    def test_verify_multiple_near_root_edges_propagate(self):
+        sourcefile = '../DeltaFiles/dijkstra_restart_blowup/Lishun.sec'
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+
+        graph = galaxy.stars
+        stars = list(graph.nodes)
+        source = stars[4]
+
+        approx = ApproximateShortestPathTree(source, graph, 0)
+
+
+        edges = [(stars[3], stars[2]), (stars[2], source)]
+
+        for item in edges:
+            graph[item[0]][item[1]]['weight'] *= 0.9
+
+        approx.update_edges(edges)
+
+
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
