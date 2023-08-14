@@ -138,6 +138,7 @@ class ApproximateShortestPathTree:
 
         self._distances, self._paths, self._diag = single_source_dijkstra(self._graph, self._source, distances=distances, frontier=frontier, paths=paths)
         self._build_parents(self._source)
+        self._kids = ApproximateShortestPathTree._build_children(self._parent)
 
     def _build_parents(self, source):
         self._parent = dict()
