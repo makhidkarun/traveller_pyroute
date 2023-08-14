@@ -73,6 +73,24 @@ class ApproximateShortestPathTree:
 
         kids = self._build_children(parent)
 
+        # final pass - children of frontier nodes that haven't been dropped are frontier nodes themselves
+        parent = set()
+        extend = set()
+        for node in frontier:
+            for kid in self._kids[node]:
+                if kid not in nodedrop:
+                    extend.add(kid)
+
+        while 0 < len(extend):
+            for item in extend:
+                frontier.add(item)
+            parent = extend
+            extend = set()
+            for node in parent:
+                for item in self._kids[node]:
+                    if item not in nodedrop and item not in frontier:
+                        extend.add(item)
+
         return distances, paths, parent, kids, frontier
 
     @staticmethod
