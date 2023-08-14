@@ -36,12 +36,12 @@ class ApproximateShortestPathTree:
         nodedrop = {item for item in nodes_to_drop if item.component == self._source.component}
         parent = nodedrop.copy()
         extend = set()
-        restart = set()
+        frontier = set()
 
         for node in parent:
             parnode = self._parent[node]
             if parnode is not None:
-                restart.add(parnode)
+                frontier.add(parnode)
             for item in self._kids[node]:
                 extend.add(item)
 
@@ -56,9 +56,9 @@ class ApproximateShortestPathTree:
 
         # now nodedrop is populated, properly populate restart
         for node in nodedrop:
-            nodes_to_add = (k for k in self._graph[node].keys() if k not in nodedrop and k not in restart)
+            nodes_to_add = (k for k in self._graph[node].keys() if k not in nodedrop and k not in frontier)
             for item in nodes_to_add:
-                restart.add(item)
+                frontier.add(item)
 
         distances = copy.deepcopy(self._distances)
         paths = copy.deepcopy(self._paths)
@@ -68,12 +68,12 @@ class ApproximateShortestPathTree:
             del distances[node]
             del paths[node]
             del parent[node]
-            if node in restart:
-                restart.remove(node)
+            if node in frontier:
+                frontier.remove(node)
 
         kids = self._build_children(parent)
 
-        return distances, paths, parent, kids, restart
+        return distances, paths, parent, kids, frontier
 
     @staticmethod
     def _build_children(parents):
