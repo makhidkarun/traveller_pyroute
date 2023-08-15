@@ -76,21 +76,16 @@ class ApproximateShortestPathTree:
                 frontier.add(item)
 
         distances = dict()
-        for node in self._distances:
-            if node not in nodedrop:
-                distances[node] = self._distances[node]
-
         parent = dict()
-        for node in self._parent:
-            if node not in nodedrop:
-                parent[node] = self._parent[node]
-
         paths = dict()
-        for node in self._paths:
-            if node not in nodedrop:
-                chunk = []
-                chunk.extend(self._paths[node])
-                paths[node] = chunk
+
+        nodes_to_check = (k for k in self._distances if k not in nodedrop)
+        for node in nodes_to_check:
+            distances[node] = self._distances[node]
+            parent[node] = self._parent[node]
+            chunk = []
+            chunk.extend(self._paths[node])
+            paths[node] = chunk
 
         for node in nodedrop:
             if node in frontier:
