@@ -61,14 +61,24 @@ class ApproximateShortestPathTree:
             for item in nodes_to_add:
                 frontier.add(item)
 
-        distances = copy.deepcopy(self._distances)
-        paths = copy.deepcopy(self._paths)
-        parent = copy.deepcopy(self._parent)
+        distances = dict()
+        for node in self._distances:
+            if node not in nodedrop:
+                distances[node] = self._distances[node]
+
+        parent = dict()
+        for node in self._parent:
+            if node not in nodedrop:
+                parent[node] = self._parent[node]
+
+        paths = dict()
+        for node in self._paths:
+            if node not in nodedrop:
+                chunk = []
+                chunk.extend(self._paths[node])
+                paths[node] = chunk
 
         for node in nodedrop:
-            del distances[node]
-            del paths[node]
-            del parent[node]
             if node in frontier:
                 frontier.remove(node)
 
