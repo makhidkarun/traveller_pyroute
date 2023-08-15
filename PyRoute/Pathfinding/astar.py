@@ -111,6 +111,8 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
     explored = {}
     # Tracks shortest _complete_ path found so far
     upbound = float('inf')
+    # Diagnostic dictionary
+    diagnostics = {'nodes_expanded': 0, 'nodes_queued': 0, 'neighbours_checked': 0, 'heuristic_calls': 0}
 
     # set target node flag
     target.is_target = True
@@ -128,6 +130,7 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
             heapify(queue)
 
         if curnode.is_target and targ_hash == curnode.__hash__() and curnode == target:
+            diagnostics['nodes_expanded'] = node_counter
             target.is_target = False
             for node in enqueued:
                 node.is_enqueued = False
@@ -137,7 +140,7 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
                 path.append(node)
                 node = explored[node]
             path.reverse()
-            return path
+            return path, diagnostics
 
         if curnode in explored:
             # Do not override the parent of starting node
@@ -176,6 +179,7 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
                 neighbours = [(k, v) for (k, v) in neighbours if v['weight'] <= targ_weight]
 
         for neighbor, w in neighbours:
+            diagnostics['neighbours_checked'] += 1
             ncost = dist + w['weight']
             if neighbor.is_enqueued and neighbor in enqueued:
                 qcost, h = enqueued[neighbor]
@@ -189,6 +193,7 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
                 # path from neighbour to the source, so update enqueued value
                 enqueued[neighbor] = ncost, h
             else:
+                diagnostics['heuristic_calls'] += 1
                 h = heuristic(neighbor, target)
 
             # if this completes a path (no matter how _bad_), update the upper bound.
@@ -207,6 +212,7 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
             # if ncost + heuristic would bust the _upper_ bound, there's no point queueing the neighbour
             # If neighbour is the target, h should be zero
             if ncost + h <= upbound:
+                diagnostics['nodes_queued'] += 1
                 neighbor.is_enqueued = True
                 enqueued[neighbor] = ncost, h
                 push(queue, (ncost + h, next(c), neighbor, ncost, curnode))
