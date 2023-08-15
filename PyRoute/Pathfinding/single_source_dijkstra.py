@@ -8,6 +8,7 @@ Major modifications here are ripping out gubbins unrelated to the single-source 
 where less than the entire shortest path tree needs to be regenerated due to a link weight change.
 
 """
+import heapq
 from heapq import heappush, heappop
 from itertools import count
 
@@ -212,3 +213,27 @@ def _dijkstra_core(G, source, paths=None, cutoff=None, distances=None, frontier=
     # The optional predecessor and path dictionaries can be accessed
     # by the caller via the pred and paths objects passed as arguments.
     return dist, diagnostics
+
+
+def implicit_shortest_path_dijkstra(graph, source, distance_labels=None, seeds=None):
+    if distance_labels is None:
+        # dig up nodes in same graph component as source - that's the ones we care about finding distance labels _for_
+        distance_labels = {item: float('+inf') for item in graph if item.component == source.component}
+        distance_labels[source] = 0
+        seeds = {source}
+
+    c = count()
+    heap = [(distance_labels[seed], next(c), seed) for seed in seeds]
+    heapq.heapify(heap)
+
+    while heap:
+        dist_tail, _, tail = heapq.heappop(heap)
+        if dist_tail > distance_labels[tail]:
+            continue
+        for head, data in graph[tail].items():
+            weight = data['weight']
+            dist_head = dist_tail + weight
+            if dist_head < distance_labels[head]:
+                distance_labels[head] = dist_head
+                heapq.heappush(heap, (dist_head, next(c), head))
+    return distance_labels

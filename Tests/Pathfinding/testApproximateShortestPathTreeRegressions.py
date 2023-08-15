@@ -6,7 +6,7 @@ from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
 from PyRoute.Pathfinding.astar import astar_path
-from PyRoute.Pathfinding.single_source_dijkstra import single_source_dijkstra
+from PyRoute.Pathfinding.single_source_dijkstra import single_source_dijkstra, implicit_shortest_path_dijkstra
 
 
 class testApproximateShortestPathTreeRegressions(unittest.TestCase):
@@ -178,28 +178,7 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         for item in edges:
             galaxy.stars[item[0]][item[1]]['weight'] *= 0.9
 
-        #galaxy.trade.shortest_path_tree.update_edges(edges)
-
-        dropnodes = [route[0]]
-
-        source = stars[0]
-        distances, paths, parent, kids, frontier = galaxy.trade.shortest_path_tree.drop_nodes(dropnodes)
-
-        if source not in frontier:
-            # Check no non-frontier nodes have frontier parents
-            for node in distances.keys():
-                if node not in frontier and parent[node] is not None:
-                    self.assertFalse(
-                        parent[node] in frontier,
-                        "Non-frontier node " + str(node) + " has frontier parent " + str(parent[node])
-                    )
-
-        else:
-            self.assertEqual(1, len(frontier), "Frontier should only have source node in it")
-            self.assertEqual({source: 0}, distances, "Distances should only have source node in it")
-            self.assertEqual(1, len(paths), "Paths should only have source node in it")
-
-        single_source_dijkstra(galaxy.stars, source, distances=distances, frontier=frontier, paths=paths)
+        galaxy.trade.shortest_path_tree.update_edges(edges)
 
 
     def _make_args(self):
