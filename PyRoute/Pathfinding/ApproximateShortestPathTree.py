@@ -92,6 +92,8 @@ class ApproximateShortestPathTree:
                     if item not in nodedrop and item not in frontier:
                         extend.add(item)
 
+        ApproximateShortestPathTree._check_frontier(parent, frontier)
+
         return distances, paths, parent, kids, frontier
 
     @staticmethod
@@ -154,4 +156,13 @@ class ApproximateShortestPathTree:
         for parent in self._parent:
             for kid in self._kids[parent]:
                 assert parent == self._parent[kid], "Parent-child mismatch between " + str(parent) + " and " + str(kid)
+        return True
+
+    @staticmethod
+    def _check_frontier(parents, frontier):
+        for node in parents:
+            parnode = parents[node]
+            if node not in frontier and parnode is not None:
+                assert parnode not in frontier, "Non-frontier node " + str(node) + " has frontier parent " + str(parnode)
+
         return True
