@@ -91,6 +91,17 @@ class ApproximateShortestPathTree:
                 for item in self._kids[node]:
                     if item not in nodedrop and item not in frontier:
                         extend.add(item)
+                nodes_to_add = (k for k in self._graph[node].keys() if k not in nodedrop and k not in frontier)
+                for item in nodes_to_add:
+                    extend.add(item)
+
+        if self._source in frontier:
+            frontier = set()
+            frontier.add(self._source)
+            distances = {self._source: 0}
+            paths = {self._source: [self._source]}
+            parent = {self._source: None}
+            kids = {self._source: []}
 
         ApproximateShortestPathTree._check_frontier(parent, frontier)
 

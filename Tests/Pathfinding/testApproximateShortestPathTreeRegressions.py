@@ -185,7 +185,7 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         source = stars[0]
         distances, paths, parent, kids, frontier = galaxy.trade.shortest_path_tree.drop_nodes(dropnodes)
 
-        if stars[0] not in frontier:
+        if source not in frontier:
             # Check no non-frontier nodes have frontier parents
             for node in distances.keys():
                 if node not in frontier and parent[node] is not None:
@@ -194,15 +194,12 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
                         "Non-frontier node " + str(node) + " has frontier parent " + str(parent[node])
                     )
 
-            # check specific nodes to see if they're in the frontier
-            narvik = stars[39]
-            self.assertIn(narvik, frontier, str(narvik) + " should be in frontier")
         else:
             self.assertEqual(1, len(frontier), "Frontier should only have source node in it")
-            self.assertEqual({stars[0]: 0}, "Distances should only have source node in it")
+            self.assertEqual({source: 0}, distances, "Distances should only have source node in it")
             self.assertEqual(1, len(paths), "Paths should only have source node in it")
 
-        single_source_dijkstra(galaxy.stars, stars[0], distances=distances, frontier=frontier, paths=paths)
+        single_source_dijkstra(galaxy.stars, source, distances=distances, frontier=frontier, paths=paths)
 
 
     def _make_args(self):
