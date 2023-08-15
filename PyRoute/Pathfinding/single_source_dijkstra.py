@@ -15,7 +15,7 @@ import networkx as nx
 from networkx.algorithms.shortest_paths.weighted import _weight_function
 
 
-def single_source_dijkstra(G, source, weight="weight", cutoff=None, distances=None, paths=None, frontier=None):
+def single_source_dijkstra(G, source, cutoff=None, distances=None, paths=None, frontier=None):
     """Find shortest weighted paths and lengths from a source node.
 
     Compute the shortest path length between source and all other
@@ -34,19 +34,6 @@ def single_source_dijkstra(G, source, weight="weight", cutoff=None, distances=No
     cutoff : integer or float, optional
         Length (sum of edge weights) at which the search is stopped.
         If cutoff is provided, only return paths with summed weight <= cutoff.
-
-    weight : string or function
-        If this is a string, then edge weights will be accessed via the
-        edge attribute with this key (that is, the weight of the edge
-        joining `u` to `v` will be ``G.edges[u, v][weight]``). If no
-        such edge attribute exists, the weight of the edge is assumed to
-        be one.
-
-        If this is a function, the weight of an edge is the value
-        returned by the function. The function must accept exactly three
-        positional arguments: the two endpoints of an edge and the
-        dictionary of edge attributes for that edge. The function must
-        return a number or None to indicate a hidden edge.
 
     distances : dict of nodes, optional
         If provided, is assumed to be a dictionary of node-numeric pairs,
@@ -98,16 +85,14 @@ def single_source_dijkstra(G, source, weight="weight", cutoff=None, distances=No
     if (distances is None) != (paths is None) or (distances is None) != (frontier is None):
         raise nx.NetworkXException("Provide all of distances, paths and frontier, or none of them")
 
-
-    weight = _weight_function(G, weight)
     paths = {source: [source]} if paths is None else paths  # dictionary of paths
 
-    dist, diagnostics = _dijkstra_core(G, source, weight, paths=paths, distances=distances, frontier=frontier)
+    dist, diagnostics = _dijkstra_core(G, source, paths=paths, distances=distances, frontier=frontier)
 
     return (dist, paths, diagnostics)
 
 
-def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None, distances=None, frontier=None):
+def _dijkstra_core(G, source, paths=None, cutoff=None, distances=None, frontier=None):
     """Uses Dijkstra's algorithm to find shortest weighted paths
 
      Parameters
@@ -118,14 +103,6 @@ def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None, distan
          Starting node for paths. If this is just an iterable containing
          a single node, then all paths computed by this function will
          start from that node.
-
-     weight: function
-         Function with (u, v, data) input that returns that edge's weight
-         or None to indicate a hidden edge
-
-     pred: dict of lists, optional(default=None)
-         dict to store a list of predecessors keyed by that node
-         If None, predecessors are not stored.
 
      paths: dict, optional (default=None)
          dict to store the path list from source to each node, keyed by node.
@@ -221,9 +198,6 @@ def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None, distan
                 # if we've found a shorter path than the canonical "shortest" path, we've violated an invariant
                 if vu_dist < u_dist:
                     raise ValueError("Contradictory paths found for " + str(u) + ":", "negative weights?")
-                # if v turns out to be u's ancestor in the SPT, note that down
-                elif pred is not None and vu_dist == u_dist:
-                    pred[u].append(v)
             # if either this is the first time we've hit u, or we've found a shorter path to u:
             elif u not in seen or vu_dist < seen[u]:
                 # set/update the tentative cost
@@ -234,13 +208,6 @@ def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None, distan
                 # if we're recording paths, record the path from source to u via v:
                 if paths is not None:
                     paths[u] = paths[v] + [u]
-                # if we're recording predecessors, do so
-                if pred is not None:
-                    pred[u] = [v]
-            # u is not searched, we've hit u before, and we've found an _equally_ short path to u
-            elif vu_dist == seen[u]:
-                if pred is not None:
-                    pred[u].append(v)
 
     # The optional predecessor and path dictionaries can be accessed
     # by the caller via the pred and paths objects passed as arguments.
