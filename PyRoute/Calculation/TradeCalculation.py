@@ -156,7 +156,7 @@ class TradeCalculation(RouteCalculation):
         stars = [item for item in self.galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
-        self.shortest_path_tree = ApproximateShortestPathTree(stars[0], self.galaxy.stars, 0)
+        self.shortest_path_tree = ApproximateShortestPathTree(stars[0], self.galaxy.stars, 0.2)
 
         base_btn = 0
         counter = 0

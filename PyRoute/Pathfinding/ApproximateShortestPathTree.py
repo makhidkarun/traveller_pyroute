@@ -20,6 +20,9 @@ class ApproximateShortestPathTree:
         self._distances = implicit_shortest_path_dijkstra(self._graph, self._source)
 
     def lower_bound(self, source, target):
+        if self._source.component != source.component:
+            return 0
+
         left = self._distances[source]
         right = self._distances[target]
         big = max(left, right)
@@ -33,6 +36,8 @@ class ApproximateShortestPathTree:
         for item in edges:
             left = item[0]
             right = item[1]
+            if self._source.component != left.component:
+                continue
             leftdist = self._distances[left]
             rightdist = self._distances[right]
             weight = self._graph[left][right]['weight']
