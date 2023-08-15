@@ -220,7 +220,7 @@ def _dijkstra_core(G, source, weight, pred=None, paths=None, cutoff=None, distan
                 u_dist = dist[u]
                 # if we've found a shorter path than the canonical "shortest" path, we've violated an invariant
                 if vu_dist < u_dist:
-                    raise ValueError("Contradictory paths found:", "negative weights?")
+                    raise ValueError("Contradictory paths found for " + str(u) + ":", "negative weights?")
                 # if v turns out to be u's ancestor in the SPT, note that down
                 elif pred is not None and vu_dist == u_dist:
                     pred[u].append(v)

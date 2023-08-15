@@ -64,7 +64,7 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         for node in distances.keys():
             if node not in frontier and parent[node] is not None:
                 self.assertFalse(
-                    parent[node] not in frontier,
+                    parent[node] in frontier,
                     "Non-frontier node " + str(node) + " has frontier parent " + str(parent[node])
                 )
 
@@ -102,6 +102,7 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
+        galaxy.trade.shortest_path_tree.is_well_formed()
         star = testrun[0]
         neighbour = testrun[1]
 
@@ -125,11 +126,84 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         for node in distances.keys():
             if node not in frontier and parent[node] is not None:
                 self.assertFalse(
-                    parent[node] not in frontier,
+                    parent[node] in frontier,
                     "Non-frontier node " + str(node) + " has frontier parent " + str(parent[node])
                 )
 
         single_source_dijkstra(galaxy.stars, stars[0], distances=distances, frontier=frontier, paths=paths)
+
+    def test_restart_blowup_on_jump_4_1(self):
+        sourcefile = '../DeltaFiles/dijkstra_restart_blowup/Lishun-jump4-1.sec'
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
+
+        btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
+        btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+
+        # Pick landmark - biggest WTN system in the biggest graph component
+        stars = [item for item in galaxy.stars]
+        stars.sort(key=lambda item: item.wtn, reverse=True)
+        stars[0].is_landmark = True
+
+        testrun = btn[25]
+        btn = btn[0:25]
+
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0], galaxy.stars, 0)
+        for (star, neighbour, data) in btn:
+            galaxy.trade.get_trade_between(star, neighbour)
+
+        galaxy.trade.shortest_path_tree.is_well_formed()
+        star = testrun[0]
+        neighbour = testrun[1]
+
+        route = astar_path(galaxy.stars, star, neighbour, galaxy.heuristic_distance)
+
+        galaxy.route_no_revisit(route)
+
+        # manually land the route updates
+        edges = list(zip(route[0:-1], route[1:]))
+
+        for item in edges:
+            galaxy.stars[item[0]][item[1]]['weight'] *= 0.9
+
+        #galaxy.trade.shortest_path_tree.update_edges(edges)
+
+        dropnodes = [route[0]]
+
+        source = stars[0]
+        distances, paths, parent, kids, frontier = galaxy.trade.shortest_path_tree.drop_nodes(dropnodes)
+
+        if stars[0] not in frontier:
+            # Check no non-frontier nodes have frontier parents
+            for node in distances.keys():
+                if node not in frontier and parent[node] is not None:
+                    self.assertFalse(
+                        parent[node] in frontier,
+                        "Non-frontier node " + str(node) + " has frontier parent " + str(parent[node])
+                    )
+
+            # check specific nodes to see if they're in the frontier
+            narvik = stars[39]
+            self.assertIn(narvik, frontier, str(narvik) + " should be in frontier")
+        else:
+            self.assertEqual(1, len(frontier), "Frontier should only have source node in it")
+            self.assertEqual({stars[0]: 0}, "Distances should only have source node in it")
+            self.assertEqual(1, len(paths), "Paths should only have source node in it")
+
+        single_source_dijkstra(galaxy.stars, stars[0], distances=distances, frontier=frontier, paths=paths)
+
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
