@@ -38,6 +38,7 @@ class ApproximateShortestPathTree:
         parent = nodedrop.copy()
         extend = set()
         frontier = set()
+        off_source = False
 
         for node in parent:
             parnode = self._parent[node]
@@ -45,6 +46,19 @@ class ApproximateShortestPathTree:
                 frontier.add(parnode)
             for item in self._kids[node]:
                 extend.add(item)
+            if parnode is self._source:
+                off_source = True
+
+        if off_source:
+            frontier = set()
+            frontier.add(self._source)
+            distances = {self._source: 0}
+            paths = {self._source: [self._source]}
+            parent = {self._source: None}
+            kids = {self._source: []}
+
+            ApproximateShortestPathTree._check_frontier(parent, frontier)
+            return distances, paths, parent, kids, frontier
 
         while 0 < len(extend):
             for item in extend:
@@ -85,7 +99,6 @@ class ApproximateShortestPathTree:
         kids = self._build_children(parent)
 
         # final pass - children of frontier nodes that haven't been dropped are frontier nodes themselves
-        gather = set()
         extend = set()
         for node in frontier:
             for kid in self._kids[node]:
@@ -104,14 +117,6 @@ class ApproximateShortestPathTree:
                 nodes_to_add = (k for k in self._graph[node].keys() if k not in nodedrop and k not in frontier)
                 for item in nodes_to_add:
                     extend.add(item)
-
-        if self._source in frontier:
-            frontier = set()
-            frontier.add(self._source)
-            distances = {self._source: 0}
-            paths = {self._source: [self._source]}
-            parent = {self._source: None}
-            kids = {self._source: []}
 
         ApproximateShortestPathTree._check_frontier(parent, frontier)
 
