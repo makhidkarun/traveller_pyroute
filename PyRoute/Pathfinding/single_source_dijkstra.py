@@ -230,10 +230,14 @@ def implicit_shortest_path_dijkstra(graph, source, distance_labels=None, seeds=N
         dist_tail, _, tail = heapq.heappop(heap)
         if dist_tail > distance_labels[tail]:
             continue
-        for head, data in graph[tail].items():
-            weight = data['weight']
-            dist_head = dist_tail + weight
-            if dist_head < distance_labels[head]:
-                distance_labels[head] = dist_head
-                heapq.heappush(heap, (dist_head, next(c), head))
+        # Link weights are strictly positive, thus lower bounded by zero. Thus, when the current dist_tail value exceeds
+        # the corresponding node's distance label at the other end of the candidate edge, trim that edge.  Such edges
+        # cannot _possibly_ result in smaller distance labels.  By a similar argument, filter the remaining edges
+        # when the sum of dist_tail and that edge's weight equals or exceeds the corresponding node's distance label.
+        neighbours = ((head, dist_tail + data['weight']) for (head, data) in graph[tail].items()
+                      if dist_tail <= distance_labels[head] and dist_tail + data['weight'] < distance_labels[head]
+                      )
+        for head, dist_head in neighbours:
+            distance_labels[head] = dist_head
+            heapq.heappush(heap, (dist_head, next(c), head))
     return distance_labels
