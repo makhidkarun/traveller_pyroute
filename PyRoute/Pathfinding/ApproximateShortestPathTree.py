@@ -11,19 +11,22 @@ from PyRoute.Pathfinding.single_source_dijkstra import single_source_dijkstra, i
 
 
 class ApproximateShortestPathTree:
+    __slots__ = '_source', '_graph', '_epsilon', '_divisor', '_distances', '_component'
 
     def __init__(self, source, graph, epsilon):
         if source.component is None:
             raise ValueError("Source node " + str(source) + " has undefined component.  Has calculate_components() been run?")
 
         self._source = source
+        self._component = source.component
         self._graph = graph
         self._epsilon = epsilon
+        self._divisor = 1 / (1 + epsilon)
 
         self._distances = implicit_shortest_path_dijkstra(self._graph, self._source)
 
     def lower_bound(self, source, target):
-        if self._source.component != source.component:
+        if self._component != source.component:
             return 0
 
         left = self._distances[source]
@@ -31,15 +34,14 @@ class ApproximateShortestPathTree:
         big = max(left, right)
         little = min(left, right)
 
-        bound = max(0, big / (1 + self._epsilon) - little)
-        return bound
+        return max(0, big * self._divisor - little)
 
     def update_edges(self, edges):
         dropnodes = set()
         for item in edges:
             left = item[0]
             right = item[1]
-            if self._source.component != left.component:
+            if self._component != left.component:
                 continue
             leftdist = self._distances[left]
             rightdist = self._distances[right]
