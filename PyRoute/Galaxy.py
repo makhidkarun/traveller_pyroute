@@ -249,7 +249,6 @@ class Galaxy(AreaItem):
         self.debug_flag = debug_flag
         self.landmarks = dict()
         self.big_component = None
-        self.distance_alt_tracking = dict()
 
     # For the JSONPickel work
     def __getstate__(self):

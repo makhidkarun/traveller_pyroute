@@ -248,26 +248,6 @@ class TradeCalculation(RouteCalculation):
         rangedata['actual distance'] = distance
         rangedata['jumps'] = len(route) - 1
 
-        if False and source.is_landmark != target.is_landmark:
-            if source.is_landmark:
-                # landmark = source
-                other = target
-            else:
-                # landmark = target
-                other = source
-
-            items = self.galaxy.distance_alt_tracking.items()
-            #combos = [(k, v) for (k, v) in items if 4 < abs(v - distance)]
-
-            for item in items:
-                straight = other.hex_distance(item[0])
-                bound = abs(distance - item[1])
-                if bound > straight:
-                    self.galaxy.landmarks[(other, item[0])] = bound
-                    self.galaxy.landmarks[(item[0], other)] = bound
-
-            self.galaxy.distance_alt_tracking[other] = distance
-
         self.galaxy.landmarks[(source, target)] = distance
         self.galaxy.landmarks[(target, source)] = distance
 

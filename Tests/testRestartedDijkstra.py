@@ -8,7 +8,7 @@ from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Pathfinding.single_source_dijkstra import single_source_dijkstra
 
 
-class MyTestCase(unittest.TestCase):
+class testRestartedDijkstra(unittest.TestCase):
     def test_from_single_node(self):
         sourcefile = 'DeltaFiles/Zarushagar-Ibara.sec'
         jsonfile = 'PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json'

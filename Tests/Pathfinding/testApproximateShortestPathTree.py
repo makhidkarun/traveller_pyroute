@@ -15,8 +15,6 @@ import networkx as nx
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
-from PyRoute.Pathfinding.relaxed_single_source_dijkstra import relaxed_single_source_dijkstra
-from PyRoute.Pathfinding.single_source_dijkstra import single_source_dijkstra
 
 
 class testApproximateShortestPathTree(unittest.TestCase):
