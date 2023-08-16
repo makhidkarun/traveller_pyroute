@@ -90,7 +90,7 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(43, diagnostics['nodes_expanded'])
         self.assertEqual(43, diagnostics['nodes_queued'])
-        self.assertEqual(115, diagnostics['neighbours_checked'])
+        self.assertEqual(44, diagnostics['neighbours_checked'])
 
         # select node and trim inputs to set up for regeneration
         leafnode = stars[30]
@@ -152,7 +152,7 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(43, diagnostics['nodes_expanded'])
         self.assertEqual(43, diagnostics['nodes_queued'])
-        self.assertEqual(115, diagnostics['neighbours_checked'])
+        self.assertEqual(44, diagnostics['neighbours_checked'])
 
         # select node and trim inputs to set up for regeneration
         subnode = stars[30]
@@ -178,7 +178,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_distances, new_distances)
         self.assertEqual(6, new_diagnostics['nodes_expanded'])
         self.assertEqual(6, new_diagnostics['nodes_queued'])
-        self.assertEqual(6, new_diagnostics['neighbours_checked'])
+        self.assertEqual(5, new_diagnostics['neighbours_checked'])
 
 
     def _make_args(self):

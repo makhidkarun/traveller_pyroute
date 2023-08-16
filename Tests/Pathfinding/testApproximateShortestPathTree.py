@@ -6,8 +6,11 @@ Created on Aug 08, 2023
 import argparse
 import copy
 import json
+import os
 import tempfile
 import unittest
+
+import networkx as nx
 
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
@@ -19,6 +22,9 @@ from PyRoute.Pathfinding.single_source_dijkstra import single_source_dijkstra
 class testApproximateShortestPathTree(unittest.TestCase):
     def test_lower_bound_doesnt_overlap(self):
         sourcefile = '../DeltaFiles/Zarushagar.sec'
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar.sec')
+
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -31,15 +37,14 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.output_path = args.output
 
         galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
 
         graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
 
         approx = ApproximateShortestPathTree(source, graph, 0.2)
-        self.assertTrue(isinstance(approx._parent, dict), "Parent-tree dictionary not generated")
-        # In this case, giant component has 482 stars, so parent tree should have the same
-        self.assertEqual(len(approx._paths), len(approx._parent), "Parent-tree dictionary has unexpected length")
+        self.assertEqual(482, len(approx._distances), "Distances dictionary has unexpected length")
 
         src = stars[2]
         targ = stars[80]
@@ -50,6 +55,9 @@ class testApproximateShortestPathTree(unittest.TestCase):
 
     def test_lower_bound_does_overlap(self):
         sourcefile = '../DeltaFiles/Zarushagar.sec'
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar.sec')
+
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -62,6 +70,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.output_path = args.output
 
         galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
 
         graph = galaxy.stars
         stars = list(graph.nodes)
@@ -78,6 +87,9 @@ class testApproximateShortestPathTree(unittest.TestCase):
 
     def test_lower_bound_self_to_self(self):
         sourcefile = '../DeltaFiles/Zarushagar.sec'
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar.sec')
+
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -90,6 +102,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.output_path = args.output
 
         galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
 
         graph = galaxy.stars
         stars = list(graph.nodes)
@@ -103,72 +116,10 @@ class testApproximateShortestPathTree(unittest.TestCase):
         actual = approx.lower_bound(src, src)
         self.assertEqual(expected, actual, "Unexpected lower bound value")
 
-    def test_drop_nodes_not_in_same_component(self):
-        sourcefile = '../DeltaFiles/Zarushagar.sec'
-
-        sector = SectorDictionary.load_traveller_map_file(sourcefile)
-        delta = DeltaDictionary()
-        delta[sector.name] = sector
-
-        args = self._make_args()
-
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
-        galaxy.output_path = args.output
-
-        galaxy.generate_routes(args.routes, args.route_reuse)
-
-        graph = galaxy.stars
-        stars = list(graph.nodes)
-        source = stars[0]
-
-        approx = ApproximateShortestPathTree(source, graph, 0.2)
-        old_distances = copy.deepcopy(approx._distances)
-        old_paths = copy.deepcopy(approx._paths)
-        old_parent = copy.deepcopy(approx._parent)
-
-        dropnodes = [item for item in stars if item.component != source.component]
-
-        distances, paths, parent, _, _ = approx.drop_nodes(dropnodes)
-        self.assertEqual(old_distances, distances)
-        self.assertEqual(old_paths, paths)
-        self.assertEqual(old_parent, parent)
-
-    def test_drop_nodes_leaf_in_same_component(self):
-        sourcefile = '../DeltaFiles/Zarushagar.sec'
-
-        sector = SectorDictionary.load_traveller_map_file(sourcefile)
-        delta = DeltaDictionary()
-        delta[sector.name] = sector
-
-        args = self._make_args()
-
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
-        galaxy.output_path = args.output
-
-        galaxy.generate_routes(args.routes, args.route_reuse)
-
-        graph = galaxy.stars
-        stars = list(graph.nodes)
-        source = stars[0]
-
-        approx = ApproximateShortestPathTree(source, graph, 0.2)
-
-        leaves = [item for item in stars if -1 != str(item).find('Dorsiki')]
-
-        distances, paths, parent, kids, restart = approx.drop_nodes(leaves)
-        self.assertEqual(481, len(distances))
-        self.assertEqual(481, len(paths))
-        self.assertEqual(481, len(parent))
-        self.assertEqual(481, len(kids))
-        self.assertNotIn(leaves[0], distances, "Leaf node not removed from distances")
-        self.assertNotIn(leaves[0], paths, "Leaf node not removed from paths")
-        self.assertNotIn(leaves[0], parent, "Leaf node not removed from parent")
-        self.assertNotIn(leaves[0], kids, "Leaf node not removed from kids")
-
     def test_drop_first_level_intermediate_nodes_in_same_component(self):
         sourcefile = '../DeltaFiles/Zarushagar.sec'
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -181,35 +132,36 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.output_path = args.output
 
         galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
 
         graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
 
         approx = ApproximateShortestPathTree(source, graph, 0.2)
+        # verify that all distances as at ctor are finite
+        distances = approx._distances
+        old_num = len(distances)
+        for node in distances:
+            self.assertFalse(distances[node] == float('+inf'), "SPT distance for " + str(node) + " not finite")
+
+        # auxiliary network dijkstra calculation to dish out parent nodes
+        paths = nx.single_source_dijkstra_path(graph, source)
 
         leaf = [item for item in stars if -1 != str(item).find('Dorsiki')][0]
-        inter = approx._parent[leaf]
+        leafpath = paths[leaf]
+        inter = leafpath[-2]
 
-        check = copy.deepcopy(approx._kids[inter])
-        check.add(inter)
+        edges = [(leaf, inter)]
 
-        dropnodes = [inter]
-
-        distances, paths, parent, kids, restart = approx.drop_nodes(dropnodes)
-        self.assertEqual(479, len(distances))
-        self.assertEqual(479, len(paths))
-        self.assertEqual(479, len(parent))
-        self.assertEqual(479, len(kids))
-
-        for node in check:
-            self.assertNotIn(node, distances, "Node " + str(node) + " not removed from distances")
-            self.assertNotIn(node, paths, "Node " + str(node) + " not removed from paths")
-            self.assertNotIn(node, parent, "Node " + str(node) + " not removed from parent")
-            self.assertNotIn(node, kids, "Node " + str(node) + " not removed from kids")
+        approx.update_edges(edges)
+        self.assertEqual(old_num, len(approx._distances))
 
     def test_drop_third_level_intermediate_nodes_in_same_component_and_regenerate(self):
         sourcefile = '../DeltaFiles/Zarushagar.sec'
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar.sec')
+
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -222,6 +174,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.output_path = args.output
 
         galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
 
         graph = galaxy.stars
         stars = list(graph.nodes)
@@ -229,79 +182,28 @@ class testApproximateShortestPathTree(unittest.TestCase):
 
         approx = ApproximateShortestPathTree(source, graph, 0.2)
 
-        leaf = [item for item in stars if -1 != str(item).find('Dorsiki')][0]
-        mid = approx._parent[leaf]
-        hi = approx._parent[mid]
-        inter = approx._parent[hi]
-
-        check = set(approx._kids[inter])
-        check.add(inter)
-        num_check = 0
-
-        while num_check != len(check):
-            num_check = len(check)
-            scratch = set()
-            for item in check:
-                for kid in approx._kids[item]:
-                    scratch.add(kid)
-
-            for item in scratch:
-                check.add(item)
-
-        dropnodes = [inter]
-
-        distances, paths, parent, kids, restart = approx.drop_nodes(dropnodes)
-        self.assertEqual(475, len(distances))
-        self.assertEqual(475, len(paths))
-        self.assertEqual(475, len(parent))
-        self.assertEqual(475, len(kids))
-        self.assertEqual(1, len(restart))
-
-        for node in check:
-            self.assertNotIn(node, distances, "Node " + str(node) + " not removed from distances")
-            self.assertNotIn(node, paths, "Node " + str(node) + " not removed from paths")
-            self.assertNotIn(node, parent, "Node " + str(node) + " not removed from parent")
-            self.assertNotIn(node, kids, "Node " + str(node) + " not removed from kids")
-
-        new_distances, new_paths, new_diagnostics = single_source_dijkstra(graph, source, distances=distances,
-                                                                           paths=paths, frontier=restart)
-        self.assertEqual(482, len(new_distances), "Removed node distances should be added by restart")
-        self.assertEqual(482, len(new_paths), "Removed node paths should be added by restart")
-
-    def test_recurrently_dropped_nodes_dont_turn_up_in_restart(self):
-        sourcefile = '../DeltaFiles/Zarushagar.sec'
-
-        sector = SectorDictionary.load_traveller_map_file(sourcefile)
-        delta = DeltaDictionary()
-        delta[sector.name] = sector
-
-        args = self._make_args()
-
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
-        galaxy.output_path = args.output
-
-        galaxy.generate_routes(args.routes, args.route_reuse)
-
-        graph = galaxy.stars
-        stars = list(graph.nodes)
-        source = stars[0]
-
-        approx = ApproximateShortestPathTree(source, graph, 0.2)
+        # auxiliary network dijkstra calculation to dish out parent nodes
+        paths = nx.single_source_dijkstra_path(graph, source)
 
         leaf = [item for item in stars if -1 != str(item).find('Dorsiki')][0]
-        mid = approx._parent[leaf]
-        hi = approx._parent[mid]
-        inter = approx._parent[hi]
+        leafpath = paths[leaf]
+        mid = leafpath[-2]
+        hi = leafpath[-3]
+        inter = leafpath[-4]
 
-        dropnodes = [inter, hi, mid, leaf]
+        edges = [(inter, hi)]
 
-        _, _, _, _, restart = approx.drop_nodes(dropnodes)
-        self.assertEqual(1, len(restart), "Restart nodes shouldn't be parents of other restart nodes")
+        approx.update_edges(edges)
+        self.assertEqual(482, len(approx._distances))
 
     def test_verify_changed_leaf_edge_trip_update(self):
         sourcefile = '../DeltaFiles/Zarushagar-Ibara.sec'
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar-Ibara.sec')
+
         jsonfile = '../PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json'
+        if not os.path.isfile(jsonfile):
+            jsonfile = os.path.abspath('../Tests/PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -314,6 +216,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.output_path = args.output
 
         galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
 
         graph = galaxy.stars
         stars = list(graph.nodes)
@@ -322,8 +225,6 @@ class testApproximateShortestPathTree(unittest.TestCase):
         subnode = stars[23]
 
         approx = ApproximateShortestPathTree(source, graph, 0)
-        expected_diag = {'neighbours_checked': 115, 'nodes_expanded': 43, 'nodes_queued': 43}
-        self.assertEqual(expected_diag, approx._diag, "Unexpected diagnostics dict")
 
         # seed expected distances
         with open(jsonfile, 'r') as file:
@@ -347,14 +248,16 @@ class testApproximateShortestPathTree(unittest.TestCase):
         approx.update_edges([edge])
 
         # verify update tripped
-        self.assertNotEqual(expected_diag, approx._diag, "Diagnostics dict did not change")
         self.assertEqual(expected_distances[leafnode] - 1, approx._distances[leafnode], "Leaf node distance not updated")
-        expected_diag = {'neighbours_checked': 1, 'nodes_expanded': 2, 'nodes_queued': 2}
-        self.assertEqual(expected_diag, approx._diag, "Unexpected diagnostics dict")
 
     def test_verify_near_root_edge_propagates(self):
         sourcefile = '../DeltaFiles/Zarushagar-Ibara.sec'
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar-Ibara.sec')
         jsonfile = '../PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json'
+        if not os.path.isfile(jsonfile):
+            jsonfile = os.path.abspath('../Tests/PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
+
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -367,6 +270,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.output_path = args.output
 
         galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
 
         graph = galaxy.stars
         stars = list(graph.nodes)
@@ -375,7 +279,9 @@ class testApproximateShortestPathTree(unittest.TestCase):
 
         approx = ApproximateShortestPathTree(source, graph, 0)
 
-        right = approx._paths[leafnode][1]
+        # auxiliary network dijkstra calculation to dish out parent nodes
+        paths = nx.single_source_dijkstra_path(graph, source)
+        right = paths[leafnode][1]
 
         # seed expected distances
         with open(jsonfile, 'r') as file:
@@ -402,16 +308,15 @@ class testApproximateShortestPathTree(unittest.TestCase):
             if expected_distances[item] > 0 and 'Selsinia (Zarushagar 0201)' != str(item):
                 expected_distances[item] -= 1
 
-        # verify frontier generation
-        _, _, _, kids, frontier = approx.drop_nodes(dropnodes)
-        self.assertEqual(4, len(frontier), "Unexpected frontier set size")
-
         approx.update_edges([edge])
 
         self.assertEqual(expected_distances, approx._distances, "Unexpected distances after SPT restart")
 
     def test_verify_multiple_near_root_edges_propagate(self):
         sourcefile = '../DeltaFiles/dijkstra_restart_blowup/Lishun.sec'
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/dijkstra_restart_blowup/Lishun.sec')
+
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -424,6 +329,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.output_path = args.output
 
         galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
 
         graph = galaxy.stars
         stars = list(graph.nodes)

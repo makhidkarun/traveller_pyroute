@@ -13,6 +13,9 @@ from PyRoute.Pathfinding.single_source_dijkstra import single_source_dijkstra, i
 class ApproximateShortestPathTree:
 
     def __init__(self, source, graph, epsilon):
+        if source.component is None:
+            raise ValueError("Source node " + str(source) + " has undefined component.  Has calculate_components() been run?")
+
         self._source = source
         self._graph = graph
         self._epsilon = epsilon
