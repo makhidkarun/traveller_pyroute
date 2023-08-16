@@ -512,9 +512,10 @@ class Galaxy(AreaItem):
 
     def heuristic_distance(self, star, target):
         item = (star, target)
-        base = Star.heuristicDistance(star, target)
         if item in self.landmarks:
             base = self.landmarks[item]
+        else:
+            base = Star.heuristicDistance(star, target)
         sp_bound = self.trade.shortest_path_tree.lower_bound(star, target)
         return max(base, sp_bound)
 
