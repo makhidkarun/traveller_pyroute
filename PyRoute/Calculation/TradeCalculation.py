@@ -154,7 +154,18 @@ class TradeCalculation(RouteCalculation):
 
         # Pick landmark - biggest WTN system in the biggest graph component
         stars = [item for item in self.galaxy.stars]
+        num_stars = len(stars)
+        threshold_stars = 0.25 * num_stars
         stars.sort(key=lambda item: item.wtn, reverse=True)
+        landmark_component = stars[0].component
+        component_size = 0
+        # check we're actually _in_ a component worth landmarking
+        while component_size < threshold_stars:
+            component_size = len([item for item in stars if landmark_component == item.component])
+            if component_size < threshold_stars:
+                stars = [item for item in stars if landmark_component != item.component]
+                landmark_component = stars[0].component
+
         stars[0].is_landmark = True
         self.shortest_path_tree = ApproximateShortestPathTree(stars[0], self.galaxy.stars, 0.2)
 
