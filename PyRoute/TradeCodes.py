@@ -27,6 +27,8 @@ class TradeCodes(object):
               'Oc': '#0094ED', 'Po': '#6a986a', 'Va': '#c9c9c9', 'Wa': '#4abef4'}
     ext_codes = {'Lt', 'Ht', 'Lg', 'Hg'}
 
+    __slots__ = '__dict__', 'codeset', 'pcode', 'dcode', 'xcode'
+
     def __init__(self, initial_codes):
         """
         Constructor

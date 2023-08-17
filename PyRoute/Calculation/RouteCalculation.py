@@ -102,12 +102,15 @@ class RouteCalculation(object):
         WTNs plus a modifier for types, minus a modifier for distance.
         """
         btn = star1.wtn + star2.wtn
-        if (star1.tradeCode.agricultural and (star2.tradeCode.nonagricultural or star2.tradeCode.extreme)) or \
-                ((star1.tradeCode.nonagricultural or star1.tradeCode.extreme) and star2.tradeCode.agricultural):
-            btn += 1
-        if (star1.tradeCode.nonindustrial and star2.tradeCode.industrial) or \
-                (star2.tradeCode.nonindustrial and star1.tradeCode.industrial):
-            btn += 1
+        code1 = star1.tradeCode
+        code2 = star2.tradeCode
+        if code1.agricultural or code2.agricultural:
+            if (code1.agricultural and (code2.nonagricultural or code2.extreme)) or \
+               ((code1.nonagricultural or code1.extreme) and code2.agricultural):
+                btn += 1
+        if code1.industrial or code2.industrial:
+            if (code1.nonindustrial and code2.industrial) or (code2.nonindustrial and code1.industrial):
+                btn += 1
 
         if not AllyGen.are_allies(star1.alg_code, star2.alg_code):
             btn -= 1
