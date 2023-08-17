@@ -8,6 +8,8 @@ import functools
 import itertools
 import logging
 
+import networkx as nx
+
 from PyRoute.AllyGen import AllyGen
 
 
@@ -31,6 +33,9 @@ class RouteCalculation(object):
     def __init__(self, galaxy):
         self.logger = logging.getLogger('PyRoute.TradeCalculation')
         self.galaxy = galaxy
+
+        # component level tracking
+        self.components = dict()
 
     def generate_routes(self):
         raise NotImplementedError("Base Class")
@@ -152,3 +157,14 @@ class RouteCalculation(object):
         else:
             trade = 10 ** ((btn - 10) // 2)
         return trade
+
+    def calculate_components(self):
+        bitz = nx.connected_components(self.galaxy.stars)
+        counter = -1
+
+        for component in bitz:
+            counter += 1
+            self.components[counter] = len(component)
+            for star in component:
+                star.component = counter
+        return

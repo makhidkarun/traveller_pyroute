@@ -70,9 +70,6 @@ class TradeCalculation(RouteCalculation):
 
         self.shortest_path_tree = None
 
-        # component level tracking
-        self.components = dict()
-
     def base_route_filter(self, star, neighbor):
         if star in self.redzone or neighbor in self.redzone:
             return True
@@ -427,14 +424,3 @@ class TradeCalculation(RouteCalculation):
         assert 0 < weight, "Weight of edge between " + str(star) + " and " + str(
             target) + " must be positive"
         return weight
-
-    def calculate_components(self):
-        bitz = nx.connected_components(self.galaxy.stars)
-        counter = -1
-
-        for component in bitz:
-            counter += 1
-            self.components[counter] = len(component)
-            for star in component:
-                star.component = counter
-        return
