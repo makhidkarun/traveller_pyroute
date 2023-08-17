@@ -49,6 +49,7 @@ class TradeCalculation(RouteCalculation):
 
     # Stars that have been excluded, for whatever reason, from route generation
     redzone = set()
+    greenzone = set()
 
     def __init__(self, galaxy, min_btn=13, route_btn=8, route_reuse=10, debug_flag=False):
         super(TradeCalculation, self).__init__(galaxy)
@@ -71,6 +72,10 @@ class TradeCalculation(RouteCalculation):
         self.shortest_path_tree = None
 
     def base_route_filter(self, star, neighbor):
+        # if both stars have been previously checked as good route endpoints, bail out now
+        if star in self.greenzone and neighbor in self.greenzone:
+            return False
+        # if either star has been previously checked as a bad route endpoint, bail out now
         if star in self.redzone or neighbor in self.redzone:
             return True
         if star.zone in ['R', 'F']:
@@ -85,6 +90,12 @@ class TradeCalculation(RouteCalculation):
         if neighbor.tradeCode.barren:
             self.redzone.add(neighbor)
             return True
+        # if we've gotten this far, neither star nor neighbour is already in redzone set, has a Red/Forbidden travel
+        # code, or is barren, thus is an allowed route endpoint
+        if star not in self.greenzone:
+            self.greenzone.add(star)
+        if neighbor not in self.greenzone:
+            self.greenzone.add(neighbor)
         return False
 
     def base_range_routes(self, star, neighbor):
