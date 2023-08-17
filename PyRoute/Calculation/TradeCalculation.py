@@ -70,6 +70,9 @@ class TradeCalculation(RouteCalculation):
 
         self.shortest_path_tree = None
 
+        # component level tracking
+        self.components = dict()
+
     def base_route_filter(self, star, neighbor):
         if star in self.redzone or neighbor in self.redzone:
             return True
@@ -431,6 +434,7 @@ class TradeCalculation(RouteCalculation):
 
         for component in bitz:
             counter += 1
+            self.components[counter] = len(component)
             for star in component:
                 star.component = counter
         return
