@@ -14,6 +14,7 @@ class ApproximateShortestPathTree:
     __slots__ = '_source', '_graph', '_epsilon', '_divisor', '_distances', '_sources'
 
     def __init__(self, source, graph, epsilon, sources=None):
+        seeds = None
         if source.component is None:
             raise ValueError("Source node " + str(source) + " has undefined component.  Has calculate_components() been run?")
         if sources is not None:
@@ -21,6 +22,7 @@ class ApproximateShortestPathTree:
                 if sources[source].component is None:
                     raise ValueError("Source node " + str(
                         sources[source]) + " has undefined component.  Has calculate_components() been run?")
+            seeds = sources.values()
 
         self._source = source
         self._graph = graph
@@ -28,7 +30,7 @@ class ApproximateShortestPathTree:
         self._divisor = 1 / (1 + epsilon)
         self._sources = sources
 
-        self._distances = implicit_shortest_path_dijkstra(self._graph, self._source, seeds=sources.values())
+        self._distances = implicit_shortest_path_dijkstra(self._graph, self._source, seeds=seeds)
 
     def lower_bound(self, source, target):
         left = self._distances[source]
