@@ -97,9 +97,12 @@ class Star(object):
 """
     starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
 
+    __slots__ = '__dict__', '_hash', '_key'
+
     def __init__(self):
         self.logger = logging.getLogger('PyRoute.Star')
         self._hash = None
+        self._key = None
         self.component = None
         self.x = None
         self.y = None
@@ -299,7 +302,7 @@ class Star(object):
         return "{} ({} {})".format(self.name, self.sector.name, self.position)
 
     def __key(self):
-        return (self.position, self.name, self.uwp, self.sector.name)
+        return self._key
 
     def __eq__(self, y):
         if self.__hash__() != y.__hash__():
@@ -313,7 +316,8 @@ class Star(object):
         return self._hash
 
     def calc_hash(self):
-        self._hash = hash(self.__key())
+        self._key = (self.position, self.name, self.uwp, self.sector.name)
+        self._hash = hash(self._key)
 
     def wiki_name(self):
         # name = u" ".join(w.capitalize() for w in self.name.lower().split())
