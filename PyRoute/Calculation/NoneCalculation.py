@@ -27,7 +27,7 @@ class NoneCalculation(RouteCalculation):
         return False
 
     def base_range_routes(self, star, neighbor):
-        pass
+        return star.hex_distance(neighbor)
 
     def route_weight(self, star, target):
         dist = star.hex_distance(target)

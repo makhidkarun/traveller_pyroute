@@ -67,11 +67,10 @@ class RouteCalculation(object):
     def generate_base_routes(self):
         self.logger.info('generating jumps...')
         for star, neighbor in itertools.combinations(self.galaxy.ranges, 2):
-            dist = star.hex_distance(neighbor)
             if self.base_route_filter(star, neighbor):
                 continue
 
-            self.base_range_routes(star, neighbor)
+            dist = self.base_range_routes(star, neighbor)
 
             if dist <= self.galaxy.max_jump_range:
                 weight = self.route_weight(star, neighbor)

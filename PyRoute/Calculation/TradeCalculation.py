@@ -109,6 +109,7 @@ class TradeCalculation(RouteCalculation):
             self.galaxy.ranges.add_edge(star, neighbor, distance=dist,
                                         btn=btn,
                                         passenger_btn=passBTN)
+        return dist
 
     def generate_routes(self):
         """

@@ -21,7 +21,7 @@ class XRouteCalculation(RouteCalculation):
         self.route_reuse = 5
 
     def base_range_routes(self, star, neighbor):
-        pass
+        return star.hex_distance(neighbor)
 
     def base_route_filter(self, star, neighbor):
         if not AllyGen.are_allies(star.alg_code, neighbor.alg_code):

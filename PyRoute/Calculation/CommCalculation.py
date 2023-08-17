@@ -44,6 +44,7 @@ class CommCalculation(RouteCalculation):
                          self.important(star, min_importance) or self.important(neighbor, min_importance),
                          self.is_rich(star) or self.is_rich(neighbor)]
                 self.galaxy.ranges.add_edge(star, neighbor, distance=dist, flags=flags)
+            return dist
 
     def capitals(self, star):
         # Capital of sector, subsector, or empire are in the list
