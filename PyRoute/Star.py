@@ -97,7 +97,7 @@ class Star(object):
 """
     starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
 
-    __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code'
+    __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code', 'x', 'y', 'z'
 
     def __init__(self):
         self.logger = logging.getLogger('PyRoute.Star')

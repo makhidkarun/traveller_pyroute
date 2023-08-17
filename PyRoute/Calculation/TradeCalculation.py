@@ -265,8 +265,8 @@ class TradeCalculation(RouteCalculation):
         rangedata['actual distance'] = distance
         rangedata['jumps'] = len(route) - 1
 
-        self.galaxy.landmarks[(source, target)] = distance
-        self.galaxy.landmarks[(target, source)] = distance
+        self.galaxy.landmarks[(source.index, target.index)] = distance
+        self.galaxy.landmarks[(target.index, source.index)] = distance
 
         # Gather basic statistics.
         tradeBTN = self.get_btn(source, target, distance)

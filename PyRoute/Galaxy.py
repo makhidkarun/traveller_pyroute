@@ -516,7 +516,7 @@ class Galaxy(AreaItem):
     def heuristic_distance(self, star, target):
         # The general approach used for the heuristic estimate between star and target is the maximum of whatever
         # choices are available.
-        item = (star, target)
+        item = (star.index, target.index)
         # Previous-route-distances are only stored if they exceed the straight-line bound
         if item in self.landmarks:
             base = self.landmarks[item]
