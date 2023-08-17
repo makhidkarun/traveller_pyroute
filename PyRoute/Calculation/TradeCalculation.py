@@ -424,3 +424,13 @@ class TradeCalculation(RouteCalculation):
         assert 0 < weight, "Weight of edge between " + str(star) + " and " + str(
             target) + " must be positive"
         return weight
+
+    def get_landmarks(self):
+        result = dict()
+
+        for component_id in self.components:
+            stars = [item for item in self.galaxy.stars if component_id == item.component]
+            stars.sort(key=lambda item: item.wtn, reverse=True)
+            result[component_id] = stars[0]
+
+        return result
