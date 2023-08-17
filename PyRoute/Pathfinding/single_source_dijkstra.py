@@ -218,8 +218,12 @@ def _dijkstra_core(G, source, paths=None, cutoff=None, distances=None, frontier=
 def implicit_shortest_path_dijkstra(graph, source, distance_labels=None, seeds=None):
     if distance_labels is None:
         # dig up nodes in same graph component as source - that's the ones we care about finding distance labels _for_
-        distance_labels = {item: float('+inf') for item in graph if item.component == source.component}
-        seeds = {source} if seeds is None else seeds
+        if seeds is None:
+            distance_labels = {item: float('+inf') for item in graph if item.component == source.component}
+            seeds = {source}
+        else:
+            components = [seed.component for seed in seeds]
+            distance_labels = {item: float('+inf') for item in graph if item.component in components}
         for source in seeds:
             distance_labels[source] = 0
 

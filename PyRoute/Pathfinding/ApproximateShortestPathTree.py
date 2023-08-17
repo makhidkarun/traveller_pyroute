@@ -11,24 +11,26 @@ from PyRoute.Pathfinding.single_source_dijkstra import single_source_dijkstra, i
 
 
 class ApproximateShortestPathTree:
-    __slots__ = '_source', '_graph', '_epsilon', '_divisor', '_distances', '_component'
+    __slots__ = '_source', '_graph', '_epsilon', '_divisor', '_distances', '_sources'
 
-    def __init__(self, source, graph, epsilon):
+    def __init__(self, source, graph, epsilon, sources=None):
         if source.component is None:
             raise ValueError("Source node " + str(source) + " has undefined component.  Has calculate_components() been run?")
+        if sources is not None:
+            for source in sources:
+                if sources[source].component is None:
+                    raise ValueError("Source node " + str(
+                        sources[source]) + " has undefined component.  Has calculate_components() been run?")
 
         self._source = source
-        self._component = source.component
         self._graph = graph
         self._epsilon = epsilon
         self._divisor = 1 / (1 + epsilon)
+        self._sources = sources
 
-        self._distances = implicit_shortest_path_dijkstra(self._graph, self._source)
+        self._distances = implicit_shortest_path_dijkstra(self._graph, self._source, seeds=sources.values())
 
     def lower_bound(self, source, target):
-        if self._component != source.component:
-            return 0
-
         left = self._distances[source]
         right = self._distances[target]
         big = max(left, right)
@@ -41,8 +43,6 @@ class ApproximateShortestPathTree:
         for item in edges:
             left = item[0]
             right = item[1]
-            if self._component != left.component:
-                continue
             leftdist = self._distances[left]
             rightdist = self._distances[right]
             weight = self._graph[left][right]['weight']

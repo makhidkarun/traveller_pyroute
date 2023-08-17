@@ -152,22 +152,13 @@ class TradeCalculation(RouteCalculation):
         btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True) if s.component == n.component]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
-        # Pick landmark - biggest WTN system in the biggest graph component
+        # Pick landmarks - biggest WTN system in each graph component
+        landmarks = self.get_landmarks()
         stars = [item for item in self.galaxy.stars]
         num_stars = len(stars)
-        threshold_stars = 0.25 * num_stars
         stars.sort(key=lambda item: item.wtn, reverse=True)
-        landmark_component = stars[0].component
-        component_size = 0
-        # check we're actually _in_ a component worth landmarking
-        while component_size < threshold_stars:
-            component_size = len([item for item in stars if landmark_component == item.component])
-            if component_size < threshold_stars:
-                stars = [item for item in stars if landmark_component != item.component]
-                landmark_component = stars[0].component
-
         stars[0].is_landmark = True
-        self.shortest_path_tree = ApproximateShortestPathTree(stars[0], self.galaxy.stars, 0.2)
+        self.shortest_path_tree = ApproximateShortestPathTree(stars[0], self.galaxy.stars, 0.2, sources=landmarks)
 
         base_btn = 0
         counter = 0
@@ -431,6 +422,7 @@ class TradeCalculation(RouteCalculation):
         for component_id in self.components:
             stars = [item for item in self.galaxy.stars if component_id == item.component]
             stars.sort(key=lambda item: item.wtn, reverse=True)
+            stars[0].is_landmark = True
             result[component_id] = stars[0]
 
         return result
