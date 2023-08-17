@@ -219,8 +219,9 @@ def implicit_shortest_path_dijkstra(graph, source, distance_labels=None, seeds=N
     if distance_labels is None:
         # dig up nodes in same graph component as source - that's the ones we care about finding distance labels _for_
         distance_labels = {item: float('+inf') for item in graph if item.component == source.component}
-        distance_labels[source] = 0
-        seeds = {source}
+        seeds = {source} if seeds is None else seeds
+        for source in seeds:
+            distance_labels[source] = 0
 
     c = count()
     heap = [(distance_labels[seed], next(c), seed) for seed in seeds]
