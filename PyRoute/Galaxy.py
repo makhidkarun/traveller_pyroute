@@ -263,6 +263,7 @@ class Galaxy(AreaItem):
         return state
 
     def read_sectors(self, sectors, pop_code, ru_calc):
+        star_counter = 0
         for sector in sectors:
             try:
                 lines = [line for line in codecs.open(sector, 'r', 'utf-8')]
@@ -309,6 +310,8 @@ class Galaxy(AreaItem):
                     self.set_area_alg(star, sec.subsectors[star.subsector()], self.alg)
 
                     star.tradeCode.sophont_list.append("{}A".format(self.alg[star.alg_code].population))
+                    star.index = star_counter
+                    star_counter += 1
 
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds)))

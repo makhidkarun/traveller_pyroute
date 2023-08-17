@@ -104,6 +104,7 @@ class Star(object):
         self._hash = None
         self._key = None
         self.component = None
+        self.index = None
         self.x = None
         self.y = None
         self.z = None
@@ -169,6 +170,7 @@ class Star(object):
         for key in state:
             item = state[key]
             setattr(foo, key, item)
+        foo.calc_hash()
 
         return foo
 
@@ -747,6 +749,7 @@ class Star(object):
     def is_well_formed(self):
         assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
+        assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
         return True
 
     @property
