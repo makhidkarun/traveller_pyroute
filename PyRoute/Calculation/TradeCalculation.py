@@ -73,29 +73,29 @@ class TradeCalculation(RouteCalculation):
 
     def base_route_filter(self, star, neighbor):
         # if both stars have been previously checked as good route endpoints, bail out now
-        if star in self.greenzone and neighbor in self.greenzone:
+        if star.index in self.greenzone and neighbor.index in self.greenzone:
             return False
         # if either star has been previously checked as a bad route endpoint, bail out now
-        if star in self.redzone or neighbor in self.redzone:
+        if star.index in self.redzone or neighbor.index in self.redzone:
             return True
         if star.zone in ['R', 'F']:
-            self.redzone.add(star)
+            self.redzone.add(star.index)
             return True
         if neighbor.zone in ['R', 'F']:
-            self.redzone.add(neighbor)
+            self.redzone.add(neighbor.index)
             return True
         if star.tradeCode.barren:
-            self.redzone.add(star)
+            self.redzone.add(star.index)
             return True
         if neighbor.tradeCode.barren:
-            self.redzone.add(neighbor)
+            self.redzone.add(neighbor.index)
             return True
         # if we've gotten this far, neither star nor neighbour is already in redzone set, has a Red/Forbidden travel
         # code, or is barren, thus is an allowed route endpoint
-        if star not in self.greenzone:
-            self.greenzone.add(star)
-        if neighbor not in self.greenzone:
-            self.greenzone.add(neighbor)
+        if star.index not in self.greenzone:
+            self.greenzone.add(star.index)
+        if neighbor.index not in self.greenzone:
+            self.greenzone.add(neighbor.index)
         return False
 
     def base_range_routes(self, star, neighbor):
