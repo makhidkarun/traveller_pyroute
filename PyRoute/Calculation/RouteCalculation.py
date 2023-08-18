@@ -77,7 +77,9 @@ class RouteCalculation(object):
                 btn = self.get_btn(star, neighbor)
                 self.galaxy.stars.add_edge(star, neighbor, distance=dist,
                                            weight=weight, trade=0, btn=btn, count=0)
+                self.galaxy.stars_shadow.add_edge(star.index, neighbor.index)
                 self.check_existing_routes(star, neighbor)
+                self.galaxy.stars_shadow[star.index][neighbor.index] = self.galaxy.stars[star][neighbor]
 
         self.logger.info("base routes: %s  -  ranges: %s" %
                          (self.galaxy.stars.number_of_edges(),

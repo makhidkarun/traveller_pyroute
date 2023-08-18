@@ -240,6 +240,7 @@ class Galaxy(AreaItem):
         self.logger = logging.getLogger('PyRoute.Galaxy')
         self.stars = nx.Graph()
         self.ranges = nx.Graph()
+        self.stars_shadow = nx.Graph()
         self.sectors = {}
         self.borders = AllyGen(self)
         self.output_path = 'maps'
@@ -334,7 +335,9 @@ class Galaxy(AreaItem):
             for star in sector.worlds:
                 self.stars.add_node(star)
                 self.ranges.add_node(star)
+                self.stars_shadow.add_node(star.index)
         self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
+        assert self.stars.number_of_nodes() == self.stars_shadow.number_of_nodes(), "Mismatch between full and shadow stars # of nodes"
 
     def set_bounding_sectors(self):
         for sector, neighbor in itertools.combinations(self.sectors.values(), 2):
