@@ -153,6 +153,7 @@ class Star(object):
         self.is_target = False
         self.is_landmark = False
         self._pax_btn_mod = 0
+        self.suppress_soph_percent_warning = False
 
     def __getstate__(self):
         state = self.__dict__.copy()

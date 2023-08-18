@@ -243,8 +243,9 @@ class StatCalculation(object):
 
         if total_pct < -5:
             self.logger.warning("{} has sophont percent over 100%: {}".format(star, total_pct))
-        elif total_pct < 0:
+        elif total_pct < 0 and not star.suppress_soph_percent_warning:
             self.logger.info("{} has a sophont percent just over 100%: {}".format(star, total_pct))
+            star.suppress_soph_percent_warning = True
         elif not star.tradeCode.barren:
             stats.populations[default_soph].add_population(int(star.population * (total_pct / 100.0)), None)
 
