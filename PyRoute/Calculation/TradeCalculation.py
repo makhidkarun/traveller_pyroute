@@ -152,12 +152,15 @@ class TradeCalculation(RouteCalculation):
         btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True) if s.component == n.component]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
-        # Pick landmarks - biggest WTN system in each graph component
+        # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
+        # components, even those with only one star.
         landmarks = self.get_landmarks()
         stars = [item for item in self.galaxy.stars]
         num_stars = len(stars)
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
+        # Feed the landmarks in as roots of their respective shortest-path trees.
+        # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
         self.shortest_path_tree = ApproximateShortestPathTree(stars[0], self.galaxy.stars, 0.2, sources=landmarks)
 
         base_btn = 0
@@ -278,6 +281,8 @@ class TradeCalculation(RouteCalculation):
             edges.append((start, end))
             start = end
 
+        # Feed the list of touched edges into the approximate-shortest-path machinery, so it can update whatever
+        # distance labels it needs to stay within its approximation bound.
         self.shortest_path_tree.update_edges(edges)
 
         return (tradeCr, tradePass)
@@ -419,6 +424,11 @@ class TradeCalculation(RouteCalculation):
     def get_landmarks(self):
         result = dict()
 
+        # Dig out landmarks for each connected component
+        # First landmark is the star with the biggest WTN in the component.
+        # Later landmark(s), if any, will probably be the star in the component furthest away from the closest existing
+        # landmark in that component.  If all the stars in a component are _already_ landmarks, return the previous
+        # landmark choice.
         for component_id in self.components:
             stars = [item for item in self.galaxy.stars if component_id == item.component]
             stars.sort(key=lambda item: item.wtn, reverse=True)

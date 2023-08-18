@@ -27,9 +27,11 @@ class ApproximateShortestPathTree:
         self._source = source
         self._graph = graph
         self._epsilon = epsilon
+        # memoising this because its value gets used _heavily_ in lower bound calcs, called during heuristic generation
         self._divisor = 1 / (1 + epsilon)
         self._sources = sources
 
+        # now we're all set up, seed the approximate-SP tree/forest (tree with seeds in 1 component, forest otherwise)
         self._distances = implicit_shortest_path_dijkstra(self._graph, self._source, seeds=seeds)
 
     def lower_bound(self, source, target):
@@ -38,6 +40,9 @@ class ApproximateShortestPathTree:
         big = max(left, right)
         little = min(left, right)
 
+        # Since we're trying to _lower_ bound the cost between source and target, we have to assume the little value
+        # is accurate, while the big value is overstated by (1 + epsilon).  Thus, we divide big by (1 + epsilon) before
+        # subtracting, and lower-bounding the result to zero (since costs can't be negative).
         return max(0, big * self._divisor - little)
 
     def update_edges(self, edges):
@@ -49,7 +54,18 @@ class ApproximateShortestPathTree:
             rightdist = self._distances[right]
             weight = self._graph[left][right]['weight']
             delta = abs(leftdist - rightdist)
-            # check if (1+eps) approximation is busted
+            # Given distance labels, L, on nodes u and v, assuming u's label being smaller,
+            # and edge cost between u and v of d(u, v):
+            # L(u) + d(u, v) <= L(v)
+            # Or, after rearranging,
+            # d(u, v) <= L(v) - L(u)
+            # u and v do _NOT_ have to be shortest-path parent/child for this bound to hold
+
+            # Allowing an approximation tolerance of epsilon (say 0.1), that bound becomes
+            # d(u, v) * (1 + epsilon) <= L(v) - L(u)
+
+            # If that bound no longer holds, it's due to the edge (u, v) having its weight decreased during pathfinding.
+            # Tag each incident node as needing updates.
             if delta >= (1 + self._epsilon) * weight:
                 dropnodes.add(left)
                 dropnodes.add(right)
@@ -58,6 +74,9 @@ class ApproximateShortestPathTree:
         if 0 == len(dropnodes):
             return
 
+        # Now we have the nodes incident to edges that bust the (1+eps) approximation bound, feed them into restarted
+        # dijkstra to update the approx-SP tree/forest.  Some nodes in dropnodes may well be SP descendants of others,
+        # but it wasn't worth the time or complexity cost to filter them out here.
         self._distances = implicit_shortest_path_dijkstra(self._graph, self._source, distance_labels=self._distances, seeds=dropnodes)
 
     def is_well_formed(self):
