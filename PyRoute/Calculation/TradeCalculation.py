@@ -166,14 +166,14 @@ class TradeCalculation(RouteCalculation):
 
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
-        landmarks = self.get_landmarks()
+        landmarks = self.get_landmarks(index=True)
         stars = [item for item in self.galaxy.stars]
         num_stars = len(stars)
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathTree(stars[0], self.galaxy.stars, 0.2, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, self.galaxy.stars_shadow, 0.2, sources=landmarks)
 
         base_btn = 0
         counter = 0
@@ -290,7 +290,7 @@ class TradeCalculation(RouteCalculation):
             data['trade'] += tradeCr
             data['count'] += 1
             data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
-            edges.append((start, end))
+            edges.append((start.index, end.index))
             start = end
 
         # Feed the list of touched edges into the approximate-shortest-path machinery, so it can update whatever
@@ -433,7 +433,7 @@ class TradeCalculation(RouteCalculation):
             target) + " must be positive"
         return weight
 
-    def get_landmarks(self):
+    def get_landmarks(self, index=False):
         result = dict()
 
         # Dig out landmarks for each connected component
@@ -445,6 +445,9 @@ class TradeCalculation(RouteCalculation):
             stars = [item for item in self.galaxy.stars if component_id == item.component]
             stars.sort(key=lambda item: item.wtn, reverse=True)
             stars[0].is_landmark = True
-            result[component_id] = stars[0]
+            if index:
+                result[component_id] = stars[0].index
+            else:
+                result[component_id] = stars[0]
 
         return result

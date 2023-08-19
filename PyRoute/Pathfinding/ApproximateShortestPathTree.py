@@ -7,7 +7,9 @@ import copy
 
 import networkx as nx
 
-from PyRoute.Pathfinding.single_source_dijkstra import single_source_dijkstra, implicit_shortest_path_dijkstra
+from PyRoute.Pathfinding.single_source_dijkstra import single_source_dijkstra, implicit_shortest_path_dijkstra, \
+    implicit_shortest_path_dijkstra_indexes
+from PyRoute.Star import Star
 
 
 class ApproximateShortestPathTree:
@@ -15,11 +17,11 @@ class ApproximateShortestPathTree:
 
     def __init__(self, source, graph, epsilon, sources=None):
         seeds = None
-        if source.component is None:
+        if isinstance(source, Star) and source.component is None:
             raise ValueError("Source node " + str(source) + " has undefined component.  Has calculate_components() been run?")
         if sources is not None:
             for source in sources:
-                if sources[source].component is None:
+                if isinstance(source, Star) and sources[source].component is None:
                     raise ValueError("Source node " + str(
                         sources[source]) + " has undefined component.  Has calculate_components() been run?")
             seeds = sources.values()
@@ -32,7 +34,7 @@ class ApproximateShortestPathTree:
         self._sources = sources
 
         # now we're all set up, seed the approximate-SP tree/forest (tree with seeds in 1 component, forest otherwise)
-        self._distances = implicit_shortest_path_dijkstra(self._graph, self._source, seeds=seeds)
+        self._distances = implicit_shortest_path_dijkstra_indexes(self._graph, self._source, seeds=seeds)
 
     def lower_bound(self, source, target):
         left = self._distances[source]
@@ -77,7 +79,7 @@ class ApproximateShortestPathTree:
         # Now we have the nodes incident to edges that bust the (1+eps) approximation bound, feed them into restarted
         # dijkstra to update the approx-SP tree/forest.  Some nodes in dropnodes may well be SP descendants of others,
         # but it wasn't worth the time or complexity cost to filter them out here.
-        self._distances = implicit_shortest_path_dijkstra(self._graph, self._source, distance_labels=self._distances, seeds=dropnodes)
+        self._distances = implicit_shortest_path_dijkstra_indexes(self._graph, self._source, distance_labels=self._distances, seeds=dropnodes)
 
     def is_well_formed(self):
         return True
