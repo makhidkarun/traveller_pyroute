@@ -158,6 +158,7 @@ def astar_path(G, source, target, heuristic=None, weight="weight"):
 
         # gap between dist and current upper bound - if a neighbour's connecting weight exceeds this, skip it
         delta = upbound - dist
+
         # Pre-filter neighbours
         # Remove neighbour nodes that are already enqueued and won't result in shorter paths to them
         # Explicitly retain target node (if present) to give a chance of finding a better upper bound
@@ -356,15 +357,13 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
 
         explored[curnode] = parent
 
-        # gap between dist and current upper bound - if a neighbour's connecting weight exceeds this, skip it
-        delta = upbound - dist
         # Pre-filter neighbours
         # Remove neighbour nodes that are already enqueued and won't result in shorter paths to them
         # Explicitly retain target node (if present) to give a chance of finding a better upper bound
-        neighbours = [(k, v) for (k, v) in G_succ[curnode].items() if not (k in enqueued and dist + v['weight'] >= enqueued[k][0] and not (k == target))]
+        neighbours = [(k, dist + v['weight']) for (k, v) in G_succ[curnode].items() if not (k in enqueued and dist + v['weight'] >= enqueued[k][0] and not (k == target))]
         if upbound != float('inf') and 0 < len(neighbours):
             # Remove neighbour nodes who will bust the upper bound as it currently stands
-            neighbours = [(k, v) for (k, v) in neighbours if v['weight'] <= delta]
+            neighbours = [(k, v) for (k, v) in neighbours if v <= upbound]
 
         # if neighbours list is empty, go around
         if 0 == len(neighbours):
@@ -372,15 +371,14 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
 
         # if neighbours list has at least 2 elements, sort it, putting the target node first, then by ascending weight
         if 1 < len(neighbours):
-            neighbours.sort(key=lambda item: item[1]['weight'])
+            neighbours.sort(key=lambda item: item[1])
             neighbours.sort(key=lambda item: item[0] == target, reverse=True)
             if neighbours[0][0] == target:  # If first item is the target node, drop all neighbours with higher weights
-                targ_weight = neighbours[0][1]['weight']
-                neighbours = [(k, v) for (k, v) in neighbours if v['weight'] <= targ_weight]
+                targ_weight = neighbours[0][1]
+                neighbours = [(k, v) for (k, v) in neighbours if v <= targ_weight]
 
-        for neighbor, w in neighbours:
+        for neighbor, ncost in neighbours:
             diagnostics['neighbours_checked'] += 1
-            ncost = dist + w['weight']
             if neighbor in enqueued:
                 qcost, h = enqueued[neighbor]
                 # if qcost <= ncost, a less costly path from the
