@@ -13,6 +13,7 @@ from PyRoute.AllyGen import AllyGen
 class DeltaGalaxy(Galaxy):
 
     def read_sectors(self, sectors, pop_code, ru_calc):
+        star_counter = 0
         sector: SectorDictionary
 
         sectors.skip_void_subsectors_if_half()
@@ -40,6 +41,11 @@ class DeltaGalaxy(Galaxy):
                     continue
                 star = Star.parse_line_into_star(line, sec, pop_code, ru_calc)
                 if star:
+                    star.index = star_counter
+                    star_counter += 1
+                    if star not in sec.worlds:
+                        self.star_mapping[star.index] = star
+
                     sec.worlds.append(star)
                     sec.subsectors[star.subsector()].worlds.append(star)
                     star.alg_base_code = AllyGen.same_align(star.alg_code)
@@ -49,6 +55,7 @@ class DeltaGalaxy(Galaxy):
                     self.set_area_alg(star, sec.subsectors[star.subsector()], self.alg)
 
                     star.tradeCode.sophont_list.append("{}A".format(self.alg[star.alg_code].population))
+
 
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds)))

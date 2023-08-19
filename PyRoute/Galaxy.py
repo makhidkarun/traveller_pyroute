@@ -250,6 +250,7 @@ class Galaxy(AreaItem):
         self.debug_flag = debug_flag
         self.landmarks = dict()
         self.big_component = None
+        self.star_mapping = dict()
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -302,6 +303,11 @@ class Galaxy(AreaItem):
                     continue
                 star = Star.parse_line_into_star(line, sec, pop_code, ru_calc)
                 if star:
+                    star.index = star_counter
+                    star_counter += 1
+                    if star not in sec.worlds:
+                        self.star_mapping[star.index] = star
+
                     sec.worlds.append(star)
                     sec.subsectors[star.subsector()].worlds.append(star)
                     star.alg_base_code = AllyGen.same_align(star.alg_code)
@@ -313,6 +319,7 @@ class Galaxy(AreaItem):
                     star.tradeCode.sophont_list.append("{}A".format(self.alg[star.alg_code].population))
                     star.index = star_counter
                     star_counter += 1
+                    self.star_mapping[star.index] = star
 
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds)))
@@ -331,13 +338,21 @@ class Galaxy(AreaItem):
             area.alg.setdefault(star.alg_code, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
 
     def set_positions(self):
+        stars_len = self.stars.number_of_nodes()
+        shadow_len = self.stars_shadow.number_of_nodes()
+        assert stars_len == shadow_len, "Pre-set-positions mismatch between full and shadow stars # of nodes, " + str(stars_len) + " and " + str(shadow_len)
         for sector in self.sectors.values():
             for star in sector.worlds:
+                if star not in self.stars:
+                    self.stars_shadow.add_node(star.index)
                 self.stars.add_node(star)
                 self.ranges.add_node(star)
-                self.stars_shadow.add_node(star.index)
         self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
-        assert self.stars.number_of_nodes() == self.stars_shadow.number_of_nodes(), "Mismatch between full and shadow stars # of nodes"
+        stars_len = self.stars.number_of_nodes()
+        shadow_len = self.stars_shadow.number_of_nodes()
+        map_len = len(self.star_mapping)
+        assert stars_len == shadow_len, "Mismatch between full and shadow stars # of nodes, " + str(stars_len) + " and " + str(shadow_len)
+        assert stars_len == map_len, "Mismatch between stars graph and stars mapping, " + str(stars_len) + " and " + str(map_len)
 
     def set_bounding_sectors(self):
         for sector, neighbor in itertools.combinations(self.sectors.values(), 2):

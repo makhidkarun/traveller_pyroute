@@ -171,6 +171,7 @@ class Star(object):
         for key in state:
             item = state[key]
             setattr(foo, key, item)
+        foo.index = self.index
         foo.calc_hash()
 
         return foo
