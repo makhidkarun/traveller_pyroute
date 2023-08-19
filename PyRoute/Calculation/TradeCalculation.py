@@ -7,7 +7,7 @@ import networkx as nx
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
-from PyRoute.Pathfinding.astar import astar_path
+from PyRoute.Pathfinding.astar import astar_path, astar_path_indexes
 from PyRoute.Star import Star
 
 
@@ -203,6 +203,7 @@ class TradeCalculation(RouteCalculation):
 
         try:
             route, diag = astar_path(self.galaxy.stars, star, target, self.galaxy.heuristic_distance)
+            fooroute, foodiag = astar_path_indexes(self.galaxy.stars_shadow, star.index, target.index, self.galaxy.heuristic_distance_indexes)
         except nx.NetworkXNoPath:
             return
 
