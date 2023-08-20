@@ -360,7 +360,9 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
         # Pre-filter neighbours
         # Remove neighbour nodes that are already enqueued and won't result in shorter paths to them
         # Explicitly retain target node (if present) to give a chance of finding a better upper bound
-        neighbours = [(k, dist + v['weight']) for (k, v) in G_succ[curnode].items() if not (k in enqueued and dist + v['weight'] >= enqueued[k][0] and not (k == target))]
+        # Explicitly _exclude_ source node (if present) because re-considering it is pointless
+        neighbours = [(k, dist + v['weight']) for (k, v) in G_succ[curnode].items()
+                      if not (k in enqueued and dist + v['weight'] >= enqueued[k][0] and not (k == target)) and not (k == source)]
         if upbound != float('inf') and 0 < len(neighbours):
             # Remove neighbour nodes who will bust the upper bound as it currently stands
             neighbours = [(k, v) for (k, v) in neighbours if v <= upbound]
