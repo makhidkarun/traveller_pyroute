@@ -389,8 +389,7 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
                 if qcost <= ncost:
                     continue
                 # if qcost > ncost, we've found a less-costly
-                # path from neighbour to the source, so update enqueued value
-                enqueued[neighbor] = ncost, h
+                # path from neighbour to the source, so we'll update it when we re-queue the neighbour
             else:
                 diagnostics['heuristic_calls'] += 1
                 h = heuristic(neighbor, target)
