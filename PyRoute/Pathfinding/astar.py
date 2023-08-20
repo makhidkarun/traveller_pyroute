@@ -366,19 +366,20 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
             neighbours = [(k, v) for (k, v) in neighbours if v <= upbound]
 
         # if neighbours list is empty, go around
-        if 0 == len(neighbours):
+        num_neighbours = len(neighbours)
+        if 0 == num_neighbours:
             continue
 
         # if neighbours list has at least 2 elements, sort it, putting the target node first, then by ascending weight
-        if 1 < len(neighbours):
+        if 1 < num_neighbours:
             neighbours.sort(key=lambda item: item[1])
             neighbours.sort(key=lambda item: item[0] == target, reverse=True)
             if neighbours[0][0] == target:  # If first item is the target node, drop all neighbours with higher weights
                 targ_weight = neighbours[0][1]
                 neighbours = [(k, v) for (k, v) in neighbours if v <= targ_weight]
 
+        diagnostics['neighbours_checked'] += num_neighbours
         for neighbor, ncost in neighbours:
-            diagnostics['neighbours_checked'] += 1
             if neighbor in enqueued:
                 qcost, h = enqueued[neighbor]
                 # if qcost <= ncost, a less costly path from the
