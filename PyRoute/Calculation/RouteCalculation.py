@@ -4,8 +4,11 @@ Created on Aug 09, 2023
 @author: CyberiaResurrection
 """
 import bisect
+import functools
 import itertools
 import logging
+
+import networkx as nx
 
 from PyRoute.AllyGen import AllyGen
 
@@ -30,6 +33,9 @@ class RouteCalculation(object):
     def __init__(self, galaxy):
         self.logger = logging.getLogger('PyRoute.TradeCalculation')
         self.galaxy = galaxy
+
+        # component level tracking
+        self.components = dict()
 
     def generate_routes(self):
         raise NotImplementedError("Base Class")
@@ -124,20 +130,11 @@ class RouteCalculation(object):
 
     @staticmethod
     def get_passenger_btn(btn, star, neighbor):
-        rich = 1 if star.tradeCode.rich else 0
-        rich += 1 if neighbor.tradeCode.rich else 0
-        # Only apply the modifier corresponding to the highest-level capital - other_capital beats sector_capital,
-        # which in turn beats subsector_capital.  The current approach makes adding a different value for other_capital
-        # (eg 3) very easy.
-        capital = 2 if star.tradeCode.sector_capital or star.tradeCode.other_capital else 1 if \
-            star.tradeCode.subsector_capital else 0
-        capital += 2 if neighbor.tradeCode.sector_capital or neighbor.tradeCode.other_capital else 1 if \
-            neighbor.tradeCode.subsector_capital else 0
-
-        passBTN = btn + rich + capital
+        passBTN = btn + star.passenger_btn_mod + neighbor.passenger_btn_mod
         return passBTN
 
     @staticmethod
+    @functools.cache
     def calc_trade(btn):
         """
         Convert the BTN trade number to a credit value.
@@ -150,6 +147,7 @@ class RouteCalculation(object):
         return trade
 
     @staticmethod
+    @functools.cache
     def calc_passengers(btn):
         trade = 0
         if (btn <= 10):
@@ -159,3 +157,14 @@ class RouteCalculation(object):
         else:
             trade = 10 ** ((btn - 10) // 2)
         return trade
+
+    def calculate_components(self):
+        bitz = nx.connected_components(self.galaxy.stars)
+        counter = -1
+
+        for component in bitz:
+            counter += 1
+            self.components[counter] = len(component)
+            for star in component:
+                star.component = counter
+        return

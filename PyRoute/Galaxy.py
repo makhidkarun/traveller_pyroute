@@ -247,6 +247,8 @@ class Galaxy(AreaItem):
         self.min_btn = min_btn
         self.route_btn = route_btn
         self.debug_flag = debug_flag
+        self.landmarks = dict()
+        self.big_component = None
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -509,7 +511,18 @@ class Galaxy(AreaItem):
             star.is_well_formed()
 
     def heuristic_distance(self, star, target):
-        return Star.heuristicDistance(star, target)
+        # The general approach used for the heuristic estimate between star and target is the maximum of whatever
+        # choices are available.
+        item = (star, target)
+        # Previous-route-distances are only stored if they exceed the straight-line bound
+        if item in self.landmarks:
+            base = self.landmarks[item]
+        else:
+            base = Star.heuristicDistance(star, target)
+        # Now we've got the maximum of the fixed bounds, compare that maximum with the dynamic-between-runs
+        # approximate-shortest-path bound.
+        sp_bound = self.trade.shortest_path_tree.lower_bound(star, target)
+        return max(base, sp_bound)
 
     def route_cost(self, route):
         """
@@ -527,3 +540,17 @@ class Galaxy(AreaItem):
 
             start = end
         return total_weight
+
+    '''
+    Check that route doesn't revisit any stars
+    '''
+    def route_no_revisit(self, route):
+        visited = set()
+
+        for item in route:
+            name = str(item)
+            if name in visited:
+                return False
+            visited.add(name)
+
+        return True

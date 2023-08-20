@@ -97,9 +97,12 @@ class Star(object):
 """
     starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
 
+    __slots__ = '__dict__', '_hash', '_key'
+
     def __init__(self):
         self.logger = logging.getLogger('PyRoute.Star')
         self._hash = None
+        self._key = None
         self.component = None
         self.x = None
         self.y = None
@@ -147,6 +150,8 @@ class Star(object):
         self.stars = None
         self.is_enqueued = False
         self.is_target = False
+        self.is_landmark = False
+        self._pax_btn_mod = 0
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -284,6 +289,7 @@ class Star(object):
 
         star.trade_id = None # Used by the Speculative Trade
         star.calc_hash()
+        star.calc_passenger_btn_mod()
         return star
 
     def __unicode__(self):
@@ -296,7 +302,7 @@ class Star(object):
         return "{} ({} {})".format(self.name, self.sector.name, self.position)
 
     def __key(self):
-        return (self.position, self.name, self.uwp, self.sector.name)
+        return self._key
 
     def __eq__(self, y):
         if self.__hash__() != y.__hash__():
@@ -310,7 +316,8 @@ class Star(object):
         return self._hash
 
     def calc_hash(self):
-        self._hash = hash(self.__key())
+        self._key = (self.position, self.name, self.uwp, self.sector.name)
+        self._hash = hash(self._key)
 
     def wiki_name(self):
         # name = u" ".join(w.capitalize() for w in self.name.lower().split())
@@ -741,3 +748,16 @@ class Star(object):
         assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         return True
+
+    @property
+    def passenger_btn_mod(self):
+        return self._pax_btn_mod
+
+    def calc_passenger_btn_mod(self):
+        rich = 1 if self.tradeCode.rich else 0
+        # Only apply the modifier corresponding to the highest-level capital - other_capital beats sector_capital,
+        # which in turn beats subsector_capital.  The current approach makes adding a different value for other_capital
+        # (eg 3) very easy.
+        capital = 2 if self.tradeCode.sector_capital or self.tradeCode.other_capital else 1 if \
+            self.tradeCode.subsector_capital else 0
+        self._pax_btn_mod = rich + capital

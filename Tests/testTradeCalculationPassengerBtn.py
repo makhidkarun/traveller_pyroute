@@ -55,8 +55,10 @@ class testTradeCalculationPassengerBtn(unittest.TestCase):
 
                 astar = Star()
                 astar.tradeCode = TradeCodes(a_string.strip())
+                astar.calc_passenger_btn_mod()
                 bstar = Star()
                 bstar.tradeCode = TradeCodes(b_string.strip())
+                bstar.calc_passenger_btn_mod()
 
                 actual = TradeCalculation.get_passenger_btn(0, astar, bstar)
                 self.assertEqual(expected, actual)

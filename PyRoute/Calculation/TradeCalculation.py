@@ -6,7 +6,9 @@ Created on Mar 15, 2014
 import networkx as nx
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
+from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
 from PyRoute.Pathfinding.astar import astar_path
+from PyRoute.Star import Star
 
 
 class TradeCalculation(RouteCalculation):
@@ -65,6 +67,8 @@ class TradeCalculation(RouteCalculation):
 
         # Are debugging gubbins turned on?
         self.debug_flag = debug_flag
+
+        self.shortest_path_tree = None
 
     def base_route_filter(self, star, neighbor):
         if star in self.redzone or neighbor in self.redzone:
@@ -148,6 +152,17 @@ class TradeCalculation(RouteCalculation):
         btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True) if s.component == n.component]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
+        # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
+        # components, even those with only one star.
+        landmarks = self.get_landmarks()
+        stars = [item for item in self.galaxy.stars]
+        num_stars = len(stars)
+        stars.sort(key=lambda item: item.wtn, reverse=True)
+        stars[0].is_landmark = True
+        # Feed the landmarks in as roots of their respective shortest-path trees.
+        # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
+        self.shortest_path_tree = ApproximateShortestPathTree(stars[0], self.galaxy.stars, 0.2, sources=landmarks)
+
         base_btn = 0
         counter = 0
         processed = 0
@@ -175,9 +190,11 @@ class TradeCalculation(RouteCalculation):
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
-            route = astar_path(self.galaxy.stars, star, target, self.galaxy.heuristic_distance)
+            route, diag = astar_path(self.galaxy.stars, star, target, self.galaxy.heuristic_distance)
         except nx.NetworkXNoPath:
             return
+
+        assert self.galaxy.route_no_revisit(route), "Route between " + str(star) + " and " + str(target) + " revisits at least one star"
 
         if self.debug_flag:
             fwd_weight = self.route_cost(route)
@@ -228,31 +245,45 @@ class TradeCalculation(RouteCalculation):
         """
         distance = self.route_distance(route)
 
-        # Internal statistics
-        self.galaxy.ranges[route[0]][route[-1]]['actual distance'] = distance
-        self.galaxy.ranges[route[0]][route[-1]]['jumps'] = len(route) - 1
+        source = route[0]
+        target = route[-1]
 
-        # Gather basic statistics. 
-        tradeBTN = self.get_btn(route[0], route[-1], distance)
+        # Internal statistics
+        rangedata = self.galaxy.ranges[source][target]
+        rangedata['actual distance'] = distance
+        rangedata['jumps'] = len(route) - 1
+
+        self.galaxy.landmarks[(source, target)] = distance
+        self.galaxy.landmarks[(target, source)] = distance
+
+        # Gather basic statistics.
+        tradeBTN = self.get_btn(source, target, distance)
         tradeCr = self.calc_trade(tradeBTN)
-        route[0].tradeIn += tradeCr // 2
-        route[-1].tradeIn += tradeCr // 2
-        tradePassBTN = self.get_passenger_btn(tradeBTN, route[0], route[-1])
+        source.tradeIn += tradeCr // 2
+        target.tradeIn += tradeCr // 2
+        tradePassBTN = self.get_passenger_btn(tradeBTN, source, target)
         tradePass = self.calc_passengers(tradePassBTN)
 
-        route[0].passIn += tradePass
-        route[-1].passIn += tradePass
+        source.passIn += tradePass
+        target.passIn += tradePass
 
-        start = route[0]
+        edges = []
+        start = source
         for end in route[1:]:
-            end.tradeOver += tradeCr if end != route[-1] else 0
-            end.tradeCount += 1 if end != route[-1] else 0
-            end.passOver += tradePass if end != route[-1] else 0
+            if end != target:
+                end.tradeOver += tradeCr
+                end.tradeCount += 1
+                end.passOver += tradePass
             data = self.galaxy.stars[start][end]
             data['trade'] += tradeCr
             data['count'] += 1
             data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
+            edges.append((start, end))
             start = end
+
+        # Feed the list of touched edges into the approximate-shortest-path machinery, so it can update whatever
+        # distance labels it needs to stay within its approximation bound.
+        self.shortest_path_tree.update_edges(edges)
 
         return (tradeCr, tradePass)
 
@@ -262,10 +293,9 @@ class TradeCalculation(RouteCalculation):
         Given a route, return its line length in parsec
         """
         distance = 0
-        start = route[0]
-        for end in route[1:]:
-            distance += start.hex_distance(end)
-            start = end
+        links = zip(route[0:-1], route[1:])
+        for item in links:
+            distance += item[0].hex_distance(item[1])
         return distance
 
     def route_cost(self, route):
@@ -391,12 +421,18 @@ class TradeCalculation(RouteCalculation):
             target) + " must be positive"
         return weight
 
-    def calculate_components(self):
-        bitz = nx.connected_components(self.galaxy.stars)
-        counter = -1
+    def get_landmarks(self):
+        result = dict()
 
-        for component in bitz:
-            counter += 1
-            for star in component:
-                star.component = counter
-        return
+        # Dig out landmarks for each connected component
+        # First landmark is the star with the biggest WTN in the component.
+        # Later landmark(s), if any, will probably be the star in the component furthest away from the closest existing
+        # landmark in that component.  If all the stars in a component are _already_ landmarks, return the previous
+        # landmark choice.
+        for component_id in self.components:
+            stars = [item for item in self.galaxy.stars if component_id == item.component]
+            stars.sort(key=lambda item: item.wtn, reverse=True)
+            stars[0].is_landmark = True
+            result[component_id] = stars[0]
+
+        return result

@@ -26,8 +26,8 @@ import math
 
 sys.path.append(os.path.abspath('../../'))
 
-from PyRoute.DeltaDictionary import DeltaDictionary, SectorDictionary
-from PyRoute.DeltaReduce import DeltaReduce
+from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
+from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
 from PyRoute.Galaxy import Galaxy
 
 

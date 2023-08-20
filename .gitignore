@@ -2,10 +2,12 @@ PyRoute/__pycache__/
 PyRoute/DeltaPasses/__pycache__/
 PyRoute/DeltaDebug/__pycache__/
 PyRoute/Pathfinding/__pycache__/
+PyRoute/Calculation/__pycache__/
 Tests/__pycache__/
 PyRoute/*.pyc
 PyRoute/DeltaDebug/*.pyc
 PyRoute/Pathfinding/*.pyc
+PyRoute/Calculation/*.pyc
 Tests/*.pyc
 PyRoute/*.class
 PyRoute/DeltaDebug/*.class
