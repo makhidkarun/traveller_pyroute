@@ -151,6 +151,7 @@ class TradeCalculation(RouteCalculation):
                 if d.get('xboat', False) or d.get('comm', False):
                     continue
                 self.galaxy.stars.remove_edge(s, n)
+                self.galaxy.stars_shadow.remove_edge(s.index, n.index)
                 length -= 1
 
         # check both stars and stars_shadow at least have same number of nodes and edges

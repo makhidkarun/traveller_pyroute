@@ -193,7 +193,7 @@ class testDeltaReduce(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_final_result_should_be_independently_interesting(self):
+    def test_verify_stars_and_shadow_bijection(self):
         sourcefile = 'DeltaFiles/final_result_should_be_independently_interesting/Gushemege.sec'
 
         args = self._make_args()
