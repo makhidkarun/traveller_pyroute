@@ -39,12 +39,30 @@
 
 Hex  Name                 UWP       Remarks                    {Ix}   (Ex)    [Cx]   N    B  Z PBG W  A    Stellar        Routes                         
 ---- -------------------- --------- -------------------------- ------ ------- ------ ---- -- - --- -- ---- -------------- -------------------------------
-2216 Seaport              C595655-9 Ag Ni (Giiguuglum)         { 0 }  (D54-2) [4637] BC   -  - 414 8  ImDv M2 V
+2210 Sehnaihal            C658833-6 Pa Ph                      { -1 } (A76-4) [5723] Bce  S  - 713 17 ImLc M2 V           Xb:1811
+2310 Viskka               A794524-D Ag Ni                      { 2 }  (746+1) [373B] BC   -  - 500 13 ImLc M1 V M1 V
+2410 Admalaknii           C88A455-B Ni Wa                      { 0 }  (A33-2) [2439] B    -  - 204 13 ImLc K0 V M9 V
+2509 Jonosva              B9C7867-9 Fl Ph Mr                   { 1 }  (D7A+1) [8959] Be   N  - 603 9  ImLc G0 III D
+2609 Ellje                B796527-B Ag Ni                      { 2 }  (D46+2) [575B] BC   -  - 815 13 ImLc K2 V
+2610 Tosiv                D525545-8 Ni                         { -3 } (841-5) [3236] B    -  - 110 11 ImLc K4 V M6 V
+2810 Mekar                A584578-C Ag Ni Pr                   { 2 }  (746+2) [575C] BcC  -  - 900 8  ImLc M0 V
+1616 Imaparlu             B5569A7-A Hi                         { 3 }  (F8D+3) [9C5A] BE   N  - 304 10 ImDv G1 V           Xb:1414 Xb:1816
+1715 Vehko                B665655-A Ag Ni Ga Ri                { 3 }  (E57+1) [4938] BC   S  - 215 12 ImDv M1 V M2 V
+1717 Arsuch               D566446-7 Ni Pa                      { -3 } (631-4) [3146] Bc   S  - 804 8  ImDv G0 V M8 V
+1814 Apay Maru            B557774-A Ag                         { 3 }  (D6C+1) [5A38] BC   S  - 904 10 ImDv M2 V           Xb:1811 Xb:1816
+2115 Pihkiit              C420440-7 De He Ni Po Da             { -2 } (631-5) [1212] B    -  A 402 13 ImDv M0 V
+2119 Nogo                 EA9A8A7-8 Oc Ph Pi                   { -2 } (B76-2) [8658] BDe  -  - 101 9  ImDv M2 V M7 V
+2213 Vilir's World        C9B466A-9 Fl Ni O:2313               { -1 } (F53+1) [857B] B    -  - 134 10 ImDv K1 V M3 V
+2215 Murshen              C585598-6 Ag Ni Pr                   { -1 } (743-1) [5456] BcC  -  - 110 11 ImDv G1 V
+2217 Ashsha               B422586-D He Ni Po                   { 2 }  (A46+1) [474C] B    NS - 503 12 ImDv M1 V
+2313 Ed                   B57AA7A-F Hi In Wa Cp                { 4 }  (G9G+5) [CE7H] BEF  -  - 313 10 ImDv M0 V
 2316 Tu Tandi             C647444-6 Ni Pa                      { -2 } (631-4) [2234] Bc   -  - 600 13 ImDv G3 V M3 V
 2318 Mimip                B876420-9 Ni Pa                      { 0 }  (633-4) [1414] Bc   -  - 800 10 ImDv M1 V
+2411 Cerell               C78A48A-9 Ni Wa                      { -1 } (832+1) [637B] B    S  - 202 5  ImLc M0 V
 2414 Wolstene             C000675-B As Na Ni Va                { 0 }  (B54-2) [4639] B    S  - 903 10 ImLc M2 V M6 V
 2415 Kikhi Zun            B77A445-A Ni Wa                      { 2 }  (635+1) [2638] B    NS - 100 11 ImLc M1 V M2 V      Xb:2418 Xb:2614
-2418 Liebing              A621666-D He Na Ni Po O:2716         { 1 }  (855+1) [574C] B    -  - 300 12 ImDv M1 V M4 V      Xb:2018 Xb:2415
+2511 Gurdadusu            E736548-7 Ni                         { -3 } (741-3) [5257] B    -  - 703 10 ImLc M0 V M6 V
+2512 Andelech             E436446-9 Ni                         { -2 } (A31-3) [3248] B    -  - 404 9  ImLc K9 V
 2513 Masa                 B421AAA-F He Hi In Na Po Pz LancW    { 4 }  (C9G+5) [CE7H] BEf  S  A 700 9  ImLc M3 V
 2514 Rutkowski            A63726B-B Lo O:2513                  { 1 }  (711+3) [437D] B    -  - 303 10 ImLc M1 V M2 V
 2517 Royef                D542200-8 He Lo Po                   { -3 } (910-5) [1113] B    S  - 405 12 ImLc K5 V
@@ -52,23 +70,12 @@ Hex  Name                 UWP       Remarks                    {Ix}   (Ex)    [C
 2613 Nourm                D647400-8 Ni Pa                      { -3 } (831-5) [1113] Bc   -  - 202 8  ImLc K8 V M0 V
 2614 Upllor               D558836-6 Pa Ph Gray5                { -2 } (A75-3) [7645] Bce  S  - 520 9  ImLc K1 V           Xb:2415 Xb:2815
 2615 Erdousse             C7855AC-9 Ag Ni Ga Pr Da             { 0 }  (D44+3) [858C] BcC  -  A 624 14 ImLc M2 V
-2617 Une                  D438464-9 Ni Gray2 O:2716            { -2 } (A31-4) [2237] B    S  - 104 14 ImLc G9 V
-2618 Courtesy             A647200-B Lo                         { 1 }  (811-3) [1316] B    -  - 604 8  ImLc M1 V M1 V
-2619 Guumishmak           E434579-9 Ni                         { -2 } (C42-1) [636A] B    -  - 214 11 ImLc M0 V M6 V
 2713 Kinshasa             C8688BB-7 Ri Pa Ph Pz Lanc5 Gray1    { 0 }  (A78+2) [A879] BcCe S  A 612 11 ImLc K2 V M8 V
 2715 Bruyrkna             C8B379B-9 Fl Pz Gray1                { 0 }  (D69+2) [977B] B    S  A 704 8  ImLc K3 V
 2716 Shakhamash           A94A99A-F Hi In Wa Cp (Hanen)9 Gray1 { 4 }  (E8G+5) [BD7H] BEF  N  - 503 8  ImLc K0 V M3 V
-2717 Lallvi               C5878B8-8 Ri Pa Ph LancW             { 0 }  (E78+1) [8858] BcCe -  - 704 9  ImLc K3 V
+2812 Koinunmatie          D566310-5 Lo GrayW                   { -3 } (520-5) [1111] B    -  - 104 11 ImLc M2 V
 2813 Lumu                 B553455-A Ni Po Gray2                { 2 }  (935+1) [2638] B    W  - 103 15 ImLc K6 V M7 V
 2814 Tuuttka              A876623-9 Ag Ni Gray7                { 1 }  (A55-2) [3726] BC   N  - 902 15 ImLc M0 V
 2815 Liigash              A688863-A Ri Pa Ph (Graytch) Mr      { 3 }  (C7C+1) [5B27] BcCe N  - 602 12 ImLc G3 Ib BD       Xb:2614 Xb:3013
 2914 Twele                A00066B-E As Na Ni Va Gray5 Mr       { 1 }  (955+3) [877G] B    N  - 110 14 ImLc K7 V M5 V
 2915 Jasper               A563566-D Ni Pr Gray4 Mr             { 1 }  (745+1) [464C] Bc   -  - 400 13 ImLc G2 V M4 V
-2916 Tinisutta            C679426-A Ni Gray0                   { 0 }  (933-1) [3449] B    -  - 303 14 ImLc M1 V M2 V
-2919 Oneria               D544136-7 Lo                         { -3 } (300-4) [1146] B    S  - 800 11 ImLc M2 V
-3013 Amda                 C632765-9 Na Po O:2716               { 0 }  (969-2) [5737] B    -  - 600 13 ImLc K4 V           Xb:2815 Xb:3211
-3014 Vell                 E667687-6 Ag Ni Ga Ri                { -1 } (853-1) [6556] BC   -  - 204 11 ImLc K8 V M2 V
-3015 Asylum               A6B3420-B Fl Ni                      { 1 }  (C34-3) [1516] B    -  - 324 11 ImLc G6 V
-3016 Depot                A54066B-C De He Ni Po Da Mr          { 2 }  (E56+4) [887E] B    D  A 124 9  ImLc G4 V
-3017 Kaagaarkha           C835778-8 GrayW                      { -1 } (C67-1) [7658] B    S  - 803 8  ImLc K0 IV
-3118 Koustorm             E537745-7                            { -2 } (966-4) [5535] B    -  - 910 14 ImLc K4 V

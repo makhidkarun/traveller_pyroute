@@ -4,7 +4,9 @@ import unittest
 import logging
 
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
+from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
 from PyRoute.route import set_logging
 
 
@@ -190,6 +192,63 @@ class testDeltaReduce(unittest.TestCase):
             actual = str(e)
 
         self.assertEqual(expected, actual)
+
+    def test_final_result_should_be_independently_interesting(self):
+        sourcefile = 'DeltaFiles/final_result_should_be_independently_interesting/Gushemege.sec'
+
+        args = self._make_args()
+        args.btn = 20
+        args.max_jump = 4
+        args.route_btn = 8
+        args.pop_code = 'fixed'
+        args.ru_calc = 'scaled'
+        args.routes = 'trade'
+        args.route_reuse = 10
+        args.interestingline = None
+        args.interestingtype = 'KeyError'
+        args.maps = False
+        args.subsectors = False
+        args.debugflag = False
+        args.run_sector = True
+        args.run_subsector = True
+        args.run_line = False
+        args.run_init = True
+        args.two_min = False
+        args.borders = 'erode'
+        args.ally_match = 'collapse'
+        args.owned = False
+        args.trade = True
+        args.speculative_version = 'CT'
+        args.ally_count = 10
+        args.json_data = False
+        args.output = tempfile.gettempdir()
+
+        delta = DeltaDictionary()
+        gushsector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -2,0', gushsector.position, "Unexpected position value for Gushemege")
+        delta[gushsector.name] = gushsector
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
+
+        stars = list(galaxy.stars_shadow.nodes)
+
+        btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
+        btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0], galaxy.stars_shadow, 0.2)
+
+        switch = 7
+        line = btn[switch]
+        btn = btn[0:switch]
+
+        for (star, neighbour, data) in btn:
+            galaxy.trade.get_trade_between(star, neighbour)
+
+        galaxy.trade.get_trade_between(line[0], line[1])
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
