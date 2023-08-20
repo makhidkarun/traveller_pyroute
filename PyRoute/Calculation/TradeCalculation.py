@@ -120,6 +120,10 @@ class TradeCalculation(RouteCalculation):
         """
         self.generate_base_routes()
 
+        # check both stars and stars_shadow at least have same number of nodes and edges
+        assert self.galaxy.stars.order() == self.galaxy.stars_shadow.order(), "Mismatch between stars and stars_shadow node counts"
+        assert self.galaxy.stars.number_of_edges() == self.galaxy.stars_shadow.number_of_edges(), "Mismatch between stars and stars_shadow edge counts"
+
         self.logger.info('calculating routes...')
         for star in self.galaxy.stars:
             if len(self.galaxy.stars[star]) < 11:
@@ -148,6 +152,11 @@ class TradeCalculation(RouteCalculation):
                     continue
                 self.galaxy.stars.remove_edge(s, n)
                 length -= 1
+
+        # check both stars and stars_shadow at least have same number of nodes and edges
+        assert self.galaxy.stars.order() == self.galaxy.stars_shadow.order(), "Mismatch between stars and stars_shadow node counts after edge removal"
+        assert self.galaxy.stars.number_of_edges() == self.galaxy.stars_shadow.number_of_edges(), "Mismatch between stars and stars_shadow edge counts after edge removal"
+
         self.logger.info('Final route count {}'.format(self.galaxy.stars.number_of_edges()))
 
     def calculate_routes(self):
