@@ -304,11 +304,8 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
 
     # The queue stores priority, node, cost to reach, and parent.
     # Uses Python heapq to keep in priority order.
-    # Add a counter to the queue to prevent the underlying heap from
-    # attempting to compare the nodes themselves. The hash breaks ties in the
-    # priority and is guaranteed unique for all nodes in the graph.
-    c = count()
-    queue = [(0, next(c), source, 0, None)]
+    # The nodes themselves, being integers, are directly comparable.
+    queue = [(0, source, 0, None)]
 
     # Maps enqueued nodes to distance of discovered paths and the
     # computed heuristics to target. We avoid computing the heuristics
@@ -325,7 +322,7 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
 
     while queue:
         # Pop the smallest item from queue.
-        _, __, curnode, dist, parent = pop(queue)
+        _, curnode, dist, parent = pop(queue)
         node_counter += 1
 
         if 0 == node_counter % 49 and 0 < len(queue):
@@ -405,8 +402,8 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
             # if this completes a path (no matter how _bad_), update the upper bound.
             # We hold the is_target checks until _after_ we've checked we're enqueueing
             # a cheaper path
-            if neighbor == target:
-                upbound = min(upbound, ncost)
+            if neighbor == target and upbound > ncost:
+                upbound = ncost
                 # only trim the queue if it's not empty
                 if 0 < len(queue):
                     queue = [item for item in queue if item[0] <= upbound]
@@ -416,6 +413,6 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
 
             diagnostics['nodes_queued'] += 1
             enqueued[neighbor] = ncost, h
-            push(queue, (ncost + h, next(c), neighbor, ncost, curnode))
+            push(queue, (ncost + h, neighbor, ncost, curnode))
 
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
