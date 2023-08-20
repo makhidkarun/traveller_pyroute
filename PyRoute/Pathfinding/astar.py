@@ -394,6 +394,12 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
                 diagnostics['heuristic_calls'] += 1
                 h = heuristic(neighbor, target)
 
+            # if ncost + h would bust the current _upper_ bound, there's no point continuing with the neighbour,
+            # let alone queueing it
+            # If neighbour is the target, h should be zero
+            if ncost + h > upbound:
+                continue
+
             # if this completes a path (no matter how _bad_), update the upper bound.
             # We hold the is_target checks until _after_ we've checked we're enqueueing
             # a cheaper path
@@ -406,11 +412,8 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
                     queue = [item for item in queue if not (item[2] in enqueued and item[3] > enqueued[item[2]][0])]
                     heapify(queue)
 
-            # if ncost + heuristic would bust the _upper_ bound, there's no point queueing the neighbour
-            # If neighbour is the target, h should be zero
-            if ncost + h <= upbound:
-                diagnostics['nodes_queued'] += 1
-                enqueued[neighbor] = ncost, h
-                push(queue, (ncost + h, next(c), neighbor, ncost, curnode))
+            diagnostics['nodes_queued'] += 1
+            enqueued[neighbor] = ncost, h
+            push(queue, (ncost + h, next(c), neighbor, ncost, curnode))
 
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
