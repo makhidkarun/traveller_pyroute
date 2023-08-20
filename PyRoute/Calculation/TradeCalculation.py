@@ -202,10 +202,12 @@ class TradeCalculation(RouteCalculation):
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
-            route, diag = astar_path(self.galaxy.stars, star, target, self.galaxy.heuristic_distance)
-            fooroute, foodiag = astar_path_indexes(self.galaxy.stars_shadow, star.index, target.index, self.galaxy.heuristic_distance_indexes)
+            #route, diag = astar_path(self.galaxy.stars, star, target, self.galaxy.heuristic_distance)
+            rawroute, foodiag = astar_path_indexes(self.galaxy.stars_shadow, star.index, target.index, self.galaxy.heuristic_distance_indexes)
         except nx.NetworkXNoPath:
             return
+
+        route = [self.galaxy.star_mapping[item] for item in rawroute]
 
         assert self.galaxy.route_no_revisit(route), "Route between " + str(star) + " and " + str(target) + " revisits at least one star"
 
