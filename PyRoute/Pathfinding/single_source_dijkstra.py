@@ -273,7 +273,12 @@ def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None,
     while heap:
         dist_tail, tail = heapq.heappop(heap)
         if dist_tail > distance_labels[tail]:
+            # Since we've just dequeued a bad node, remove other bad nodes from the list to avoid tripping
+            # over them later
+            heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]
+            heapq.heapify(heap)
             continue
+
         # Link weights are strictly positive, thus lower bounded by zero. Thus, when the current dist_tail value exceeds
         # the corresponding node's distance label at the other end of the candidate edge, trim that edge.  Such edges
         # cannot _possibly_ result in smaller distance labels.  By a similar argument, filter the remaining edges
