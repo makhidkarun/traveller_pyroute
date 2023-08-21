@@ -253,12 +253,17 @@ def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None,
         # dig up nodes in same graph component as source - that's the ones we care about finding distance labels _for_
         if seeds is None:
             if isinstance(source, int):
-                distance_labels = {item: float('+inf') for item in graph}
+                sourcecomp = graph.nodes[source]['star'].component
+                distance_labels = {item: float('+inf') for item in graph if graph.nodes[item]['star'].component == sourcecomp}
             else:
                 distance_labels = {item: float('+inf') for item in graph if source.component == item.component}
             seeds = {source}
         else:
-            distance_labels = {item: float('+inf') for item in graph}
+            components = set()
+            for source in seeds:
+                sourcecomp = graph.nodes[source]['star'].component
+                components.add(sourcecomp)
+            distance_labels = {item: float('+inf') for item in graph if graph.nodes[item]['star'].component in components}
         for source in seeds:
             distance_labels[source] = 0
 

@@ -19,19 +19,25 @@ class ApproximateShortestPathTree:
         seeds = None
         if isinstance(source, Star) and source.component is None:
             raise ValueError("Source node " + str(source) + " has undefined component.  Has calculate_components() been run?")
+        if isinstance(source, int):
+            if 'star' not in graph.nodes[source]:
+                raise ValueError("Source node # " + str(source) + " does not have star attribute")
+            if graph.nodes[source]['star'].component is None:
+                raise ValueError(
+                    "Source node " + str(graph.nodes[source]['star']) + " has undefined component.  Has calculate_components() been run?")
         if sources is not None:
             for source in sources:
                 if isinstance(source, Star) and sources[source].component is None:
                     raise ValueError("Source node " + str(
                         sources[source]) + " has undefined component.  Has calculate_components() been run?")
+                if isinstance(source, int):
+                    if 'star' not in graph.nodes[source]:
+                        raise ValueError("Source node # " + str(source) + " does not have star attribute")
+                    if graph.nodes[source]['star'].component is None:
+                        raise ValueError(
+                            "Source node " + str(graph.nodes[source][
+                                                     'star']) + " has undefined component.  Has calculate_components() been run?")
             seeds = sources.values()
-
-        if sources is None and isinstance(source, int):
-            bitz = nx.connected_components(graph)
-            for component in bitz:
-                if source in component:
-                    graph = graph.subgraph(component)
-                    break
 
         self._source = source
         self._graph = graph
