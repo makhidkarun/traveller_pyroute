@@ -122,15 +122,11 @@ class TradeCalculation(RouteCalculation):
         """
         self.generate_base_routes()
 
-        # check both stars and stars_shadow at least have same number of nodes and edges
-        assert self.galaxy.stars.order() == self.galaxy.stars_shadow.order(), "Mismatch between stars and stars_shadow node counts"
-        assert self.galaxy.stars.number_of_edges() == self.galaxy.stars_shadow.number_of_edges(), "Mismatch between stars and stars_shadow edge counts"
-
         self.logger.info('calculating routes...')
-        for star in self.galaxy.stars:
-            if len(self.galaxy.stars[star]) < 11:
+        for star in self.galaxy.stars_shadow:
+            if len(self.galaxy.stars_shadow[star]) < 11:
                 continue
-            neighbor_routes = [(s, n, d) for (s, n, d) in self.galaxy.stars.edges([star], True)]
+            neighbor_routes = [(s, n, d) for (s, n, d) in self.galaxy.stars_shadow.edges([star], True)]
             # Need to do two sorts here:
             # BTN low to high to find them first
             # Range high to low to find them first 
@@ -146,21 +142,16 @@ class TradeCalculation(RouteCalculation):
             # until there are 20 connections left. 
             # This may be reduced by other stars deciding you are too far away.             
             for (s, n, d) in neighbor_routes:
-                if len(self.galaxy.stars[n]) < 15:
+                if len(self.galaxy.stars_shadow[n]) < 15:
                     continue
                 if length <= self.max_connections[self.galaxy.max_jump_range - 1]:
                     break
                 if d.get('xboat', False) or d.get('comm', False):
                     continue
-                self.galaxy.stars.remove_edge(s, n)
                 self.galaxy.stars_shadow.remove_edge(s.index, n.index)
                 length -= 1
 
-        # check both stars and stars_shadow at least have same number of nodes and edges
-        assert self.galaxy.stars.order() == self.galaxy.stars_shadow.order(), "Mismatch between stars and stars_shadow node counts after edge removal"
-        assert self.galaxy.stars.number_of_edges() == self.galaxy.stars_shadow.number_of_edges(), "Mismatch between stars and stars_shadow edge counts after edge removal"
-
-        self.logger.info('Final route count {}'.format(self.galaxy.stars.number_of_edges()))
+        self.logger.info('Final route count {}'.format(self.galaxy.stars_shadow.number_of_edges()))
 
     def calculate_routes(self):
         """

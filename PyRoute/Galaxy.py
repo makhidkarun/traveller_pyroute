@@ -238,7 +238,7 @@ class Galaxy(AreaItem):
         """
         super(Galaxy, self).__init__('Charted Space')
         self.logger = logging.getLogger('PyRoute.Galaxy')
-        self.stars = nx.Graph()
+        # self.stars = nx.Graph()
         self.ranges = nx.Graph()
         self.stars_shadow = nx.Graph()
         self.sectors = {}
@@ -335,21 +335,16 @@ class Galaxy(AreaItem):
             area.alg.setdefault(star.alg_code, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
 
     def set_positions(self):
-        stars_len = self.stars.number_of_nodes()
         shadow_len = self.stars_shadow.number_of_nodes()
-        assert stars_len == shadow_len, "Pre-set-positions mismatch between full and shadow stars # of nodes, " + str(stars_len) + " and " + str(shadow_len)
         for sector in self.sectors.values():
             for star in sector.worlds:
                 if star not in self.ranges:
                     self.stars_shadow.add_node(star.index, star=star)
-                self.stars.add_node(star)
                 self.ranges.add_node(star)
-        self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
-        stars_len = self.stars.number_of_nodes()
+        self.logger.info("Total number of worlds: %s" % self.stars_shadow.number_of_nodes())
         shadow_len = self.stars_shadow.number_of_nodes()
         map_len = len(self.star_mapping)
-        assert stars_len == shadow_len, "Mismatch between full and shadow stars # of nodes, " + str(stars_len) + " and " + str(shadow_len)
-        assert stars_len == map_len, "Mismatch between stars graph and stars mapping, " + str(stars_len) + " and " + str(map_len)
+        assert map_len == shadow_len, "Mismatch between shadow stars and stars mapping, " + str(shadow_len) + " and " + str(map_len)
 
     def set_bounding_sectors(self):
         for sector, neighbor in itertools.combinations(self.sectors.values(), 2):

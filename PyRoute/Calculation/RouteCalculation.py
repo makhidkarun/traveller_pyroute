@@ -75,16 +75,12 @@ class RouteCalculation(object):
             if dist <= self.galaxy.max_jump_range:
                 weight = self.route_weight(star, neighbor)
                 btn = self.get_btn(star, neighbor)
-                self.galaxy.stars.add_edge(star, neighbor, distance=dist,
+                self.galaxy.stars_shadow.add_edge(star, neighbor, distance=dist,
                                            weight=weight, trade=0, btn=btn, count=0)
-                self.galaxy.stars_shadow.add_edge(star.index, neighbor.index)
                 self.check_existing_routes(star, neighbor)
-                # Deliberate direct writes to shadow's _adj property to ensure edge is shared between shadow and stars
-                self.galaxy.stars_shadow._adj[star.index][neighbor.index] = self.galaxy.stars[star][neighbor]
-                self.galaxy.stars_shadow._adj[neighbor.index][star.index] = self.galaxy.stars[star][neighbor]
 
         self.logger.info("base routes: %s  -  ranges: %s" %
-                         (self.galaxy.stars.number_of_edges(),
+                         (self.galaxy.stars_shadow.number_of_edges(),
                           self.galaxy.ranges.number_of_edges()))
 
     def check_existing_routes(self, star, neighbor):
@@ -95,9 +91,9 @@ class RouteCalculation(object):
                 route_des = route[8:]
             if neighbor.position == route_des:
                 if route.startswith('Xb'):
-                    self.galaxy.stars[star][neighbor]['xboat'] = True
+                    self.galaxy.stars_shadow[star][neighbor]['xboat'] = True
                 elif route.startswith('Tr'):
-                    self.galaxy.stars[star][neighbor]['comm'] = True
+                    self.galaxy.stars_shadow[star][neighbor]['comm'] = True
 
     @staticmethod
     def get_btn(star1, star2, distance=None):
@@ -165,12 +161,13 @@ class RouteCalculation(object):
         return trade
 
     def calculate_components(self):
-        bitz = nx.connected_components(self.galaxy.stars)
+        bitz = nx.connected_components(self.galaxy.stars_shadow)
         counter = -1
 
         for component in bitz:
             counter += 1
             self.components[counter] = len(component)
             for star in component:
-                star.component = counter
+                self.galaxy.stars_shadow.nodes[star]['star'].component = counter
+                # star.component = counter
         return
