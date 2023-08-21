@@ -26,6 +26,13 @@ class ApproximateShortestPathTree:
                         sources[source]) + " has undefined component.  Has calculate_components() been run?")
             seeds = sources.values()
 
+        if sources is None and isinstance(source, int):
+            bitz = nx.connected_components(graph)
+            for component in bitz:
+                if source in component:
+                    graph = graph.subgraph(component)
+                    break
+
         self._source = source
         self._graph = graph
         self._epsilon = epsilon

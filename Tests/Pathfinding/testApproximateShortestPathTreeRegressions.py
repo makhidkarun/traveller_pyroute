@@ -35,7 +35,7 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0], galaxy.stars, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars_shadow, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -66,7 +66,7 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0], galaxy.stars, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars_shadow, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -97,7 +97,7 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0], galaxy.stars, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars_shadow, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
