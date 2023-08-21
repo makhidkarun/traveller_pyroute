@@ -340,7 +340,7 @@ class Galaxy(AreaItem):
         assert stars_len == shadow_len, "Pre-set-positions mismatch between full and shadow stars # of nodes, " + str(stars_len) + " and " + str(shadow_len)
         for sector in self.sectors.values():
             for star in sector.worlds:
-                if star not in self.stars:
+                if star not in self.ranges:
                     self.stars_shadow.add_node(star.index, star=star)
                 self.stars.add_node(star)
                 self.ranges.add_node(star)
