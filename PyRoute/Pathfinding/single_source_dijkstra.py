@@ -267,12 +267,11 @@ def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None,
         for source in seeds:
             distance_labels[source] = 0
 
-    c = count()
-    heap = [(distance_labels[seed], next(c), seed) for seed in seeds]
+    heap = [(distance_labels[seed], seed) for seed in seeds]
     heapq.heapify(heap)
 
     while heap:
-        dist_tail, _, tail = heapq.heappop(heap)
+        dist_tail, tail = heapq.heappop(heap)
         if dist_tail > distance_labels[tail]:
             continue
         # Link weights are strictly positive, thus lower bounded by zero. Thus, when the current dist_tail value exceeds
@@ -284,5 +283,5 @@ def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None,
                       )
         for head, dist_head in neighbours:
             distance_labels[head] = dist_head
-            heapq.heappush(heap, (dist_head, next(c), head))
+            heapq.heappush(heap, (dist_head, head))
     return distance_labels
