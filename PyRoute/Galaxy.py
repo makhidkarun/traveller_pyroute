@@ -341,7 +341,7 @@ class Galaxy(AreaItem):
         for sector in self.sectors.values():
             for star in sector.worlds:
                 if star not in self.stars:
-                    self.stars_shadow.add_node(star.index)
+                    self.stars_shadow.add_node(star.index, star=star)
                 self.stars.add_node(star)
                 self.ranges.add_node(star)
         self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
