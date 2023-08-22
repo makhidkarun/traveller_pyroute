@@ -179,6 +179,75 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
 
         galaxy.process_owned_worlds()
 
+    def test_stars_node_types_xroute(self):
+        sourcefile = os.path.abspath('../DeltaFiles/stars_node_types/Antares.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/stars_node_types/Antares.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+        args.routes = 'xroute'
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.is_well_formed()
+        galaxy.trade.calculate_routes()
+
+        galaxy.process_owned_worlds()
+
+    def test_stars_node_types_xroute_subsector(self):
+        sourcefile = os.path.abspath('../DeltaFiles/xroute_calculation_blowups/Antares-Urunishu.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/xroute_calculation_blowups/Antares-Urunishu.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+        args.routes = 'xroute'
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.is_well_formed()
+        galaxy.trade.calculate_routes()
+
+        galaxy.process_owned_worlds()
+
+    def test_stars_node_types_xroute_two_subsectors(self):
+        sourcefile = os.path.abspath('../DeltaFiles/xroute_calculation_blowups/Antares-Sakhag-Celebes.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/xroute_calculation_blowups/Antares-Sakhag-Celebes.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+        args.routes = 'xroute'
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.is_well_formed()
+        galaxy.trade.calculate_routes()
+
+        galaxy.process_owned_worlds()
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
