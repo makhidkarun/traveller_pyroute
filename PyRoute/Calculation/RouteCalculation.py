@@ -76,7 +76,7 @@ class RouteCalculation(object):
             if dist <= self.galaxy.max_jump_range:
                 weight = self.route_weight(star, neighbor)
                 btn = self.get_btn(star, neighbor)
-                self.galaxy.stars_shadow.add_edge(star, neighbor, distance=dist,
+                self.galaxy.stars_shadow.add_edge(star.index, neighbor.index, distance=dist,
                                            weight=weight, trade=0, btn=btn, count=0)
                 self.check_existing_routes(star, neighbor)
 
