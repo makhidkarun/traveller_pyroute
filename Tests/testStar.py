@@ -378,6 +378,22 @@ class TestStar(unittest.TestCase):
         self.assertTrue(object_time > saved_time, "Object comparison unexpectedly faster than integer comparison")
         self.assertTrue(property_time > saved_time, "Property comparison unexpectedly faster than integer comparison")
 
+    def testCompareHexDistanceToAxialDistance(self):
+        star1 = Star.parse_line_into_star(
+            "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+
+        sector = Sector(' Zhdant', ' -7, 2')
+        star2 = Star.parse_line_into_star(
+            "2720 Vlazzhden            C210143-8 Lo Ni                               - -  - 303   Zh G1 IV                       ",
+            sector, 'fixed', 'fixed')
+
+        hex_dist = star1.hex_distance(star2)
+        axial_dist = Star.axial_distance((star1.q, star1.r), (star2.q, star2.r))
+        self.assertEqual(hex_dist, axial_dist, "Unexpected axial distance")
+        distance = star1.distance(star2)
+        self.assertEqual(hex_dist, distance, "Unexpected distance")
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
