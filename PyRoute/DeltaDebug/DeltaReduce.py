@@ -284,7 +284,7 @@ class DeltaReduce:
             if args.trade:
                 galaxy.trade.calculate_routes()
                 galaxy.process_eti()
-                spectrade = SpeculativeTrade(args.speculative_version, galaxy.stars)
+                spectrade = SpeculativeTrade(args.speculative_version, galaxy.stars_shadow)
                 spectrade.process_tradegoods()
 
             if args.routes:

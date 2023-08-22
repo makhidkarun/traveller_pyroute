@@ -463,8 +463,9 @@ class Galaxy(AreaItem):
         ow_list = os.path.join(self.output_path, 'owned-worlds-list.csv')
         with codecs.open(ow_names, 'w+', 'utf-8') as f, codecs.open(ow_list, 'w+', 'utf-8') as g:
 
-            for world in self.stars:
-                if world.ownedBy == world:
+            for world in self.stars_shadow:
+                worldstar = self.stars_shadow.nodes[world]['star']
+                if worldstar.ownedBy == worldstar:
                     continue
                 ownedBy = [star for star in self.stars.neighbors(world) \
                            if star.tl >= 9 and star.popCode >= 6 and \
@@ -474,42 +475,42 @@ class Galaxy(AreaItem):
                 ownedBy.sort(reverse=True,
                              key=lambda star: star.popCode)
                 ownedBy.sort(reverse=True,
-                             key=lambda star: star.importance - (star.hex_distance(world) - 1))
+                             key=lambda star: star.importance - (star.hex_distance(worldstar) - 1))
 
                 owner = None
-                if world.ownedBy is None:
+                if worldstar.ownedBy is None:
                     owner = None
-                elif world.ownedBy == 'Mr':
+                elif worldstar.ownedBy == 'Mr':
                     owner = 'Mr'
-                elif world.ownedBy == 'Re':
+                elif worldstar.ownedBy == 'Re':
                     owner = 'Re'
-                elif world.ownedBy == 'Px':
+                elif worldstar.ownedBy == 'Px':
                     owner = 'Px'
-                elif len(world.ownedBy) > 4:
-                    ownedSec = world.ownedBy[0:4]
-                    ownedHex = world.ownedBy[5:]
+                elif len(worldstar.ownedBy) > 4:
+                    ownedSec = worldstar.ownedBy[0:4]
+                    ownedHex = worldstar.ownedBy[5:]
                     owner = None
                     self.logger.debug(
-                        "World {}@({},{}) owned by {} - {}".format(world, world.col, world.row, ownedSec, ownedHex))
-                    if world.col < 4 and world.sector.spinward:
-                        owner = world.sector.spinward.find_world_by_pos(ownedHex)
-                    elif world.col > 28 and world.sector.trailing:
-                        owner = world.sector.trailing.find_world_by_pos(ownedHex)
+                        "World {}@({},{}) owned by {} - {}".format(worldstar, worldstar.col, worldstar.row, ownedSec, ownedHex))
+                    if worldstar.col < 4 and worldstar.sector.spinward:
+                        owner = worldstar.sector.spinward.find_world_by_pos(ownedHex)
+                    elif worldstar.col > 28 and worldstar.sector.trailing:
+                        owner = worldstar.sector.trailing.find_world_by_pos(ownedHex)
 
-                    if world.row < 4 and owner is None and world.sector.coreward:
-                        owner = world.sector.coreward.find_world_by_pos(ownedHex)
-                    elif world.row > 36 and owner is None and world.sector.rimward:
-                        owner = world.sector.rimward.find_world_by_pos(ownedHex)
+                    if worldstar.row < 4 and owner is None and worldstar.sector.coreward:
+                        owner = worldstar.sector.coreward.find_world_by_pos(ownedHex)
+                    elif worldstar.row > 36 and owner is None and worldstar.sector.rimward:
+                        owner = worldstar.sector.rimward.find_world_by_pos(ownedHex)
 
                     # If we can't find world in the sector next door, try the this one
                     if owner is None:
-                        owner = world.sector.find_world_by_pos(ownedHex)
-                elif len(world.ownedBy) == 4:
-                    owner = world.sector.find_world_by_pos(world.ownedBy)
+                        owner = worldstar.sector.find_world_by_pos(ownedHex)
+                elif len(worldstar.ownedBy) == 4:
+                    owner = worldstar.sector.find_world_by_pos(world.ownedBy)
 
-                self.logger.debug("Worlds {} is owned by {}".format(world, owner))
+                self.logger.debug("Worlds {} is owned by {}".format(worldstar, owner))
 
-                ow_path_items = ['"{}"'.format(world), '"{}"'.format(owner)]
+                ow_path_items = ['"{}"'.format(worldstar), '"{}"'.format(owner)]
                 ow_path_items.extend(['"{}"'.format(item) for item in ownedBy[0:4]])
                 ow_path_world = ', '.join(ow_path_items)
                 f.write(ow_path_world + '\n')

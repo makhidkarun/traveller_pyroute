@@ -189,7 +189,8 @@ class AllyGen(object):
             of control is contiguous. Every Non-aligned world is independent
         """
         self.logger.info('Processing worlds for border drawing')
-        for star in self.galaxy.stars:
+        stars = [self.galaxy.stars_shadow.nodes[item]['star'] for item in self.galaxy.stars_shadow]
+        for star in stars:
             alg = star.alg_code
             # Skip the non-entity worlds
             if alg in self.noOne:
@@ -361,7 +362,7 @@ class AllyGen(object):
 
     def _ally_map(self, match):
         # Create list of stars
-        stars = [star for star in self.galaxy.stars]
+        stars = [self.galaxy.stars_shadow.nodes[item]['star'] for item in self.galaxy.stars_shadow]
         allyMap = defaultdict(set)
         starMap = {}
         # Mark the map with all the stars        

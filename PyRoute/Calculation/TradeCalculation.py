@@ -162,7 +162,7 @@ class TradeCalculation(RouteCalculation):
         """
         self.logger.info('sorting routes...')
         # Filter out pathfinding attempts that can never return a route, as they're between two different
-        # connected components in the underlying galaxy.stars graph - such pathfinding attempts are doomed
+        # connected components in the underlying galaxy.stars_shadow graph - such pathfinding attempts are doomed
         # to failure.
         self.calculate_components()
         btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True) if s.component == n.component]
@@ -323,7 +323,7 @@ class TradeCalculation(RouteCalculation):
         c = 0
         start = route[0]
         for end in route[1:]:
-            y = float(self.galaxy.stars[start][end]['weight']) - c
+            y = float(self.galaxy.stars_shadow[start.index][end.index]['weight']) - c
             t = total_weight + y
             c = (t - total_weight) - y
 

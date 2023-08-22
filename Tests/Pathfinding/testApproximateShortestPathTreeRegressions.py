@@ -31,7 +31,7 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmark - biggest WTN system in the biggest graph component
-        stars = [item for item in galaxy.stars]
+        stars = [galaxy.stars_shadow.nodes[item]['star'] for item in galaxy.stars_shadow]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
@@ -62,7 +62,7 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmark - biggest WTN system in the biggest graph component
-        stars = [item for item in galaxy.stars]
+        stars = [galaxy.stars_shadow.nodes[item]['star'] for item in galaxy.stars_shadow]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
@@ -93,7 +93,7 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmark - biggest WTN system in the biggest graph component
-        stars = [item for item in galaxy.stars]
+        stars = [galaxy.stars_shadow.nodes[item]['star'] for item in galaxy.stars_shadow]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
@@ -118,6 +118,20 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         galaxy.output_path = args.output
 
         galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
+
+        btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
+        btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+
+        # Pick landmark - biggest WTN system in the biggest graph component
+        stars = [galaxy.stars_shadow.nodes[item]['star'] for item in galaxy.stars_shadow]
+        stars.sort(key=lambda item: item.wtn, reverse=True)
+
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars_shadow, 0)
+        for (star, neighbour, data) in btn:
+            galaxy.trade.get_trade_between(star, neighbour)
+
+        galaxy.process_owned_worlds()
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
