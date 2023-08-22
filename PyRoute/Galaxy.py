@@ -410,7 +410,7 @@ class Galaxy(AreaItem):
         if routes == 'xroute':
             path = os.path.join(self.output_path, 'stations.txt')
             with codecs.open(path, "wb", 'utf-8') as f:
-                stars = [self.stars_shadow.nodes[item]['star'] for item in self.stars_shadow]
+                stars = [self.star_mapping[item] for item in self.stars_shadow]
                 stars = [star for star in stars if star.tradeCount > 0]
                 for star in stars:
                     f.write("{} - {}\n".format(star, star.tradeCount))
@@ -418,8 +418,8 @@ class Galaxy(AreaItem):
     def process_eti(self):
         self.logger.info("Processing ETI for worlds")
         for (world, neighbor) in self.stars_shadow.edges():
-            worldstar = self.stars_shadow.nodes[world]['star']
-            neighborstar = self.stars_shadow.nodes[neighbor]['star']
+            worldstar = self.star_mapping[world]
+            neighborstar = self.star_mapping[neighbor]
             distance = worldstar.hex_distance(neighborstar)
             distanceMod = int(distance / 2)
             CargoTradeIndex = int(round(math.sqrt(
@@ -463,10 +463,10 @@ class Galaxy(AreaItem):
         with codecs.open(ow_names, 'w+', 'utf-8') as f, codecs.open(ow_list, 'w+', 'utf-8') as g:
 
             for world in self.stars_shadow:
-                worldstar = self.stars_shadow.nodes[world]['star']
+                worldstar = self.star_mapping[world]
                 if worldstar.ownedBy == worldstar:
                     continue
-                neighbours = [self.stars_shadow.nodes[item]['star'] for item in self.stars_shadow.neighbors(world)]
+                neighbours = [self.star_mapping[item] for item in self.stars_shadow.neighbors(world)]
                 ownedBy = [star for star in neighbours \
                            if star.tl >= 9 and star.popCode >= 6 and \
                            star.port in 'ABC' and star.ownedBy == star and \
@@ -530,7 +530,7 @@ class Galaxy(AreaItem):
         for item in self.stars_shadow.nodes:
             assert isinstance(item, int), "Star nodes must be integers"
             assert 'star' in self.stars_shadow.nodes[item], "Star attribute not set for item " + str(item)
-            star = self.stars_shadow.nodes[item]['star']
+            star = self.star_mapping[item]
             star.is_well_formed()
 
     def heuristic_distance(self, star, target):

@@ -138,7 +138,7 @@ class XRouteCalculation(RouteCalculation):
             if star in jumpStations:
                 continue
             for neighbor in self.galaxy.stars_shadow.neighbors(star.index):
-                neighbour_world = self.galaxy.stars_shadow.nodes[neighbor]['star']
+                neighbour_world = self.galaxy.star_mapping[neighbor]
                 if star.hex_distance(neighbour_world) > 4:
                     continue
                 if neighbor in jumpStations:
@@ -167,7 +167,7 @@ class XRouteCalculation(RouteCalculation):
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
         landmarks = self.get_landmarks(index=True)
-        stars = [self.galaxy.stars_shadow.nodes[item]['star'] for item in self.galaxy.stars_shadow]
+        stars = [self.galaxy.star_mapping[item] for item in self.galaxy.stars_shadow]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
@@ -186,8 +186,8 @@ class XRouteCalculation(RouteCalculation):
     def reweight_routes(self, weightList):
         self.distance_weight = weightList
         for (star, neighbor, data) in self.galaxy.stars_shadow.edges(data=True):
-            star_world = self.galaxy.stars_shadow.nodes[star]['star']
-            neighbour_world = self.galaxy.stars_shadow.nodes[neighbor]['star']
+            star_world = self.galaxy.star_mapping[star]
+            neighbour_world = self.galaxy.star_mapping[neighbor]
             data['weight'] = self.route_weight(star_world, neighbour_world)
             for _ in range(1, min(data['count'], 5)):
                 data['weight'] -= data['weight'] // self.route_reuse
@@ -215,12 +215,12 @@ class XRouteCalculation(RouteCalculation):
 
         distance = 0
         start = route[0]
-        startstar = self.galaxy.stars_shadow.nodes[start]['star']
+        startstar = self.galaxy.star_mapping[start]
         startstar.tradeCount += 1
         edges = []
 
         for end in route[1:]:
-            endstar = self.galaxy.stars_shadow.nodes[end]['star']
+            endstar = self.galaxy.star_mapping[end]
             distance += startstar.hex_distance(endstar)
             endstar.tradeCount += 1
             data = self.galaxy.stars_shadow[start][end]
@@ -231,8 +231,8 @@ class XRouteCalculation(RouteCalculation):
             start = end
             startstar = endstar
 
-        startstar = self.galaxy.stars_shadow.nodes[route[0]]['star']
-        endstar = self.galaxy.stars_shadow.nodes[route[-1]]['star']
+        startstar = self.galaxy.star_mapping[route[0]]
+        endstar = self.galaxy.star_mapping[route[-1]]
 
         self.shortest_path_tree.update_edges(edges)
         self.galaxy.ranges[startstar][endstar]['actual distance'] = distance

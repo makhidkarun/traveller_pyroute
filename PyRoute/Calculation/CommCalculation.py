@@ -125,7 +125,7 @@ class CommCalculation(RouteCalculation):
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
         landmarks = self.get_landmarks(index=True)
-        stars = [self.galaxy.stars_shadow.nodes[item]['star'] for item in self.galaxy.stars_shadow]
+        stars = [self.galaxy.star_mapping[item] for item in self.galaxy.stars_shadow]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
@@ -205,10 +205,9 @@ class CommCalculation(RouteCalculation):
 
         trade = self.calc_trade(19) if AllyGen.are_allies('As', star.alg_code) else self.calc_trade(23)
         start = route[0]
-        start_star = self.galaxy.stars_shadow.nodes[start]['star']
         edges = []
         for end in route[1:]:
-            end_star = self.galaxy.stars_shadow.nodes[end]['star']
+            end_star = self.galaxy.star_mapping[end]
             end_star.tradeCount += 1 if end != route[-1] else 0
             data = self.galaxy.stars_shadow[start][end]
             data['trade'] = trade
