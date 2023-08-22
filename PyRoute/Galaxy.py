@@ -238,7 +238,6 @@ class Galaxy(AreaItem):
         """
         super(Galaxy, self).__init__('Charted Space')
         self.logger = logging.getLogger('PyRoute.Galaxy')
-        # self.stars = nx.Graph()
         self.ranges = nx.Graph()
         self.stars_shadow = nx.Graph()
         self.sectors = {}
