@@ -351,8 +351,7 @@ class Star(object):
         @param dx: Base sector-level trailing-spinward offset added to star's within-sector x position
         @param dy: Base sector-level coreward-rimward offset added to star's within-sector y position
         """
-
-        # convert odd-q offset to cube
+        # convert odd-q offset to axial
         q = int(self.position[0:2]) + dx - 1
         raw_r_offset = 41 - int(self.position[2:4])
         r = raw_r_offset + dy - 1
@@ -360,14 +359,14 @@ class Star(object):
         # Halving q, rounding up _towards negative infinity_ to the nearest integer - ie, ceil(q / 2).
         # redblob's implementation uses floor(q/2), but they haven't inverted the r axis.
         q_offset = (q + (q & 1)) // 2
-        self.x = q
-        self.z = r - q_offset
-        # cubic co-ords must sum to zero
-        self.y = -self.x - self.z
 
-        # convert cube to axial
-        self.q = self.x
-        self.r = self.z
+        self.q = q
+        self.r = r - q_offset
+
+        # convert axial to cube
+        self.x = self.q
+        self.z = self.r
+        self.y = -self.x - self.z
 
         # store within-sector column and row co-ords
         self.col = q - dx + 1
