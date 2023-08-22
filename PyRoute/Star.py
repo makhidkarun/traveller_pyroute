@@ -97,7 +97,7 @@ class Star(object):
 """
     starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
 
-    __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code', 'x', 'y', 'z'
+    __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code'
 
     def __init__(self):
         self.logger = logging.getLogger('PyRoute.Star')
@@ -105,9 +105,6 @@ class Star(object):
         self._key = None
         self.component = None
         self.index = None
-        self.x = None
-        self.y = None
-        self.z = None
         self.q = None
         self.r = None
         self.col = None
@@ -363,14 +360,23 @@ class Star(object):
         self.q = q
         self.r = r - q_offset
 
-        # convert axial to cube
-        self.x = self.q
-        self.z = self.r
-        self.y = -self.x - self.z
+        # cube co-ords are properties
 
         # store within-sector column and row co-ords
         self.col = q - dx + 1
         self.row = 41 - (r - dy + 1)
+
+    @property
+    def x(self):
+        return self.q
+
+    @property
+    def y(self):
+        return -self.q -self.r
+
+    @property
+    def z(self):
+        return self.r
 
     def hex_distance(self, star):
         return Star._heuristic_core(self.x - star.x, self.y - star.y, self.z - star.z)
