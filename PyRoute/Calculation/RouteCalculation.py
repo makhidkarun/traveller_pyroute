@@ -37,6 +37,8 @@ class RouteCalculation(object):
         # component level tracking
         self.components = dict()
 
+        self.shortest_path_tree = None
+
     def generate_routes(self):
         raise NotImplementedError("Base Class")
 
@@ -72,6 +74,8 @@ class RouteCalculation(object):
                 continue
 
             dist = self.base_range_routes(star, neighbor)
+            if dist is None:
+                continue
 
             if dist <= self.galaxy.max_jump_range:
                 weight = self.route_weight(star, neighbor)
@@ -172,3 +176,23 @@ class RouteCalculation(object):
                 self.galaxy.stars_shadow.nodes[star]['star'].component = counter
                 # star.component = counter
         return
+
+    def get_landmarks(self, index=False):
+        result = dict()
+
+        # Dig out landmarks for each connected component
+        # First landmark is the star with the biggest WTN in the component.
+        # Later landmark(s), if any, will probably be the star in the component furthest away from the closest existing
+        # landmark in that component.  If all the stars in a component are _already_ landmarks, return the previous
+        # landmark choice.
+        for component_id in self.components:
+            stars = [self.galaxy.stars_shadow.nodes[item]['star'] for item in self.galaxy.stars_shadow]
+            stars = [item for item in stars if component_id == item.component]
+            stars.sort(key=lambda item: item.wtn, reverse=True)
+            stars[0].is_landmark = True
+            if index:
+                result[component_id] = stars[0].index
+            else:
+                result[component_id] = stars[0]
+
+        return result

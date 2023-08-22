@@ -69,8 +69,6 @@ class TradeCalculation(RouteCalculation):
         # Are debugging gubbins turned on?
         self.debug_flag = debug_flag
 
-        self.shortest_path_tree = None
-
     def base_route_filter(self, star, neighbor):
         star_dex = star.index
         neigh_dex = neighbor.index
@@ -437,23 +435,3 @@ class TradeCalculation(RouteCalculation):
         assert 0 < weight, "Weight of edge between " + str(star) + " and " + str(
             target) + " must be positive"
         return weight
-
-    def get_landmarks(self, index=False):
-        result = dict()
-
-        # Dig out landmarks for each connected component
-        # First landmark is the star with the biggest WTN in the component.
-        # Later landmark(s), if any, will probably be the star in the component furthest away from the closest existing
-        # landmark in that component.  If all the stars in a component are _already_ landmarks, return the previous
-        # landmark choice.
-        for component_id in self.components:
-            stars = [self.galaxy.stars_shadow.nodes[item]['star'] for item in self.galaxy.stars_shadow]
-            stars = [item for item in stars if component_id == item.component]
-            stars.sort(key=lambda item: item.wtn, reverse=True)
-            stars[0].is_landmark = True
-            if index:
-                result[component_id] = stars[0].index
-            else:
-                result[component_id] = stars[0]
-
-        return result

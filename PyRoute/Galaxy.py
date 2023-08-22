@@ -467,10 +467,11 @@ class Galaxy(AreaItem):
                 worldstar = self.stars_shadow.nodes[world]['star']
                 if worldstar.ownedBy == worldstar:
                     continue
-                ownedBy = [star for star in self.stars.neighbors(world) \
+                neighbours = [self.stars_shadow.nodes[item]['star'] for item in self.stars_shadow.neighbors(world)]
+                ownedBy = [star for star in neighbours \
                            if star.tl >= 9 and star.popCode >= 6 and \
                            star.port in 'ABC' and star.ownedBy == star and \
-                           AllyGen.are_owned_allies(star.alg_code, world.alg_code)]
+                           AllyGen.are_owned_allies(star.alg_code, worldstar.alg_code)]
 
                 ownedBy.sort(reverse=True,
                              key=lambda star: star.popCode)
@@ -506,7 +507,7 @@ class Galaxy(AreaItem):
                     if owner is None:
                         owner = worldstar.sector.find_world_by_pos(ownedHex)
                 elif len(worldstar.ownedBy) == 4:
-                    owner = worldstar.sector.find_world_by_pos(world.ownedBy)
+                    owner = worldstar.sector.find_world_by_pos(worldstar.ownedBy)
 
                 self.logger.debug("Worlds {} is owned by {}".format(worldstar, owner))
 
@@ -516,15 +517,15 @@ class Galaxy(AreaItem):
                 f.write(ow_path_world + '\n')
 
                 ow_list_items = [
-                    '"{}"'.format(world.sector.name[0:4]),
-                    '"{}"'.format(world.position),
+                    '"{}"'.format(worldstar.sector.name[0:4]),
+                    '"{}"'.format(worldstar.position),
                     '"{}"'.format(owner)
                 ]
-                ow_list_items.extend(['"O:{}"'.format(item.sec_pos(world.sector)) for item in ownedBy[0:4]])
+                ow_list_items.extend(['"O:{}"'.format(item.sec_pos(worldstar.sector)) for item in ownedBy[0:4]])
                 ow_list_world = ', '.join(ow_list_items)
                 g.write(ow_list_world + '\n')
 
-                world.ownedBy = (owner, ownedBy[0:4])
+                worldstar.ownedBy = (owner, ownedBy[0:4])
 
     def is_well_formed(self):
         for item in self.stars_shadow.nodes:

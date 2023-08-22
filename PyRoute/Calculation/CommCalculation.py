@@ -7,6 +7,7 @@ import networkx as nx
 
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
+from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
 from PyRoute.Star import Star
 
 
@@ -100,6 +101,7 @@ class CommCalculation(RouteCalculation):
         self.logger.info("considering {} worlds for removal".format(len(routes)))
         removed = 0
         for route in routes:
+            d = route[2]
             imp = self.galaxy.alg[route[0].alg_base_code].min_importance
             if (len(self.galaxy.alg[route[0].alg_base_code].worlds) < 100 and d['distance'] > 1) or \
                     len(self.galaxy.alg[route[0].alg_base_code].worlds) < 25:
@@ -107,7 +109,7 @@ class CommCalculation(RouteCalculation):
             star = self.more_important(route[0], route[1], imp)
             if star is not None:
                 removed += 1
-                neighbors = self.galaxy.ranges.neighbors(star)
+                neighbors = list(self.galaxy.ranges.neighbors(star))
                 for neighbor in neighbors:
                     self.galaxy.ranges.remove_edge(star, neighbor)
             else:
@@ -115,10 +117,21 @@ class CommCalculation(RouteCalculation):
 
         self.logger.info("Removed {} worlds".format(removed))
         self.logger.info("Routes: %s  -  connections: %s" %
-                         (self.galaxy.stars.number_of_edges(),
+                         (self.galaxy.stars_shadow.number_of_edges(),
                           self.galaxy.ranges.number_of_edges()))
 
     def calculate_routes(self):
+        self.calculate_components()
+        # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
+        # components, even those with only one star.
+        landmarks = self.get_landmarks(index=True)
+        stars = [self.galaxy.stars_shadow.nodes[item]['star'] for item in self.galaxy.stars_shadow]
+        stars.sort(key=lambda item: item.wtn, reverse=True)
+        stars[0].is_landmark = True
+        # Feed the landmarks in as roots of their respective shortest-path trees.
+        # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
+        self.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, self.galaxy.stars_shadow, 0.2, sources=landmarks)
+
         self.logger.info('sorting routes...')
         routes = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
         routes.sort(key=lambda route: route[2]['distance'])
@@ -132,7 +145,7 @@ class CommCalculation(RouteCalculation):
             self.get_route_between(star, neighbor)
             processed += 1
 
-        active = [(s, n, d) for (s, n, d) in self.galaxy.stars.edges(data=True) if d['count'] > 0]
+        active = [(s, n, d) for (s, n, d) in self.galaxy.stars_shadow.edges(data=True) if d['count'] > 0]
         active_graph = nx.Graph()
 
         active_graph.add_edges_from(active)
@@ -186,15 +199,18 @@ class CommCalculation(RouteCalculation):
 
     def get_route_between(self, star, target):
         try:
-            route = nx.astar_path(self.galaxy.stars, star, target, Star.heuristicDistance)
+            route = nx.astar_path(self.galaxy.stars_shadow, star.index, target.index, self.galaxy.heuristic_distance_indexes)
         except nx.NetworkXNoPath:
             return
 
         trade = self.calc_trade(19) if AllyGen.are_allies('As', star.alg_code) else self.calc_trade(23)
         start = route[0]
+        start_star = self.galaxy.stars_shadow.nodes[start]['star']
+        edges = []
         for end in route[1:]:
-            end.tradeCount += 1 if end != route[-1] else 0
-            data = self.galaxy.stars[start][end]
+            end_star = self.galaxy.stars_shadow.nodes[end]['star']
+            end_star.tradeCount += 1 if end != route[-1] else 0
+            data = self.galaxy.stars_shadow[start][end]
             data['trade'] = trade
             data['count'] += 1
             if start == route[0] or end == route[-1]:
@@ -203,4 +219,7 @@ class CommCalculation(RouteCalculation):
                         self.route_reuse)
             else:
                 data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
+            edges.append((start, end))
             start = end
+
+        self.shortest_path_tree.update_edges(edges)
