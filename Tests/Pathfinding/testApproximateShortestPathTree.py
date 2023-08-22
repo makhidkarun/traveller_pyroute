@@ -37,7 +37,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        graph = galaxy.stars_shadow
+        graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
 
@@ -70,7 +70,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        graph = galaxy.stars_shadow
+        graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
 
@@ -102,7 +102,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        graph = galaxy.stars_shadow
+        graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
 
@@ -132,7 +132,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        graph = galaxy.stars_shadow
+        graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
 
@@ -174,7 +174,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        graph = galaxy.stars_shadow
+        graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
 
@@ -216,7 +216,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        graph = galaxy.stars_shadow
+        graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
         leafnode = stars[30]
@@ -240,7 +240,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         self.assertEqual(expected_distances, approx._distances, "Unexpected distances after SPT creation")
 
         # adjust weight
-        galaxy.stars_shadow[subnode][leafnode]['weight'] -= 1
+        galaxy.stars[subnode][leafnode]['weight'] -= 1
 
         # tell SPT weight has changed
         edge = (subnode, leafnode)
@@ -271,7 +271,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        graph = galaxy.stars_shadow
+        graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
         leafnode = stars[30]
@@ -298,7 +298,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         self.assertEqual(expected_distances, approx._distances, "Unexpected distances after SPT creation")
 
         # adjust weight
-        galaxy.stars_shadow[source][right]['weight'] -= 1
+        galaxy.stars[source][right]['weight'] -= 1
 
         # tell SPT weight has changed
         edge = (source, right)
@@ -331,7 +331,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        graph = galaxy.stars_shadow
+        graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[4]
 

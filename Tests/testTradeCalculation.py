@@ -77,11 +77,11 @@ class testTradeCalculation(unittest.TestCase):
         tradecalc = TradeCalculation(galaxy)
 
         route = [star1, star2]
-        galaxy.stars_shadow.add_node(star1.index, star=star1)
-        galaxy.stars_shadow.add_node(star2.index, star=star2)
+        galaxy.stars.add_node(star1.index, star=star1)
+        galaxy.stars.add_node(star2.index, star=star2)
         galaxy.ranges.add_node(star1)
         galaxy.ranges.add_node(star2)
-        galaxy.stars_shadow.add_edge(star1.index, star2.index, distance=1,
+        galaxy.stars.add_edge(star1.index, star2.index, distance=1,
                               weight=10, trade=0, btn=10, count=0)
 
         expected_weight = 10

@@ -31,11 +31,11 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmark - biggest WTN system in the biggest graph component
-        stars = [galaxy.stars_shadow.nodes[item]['star'] for item in galaxy.stars_shadow]
+        stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars_shadow, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -62,11 +62,11 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmark - biggest WTN system in the biggest graph component
-        stars = [galaxy.stars_shadow.nodes[item]['star'] for item in galaxy.stars_shadow]
+        stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars_shadow, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -93,11 +93,11 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmark - biggest WTN system in the biggest graph component
-        stars = [galaxy.stars_shadow.nodes[item]['star'] for item in galaxy.stars_shadow]
+        stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars_shadow, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -124,10 +124,10 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmark - biggest WTN system in the biggest graph component
-        stars = [galaxy.stars_shadow.nodes[item]['star'] for item in galaxy.stars_shadow]
+        stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars_shadow, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -272,10 +272,10 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmark - biggest WTN system in the biggest graph component
-        stars = [galaxy.stars_shadow.nodes[item]['star'] for item in galaxy.stars_shadow]
+        stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars_shadow, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -305,10 +305,10 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmark - biggest WTN system in the biggest graph component
-        stars = [galaxy.stars_shadow.nodes[item]['star'] for item in galaxy.stars_shadow]
+        stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars_shadow, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 

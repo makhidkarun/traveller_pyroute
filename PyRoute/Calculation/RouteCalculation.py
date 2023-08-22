@@ -80,12 +80,12 @@ class RouteCalculation(object):
             if dist <= self.galaxy.max_jump_range:
                 weight = self.route_weight(star, neighbor)
                 btn = self.get_btn(star, neighbor)
-                self.galaxy.stars_shadow.add_edge(star.index, neighbor.index, distance=dist,
+                self.galaxy.stars.add_edge(star.index, neighbor.index, distance=dist,
                                            weight=weight, trade=0, btn=btn, count=0)
                 self.check_existing_routes(star, neighbor)
 
         self.logger.info("base routes: %s  -  ranges: %s" %
-                         (self.galaxy.stars_shadow.number_of_edges(),
+                         (self.galaxy.stars.number_of_edges(),
                           self.galaxy.ranges.number_of_edges()))
 
     def check_existing_routes(self, star, neighbor):
@@ -96,9 +96,9 @@ class RouteCalculation(object):
                 route_des = route[8:]
             if neighbor.position == route_des:
                 if route.startswith('Xb'):
-                    self.galaxy.stars_shadow[star.index][neighbor.index]['xboat'] = True
+                    self.galaxy.stars[star.index][neighbor.index]['xboat'] = True
                 elif route.startswith('Tr'):
-                    self.galaxy.stars_shadow[star.index][neighbor.index]['comm'] = True
+                    self.galaxy.stars[star.index][neighbor.index]['comm'] = True
 
     @staticmethod
     def get_btn(star1, star2, distance=None):
@@ -166,7 +166,7 @@ class RouteCalculation(object):
         return trade
 
     def calculate_components(self):
-        bitz = nx.connected_components(self.galaxy.stars_shadow)
+        bitz = nx.connected_components(self.galaxy.stars)
         counter = -1
 
         for component in bitz:
@@ -185,7 +185,7 @@ class RouteCalculation(object):
         # landmark in that component.  If all the stars in a component are _already_ landmarks, return the previous
         # landmark choice.
         for component_id in self.components:
-            stars = [self.galaxy.star_mapping[item] for item in self.galaxy.stars_shadow]
+            stars = [self.galaxy.star_mapping[item] for item in self.galaxy.stars]
             stars = [item for item in stars if component_id == item.component]
             stars.sort(key=lambda item: item.wtn, reverse=True)
             stars[0].is_landmark = True

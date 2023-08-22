@@ -145,7 +145,7 @@ class StatCalculation(object):
         self.imp_uwp = UWPCollection()
 
     def calculate_statistics(self, ally_match):
-        self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars_shadow)))
+        self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
         for sector in self.galaxy.sectors.values():
             if sector is None:
                 continue

@@ -117,7 +117,7 @@ class CommCalculation(RouteCalculation):
 
         self.logger.info("Removed {} worlds".format(removed))
         self.logger.info("Routes: %s  -  connections: %s" %
-                         (self.galaxy.stars_shadow.number_of_edges(),
+                         (self.galaxy.stars.number_of_edges(),
                           self.galaxy.ranges.number_of_edges()))
 
     def calculate_routes(self):
@@ -125,12 +125,12 @@ class CommCalculation(RouteCalculation):
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
         landmarks = self.get_landmarks(index=True)
-        stars = [self.galaxy.star_mapping[item] for item in self.galaxy.stars_shadow]
+        stars = [self.galaxy.star_mapping[item] for item in self.galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, self.galaxy.stars_shadow, 0.2, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, self.galaxy.stars, 0.2, sources=landmarks)
 
         self.logger.info('sorting routes...')
         routes = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
@@ -145,7 +145,7 @@ class CommCalculation(RouteCalculation):
             self.get_route_between(star, neighbor)
             processed += 1
 
-        active = [(s, n, d) for (s, n, d) in self.galaxy.stars_shadow.edges(data=True) if d['count'] > 0]
+        active = [(s, n, d) for (s, n, d) in self.galaxy.stars.edges(data=True) if d['count'] > 0]
         active_graph = nx.Graph()
 
         active_graph.add_edges_from(active)
@@ -199,7 +199,7 @@ class CommCalculation(RouteCalculation):
 
     def get_route_between(self, star, target):
         try:
-            route = nx.astar_path(self.galaxy.stars_shadow, star.index, target.index, self.galaxy.heuristic_distance_indexes)
+            route = nx.astar_path(self.galaxy.stars, star.index, target.index, self.galaxy.heuristic_distance_indexes)
         except nx.NetworkXNoPath:
             return
 
@@ -209,7 +209,7 @@ class CommCalculation(RouteCalculation):
         for end in route[1:]:
             end_star = self.galaxy.star_mapping[end]
             end_star.tradeCount += 1 if end != route[-1] else 0
-            data = self.galaxy.stars_shadow[start][end]
+            data = self.galaxy.stars[start][end]
             data['trade'] = trade
             data['count'] += 1
             if start == route[0] or end == route[-1]:

@@ -122,10 +122,10 @@ class TradeCalculation(RouteCalculation):
 
         self.logger.info('calculating routes...')
         self.galaxy.is_well_formed()
-        for star in self.galaxy.stars_shadow:
-            if len(self.galaxy.stars_shadow[star]) < 11:
+        for star in self.galaxy.stars:
+            if len(self.galaxy.stars[star]) < 11:
                 continue
-            neighbor_routes = [(s, n, d) for (s, n, d) in self.galaxy.stars_shadow.edges([star], True)]
+            neighbor_routes = [(s, n, d) for (s, n, d) in self.galaxy.stars.edges([star], True)]
             # Need to do two sorts here:
             # BTN low to high to find them first
             # Range high to low to find them first 
@@ -141,16 +141,16 @@ class TradeCalculation(RouteCalculation):
             # until there are 20 connections left. 
             # This may be reduced by other stars deciding you are too far away.             
             for (s, n, d) in neighbor_routes:
-                if len(self.galaxy.stars_shadow[n]) < 15:
+                if len(self.galaxy.stars[n]) < 15:
                     continue
                 if length <= self.max_connections[self.galaxy.max_jump_range - 1]:
                     break
                 if d.get('xboat', False) or d.get('comm', False):
                     continue
-                self.galaxy.stars_shadow.remove_edge(s, n)
+                self.galaxy.stars.remove_edge(s, n)
                 length -= 1
 
-        self.logger.info('Final route count {}'.format(self.galaxy.stars_shadow.number_of_edges()))
+        self.logger.info('Final route count {}'.format(self.galaxy.stars.number_of_edges()))
 
     def calculate_routes(self):
         """
@@ -160,7 +160,7 @@ class TradeCalculation(RouteCalculation):
         """
         self.logger.info('sorting routes...')
         # Filter out pathfinding attempts that can never return a route, as they're between two different
-        # connected components in the underlying galaxy.stars_shadow graph - such pathfinding attempts are doomed
+        # connected components in the underlying galaxy.stars graph - such pathfinding attempts are doomed
         # to failure.
         self.calculate_components()
         btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True) if s.component == n.component]
@@ -169,12 +169,12 @@ class TradeCalculation(RouteCalculation):
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
         landmarks = self.get_landmarks(index=True)
-        stars = [self.galaxy.star_mapping[item] for item in self.galaxy.stars_shadow]
+        stars = [self.galaxy.star_mapping[item] for item in self.galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, self.galaxy.stars_shadow, 0.2, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, self.galaxy.stars, 0.2, sources=landmarks)
 
         base_btn = 0
         counter = 0
@@ -203,7 +203,7 @@ class TradeCalculation(RouteCalculation):
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
-            rawroute, diag = astar_path_indexes(self.galaxy.stars_shadow, star.index, target.index, self.galaxy.heuristic_distance_indexes)
+            rawroute, diag = astar_path_indexes(self.galaxy.stars, star.index, target.index, self.galaxy.heuristic_distance_indexes)
         except nx.NetworkXNoPath:
             return
 
@@ -289,7 +289,7 @@ class TradeCalculation(RouteCalculation):
                 end.tradeOver += tradeCr
                 end.tradeCount += 1
                 end.passOver += tradePass
-            data = self.galaxy.stars_shadow[start.index][end.index]
+            data = self.galaxy.stars[start.index][end.index]
             data['trade'] += tradeCr
             data['count'] += 1
             data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
@@ -321,7 +321,7 @@ class TradeCalculation(RouteCalculation):
         c = 0
         start = route[0]
         for end in route[1:]:
-            y = float(self.galaxy.stars_shadow[start.index][end.index]['weight']) - c
+            y = float(self.galaxy.stars[start.index][end.index]['weight']) - c
             t = total_weight + y
             c = (t - total_weight) - y
 

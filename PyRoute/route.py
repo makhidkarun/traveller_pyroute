@@ -100,7 +100,7 @@ def process():
     if args.trade:
         galaxy.trade.calculate_routes()
         galaxy.process_eti()
-        spectrade = SpeculativeTrade(args.speculative_version, galaxy.stars_shadow)
+        spectrade = SpeculativeTrade(args.speculative_version, galaxy.stars)
         spectrade.process_tradegoods()
 
     if args.routes:

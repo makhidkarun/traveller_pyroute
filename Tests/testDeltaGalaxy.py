@@ -28,7 +28,7 @@ class testDeltaGalaxy(unittest.TestCase):
         )
         # looks like the nx.Graph object deduplicates on addition, thus the duplicate system
         # not showing up in the overall count
-        self.assertEqual(560, len(galaxy.stars_shadow), "Unexpected total world count after load")
+        self.assertEqual(560, len(galaxy.stars), "Unexpected total world count after load")
 
 
 if __name__ == '__main__':

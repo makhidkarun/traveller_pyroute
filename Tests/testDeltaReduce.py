@@ -235,11 +235,11 @@ class testDeltaReduce(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        stars = list(galaxy.stars_shadow.nodes)
+        stars = list(galaxy.stars.nodes)
 
         btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0], galaxy.stars_shadow, 0.2)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0], galaxy.stars, 0.2)
 
         switch = 7
         line = btn[switch]

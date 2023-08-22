@@ -239,7 +239,7 @@ class Galaxy(AreaItem):
         super(Galaxy, self).__init__('Charted Space')
         self.logger = logging.getLogger('PyRoute.Galaxy')
         self.ranges = nx.Graph()
-        self.stars_shadow = nx.Graph()
+        self.stars = nx.Graph()
         self.sectors = {}
         self.borders = AllyGen(self)
         self.output_path = 'maps'
@@ -334,18 +334,18 @@ class Galaxy(AreaItem):
             area.alg.setdefault(star.alg_code, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
 
     def set_positions(self):
-        shadow_len = self.stars_shadow.number_of_nodes()
+        shadow_len = self.stars.number_of_nodes()
         for sector in self.sectors.values():
             for star in sector.worlds:
                 if star not in self.ranges:
-                    self.stars_shadow.add_node(star.index, star=star)
+                    self.stars.add_node(star.index, star=star)
                 self.ranges.add_node(star)
-        self.logger.info("Total number of worlds: %s" % self.stars_shadow.number_of_nodes())
-        shadow_len = self.stars_shadow.number_of_nodes()
+        self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
+        shadow_len = self.stars.number_of_nodes()
         map_len = len(self.star_mapping)
         assert map_len == shadow_len, "Mismatch between shadow stars and stars mapping, " + str(shadow_len) + " and " + str(map_len)
-        for item in self.stars_shadow.nodes:
-            assert 'star' in self.stars_shadow.nodes[item], "Star attribute not set for item " + str(item)
+        for item in self.stars.nodes:
+            assert 'star' in self.stars.nodes[item], "Star attribute not set for item " + str(item)
 
     def set_bounding_sectors(self):
         for sector, neighbor in itertools.combinations(self.sectors.values(), 2):
@@ -401,7 +401,7 @@ class Galaxy(AreaItem):
             nx.write_edgelist(self.ranges, f, data=True)
         path = os.path.join(self.output_path, 'stars.txt')
         with open(path, "wb") as f:
-            nx.write_edgelist(self.stars_shadow, f, data=True)
+            nx.write_edgelist(self.stars, f, data=True)
         path = os.path.join(self.output_path, 'borders.txt')
         with codecs.open(path, "wb", "utf-8") as f:
             for key, value in self.borders.borders.items():
@@ -410,14 +410,14 @@ class Galaxy(AreaItem):
         if routes == 'xroute':
             path = os.path.join(self.output_path, 'stations.txt')
             with codecs.open(path, "wb", 'utf-8') as f:
-                stars = [self.star_mapping[item] for item in self.stars_shadow]
+                stars = [self.star_mapping[item] for item in self.stars]
                 stars = [star for star in stars if star.tradeCount > 0]
                 for star in stars:
                     f.write("{} - {}\n".format(star, star.tradeCount))
 
     def process_eti(self):
         self.logger.info("Processing ETI for worlds")
-        for (world, neighbor) in self.stars_shadow.edges():
+        for (world, neighbor) in self.stars.edges():
             worldstar = self.star_mapping[world]
             neighborstar = self.star_mapping[neighbor]
             distance = worldstar.hex_distance(neighborstar)
@@ -428,8 +428,8 @@ class Galaxy(AreaItem):
             PassTradeIndex = int(round(math.sqrt(
                 max(worldstar.eti_passenger - distanceMod, 0) *
                 max(neighborstar.eti_passenger - distanceMod, 0))))
-            self.stars_shadow[world][neighbor]['CargoTradeIndex'] = CargoTradeIndex
-            self.stars_shadow[world][neighbor]['PassTradeIndex'] = PassTradeIndex
+            self.stars[world][neighbor]['CargoTradeIndex'] = CargoTradeIndex
+            self.stars[world][neighbor]['PassTradeIndex'] = PassTradeIndex
             if CargoTradeIndex > 0:
                 worldstar.eti_cargo_volume += math.pow(10, CargoTradeIndex) * 10
                 neighborstar.eti_cargo_volume += math.pow(10, CargoTradeIndex) * 10
@@ -462,11 +462,11 @@ class Galaxy(AreaItem):
         ow_list = os.path.join(self.output_path, 'owned-worlds-list.csv')
         with codecs.open(ow_names, 'w+', 'utf-8') as f, codecs.open(ow_list, 'w+', 'utf-8') as g:
 
-            for world in self.stars_shadow:
+            for world in self.stars:
                 worldstar = self.star_mapping[world]
                 if worldstar.ownedBy == worldstar:
                     continue
-                neighbours = [self.star_mapping[item] for item in self.stars_shadow.neighbors(world)]
+                neighbours = [self.star_mapping[item] for item in self.stars.neighbors(world)]
                 ownedBy = [star for star in neighbours \
                            if star.tl >= 9 and star.popCode >= 6 and \
                            star.port in 'ABC' and star.ownedBy == star and \
@@ -527,9 +527,9 @@ class Galaxy(AreaItem):
                 worldstar.ownedBy = (owner, ownedBy[0:4])
 
     def is_well_formed(self):
-        for item in self.stars_shadow.nodes:
+        for item in self.stars.nodes:
             assert isinstance(item, int), "Star nodes must be integers"
-            assert 'star' in self.stars_shadow.nodes[item], "Star attribute not set for item " + str(item)
+            assert 'star' in self.stars.nodes[item], "Star attribute not set for item " + str(item)
             star = self.star_mapping[item]
             star.is_well_formed()
 

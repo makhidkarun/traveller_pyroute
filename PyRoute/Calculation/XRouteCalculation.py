@@ -137,7 +137,7 @@ class XRouteCalculation(RouteCalculation):
         for star in important:
             if star in jumpStations:
                 continue
-            for neighbor in self.galaxy.stars_shadow.neighbors(star.index):
+            for neighbor in self.galaxy.stars.neighbors(star.index):
                 neighbour_world = self.galaxy.star_mapping[neighbor]
                 if star.hex_distance(neighbour_world) > 4:
                     continue
@@ -149,7 +149,7 @@ class XRouteCalculation(RouteCalculation):
 
         important3 = []
         for star in important2:
-            for neighbor in self.galaxy.stars_shadow.neighbors(star.index):
+            for neighbor in self.galaxy.stars.neighbors(star.index):
                 if neighbor in jumpStations:
                     self.get_route_between(star, neighbor, self.calc_trade(21), None)
                     jumpStations.append(star)
@@ -167,12 +167,12 @@ class XRouteCalculation(RouteCalculation):
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
         landmarks = self.get_landmarks(index=True)
-        stars = [self.galaxy.star_mapping[item] for item in self.galaxy.stars_shadow]
+        stars = [self.galaxy.star_mapping[item] for item in self.galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, self.galaxy.stars_shadow, 0.2,
+        self.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, self.galaxy.stars, 0.2,
                                                               sources=landmarks)
         self.logger.info('XRoute pass 1')
         self.routes_pass_1()
@@ -185,7 +185,7 @@ class XRouteCalculation(RouteCalculation):
 
     def reweight_routes(self, weightList):
         self.distance_weight = weightList
-        for (star, neighbor, data) in self.galaxy.stars_shadow.edges(data=True):
+        for (star, neighbor, data) in self.galaxy.stars.edges(data=True):
             star_world = self.galaxy.star_mapping[star]
             neighbour_world = self.galaxy.star_mapping[neighbor]
             data['weight'] = self.route_weight(star_world, neighbour_world)
@@ -208,7 +208,7 @@ class XRouteCalculation(RouteCalculation):
 
     def get_route_between(self, star, target, trade, heuristic):
         try:
-            route = nx.astar_path(self.galaxy.stars_shadow, star.index, target.index, heuristic)
+            route = nx.astar_path(self.galaxy.stars, star.index, target.index, heuristic)
         except nx.NetworkXNoPath:
             return
         self.galaxy.ranges.add_edge(star, target, distance=star.hex_distance(target))
@@ -223,7 +223,7 @@ class XRouteCalculation(RouteCalculation):
             endstar = self.galaxy.star_mapping[end]
             distance += startstar.hex_distance(endstar)
             endstar.tradeCount += 1
-            data = self.galaxy.stars_shadow[start][end]
+            data = self.galaxy.stars[start][end]
             data['trade'] = max(trade, data['trade'])
             data['count'] += 1
             data['weight'] -= (data['weight'] - data['distance']) // self.route_reuse
