@@ -101,6 +101,24 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
+    def test_stars_node_types(self):
+        sourcefile = os.path.abspath('../DeltaFiles/stars_node_types/Antares.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/stars_node_types/Antares.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
