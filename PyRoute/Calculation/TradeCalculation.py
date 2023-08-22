@@ -123,6 +123,7 @@ class TradeCalculation(RouteCalculation):
         self.generate_base_routes()
 
         self.logger.info('calculating routes...')
+        self.galaxy.is_well_formed()
         for star in self.galaxy.stars_shadow:
             if len(self.galaxy.stars_shadow[star]) < 11:
                 continue

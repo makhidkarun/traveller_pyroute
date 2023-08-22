@@ -66,6 +66,7 @@ class RouteCalculation(object):
 
     def generate_base_routes(self):
         self.logger.info('generating jumps...')
+        self.galaxy.is_well_formed()
         for star, neighbor in itertools.combinations(self.galaxy.ranges, 2):
             if self.base_route_filter(star, neighbor):
                 continue

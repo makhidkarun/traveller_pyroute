@@ -345,6 +345,8 @@ class Galaxy(AreaItem):
         shadow_len = self.stars_shadow.number_of_nodes()
         map_len = len(self.star_mapping)
         assert map_len == shadow_len, "Mismatch between shadow stars and stars mapping, " + str(shadow_len) + " and " + str(map_len)
+        for item in self.stars_shadow.nodes:
+            assert 'star' in self.stars_shadow.nodes[item], "Star attribute not set for item " + str(item)
 
     def set_bounding_sectors(self):
         for sector, neighbor in itertools.combinations(self.sectors.values(), 2):
@@ -369,6 +371,7 @@ class Galaxy(AreaItem):
                 subsector.set_bounding_subsectors()
 
     def generate_routes(self, routes, reuse=10):
+        self.is_well_formed()
         if routes == 'trade':
             self.trade = TradeCalculation(self, self.min_btn, self.route_btn, reuse, self.debug_flag)
         elif routes == 'comm':
@@ -520,7 +523,10 @@ class Galaxy(AreaItem):
                 world.ownedBy = (owner, ownedBy[0:4])
 
     def is_well_formed(self):
-        for star in self.stars:
+        for item in self.stars_shadow.nodes:
+            assert isinstance(item, int), "Star nodes must be integers"
+            assert 'star' in self.stars_shadow.nodes[item], "Star attribute not set for item " + str(item)
+            star = self.stars_shadow.nodes[item]['star']
             star.is_well_formed()
 
     def heuristic_distance(self, star, target):
