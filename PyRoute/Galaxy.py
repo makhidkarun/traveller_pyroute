@@ -402,7 +402,7 @@ class Galaxy(AreaItem):
             nx.write_edgelist(self.ranges, f, data=True)
         path = os.path.join(self.output_path, 'stars.txt')
         with open(path, "wb") as f:
-            nx.write_edgelist(self.stars, f, data=True)
+            nx.write_edgelist(self.stars_shadow, f, data=True)
         path = os.path.join(self.output_path, 'borders.txt')
         with codecs.open(path, "wb", "utf-8") as f:
             for key, value in self.borders.borders.items():
@@ -411,31 +411,34 @@ class Galaxy(AreaItem):
         if routes == 'xroute':
             path = os.path.join(self.output_path, 'stations.txt')
             with codecs.open(path, "wb", 'utf-8') as f:
-                stars = [star for star in self.stars if star.tradeCount > 0]
+                stars = [self.stars_shadow.nodes[item]['star'] for item in self.stars_shadow]
+                stars = [star for star in stars if star.tradeCount > 0]
                 for star in stars:
                     f.write("{} - {}\n".format(star, star.tradeCount))
 
     def process_eti(self):
         self.logger.info("Processing ETI for worlds")
-        for (world, neighbor) in self.stars.edges():
-            distance = world.hex_distance(neighbor)
+        for (world, neighbor) in self.stars_shadow.edges():
+            worldstar = self.stars_shadow.nodes[world]['star']
+            neighborstar = self.stars_shadow.nodes[neighbor]['star']
+            distance = worldstar.hex_distance(neighborstar)
             distanceMod = int(distance / 2)
             CargoTradeIndex = int(round(math.sqrt(
-                max(world.eti_cargo - distanceMod, 0) *
-                max(neighbor.eti_cargo - distanceMod, 0))))
+                max(worldstar.eti_cargo - distanceMod, 0) *
+                max(neighborstar.eti_cargo - distanceMod, 0))))
             PassTradeIndex = int(round(math.sqrt(
-                max(world.eti_passenger - distanceMod, 0) *
-                max(neighbor.eti_passenger - distanceMod, 0))))
-            self.stars[world][neighbor]['CargoTradeIndex'] = CargoTradeIndex
-            self.stars[world][neighbor]['PassTradeIndex'] = PassTradeIndex
+                max(worldstar.eti_passenger - distanceMod, 0) *
+                max(neighborstar.eti_passenger - distanceMod, 0))))
+            self.stars_shadow[world][neighbor]['CargoTradeIndex'] = CargoTradeIndex
+            self.stars_shadow[world][neighbor]['PassTradeIndex'] = PassTradeIndex
             if CargoTradeIndex > 0:
-                world.eti_cargo_volume += math.pow(10, CargoTradeIndex) * 10
-                neighbor.eti_cargo_volume += math.pow(10, CargoTradeIndex) * 10
-                world.eti_worlds += 1
-                neighbor.eti_worlds += 1
+                worldstar.eti_cargo_volume += math.pow(10, CargoTradeIndex) * 10
+                neighborstar.eti_cargo_volume += math.pow(10, CargoTradeIndex) * 10
+                worldstar.eti_worlds += 1
+                neighborstar.eti_worlds += 1
             if PassTradeIndex > 0:
-                world.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
-                neighbor.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
+                worldstar.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
+                neighborstar.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
 
     def read_routes(self, routes=None):
         route_regex = "^({1,}) \(({3,}) (\d\d\d\d)\) ({1,}) \(({3,}) (\d\d\d\d)\) (\{.*\})"

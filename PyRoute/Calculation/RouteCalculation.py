@@ -92,9 +92,9 @@ class RouteCalculation(object):
                 route_des = route[8:]
             if neighbor.position == route_des:
                 if route.startswith('Xb'):
-                    self.galaxy.stars_shadow[star][neighbor]['xboat'] = True
+                    self.galaxy.stars_shadow[star.index][neighbor.index]['xboat'] = True
                 elif route.startswith('Tr'):
-                    self.galaxy.stars_shadow[star][neighbor]['comm'] = True
+                    self.galaxy.stars_shadow[star.index][neighbor.index]['comm'] = True
 
     @staticmethod
     def get_btn(star1, star2, distance=None):

@@ -149,7 +149,7 @@ class TradeCalculation(RouteCalculation):
                     break
                 if d.get('xboat', False) or d.get('comm', False):
                     continue
-                self.galaxy.stars_shadow.remove_edge(s.index, n.index)
+                self.galaxy.stars_shadow.remove_edge(s, n)
                 length -= 1
 
         self.logger.info('Final route count {}'.format(self.galaxy.stars_shadow.number_of_edges()))
@@ -171,8 +171,7 @@ class TradeCalculation(RouteCalculation):
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
         landmarks = self.get_landmarks(index=True)
-        stars = [item for item in self.galaxy.stars]
-        num_stars = len(stars)
+        stars = [self.galaxy.stars_shadow.nodes[item]['star'] for item in self.galaxy.stars_shadow]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
@@ -292,7 +291,7 @@ class TradeCalculation(RouteCalculation):
                 end.tradeOver += tradeCr
                 end.tradeCount += 1
                 end.passOver += tradePass
-            data = self.galaxy.stars[start][end]
+            data = self.galaxy.stars_shadow[start.index][end.index]
             data['trade'] += tradeCr
             data['count'] += 1
             data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
@@ -448,7 +447,8 @@ class TradeCalculation(RouteCalculation):
         # landmark in that component.  If all the stars in a component are _already_ landmarks, return the previous
         # landmark choice.
         for component_id in self.components:
-            stars = [item for item in self.galaxy.stars if component_id == item.component]
+            stars = [self.galaxy.stars_shadow.nodes[item]['star'] for item in self.galaxy.stars_shadow]
+            stars = [item for item in stars if component_id == item.component]
             stars.sort(key=lambda item: item.wtn, reverse=True)
             stars[0].is_landmark = True
             if index:

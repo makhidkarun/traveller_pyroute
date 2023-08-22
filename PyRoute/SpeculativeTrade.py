@@ -48,13 +48,16 @@ class SpeculativeTrade(object):
     def process_tradegoods(self):
         self.logger.info("Processing TradeGoods for worlds")
         for world in self.stars:
-            self.get_source_tradegoods(world)
+            worldstar = self.stars.nodes[world]['star']
+            self.get_source_tradegoods(worldstar)
         if self.trade_version == 'None':
             return
         for (world, neighbor) in self.stars.edges():
-            distance = world.hex_distance(neighbor)
-            source_market = max(self.get_market_price(world, neighbor) - distance, 0)
-            target_market = max(self.get_market_price(neighbor, world) - distance, 0)
+            worldstar = self.stars.nodes[world]['star']
+            neighborstar = self.stars.nodes[world]['star']
+            distance = worldstar.hex_distance(neighborstar)
+            source_market = max(self.get_market_price(worldstar, neighborstar) - distance, 0)
+            target_market = max(self.get_market_price(neighborstar, worldstar) - distance, 0)
             self.stars[world][neighbor]['SourceMarketPrice'] = int(source_market * 1000)
             self.stars[world][neighbor]['TargetMarketPrice'] = int(target_market * 1000)
 

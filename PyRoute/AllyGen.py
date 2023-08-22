@@ -595,7 +595,7 @@ class AllyGen(object):
         Note: This does not match the original system.
         """
         # Create list of stars
-        stars = [star for star in self.galaxy.stars]
+        stars = [self.galaxy.stars_shadow.nodes[item]['star'] for item in self.galaxy.stars_shadow]
         allyMap = defaultdict(set)
         starMap = {}
         # Mark the map with all the stars        
