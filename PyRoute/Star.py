@@ -384,8 +384,8 @@ class Star(object):
             # If self.x is even, bump y1 up by 1
             if not self.x % 2:
                 y1 += 1
-            # If star.x is even, bump y2 up by 1
-            if not star.x % 2:
+            # If self.x is odd, then star.x _MUST_ be even, bump y2 up by 1
+            else:
                 y2 += 1
 
         # If star.x is even and self.x is odd, raw value of dy is += 1 (y2 gets increased, y1 stays same)
