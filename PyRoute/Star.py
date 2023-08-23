@@ -378,9 +378,7 @@ class Star(object):
         y2 = star.y * 2
         if not star.x % 2:
             y2 += 1
-        dy = y2 - y1
-        if dy < 1:
-            dy = -dy
+        dy = abs(y2 - y1)
         dx = star.x - self.x
         if dx < 1:
             dx = -dx
