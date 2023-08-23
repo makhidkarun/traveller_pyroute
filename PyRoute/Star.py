@@ -373,11 +373,18 @@ class Star(object):
 
     def distance(self, star):
         y1 = self.y * 2
+        # If self.x is even, bump y1 up by 1
         if not self.x % 2:
             y1 += 1
+        # If star.x is even, bump y2 up by 1
         y2 = star.y * 2
         if not star.x % 2:
             y2 += 1
+        # If star.x and self.x are both even or both odd (implying dx must be even), they have no net effect on dy's value
+        # If both even, y1 and y2 each get 1 added, which drops out in subtraction
+        # If both odd, y1 and y2 each get nothing added.
+        # If star.x is even and self.x is odd, raw value of dy is += 1 (y2 gets increased, y1 stays same)
+        # If self.x is even and star.x is odd, raw value of dy is -= 1 (y1 gets increased, y2 stays same)
         dy = abs(y2 - y1)
         dx = abs(star.x - self.x)
         if dx > dy:
