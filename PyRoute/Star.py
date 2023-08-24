@@ -391,9 +391,9 @@ class Star(object):
         # If star.x is even and self.x is odd, raw value of dy is += 1 (y2 gets increased, y1 stays same)
         # If self.x is even and star.x is odd, raw value of dy is -= 1 (y1 gets increased, y2 stays same)
         dy = abs(y2 - y1)
-        if dx > dy:
+        if dx > (dy // 2):
             return dx
-        return dx + dy // 2
+        return dx + (dy // 2)
 
     def subsector(self):
         subsector = ["ABCD", "EFGH", "IJKL", "MNOP"]
