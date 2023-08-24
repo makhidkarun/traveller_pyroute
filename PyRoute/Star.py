@@ -393,6 +393,8 @@ class Star(object):
         dy = abs(y2 - y1)
         if dx > (dy // 2):
             return dx
+        if (dy // 2) > dx:
+            return ((dy + 1) // 2)
         return dx + (dy // 2)
 
     def subsector(self):
