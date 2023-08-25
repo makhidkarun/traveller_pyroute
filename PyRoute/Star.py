@@ -376,13 +376,15 @@ class Star(object):
         return (abs(Hex1[0] - Hex2[0]) + abs(Hex1[1] - Hex2[1])
                 + abs(Hex1[0] + Hex1[1] - Hex2[0] - Hex2[1])) // 2
 
-    def distance(self, star):
+    def distance(self, star, diagnostic=False):
         # If star.x and self.x are both even or both odd (implying dx must be even), they have no net effect on dy's value
         # If both even, y1 and y2 each get 1 added, which drops out in subtraction
         # If both odd, y1 and y2 each get nothing added.
         y1 = self.y * 2
         y2 = star.y * 2
         dx = abs(star.x - self.x)
+        raw_dy = y2 - y1
+        raw_dx = star.x - self.x
 
         # Only look at the following if dx is odd, implying exactly one of self.x and star.x is even
         if dx % 2:
@@ -397,10 +399,10 @@ class Star(object):
         # If self.x is even and star.x is odd, raw value of dy is -= 1 (y1 gets increased, y2 stays same)
         dy = abs(y2 - y1)
         if dx > (dy // 2):
-            return dx
+            return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
         if (dy // 2) > dx:
-            return ((dy + 1) // 2)
-        return dx + (dy // 2)
+            return ((dy + 1) // 2) if not diagnostic else (((dy + 1) // 2), raw_dx, raw_dy, dx, dy)
+        return dx + (dy // 2) if not diagnostic else (dx + (dy // 2), raw_dx, raw_dy, dx, dy)
 
     def subsector(self):
         subsector = ["ABCD", "EFGH", "IJKL", "MNOP"]

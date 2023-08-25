@@ -159,10 +159,12 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(target_star[1], star2.row, "Unexpected row value for " + target_name)
 
                 hexdist = star1.hex_distance(star2)
-                straight_dist = star1.distance(star2)
+                straight_dist, raw_dx, raw_dy, dx, dy = star1.distance(star2, diagnostic=True)
                 rev_straight_dist = star2.distance(star1)
                 self.assertEqual(straight_dist, rev_straight_dist, "Straight distance should not be direction sensitive")
-                self.assertEqual(hexdist, straight_dist, "Straight distance " + str(straight_dist) + " not equal to hex distance " + str(hexdist))
+                msg = "Straight distance " + str(straight_dist) + " not equal to hex distance " + str(hexdist)
+                gubbins = "Raw dx: " + str(raw_dx) + ", raw dy: " + str(raw_dy) + ", dx: " + str(dx) + ", dy: " + str(dy)
+                self.assertEqual(hexdist, straight_dist, msg + "\n" + gubbins)
 
 
 if __name__ == '__main__':
