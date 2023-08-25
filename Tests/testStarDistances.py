@@ -149,10 +149,14 @@ class testStarDistances(unittest.TestCase):
                 star1 = Star.parse_line_into_star(
                     source_hex + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
                     source_sector, 'fixed', 'fixed')
+                self.assertEqual(source_star[0], star1.col, "Unexpected col value for " + source_name)
+                self.assertEqual(source_star[1], star1.row, "Unexpected row value for " + source_name)
 
                 star2 = Star.parse_line_into_star(
                     target_hex + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
                     target_sector, 'fixed', 'fixed')
+                self.assertEqual(target_star[0], star2.col, "Unexpected col value for " + target_name)
+                self.assertEqual(target_star[1], star2.row, "Unexpected row value for " + target_name)
 
                 hexdist = star1.hex_distance(star2)
                 straight_dist = star1.distance(star2)
