@@ -343,14 +343,19 @@ class Star(object):
         # convert odd-q offset to cube
         q = int(self.position[0:2]) + dx - 1
         r = int(self.position[2:4]) + dy - 1
+
+        # Halving q, rounding down _towards negative infinity_ to the nearest integer - ie, floor(q / 2)
+        q_offset = (q - (q & 1)) // 2
         self.x = q
-        self.z = r - (q - (q & 1)) // 2
+        self.z = r - q_offset
+        # cubic co-ords must sum to zero
         self.y = -self.x - self.z
 
         # convert cube to axial
         self.q = self.x
         self.r = self.z
 
+        # store within-sector column and row co-ords
         self.col = q - dx + 1
         self.row = r - dy + 1
 
