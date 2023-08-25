@@ -138,7 +138,13 @@ class testStarDistances(unittest.TestCase):
             blurb = source_name + ", " + target_name
             with self.subTest(msg=blurb):
                 source_sector = Sector(source_secname, sourcesectorloc)
+                self.assertEqual(-224, source_sector.dx, "Unexpected Zhdant sector dx value")
+                self.assertEqual(80, source_sector.dy, "Unexpected Zhdant sector dx value")
                 target_sector = Sector(target_secname, targetsectorloc)
+                self.assertEqual(sector_offset[0] * 32, target_sector.dx,
+                                 "Unexpected " + target_secname + " sector dx value")
+                self.assertEqual(sector_offset[1] * 40, target_sector.dy,
+                                 "Unexpected " + target_secname + " sector dy value")
 
                 star1 = Star.parse_line_into_star(
                     source_hex + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
@@ -152,7 +158,7 @@ class testStarDistances(unittest.TestCase):
                 straight_dist = star1.distance(star2)
                 rev_straight_dist = star2.distance(star1)
                 self.assertEqual(straight_dist, rev_straight_dist, "Straight distance should not be direction sensitive")
-                self.assertEqual(hexdist, straight_dist, "Straight distance not equal to hex distance")
+                self.assertEqual(hexdist, straight_dist, "Straight distance " + str(straight_dist) + " not equal to hex distance " + str(hexdist))
 
 
 if __name__ == '__main__':
