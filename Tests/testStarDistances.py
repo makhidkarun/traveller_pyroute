@@ -30,6 +30,34 @@ distance_list = [
     ('0910, Core, even-radius middle hexagon side', ' Core', ' 0, 0', '0910', '1510', 6, 0, 6)
 ]
 
+inter_distance_list = [
+    ("odd", "even", "even", "odd", -2, 0, "delta", "alpha"),
+    ("odd", "odd", "odd", "even", +1, -2, "beta", "beta"),
+    ("even", "odd", "even", "even", -2, -1, "alpha", "delta"),
+    ("even", "even", "odd", "odd", 0, +2, "gamma", "gamma"),
+    ("even", "even", "odd", "even", -1, +1, "alpha", "alpha"),
+    ("odd", "odd", "even", "odd", -1, 0, "beta", "delta"),
+    ("odd", "odd", "even", "even", +2, +1, "delta", "gamma"),
+    ("even", "even", "odd", "odd", 0, -1, "delta", "beta"),
+    ("odd", "odd", "even", "even", 0, -2, "gamma", "delta"),
+    ("even", "even", "odd", "odd", +2, -2, "alpha", "alpha"),
+    ("odd", "even", "even", "even", +2, +2, "beta", "beta"),
+    ("even", "odd", "odd", "odd", -2, -2, "beta", "gamma"),
+    ("even", "even", "odd", "odd", -2, +1, "gamma", "beta"),
+    ("odd", "even", "even", "odd", -1, -2, "delta", "beta"),
+    ("even", "even", "even", "odd", +1, +2, "delta", "delta"),
+    ("odd", "odd", "even", "even", +1, -1, "gamma", "alpha"),
+    ("even", "odd", "even", "even", 0, +1, "beta", "alpha"),
+    ("even", "even", "odd", "even", +1, 0, "alpha", "gamma"),
+    ("odd", "odd", "even", "even", -2, +2, "alpha", "alpha"),
+    ("even", "odd", "odd", "odd", +2, -1, "beta", "delta"),
+    ("even", "even", "even", "even", +2, 0, "gamma", "beta"),
+    ("even", "odd", "even", "odd", -1, -1, "gamma", "gamma"),
+    ("even", "even", "odd", "even", -1, +2, "alpha", "beta"),
+    ("odd", "odd", "even", "even", 0, +1, "alpha", "delta"),
+    ("odd", "even", "odd", "odd", +1, +1, "delta", "alpha")
+]
+
 class testStarDistances(unittest.TestCase):
     def test_straight_distance(self):
         for blurb, sectorname, sectorloc, starthex, finhex, dx, dy, expected_straight_distance in distance_list:
@@ -56,6 +84,75 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(expected_straight_distance, fwd_distance, "Unexpected forward distance between " + starthex + " and " + newpos)
                 rev_distance = star2.distance(star1)
                 self.assertEqual(expected_straight_distance, rev_distance, "Unexpected reverse distance between " + starthex + " and " + newpos)
+
+    def test_intersector_straight_distance(self):
+        sector_dict = dict()
+        sector_dict[(-2, 0)] = 'Pliabriebl'
+        sector_dict[(-2, 1)] = 'Tsadra Davr'
+        sector_dict[(-2, 2)] = 'Chiep Zhez'
+        sector_dict[(-2, -1)] = 'Brieplanz'
+        sector_dict[(-2, -2)] = 'Viajlefliez'
+        sector_dict[(-1, 0)] = 'Eiaplial'
+        sector_dict[(-1, 1)] = 'Tsadra'
+        sector_dict[(-1, 2)] = 'Shiants'
+        sector_dict[(-1, -1)] = 'Sidiadl'
+        sector_dict[(-1, -2)] = 'Bleblqansh'
+        sector_dict[(0, 0)] = 'Zhdant'
+        sector_dict[(0, 1)] = 'Zdiedeiant'
+        sector_dict[(0, 2)] = 'Driasera'
+        sector_dict[(0, -1)] = 'Yiklerzdanzh'
+        sector_dict[(0, -2)] = 'Chtedrdia'
+        sector_dict[(1, 0)] = 'Tienspevnekr'
+        sector_dict[(1, 1)] = 'Stiatlchepr'
+        sector_dict[(1, 2)] = 'Dalchie Jdatl'
+        sector_dict[(1, -1)] = 'Afachtiabr'
+        sector_dict[(1, -2)] = 'Steblenzh'
+        sector_dict[(2, 0)] = 'Ziafrplians'
+        sector_dict[(2, 1)] = 'Iakr'
+        sector_dict[(2, 2)] = 'Zhdiakitlatl'
+        sector_dict[(2, -1)] = 'Itvikiastaf'
+        sector_dict[(2, -2)] = 'Chit Botshti'
+
+        system_base = dict()
+        system_base['alpha'] = (8, 10)
+        system_base['beta'] = (24, 10)
+        system_base['gamma'] = (8, 30)
+        system_base['delta'] = (24, 30)
+
+        zhdant_offset = (-7, +2)
+
+        for source_x, source_y, target_x, target_y, sector_x, sector_y, source_quad, target_quad in inter_distance_list:
+            source_secname = " Zhdant"
+            sourcesectorloc = ' -7, 2'
+            target_secname = ' ' + sector_dict[(sector_x, sector_y)]
+            sector_offset = (zhdant_offset[0] + sector_x, zhdant_offset[1] + sector_y)
+            targetsectorloc = ' ' + str(sector_offset[0]) + ', ' + str(sector_offset[1])
+            source_raw = system_base[source_quad]
+            source_star = (source_raw[0] + (1 if source_x == "odd" else 0), source_raw[1] + (1 if source_y == "odd" else 0))
+            target_raw = system_base[target_quad]
+            target_star = (target_raw[0] + (1 if target_x == "odd" else 0), target_raw[1] + (1 if target_y == "odd" else 0))
+            source_hex = str(source_star[0]).rjust(2, '0') + str(source_star[1]).rjust(2, '0')
+            target_hex = str(target_star[0]).rjust(2, '0') + str(target_star[1]).rjust(2, '0')
+            source_name = source_secname + ' ' + source_hex
+            target_name = target_secname + ' ' + target_hex
+            blurb = source_name + ", " + target_name
+            with self.subTest(msg=blurb):
+                source_sector = Sector(source_secname, sourcesectorloc)
+                target_sector = Sector(target_secname, targetsectorloc)
+
+                star1 = Star.parse_line_into_star(
+                    source_hex + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    source_sector, 'fixed', 'fixed')
+
+                star2 = Star.parse_line_into_star(
+                    target_hex + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    target_sector, 'fixed', 'fixed')
+
+                hexdist = star1.hex_distance(star2)
+                straight_dist = star1.distance(star2)
+                rev_straight_dist = star2.distance(star1)
+                self.assertEqual(straight_dist, rev_straight_dist, "Straight distance should not be direction sensitive")
+                self.assertEqual(hexdist, straight_dist, "Straight distance not equal to hex distance")
 
 
 if __name__ == '__main__':
