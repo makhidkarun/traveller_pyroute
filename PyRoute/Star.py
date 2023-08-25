@@ -387,6 +387,8 @@ class Star(object):
         raw_dx = star.x - self.x
 
         # Only look at the following if dx is odd, implying exactly one of self.x and star.x is even
+        # If star.x is even and self.x is odd, raw value of dy is += 1 (y2 gets increased, y1 stays same)
+        # If self.x is even and star.x is odd, raw value of dy is -= 1 (y1 gets increased, y2 stays same)
         if dx % 2:
             # If self.x is even, bump y1 up by 1
             if not self.x % 2:
@@ -395,9 +397,17 @@ class Star(object):
             else:
                 y2 += 1
 
-        # If star.x is even and self.x is odd, raw value of dy is += 1 (y2 gets increased, y1 stays same)
-        # If self.x is even and star.x is odd, raw value of dy is -= 1 (y1 gets increased, y2 stays same)
+        # The hexagons we're using have 3 axes of symmetry
+        # - The 12 o'clock-6 o'clock line
+        # - The 10 o'clock-4 o'clock line
+        # - The 8 o'clock-2'oclock line
+        # Let's tackle those special cases _first_, to try to simplify the residual cases
         dy = abs(y2 - y1)
+
+        # 12 o'clock-6 o'clock line
+        if 0 == dx:
+            return dy//2 if not diagnostic else (dy//2, raw_dx, raw_dy, dx, dy)
+
         if dx > (dy // 2):
             return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
         if (dy // 2) > dx:
