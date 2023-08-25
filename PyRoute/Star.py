@@ -400,13 +400,19 @@ class Star(object):
         # The hexagons we're using have 3 axes of symmetry
         # - The 12 o'clock-6 o'clock line
         # - The 10 o'clock-4 o'clock line
-        # - The 8 o'clock-2'oclock line
+        # - The 8 o'clock-2'o'clock line
         # Let's tackle those special cases _first_, to try to simplify the residual cases
         dy = abs(y2 - y1)
 
         # 12 o'clock-6 o'clock line
         if 0 == dx:
             return dy//2 if not diagnostic else (dy//2, raw_dx, raw_dy, dx, dy)
+        # 10 o'clock-4 o'clock line
+        if dx * 2 == dy:
+            return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
+        # 8 o'clock-2 o'clock line
+        if 0 == raw_dy:
+            return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
 
         if dx > (dy // 2):
             return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
