@@ -414,8 +414,16 @@ class Star(object):
         if 0 == raw_dy:
             return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
 
+        # connecting segment is in the bowtie
+        # between 8 o'clock and 10 o'clock exclusive, xor between 2 o'clock and 4 o'clock exclusive
         if dx > (dy // 2):
             return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
+        # connecting segment is between 12 o'clock and 2 o'clock exclusive,
+        # xor between 6 o'clock and 8 o'clock exclusive
+        if (0 < raw_dx) == (0 < raw_dy):
+            pass
+        # by exhaustion, connecting segment is between 10 o'clock and 12 o'clock exclusive,
+        # xor 4 o'clock and 6 o'clock exclusive
         if (dy // 2) > dx:
             return ((dy + 1) // 2) if not diagnostic else (((dy + 1) // 2), raw_dx, raw_dy, dx, dy)
         return dx + (dy // 2) if not diagnostic else (dx + (dy // 2), raw_dx, raw_dy, dx, dy)
