@@ -168,6 +168,120 @@ class testStarDistances(unittest.TestCase):
                 msg = "Straight distance " + str(straight_dist) + " not equal to hex distance " + str(hexdist)
                 self.assertEqual(hexdist, straight_dist, msg)
 
+    def test_trans_sector_border_distances_spinward_marches_to_gvurrdon(self):
+        spin = Sector(' Spinward Marches', ' -4, 1')
+        self.assertEqual(-128, spin.dx, "Unexpected sector dx")
+        self.assertEqual(40, spin.dy, "Unexpected sector dy")
+        gvur = Sector(' Gvurrdon', ' -4, 2')
+        self.assertEqual(-128, gvur.dx, "Unexpected sector dx")
+        self.assertEqual(80, gvur.dy, "Unexpected sector dy")
+
+        for i in range(1, 33):
+            with self.subTest(msg='Checking column ' + str(i)):
+                spinpos = str(i).rjust(2, '0') + '01'
+                gvurpos = str(i).rjust(2, '0') + '40'
+
+                star1 = Star.parse_line_into_star(
+                    spinpos + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    spin, 'fixed', 'fixed')
+                self.assertEqual(i, star1.col)
+                self.assertEqual(1, star1.row)
+
+                star2 = Star.parse_line_into_star(
+                    gvurpos + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    gvur, 'fixed', 'fixed')
+                self.assertEqual(i, star2.col)
+                self.assertEqual(40, star2.row)
+
+                # Stars are immediately rimward/coreward of each other, so should have same q co-ord
+                self.assertEqual(star1.q, star2.q, "q co-ords should match")
+
+                self.assertEqual(1, star1.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 between ' + str(star1) + ' and ' + str(star2))
+                self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
+
+    def test_trans_sector_border_distances_core_to_massilia(self):
+        core = Sector(' Core', ' 0, 0')
+        self.assertEqual(0, core.dx, "Unexpected sector dx")
+        self.assertEqual(0, core.dy, "Unexpected sector dy")
+        mass = Sector(' Massilia', ' 0, -1')
+        self.assertEqual(0, mass.dx, "Unexpected sector dx")
+        self.assertEqual(-40, mass.dy, "Unexpected sector dy")
+
+        for i in range(1, 33):
+            with self.subTest(msg='Checking column ' + str(i)):
+                masspos = str(i).rjust(2, '0') + '01'
+                corepos = str(i).rjust(2, '0') + '40'
+
+                star1 = Star.parse_line_into_star(
+                    masspos + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    mass, 'fixed', 'fixed')
+                self.assertEqual(i, star1.col)
+                self.assertEqual(1, star1.row)
+
+                star2 = Star.parse_line_into_star(
+                    corepos + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    core, 'fixed', 'fixed')
+                self.assertEqual(i, star2.col)
+                self.assertEqual(40, star2.row)
+
+                self.assertEqual(1, star1.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 ' + str(star1) + ' and ' + str(star2))
+                self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
+
+    def test_trans_sector_border_distances_massilia_to_diaspora(self):
+        mass = Sector(' Massilia', ' 0, -1')
+        self.assertEqual(0, mass.dx, "Unexpected sector dx")
+        self.assertEqual(-40, mass.dy, "Unexpected sector dy")
+        dias = Sector(' Diaspora', ' 0, -2')
+        self.assertEqual(0, dias.dx, "Unexpected sector dx")
+        self.assertEqual(-80, dias.dy, "Unexpected sector dy")
+
+        for i in range(1, 33):
+            with self.subTest(msg='Checking column ' + str(i)):
+                diaspos = str(i).rjust(2, '0') + '01'
+                masspos = str(i).rjust(2, '0') + '40'
+
+                star1 = Star.parse_line_into_star(
+                    diaspos + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    dias, 'fixed', 'fixed')
+                self.assertEqual(i, star1.col)
+                self.assertEqual(1, star1.row)
+
+                star2 = Star.parse_line_into_star(
+                    masspos + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    mass, 'fixed', 'fixed')
+                self.assertEqual(i, star2.col)
+                self.assertEqual(40, star2.row)
+
+                self.assertEqual(1, star1.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 ' + str(star1) + ' and ' + str(star2))
+                self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
+
+    def test_trans_sector_border_distances_core_to_dagudashaag(self):
+        core = Sector(' Core', ' 0, 0')
+        self.assertEqual(0, core.dx, "Unexpected sector dx")
+        self.assertEqual(0, core.dy, "Unexpected sector dy")
+        dagu = Sector(' Dagudashaag', ' -1, 0')
+        self.assertEqual(-32, dagu.dx, "Unexpected sector dx")
+        self.assertEqual(0, dagu.dy, "Unexpected sector dy")
+
+        for i in range(1, 33):
+            with self.subTest(msg='Checking column ' + str(i)):
+                dagupos = '32' + str(i).rjust(2, '0')
+                corepos = '01' + str(i).rjust(2, '0')
+
+                star1 = Star.parse_line_into_star(
+                    dagupos + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    dagu, 'fixed', 'fixed')
+                self.assertEqual(32, star1.col)
+                self.assertEqual(i, star1.row)
+
+                star2 = Star.parse_line_into_star(
+                    corepos + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    core, 'fixed', 'fixed')
+                self.assertEqual(1, star2.col)
+                self.assertEqual(i, star2.row)
+
+                self.assertEqual(1, star1.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 ' + str(star1) + ' and ' + str(star2))
+                self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
 if __name__ == '__main__':
     unittest.main()
