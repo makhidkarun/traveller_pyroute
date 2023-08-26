@@ -410,8 +410,7 @@ class Galaxy(AreaItem):
         if routes == 'xroute':
             path = os.path.join(self.output_path, 'stations.txt')
             with codecs.open(path, "wb", 'utf-8') as f:
-                stars = self.star_mapping.values()
-                stars = [star for star in stars if star.tradeCount > 0]
+                stars = [star for star in self.star_mapping.values() if star.tradeCount > 0]
                 for star in stars:
                     f.write("{} - {}\n".format(star, star.tradeCount))
 
