@@ -421,6 +421,8 @@ class Star(object):
                 return dx + (dy // 2) if not diagnostic else (dx + (dy // 2), raw_dx, raw_dy, dx, dy)
             if (dy // 2) > dx and abs(raw_dy) == dy:
                 return dx + (dy // 2) if not diagnostic else (dx + (dy // 2), raw_dx, raw_dy, dx, dy)
+            if (dy // 2) > dx and abs(raw_dy) > dy:
+                return dx + ((dy + 1) // 2) if not diagnostic else (dx + ((dy + 1) // 2), raw_dx, raw_dy, dx, dy)
             if dy > dx and not (dy // 2) > dx:
                 return dx + (dy // 2) if not diagnostic else (dx + (dy // 2), raw_dx, raw_dy, dx, dy)
             # if we haven't found a definitive category yet, drop through to the remaining segment
