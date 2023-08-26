@@ -125,12 +125,11 @@ class CommCalculation(RouteCalculation):
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
         landmarks = self.get_landmarks(index=True)
-        stars = list(self.galaxy.star_mapping.values())
-        stars.sort(key=lambda item: item.wtn, reverse=True)
-        stars[0].is_landmark = True
+        source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
+        source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, self.galaxy.stars, 0.2, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathTree(source.index, self.galaxy.stars, 0.2, sources=landmarks)
 
         self.logger.info('sorting routes...')
         routes = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
