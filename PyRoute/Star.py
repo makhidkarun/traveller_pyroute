@@ -374,8 +374,10 @@ class Star(object):
 
     @staticmethod
     def axial_distance(Hex1, Hex2):
-        return (abs(Hex1[0] - Hex2[0]) + abs(Hex1[1] - Hex2[1])
-                + abs(Hex1[0] + Hex1[1] - Hex2[0] - Hex2[1])) // 2
+        dq = Hex1[0] - Hex2[0]
+        dr = Hex1[1] - Hex2[1]
+        delta = Hex1[0] - Hex2[0] + Hex1[1] - Hex2[1]
+        return (abs(dq) + abs(dr) + abs(delta)) // 2
 
     def distance(self, star):
         hex1 = (self.q, self.r)
