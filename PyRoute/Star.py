@@ -342,7 +342,8 @@ class Star(object):
     def set_location(self, dx, dy):
         # convert odd-q offset to cube
         q = int(self.position[0:2]) + dx - 1
-        r = int(self.position[2:4]) + dy - 1
+        raw_r_offset = 41 - int(self.position[2:4])
+        r = raw_r_offset + dy - 1
 
         # Halving q, rounding down _towards negative infinity_ to the nearest integer - ie, floor(q / 2)
         q_offset = (q - (q & 1)) // 2
@@ -357,7 +358,7 @@ class Star(object):
 
         # store within-sector column and row co-ords
         self.col = q - dx + 1
-        self.row = r - dy + 1
+        self.row = 41 - (r - dy + 1)
 
     def hex_distance(self, star):
         return Star._heuristic_core(self.x - star.x, self.y - star.y, self.z - star.z)
