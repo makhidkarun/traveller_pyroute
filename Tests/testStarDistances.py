@@ -80,10 +80,17 @@ class testStarDistances(unittest.TestCase):
                     newpos + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
                     sector, 'fixed', 'fixed')
 
-                fwd_distance = star1.distance(star2)
-                self.assertEqual(expected_straight_distance, fwd_distance, "Unexpected forward distance between " + starthex + " and " + newpos)
-                rev_distance = star2.distance(star1)
-                self.assertEqual(expected_straight_distance, rev_distance, "Unexpected reverse distance between " + starthex + " and " + newpos)
+                fwd_distance, raw_dx, raw_dy, dx, dy = star1.distance(star2, diagnostic=True)
+                gubbins = "\nRaw dx: " + str(raw_dx) + ", raw dy: " + str(raw_dy) + ", dx: " + str(dx) + ", dy: " + str(
+                    dy)
+                self.assertEqual(expected_straight_distance, fwd_distance, "Unexpected forward distance between " + starthex + " and " + newpos + gubbins)
+                rev_distance, raw_dx, raw_dy, dx, dy = star2.distance(star1, diagnostic=True)
+                gubbins = "\nRaw dx: " + str(raw_dx) + ", raw dy: " + str(raw_dy) + ", dx: " + str(dx) + ", dy: " + str(
+                    dy)
+                self.assertEqual(expected_straight_distance, rev_distance, "Unexpected reverse distance between " + starthex + " and " + newpos + gubbins)
+                hexdist = star1.hex_distance(star2)
+                msg = "Straight distance " + str(fwd_distance) + " not equal to hex distance " + str(hexdist)
+                self.assertEqual(hexdist, fwd_distance, msg + gubbins)
 
     def test_intersector_straight_distance(self):
         sector_dict = dict()
