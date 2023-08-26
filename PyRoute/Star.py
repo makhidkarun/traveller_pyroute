@@ -410,6 +410,9 @@ class Star(object):
         # 10 o'clock-4 o'clock line
         if dx * 2 == dy:
             return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
+        # 10 o'clock-4 o'clock shadow line
+        if raw_dx * 2 + raw_dy == 0:
+            return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
         # 8 o'clock-2 o'clock line
         if 0 == raw_dy:
             return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
