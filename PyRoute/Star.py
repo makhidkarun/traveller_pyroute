@@ -377,68 +377,10 @@ class Star(object):
                 + abs(Hex1[0] + Hex1[1] - Hex2[0] - Hex2[1])) // 2
 
     def distance(self, star, diagnostic=False):
-        # If star.x and self.x are both even or both odd (implying dx must be even), they have no net effect on dy's value
-        # If both even, y1 and y2 each get 1 added, which drops out in subtraction
-        # If both odd, y1 and y2 each get nothing added.
-        y1 = self.y * 2
-        y2 = star.y * 2
-        dx = abs(star.x - self.x)
-        raw_dy = y2 - y1
-        raw_dx = star.x - self.x
+        hex1 = (self.q, self.r)
+        hex2 = (star.q, star.r)
 
-        # Only look at the following if dx is odd, implying exactly one of self.x and star.x is even
-        # If star.x is even and self.x is odd, raw value of dy is += 1 (y2 gets increased, y1 stays same)
-        # If self.x is even and star.x is odd, raw value of dy is -= 1 (y1 gets increased, y2 stays same)
-        if dx % 2:
-            # If self.x is even, bump y1 up by 1
-            if not self.x % 2:
-                y1 += 1
-            # If self.x is odd, then star.x _MUST_ be even, bump y2 up by 1
-            else:
-                y2 += 1
-
-        # The hexagons we're using have 3 axes of symmetry
-        # - The 12 o'clock-6 o'clock line
-        # - The 10 o'clock-4 o'clock line
-        # - The 8 o'clock-2'o'clock line
-        # Let's tackle those special cases _first_, to try to simplify the residual cases
-        dy = abs(y2 - y1)
-
-        # 12 o'clock-6 o'clock line
-        if 0 == dx:
-            return dy//2 if not diagnostic else (dy//2, raw_dx, raw_dy, dx, dy)
-        # 10 o'clock-4 o'clock line
-        if dx * 2 == dy:
-            return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
-        # 10 o'clock-4 o'clock shadow line
-        if raw_dx * 2 + raw_dy == 0:
-            return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
-        # 8 o'clock-2 o'clock line
-        if 0 == raw_dy:
-            return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
-
-        # connecting segment is between 12 o'clock and 2 o'clock exclusive,
-        # xor between 6 o'clock and 8 o'clock exclusive
-        if (0 < raw_dx) == (0 < raw_dy):
-            if (dx // 2) > dy:
-                return dx + (dy // 2) if not diagnostic else (dx + (dy // 2), raw_dx, raw_dy, dx, dy)
-            if (dy // 2) > dx and abs(raw_dy) == dy:
-                return dx + (dy // 2) if not diagnostic else (dx + (dy // 2), raw_dx, raw_dy, dx, dy)
-            if (dy // 2) > dx and abs(raw_dy) > dy:
-                return dx + ((dy + 1) // 2) if not diagnostic else (dx + ((dy + 1) // 2), raw_dx, raw_dy, dx, dy)
-            if dy > dx and not (dy // 2) > dx:
-                return dx + (dy // 2) if not diagnostic else (dx + (dy // 2), raw_dx, raw_dy, dx, dy)
-            # if we haven't found a definitive category yet, drop through to the remaining segment
-            pass
-        # connecting segment is in the bowtie
-        # between 8 o'clock and 10 o'clock exclusive, xor between 2 o'clock and 4 o'clock exclusive
-        if dx > (dy // 2):
-            return dx if not diagnostic else (dx, raw_dx, raw_dy, dx, dy)
-        # by exhaustion, connecting segment is between 10 o'clock and 12 o'clock exclusive,
-        # xor 4 o'clock and 6 o'clock exclusive
-        if (dy // 2) > dx:
-            return ((dy + 1) // 2) if not diagnostic else (((dy + 1) // 2), raw_dx, raw_dy, dx, dy)
-        return dx + (dy // 2) if not diagnostic else (dx + (dy // 2), raw_dx, raw_dy, dx, dy)
+        return Star.axial_distance(hex1, hex2) if not diagnostic else (Star.axial_distance(hex1, hex2), 0, 0, 0, 0)
 
     def subsector(self):
         subsector = ["ABCD", "EFGH", "IJKL", "MNOP"]
