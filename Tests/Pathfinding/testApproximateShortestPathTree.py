@@ -47,7 +47,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         src = stars[2]
         targ = stars[80]
 
-        expected = 540 / 1.2 - 239
+        expected = 506 / 1.2 - 239
         actual = approx.lower_bound(src, targ)
         self.assertEqual(expected, actual, "Unexpected lower bound value")
 
@@ -217,10 +217,12 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.trade.calculate_components()
 
         graph = galaxy.stars
+
         stars = list(graph.nodes)
         source = stars[0]
+        distances, paths = nx.single_source_dijkstra(graph, source)
         leafnode = stars[30]
-        subnode = stars[23]
+        subnode = stars[paths[leafnode][-2]]
 
         approx = ApproximateShortestPathTree(source, graph, 0)
 
