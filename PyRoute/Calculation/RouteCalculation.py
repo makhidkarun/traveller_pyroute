@@ -185,13 +185,12 @@ class RouteCalculation(object):
         # landmark in that component.  If all the stars in a component are _already_ landmarks, return the previous
         # landmark choice.
         for component_id in self.components:
-            stars = self.galaxy.star_mapping.values()
-            stars = [item for item in stars if component_id == item.component]
-            stars.sort(key=lambda item: item.wtn, reverse=True)
-            stars[0].is_landmark = True
+            stars = [item for item in self.galaxy.star_mapping.values() if component_id == item.component]
+            source = max(stars, key=lambda item: item.wtn)
+            source.is_landmark = True
             if index:
-                result[component_id] = stars[0].index
+                result[component_id] = source.index
             else:
-                result[component_id] = stars[0]
+                result[component_id] = source
 
         return result
