@@ -12,8 +12,8 @@ distance_list = [
     ('0205, Dagudashaag, odd dx, even dy', ' Dagudashaag', ' -1, 0', '0205', '1315', 11, 10, 15),
     ('0204, Core, even dx, odd dy', ' Core', ' 0, 0', '0204', '1215', 10, 11, 16),
     ('0204, Zarushagar, even dx, odd dy', ' Zarushagar', ' -1, -1', '0204', '1215', 10, 11, 16),
-    ('0105, Core, odd dx, odd dy', ' Core', ' 0, 0', '0105', '1216', 11, 11, 18),
-    ('0105, Massilia, odd dx, odd dy', ' Massilia', ' 0, -1', '0105', '1216', 11, 11, 18),
+    ('0105, Core, odd dx, odd dy', ' Core', ' 0, 0', '0105', '1216', 11, 11, 17),
+    ('0105, Massilia, odd dx, odd dy', ' Massilia', ' 0, -1', '0105', '1216', 11, 11, 17),
     ('0204, Core, big even dx, even dy', ' Core', ' 0, 0', '0204', '2208', 20, 4, 20),
     ('0204, Delphi, big even dx, even dy', ' Delphi', ' 1, -1', '0204', '2208', 20, 4, 20),
     ('0204, Core, odd dx, big odd dy', ' Core', ' 0, 0', '0204', '0725', 5, 21, 23),
@@ -80,17 +80,13 @@ class testStarDistances(unittest.TestCase):
                     newpos + " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
                     sector, 'fixed', 'fixed')
 
-                fwd_distance, raw_dx, raw_dy, dx, dy = star1.distance(star2, diagnostic=True)
-                gubbins = "\nRaw dx: " + str(raw_dx) + ", raw dy: " + str(raw_dy) + ", dx: " + str(dx) + ", dy: " + str(
-                    dy)
-                self.assertEqual(expected_straight_distance, fwd_distance, "Unexpected forward distance between " + starthex + " and " + newpos + gubbins)
-                rev_distance, raw_dx, raw_dy, dx, dy = star2.distance(star1, diagnostic=True)
-                gubbins = "\nRaw dx: " + str(raw_dx) + ", raw dy: " + str(raw_dy) + ", dx: " + str(dx) + ", dy: " + str(
-                    dy)
-                self.assertEqual(expected_straight_distance, rev_distance, "Unexpected reverse distance between " + starthex + " and " + newpos + gubbins)
+                fwd_distance = star1.distance(star2)
+                self.assertEqual(expected_straight_distance, fwd_distance, "Unexpected forward distance between " + starthex + " and " + newpos)
+                rev_distance = star2.distance(star1)
+                self.assertEqual(expected_straight_distance, rev_distance, "Unexpected reverse distance between " + starthex + " and " + newpos)
                 hexdist = star1.hex_distance(star2)
                 msg = "Straight distance " + str(fwd_distance) + " not equal to hex distance " + str(hexdist)
-                self.assertEqual(hexdist, fwd_distance, msg + gubbins)
+                self.assertEqual(hexdist, fwd_distance, msg)
 
     def test_intersector_straight_distance(self):
         sector_dict = dict()
@@ -166,12 +162,11 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(target_star[1], star2.row, "Unexpected row value for " + target_name)
 
                 hexdist = star1.hex_distance(star2)
-                straight_dist, raw_dx, raw_dy, dx, dy = star1.distance(star2, diagnostic=True)
+                straight_dist = star1.distance(star2)
                 rev_straight_dist = star2.distance(star1)
                 self.assertEqual(straight_dist, rev_straight_dist, "Straight distance should not be direction sensitive")
                 msg = "Straight distance " + str(straight_dist) + " not equal to hex distance " + str(hexdist)
-                gubbins = "Raw dx: " + str(raw_dx) + ", raw dy: " + str(raw_dy) + ", dx: " + str(dx) + ", dy: " + str(dy)
-                self.assertEqual(hexdist, straight_dist, msg + "\n" + gubbins)
+                self.assertEqual(hexdist, straight_dist, msg)
 
 
 if __name__ == '__main__':

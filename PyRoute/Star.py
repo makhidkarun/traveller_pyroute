@@ -376,11 +376,11 @@ class Star(object):
         return (abs(Hex1[0] - Hex2[0]) + abs(Hex1[1] - Hex2[1])
                 + abs(Hex1[0] + Hex1[1] - Hex2[0] - Hex2[1])) // 2
 
-    def distance(self, star, diagnostic=False):
+    def distance(self, star):
         hex1 = (self.q, self.r)
         hex2 = (star.q, star.r)
 
-        return Star.axial_distance(hex1, hex2) if not diagnostic else (Star.axial_distance(hex1, hex2), 0, 0, 0, 0)
+        return Star.axial_distance(hex1, hex2)
 
     def subsector(self):
         subsector = ["ABCD", "EFGH", "IJKL", "MNOP"]
