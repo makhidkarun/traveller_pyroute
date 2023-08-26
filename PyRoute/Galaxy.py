@@ -302,10 +302,10 @@ class Galaxy(AreaItem):
                     continue
                 star = Star.parse_line_into_star(line, sec, pop_code, ru_calc)
                 if star:
+                    assert star not in sec.worlds, "Star " + str(star) + " duplicated in sector " + str(sec)
                     star.index = star_counter
                     star_counter += 1
-                    if star not in sec.worlds:
-                        self.star_mapping[star.index] = star
+                    self.star_mapping[star.index] = star
 
                     sec.worlds.append(star)
                     sec.subsectors[star.subsector()].worlds.append(star)

@@ -127,6 +127,8 @@ class testDeltaReduce(unittest.TestCase):
         sourcefile = 'DeltaFiles/Dagudashaag-spiked.sec'
 
         args = self._make_args()
+        args.interestingtype = 'AssertionError'
+        args.interestingline = 'duplicated'
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
