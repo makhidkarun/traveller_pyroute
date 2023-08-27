@@ -13,6 +13,7 @@ from PyRoute.AllyGen import AllyGen
 class DeltaGalaxy(Galaxy):
 
     def read_sectors(self, sectors, pop_code, ru_calc):
+        self._set_trade_object(self.route_reuse, self.trade_choice)
         star_counter = 0
         sector: SectorDictionary
 
