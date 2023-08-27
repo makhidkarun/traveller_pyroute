@@ -69,7 +69,8 @@ class RouteCalculation(object):
     def generate_base_routes(self):
         self.logger.info('generating jumps...')
         self.galaxy.is_well_formed()
-        for star, neighbor in itertools.combinations(self.galaxy.ranges, 2):
+        raw_ranges = self._raw_ranges()
+        for star, neighbor in raw_ranges:
             if self.base_route_filter(star, neighbor):
                 continue
 
@@ -87,6 +88,11 @@ class RouteCalculation(object):
         self.logger.info("base routes: %s  -  ranges: %s" %
                          (self.galaxy.stars.number_of_edges(),
                           self.galaxy.ranges.number_of_edges()))
+
+    def _raw_ranges(self):
+        raw_ranges = ((star, neighbour) for (star, neighbour) in itertools.combinations(self.galaxy.ranges, 2) if
+                      not star.is_redzone and not neighbour.is_redzone)
+        return raw_ranges
 
     def check_existing_routes(self, star, neighbor):
         for route in star.routes:
