@@ -76,21 +76,6 @@ class TradeCalculation(RouteCalculation):
         # if both stars have been previously checked as good route endpoints, bail out now
         if star_dex in self.greenzone and neigh_dex in self.greenzone:
             return False
-        # if either star has been previously checked as a bad route endpoint, bail out now
-        if star_dex in self.redzone or neigh_dex in self.redzone:
-            return True
-        if star.zone in ['R', 'F']:
-            self.redzone.add(star_dex)
-            return True
-        if neighbor.zone in ['R', 'F']:
-            self.redzone.add(neigh_dex)
-            return True
-        if star.tradeCode.barren:
-            self.redzone.add(star_dex)
-            return True
-        if neighbor.tradeCode.barren:
-            self.redzone.add(neigh_dex)
-            return True
         # if we've gotten this far, neither star nor neighbour is already in redzone set, has a Red/Forbidden travel
         # code, or is barren, thus is an allowed route endpoint
         if star_dex not in self.greenzone:
@@ -435,3 +420,10 @@ class TradeCalculation(RouteCalculation):
         assert 0 < weight, "Weight of edge between " + str(star) + " and " + str(
             target) + " must be positive"
         return weight
+
+    def unilateral_filter(self, star):
+        if star.zone in ['R', 'F']:
+            return True
+        if star.tradeCode.barren:
+            return True
+        return False
