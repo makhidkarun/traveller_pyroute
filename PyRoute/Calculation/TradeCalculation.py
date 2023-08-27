@@ -71,17 +71,9 @@ class TradeCalculation(RouteCalculation):
         self.debug_flag = debug_flag
 
     def base_route_filter(self, star, neighbor):
-        star_dex = star.index
-        neigh_dex = neighbor.index
-        # if both stars have been previously checked as good route endpoints, bail out now
-        if star_dex in self.greenzone and neigh_dex in self.greenzone:
-            return False
-        # if we've gotten this far, neither star nor neighbour is already in redzone set, has a Red/Forbidden travel
-        # code, or is barren, thus is an allowed route endpoint
-        if star_dex not in self.greenzone:
-            self.greenzone.add(star_dex)
-        if neigh_dex not in self.greenzone:
-            self.greenzone.add(neigh_dex)
+        # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
+        # - in this case, red/forbidden zones and barren systems - so only bilateral filtering remains.
+        # TODO: Bilateral filtering
         return False
 
     def base_range_routes(self, star, neighbor):
