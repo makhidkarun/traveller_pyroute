@@ -27,10 +27,6 @@ class XRouteCalculation(RouteCalculation):
     def base_route_filter(self, star, neighbor):
         if not AllyGen.are_allies(star.alg_code, neighbor.alg_code):
             return True
-        if not AllyGen.imperial_align(star.alg_code):
-            return True
-        if star.zone in ['R', 'F'] or neighbor.zone in ['R', 'F']:
-            return True
 
         return False
 
@@ -260,3 +256,10 @@ class XRouteCalculation(RouteCalculation):
             target) + " must be positive"
 
         return weight
+
+    def unilateral_filter(self, star):
+        if star.zone in ['R', 'F']:
+            return True
+        if not AllyGen.imperial_align(star.alg_code):
+            return True
+        return False
