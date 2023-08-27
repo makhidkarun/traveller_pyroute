@@ -48,10 +48,6 @@ class TradeCalculation(RouteCalculation):
     # Maximum WTN to process routes for
     max_wtn = 15
 
-    # Stars that have been excluded, for whatever reason, from route generation
-    redzone = set()
-    greenzone = set()
-
     def __init__(self, galaxy, min_btn=13, route_btn=8, route_reuse=10, debug_flag=False):
         super(TradeCalculation, self).__init__(galaxy)
 
