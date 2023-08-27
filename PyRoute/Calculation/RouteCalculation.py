@@ -194,3 +194,15 @@ class RouteCalculation(object):
                 result[component_id] = source
 
         return result
+
+    def unilateral_filter(self, star):
+        """
+        Routes can be filtered either bilaterally (some combination of the endpoints means the route needs filtering)
+        or unilaterally, where at least one of the endpoints requires the route to be filtered (eg red trade zone in
+        TradeCalculation).
+
+        @type star: Star
+        @param star: The star object to check
+        @return: Whether the star can be unilaterally filtered
+        """
+        return False
