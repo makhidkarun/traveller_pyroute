@@ -232,7 +232,7 @@ class Galaxy(AreaItem):
     classdocs
     """
  
-    def __init__(self, min_btn, max_jump=4, route_btn=8, debug_flag=False):
+    def __init__(self, min_btn, max_jump=4, route_btn=8, debug_flag=False, trade_choice='trade', reuse=10):
         """
        Constructor
         """
@@ -251,6 +251,8 @@ class Galaxy(AreaItem):
         self.big_component = None
         self.star_mapping = dict()
         self.trade = None
+        self.trade_choice = trade_choice
+        self.route_reuse = reuse
 
     # For the JSONPickel work
     def __getstate__(self):
