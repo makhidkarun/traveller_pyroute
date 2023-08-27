@@ -327,7 +327,7 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
 
         if 0 == node_counter % 49 and 0 < len(queue):
             # Trim queue items that can not result in a shorter path
-            queue = [item for item in queue if not (item[2] in enqueued and item[3] > enqueued[item[2]][0])]
+            queue = [item for item in queue if not (item[1] in enqueued and item[2] > enqueued[item[1]][0])]
             heapify(queue)
 
         if curnode == target:
@@ -348,6 +348,8 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
             # Skip bad paths that were enqueued before finding a better one
             qcost, h = enqueued[curnode]
             if qcost < dist:
+                queue = [item for item in queue if not (item[1] in enqueued and item[2] > enqueued[item[1]][0])]
+                heapify(queue)
                 continue
             # If we've found a better path, update
             enqueued[curnode] = dist, h
@@ -408,7 +410,7 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
                 if 0 < len(queue):
                     queue = [item for item in queue if item[0] <= upbound]
                     # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
-                    queue = [item for item in queue if not (item[2] in enqueued and item[3] > enqueued[item[2]][0])]
+                    queue = [item for item in queue if not (item[1] in enqueued and item[2] > enqueued[item[1]][0])]
                     heapify(queue)
 
             diagnostics['nodes_queued'] += 1
