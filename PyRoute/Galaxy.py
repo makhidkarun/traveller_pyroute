@@ -250,6 +250,7 @@ class Galaxy(AreaItem):
         self.landmarks = dict()
         self.big_component = None
         self.star_mapping = dict()
+        self.trade = None
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -370,6 +371,14 @@ class Galaxy(AreaItem):
                 subsector.set_bounding_subsectors()
 
     def generate_routes(self, routes, reuse=10):
+        self._set_trade_object(reuse, routes)
+
+        self.trade.generate_routes()
+
+    def _set_trade_object(self, reuse, routes):
+        # if trade object already set, bail out
+        if self.trade is not None:
+            return
         self.is_well_formed()
         if routes == 'trade':
             self.trade = TradeCalculation(self, self.min_btn, self.route_btn, reuse, self.debug_flag)
@@ -381,8 +390,6 @@ class Galaxy(AreaItem):
             self.trade = OwnedWorldCalculation(self)
         elif routes == 'none':
             self.trade = NoneCalculation(self)
-
-        self.trade.generate_routes()
 
     def set_borders(self, border_gen, match):
         self.logger.info('setting borders...')
