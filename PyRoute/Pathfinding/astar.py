@@ -365,6 +365,8 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
         if upbound != float('inf') and 0 < len(neighbours):
             # Remove neighbour nodes who will bust the upper bound as it currently stands
             neighbours = [(k, v) for (k, v) in neighbours if v <= upbound]
+            # remove enqueued neighbour nodes whose cost plus stored heuristic value will bust upper bound
+            neighbours = [(k, v) for (k, v) in neighbours if not (k in enqueued and v + enqueued[k][1] > upbound)]
 
         # if neighbours list is empty, go around
         num_neighbours = len(neighbours)
@@ -378,6 +380,7 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
             if neighbours[0][0] == target:  # If first item is the target node, drop all neighbours with higher weights
                 targ_weight = neighbours[0][1]
                 neighbours = [(k, v) for (k, v) in neighbours if v <= targ_weight]
+                num_neighbours = len(neighbours)
 
         diagnostics['neighbours_checked'] += num_neighbours
         for neighbor, ncost in neighbours:
