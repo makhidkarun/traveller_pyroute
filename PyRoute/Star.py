@@ -345,8 +345,9 @@ class Star(object):
         raw_r_offset = 41 - int(self.position[2:4])
         r = raw_r_offset + dy - 1
 
-        # Halving q, rounding down _towards negative infinity_ to the nearest integer - ie, floor(q / 2)
-        q_offset = (q - (q & 1)) // 2
+        # Halving q, rounding up _towards negative infinity_ to the nearest integer - ie, ceil(q / 2).
+        # redblob's implementation uses floor(q/2), but they haven't inverted the r axis.
+        q_offset = (q + (q & 1)) // 2
         self.x = q
         self.z = r - q_offset
         # cubic co-ords must sum to zero

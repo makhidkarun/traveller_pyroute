@@ -52,18 +52,17 @@ class MyTestCase(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        self.assertEqual(7, len(galaxy.trade.components), "Unexpected number of components at J-1")
+        self.assertEqual(6, len(galaxy.trade.components), "Unexpected number of components at J-1")
 
         landmarks = galaxy.trade.get_landmarks()
         self.assertTrue(isinstance(landmarks, dict), 'Landmarks result should be a dict')
         self.assertEquals(len(galaxy.trade.components), len(landmarks), 'Should have one landmark per component')
-        self.assertEquals("Didraga (Zarushagar 0101)", str(landmarks[0]), "Unexpected landmark choice")
+        self.assertEquals("Strela (Zarushagar 0407)", str(landmarks[0]), "Unexpected landmark choice")
         self.assertEquals("Ymirial (Zarushagar 0106)", str(landmarks[1]), "Unexpected landmark choice")
         self.assertEquals("San Nuska Kilna (Zarushagar 0108)", str(landmarks[2]), "Unexpected landmark choice")
-        self.assertEquals("Strela (Zarushagar 0407)", str(landmarks[3]), "Unexpected landmark choice")
-        self.assertEquals("Toulon-Cadiz (Zarushagar 0510)", str(landmarks[4]), "Unexpected landmark choice")
-        self.assertEquals("Dorevann (Zarushagar 0708)", str(landmarks[5]), "Unexpected landmark choice")
-        self.assertEquals("New Orlando (Zarushagar 0710)", str(landmarks[6]), "Unexpected landmark choice")
+        self.assertEquals("Toulon-Cadiz (Zarushagar 0510)", str(landmarks[3]), "Unexpected landmark choice")
+        self.assertEquals("Gishin (Zarushagar 0804)", str(landmarks[4]), "Unexpected landmark choice")
+        self.assertEquals("New Orlando (Zarushagar 0710)", str(landmarks[5]), "Unexpected landmark choice")
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')

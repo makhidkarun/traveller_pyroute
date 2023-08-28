@@ -47,7 +47,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         src = stars[2]
         targ = stars[80]
 
-        expected = 506 / 1.2 - 239
+        expected = 540 / 1.2 - 239
         actual = approx.lower_bound(src, targ)
         self.assertEqual(expected, actual, "Unexpected lower bound value")
 
