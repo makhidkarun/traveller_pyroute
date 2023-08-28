@@ -362,5 +362,64 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(1, star1.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 ' + str(star1) + ' and ' + str(star2))
                 self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
+    def test_distance_from_core_0101(self):
+        core = Sector(' Core', ' 0, 0')
+        dagu = Sector(' Dagudashaag', ' -1, 0')
+        vland = Sector(' Vland', ' -1, 1')
+        lishun = Sector(' Lishun', ' 0, 1')
+
+        starline = '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V'
+
+        base = Star.parse_line_into_star(starline, core, 'fixed', 'fixed')
+        stub = " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     "
+
+        systems = [
+            ('Lishun 0140 - 1pc', lishun, '0140', 1),
+            ('Lishun 0240 - 1pc', lishun, '0240', 1),
+            ('Core 0201 - 1pc', core, '0201', 1),
+            ('Core 0102 - 1pc', core, '0102', 1),
+            ('Dagudashaag 3201 - 1pc', dagu, '3201', 1),
+            ('Vland 3240 - 1pc', vland, '3240', 1),
+            ('Lishun 0139 - 2pc', lishun, '0139', 2),
+            ('Lishun 0239 - 2pc', lishun, '0239', 2),
+            ('Lishun 0340 - 2pc', lishun, '0340', 2),
+            ('Core 0301 - 2pc', core, '0301', 2),
+            ('Core 0302 - 2pc', core, '0302', 2),
+            ('Core 0202 - 2pc', core, '0202', 2),
+            ('Core 0103 - 2pc', core, '0103', 2),
+            ('Dagudashaag 3202 - 2pc', dagu, '3202', 2),
+            ('Dagudashaag 3102 - 2pc', dagu, '3102', 2),
+            ('Dagudashaag 3101 - 2pc', dagu, '3101', 2),
+            ('Vland 3140 - 2pc', vland, '3140', 2),
+            ('Vland 3239 - 2pc', vland, '3239', 2),
+            ('Lishun 0138 - 3pc', lishun, '0138', 3),
+            ('Lishun 0238 - 3pc', lishun, '0238', 3),
+            ('Lishun 0339 - 3pc', lishun, '0339', 3),
+            ('Lishun 0439 - 3pc', lishun, '0439', 3),
+            ('Lishun 0440 - 3pc', lishun, '0440', 3),
+            ('Core 0401 - 3pc', core, '0401', 3),
+            ('Core 0402 - 3pc', core, '0402', 3),
+            ('Core 0303 - 3pc', core, '0303', 3),
+            ('Core 0203 - 3pc', core, '0203', 3),
+            ('Core 0104 - 3pc', core, '0104', 3),
+            ('Dagudashaag 3203 - 3pc', dagu, '3203', 3),
+            ('Dagudashaag 3103 - 3pc', dagu, '3103', 3),
+            ('Dagudashaag 3002 - 3pc', dagu, '3002', 3),
+            ('Dagudashaag 3001 - 3pc', dagu, '3001', 3),
+            ('Vland 3040 - 3pc', vland, '3040', 3),
+            ('Vland 3039 - 3pc', vland, '3039', 3),
+            ('Vland 3139 - 3pc', vland, '3139', 3),
+            ('Vland 3238 - 3pc', vland, '3238', 3),
+        ]
+
+        for blurb, sector, position, distance in systems:
+            with self.subTest(msg=blurb):
+                targstar = Star.parse_line_into_star(position + stub, sector, 'fixed', 'fixed')
+                self.assertEqual(distance, base.hex_distance(targstar), "Forward hex distance unexpected")
+                self.assertEqual(distance, targstar.hex_distance(base), "Reverse hex distance unexpected")
+                self.assertEqual(distance, base.distance(targstar), "Forward straight distance unexpected")
+                self.assertEqual(distance, targstar.distance(base), "Reverse straight distance unexpected")
+
+
 if __name__ == '__main__':
     unittest.main()
