@@ -146,7 +146,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         # auxiliary network dijkstra calculation to dish out parent nodes
         paths = nx.single_source_dijkstra_path(graph, source)
 
-        leaf = [item for item in stars if -1 != str(item).find('Dorsiki')][0]
+        leaf = [item for item in stars if -1 != graph.nodes[item]['star'].name.find('Dorsiki')][0]
         leafpath = paths[leaf]
         inter = leafpath[-2]
 
@@ -183,7 +183,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         # auxiliary network dijkstra calculation to dish out parent nodes
         paths = nx.single_source_dijkstra_path(graph, source)
 
-        leaf = [item for item in stars if -1 != str(item).find('Dorsiki')][0]
+        leaf = [item for item in stars if -1 != graph.nodes[item]['star'].name.find('Dorsiki')][0]
         leafpath = paths[leaf]
         mid = leafpath[-2]
         hi = leafpath[-3]
@@ -229,11 +229,12 @@ class testApproximateShortestPathTree(unittest.TestCase):
             expected_string = json.load(file)
 
         expected_distances = dict()
-        component = [item for item in stars if item.component == source.component]
+        component = [item for item in stars if graph.nodes[item]['star'].component == graph.nodes[source]['star'].component]
         for item in component:
             exp_dist = 0
-            if str(item) in expected_string:
-                exp_dist = expected_string[str(item)]
+            rawstar = graph.nodes[item]['star']
+            if str(rawstar) in expected_string:
+                exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
 
         self.assertEqual(expected_distances, approx._distances, "Unexpected distances after SPT creation")
@@ -286,11 +287,12 @@ class testApproximateShortestPathTree(unittest.TestCase):
             expected_string = json.load(file)
 
         expected_distances = dict()
-        component = [item for item in stars if item.component == source.component]
+        component = [item for item in stars if graph.nodes[item]['star'].component == graph.nodes[source]['star'].component]
         for item in component:
             exp_dist = 0
-            if str(item) in expected_string:
-                exp_dist = expected_string[str(item)]
+            rawstar = graph.nodes[item]['star']
+            if str(rawstar) in expected_string:
+                exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
 
         self.assertEqual(expected_distances, approx._distances, "Unexpected distances after SPT creation")
@@ -303,7 +305,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         dropnodes = [right]
 
         for item in expected_distances:
-            if expected_distances[item] > 0 and 'Selsinia (Zarushagar 0201)' != str(item):
+            if expected_distances[item] > 0 and 'Selsinia (Zarushagar 0201)' != str(graph.nodes[item]['star']):
                 expected_distances[item] -= 1
 
         approx.update_edges([edge])

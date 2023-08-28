@@ -31,11 +31,11 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmark - biggest WTN system in the biggest graph component
-        stars = [item for item in galaxy.stars]
+        stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0], galaxy.stars, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -62,11 +62,11 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmark - biggest WTN system in the biggest graph component
-        stars = [item for item in galaxy.stars]
+        stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0], galaxy.stars, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -93,13 +93,226 @@ class testApproximateShortestPathTreeRegressions(unittest.TestCase):
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmark - biggest WTN system in the biggest graph component
-        stars = [item for item in galaxy.stars]
+        stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0], galaxy.stars, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
+
+    def test_stars_node_types(self):
+        sourcefile = os.path.abspath('../DeltaFiles/stars_node_types/Antares.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/stars_node_types/Antares.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
+
+        btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
+        btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+
+        # Pick landmark - biggest WTN system in the biggest graph component
+        stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
+        stars.sort(key=lambda item: item.wtn, reverse=True)
+
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
+        for (star, neighbour, data) in btn:
+            galaxy.trade.get_trade_between(star, neighbour)
+
+        galaxy.process_owned_worlds()
+
+    def test_stars_node_types_comm(self):
+        sourcefile = os.path.abspath('../DeltaFiles/stars_node_types/Antares.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/stars_node_types/Antares.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+        args.routes = 'comm'
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.is_well_formed()
+        galaxy.trade.calculate_routes()
+
+        galaxy.process_owned_worlds()
+
+    def test_stars_comm_dont_change_iterator_in_flight(self):
+        sourcefile = os.path.abspath('../DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+        args.routes = 'comm'
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.is_well_formed()
+        galaxy.trade.calculate_routes()
+
+        galaxy.process_owned_worlds()
+
+    def test_stars_node_types_xroute(self):
+        sourcefile = os.path.abspath('../DeltaFiles/stars_node_types/Antares.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/stars_node_types/Antares.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+        args.routes = 'xroute'
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.is_well_formed()
+        galaxy.trade.calculate_routes()
+
+        galaxy.process_owned_worlds()
+
+    def test_stars_node_types_xroute_subsector(self):
+        sourcefile = os.path.abspath('../DeltaFiles/xroute_calculation_blowups/Antares-Urunishu.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/xroute_calculation_blowups/Antares-Urunishu.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+        args.routes = 'xroute'
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.is_well_formed()
+        galaxy.trade.calculate_routes()
+
+        galaxy.process_owned_worlds()
+
+    def test_stars_node_types_xroute_two_subsectors(self):
+        sourcefile = os.path.abspath('../DeltaFiles/xroute_calculation_blowups/Antares-Sakhag-Celebes.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/xroute_calculation_blowups/Antares-Sakhag-Celebes.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+        args.routes = 'xroute'
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.is_well_formed()
+        galaxy.trade.calculate_routes()
+
+        galaxy.process_owned_worlds()
+
+    def test_stars_node_types_owned(self):
+        sourcefile = os.path.abspath('../DeltaFiles/stars_node_types/Antares.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/stars_node_types/Antares.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+        args.routes = 'owned'
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
+
+        btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
+        btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+
+        # Pick landmark - biggest WTN system in the biggest graph component
+        stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
+        stars.sort(key=lambda item: item.wtn, reverse=True)
+
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
+        for (star, neighbour, data) in btn:
+            galaxy.trade.get_trade_between(star, neighbour)
+
+        galaxy.process_owned_worlds()
+
+    def test_stars_node_types_none(self):
+        sourcefile = os.path.abspath('../DeltaFiles/stars_node_types/Antares.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/stars_node_types/Antares.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+        args.routes = 'none'
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
+
+        btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
+        btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+
+        # Pick landmark - biggest WTN system in the biggest graph component
+        stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
+        stars.sort(key=lambda item: item.wtn, reverse=True)
+
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
+        for (star, neighbour, data) in btn:
+            galaxy.trade.get_trade_between(star, neighbour)
+
+        galaxy.process_owned_worlds()
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')

@@ -232,14 +232,14 @@ class Galaxy(AreaItem):
     classdocs
     """
  
-    def __init__(self, min_btn, max_jump=4, route_btn=8, debug_flag=False):
+    def __init__(self, min_btn, max_jump=4, route_btn=8, debug_flag=False, trade_choice='trade', reuse=10):
         """
        Constructor
         """
         super(Galaxy, self).__init__('Charted Space')
         self.logger = logging.getLogger('PyRoute.Galaxy')
-        self.stars = nx.Graph()
         self.ranges = nx.Graph()
+        self.stars = nx.Graph()
         self.sectors = {}
         self.borders = AllyGen(self)
         self.output_path = 'maps'
@@ -249,6 +249,10 @@ class Galaxy(AreaItem):
         self.debug_flag = debug_flag
         self.landmarks = dict()
         self.big_component = None
+        self.star_mapping = dict()
+        self.trade = None
+        self.trade_choice = trade_choice
+        self.route_reuse = reuse
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -263,6 +267,8 @@ class Galaxy(AreaItem):
         return state
 
     def read_sectors(self, sectors, pop_code, ru_calc):
+        self._set_trade_object(self.route_reuse, self.trade_choice)
+        star_counter = 0
         for sector in sectors:
             try:
                 lines = [line for line in codecs.open(sector, 'r', 'utf-8')]
@@ -300,6 +306,11 @@ class Galaxy(AreaItem):
                     continue
                 star = Star.parse_line_into_star(line, sec, pop_code, ru_calc)
                 if star:
+                    assert star not in sec.worlds, "Star " + str(star) + " duplicated in sector " + str(sec)
+                    star.index = star_counter
+                    star_counter += 1
+                    self.star_mapping[star.index] = star
+
                     sec.worlds.append(star)
                     sec.subsectors[star.subsector()].worlds.append(star)
                     star.alg_base_code = AllyGen.same_align(star.alg_code)
@@ -309,6 +320,7 @@ class Galaxy(AreaItem):
                     self.set_area_alg(star, sec.subsectors[star.subsector()], self.alg)
 
                     star.tradeCode.sophont_list.append("{}A".format(self.alg[star.alg_code].population))
+                    star.is_redzone = self.trade.unilateral_filter(star)
 
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds)))
@@ -327,11 +339,18 @@ class Galaxy(AreaItem):
             area.alg.setdefault(star.alg_code, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
 
     def set_positions(self):
+        shadow_len = self.stars.number_of_nodes()
         for sector in self.sectors.values():
             for star in sector.worlds:
-                self.stars.add_node(star)
+                if star not in self.ranges:
+                    self.stars.add_node(star.index, star=star)
                 self.ranges.add_node(star)
         self.logger.info("Total number of worlds: %s" % self.stars.number_of_nodes())
+        shadow_len = self.stars.number_of_nodes()
+        map_len = len(self.star_mapping)
+        assert map_len == shadow_len, "Mismatch between shadow stars and stars mapping, " + str(shadow_len) + " and " + str(map_len)
+        for item in self.stars.nodes:
+            assert 'star' in self.stars.nodes[item], "Star attribute not set for item " + str(item)
 
     def set_bounding_sectors(self):
         for sector, neighbor in itertools.combinations(self.sectors.values(), 2):
@@ -356,6 +375,15 @@ class Galaxy(AreaItem):
                 subsector.set_bounding_subsectors()
 
     def generate_routes(self, routes, reuse=10):
+        self._set_trade_object(reuse, routes)
+
+        self.trade.generate_routes()
+
+    def _set_trade_object(self, reuse, routes):
+        # if trade object already set, bail out
+        if self.trade is not None:
+            return
+        self.is_well_formed()
         if routes == 'trade':
             self.trade = TradeCalculation(self, self.min_btn, self.route_btn, reuse, self.debug_flag)
         elif routes == 'comm':
@@ -366,8 +394,6 @@ class Galaxy(AreaItem):
             self.trade = OwnedWorldCalculation(self)
         elif routes == 'none':
             self.trade = NoneCalculation(self)
-
-        self.trade.generate_routes()
 
     def set_borders(self, border_gen, match):
         self.logger.info('setting borders...')
@@ -395,31 +421,33 @@ class Galaxy(AreaItem):
         if routes == 'xroute':
             path = os.path.join(self.output_path, 'stations.txt')
             with codecs.open(path, "wb", 'utf-8') as f:
-                stars = [star for star in self.stars if star.tradeCount > 0]
+                stars = [star for star in self.star_mapping.values() if star.tradeCount > 0]
                 for star in stars:
                     f.write("{} - {}\n".format(star, star.tradeCount))
 
     def process_eti(self):
         self.logger.info("Processing ETI for worlds")
         for (world, neighbor) in self.stars.edges():
-            distance = world.hex_distance(neighbor)
+            worldstar = self.star_mapping[world]
+            neighborstar = self.star_mapping[neighbor]
+            distance = worldstar.hex_distance(neighborstar)
             distanceMod = int(distance / 2)
             CargoTradeIndex = int(round(math.sqrt(
-                max(world.eti_cargo - distanceMod, 0) *
-                max(neighbor.eti_cargo - distanceMod, 0))))
+                max(worldstar.eti_cargo - distanceMod, 0) *
+                max(neighborstar.eti_cargo - distanceMod, 0))))
             PassTradeIndex = int(round(math.sqrt(
-                max(world.eti_passenger - distanceMod, 0) *
-                max(neighbor.eti_passenger - distanceMod, 0))))
+                max(worldstar.eti_passenger - distanceMod, 0) *
+                max(neighborstar.eti_passenger - distanceMod, 0))))
             self.stars[world][neighbor]['CargoTradeIndex'] = CargoTradeIndex
             self.stars[world][neighbor]['PassTradeIndex'] = PassTradeIndex
             if CargoTradeIndex > 0:
-                world.eti_cargo_volume += math.pow(10, CargoTradeIndex) * 10
-                neighbor.eti_cargo_volume += math.pow(10, CargoTradeIndex) * 10
-                world.eti_worlds += 1
-                neighbor.eti_worlds += 1
+                worldstar.eti_cargo_volume += math.pow(10, CargoTradeIndex) * 10
+                neighborstar.eti_cargo_volume += math.pow(10, CargoTradeIndex) * 10
+                worldstar.eti_worlds += 1
+                neighborstar.eti_worlds += 1
             if PassTradeIndex > 0:
-                world.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
-                neighbor.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
+                worldstar.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
+                neighborstar.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
 
     def read_routes(self, routes=None):
         route_regex = "^({1,}) \(({3,}) (\d\d\d\d)\) ({1,}) \(({3,}) (\d\d\d\d)\) (\{.*\})"
@@ -445,75 +473,80 @@ class Galaxy(AreaItem):
         with codecs.open(ow_names, 'w+', 'utf-8') as f, codecs.open(ow_list, 'w+', 'utf-8') as g:
 
             for world in self.stars:
-                if world.ownedBy == world:
+                worldstar = self.star_mapping[world]
+                if worldstar.ownedBy == worldstar:
                     continue
-                ownedBy = [star for star in self.stars.neighbors(world) \
+                neighbours = [self.star_mapping[item] for item in self.stars.neighbors(world)]
+                ownedBy = [star for star in neighbours \
                            if star.tl >= 9 and star.popCode >= 6 and \
                            star.port in 'ABC' and star.ownedBy == star and \
-                           AllyGen.are_owned_allies(star.alg_code, world.alg_code)]
+                           AllyGen.are_owned_allies(star.alg_code, worldstar.alg_code)]
 
                 ownedBy.sort(reverse=True,
                              key=lambda star: star.popCode)
                 ownedBy.sort(reverse=True,
-                             key=lambda star: star.importance - (star.hex_distance(world) - 1))
+                             key=lambda star: star.importance - (star.hex_distance(worldstar) - 1))
 
                 owner = None
-                if world.ownedBy is None:
+                if worldstar.ownedBy is None:
                     owner = None
-                elif world.ownedBy == 'Mr':
+                elif worldstar.ownedBy == 'Mr':
                     owner = 'Mr'
-                elif world.ownedBy == 'Re':
+                elif worldstar.ownedBy == 'Re':
                     owner = 'Re'
-                elif world.ownedBy == 'Px':
+                elif worldstar.ownedBy == 'Px':
                     owner = 'Px'
-                elif len(world.ownedBy) > 4:
-                    ownedSec = world.ownedBy[0:4]
-                    ownedHex = world.ownedBy[5:]
+                elif len(worldstar.ownedBy) > 4:
+                    ownedSec = worldstar.ownedBy[0:4]
+                    ownedHex = worldstar.ownedBy[5:]
                     owner = None
                     self.logger.debug(
-                        "World {}@({},{}) owned by {} - {}".format(world, world.col, world.row, ownedSec, ownedHex))
-                    if world.col < 4 and world.sector.spinward:
-                        owner = world.sector.spinward.find_world_by_pos(ownedHex)
-                    elif world.col > 28 and world.sector.trailing:
-                        owner = world.sector.trailing.find_world_by_pos(ownedHex)
+                        "World {}@({},{}) owned by {} - {}".format(worldstar, worldstar.col, worldstar.row, ownedSec, ownedHex))
+                    if worldstar.col < 4 and worldstar.sector.spinward:
+                        owner = worldstar.sector.spinward.find_world_by_pos(ownedHex)
+                    elif worldstar.col > 28 and worldstar.sector.trailing:
+                        owner = worldstar.sector.trailing.find_world_by_pos(ownedHex)
 
-                    if world.row < 4 and owner is None and world.sector.coreward:
-                        owner = world.sector.coreward.find_world_by_pos(ownedHex)
-                    elif world.row > 36 and owner is None and world.sector.rimward:
-                        owner = world.sector.rimward.find_world_by_pos(ownedHex)
+                    if worldstar.row < 4 and owner is None and worldstar.sector.coreward:
+                        owner = worldstar.sector.coreward.find_world_by_pos(ownedHex)
+                    elif worldstar.row > 36 and owner is None and worldstar.sector.rimward:
+                        owner = worldstar.sector.rimward.find_world_by_pos(ownedHex)
 
                     # If we can't find world in the sector next door, try the this one
                     if owner is None:
-                        owner = world.sector.find_world_by_pos(ownedHex)
-                elif len(world.ownedBy) == 4:
-                    owner = world.sector.find_world_by_pos(world.ownedBy)
+                        owner = worldstar.sector.find_world_by_pos(ownedHex)
+                elif len(worldstar.ownedBy) == 4:
+                    owner = worldstar.sector.find_world_by_pos(worldstar.ownedBy)
 
-                self.logger.debug("Worlds {} is owned by {}".format(world, owner))
+                self.logger.debug("Worlds {} is owned by {}".format(worldstar, owner))
 
-                ow_path_items = ['"{}"'.format(world), '"{}"'.format(owner)]
+                ow_path_items = ['"{}"'.format(worldstar), '"{}"'.format(owner)]
                 ow_path_items.extend(['"{}"'.format(item) for item in ownedBy[0:4]])
                 ow_path_world = ', '.join(ow_path_items)
                 f.write(ow_path_world + '\n')
 
                 ow_list_items = [
-                    '"{}"'.format(world.sector.name[0:4]),
-                    '"{}"'.format(world.position),
+                    '"{}"'.format(worldstar.sector.name[0:4]),
+                    '"{}"'.format(worldstar.position),
                     '"{}"'.format(owner)
                 ]
-                ow_list_items.extend(['"O:{}"'.format(item.sec_pos(world.sector)) for item in ownedBy[0:4]])
+                ow_list_items.extend(['"O:{}"'.format(item.sec_pos(worldstar.sector)) for item in ownedBy[0:4]])
                 ow_list_world = ', '.join(ow_list_items)
                 g.write(ow_list_world + '\n')
 
-                world.ownedBy = (owner, ownedBy[0:4])
+                worldstar.ownedBy = (owner, ownedBy[0:4])
 
     def is_well_formed(self):
-        for star in self.stars:
+        for item in self.stars.nodes:
+            assert isinstance(item, int), "Star nodes must be integers"
+            assert 'star' in self.stars.nodes[item], "Star attribute not set for item " + str(item)
+            star = self.star_mapping[item]
             star.is_well_formed()
 
     def heuristic_distance(self, star, target):
         # The general approach used for the heuristic estimate between star and target is the maximum of whatever
         # choices are available.
-        item = (star, target)
+        item = (star.index, target.index)
         # Previous-route-distances are only stored if they exceed the straight-line bound
         if item in self.landmarks:
             base = self.landmarks[item]
@@ -521,7 +554,21 @@ class Galaxy(AreaItem):
             base = Star.heuristicDistance(star, target)
         # Now we've got the maximum of the fixed bounds, compare that maximum with the dynamic-between-runs
         # approximate-shortest-path bound.
-        sp_bound = self.trade.shortest_path_tree.lower_bound(star, target)
+        sp_bound = self.trade.shortest_path_tree.lower_bound(item[0], item[1])
+        return max(base, sp_bound)
+
+    def heuristic_distance_indexes(self, star, target):
+        # The general approach used for the heuristic estimate between star and target is the maximum of whatever
+        # choices are available.
+        item = (star, target)
+        # Previous-route-distances are only stored if they exceed the straight-line bound
+        if item in self.landmarks:
+            base = self.landmarks[item]
+        else:
+            base = Star.heuristicDistance(self.star_mapping[star], self.star_mapping[target])
+        # Now we've got the maximum of the fixed bounds, compare that maximum with the dynamic-between-runs
+        # approximate-shortest-path bound.
+        sp_bound = self.trade.shortest_path_tree.lower_bound(item[0], item[1])
         return max(base, sp_bound)
 
     def route_cost(self, route):

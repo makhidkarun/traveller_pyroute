@@ -13,6 +13,8 @@ from PyRoute.AllyGen import AllyGen
 class DeltaGalaxy(Galaxy):
 
     def read_sectors(self, sectors, pop_code, ru_calc):
+        self._set_trade_object(self.route_reuse, self.trade_choice)
+        star_counter = 0
         sector: SectorDictionary
 
         sectors.skip_void_subsectors_if_half()
@@ -40,6 +42,11 @@ class DeltaGalaxy(Galaxy):
                     continue
                 star = Star.parse_line_into_star(line, sec, pop_code, ru_calc)
                 if star:
+                    assert star not in sec.worlds, "Star " + str(star) + " duplicated in sector " + str(sec)
+                    star.index = star_counter
+                    star_counter += 1
+                    self.star_mapping[star.index] = star
+
                     sec.worlds.append(star)
                     sec.subsectors[star.subsector()].worlds.append(star)
                     star.alg_base_code = AllyGen.same_align(star.alg_code)
@@ -49,6 +56,8 @@ class DeltaGalaxy(Galaxy):
                     self.set_area_alg(star, sec.subsectors[star.subsector()], self.alg)
 
                     star.tradeCode.sophont_list.append("{}A".format(self.alg[star.alg_code].population))
+                    star.is_redzone = self.trade.unilateral_filter(star)
+
 
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds)))

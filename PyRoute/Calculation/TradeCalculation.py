@@ -3,11 +3,12 @@ Created on Mar 15, 2014
 
 @author: tjoneslo
 """
+
 import networkx as nx
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
-from PyRoute.Pathfinding.astar import astar_path
+from PyRoute.Pathfinding.astar import astar_path, astar_path_indexes
 from PyRoute.Star import Star
 
 
@@ -47,9 +48,6 @@ class TradeCalculation(RouteCalculation):
     # Maximum WTN to process routes for
     max_wtn = 15
 
-    # Stars that have been excluded, for whatever reason, from route generation
-    redzone = set()
-
     def __init__(self, galaxy, min_btn=13, route_btn=8, route_reuse=10, debug_flag=False):
         super(TradeCalculation, self).__init__(galaxy)
 
@@ -68,23 +66,10 @@ class TradeCalculation(RouteCalculation):
         # Are debugging gubbins turned on?
         self.debug_flag = debug_flag
 
-        self.shortest_path_tree = None
-
     def base_route_filter(self, star, neighbor):
-        if star in self.redzone or neighbor in self.redzone:
-            return True
-        if star.zone in ['R', 'F']:
-            self.redzone.add(star)
-            return True
-        if neighbor.zone in ['R', 'F']:
-            self.redzone.add(neighbor)
-            return True
-        if star.tradeCode.barren:
-            self.redzone.add(star)
-            return True
-        if neighbor.tradeCode.barren:
-            self.redzone.add(neighbor)
-            return True
+        # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
+        # - in this case, red/forbidden zones and barren systems - so only bilateral filtering remains.
+        # TODO: Bilateral filtering
         return False
 
     def base_range_routes(self, star, neighbor):
@@ -98,6 +83,7 @@ class TradeCalculation(RouteCalculation):
             self.galaxy.ranges.add_edge(star, neighbor, distance=dist,
                                         btn=btn,
                                         passenger_btn=passBTN)
+        return dist
 
     def generate_routes(self):
         """
@@ -109,6 +95,7 @@ class TradeCalculation(RouteCalculation):
         self.generate_base_routes()
 
         self.logger.info('calculating routes...')
+        self.galaxy.is_well_formed()
         for star in self.galaxy.stars:
             if len(self.galaxy.stars[star]) < 11:
                 continue
@@ -136,6 +123,7 @@ class TradeCalculation(RouteCalculation):
                     continue
                 self.galaxy.stars.remove_edge(s, n)
                 length -= 1
+
         self.logger.info('Final route count {}'.format(self.galaxy.stars.number_of_edges()))
 
     def calculate_routes(self):
@@ -154,14 +142,12 @@ class TradeCalculation(RouteCalculation):
 
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
-        landmarks = self.get_landmarks()
-        stars = [item for item in self.galaxy.stars]
-        num_stars = len(stars)
-        stars.sort(key=lambda item: item.wtn, reverse=True)
-        stars[0].is_landmark = True
+        landmarks = self.get_landmarks(index=True)
+        source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
+        source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathTree(stars[0], self.galaxy.stars, 0.2, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathTree(source.index, self.galaxy.stars, 0.2, sources=landmarks)
 
         base_btn = 0
         counter = 0
@@ -190,9 +176,11 @@ class TradeCalculation(RouteCalculation):
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
-            route, diag = astar_path(self.galaxy.stars, star, target, self.galaxy.heuristic_distance)
+            rawroute, diag = astar_path_indexes(self.galaxy.stars, star.index, target.index, self.galaxy.heuristic_distance_indexes)
         except nx.NetworkXNoPath:
             return
+
+        route = [self.galaxy.star_mapping[item] for item in rawroute]
 
         assert self.galaxy.route_no_revisit(route), "Route between " + str(star) + " and " + str(target) + " revisits at least one star"
 
@@ -253,8 +241,8 @@ class TradeCalculation(RouteCalculation):
         rangedata['actual distance'] = distance
         rangedata['jumps'] = len(route) - 1
 
-        self.galaxy.landmarks[(source, target)] = distance
-        self.galaxy.landmarks[(target, source)] = distance
+        self.galaxy.landmarks[(source.index, target.index)] = distance
+        self.galaxy.landmarks[(target.index, source.index)] = distance
 
         # Gather basic statistics.
         tradeBTN = self.get_btn(source, target, distance)
@@ -274,11 +262,11 @@ class TradeCalculation(RouteCalculation):
                 end.tradeOver += tradeCr
                 end.tradeCount += 1
                 end.passOver += tradePass
-            data = self.galaxy.stars[start][end]
+            data = self.galaxy.stars[start.index][end.index]
             data['trade'] += tradeCr
             data['count'] += 1
             data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
-            edges.append((start, end))
+            edges.append((start.index, end.index))
             start = end
 
         # Feed the list of touched edges into the approximate-shortest-path machinery, so it can update whatever
@@ -306,7 +294,7 @@ class TradeCalculation(RouteCalculation):
         c = 0
         start = route[0]
         for end in route[1:]:
-            y = float(self.galaxy.stars[start][end]['weight']) - c
+            y = float(self.galaxy.stars[start.index][end.index]['weight']) - c
             t = total_weight + y
             c = (t - total_weight) - y
 
@@ -421,18 +409,9 @@ class TradeCalculation(RouteCalculation):
             target) + " must be positive"
         return weight
 
-    def get_landmarks(self):
-        result = dict()
-
-        # Dig out landmarks for each connected component
-        # First landmark is the star with the biggest WTN in the component.
-        # Later landmark(s), if any, will probably be the star in the component furthest away from the closest existing
-        # landmark in that component.  If all the stars in a component are _already_ landmarks, return the previous
-        # landmark choice.
-        for component_id in self.components:
-            stars = [item for item in self.galaxy.stars if component_id == item.component]
-            stars.sort(key=lambda item: item.wtn, reverse=True)
-            stars[0].is_landmark = True
-            result[component_id] = stars[0]
-
-        return result
+    def unilateral_filter(self, star):
+        if star.zone in ['R', 'F']:
+            return True
+        if star.tradeCode.barren:
+            return True
+        return False

@@ -241,10 +241,15 @@ class StatCalculation(object):
 
             total_pct -= soph_pct
 
-        if total_pct < -5:
+        # We don't need to hear umpteen times that a given star has bad sophont percentages - just once will do
+        squish = star.suppress_soph_percent_warning is True
+
+        if total_pct < -5 and not squish:
             self.logger.warning("{} has sophont percent over 100%: {}".format(star, total_pct))
-        elif total_pct < 0:
+            star.suppress_soph_percent_warning = True
+        elif total_pct < 0 and not squish:
             self.logger.info("{} has a sophont percent just over 100%: {}".format(star, total_pct))
+            star.suppress_soph_percent_warning = True
         elif not star.tradeCode.barren:
             stats.populations[default_soph].add_population(int(star.population * (total_pct / 100.0)), None)
 

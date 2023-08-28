@@ -97,13 +97,14 @@ class Star(object):
 """
     starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
 
-    __slots__ = '__dict__', '_hash', '_key'
+    __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code', 'x', 'y', 'z'
 
     def __init__(self):
         self.logger = logging.getLogger('PyRoute.Star')
         self._hash = None
         self._key = None
         self.component = None
+        self.index = None
         self.x = None
         self.y = None
         self.z = None
@@ -152,6 +153,9 @@ class Star(object):
         self.is_target = False
         self.is_landmark = False
         self._pax_btn_mod = 0
+        self.suppress_soph_percent_warning = False
+        # Can this star be unilaterally excluded from routes?
+        self.is_redzone = False
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -169,6 +173,8 @@ class Star(object):
         for key in state:
             item = state[key]
             setattr(foo, key, item)
+        foo.index = self.index
+        foo.calc_hash()
 
         return foo
 
@@ -747,6 +753,7 @@ class Star(object):
     def is_well_formed(self):
         assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
+        assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
         return True
 
     @property

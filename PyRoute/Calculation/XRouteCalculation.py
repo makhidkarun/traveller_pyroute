@@ -7,6 +7,7 @@ import networkx as nx
 
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
+from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
 from PyRoute.Star import Star
 
 
@@ -21,14 +22,10 @@ class XRouteCalculation(RouteCalculation):
         self.route_reuse = 5
 
     def base_range_routes(self, star, neighbor):
-        pass
+        return star.hex_distance(neighbor)
 
     def base_route_filter(self, star, neighbor):
         if not AllyGen.are_allies(star.alg_code, neighbor.alg_code):
-            return True
-        if not AllyGen.imperial_align(star.alg_code):
-            return True
-        if star.zone in ['R', 'F'] or neighbor.zone in ['R', 'F']:
             return True
 
         return False
@@ -41,7 +38,7 @@ class XRouteCalculation(RouteCalculation):
         self.secCapitals = [star for star in self.galaxy.ranges if \
                             AllyGen.imperial_align(star.alg_code) and star.tradeCode.sector_capital]
         self.subCapitals = [star for star in self.galaxy.ranges if \
-                            AllyGen.imperial_align(star.alg_code) and star.tradeCode.subsector_captial]
+                            AllyGen.imperial_align(star.alg_code) and star.tradeCode.subsector_capital]
 
     def routes_pass_1(self):
         # Pass 1: Get routes at J6  Capital and sector capitals
@@ -106,18 +103,21 @@ class XRouteCalculation(RouteCalculation):
                     self.logger.info("{} has subsector capitals but no sector capital".format(sector.name))
                     for star in subCap:
                         capital = self.find_nearest_capital(star, secCapitals)
+                        # if we couldn't find a nearest sector capital, don't try finding a route to one
+                        if capital[0] is None:
+                            continue
                         self.get_route_between(capital[0], star, self.calc_trade(23), Star.heuristicDistance)
             else:
                 for star in subCap:
                     if self.galaxy.ranges.has_edge(secCap[0], star):
                         continue
-                    self.get_route_between(secCap[0], star, self.calc_trade(23), Star.heuristicDistance)
+                    self.get_route_between(secCap[0], star, self.calc_trade(23), self.galaxy.heuristic_distance_indexes)
 
         for star in self.subCapitals:
             routes = [neighbor for neighbor in self.subCapitals if \
                       neighbor != star and neighbor.hex_distance(star) <= 40]
             for neighbor in routes:
-                self.get_route_between(star, neighbor, self.calc_trade(23), Star.heuristicDistance)
+                self.get_route_between(star, neighbor, self.calc_trade(23), self.galaxy.heuristic_distance_indexes)
 
     def routes_pass_3(self):
         self.reweight_routes(self.impt_weight)
@@ -133,8 +133,9 @@ class XRouteCalculation(RouteCalculation):
         for star in important:
             if star in jumpStations:
                 continue
-            for neighbor in self.galaxy.stars.neighbors_iter(star):
-                if star.hex_distance(neighbor) > 4:
+            for neighbor in self.galaxy.stars.neighbors(star.index):
+                neighbour_world = self.galaxy.star_mapping[neighbor]
+                if star.hex_distance(neighbour_world) > 4:
                     continue
                 if neighbor in jumpStations:
                     self.get_route_between(star, neighbor, self.calc_trade(21), None)
@@ -144,7 +145,7 @@ class XRouteCalculation(RouteCalculation):
 
         important3 = []
         for star in important2:
-            for neighbor in self.galaxy.stars.neighbors_iter(star):
+            for neighbor in self.galaxy.stars.neighbors(star.index):
                 if neighbor in jumpStations:
                     self.get_route_between(star, neighbor, self.calc_trade(21), None)
                     jumpStations.append(star)
@@ -158,6 +159,16 @@ class XRouteCalculation(RouteCalculation):
             self.get_route_between(capital[0], star, self.calc_trade(21), None)
 
     def calculate_routes(self):
+        self.calculate_components()
+        # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
+        # components, even those with only one star.
+        landmarks = self.get_landmarks(index=True)
+        source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
+        source.is_landmark = True
+        # Feed the landmarks in as roots of their respective shortest-path trees.
+        # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
+        self.shortest_path_tree = ApproximateShortestPathTree(source.index, self.galaxy.stars, 0.2,
+                                                              sources=landmarks)
         self.logger.info('XRoute pass 1')
         self.routes_pass_1()
 
@@ -170,7 +181,9 @@ class XRouteCalculation(RouteCalculation):
     def reweight_routes(self, weightList):
         self.distance_weight = weightList
         for (star, neighbor, data) in self.galaxy.stars.edges(data=True):
-            data['weight'] = self.route_weight(star, neighbor)
+            star_world = self.galaxy.star_mapping[star]
+            neighbour_world = self.galaxy.star_mapping[neighbor]
+            data['weight'] = self.route_weight(star_world, neighbour_world)
             for _ in range(1, min(data['count'], 5)):
                 data['weight'] -= data['weight'] // self.route_reuse
 
@@ -190,25 +203,35 @@ class XRouteCalculation(RouteCalculation):
 
     def get_route_between(self, star, target, trade, heuristic):
         try:
-            route = nx.astar_path(self.galaxy.stars, star, target, heuristic)
+            route = nx.astar_path(self.galaxy.stars, star.index, target.index, heuristic)
         except nx.NetworkXNoPath:
             return
         self.galaxy.ranges.add_edge(star, target, distance=star.hex_distance(target))
 
         distance = 0
         start = route[0]
-        start.tradeCount += 1
+        startstar = self.galaxy.star_mapping[start]
+        startstar.tradeCount += 1
+        edges = []
+
         for end in route[1:]:
-            distance += start.hex_distance(end)
-            end.tradeCount += 1
+            endstar = self.galaxy.star_mapping[end]
+            distance += startstar.hex_distance(endstar)
+            endstar.tradeCount += 1
             data = self.galaxy.stars[start][end]
-            data['trade'] = max(trade, data[start][end]['trade'])
+            data['trade'] = max(trade, data['trade'])
             data['count'] += 1
             data['weight'] -= (data['weight'] - data['distance']) // self.route_reuse
+            edges.append((start, end))
             start = end
+            startstar = endstar
 
-        self.galaxy.ranges[route[0]][route[-1]]['actual distance'] = distance
-        self.galaxy.ranges[route[0]][route[-1]]['jumps'] = len(route) - 1
+        startstar = self.galaxy.star_mapping[route[0]]
+        endstar = self.galaxy.star_mapping[route[-1]]
+
+        self.shortest_path_tree.update_edges(edges)
+        self.galaxy.ranges[startstar][endstar]['actual distance'] = distance
+        self.galaxy.ranges[startstar][endstar]['jumps'] = len(route) - 1
 
     def route_weight(self, star, target):
         dist = star.hex_distance(target)
@@ -226,10 +249,17 @@ class XRouteCalculation(RouteCalculation):
         weight -= 6 if 'W' in star.baseCode or 'W' in target.baseCode else 0
         weight -= 3 if 'N' in star.baseCode or 'N' in target.baseCode else 0
         weight -= 3 if 'D' in star.baseCode or 'D' in target.baseCode else 0
-        weight -= 6 if star.tradeCode.subsecor_capital or target.tradeCode.subsector_capital else 0
+        weight -= 6 if star.tradeCode.subsector_capital or target.tradeCode.subsector_capital else 0
         weight -= 6 if star.tradeCode.other_capital or target.tradeCode.other_capital else 0
         weight -= 6 if star.tradeCode.sector_capital or target.tradeCode.sector_capital else 0
         assert 0 < weight, "Weight of edge between " + str(star) + " and " + str(
             target) + " must be positive"
 
         return weight
+
+    def unilateral_filter(self, star):
+        if star.zone in ['R', 'F']:
+            return True
+        if not AllyGen.imperial_align(star.alg_code):
+            return True
+        return False

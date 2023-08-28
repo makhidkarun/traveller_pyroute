@@ -67,19 +67,21 @@ class testTradeCalculation(unittest.TestCase):
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            B9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
             sector, 'fixed', 'fixed')
+        star1.index = 1
         star2 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
             Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+        star2.index = 2
 
         galaxy = Galaxy(min_btn=13)
         tradecalc = TradeCalculation(galaxy)
 
         route = [star1, star2]
-        galaxy.stars.add_node(star1)
-        galaxy.stars.add_node(star2)
+        galaxy.stars.add_node(star1.index, star=star1)
+        galaxy.stars.add_node(star2.index, star=star2)
         galaxy.ranges.add_node(star1)
         galaxy.ranges.add_node(star2)
-        galaxy.stars.add_edge(star1, star2, distance=1,
+        galaxy.stars.add_edge(star1.index, star2.index, distance=1,
                               weight=10, trade=0, btn=10, count=0)
 
         expected_weight = 10

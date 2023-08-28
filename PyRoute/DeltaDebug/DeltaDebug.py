@@ -112,7 +112,7 @@ def process():
     if not (args.two_min or args.run_sector or args.run_subsector or args.run_line):
         raise ValueError("Must select at least one reduction pass to run")
 
-    galaxy = Galaxy(args.btn, args.max_jump, args.route_btn, args.debug_flag)
+    galaxy = Galaxy(args.btn, args.max_jump, args.route_btn, args.debug_flag, trade_choice=args.routes, reuse=args.route_reuse)
     galaxy.output_path = args.output
 
     sectors_list = args.sector
@@ -137,14 +137,18 @@ def process():
     if args.run_sector:
         logger.error("Reducing by sector")
         reducer.reduce_sector_pass()
+        reducer.is_initial_state_interesting()
 
     if args.run_subsector:
         logger.error("Reducing by subsector")
         reducer.reduce_subsector_pass()
+        reducer.is_initial_state_interesting()
 
     if args.run_line:
+        reducer.is_initial_state_interesting()
         logger.error("Reducing by line")
         reducer.reduce_line_pass()
+        reducer.is_initial_state_interesting()
 
     # enforce 2-minimality
     if args.two_min:

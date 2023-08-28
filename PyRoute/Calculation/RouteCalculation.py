@@ -37,6 +37,8 @@ class RouteCalculation(object):
         # component level tracking
         self.components = dict()
 
+        self.shortest_path_tree = None
+
     def generate_routes(self):
         raise NotImplementedError("Base Class")
 
@@ -66,23 +68,31 @@ class RouteCalculation(object):
 
     def generate_base_routes(self):
         self.logger.info('generating jumps...')
-        for star, neighbor in itertools.combinations(self.galaxy.ranges, 2):
-            dist = star.hex_distance(neighbor)
+        self.galaxy.is_well_formed()
+        raw_ranges = self._raw_ranges()
+        for star, neighbor in raw_ranges:
             if self.base_route_filter(star, neighbor):
                 continue
 
-            self.base_range_routes(star, neighbor)
+            dist = self.base_range_routes(star, neighbor)
+            if dist is None:
+                continue
 
             if dist <= self.galaxy.max_jump_range:
                 weight = self.route_weight(star, neighbor)
                 btn = self.get_btn(star, neighbor)
-                self.galaxy.stars.add_edge(star, neighbor, distance=dist,
+                self.galaxy.stars.add_edge(star.index, neighbor.index, distance=dist,
                                            weight=weight, trade=0, btn=btn, count=0)
                 self.check_existing_routes(star, neighbor)
 
         self.logger.info("base routes: %s  -  ranges: %s" %
                          (self.galaxy.stars.number_of_edges(),
                           self.galaxy.ranges.number_of_edges()))
+
+    def _raw_ranges(self):
+        raw_ranges = ((star, neighbour) for (star, neighbour) in itertools.combinations(self.galaxy.ranges, 2) if
+                      not star.is_redzone and not neighbour.is_redzone)
+        return raw_ranges
 
     def check_existing_routes(self, star, neighbor):
         for route in star.routes:
@@ -92,9 +102,9 @@ class RouteCalculation(object):
                 route_des = route[8:]
             if neighbor.position == route_des:
                 if route.startswith('Xb'):
-                    self.galaxy.stars[star][neighbor]['xboat'] = True
+                    self.galaxy.stars[star.index][neighbor.index]['xboat'] = True
                 elif route.startswith('Tr'):
-                    self.galaxy.stars[star][neighbor]['comm'] = True
+                    self.galaxy.stars[star.index][neighbor.index]['comm'] = True
 
     @staticmethod
     def get_btn(star1, star2, distance=None):
@@ -103,12 +113,15 @@ class RouteCalculation(object):
         WTNs plus a modifier for types, minus a modifier for distance.
         """
         btn = star1.wtn + star2.wtn
-        if (star1.tradeCode.agricultural and (star2.tradeCode.nonagricultural or star2.tradeCode.extreme)) or \
-                ((star1.tradeCode.nonagricultural or star1.tradeCode.extreme) and star2.tradeCode.agricultural):
-            btn += 1
-        if (star1.tradeCode.nonindustrial and star2.tradeCode.industrial) or \
-                (star2.tradeCode.nonindustrial and star1.tradeCode.industrial):
-            btn += 1
+        code1 = star1.tradeCode
+        code2 = star2.tradeCode
+        if code1.agricultural or code2.agricultural:
+            if (code1.agricultural and (code2.nonagricultural or code2.extreme)) or \
+               ((code1.nonagricultural or code1.extreme) and code2.agricultural):
+                btn += 1
+        if code1.industrial or code2.industrial:
+            if (code1.nonindustrial and code2.industrial) or (code2.nonindustrial and code1.industrial):
+                btn += 1
 
         if not AllyGen.are_allies(star1.alg_code, star2.alg_code):
             btn -= 1
@@ -166,5 +179,36 @@ class RouteCalculation(object):
             counter += 1
             self.components[counter] = len(component)
             for star in component:
-                star.component = counter
+                self.galaxy.star_mapping[star].component = counter
         return
+
+    def get_landmarks(self, index=False):
+        result = dict()
+
+        # Dig out landmarks for each connected component
+        # First landmark is the star with the biggest WTN in the component.
+        # Later landmark(s), if any, will probably be the star in the component furthest away from the closest existing
+        # landmark in that component.  If all the stars in a component are _already_ landmarks, return the previous
+        # landmark choice.
+        for component_id in self.components:
+            stars = [item for item in self.galaxy.star_mapping.values() if component_id == item.component]
+            source = max(stars, key=lambda item: item.wtn)
+            source.is_landmark = True
+            if index:
+                result[component_id] = source.index
+            else:
+                result[component_id] = source
+
+        return result
+
+    def unilateral_filter(self, star):
+        """
+        Routes can be filtered either bilaterally (some combination of the endpoints means the route needs filtering)
+        or unilaterally, where at least one of the endpoints requires the route to be filtered (eg red trade zone in
+        TradeCalculation).
+
+        @type star: Star
+        @param star: The star object to check
+        @return: Whether the star can be unilaterally filtered
+        """
+        return False

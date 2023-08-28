@@ -246,3 +246,47 @@ def implicit_shortest_path_dijkstra(graph, source, distance_labels=None, seeds=N
             distance_labels[head] = dist_head
             heapq.heappush(heap, (dist_head, next(c), head))
     return distance_labels
+
+
+def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None, seeds=None):
+    if distance_labels is None:
+        # dig up nodes in same graph component as source - that's the ones we care about finding distance labels _for_
+        if seeds is None:
+            if isinstance(source, int):
+                sourcecomp = graph.nodes[source]['star'].component
+                distance_labels = {item: float('+inf') for item in graph if graph.nodes[item]['star'].component == sourcecomp}
+            else:
+                distance_labels = {item: float('+inf') for item in graph if source.component == item.component}
+            seeds = {source}
+        else:
+            components = set()
+            for source in seeds:
+                sourcecomp = graph.nodes[source]['star'].component
+                components.add(sourcecomp)
+            distance_labels = {item: float('+inf') for item in graph if graph.nodes[item]['star'].component in components}
+        for source in seeds:
+            distance_labels[source] = 0
+
+    heap = [(distance_labels[seed], seed) for seed in seeds]
+    heapq.heapify(heap)
+
+    while heap:
+        dist_tail, tail = heapq.heappop(heap)
+        if dist_tail > distance_labels[tail]:
+            # Since we've just dequeued a bad node, remove other bad nodes from the list to avoid tripping
+            # over them later
+            heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]
+            heapq.heapify(heap)
+            continue
+
+        # Link weights are strictly positive, thus lower bounded by zero. Thus, when the current dist_tail value exceeds
+        # the corresponding node's distance label at the other end of the candidate edge, trim that edge.  Such edges
+        # cannot _possibly_ result in smaller distance labels.  By a similar argument, filter the remaining edges
+        # when the sum of dist_tail and that edge's weight equals or exceeds the corresponding node's distance label.
+        neighbours = ((head, dist_tail + data['weight']) for (head, data) in graph[tail].items()
+                      if dist_tail <= distance_labels[head] and dist_tail + data['weight'] < distance_labels[head]
+                      )
+        for head, dist_head in neighbours:
+            distance_labels[head] = dist_head
+            heapq.heappush(heap, (dist_head, head))
+    return distance_labels

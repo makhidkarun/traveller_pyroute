@@ -7,6 +7,7 @@ import networkx as nx
 
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
+from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
 from PyRoute.Star import Star
 
 
@@ -22,8 +23,6 @@ class CommCalculation(RouteCalculation):
         self.min_importance = 4
 
     def base_route_filter(self, star, neighbor):
-        if star.zone in ['R', 'F'] or neighbor.zone in ['R', 'F']:
-            return True
         if not AllyGen.are_allies(star.alg_code, neighbor.alg_code):
             return True
         return False
@@ -44,6 +43,7 @@ class CommCalculation(RouteCalculation):
                          self.important(star, min_importance) or self.important(neighbor, min_importance),
                          self.is_rich(star) or self.is_rich(neighbor)]
                 self.galaxy.ranges.add_edge(star, neighbor, distance=dist, flags=flags)
+            return dist
 
     def capitals(self, star):
         # Capital of sector, subsector, or empire are in the list
@@ -99,6 +99,7 @@ class CommCalculation(RouteCalculation):
         self.logger.info("considering {} worlds for removal".format(len(routes)))
         removed = 0
         for route in routes:
+            d = route[2]
             imp = self.galaxy.alg[route[0].alg_base_code].min_importance
             if (len(self.galaxy.alg[route[0].alg_base_code].worlds) < 100 and d['distance'] > 1) or \
                     len(self.galaxy.alg[route[0].alg_base_code].worlds) < 25:
@@ -106,7 +107,7 @@ class CommCalculation(RouteCalculation):
             star = self.more_important(route[0], route[1], imp)
             if star is not None:
                 removed += 1
-                neighbors = self.galaxy.ranges.neighbors(star)
+                neighbors = list(self.galaxy.ranges.neighbors(star))
                 for neighbor in neighbors:
                     self.galaxy.ranges.remove_edge(star, neighbor)
             else:
@@ -118,6 +119,16 @@ class CommCalculation(RouteCalculation):
                           self.galaxy.ranges.number_of_edges()))
 
     def calculate_routes(self):
+        self.calculate_components()
+        # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
+        # components, even those with only one star.
+        landmarks = self.get_landmarks(index=True)
+        source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
+        source.is_landmark = True
+        # Feed the landmarks in as roots of their respective shortest-path trees.
+        # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
+        self.shortest_path_tree = ApproximateShortestPathTree(source.index, self.galaxy.stars, 0.2, sources=landmarks)
+
         self.logger.info('sorting routes...')
         routes = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
         routes.sort(key=lambda route: route[2]['distance'])
@@ -185,14 +196,16 @@ class CommCalculation(RouteCalculation):
 
     def get_route_between(self, star, target):
         try:
-            route = nx.astar_path(self.galaxy.stars, star, target, Star.heuristicDistance)
+            route = nx.astar_path(self.galaxy.stars, star.index, target.index, self.galaxy.heuristic_distance_indexes)
         except nx.NetworkXNoPath:
             return
 
         trade = self.calc_trade(19) if AllyGen.are_allies('As', star.alg_code) else self.calc_trade(23)
         start = route[0]
+        edges = []
         for end in route[1:]:
-            end.tradeCount += 1 if end != route[-1] else 0
+            end_star = self.galaxy.star_mapping[end]
+            end_star.tradeCount += 1 if end != route[-1] else 0
             data = self.galaxy.stars[start][end]
             data['trade'] = trade
             data['count'] += 1
@@ -202,4 +215,12 @@ class CommCalculation(RouteCalculation):
                         self.route_reuse)
             else:
                 data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
+            edges.append((start, end))
             start = end
+
+        self.shortest_path_tree.update_edges(edges)
+
+    def unilateral_filter(self, star):
+        if star.zone in ['R', 'F']:
+            return True
+        return False
