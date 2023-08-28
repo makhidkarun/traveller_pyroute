@@ -59,6 +59,85 @@ inter_distance_list = [
 ]
 
 class testStarDistances(unittest.TestCase):
+
+    def test_core_0101(self):
+        sector = Sector('Core', ' 0, 0')
+        starline = '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V'
+
+        star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        self.assertEqual(0, star.q, "Origin should have zero q value")
+        self.assertEqual(39, star.r, "Origin should have 39 r value")
+
+    def test_core_0140(self):
+        origin = Star.parse_line_into_star(
+            '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
+            Sector('Core', ' 0, 0'), 'fixed', 'fixed'
+        )
+
+        sector = Sector('Core', ' 0, 0')
+        starline = '0140 Reference            B100727-C Na Va Pi RsA Ab                      { 3 }  (B6D+3) [7A5C] BD    NS - 302 12 ImDc K0 V'
+
+        star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        self.assertEqual(39, abs(origin.r - star.r), "Unexpected r offset")
+        self.assertEqual(0, star.q, "Star should have zero q value")
+        self.assertEqual(0, star.r, "Star should have 0 r value")
+
+    def test_lishun_0101(self):
+        origin = Star.parse_line_into_star(
+            '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
+            Sector('Core', ' 0, 0'), 'fixed', 'fixed'
+        )
+
+        sector = Sector('Lishun', ' 0, 1')
+        starline = '0101 Ishimaga             A734433-9 Ni                       { 0 }  (933-3) [1426] B    -  - 603 10 ImDa K4 V M2 V'
+
+        star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        self.assertEqual(40, abs(origin.r - star.r), "Unexpected r offset")
+        self.assertEqual(0, star.q, "Star should have zero q value")
+        self.assertEqual(79, star.r, "Star should have 79 r value")
+
+    def test_lishun_0140(self):
+        origin = Star.parse_line_into_star(
+            '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
+            Sector('Core', ' 0, 0'), 'fixed', 'fixed'
+        )
+
+        sector = Sector('Lishun', ' 0, 1')
+        starline = '0140 Vodyr                B782999-A Hi Pr                    { 3 }  (G8D+4) [AC6B] BcE  -  - 414 12 ImDa G8 V'
+
+        star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        self.assertEqual(1, abs(origin.r - star.r), "Unexpected r offset")
+        self.assertEqual(0, star.q, "Star should have zero q value")
+        self.assertEqual(40, star.r, "Star should have 40 r value")
+
+    def test_massilia_0101(self):
+        origin = Star.parse_line_into_star(
+            '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
+            Sector('Core', ' 0, 0'), 'fixed', 'fixed'
+        )
+
+        sector = Sector('Massilia', ' 0, -1')
+        starline = '0101 Ishimaga             A734433-9 Ni                       { 0 }  (933-3) [1426] B    -  - 603 10 ImDa K4 V M2 V'
+
+        star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        self.assertEqual(40, abs(origin.r - star.r), "Unexpected r offset")
+        self.assertEqual(0, star.q, "Star should have zero q value")
+        self.assertEqual(-1, star.r, "Star should have -1 r value")
+
+    def test_massilia_0140(self):
+        origin = Star.parse_line_into_star(
+            '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
+            Sector('Core', ' 0, 0'), 'fixed', 'fixed'
+        )
+
+        sector = Sector('Massilia', ' 0, -1')
+        starline = '0140 Sekeltin             B633447-B Ni Po Da                   { 1 }  (734+1) [455B] B    N  A 101 12 ImDc M2 V M4 V'
+
+        star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        self.assertEqual(79, abs(origin.r - star.r), "Unexpected r offset")
+        self.assertEqual(0, star.q, "Star should have zero q value")
+        self.assertEqual(-40, star.r, "Star should have -40 r value")
+
     def test_straight_distance(self):
         for blurb, sectorname, sectorloc, starthex, finhex, dx, dy, expected_straight_distance in distance_list:
             with self.subTest(msg=blurb):
