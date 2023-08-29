@@ -9,6 +9,8 @@ import bisect
 import random
 import math
 import re
+
+from Position.Hex import Hex
 from PyRoute.AllyGen import AllyGen
 from PyRoute.TradeCodes import TradeCodes
 from collections import OrderedDict
@@ -97,7 +99,7 @@ class Star(object):
 """
     starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
 
-    __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code'
+    __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code', 'hex'
 
     def __init__(self):
         self.logger = logging.getLogger('PyRoute.Star')
@@ -153,6 +155,7 @@ class Star(object):
         self.suppress_soph_percent_warning = False
         # Can this star be unilaterally excluded from routes?
         self.is_redzone = False
+        self.hex = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -365,6 +368,10 @@ class Star(object):
         # store within-sector column and row co-ords
         self.col = q - dx + 1
         self.row = 41 - (r - dy + 1)
+
+        self.hex = Hex(self.sector, self.position)
+        assert self.q == self.hex.q, "Mismatch between direct q value " + str(self.q) + " and Hex-level q value " + str(self.hex.q)
+        assert self.r == self.hex.r, "Mismatch between direct r value " + str(self.r) + " and Hex-level r value " + str(self.hex.r)
 
     @property
     def x(self):
