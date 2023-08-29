@@ -375,15 +375,15 @@ class Star(object):
 
     @property
     def x(self):
-        return self.q
+        return self.hex.x
 
     @property
     def y(self):
-        return -self.q -self.r
+        return self.hex.y
 
     @property
     def z(self):
-        return self.r
+        return self.hex.z
 
     def hex_distance(self, star):
         return Star._heuristic_core(self.x - star.x, self.y - star.y, self.z - star.z)

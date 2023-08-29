@@ -76,3 +76,14 @@ class Hex(object):
         r = col - q_offset
         return q, r
 
+    @property
+    def x(self):
+        return self.q
+
+    @property
+    def y(self):
+        return -self.q -self.r
+
+    @property
+    def z(self):
+        return self.r
