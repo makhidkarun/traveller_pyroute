@@ -3,6 +3,7 @@ Created on Mar 5, 2014
 
 @author: tjoneslo
 """
+import copy
 import functools
 import logging
 import bisect
@@ -175,6 +176,7 @@ class Star(object):
             setattr(foo, key, item)
         foo.index = self.index
         foo.calc_hash()
+        foo.hex = copy.deepcopy(self.hex)
 
         return foo
 
@@ -768,6 +770,7 @@ class Star(object):
         assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
+        assert self.hex is not None, "Star " + str(self.name) + " is missing hex attribute"
         return True
 
     @property
