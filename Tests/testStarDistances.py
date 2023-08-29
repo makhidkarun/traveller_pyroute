@@ -410,6 +410,42 @@ class testStarDistances(unittest.TestCase):
             ('Vland 3039 - 3pc', vland, '3039', 3),
             ('Vland 3139 - 3pc', vland, '3139', 3),
             ('Vland 3238 - 3pc', vland, '3238', 3),
+            ('Lishun 0137 - 4pc', lishun, '0137', 4),
+            ('Lishun 0237 - 4pc', lishun, '0237', 4),
+            ('Lishun 0539 - 4pc', lishun, '0539', 4),
+            ('Lishun 0540 - 4pc', lishun, '0540', 4),
+            ('Core 0503 - 4pc', core, '0503', 4),
+            ('Core 0403 - 4pc', core, '0403', 4),
+            ('Core 0105 - 4pc', core, '0105', 4),
+            ('Dagudashaag 3204 - 4pc', dagu, '3204', 4),
+            ('Dagudashaag 2903 - 4pc', dagu, '2903', 4),
+            ('Dagudashaag 2902 - 4pc', dagu, '2902', 4),
+            ('Vland 2939 - 4pc', vland, '2939', 4),
+            ('Vland 3038 - 4pc', vland, '3038', 4),
+            ('Lishun 0136 - 5pc', lishun, '0136', 5),
+            ('Vland 3236 - 5pc', vland, '3236', 5),
+            ('Vland 2838 - 5pc', vland, '2838', 5),
+            ('Vland 2839 - 5pc', vland, '2839', 5),
+            ('Dagudashaag 2803 - 5pc', dagu, '2803', 5),
+            ('Dagudashaag 2904 - 5pc', dagu, '2904', 5),
+            ('Core 0106 - 5pc', core, '0106', 5),
+            ('Core 0205 - 5pc', core, '0205', 5),
+            ('Core 0603 - 5pc', core, '0603', 5),
+            ('Core 0602 - 5pc', core, '0602', 5),
+            ('Lishun 0638 - 5pc', lishun, '0638', 5),
+            ('Lishun 0538 - 5pc', lishun, '0538', 5),
+            ('Lishun 0135 - 6pc', lishun, '0135', 6),
+            ('Lishun 0235 - 6pc', lishun, '0235', 6),
+            ('Lishun 0738 - 6pc', lishun, '0738', 6),
+            ('Lishun 0739 - 6pc', lishun, '0739', 6),
+            ('Core 0704 - 6pc', core, '0704', 6),
+            ('Core 0604 - 6pc', core, '0604', 6),
+            ('Core 0107 - 6pc', core, '0107', 6),
+            ('Dagudashaag 3206 - 6pc', dagu, '3206', 6),
+            ('Dagudashaag 2704 - 6pc', dagu, '2704', 6),
+            ('Dagudashaag 2703 - 6pc', dagu, '2703', 6),
+            ('Vland 2738 - 6pc', vland, '2738', 6),
+            ('Vland 2837 - 6pc', vland, '2837', 6),
         ]
 
         for blurb, sector, position, distance in systems:
@@ -420,6 +456,55 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(distance, base.distance(targstar), "Forward straight distance unexpected")
                 self.assertEqual(distance, targstar.distance(base), "Reverse straight distance unexpected")
 
+    def test_hop_1_odd_column_offsets_and_hexagon_vertices_from_core_3240(self):
+        core = Sector(' Core', ' 0, 0')
+        massilia = Sector(' Massilia', ' 0, -1')
+        fornast = Sector(' Fornast', ' 1, 0')
+        delphi = Sector(' Delphi', ' 1, -1')
+
+        starline = '3240 Reference            B100727-C Na Va Pi RsA Ab                      { 3 }  (B6D+3) [7A5C] BD    NS - 302 12 ImDc K0 V'
+
+        base = Star.parse_line_into_star(starline, core, 'fixed', 'fixed')
+        stub = " Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     "
+
+        systems = [
+            # Hexagon vertices
+            ('Core 3230 - 10pc', core, '3230', 10),
+            ('Fornast 1035 - 10pc', fornast, '1035', 10),
+            ('Delphi 1005 - 10pc', delphi, '1005', 10),
+            ('Massilia 3210 - 10pc', massilia, '3210', 10),
+            ('Massilia 2205 - 10pc', massilia, '2205', 10),
+            ('Core 2235 - 10pc', core, '2235', 10),
+            # Odd-column offsets - what we've historically had trouble with
+            ('Fornast 0131 - 10pc', fornast, '0131', 10),
+            ('Fornast 0332 - 10pc', fornast, '0332', 10),
+            ('Fornast 0533 - 10pc', fornast, '0533', 10),
+            ('Fornast 0734 - 10pc', fornast, '0734', 10),
+            ('Fornast 0935 - 10pc', fornast, '0935', 10),
+            ('Delphi 0906 - 10pc', delphi, '0906', 10),
+            ('Delphi 0707 - 10pc', delphi, '0707', 10),
+            ('Delphi 0508 - 10pc', delphi, '0508', 10),
+            ('Delphi 0309 - 10pc', delphi, '0309', 10),
+            ('Delphi 0110 - 10pc', delphi, '0110', 10),
+            ('Massilia 3110 - 10pc', massilia, '3110', 10),
+            ('Massilia 2909 - 10pc', massilia, '2909', 10),
+            ('Massilia 2708 - 10pc', massilia, '2708', 10),
+            ('Massilia 2507 - 10pc', massilia, '2507', 10),
+            ('Massilia 2306 - 10pc', massilia, '2306', 10),
+            ('Core 2335 - 10pc', core, '2335', 10),
+            ('Core 2534 - 10pc', core, '2534', 10),
+            ('Core 2733 - 10pc', core, '2733', 10),
+            ('Core 2932 - 10pc', core, '2932', 10),
+            ('Core 3131 - 10pc', core, '3131', 10),
+        ]
+
+        for blurb, sector, position, distance in systems:
+            with self.subTest(msg=blurb):
+                targstar = Star.parse_line_into_star(position + stub, sector, 'fixed', 'fixed')
+                self.assertEqual(distance, base.hex_distance(targstar), "Forward hex distance unexpected")
+                self.assertEqual(distance, targstar.hex_distance(base), "Reverse hex distance unexpected")
+                self.assertEqual(distance, base.distance(targstar), "Forward straight distance unexpected")
+                self.assertEqual(distance, targstar.distance(base), "Reverse straight distance unexpected")
 
 if __name__ == '__main__':
     unittest.main()
