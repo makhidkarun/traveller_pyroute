@@ -1,5 +1,6 @@
 import unittest
 
+from Position.Hex import Hex
 from PyRoute.Galaxy import Sector
 from PyRoute.Star import Star
 
@@ -576,9 +577,9 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(expected_distance, hex_dist, "Unexpected hex distance")
                 hex_dist = star2.hex.hex_distance(star1)
                 self.assertEqual(expected_distance, hex_dist, "Unexpected reverse hex distance")
-                axial_dist = Star.axial_distance((star1.q, star1.r), (star2.q, star2.r))
+                axial_dist = Hex.axial_distance((star1.q, star1.r), (star2.q, star2.r))
                 self.assertEqual(expected_distance, axial_dist, "Unexpected axial distance")
-                axial_dist = Star.axial_distance((star2.q, star2.r), (star1.q, star1.r))
+                axial_dist = Hex.axial_distance((star2.q, star2.r), (star1.q, star1.r))
                 self.assertEqual(expected_distance, axial_dist, "Unexpected reverse axial distance")
                 distance = star1.distance(star2)
                 self.assertEqual(expected_alt_distance, distance, "Unexpected distance")

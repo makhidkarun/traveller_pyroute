@@ -10,6 +10,7 @@ import unittest
 import re
 import sys
 
+from Position.Hex import Hex
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 
 sys.path.append('../PyRoute')
@@ -389,7 +390,7 @@ class TestStar(unittest.TestCase):
             sector, 'fixed', 'fixed')
 
         hex_dist = star1.hex.hex_distance(star2)
-        axial_dist = Star.axial_distance((star1.q, star1.r), (star2.q, star2.r))
+        axial_dist = Hex.axial_distance((star1.q, star1.r), (star2.q, star2.r))
         self.assertEqual(hex_dist, axial_dist, "Unexpected axial distance")
         distance = star1.distance(star2)
         self.assertEqual(hex_dist, distance, "Unexpected distance")

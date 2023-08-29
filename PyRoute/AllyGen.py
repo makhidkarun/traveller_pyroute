@@ -398,7 +398,7 @@ class AllyGen(object):
                 neighbor = AllyGen._get_neighbor(Hex, 4, dist)
                 for direction in range(6):
                     for _ in range(dist):
-                        allyMap[neighbor].add((alg, star.axial_distance(Hex, neighbor)))
+                        allyMap[neighbor].add((alg, star.distance(Hex, neighbor)))
                         neighbor = AllyGen._get_neighbor(neighbor, direction)
 
         # self._output_map(allyMap, 1)
@@ -580,7 +580,7 @@ class AllyGen(object):
                 if searchHex in checked:
                     newBridge = None
                     continue
-                if searchHex == Hex or Star.axial_distance(searchHex, Hex) == 1:
+                if searchHex == Hex or Hex.axial_distance(searchHex, Hex) == 1:
                     continue
                 if starMap.get(searchHex, False) and \
                         self.are_allies(starMap[Hex], starMap[searchHex]):
@@ -635,7 +635,7 @@ class AllyGen(object):
                 # walk six sides
                 for side in range(6):
                     for _ in range(dist):
-                        allyMap[neighbor].add((alg, star.axial_distance(Hex, neighbor)))
+                        allyMap[neighbor].add((alg, star.distance(Hex, neighbor)))
                         neighbor = self._get_neighbor(neighbor, side)
         # self._output_map(allyMap, 1)
 
