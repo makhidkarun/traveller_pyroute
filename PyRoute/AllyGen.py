@@ -9,6 +9,8 @@ from operator import itemgetter
 from collections import defaultdict
 import os
 
+from Position.Hex import Hex
+
 
 class AllyGen(object):
     """
@@ -562,17 +564,17 @@ class AllyGen(object):
         for Hex in starMap.keys():
             self._search_range(Hex, allyMap, starMap)
 
-    def _search_range(self, Hex, allyMap, starMap):
+    def _search_range(self, hex, allyMap, starMap):
         from PyRoute.Star import Star
         newBridge = None
         checked = []
         for direction in range(6):
-            checkHex = AllyGen._get_neighbor(Hex, direction)
+            checkHex = AllyGen._get_neighbor(hex, direction)
             if starMap.get(checkHex, False):
-                if self.are_allies(starMap[Hex], starMap[checkHex]):
+                if self.are_allies(starMap[hex], starMap[checkHex]):
                     checked.append(checkHex)
                 continue
-            if self.are_allies(starMap[Hex], allyMap.get(checkHex, None)):
+            if self.are_allies(starMap[hex], allyMap.get(checkHex, None)):
                 checked.append(checkHex)
                 continue
             for second in range(6):
@@ -580,14 +582,14 @@ class AllyGen(object):
                 if searchHex in checked:
                     newBridge = None
                     continue
-                if searchHex == Hex or Hex.axial_distance(searchHex, Hex) == 1:
+                if searchHex == hex or Hex.axial_distance(searchHex, hex) == 1:
                     continue
                 if starMap.get(searchHex, False) and \
-                        self.are_allies(starMap[Hex], starMap[searchHex]):
+                        self.are_allies(starMap[hex], starMap[searchHex]):
                     newBridge = checkHex
                     checked.append(checkHex)
         if newBridge:
-            allyMap[newBridge] = starMap[Hex]
+            allyMap[newBridge] = starMap[hex]
 
     def _erode_map(self, match):
         """
@@ -618,8 +620,8 @@ class AllyGen(object):
         # Pass 1: generate initial allegiance arrays,
         # with overlapping maps
         for star in stars:
-            Hex = (star.q, star.r)
-            alg = starMap[Hex]
+            hex = (star.q, star.r)
+            alg = starMap[hex]
 
             if star.port in ['E', 'X', '?']:
                 maxRange = 1
@@ -631,11 +633,11 @@ class AllyGen(object):
             # Walk the ring filling in the hexes around star with this neighbor
             for dist in range(1, maxRange):
                 # Start in direction 0, at distance n
-                neighbor = self._get_neighbor(Hex, 4, dist)
+                neighbor = self._get_neighbor(hex, 4, dist)
                 # walk six sides
                 for side in range(6):
                     for _ in range(dist):
-                        allyMap[neighbor].add((alg, star.distance(Hex, neighbor)))
+                        allyMap[neighbor].add((alg, Hex.axial_distance(hex, neighbor)))
                         neighbor = self._get_neighbor(neighbor, side)
         # self._output_map(allyMap, 1)
 
@@ -645,18 +647,18 @@ class AllyGen(object):
         # 3: hexes claimed by two (or more) allies are pushed to the closest world
         # 4: hexes claimed by two (or more) allies at the same distance
         #    are claimed by the larger empire. 
-        for Hex in allyMap.keys():
-            if len(allyMap[Hex]) == 1:
-                allyMap[Hex] = allyMap[Hex].pop()[0]
+        for hex in allyMap.keys():
+            if len(allyMap[hex]) == 1:
+                allyMap[hex] = allyMap[hex].pop()[0]
             else:
-                allyList = sorted([algs for algs in allyMap[Hex]], key=itemgetter(1))
+                allyList = sorted([algs for algs in allyMap[hex]], key=itemgetter(1))
                 if allyList[0][1] == 0:
-                    allyMap[Hex] = allyList[0][0]
+                    allyMap[hex] = allyList[0][0]
                 else:
                     minDistance = allyList[0][1]
                     allyDist = [algs for algs in allyList if algs[1] == minDistance]
                     if len(allyDist) == 1:
-                        allyMap[Hex] = allyDist[0][0]
+                        allyMap[hex] = allyDist[0][0]
                     else:
                         maxCount = -1
                         maxAlly = None
@@ -665,6 +667,6 @@ class AllyGen(object):
                                     self.galaxy.alg[alg].stats.number > maxCount:
                                 maxAlly = alg
                                 maxCount = self.galaxy.alg[alg].stats.number
-                        allyMap[Hex] = maxAlly
+                        allyMap[hex] = maxAlly
 
         return allyMap, starMap
