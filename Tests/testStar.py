@@ -129,9 +129,9 @@ class TestStar(unittest.TestCase):
 
         self.assertEqual(-198, star1.x)
         self.assertEqual(-2, star1.y)
-        self.assertEqual(199, star1.z)
+        self.assertEqual(200, star1.z)
         self.assertEqual(-198, star1.q)
-        self.assertEqual(199, star1.r)
+        self.assertEqual(200, star1.r)
         self.assertEqual(19, star1.row)
         self.assertEqual(27, star1.col)
 
