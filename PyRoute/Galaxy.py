@@ -437,7 +437,7 @@ class Galaxy(AreaItem):
         for (world, neighbor) in self.stars.edges():
             worldstar = self.star_mapping[world]
             neighborstar = self.star_mapping[neighbor]
-            distance = worldstar.hex_distance(neighborstar)
+            distance = worldstar.distance(neighborstar)
             distanceMod = int(distance / 2)
             CargoTradeIndex = int(round(math.sqrt(
                 max(worldstar.eti_cargo - distanceMod, 0) *
@@ -492,7 +492,7 @@ class Galaxy(AreaItem):
                 ownedBy.sort(reverse=True,
                              key=lambda star: star.popCode)
                 ownedBy.sort(reverse=True,
-                             key=lambda star: star.importance - (star.hex_distance(worldstar) - 1))
+                             key=lambda star: star.importance - (star.distance(worldstar) - 1))
 
                 owner = None
                 if worldstar.ownedBy is None:

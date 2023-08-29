@@ -73,7 +73,7 @@ class TradeCalculation(RouteCalculation):
         return False
 
     def base_range_routes(self, star, neighbor):
-        dist = star.hex_distance(neighbor)
+        dist = star.distance(neighbor)
         max_dist = self.btn_range[min(max(0, max(star.wtn, neighbor.wtn) - self.min_wtn), 5)]
         btn = self.get_btn(star, neighbor, dist)
         # add all the stars in the BTN range, but  skip this pair
@@ -283,7 +283,7 @@ class TradeCalculation(RouteCalculation):
         distance = 0
         links = zip(route[0:-1], route[1:])
         for item in links:
-            distance += item[0].hex_distance(item[1])
+            distance += item[0].distance(item[1])
         return distance
 
     def route_cost(self, route):
@@ -394,7 +394,7 @@ class TradeCalculation(RouteCalculation):
                 start = end
 
     def route_weight(self, star, target):
-        dist = star.hex_distance(target)
+        dist = star.distance(target)
         weight = self.distance_weight[dist]
         if target.alg_code != star.alg_code:
             weight += 25

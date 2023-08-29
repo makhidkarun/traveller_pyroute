@@ -215,7 +215,7 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(expected_straight_distance, fwd_distance, "Unexpected forward distance between " + starthex + " and " + newpos)
                 rev_distance = star2.distance(star1)
                 self.assertEqual(expected_straight_distance, rev_distance, "Unexpected reverse distance between " + starthex + " and " + newpos)
-                hexdist = star1.hex_distance(star2)
+                hexdist = star1.hex.hex_distance(star2)
                 msg = "Straight distance " + str(fwd_distance) + " not equal to hex distance " + str(hexdist)
                 self.assertEqual(hexdist, fwd_distance, msg)
 
@@ -292,7 +292,7 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(target_star[0], star2.col, "Unexpected col value for " + target_name)
                 self.assertEqual(target_star[1], star2.row, "Unexpected row value for " + target_name)
 
-                hexdist = star1.hex_distance(star2)
+                hexdist = star1.hex.hex_distance(star2)
                 straight_dist = star1.distance(star2)
                 rev_straight_dist = star2.distance(star1)
                 self.assertEqual(straight_dist, rev_straight_dist, "Straight distance should not be direction sensitive")
@@ -327,7 +327,7 @@ class testStarDistances(unittest.TestCase):
                 # Stars are immediately rimward/coreward of each other, so should have same q co-ord
                 self.assertEqual(star1.q, star2.q, "q co-ords should match")
 
-                self.assertEqual(1, star1.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 between ' + str(star1) + ' and ' + str(star2))
+                self.assertEqual(1, star1.hex.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 between ' + str(star1) + ' and ' + str(star2))
                 self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
     def test_trans_sector_border_distances_core_to_massilia(self):
@@ -355,7 +355,7 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(i, star2.col)
                 self.assertEqual(40, star2.row)
 
-                self.assertEqual(1, star1.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 ' + str(star1) + ' and ' + str(star2))
+                self.assertEqual(1, star1.hex.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 ' + str(star1) + ' and ' + str(star2))
                 self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
     def test_trans_sector_border_distances_massilia_to_diaspora(self):
@@ -383,7 +383,7 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(i, star2.col)
                 self.assertEqual(40, star2.row)
 
-                self.assertEqual(1, star1.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 ' + str(star1) + ' and ' + str(star2))
+                self.assertEqual(1, star1.hex.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 ' + str(star1) + ' and ' + str(star2))
                 self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
     def test_trans_sector_border_distances_core_to_dagudashaag(self):
@@ -411,7 +411,7 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(1, star2.col)
                 self.assertEqual(i, star2.row)
 
-                self.assertEqual(1, star1.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 ' + str(star1) + ' and ' + str(star2))
+                self.assertEqual(1, star1.hex.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 ' + str(star1) + ' and ' + str(star2))
                 self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
     def test_distance_from_core_0101(self):
@@ -503,8 +503,8 @@ class testStarDistances(unittest.TestCase):
         for blurb, sector, position, distance in systems:
             with self.subTest(msg=blurb):
                 targstar = Star.parse_line_into_star(position + stub, sector, 'fixed', 'fixed')
-                self.assertEqual(distance, base.hex_distance(targstar), "Forward hex distance unexpected")
-                self.assertEqual(distance, targstar.hex_distance(base), "Reverse hex distance unexpected")
+                self.assertEqual(distance, base.hex.hex_distance(targstar), "Forward hex distance unexpected")
+                self.assertEqual(distance, targstar.hex.hex_distance(base), "Reverse hex distance unexpected")
                 self.assertEqual(distance, base.distance(targstar), "Forward straight distance unexpected")
                 self.assertEqual(distance, targstar.distance(base), "Reverse straight distance unexpected")
 
@@ -553,8 +553,8 @@ class testStarDistances(unittest.TestCase):
         for blurb, sector, position, distance in systems:
             with self.subTest(msg=blurb):
                 targstar = Star.parse_line_into_star(position + stub, sector, 'fixed', 'fixed')
-                self.assertEqual(distance, base.hex_distance(targstar), "Forward hex distance unexpected")
-                self.assertEqual(distance, targstar.hex_distance(base), "Reverse hex distance unexpected")
+                self.assertEqual(distance, base.hex.hex_distance(targstar), "Forward hex distance unexpected")
+                self.assertEqual(distance, targstar.hex.hex_distance(base), "Reverse hex distance unexpected")
                 self.assertEqual(distance, base.distance(targstar), "Forward straight distance unexpected")
                 self.assertEqual(distance, targstar.distance(base), "Reverse straight distance unexpected")
 
@@ -572,9 +572,9 @@ class testStarDistances(unittest.TestCase):
                     "2720 Vlazzhden            C210143-8 Lo Ni                               - -  - 303   Zh G1 IV                       ",
                     sector2, 'fixed', 'fixed')
 
-                hex_dist = star1.hex_distance(star2)
+                hex_dist = star1.hex.hex_distance(star2)
                 self.assertEqual(expected_distance, hex_dist, "Unexpected hex distance")
-                hex_dist = star2.hex_distance(star1)
+                hex_dist = star2.hex.hex_distance(star1)
                 self.assertEqual(expected_distance, hex_dist, "Unexpected reverse hex distance")
                 axial_dist = Star.axial_distance((star1.q, star1.r), (star2.q, star2.r))
                 self.assertEqual(expected_distance, axial_dist, "Unexpected axial distance")

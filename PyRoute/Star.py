@@ -387,9 +387,6 @@ class Star(object):
     def z(self):
         return self.hex.z
 
-    def hex_distance(self, star):
-        return self.hex.hex_distance(star.hex)
-
     @staticmethod
     def axial_distance(Hex1, Hex2):
         return Hex.axial_distance(Hex1, Hex2)

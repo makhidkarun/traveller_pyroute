@@ -32,7 +32,7 @@ class CommCalculation(RouteCalculation):
             return
         min_importance = self.galaxy.alg[star.alg_base_code].min_importance
         if self.endpoint_selection(star, min_importance) and self.endpoint_selection(neighbor, min_importance):
-            dist = star.hex_distance(neighbor)
+            dist = star.distance(neighbor)
 
             if ((self.capitals(star) or self.bases(star)) and
                 (self.capitals(neighbor) or self.bases(neighbor)) and dist < 100) or \
@@ -150,7 +150,7 @@ class CommCalculation(RouteCalculation):
         #    pass
 
     def route_weight(self, star, target):
-        dist = star.hex_distance(target)
+        dist = star.distance(target)
         weight = self.distance_weight[dist]
         if star.port in 'CDEX':
             weight += 25

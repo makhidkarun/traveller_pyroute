@@ -25,9 +25,9 @@ class OwnedWorldCalculation(RouteCalculation):
         return not AllyGen.are_owned_allies(star.alg_code, neighbor.alg_code)
 
     def base_range_routes(self, star, neighbor):
-        return star.hex_distance(neighbor)
+        return star.distance(neighbor)
 
     def route_weight(self, star, target):
-        dist = star.hex_distance(target)
+        dist = star.distance(target)
         weight = self.distance_weight[dist]
         return weight
