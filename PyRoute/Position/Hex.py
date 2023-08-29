@@ -3,6 +3,7 @@ Created on Aug 29, 2023
 
 @author: CyberiaResurrection
 """
+import functools
 
 
 class Hex(object):
@@ -44,6 +45,14 @@ class Hex(object):
     @staticmethod
     def heuristicDistance(star1, star2):
         return star1.hex_pos.distance(star2.hex_pos)
+
+    def hex_distance(self, star):
+        return Hex._hex_core(self.x - star.x, self.y - star.y, self.z - star.z)
+
+    @staticmethod
+    @functools.cache
+    def _hex_core(dx, dy, dz):
+        return max(abs(dx), abs(dy), abs(dz))
 
     def hex_position(self):
         return (self.q, self.r)

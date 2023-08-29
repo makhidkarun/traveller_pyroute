@@ -386,16 +386,11 @@ class Star(object):
         return self.hex.z
 
     def hex_distance(self, star):
-        return Star._heuristic_core(self.x - star.x, self.y - star.y, self.z - star.z)
+        return self.hex.hex_distance(star.hex)
 
     @staticmethod
     def heuristicDistance(star1, star2):
-        return Star._heuristic_core(star1.x - star2.x, star1.y - star2.y, star1.z - star2.z)
-
-    @staticmethod
-    @functools.cache
-    def _heuristic_core(dx, dy, dz):
-        return max(abs(dx), abs(dy), abs(dz))
+        return star1.hex.hex_distance(star2.hex)
 
     @staticmethod
     def axial_distance(Hex1, Hex2):
