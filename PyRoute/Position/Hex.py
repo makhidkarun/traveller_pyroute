@@ -43,7 +43,7 @@ class Hex(object):
     # Used to calculate distances for the TradeCalculation via the Network Graph, which requires a function
     @staticmethod
     def heuristicDistance(star1, star2):
-        return star1.hex_pos.distance(star2.hex_pos)
+        return star1.hex.distance(star2.hex)
 
     def hex_distance(self, star):
         return Hex._hex_core(self.x - star.x, self.y - star.y, self.z - star.z)

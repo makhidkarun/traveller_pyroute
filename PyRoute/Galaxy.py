@@ -13,6 +13,7 @@ import itertools
 import math
 import networkx as nx
 
+from Position.Hex import Hex
 from PyRoute.Star import Star
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Calculation.CommCalculation import CommCalculation
@@ -557,7 +558,7 @@ class Galaxy(AreaItem):
         if item in self.landmarks:
             base = self.landmarks[item]
         else:
-            base = Star.heuristicDistance(star, target)
+            base = Hex.heuristicDistance(star, target)
         # Now we've got the maximum of the fixed bounds, compare that maximum with the dynamic-between-runs
         # approximate-shortest-path bound.
         sp_bound = self.trade.shortest_path_tree.lower_bound(item[0], item[1])
@@ -571,7 +572,7 @@ class Galaxy(AreaItem):
         if item in self.landmarks:
             base = self.landmarks[item]
         else:
-            base = Star.heuristicDistance(self.star_mapping[star], self.star_mapping[target])
+            base = Hex.heuristicDistance(self.star_mapping[star], self.star_mapping[target])
         # Now we've got the maximum of the fixed bounds, compare that maximum with the dynamic-between-runs
         # approximate-shortest-path bound.
         sp_bound = self.trade.shortest_path_tree.lower_bound(item[0], item[1])
