@@ -391,10 +391,6 @@ class Star(object):
         return self.hex.hex_distance(star.hex)
 
     @staticmethod
-    def heuristicDistance(star1, star2):
-        return star1.hex.hex_distance(star2.hex)
-
-    @staticmethod
     def axial_distance(Hex1, Hex2):
         return Hex.axial_distance(Hex1, Hex2)
 

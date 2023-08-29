@@ -5,6 +5,7 @@ Created on Aug 09, 2023
 """
 import networkx as nx
 
+from Position.Hex import Hex
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
@@ -47,7 +48,7 @@ class XRouteCalculation(RouteCalculation):
         if len(self.capital) == 0:
             return
         for star in self.secCapitals:
-            self.get_route_between(self.capital[0], star, self.calc_trade(25), Star.heuristicDistance)
+            self.get_route_between(self.capital[0], star, self.calc_trade(25), Hex.heuristicDistance)
 
         for star in self.secCapitals:
             localCapital = {'coreward': None, 'spinward': None, 'trailing': None, 'rimward': None,
@@ -83,7 +84,7 @@ class XRouteCalculation(RouteCalculation):
 
             for neighbor in localCapital.values():
                 if neighbor and not self.galaxy.ranges.has_edge(star, neighbor):
-                    self.get_route_between(star, neighbor, self.calc_trade(25), Star.heuristicDistance)
+                    self.get_route_between(star, neighbor, self.calc_trade(25), Hex.heuristicDistance)
 
     def routes_pass_2(self):
         # Step 2a - re-weight the routes to be more weighted to J4 than J6
@@ -106,7 +107,7 @@ class XRouteCalculation(RouteCalculation):
                         # if we couldn't find a nearest sector capital, don't try finding a route to one
                         if capital[0] is None:
                             continue
-                        self.get_route_between(capital[0], star, self.calc_trade(23), Star.heuristicDistance)
+                        self.get_route_between(capital[0], star, self.calc_trade(23), Hex.heuristicDistance)
             else:
                 for star in subCap:
                     if self.galaxy.ranges.has_edge(secCap[0], star):
