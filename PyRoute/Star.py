@@ -340,6 +340,18 @@ class Star(object):
             return self.sector.name[0:4] + '-' + self.position
 
     def set_location(self, dx, dy):
+        """
+        # The zero point of the co-ordinate system used is Reference (Core 0140).
+        # As a result, hex position 01,40 becomes q=0, r=0, x=0, y=0, z=0.
+        # Sign conventions:
+        # dx increases (becomes (more) positive) to trailing, decreases (becomes (more) negative) to spinward
+        # dy increases (becomes (more) positive) to coreward, decreases (becomes (more) negative) to rimward
+        @type dx: int
+        @type dy: int
+        @param dx: Base sector-level trailing-spinward offset added to star's within-sector x position
+        @param dy: Base sector-level coreward-rimward offset added to star's within-sector y position
+        """
+
         # convert odd-q offset to cube
         q = int(self.position[0:2]) + dx - 1
         raw_r_offset = 41 - int(self.position[2:4])
