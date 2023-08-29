@@ -399,16 +399,13 @@ class Star(object):
 
     @staticmethod
     def axial_distance(Hex1, Hex2):
-        dq = Hex1[0] - Hex2[0]
-        dr = Hex1[1] - Hex2[1]
-        delta = Hex1[0] - Hex2[0] + Hex1[1] - Hex2[1]
-        return (abs(dq) + abs(dr) + abs(delta)) // 2
+        return Hex.axial_distance(Hex1, Hex2)
 
     def distance(self, star):
-        hex1 = (self.q, self.r)
-        hex2 = (star.q, star.r)
+        hex1 = self.hex.hex_position()
+        hex2 = star.hex.hex_position()
 
-        return Star.axial_distance(hex1, hex2)
+        return Hex.axial_distance(hex1, hex2)
 
     def subsector(self):
         subsector = ["ABCD", "EFGH", "IJKL", "MNOP"]
