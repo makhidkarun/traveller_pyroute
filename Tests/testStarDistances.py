@@ -58,6 +58,58 @@ inter_distance_list = [
     ("odd", "even", "odd", "odd", +1, +1, "delta", "alpha")
 ]
 
+param_list = [
+    ('3 sectors spinward, 3 sectors coreward', -3, -3, 171, 171),
+    ('3 sectors spinward, 2 sectors coreward', -3, -2, 131, 131),
+    ('3 sectors spinward, 1 sectors coreward', -3, -1, 91, 91),
+    ('3 sectors spinward', -3, 0, 70, 70),
+    ('3 sectors spinward, 1 sectors rimward', -3, +1, 70, 70),
+    ('3 sectors spinward, 2 sectors rimward', -3, +2, 99, 99),
+    ('3 sectors spinward, 3 sectors rimward', -3, +3, 139, 139),
+    ('2 sectors spinward, 3 sectors coreward', -2, -3, 155, 155),
+    ('2 sectors spinward, 2 sectors coreward', -2, -2, 115, 115),
+    ('2 sectors spinward, 1 sectors coreward', -2, -1, 75, 75),
+    ('2 sectors spinward', -2, 0, 38, 38),
+    ('2 sectors spinward, 1 sectors rimward', -2, +1, 43, 43),
+    ('2 sectors spinward, 2 sectors rimward', -2, +2, 83, 83),
+    ('2 sectors spinward, 3 sectors rimward', -2, +3, 123, 123),
+    ('1 sectors spinward, 3 sectors coreward', -1, -3, 139, 139),
+    ('1 sectors spinward, 2 sectors coreward', -1, -2, 99, 99),
+    ('1 sectors spinward, 1 sectors coreward', -1, -1, 59, 59),
+    ('1 sectors spinward', -1, 0, 19, 19),
+    ('1 sectors spinward, 1 sectors rimward', -1, +1, 27, 27),
+    ('1 sectors spinward, 2 sectors rimward', -1, +2, 67, 67),
+    ('1 sectors spinward, 3 sectors rimward', -1, +3, 107, 107),
+    ('3 sectors coreward', 0, -3, 149, 149),
+    ('2 sectors coreward', 0, -2, 109, 109),
+    ('1 sectors coreward', 0, -1, 69, 69),
+    ('Same sector', 0, 0, 29, 29),
+    ('1 sectors rimward', 0, +1, 37, 37),
+    ('2 sectors rimward', 0, +2, 77, 77),
+    ('3 sectors rimward', 0, +3, 117, 117),
+    ('1 sectors trailing, 3 sectors coreward', +1, -3, 165, 165),
+    ('1 sectors trailing, 2 sectors coreward', +1, -2, 125, 125),
+    ('1 sectors trailing, 1 sectors coreward', +1, -1, 85, 85),
+    ('1 sectors trailing', +1, 0, 58, 58),
+    ('1 sectors trailing, 1 sectors rimward', +1, +1, 58, 58),
+    ('1 sectors trailing, 2 sectors rimward', +1, +2, 93, 93),
+    ('1 sectors trailing, 3 sectors rimward', +1, +3, 133, 133),
+    ('2 sectors trailing, 3 sectors coreward', +2, -3, 181, 181),
+    ('2 sectors trailing, 2 sectors coreward', +2, -2, 141, 141),
+    ('2 sectors trailing, 1 sectors coreward', +2, -1, 101, 101),
+    ('2 sectors trailing', +2, 0, 90, 90),
+    ('2 sectors trailing, 1 sectors rimward', +2, +1, 90, 90),
+    ('2 sectors trailing, 2 sectors rimward', +2, +2, 109, 109),
+    ('2 sectors trailing, 3 sectors rimward', +2, +3, 149, 149),
+    ('3 sectors trailing, 3 sectors coreward', +3, -3, 197, 197),
+    ('3 sectors trailing, 2 sectors coreward', +3, -2, 157, 157),
+    ('3 sectors trailing, 1 sectors coreward', +3, -1, 122, 122),
+    ('3 sectors trailing', +3, 0, 122, 122),
+    ('3 sectors trailing, 1 sectors rimward', +3, +1, 122, 122),
+    ('3 sectors trailing, 2 sectors rimward', +3, +2, 125, 125),
+    ('3 sectors trailing, 3 sectors rimward', +3, +3, 165, 165),
+]
+
 class testStarDistances(unittest.TestCase):
 
     def test_core_0101(self):
@@ -505,6 +557,33 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(distance, targstar.hex_distance(base), "Reverse hex distance unexpected")
                 self.assertEqual(distance, base.distance(targstar), "Forward straight distance unexpected")
                 self.assertEqual(distance, targstar.distance(base), "Reverse straight distance unexpected")
+
+    def test_star_distances(self):
+        for blurb, x_sector, y_sector, expected_distance, expected_alt_distance in param_list:
+            with self.subTest(msg=blurb):
+                sector1 = Sector(' Core', ' 0, 0')
+                sector2 = Sector(' ' + str(x_sector) + ', ' + str(y_sector) + ' Sector', ' ' + str(x_sector) + ', ' + str(y_sector))
+
+                star1 = Star.parse_line_into_star(
+                    "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    sector1, 'fixed', 'fixed')
+
+                star2 = Star.parse_line_into_star(
+                    "2720 Vlazzhden            C210143-8 Lo Ni                               - -  - 303   Zh G1 IV                       ",
+                    sector2, 'fixed', 'fixed')
+
+                hex_dist = star1.hex_distance(star2)
+                self.assertEqual(expected_distance, hex_dist, "Unexpected hex distance")
+                hex_dist = star2.hex_distance(star1)
+                self.assertEqual(expected_distance, hex_dist, "Unexpected reverse hex distance")
+                axial_dist = Star.axial_distance((star1.q, star1.r), (star2.q, star2.r))
+                self.assertEqual(expected_distance, axial_dist, "Unexpected axial distance")
+                axial_dist = Star.axial_distance((star2.q, star2.r), (star1.q, star1.r))
+                self.assertEqual(expected_distance, axial_dist, "Unexpected reverse axial distance")
+                distance = star1.distance(star2)
+                self.assertEqual(expected_alt_distance, distance, "Unexpected distance")
+                distance = star2.distance(star1)
+                self.assertEqual(expected_alt_distance, distance, "Unexpected reverse distance")
 
 if __name__ == '__main__':
     unittest.main()
