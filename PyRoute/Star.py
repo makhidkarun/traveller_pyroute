@@ -340,19 +340,38 @@ class Star(object):
             return self.sector.name[0:4] + '-' + self.position
 
     def set_location(self, dx, dy):
+        """
+        # The zero point of the co-ordinate system used is Reference (Core 0140).
+        # As a result, hex position 01,40 becomes q=0, r=0, x=0, y=0, z=0.
+        # Sign conventions:
+        # dx increases (becomes (more) positive) to trailing, decreases (becomes (more) negative) to spinward
+        # dy increases (becomes (more) positive) to coreward, decreases (becomes (more) negative) to rimward
+        @type dx: int
+        @type dy: int
+        @param dx: Base sector-level trailing-spinward offset added to star's within-sector x position
+        @param dy: Base sector-level coreward-rimward offset added to star's within-sector y position
+        """
+
         # convert odd-q offset to cube
         q = int(self.position[0:2]) + dx - 1
-        r = int(self.position[2:4]) + dy - 1
+        raw_r_offset = 41 - int(self.position[2:4])
+        r = raw_r_offset + dy - 1
+
+        # Halving q, rounding up _towards negative infinity_ to the nearest integer - ie, ceil(q / 2).
+        # redblob's implementation uses floor(q/2), but they haven't inverted the r axis.
+        q_offset = (q + (q & 1)) // 2
         self.x = q
-        self.z = r - (q - (q & 1)) // 2
+        self.z = r - q_offset
+        # cubic co-ords must sum to zero
         self.y = -self.x - self.z
 
         # convert cube to axial
         self.q = self.x
         self.r = self.z
 
+        # store within-sector column and row co-ords
         self.col = q - dx + 1
-        self.row = r - dy + 1
+        self.row = 41 - (r - dy + 1)
 
     def hex_distance(self, star):
         return Star._heuristic_core(self.x - star.x, self.y - star.y, self.z - star.z)
@@ -368,25 +387,16 @@ class Star(object):
 
     @staticmethod
     def axial_distance(Hex1, Hex2):
-        return (abs(Hex1[0] - Hex2[0]) + abs(Hex1[1] - Hex2[1])
-                + abs(Hex1[0] + Hex1[1] - Hex2[0] - Hex2[1])) // 2
+        dq = Hex1[0] - Hex2[0]
+        dr = Hex1[1] - Hex2[1]
+        delta = Hex1[0] - Hex2[0] + Hex1[1] - Hex2[1]
+        return (abs(dq) + abs(dr) + abs(delta)) // 2
 
     def distance(self, star):
-        y1 = self.y * 2
-        if not self.x % 2:
-            y1 += 1
-        y2 = star.y * 2
-        if not star.y % 2:
-            y2 += 1
-        dy = y2 - y1
-        if dy < 1:
-            dy = -dy
-        dx = star.x - self.x
-        if dx < 1:
-            dx = -dx
-        if dx > dy:
-            return dx
-        return dx + dy // 2
+        hex1 = (self.q, self.r)
+        hex2 = (star.q, star.r)
+
+        return Star.axial_distance(hex1, hex2)
 
     def subsector(self):
         subsector = ["ABCD", "EFGH", "IJKL", "MNOP"]

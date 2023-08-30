@@ -217,10 +217,12 @@ class testApproximateShortestPathTree(unittest.TestCase):
         galaxy.trade.calculate_components()
 
         graph = galaxy.stars
+
         stars = list(graph.nodes)
         source = stars[0]
+        distances, paths = nx.single_source_dijkstra(graph, source)
         leafnode = stars[30]
-        subnode = stars[23]
+        subnode = stars[paths[leafnode][-2]]
 
         approx = ApproximateShortestPathTree(source, graph, 0)
 

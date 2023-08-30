@@ -30,7 +30,7 @@ class TestStar(unittest.TestCase):
 
         self.assertEqual('Core', star1.sector.name, star1.sector.name)
         self.assertEqual('0103', star1.position)
-        self.assertTrue(star1.q == 0 and star1.r == 2, "%s, %s" % (star1.q, star1.r))
+        self.assertTrue(star1.q == 0 and star1.r == 37, "%s, %s" % (star1.q, star1.r))
         self.assertEqual('Irkigkhan', star1.name)
         self.assertEqual('C9C4733-9', star1.uwp)
         self.assertEqual('Im', star1.alg_code)
@@ -73,7 +73,7 @@ class TestStar(unittest.TestCase):
 
         self.assertEqual('Core', star1.sector.name, star1.sector.name)
         self.assertEqual('0104', star1.position)
-        self.assertTrue(star1.q == 0 and star1.r == 3, "%s, %s" % (star1.q, star1.r))
+        self.assertTrue(star1.q == 0 and star1.r == 36, "%s, %s" % (star1.q, star1.r))
         self.assertEqual('Shana Ma', star1.name)
         self.assertEqual('E551112-7', star1.uwp)
         self.assertEqual('Im', star1.alg_code)

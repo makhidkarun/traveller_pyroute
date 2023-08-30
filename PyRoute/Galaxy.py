@@ -269,6 +269,7 @@ class Galaxy(AreaItem):
     def read_sectors(self, sectors, pop_code, ru_calc):
         self._set_trade_object(self.route_reuse, self.trade_choice)
         star_counter = 0
+        loaded_sectors = set()
         for sector in sectors:
             try:
                 lines = [line for line in codecs.open(sector, 'r', 'utf-8')]
@@ -279,6 +280,11 @@ class Galaxy(AreaItem):
 
             sec = Sector(lines[3], lines[4])
             sec.filename = os.path.basename(sector)
+            if str(sec) not in loaded_sectors:
+                loaded_sectors.add(str(sec))
+            else:
+                self.logger.error("sector file %s loads duplicate sector %s" % (sector, str(sec)))
+                continue
 
             for lineno, line in enumerate(lines):
                 if line.startswith('Hex'):
