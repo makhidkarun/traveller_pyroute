@@ -395,9 +395,9 @@ class Star(object):
 
     def subsector(self):
         subsector = ["ABCD", "EFGH", "IJKL", "MNOP"]
-        indexy = (self.col - 1) // 8
-        indexx = (self.row - 1) // 10
-        return subsector[indexx][indexy]
+        index_y = (self.col - 1) // 8
+        index_x = (self.row - 1) // 10
+        return subsector[index_x][index_y]
 
     def calculate_gwp(self, pop_code):
         calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400,
@@ -724,13 +724,13 @@ class Star(object):
         return val
 
     def split_stellar_data(self):
-        starparts = self.stars.split()
+        star_parts = self.stars.split()
         stars = []
 
-        if len(starparts) == 1:
-            stars = starparts
+        if len(star_parts) == 1:
+            stars = star_parts
         else:
-            for (prev, current) in zip([None] + starparts[:-1], starparts):
+            for (prev, current) in zip([None] + star_parts[:-1], star_parts):
                 if prev in [None, 'V', 'IV', 'Ia', 'Ib', 'II', 'III']:
                     continue
                 if prev in ['D']:
