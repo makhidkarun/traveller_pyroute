@@ -228,12 +228,12 @@ class AllyGen(object):
         """
         for cand_hex in list(allyMap.keys()):
             if self._set_border(allyMap, cand_hex, 2):  # up
-                neighbor = AllyGen._get_neighbor(cand_hex, 2)
+                neighbor = Hex.get_neighbor(cand_hex, 2)
                 self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | 1
             if self._set_border(allyMap, cand_hex, 5):  # down
                 self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | 1
             if self._set_border(allyMap, cand_hex, 1):  # upper right
-                neighbor = AllyGen._get_neighbor(cand_hex, 1)
+                neighbor = Hex.get_neighbor(cand_hex, 1)
                 if cand_hex[0] & 1:
                     self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | 2
                 else:
@@ -244,7 +244,7 @@ class AllyGen(object):
                 else:
                     self.borders[(cand_hex[0], cand_hex[1] - 1)] = self.borders.setdefault((cand_hex[0], cand_hex[1] - 1), 0) | 4
             if self._set_border(allyMap, cand_hex, 0):  # down right
-                neighbor = AllyGen._get_neighbor(cand_hex, 0)
+                neighbor = Hex.get_neighbor(cand_hex, 0)
                 if cand_hex[0] & 1:
                     self.borders[(cand_hex[0] + 1, cand_hex[1] - 1)] = self.borders.setdefault((cand_hex[0] + 1, cand_hex[1] - 1), 0) | 4
                 else:
@@ -262,7 +262,7 @@ class AllyGen(object):
         hence requiring adding a border to the map.
         returns True if border needed, False if not
         """
-        neighbor = AllyGen._get_neighbor(cand_hex, direction)
+        neighbor = Hex.get_neighbor(cand_hex, direction)
         # if this is a non-aligned controlled hex,
         # and the neighbor has no setting ,
         # or the neighbor is aligned 
@@ -290,7 +290,7 @@ class AllyGen(object):
     def _check_direction(allyMap, cand_hex, newMap):
         newMap[cand_hex] = allyMap[cand_hex]
         for direction in range(6):
-            neighbor = AllyGen._get_neighbor(cand_hex, direction)
+            neighbor = Hex.get_neighbor(cand_hex, direction)
             if not allyMap.get(neighbor, False):
                 newMap[neighbor] = allyMap[cand_hex]
 
@@ -387,11 +387,11 @@ class AllyGen(object):
             if alg in self.nonAligned:
                 maxRange = 2
             for dist in range(maxRange):
-                neighbor = AllyGen._get_neighbor(cand_hex, 4, dist)
+                neighbor = Hex.get_neighbor(cand_hex, 4, dist)
                 for direction in range(6):
                     for _ in range(dist):
                         allyMap[neighbor].add((alg, star.distance(cand_hex, neighbor)))
-                        neighbor = AllyGen._get_neighbor(neighbor, direction)
+                        neighbor = Hex.get_neighbor(neighbor, direction)
 
         # self._output_map(allyMap, 1)
 
@@ -436,7 +436,7 @@ class AllyGen(object):
                     continue
                 neighborAlgs = defaultdict(int)
                 for direction in range(6):
-                    neighborAlg = allyMap.get(AllyGen._get_neighbor(cand_hex, direction), None)
+                    neighborAlg = allyMap.get(Hex.get_neighbor(cand_hex, direction), None)
                     neighborAlgs[neighborAlg] += 1
 
                 algList = sorted(iter(neighborAlgs.iteritems()), key=itemgetter(1), reverse=True)
@@ -494,7 +494,7 @@ class AllyGen(object):
             for direction in range(6):
                 notCount = 0
                 for check in range(3):
-                    checkHex = AllyGen._get_neighbor(cand_hex, (direction + check) % 6)
+                    checkHex = Hex.get_neighbor(cand_hex, (direction + check) % 6)
                     neighborAlg = allyMap.get(checkHex, None)
                     if not AllyGen.are_allies(allyMap[cand_hex], neighborAlg):
                         notCount += 1
@@ -517,7 +517,7 @@ class AllyGen(object):
         # Create the edge map, of hexes on the border
         for cand_hex in allyMap.keys():
             for direction in range(6):
-                checkHex = AllyGen._get_neighbor(cand_hex, direction)
+                checkHex = Hex.get_neighbor(cand_hex, direction)
                 neighborAlg = allyMap.get(checkHex, None)
                 if not AllyGen.are_allies(allyMap[cand_hex], neighborAlg):
                     edgeMap[cand_hex] = allyMap[cand_hex]
@@ -529,7 +529,7 @@ class AllyGen(object):
                 if self._check_aligned(starMap, edgeMap, cand_hex, direction, 1) and \
                         self._check_aligned(starMap, edgeMap, cand_hex, direction, 2) and \
                         self._check_aligned(starMap, edgeMap, cand_hex, direction, 3):
-                    checkHex = AllyGen._get_neighbor(cand_hex, direction, 1)
+                    checkHex = Hex.get_neighbor(cand_hex, direction, 1)
                     allyMap[checkHex] = None
                     edgeMap[checkHex] = None
                     changed = True
@@ -539,7 +539,7 @@ class AllyGen(object):
 
     def _check_aligned(self, starMap, edgeMap, cand_hex, direction, distance):
         startAlleg = edgeMap[cand_hex]
-        checkHex = AllyGen._get_neighbor(cand_hex, direction, distance)
+        checkHex = Hex.get_neighbor(cand_hex, direction, distance)
         # Occupied hex does not count as aligned for this check
         if starMap.get(checkHex, False):
             return False
@@ -559,7 +559,7 @@ class AllyGen(object):
         newBridge = None
         checked = []
         for direction in range(6):
-            checkHex = AllyGen._get_neighbor(cand_hex, direction)
+            checkHex = Hex.get_neighbor(cand_hex, direction)
             if starMap.get(checkHex, False):
                 if self.are_allies(starMap[cand_hex], starMap[checkHex]):
                     checked.append(checkHex)
@@ -568,7 +568,7 @@ class AllyGen(object):
                 checked.append(checkHex)
                 continue
             for second in range(6):
-                searchHex = AllyGen._get_neighbor(checkHex, second)
+                searchHex = Hex.get_neighbor(checkHex, second)
                 if searchHex in checked:
                     newBridge = None
                     continue
@@ -623,12 +623,12 @@ class AllyGen(object):
             # Walk the ring filling in the hexes around star with this neighbor
             for dist in range(1, maxRange):
                 # Start in direction 0, at distance n
-                neighbor = self._get_neighbor(cand_hex, 4, dist)
+                neighbor = Hex.get_neighbor(cand_hex, 4, dist)
                 # walk six sides
                 for side in range(6):
                     for _ in range(dist):
                         allyMap[neighbor].add((alg, Hex.axial_distance(cand_hex, neighbor)))
-                        neighbor = self._get_neighbor(neighbor, side)
+                        neighbor = Hex.get_neighbor(neighbor, side)
         # self._output_map(allyMap, 1)
 
         # Pass 2: find overlapping areas and reduce
