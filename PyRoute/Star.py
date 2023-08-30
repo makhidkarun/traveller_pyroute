@@ -426,8 +426,7 @@ class Star(object):
         self.perCapita *= 1.6 if self.tradeCode.rich else 1
         self.perCapita *= 1.4 if self.tradeCode.industrial else 1
         self.perCapita *= 1.2 if self.tradeCode.agricultural else 1
-        self.perCapita *= 0.8 if self.tradeCode.extreme or \
-                       self.tradeCode.poor or self.tradeCode.nonindustrial or self.tradeCode.low else 1
+        self.perCapita *= 0.8 if self.tradeCode.low_per_capita_gwp else 1
 
         self.gwp = int((self.population * self.perCapita) // 1000)
         self.population = int(self.population)
