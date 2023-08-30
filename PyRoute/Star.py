@@ -251,7 +251,7 @@ class Star(object):
 
         star.tradeCode.check_world_codes(star)
 
-        if (data[5]):
+        if data[5]:
             imp = int(data[5][1:-1].strip())
             star.calculate_importance()
             if imp != star.importance:
@@ -294,7 +294,7 @@ class Star(object):
         star.eti_worlds = 0
         star.calculate_eti()
 
-        star.trade_id = None # Used by the Speculative Trade
+        star.trade_id = None  # Used by the Speculative Trade
         star.calc_hash()
         star.calc_passenger_btn_mod()
         return star
@@ -459,17 +459,17 @@ class Star(object):
         if port == 'B':
             self.wtn = (self.wtn * 3 + 11) // 4
         if port == 'C':
-            if (self.wtn > 9):
+            if self.wtn > 9:
                 self.wtn = (self.wtn + 9) // 2
             else:
                 self.wtn = (self.wtn * 3 + 9) // 4
         if port == 'D':
-            if (self.wtn > 7):
+            if self.wtn > 7:
                 self.wtn = (self.wtn + 7) // 2
             else:
                 self.wtn = (self.wtn * 3 + 7) // 4
         if port == 'E':
-            if (self.wtn > 5):
+            if self.wtn > 5:
                 self.wtn = (self.wtn + 5) // 2
             else:
                 self.wtn = (self.wtn * 3 + 5) // 4
