@@ -7,6 +7,7 @@ import unittest
 
 from PyRoute.Galaxy import Sector
 from PyRoute.Position.Hex import Hex
+from Star import Star
 
 
 class TestHex(unittest.TestCase):
@@ -23,6 +24,10 @@ class TestHex(unittest.TestCase):
         self.assertEqual(1, pos.col)
         self.assertEqual(0, pos.r)
         self.assertEqual(0, pos.q)
+        self.assertEqual(0, pos.x)
+        self.assertEqual(0, pos.y)
+        self.assertEqual(0, pos.z)
+        self.assertEqual((0, 0), pos.hex_position())
 
     def testSetupEvenColEvenRow(self):
         pos = Hex(self.coreSector, "0220")
@@ -30,6 +35,10 @@ class TestHex(unittest.TestCase):
         self.assertEqual(2, pos.col)
         self.assertEqual(19, pos.r)
         self.assertEqual(1, pos.q)
+        self.assertEqual(1, pos.x)
+        self.assertEqual(-20, pos.y)
+        self.assertEqual(19, pos.z)
+        self.assertEqual((1, 19), pos.hex_position())
 
     def testSetupOddColOddRow(self):
         pos = Hex(self.coreSector, "0137")
@@ -37,6 +46,10 @@ class TestHex(unittest.TestCase):
         self.assertEqual(1, pos.col)
         self.assertEqual(3, pos.r)
         self.assertEqual(0, pos.q)
+        self.assertEqual(0, pos.x)
+        self.assertEqual(-3, pos.y)
+        self.assertEqual(3, pos.z)
+        self.assertEqual((0, 3), pos.hex_position())
 
     def testSetupEvenColOddRow(self):
         pos = Hex(self.coreSector, "0221")
@@ -44,6 +57,10 @@ class TestHex(unittest.TestCase):
         self.assertEqual(2, pos.col)
         self.assertEqual(18, pos.r)
         self.assertEqual(1, pos.q)
+        self.assertEqual(1, pos.x)
+        self.assertEqual(-19, pos.y)
+        self.assertEqual(18, pos.z)
+        self.assertEqual((1, 18), pos.hex_position())
 
     def testLishun(self):
         pos1 = Hex(self.lishunSector, "0140")
@@ -148,6 +165,20 @@ class TestHex(unittest.TestCase):
         self.assertEqual((3, 34), Hex.get_neighbor(pos1.hex_position(), 4))
         self.assertEqual((4, 34), Hex.get_neighbor(pos1.hex_position(), 5))
 
+    def test_auxiliary_distances(self):
+        star1 = Star.parse_line_into_star(
+            "2820 Ezevrtlad            C120000-B De Ba Po                            - -  - 900   Zh K2 III                      ",
+            self.coreSector, 'fixed', 'fixed')
+
+        star2 = Star.parse_line_into_star(
+            "2323 Syss                 C400746-8 Na Va Pi                   { -1 } (A67-2) [6647] BD   S  - 510 5  ImDv M9 III D M5 V",
+            self.lishunSector, 'fixed', 'fixed')
+
+        exp_distance = 40
+        heu_distance = Hex.heuristicDistance(star1, star2)
+        self.assertEqual(exp_distance, heu_distance)
+        hex_distance = star1.hex.hex_distance(star2.hex)
+        self.assertEqual(exp_distance, hex_distance)
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
