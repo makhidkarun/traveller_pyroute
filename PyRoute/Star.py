@@ -256,9 +256,8 @@ class Star(object):
             star.calculate_importance()
             if imp != star.importance:
                 star.logger.warning(
-                    '{}-{} Calculated importance {} does not match generated importance {}'.format(star, star.baseCode,
-                                                                                                    star.importance,
-                                                                                                    imp))
+                    '{}-{} Calculated importance {} does not match generated importance {}'.
+                    format(star, star.baseCode, star.importance, imp))
         else:
             star.calculate_importance()
 
@@ -428,7 +427,7 @@ class Star(object):
         self.perCapita *= 1.4 if self.tradeCode.industrial else 1
         self.perCapita *= 1.2 if self.tradeCode.agricultural else 1
         self.perCapita *= 0.8 if self.tradeCode.extreme or \
-                                 self.tradeCode.poor or self.tradeCode.nonindustrial or self.tradeCode.low else 1
+                       self.tradeCode.poor or self.tradeCode.nonindustrial or self.tradeCode.low else 1
 
         self.gwp = int((self.population * self.perCapita) // 1000)
         self.population = int(self.population)
@@ -493,21 +492,19 @@ class Star(object):
 
         if self.tradeCode.barren and infrastructure != 0:
             self.logger.warning(
-                '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self,
-                                                                                                          infrastructure,
-                                                                                                          0))
+                '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.
+                format(self, infrastructure, 0))
         elif self.tradeCode.low and infrastructure != max(self.importance, 0):
             self.logger.warning(
-                '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self,
-                                                                                                          infrastructure,
-                                                                                                          max(self.importance, 0)))
+                '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.
+                format(self, infrastructure, max(self.importance, 0)))
         elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= 6 + self.importance:
             self.logger.warning(
-                '{} - EX Calculated infrastructure {} not in NI range 0 - {}'.format(self, infrastructure,
-                                                                                      6 + self.importance))
+                '{} - EX Calculated infrastructure {} not in NI range 0 - {}'.
+                format(self, infrastructure, 6 + self.importance))
         elif not 0 <= infrastructure <= 12 + self.importance:
-            self.logger.warning('{} - EX Calculated infrastructure {} not in range 0 - {}'.format(self, infrastructure,
-                                                                                                 12 + self.importance))
+            self.logger.warning('{} - EX Calculated infrastructure {} not in range 0 - {}'.
+                                format(self, infrastructure, 12 + self.importance))
 
     def check_cx(self):
         if not self.economics:
@@ -520,8 +517,8 @@ class Star(object):
                 '{} - CX calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity))
         elif pop != 0 and not max(1, pop - 5) <= homogeneity <= pop + 5:
             self.logger.warning(
-                '{} - CX calculated homogeneity {} not in range {} - {}'.format(self, homogeneity, max(1, pop - 5),
-                                                                                 pop + 5))
+                '{} - CX calculated homogeneity {} not in range {} - {}'.
+                format(self, homogeneity, max(1, pop - 5), pop + 5))
 
         acceptance = self._ehex_to_int(self.social[2])  # pop + Ix, min 1
         if pop == 0 and acceptance != 0:
@@ -529,9 +526,8 @@ class Star(object):
                 '{} - CX calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
         elif pop != 0 and not max(1, pop + self.importance) == acceptance:
             self.logger.warning(
-                '{} - CX Calculated acceptance {} does not match generated acceptance {}'.format(self, acceptance,
-                                                                                                  max(1,
-                                                                                                      pop + self.importance)))
+                '{} - CX Calculated acceptance {} does not match generated acceptance {}'.
+                format(self, acceptance, max(1, pop + self.importance)))
 
         strangeness = self._ehex_to_int(self.social[3])  # flux + 5
         if pop == 0 and strangeness != 0:
@@ -546,8 +542,8 @@ class Star(object):
             self.logger.warning('{} - CX calculated symbols {} should be 0 for barren worlds'.format(self, symbols))
         elif pop != 0 and not max(1, self.tl - 5) <= symbols <= self.tl + 5:
             self.logger.warning(
-                '{} - CX calculated symbols {} not in range {} - {}'.format(self, symbols, max(1, self.tl - 5),
-                                                                             self.tl + 5))
+                '{} - CX calculated symbols {} not in range {} - {}'.
+                format(self, symbols, max(1, self.tl - 5), self.tl + 5))
 
     def calculate_ru(self, ru_calc):
         if not self.economics:
