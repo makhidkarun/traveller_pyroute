@@ -277,17 +277,7 @@ class AllyGen(object):
 
     @staticmethod
     def _get_neighbor(cand_hex, direction, distance=1):
-        """
-        determine neighboring hex from the q,r position and direction
-        """
-        neighbors = [
-            [+1, 0], [+1, -1], [0, -1],
-            [-1, 0], [-1, +1], [0, +1]
-        ]
-        d = neighbors[direction]
-        qn = cand_hex[0] + (d[0] * distance)
-        rn = cand_hex[1] + (d[1] * distance)
-        return (int(qn), int(rn))
+        return Hex.get_neighbor(cand_hex, direction, distance)
 
     @staticmethod
     def step_map(allyMap):
