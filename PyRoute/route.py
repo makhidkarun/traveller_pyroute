@@ -82,9 +82,16 @@ def process():
     galaxy = Galaxy(args.btn, args.max_jump, args.route_btn, args.debug_flag, trade_choice=args.routes, reuse=args.route_reuse)
     galaxy.output_path = args.output
 
-    sectors_list = args.sector
+    raw_sectors_list = args.sector
     if args.sectors is not None:
-        sectors_list.extend(get_sectors(args.sectors, args.input))
+        raw_sectors_list.extend(get_sectors(args.sectors, args.input))
+
+    sectors_list = []
+    for sector in raw_sectors_list:
+        if sector not in sectors_list:
+            sectors_list.append(sector)
+        else:
+            logger.warning(sector + " is duplicated")
 
     galaxy.read_sectors(sectors_list, args.pop_code, args.ru_calc)
 
