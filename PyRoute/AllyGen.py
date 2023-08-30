@@ -276,10 +276,6 @@ class AllyGen(object):
         return False
 
     @staticmethod
-    def _get_neighbor(cand_hex, direction, distance=1):
-        return Hex.get_neighbor(cand_hex, direction, distance)
-
-    @staticmethod
     def step_map(allyMap):
         newMap = {}
         for Hex in allyMap.keys():
