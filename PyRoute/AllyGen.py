@@ -538,7 +538,6 @@ class AllyGen(object):
             self._search_range(cand_hex, allyMap, starMap)
 
     def _search_range(self, cand_hex, allyMap, starMap):
-        from PyRoute.Star import Star
         newBridge = None
         checked = []
         for direction in range(6):
