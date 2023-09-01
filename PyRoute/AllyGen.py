@@ -103,7 +103,9 @@ class AllyGen(object):
         return alg in AllyGen.noOne
 
     @staticmethod
-    def is_nonaligned(alg):
+    def is_nonaligned(alg, strict=False):
+        if strict:
+            return alg in AllyGen.nonAligned
         return alg in AllyGen.nonAligned or alg in AllyGen.noOne
 
     @staticmethod
@@ -196,8 +198,8 @@ class AllyGen(object):
             # Skip the non-entity worlds
             if alg in self.noOne:
                 continue
-            # Collapse non-aligned into each their own 
-            if alg in self.nonAligned:
+            # Collapse non-aligned into each their own
+            if AllyGen.is_nonaligned(alg):
                 alg = self.nonAligned[0]
             # Collapse same Aligned into one
             alg = self.same_align(alg) if match == 'collapse' else alg
@@ -266,8 +268,8 @@ class AllyGen(object):
         # if this is a non-aligned controlled hex,
         # and the neighbor has no setting ,
         # or the neighbor is aligned 
-        # Then no border . 
-        if (allyMap[cand_hex] in AllyGen.nonAligned or allyMap[cand_hex] is None) and \
+        # Then no border .
+        if (AllyGen.is_nonaligned(allyMap[cand_hex], True) or allyMap[cand_hex] is None) and \
                 (allyMap.get(neighbor, True) or allyMap.get(neighbor, None) not in AllyGen.nonAligned):
             return False
         # If not matched allegiance, need a border.
@@ -356,7 +358,7 @@ class AllyGen(object):
         for star in stars:
             alg = star.alg_code
             # Collapse non-aligned into one value
-            if alg in self.nonAligned or alg in self.noOne:
+            if AllyGen.is_nonaligned(alg):
                 alg = self.nonAligned[0]
 
             # Collapse same Aligned into one
@@ -380,7 +382,7 @@ class AllyGen(object):
                 maxRange = 1
             else:
                 maxRange = ['D', 'C', 'B', 'A'].index(star.port) + 2
-            if alg in self.nonAligned:
+            if AllyGen.is_nonaligned(alg, True):
                 maxRange = 2
             for dist in range(maxRange):
                 neighbor = Hex.get_neighbor(cand_hex, 4, dist)
@@ -415,7 +417,7 @@ class AllyGen(object):
                         maxCount = -1
                         maxAlly = None
                         for alg, dist in allyDist:
-                            if alg in self.nonAligned:
+                            if AllyGen.is_nonaligned(alg, True):
                                 maxAlly = alg
                                 break
                             if self.galaxy.alg[alg].stats.number > maxCount:
@@ -483,7 +485,7 @@ class AllyGen(object):
             if starMap.get(cand_hex, False):
                 newMap[cand_hex] = starMap[cand_hex]
                 continue
-            if allyMap[cand_hex] in AllyGen.nonAligned or allyMap[cand_hex] in AllyGen.noOne:
+            if AllyGen.is_nonaligned(allyMap[cand_hex]):
                 newMap[cand_hex] = allyMap[cand_hex]
                 continue
 
@@ -591,7 +593,7 @@ class AllyGen(object):
         for star in stars:
             alg = star.alg_code
             # Collapse non-aligned into one value
-            if alg in self.nonAligned or alg in self.noOne:
+            if AllyGen.is_nonaligned(alg):
                 alg = self.nonAligned[0]
 
             # Collapse same Aligned into one
@@ -615,7 +617,7 @@ class AllyGen(object):
             else:
                 maxRange = ['D', 'C', 'B', 'A'].index(star.port) + 2
 
-            if alg in self.nonAligned:
+            if AllyGen.is_nonaligned(alg, True):
                 maxRange = 0
             # Walk the ring filling in the hexes around star with this neighbor
             for dist in range(1, maxRange):
@@ -650,7 +652,7 @@ class AllyGen(object):
                         maxCount = -1
                         maxAlly = None
                         for alg, dist in allyDist:
-                            if alg not in self.nonAligned and \
+                            if not AllyGen.is_nonaligned(alg, True) and \
                                     self.galaxy.alg[alg].stats.number > maxCount:
                                 maxAlly = alg
                                 maxCount = self.galaxy.alg[alg].stats.number
