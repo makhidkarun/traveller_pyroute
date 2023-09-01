@@ -196,7 +196,7 @@ class AllyGen(object):
         for star in self.galaxy.star_mapping.values():
             alg = star.alg_code
             # Skip the non-entity worlds
-            if alg in self.noOne:
+            if AllyGen.is_unclaimed(alg):
                 continue
             # Collapse non-aligned into each their own
             if AllyGen.is_nonaligned(alg):
