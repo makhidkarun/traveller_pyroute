@@ -431,7 +431,7 @@ class AllyGen(object):
         # Do two passes through the data
         for _ in range(2):
             for cand_hex in allyMap.keys():
-                if starMap.get(cand_hex, False):
+                if cand_hex in starMap:
                     continue
                 neighborAlgs = defaultdict(int)
                 for direction in range(6):
@@ -482,7 +482,7 @@ class AllyGen(object):
         # if three contiguous hexes are not aligned
         for cand_hex in allyMap.keys():
             # Worlds keep their allegiances.
-            if starMap.get(cand_hex, False):
+            if cand_hex in starMap:
                 newMap[cand_hex] = starMap[cand_hex]
                 continue
             if AllyGen.is_nonaligned(allyMap[cand_hex]):
@@ -522,7 +522,7 @@ class AllyGen(object):
                     edgeMap[cand_hex] = allyMap[cand_hex]
 
         for cand_hex in edgeMap.keys():
-            if starMap.get(cand_hex, False):
+            if cand_hex in starMap:
                 continue
             for direction in range(6):
                 if self._check_aligned(starMap, edgeMap, cand_hex, direction, 1) and \
@@ -540,7 +540,7 @@ class AllyGen(object):
         startAlleg = edgeMap[cand_hex]
         checkHex = Hex.get_neighbor(cand_hex, direction, distance)
         # Occupied hex does not count as aligned for this check
-        if starMap.get(checkHex, False):
+        if checkHex in starMap:
             return False
         checkAlleg = edgeMap.get(checkHex, None)
         return AllyGen.are_allies(startAlleg, checkAlleg)
@@ -559,7 +559,7 @@ class AllyGen(object):
         checked = []
         for direction in range(6):
             checkHex = Hex.get_neighbor(cand_hex, direction)
-            if starMap.get(checkHex, False):
+            if checkHex in starMap:
                 if self.are_allies(starMap[cand_hex], starMap[checkHex]):
                     checked.append(checkHex)
                 continue
@@ -573,7 +573,7 @@ class AllyGen(object):
                     continue
                 if searchHex == cand_hex or Hex.axial_distance(searchHex, cand_hex) == 1:
                     continue
-                if starMap.get(searchHex, False) and \
+                if searchHex in starMap and \
                         self.are_allies(starMap[cand_hex], starMap[searchHex]):
                     newBridge = checkHex
                     checked.append(checkHex)
