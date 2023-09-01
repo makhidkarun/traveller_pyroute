@@ -386,7 +386,8 @@ class AllyGen(object):
                 neighbor = Hex.get_neighbor(cand_hex, 4, dist)
                 for direction in range(6):
                     for _ in range(dist):
-                        allyMap[neighbor].add((alg, star.distance(cand_hex, neighbor)))
+                        star_dist = Hex.axial_distance(cand_hex, neighbor)
+                        allyMap[neighbor].add((alg, star_dist))
                         neighbor = Hex.get_neighbor(neighbor, direction)
 
         # self._output_map(allyMap, 1)
@@ -435,7 +436,7 @@ class AllyGen(object):
                     neighborAlg = allyMap.get(Hex.get_neighbor(cand_hex, direction), None)
                     neighborAlgs[neighborAlg] += 1
 
-                algList = sorted(iter(neighborAlgs.iteritems()), key=itemgetter(1), reverse=True)
+                algList = sorted(iter(neighborAlgs.items()), key=itemgetter(1), reverse=True)
                 if len(algList) == 0:
                     allyMap[cand_hex] = None
                 elif algList[0][1] >= 1:
