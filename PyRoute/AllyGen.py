@@ -202,7 +202,7 @@ class AllyGen(object):
             if AllyGen.is_nonaligned(alg):
                 alg = self.nonAligned[0]
             # Collapse same Aligned into one
-            alg = self.same_align(alg) if match == 'collapse' else alg
+            alg = self._collapse_allegiance_if_needed(alg, match)
 
             self.allyMap[(star.q, star.r)] = alg
 
@@ -362,10 +362,8 @@ class AllyGen(object):
                 alg = self.nonAligned[0]
 
             # Collapse same Aligned into one
-            if match == 'collapse':
-                alg = self.same_align(alg)
-            elif match == 'separate':
-                pass
+            alg = self._collapse_allegiance_if_needed(alg, match)
+
             allyMap[(star.q, star.r)].add((alg, 0))
             starMap[(star.q, star.r)] = alg
 
@@ -597,10 +595,8 @@ class AllyGen(object):
                 alg = self.nonAligned[0]
 
             # Collapse same Aligned into one
-            if match == 'collapse':
-                alg = self.same_align(alg)
-            elif match == 'separate':
-                pass
+            alg = self._collapse_allegiance_if_needed(alg, match)
+
             allyMap[(star.q, star.r)].add((alg, 0))
             starMap[(star.q, star.r)] = alg
 
@@ -659,3 +655,10 @@ class AllyGen(object):
                         allyMap[cand_hex] = maxAlly
 
         return allyMap, starMap
+
+    def _collapse_allegiance_if_needed(self, alg, match):
+        if 'collapse' == match:
+            alg = self.same_align(alg)
+        elif 'separate' == match:
+            pass
+        return alg
