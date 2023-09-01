@@ -280,8 +280,8 @@ class AllyGen(object):
     @staticmethod
     def step_map(allyMap):
         newMap = {}
-        for Hex in allyMap.keys():
-            AllyGen._check_direction(allyMap, Hex, newMap)
+        for cand_hex in allyMap.keys():
+            AllyGen._check_direction(allyMap, cand_hex, newMap)
         return newMap
 
     @staticmethod
@@ -289,7 +289,7 @@ class AllyGen(object):
         newMap[cand_hex] = allyMap[cand_hex]
         for direction in range(6):
             neighbor = Hex.get_neighbor(cand_hex, direction)
-            if not allyMap.get(neighbor, False):
+            if neighbor not in allyMap:
                 newMap[neighbor] = allyMap[cand_hex]
 
     def _output_map(self, allyMap, stage):
