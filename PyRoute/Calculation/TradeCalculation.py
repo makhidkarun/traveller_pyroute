@@ -227,9 +227,9 @@ class TradeCalculation(RouteCalculation):
             target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr // 2
             star.sector.stats.passengers += tradePass // 2
             target.sector.stats.passengers += tradePass // 2
-            if 1 == (tradeCr - 2 * (tradeCr // 2)):
+            if 1 == (tradeCr & 1):
                 self.sector_trade_balance.log_odd_unit(star, target)
-            if 1 == (tradePass - 2 * (tradePass // 2)):
+            if 1 == (tradePass & 1):
                 self.sector_passenger_balance.log_odd_unit(star, target)
         else:
             star.sector.stats.trade += tradeCr
@@ -250,9 +250,9 @@ class TradeCalculation(RouteCalculation):
             self.galaxy.alg[targcode].stats.tradeExt += tradeCr // 2
             self.galaxy.alg[starcode].stats.passengers += tradePass // 2
             self.galaxy.alg[targcode].stats.passengers += tradePass // 2
-            if 1 == (tradeCr - 2 * (tradeCr // 2)):
+            if 1 == (tradeCr & 1):
                 self.allegiance_trade_balance.log_odd_unit(star, target)
-            if 1 == (tradePass - 2 * (tradePass // 2)):
+            if 1 == (tradePass & 1):
                 self.allegiance_passenger_balance.log_odd_unit(star, target)
 
         self.galaxy.stats.trade += tradeCr
