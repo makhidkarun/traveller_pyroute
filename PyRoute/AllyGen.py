@@ -351,21 +351,7 @@ class AllyGen(object):
 
     def _ally_map(self, match):
         # Create list of stars
-        stars = self.galaxy.star_mapping.values()
-        allyMap = defaultdict(set)
-        starMap = {}
-        # Mark the map with all the stars        
-        for star in stars:
-            alg = star.alg_code
-            # Collapse non-aligned into one value
-            if AllyGen.is_nonaligned(alg):
-                alg = self.nonAligned[0]
-
-            # Collapse same Aligned into one
-            alg = self._collapse_allegiance_if_needed(alg, match)
-
-            allyMap[(star.q, star.r)].add((alg, 0))
-            starMap[(star.q, star.r)] = alg
+        allyMap, starMap, stars = self._unpack_stars_and_maps(match)
 
         # self._output_map(allyMap, 0)
 
@@ -584,21 +570,7 @@ class AllyGen(object):
         Note: This does not match the original system.
         """
         # Create list of stars
-        stars = self.galaxy.star_mapping.values()
-        allyMap = defaultdict(set)
-        starMap = {}
-        # Mark the map with all the stars        
-        for star in stars:
-            alg = star.alg_code
-            # Collapse non-aligned into one value
-            if AllyGen.is_nonaligned(alg):
-                alg = self.nonAligned[0]
-
-            # Collapse same Aligned into one
-            alg = self._collapse_allegiance_if_needed(alg, match)
-
-            allyMap[(star.q, star.r)].add((alg, 0))
-            starMap[(star.q, star.r)] = alg
+        allyMap, starMap, stars = self._unpack_stars_and_maps(match)
 
         # self._output_map(allyMap, 0)
 
@@ -655,6 +627,24 @@ class AllyGen(object):
                         allyMap[cand_hex] = maxAlly
 
         return allyMap, starMap
+
+    def _unpack_stars_and_maps(self, match):
+        stars = self.galaxy.star_mapping.values()
+        allyMap = defaultdict(set)
+        starMap = {}
+        # Mark the map with all the stars
+        for star in stars:
+            alg = star.alg_code
+            # Collapse non-aligned into one value
+            if AllyGen.is_nonaligned(alg):
+                alg = self.nonAligned[0]
+
+            # Collapse same Aligned into one
+            alg = self._collapse_allegiance_if_needed(alg, match)
+
+            allyMap[(star.q, star.r)].add((alg, 0))
+            starMap[(star.q, star.r)] = alg
+        return allyMap, starMap, stars
 
     def _collapse_allegiance_if_needed(self, alg, match):
         if 'collapse' == match:
