@@ -322,6 +322,125 @@ class testAllyGenBorders(unittest.TestCase):
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
+    def test_create_borders_district_268_collapse(self):
+        sourcefile = os.path.abspath('../DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
+        allymap = os.path.abspath('../DeltaFiles/create_borders_district_268_collapse/allymap.json')
+        if not os.path.isfile(allymap):
+            allymap = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_collapse/allymap.json')
+        borderfile = os.path.abspath('../DeltaFiles/create_borders_district_268_collapse/borders.json')
+        if not os.path.isfile(borderfile):
+            borderfile = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_collapse/borders.json')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
+
+        # Load expected allymap
+        with open(allymap, 'r') as file:
+            expected_string = json.load(file)
+        expected_allies = dict()
+        for key in expected_string:
+            trimkey = key.strip('()')
+            bitz = trimkey.split(',')
+            nukey = (int(bitz[0]), int(bitz[1]))
+            expected_allies[nukey] = expected_string[key]
+
+        # Load expected borders
+        with open(borderfile, 'r') as file:
+            expected_string = json.load(file)
+        expected_borders = dict()
+        for key in expected_string:
+            trimkey = key.strip('()')
+            bitz = trimkey.split(',')
+            nukey = (int(bitz[0]), int(bitz[1]))
+            expected_borders[nukey] = expected_string[key]
+
+        allygen = AllyGen(galaxy)
+
+        allygen.create_borders('collapse')
+
+        self.assertEqual(expected_allies, allygen.allyMap)
+        self.assertEqual(expected_borders, allygen.borders)
+
+    def test_create_borders_district_268_separate(self):
+        sourcefile = os.path.abspath('../DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
+        allymap = os.path.abspath('../DeltaFiles/create_borders_district_268_separate/allymap.json')
+        if not os.path.isfile(allymap):
+            allymap = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_separate/allymap.json')
+        borderfile = os.path.abspath('../DeltaFiles/create_borders_district_268_separate/borders.json')
+        if not os.path.isfile(borderfile):
+            borderfile = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_separate/borders.json')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.trade.calculate_components()
+
+        # Load expected allymap
+        with open(allymap, 'r') as file:
+            expected_string = json.load(file)
+        expected_allies = dict()
+        for key in expected_string:
+            trimkey = key.strip('()')
+            bitz = trimkey.split(',')
+            nukey = (int(bitz[0]), int(bitz[1]))
+            expected_allies[nukey] = expected_string[key]
+
+        # Load expected borders
+        with open(borderfile, 'r') as file:
+            expected_string = json.load(file)
+        expected_borders = dict()
+        for key in expected_string:
+            trimkey = key.strip('()')
+            bitz = trimkey.split(',')
+            nukey = (int(bitz[0]), int(bitz[1]))
+            expected_borders[nukey] = expected_string[key]
+
+        allygen = AllyGen(galaxy)
+
+        allygen.create_borders('separate')
+
+        self.assertEqual(expected_allies, allygen.allyMap)
+        self.assertEqual(expected_borders, allygen.borders)
+
+    def dump_expected_values(self, allygen, allymap, borderfile):
+        with open(borderfile, 'w') as file:
+            dump_dict = dict()
+            for loc in allygen.borders:
+                dump_dict[str(loc)] = allygen.borders[loc]
+            foo_string = json.dumps(dump_dict)
+            file.write(foo_string)
+        # seed expected allymap
+        with open(allymap, 'w') as file:
+            dump_dict = dict()
+            for loc in allygen.allyMap:
+                dump_dict[str(loc)] = allygen.allyMap[loc]
+            foo_string = json.dumps(dump_dict)
+            file.write(foo_string)
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
