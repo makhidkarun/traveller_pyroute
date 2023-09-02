@@ -35,25 +35,7 @@ class testAllyGenBorders(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        # Load expected allymap
-        with open(allymap, 'r') as file:
-            expected_string = json.load(file)
-        expected_allies = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_allies[nukey] = expected_string[key]
-
-        # Load expected borders
-        with open(borderfile, 'r') as file:
-            expected_string = json.load(file)
-        expected_borders = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_borders[nukey] = expected_string[key]
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
 
         allygen = AllyGen(galaxy)
 
@@ -87,25 +69,7 @@ class testAllyGenBorders(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        # Load expected allymap
-        with open(allymap, 'r') as file:
-            expected_string = json.load(file)
-        expected_allies = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_allies[nukey] = expected_string[key]
-
-        # Load expected borders
-        with open(borderfile, 'r') as file:
-            expected_string = json.load(file)
-        expected_borders = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_borders[nukey] = expected_string[key]
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
 
         allygen = AllyGen(galaxy)
 
@@ -139,25 +103,7 @@ class testAllyGenBorders(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        # Load expected allymap
-        with open(allymap, 'r') as file:
-            expected_string = json.load(file)
-        expected_allies = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_allies[nukey] = expected_string[key]
-
-        # Load expected borders
-        with open(borderfile, 'r') as file:
-            expected_string = json.load(file)
-        expected_borders = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_borders[nukey] = expected_string[key]
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
 
         allygen = AllyGen(galaxy)
 
@@ -191,25 +137,7 @@ class testAllyGenBorders(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        # Load expected allymap
-        with open(allymap, 'r') as file:
-            expected_string = json.load(file)
-        expected_allies = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_allies[nukey] = expected_string[key]
-
-        # Load expected borders
-        with open(borderfile, 'r') as file:
-            expected_string = json.load(file)
-        expected_borders = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_borders[nukey] = expected_string[key]
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
 
         allygen = AllyGen(galaxy)
 
@@ -243,25 +171,7 @@ class testAllyGenBorders(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        # Load expected allymap
-        with open(allymap, 'r') as file:
-            expected_string = json.load(file)
-        expected_allies = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_allies[nukey] = expected_string[key]
-
-        # Load expected borders
-        with open(borderfile, 'r') as file:
-            expected_string = json.load(file)
-        expected_borders = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_borders[nukey] = expected_string[key]
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
 
         allygen = AllyGen(galaxy)
 
@@ -295,25 +205,7 @@ class testAllyGenBorders(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        # Load expected allymap
-        with open(allymap, 'r') as file:
-            expected_string = json.load(file)
-        expected_allies = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_allies[nukey] = expected_string[key]
-
-        # Load expected borders
-        with open(borderfile, 'r') as file:
-            expected_string = json.load(file)
-        expected_borders = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_borders[nukey] = expected_string[key]
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
 
         allygen = AllyGen(galaxy)
 
@@ -347,25 +239,7 @@ class testAllyGenBorders(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
-        # Load expected allymap
-        with open(allymap, 'r') as file:
-            expected_string = json.load(file)
-        expected_allies = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_allies[nukey] = expected_string[key]
-
-        # Load expected borders
-        with open(borderfile, 'r') as file:
-            expected_string = json.load(file)
-        expected_borders = dict()
-        for key in expected_string:
-            trimkey = key.strip('()')
-            bitz = trimkey.split(',')
-            nukey = (int(bitz[0]), int(bitz[1]))
-            expected_borders[nukey] = expected_string[key]
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
 
         allygen = AllyGen(galaxy)
 
@@ -399,6 +273,16 @@ class testAllyGenBorders(unittest.TestCase):
         galaxy.generate_routes(args.routes, args.route_reuse)
         galaxy.trade.calculate_components()
 
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
+
+        allygen = AllyGen(galaxy)
+
+        allygen.create_borders('separate')
+
+        self.assertEqual(expected_allies, allygen.allyMap)
+        self.assertEqual(expected_borders, allygen.borders)
+
+    def load_expected_values(self, allymap, borderfile):
         # Load expected allymap
         with open(allymap, 'r') as file:
             expected_string = json.load(file)
@@ -408,7 +292,6 @@ class testAllyGenBorders(unittest.TestCase):
             bitz = trimkey.split(',')
             nukey = (int(bitz[0]), int(bitz[1]))
             expected_allies[nukey] = expected_string[key]
-
         # Load expected borders
         with open(borderfile, 'r') as file:
             expected_string = json.load(file)
@@ -418,13 +301,7 @@ class testAllyGenBorders(unittest.TestCase):
             bitz = trimkey.split(',')
             nukey = (int(bitz[0]), int(bitz[1]))
             expected_borders[nukey] = expected_string[key]
-
-        allygen = AllyGen(galaxy)
-
-        allygen.create_borders('separate')
-
-        self.assertEqual(expected_allies, allygen.allyMap)
-        self.assertEqual(expected_borders, allygen.borders)
+        return expected_allies, expected_borders
 
     def dump_expected_values(self, allygen, allymap, borderfile):
         with open(borderfile, 'w') as file:
@@ -463,22 +340,6 @@ class testAllyGenBorders(unittest.TestCase):
         args.output = tempfile.gettempdir()
         return args
 
-        # dump-out-allygen-guts code kept here for reference
-        # seed expected borders
-        #with open(borderfile, 'w') as file:
-        #    dump_dict = dict()
-        #    for loc in allygen.borders:
-        #        dump_dict[str(loc)] = allygen.borders[loc]
-        #    foo_string = json.dumps(dump_dict)
-        #    file.write(foo_string)
-
-        # seed expected allymap
-        #with open(allymap, 'w') as file:
-        #    dump_dict = dict()
-        #    for loc in allygen.allyMap:
-        #        dump_dict[str(loc)] = allygen.allyMap[loc]
-        #    foo_string=json.dumps(dump_dict)
-        #    file.write(foo_string)
 
 if __name__ == '__main__':
     unittest.main()
