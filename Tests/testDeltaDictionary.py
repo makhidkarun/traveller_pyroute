@@ -388,6 +388,17 @@ class testSectorDictionary(unittest.TestCase):
 
         self.assertTrue(foo.skipped)
 
+    def test_sector_file_load_with_no_named_sectors_has_subsector_dictionaries(self):
+        sourcefile = 'DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec'
+
+        # load_traveller_map_file is a little slow as it uses Star's parse_line_into_star method
+        # to validate the input line
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertTrue(isinstance(sector, SectorDictionary), "SectorDictionary object not created")
+
+        self.assertEqual(16, len(sector), "Loaded sector file should have 16 subsector dicts")
+
+
 class testSubsectorDictionary(unittest.TestCase):
     def test_drop_lines(self):
         foo = SubsectorDictionary('Mimu', 'A')
