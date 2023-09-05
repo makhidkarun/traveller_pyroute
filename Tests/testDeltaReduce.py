@@ -252,6 +252,23 @@ class testDeltaReduce(unittest.TestCase):
 
         galaxy.trade.get_trade_between(line[0], line[1])
 
+    def test_verify_sector_without_subsector_names_and_generating_maps_is_not_interesting(self):
+        sourcefile = 'DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec'
+
+        args = self._make_args()
+        args.interestingline = None
+        args.interestingtype = None
+        args.maps = True
+        args.subsectors = True
+
+        delta = DeltaDictionary()
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+
+        reducer.is_initial_state_uninteresting()
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
