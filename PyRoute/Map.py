@@ -594,11 +594,8 @@ class GraphicMap(Map):
         doc.bitmap((self.trailPos[0], self.trailPos[1] - w.size[1] / 2), w, fill=self.textFill)
 
     def get_text_size(self, font, string):
-        try:
-            size = font.getsize(string)
-        except AttributeError:
-            foo = font.getbbox(string)
-            size = (foo[2] - foo[0], foo[3] - foo[1])
+        foo = font.getbbox(string)
+        size = (foo[2] - foo[0], foo[3] - foo[1])
 
         return size
 
