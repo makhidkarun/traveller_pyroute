@@ -108,10 +108,6 @@ class Star(object):
         self._key = None
         self.component = None
         self.index = None
-        self.q = None
-        self.r = None
-        self.col = None
-        self.row = None
         self.gwp = None
         self.population = None
         self.perCapita = None
@@ -352,27 +348,7 @@ class Star(object):
         @param dx: Base sector-level trailing-spinward offset added to star's within-sector x position
         @param dy: Base sector-level coreward-rimward offset added to star's within-sector y position
         """
-        # convert odd-q offset to axial
-        q = int(self.position[0:2]) + dx - 1
-        raw_r_offset = 41 - int(self.position[2:4])
-        r = raw_r_offset + dy - 1
-
-        # Halving q, rounding up _towards negative infinity_ to the nearest integer - ie, ceil(q / 2).
-        # redblob's implementation uses floor(q/2), but they haven't inverted the r axis.
-        q_offset = (q + (q & 1)) // 2
-
-        self.q = q
-        self.r = r - q_offset
-
-        # cube co-ords are properties
-
-        # store within-sector column and row co-ords
-        self.col = q - dx + 1
-        self.row = 41 - (r - dy + 1)
-
         self.hex = Hex(self.sector, self.position)
-        assert self.q == self.hex.q, "Mismatch between direct q value " + str(self.q) + " and Hex-level q value " + str(self.hex.q)
-        assert self.r == self.hex.r, "Mismatch between direct r value " + str(self.r) + " and Hex-level r value " + str(self.hex.r)
 
     @property
     def x(self):
@@ -385,6 +361,22 @@ class Star(object):
     @property
     def z(self):
         return self.hex.z
+
+    @property
+    def q(self):
+        return self.hex.q
+
+    @property
+    def r(self):
+        return self.hex.r
+
+    @property
+    def col(self):
+        return self.hex.col
+
+    @property
+    def row(self):
+        return self.hex.row
 
     def distance(self, star):
         hex1 = self.hex.hex_position()
