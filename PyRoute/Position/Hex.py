@@ -17,6 +17,11 @@ class Hex(object):
     r = 0
 
     def __init__(self, sector, position):
+        """
+        # The zero point of the co-ordinate system used is Reference (Core 0140).
+        # As a result, hex position 01,40 becomes q=0, r=0, x=0, y=0, z=0.
+        """
+
         self.position = position
         self.col = int(self.position[0:2])
         self.row = int(self.position[2:4])
