@@ -10,6 +10,7 @@ import unittest
 import re
 import sys
 
+from Position.Hex import Hex
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 
 sys.path.append('../PyRoute')
@@ -42,6 +43,13 @@ class TestStar(unittest.TestCase):
         self.assertFalse(star1.tradeCode.rich)
         self.assertEqual(3, star1.ggCount)
         self.assertEqual(star1.star_list, ['M2 V'])
+        self.assertEqual(0, star1.x)
+        self.assertEqual(-37, star1.y)
+        self.assertEqual(37, star1.z)
+        self.assertEqual(0, star1.q)
+        self.assertEqual(37, star1.r)
+        self.assertEqual(3, star1.row)
+        self.assertEqual(1, star1.col)
 
     def testParseIrkigkhanRUCollapse(self):
         sector = Sector(' Core', ' 0, 0')
@@ -86,6 +94,13 @@ class TestStar(unittest.TestCase):
         self.assertEqual(3, star1.ggCount)
         self.assertEqual(2, len(star1.star_list))
         self.assertEqual(['K2 IV', 'M7 V'], star1.star_list)
+        self.assertEqual(0, star1.x)
+        self.assertEqual(-36, star1.y)
+        self.assertEqual(36, star1.z)
+        self.assertEqual(0, star1.q)
+        self.assertEqual(36, star1.r)
+        self.assertEqual(4, star1.row)
+        self.assertEqual(1, star1.col)
 
     def testParseSyss(self):
         sector = Sector(' Core', ' 0, 0')
@@ -99,6 +114,69 @@ class TestStar(unittest.TestCase):
         self.assertEqual(star1.uwp, 'C400746-8')
         self.assertEqual(star1.stars, 'M9 III D M5 V')
         self.assertEqual(star1.star_list, ['M9 III', 'D', 'M5 V'])
+        self.assertEqual(22, star1.x)
+        self.assertEqual(-28, star1.y)
+        self.assertEqual(6, star1.z)
+        self.assertEqual(22, star1.q)
+        self.assertEqual(6, star1.r)
+        self.assertEqual(23, star1.row)
+        self.assertEqual(23, star1.col)
+
+    def testParseZhdant(self):
+        sector = Sector(' Zhdant', ' -7, 2')
+        star1 = Star.parse_line_into_star(
+            "2719 Zhdant               A6547C8-F Ag An Cx                            - KM - 811   Zh K0 V                        ",
+            sector, 'fixed', 'fixed')
+
+        self.assertEqual(-198, star1.x)
+        self.assertEqual(-2, star1.y)
+        self.assertEqual(200, star1.z)
+        self.assertEqual(-198, star1.q)
+        self.assertEqual(200, star1.r)
+        self.assertEqual(19, star1.row)
+        self.assertEqual(27, star1.col)
+
+    def testParseVlazzhden(self):
+        sector = Sector(' Zhdant', ' -7, 2')
+        star1 = Star.parse_line_into_star(
+            "2720 Vlazzhden            C210143-8 Lo Ni                               - -  - 303   Zh G1 IV                       ",
+            sector, 'fixed', 'fixed')
+
+        self.assertEqual(-198, star1.x)
+        self.assertEqual(-1, star1.y)
+        self.assertEqual(199, star1.z)
+        self.assertEqual(-198, star1.q)
+        self.assertEqual(199, star1.r)
+        self.assertEqual(20, star1.row)
+        self.assertEqual(27, star1.col)
+
+    def testParseTlapinsh(self):
+        sector = Sector(' Zhdant', ' -7, 2')
+        star1 = Star.parse_line_into_star(
+            "2819 Tlapinsh             B569854-C Ri                                  - -  - 622   Zh F7 V                        ",
+            sector, 'fixed', 'fixed')
+
+        self.assertEqual(-197, star1.x)
+        self.assertEqual(-2, star1.y)
+        self.assertEqual(199, star1.z)
+        self.assertEqual(-197, star1.q)
+        self.assertEqual(199, star1.r)
+        self.assertEqual(19, star1.row)
+        self.assertEqual(28, star1.col)
+
+    def testParseEzevrtlad(self):
+        sector = Sector(' Zhdant', ' -7, 2')
+        star1 = Star.parse_line_into_star(
+            "2820 Ezevrtlad            C120000-B De Ba Po                            - -  - 900   Zh K2 III                      ",
+            sector, 'fixed', 'fixed')
+
+        self.assertEqual(-197, star1.x)
+        self.assertEqual(-1, star1.y)
+        self.assertEqual(198, star1.z)
+        self.assertEqual(-197, star1.q)
+        self.assertEqual(198, star1.r)
+        self.assertEqual(20, star1.row)
+        self.assertEqual(28, star1.col)
 
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
@@ -300,6 +378,22 @@ class TestStar(unittest.TestCase):
 
         self.assertTrue(object_time > saved_time, "Object comparison unexpectedly faster than integer comparison")
         self.assertTrue(property_time > saved_time, "Property comparison unexpectedly faster than integer comparison")
+
+    def testCompareHexDistanceToAxialDistance(self):
+        star1 = Star.parse_line_into_star(
+            "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+
+        sector = Sector(' Zhdant', ' -7, 2')
+        star2 = Star.parse_line_into_star(
+            "2720 Vlazzhden            C210143-8 Lo Ni                               - -  - 303   Zh G1 IV                       ",
+            sector, 'fixed', 'fixed')
+
+        hex_dist = star1.hex.hex_distance(star2)
+        axial_dist = Hex.axial_distance((star1.q, star1.r), (star2.q, star2.r))
+        self.assertEqual(hex_dist, axial_dist, "Unexpected axial distance")
+        distance = star1.distance(star2)
+        self.assertEqual(hex_dist, distance, "Unexpected distance")
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

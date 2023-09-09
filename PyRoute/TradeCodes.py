@@ -301,3 +301,6 @@ class TradeCodes(object):
     def pcode_color(self):
         return self.pcolor.get(self.pcode, '#44ff44')
 
+    @property
+    def low_per_capita_gwp(self):
+        return self.extreme or self.poor or self.nonindustrial or self.low

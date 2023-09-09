@@ -13,6 +13,7 @@ import itertools
 import math
 import networkx as nx
 
+from Position.Hex import Hex
 from PyRoute.Star import Star
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Calculation.CommCalculation import CommCalculation
@@ -436,7 +437,7 @@ class Galaxy(AreaItem):
         for (world, neighbor) in self.stars.edges():
             worldstar = self.star_mapping[world]
             neighborstar = self.star_mapping[neighbor]
-            distance = worldstar.hex_distance(neighborstar)
+            distance = worldstar.distance(neighborstar)
             distanceMod = int(distance / 2)
             CargoTradeIndex = int(round(math.sqrt(
                 max(worldstar.eti_cargo - distanceMod, 0) *
@@ -491,7 +492,7 @@ class Galaxy(AreaItem):
                 ownedBy.sort(reverse=True,
                              key=lambda star: star.popCode)
                 ownedBy.sort(reverse=True,
-                             key=lambda star: star.importance - (star.hex_distance(worldstar) - 1))
+                             key=lambda star: star.importance - (star.distance(worldstar) - 1))
 
                 owner = None
                 if worldstar.ownedBy is None:
@@ -557,7 +558,7 @@ class Galaxy(AreaItem):
         if item in self.landmarks:
             base = self.landmarks[item]
         else:
-            base = Star.heuristicDistance(star, target)
+            base = Hex.heuristicDistance(star, target)
         # Now we've got the maximum of the fixed bounds, compare that maximum with the dynamic-between-runs
         # approximate-shortest-path bound.
         sp_bound = self.trade.shortest_path_tree.lower_bound(item[0], item[1])
@@ -571,7 +572,7 @@ class Galaxy(AreaItem):
         if item in self.landmarks:
             base = self.landmarks[item]
         else:
-            base = Star.heuristicDistance(self.star_mapping[star], self.star_mapping[target])
+            base = Hex.heuristicDistance(self.star_mapping[star], self.star_mapping[target])
         # Now we've got the maximum of the fixed bounds, compare that maximum with the dynamic-between-runs
         # approximate-shortest-path bound.
         sp_bound = self.trade.shortest_path_tree.lower_bound(item[0], item[1])

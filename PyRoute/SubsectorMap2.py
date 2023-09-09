@@ -6,6 +6,8 @@ Created on Aug 7, 2016
 import os
 import logging
 import math
+
+from Position.Hex import Hex
 from PyRoute.Map import GraphicMap
 from PyRoute.Galaxy import Galaxy
 from PyRoute.AllyGen import AllyGen
@@ -255,7 +257,7 @@ class GraphicSubsectorMap(GraphicMap):
             if AllyGen.is_nonaligned(aleg):
                 return
             for n in range(6):
-                next_hex = AllyGen._get_neighbor(pos, n)
+                next_hex = Hex.get_neighbor(pos, n)
                 next_aleg = self.galaxy.borders.allyMap[next_hex] \
                     if next_hex in self.galaxy.borders.allyMap \
                     else AllyGen.noOne[0]

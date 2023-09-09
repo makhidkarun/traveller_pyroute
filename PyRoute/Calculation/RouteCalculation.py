@@ -130,7 +130,7 @@ class RouteCalculation(object):
             btn -= 1
 
         if not distance:
-            distance = star1.hex_distance(star2)
+            distance = star1.distance(star2)
 
         jump_index = bisect.bisect_left(RouteCalculation.btn_jump_range, distance)
         # if distance <= 3:

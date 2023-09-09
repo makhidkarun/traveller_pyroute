@@ -3,12 +3,15 @@ Created on Mar 5, 2014
 
 @author: tjoneslo
 """
+import copy
 import functools
 import logging
 import bisect
 import random
 import math
 import re
+
+from Position.Hex import Hex
 from PyRoute.AllyGen import AllyGen
 from PyRoute.TradeCodes import TradeCodes
 from collections import OrderedDict
@@ -97,7 +100,7 @@ class Star(object):
 """
     starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
 
-    __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code', 'x', 'y', 'z'
+    __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code', 'hex'
 
     def __init__(self):
         self.logger = logging.getLogger('PyRoute.Star')
@@ -105,13 +108,6 @@ class Star(object):
         self._key = None
         self.component = None
         self.index = None
-        self.x = None
-        self.y = None
-        self.z = None
-        self.q = None
-        self.r = None
-        self.col = None
-        self.row = None
         self.gwp = None
         self.population = None
         self.perCapita = None
@@ -156,6 +152,7 @@ class Star(object):
         self.suppress_soph_percent_warning = False
         # Can this star be unilaterally excluded from routes?
         self.is_redzone = False
+        self.hex = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -175,6 +172,7 @@ class Star(object):
             setattr(foo, key, item)
         foo.index = self.index
         foo.calc_hash()
+        foo.hex = copy.deepcopy(self.hex)
 
         return foo
 
@@ -197,7 +195,7 @@ class Star(object):
         star.logger.debug(data)
 
         star.position = data[0].strip()
-        star.set_location(sector.dx, sector.dy)
+        star.set_location()
         star.name = data[1].strip()
 
         star.uwp = data[2].strip()
@@ -249,14 +247,13 @@ class Star(object):
 
         star.tradeCode.check_world_codes(star)
 
-        if (data[5]):
+        if data[5]:
             imp = int(data[5][1:-1].strip())
             star.calculate_importance()
             if imp != star.importance:
                 star.logger.warning(
-                    '{}-{} Calculated importance {} does not match generated importance {}'.format(star, star.baseCode,
-                                                                                                    star.importance,
-                                                                                                    imp))
+                    '{}-{} Calculated importance {} does not match generated importance {}'.
+                    format(star, star.baseCode, star.importance, imp))
         else:
             star.calculate_importance()
 
@@ -293,7 +290,7 @@ class Star(object):
         star.eti_worlds = 0
         star.calculate_eti()
 
-        star.trade_id = None # Used by the Speculative Trade
+        star.trade_id = None  # Used by the Speculative Trade
         star.calc_hash()
         star.calc_passenger_btn_mod()
         return star
@@ -339,70 +336,48 @@ class Star(object):
         else:
             return self.sector.name[0:4] + '-' + self.position
 
-    def set_location(self, dx, dy):
-        """
-        # The zero point of the co-ordinate system used is Reference (Core 0140).
-        # As a result, hex position 01,40 becomes q=0, r=0, x=0, y=0, z=0.
-        # Sign conventions:
-        # dx increases (becomes (more) positive) to trailing, decreases (becomes (more) negative) to spinward
-        # dy increases (becomes (more) positive) to coreward, decreases (becomes (more) negative) to rimward
-        @type dx: int
-        @type dy: int
-        @param dx: Base sector-level trailing-spinward offset added to star's within-sector x position
-        @param dy: Base sector-level coreward-rimward offset added to star's within-sector y position
-        """
+    def set_location(self):
+        self.hex = Hex(self.sector, self.position)
 
-        # convert odd-q offset to cube
-        q = int(self.position[0:2]) + dx - 1
-        raw_r_offset = 41 - int(self.position[2:4])
-        r = raw_r_offset + dy - 1
+    @property
+    def x(self):
+        return self.hex.x
 
-        # Halving q, rounding up _towards negative infinity_ to the nearest integer - ie, ceil(q / 2).
-        # redblob's implementation uses floor(q/2), but they haven't inverted the r axis.
-        q_offset = (q + (q & 1)) // 2
-        self.x = q
-        self.z = r - q_offset
-        # cubic co-ords must sum to zero
-        self.y = -self.x - self.z
+    @property
+    def y(self):
+        return self.hex.y
 
-        # convert cube to axial
-        self.q = self.x
-        self.r = self.z
+    @property
+    def z(self):
+        return self.hex.z
 
-        # store within-sector column and row co-ords
-        self.col = q - dx + 1
-        self.row = 41 - (r - dy + 1)
+    @property
+    def q(self):
+        return self.hex.q
 
-    def hex_distance(self, star):
-        return Star._heuristic_core(self.x - star.x, self.y - star.y, self.z - star.z)
+    @property
+    def r(self):
+        return self.hex.r
 
-    @staticmethod
-    def heuristicDistance(star1, star2):
-        return Star._heuristic_core(star1.x - star2.x, star1.y - star2.y, star1.z - star2.z)
+    @property
+    def col(self):
+        return self.hex.col
 
-    @staticmethod
-    @functools.cache
-    def _heuristic_core(dx, dy, dz):
-        return max(abs(dx), abs(dy), abs(dz))
-
-    @staticmethod
-    def axial_distance(Hex1, Hex2):
-        dq = Hex1[0] - Hex2[0]
-        dr = Hex1[1] - Hex2[1]
-        delta = Hex1[0] - Hex2[0] + Hex1[1] - Hex2[1]
-        return (abs(dq) + abs(dr) + abs(delta)) // 2
+    @property
+    def row(self):
+        return self.hex.row
 
     def distance(self, star):
-        hex1 = (self.q, self.r)
-        hex2 = (star.q, star.r)
+        hex1 = self.hex.hex_position()
+        hex2 = star.hex.hex_position()
 
-        return Star.axial_distance(hex1, hex2)
+        return Hex.axial_distance(hex1, hex2)
 
     def subsector(self):
         subsector = ["ABCD", "EFGH", "IJKL", "MNOP"]
-        indexy = (self.col - 1) // 8
-        indexx = (self.row - 1) // 10
-        return subsector[indexx][indexy]
+        index_y = (self.col - 1) // 8
+        index_x = (self.row - 1) // 10
+        return subsector[index_x][index_y]
 
     def calculate_gwp(self, pop_code):
         calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400,
@@ -432,8 +407,7 @@ class Star(object):
         self.perCapita *= 1.6 if self.tradeCode.rich else 1
         self.perCapita *= 1.4 if self.tradeCode.industrial else 1
         self.perCapita *= 1.2 if self.tradeCode.agricultural else 1
-        self.perCapita *= 0.8 if self.tradeCode.extreme or \
-                                 self.tradeCode.poor or self.tradeCode.nonindustrial or self.tradeCode.low else 1
+        self.perCapita *= 0.8 if self.tradeCode.low_per_capita_gwp else 1
 
         self.gwp = int((self.population * self.perCapita) // 1000)
         self.population = int(self.population)
@@ -466,17 +440,17 @@ class Star(object):
         if port == 'B':
             self.wtn = (self.wtn * 3 + 11) // 4
         if port == 'C':
-            if (self.wtn > 9):
+            if self.wtn > 9:
                 self.wtn = (self.wtn + 9) // 2
             else:
                 self.wtn = (self.wtn * 3 + 9) // 4
         if port == 'D':
-            if (self.wtn > 7):
+            if self.wtn > 7:
                 self.wtn = (self.wtn + 7) // 2
             else:
                 self.wtn = (self.wtn * 3 + 7) // 4
         if port == 'E':
-            if (self.wtn > 5):
+            if self.wtn > 5:
                 self.wtn = (self.wtn + 5) // 2
             else:
                 self.wtn = (self.wtn * 3 + 5) // 4
@@ -498,21 +472,19 @@ class Star(object):
 
         if self.tradeCode.barren and infrastructure != 0:
             self.logger.warning(
-                '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self,
-                                                                                                          infrastructure,
-                                                                                                          0))
+                '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.
+                format(self, infrastructure, 0))
         elif self.tradeCode.low and infrastructure != max(self.importance, 0):
             self.logger.warning(
-                '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self,
-                                                                                                          infrastructure,
-                                                                                                          max(self.importance, 0)))
+                '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.
+                format(self, infrastructure, max(self.importance, 0)))
         elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= 6 + self.importance:
             self.logger.warning(
-                '{} - EX Calculated infrastructure {} not in NI range 0 - {}'.format(self, infrastructure,
-                                                                                      6 + self.importance))
+                '{} - EX Calculated infrastructure {} not in NI range 0 - {}'.
+                format(self, infrastructure, 6 + self.importance))
         elif not 0 <= infrastructure <= 12 + self.importance:
-            self.logger.warning('{} - EX Calculated infrastructure {} not in range 0 - {}'.format(self, infrastructure,
-                                                                                                 12 + self.importance))
+            self.logger.warning('{} - EX Calculated infrastructure {} not in range 0 - {}'.
+                                format(self, infrastructure, 12 + self.importance))
 
     def check_cx(self):
         if not self.economics:
@@ -525,8 +497,8 @@ class Star(object):
                 '{} - CX calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity))
         elif pop != 0 and not max(1, pop - 5) <= homogeneity <= pop + 5:
             self.logger.warning(
-                '{} - CX calculated homogeneity {} not in range {} - {}'.format(self, homogeneity, max(1, pop - 5),
-                                                                                 pop + 5))
+                '{} - CX calculated homogeneity {} not in range {} - {}'.
+                format(self, homogeneity, max(1, pop - 5), pop + 5))
 
         acceptance = self._ehex_to_int(self.social[2])  # pop + Ix, min 1
         if pop == 0 and acceptance != 0:
@@ -534,9 +506,8 @@ class Star(object):
                 '{} - CX calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
         elif pop != 0 and not max(1, pop + self.importance) == acceptance:
             self.logger.warning(
-                '{} - CX Calculated acceptance {} does not match generated acceptance {}'.format(self, acceptance,
-                                                                                                  max(1,
-                                                                                                      pop + self.importance)))
+                '{} - CX Calculated acceptance {} does not match generated acceptance {}'.
+                format(self, acceptance, max(1, pop + self.importance)))
 
         strangeness = self._ehex_to_int(self.social[3])  # flux + 5
         if pop == 0 and strangeness != 0:
@@ -551,8 +522,8 @@ class Star(object):
             self.logger.warning('{} - CX calculated symbols {} should be 0 for barren worlds'.format(self, symbols))
         elif pop != 0 and not max(1, self.tl - 5) <= symbols <= self.tl + 5:
             self.logger.warning(
-                '{} - CX calculated symbols {} not in range {} - {}'.format(self, symbols, max(1, self.tl - 5),
-                                                                             self.tl + 5))
+                '{} - CX calculated symbols {} not in range {} - {}'.
+                format(self, symbols, max(1, self.tl - 5), self.tl + 5))
 
     def calculate_ru(self, ru_calc):
         if not self.economics:
@@ -729,13 +700,13 @@ class Star(object):
         return val
 
     def split_stellar_data(self):
-        starparts = self.stars.split()
+        star_parts = self.stars.split()
         stars = []
 
-        if len(starparts) == 1:
-            stars = starparts
+        if len(star_parts) == 1:
+            stars = star_parts
         else:
-            for (prev, current) in zip([None] + starparts[:-1], starparts):
+            for (prev, current) in zip([None] + star_parts[:-1], star_parts):
                 if prev in [None, 'V', 'IV', 'Ia', 'Ib', 'II', 'III']:
                     continue
                 if prev in ['D']:
@@ -764,6 +735,7 @@ class Star(object):
         assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
+        assert self.hex is not None, "Star " + str(self.name) + " is missing hex attribute"
         return True
 
     @property
