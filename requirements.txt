@@ -1,7 +1,7 @@
 networkx
 pypdflite
 inflect
-Pillow
+Pillow >= 10.0
 wikitools3==3.0.1
 jinja2
 jsonpickle

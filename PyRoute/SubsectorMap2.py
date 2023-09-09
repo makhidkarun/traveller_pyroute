@@ -89,7 +89,7 @@ class GraphicSubsectorMap(GraphicMap):
     def subsector_grid(self, doc, sector):
         pos = (20, 1140)
         name = sector.name + " / " + sector.sector.name
-        size = doc.textsize(name, self.titleFont)
+        size = self.get_text_size(self.titleFont, name)
         if size[0] > 680:
             name = sector.name + " /"
             doc.text(pos, name, font=self.titleFont, fill=self.fillBlue)
@@ -216,7 +216,7 @@ class GraphicSubsectorMap(GraphicMap):
 
                 name = "{0:02d}{1:02d}".format(location[0], location[1])
                 point.y_plus(-self.ym + 1)
-                size = self.hexFont.getsize(name)
+                size = self.get_text_size(self.hexFont, name)
                 pos = (point.x - size[0] / 2, point.y)
 
                 doc.text(pos, name, font=self.hexFont, fill=self.fillWhite)
@@ -310,7 +310,8 @@ class GraphicSubsectorMap(GraphicMap):
 
         if star.tradeCode.asteroid:
             worldCharacter = '\u2059'
-            size = self.hexFont3.getsize(worldCharacter)
+            size = self.get_text_size(self.hexFont3, worldCharacter)
+
             pos = (point.x - size[0] / 2, point.y - size[1] * 0.6)
             doc.text(pos, worldCharacter, font=self.hexFont3, fill=self.textFill)
 
@@ -319,8 +320,8 @@ class GraphicSubsectorMap(GraphicMap):
             doc.ellipse([(point.x - radius, point.y - radius), (point.x + radius, point.y + radius)], fill=color,
                         outline=color)
 
-        # Write Port code        
-        size = self.worldFont.getsize(star.port)
+        # Write Port code
+        size = self.get_text_size(self.worldFont, star.port)
         pos = (point.x - (size[0] / 2) + 1, point.y - (2 * size[1]) + 1)
         doc.text(pos, star.port, font=self.worldFont, fill=self.textFill)
 
@@ -364,7 +365,7 @@ class GraphicSubsectorMap(GraphicMap):
             name = name.upper()
         elif star.tradeCode.low:
             name = name.lower()
-        size = self.worldFont.getsize(name)
+        size = self.get_text_size(self.worldFont, name)
         pos = (point.x - (size[0] / 2) + 1, point.y + size[1])
         if star.tradeCode.capital:
             doc.text(pos, name, font=self.worldFont, fill=self.fillRed)
@@ -391,7 +392,7 @@ class GraphicSubsectorMap(GraphicMap):
         return self._world_point(row_out, col_out)
 
     def print_base_char(self, baseCharacter, font, point, multiplier, doc, fill=GraphicMap.fillWhite):
-        size = font.getsize(baseCharacter)
+        size = self.get_text_size(self.worldFont, baseCharacter)
         pos = (point.x + (multiplier[0] * size[0]), point.y + (multiplier[1] * size[1]))
         doc.text(pos, baseCharacter, font=font, fill=fill)
 

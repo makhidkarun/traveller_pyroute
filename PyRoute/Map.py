@@ -566,17 +566,17 @@ class GraphicMap(Map):
         return GraphicLine(doc, start, end, colorname, width)
 
     def coreward_sector(self, doc, name):
-        size = self.namesFont.getsize(name)
+        size = self.get_text_size(self.namesFont, name)
         pos = (self.corePos[0] - size[0] / 2, self.corePos[1] - size[1])
         doc.text(pos, name, font=self.namesFont, fill=self.textFill)
 
     def rimward_sector(self, doc, name):
-        size = self.namesFont.getsize(name)
+        size = self.get_text_size(self.namesFont, name)
         pos = (self.rimPos[0] - size[0] / 2, self.rimPos[1] - size[1])
         doc.text(pos, name, font=self.namesFont, fill=self.textFill)
 
     def spinward_sector(self, doc, name):
-        size = self.namesFont.getsize(name)
+        size = self.get_text_size(self.namesFont, name)
         size = (size[0], size[1] + 3)
         txt = Image.new('L', size, 0)
         d = ImageDraw.Draw(txt)
@@ -585,7 +585,7 @@ class GraphicMap(Map):
         doc.bitmap((self.spinPos[0], self.spinPos[1] - w.size[1] / 2), w, fill=self.textFill)
 
     def trailing_sector(self, doc, name):
-        size = self.namesFont.getsize(name)
+        size = self.get_text_size(self.namesFont, name)
         size = (size[0], size[1] + 3)
         txt = Image.new('L', size, 0)
         d = ImageDraw.Draw(txt)
@@ -593,6 +593,11 @@ class GraphicMap(Map):
         w = txt.rotate(-90, expand=1)
         doc.bitmap((self.trailPos[0], self.trailPos[1] - w.size[1] / 2), w, fill=self.textFill)
 
+    def get_text_size(self, font, string):
+        foo = font.getbbox(string)
+        size = (foo[2] - foo[0], foo[3] - foo[1])
+
+        return size
 
 class GraphicSectorMap(GraphicMap):
     def __init__(self, galaxy, routes):

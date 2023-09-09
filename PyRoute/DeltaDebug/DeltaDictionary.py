@@ -287,6 +287,8 @@ class SectorDictionary(dict):
             bitz = line.split(':')
             alpha = bitz[0][-1]
             subname = bitz[1].strip()
+            if '' == subname:
+                subname = name.strip() + ' ' + bitz[0][2:]
             subsector_names[alpha] = subname
             subsec = SubsectorDictionary(subname, alpha)
             sector[subname] = subsec
