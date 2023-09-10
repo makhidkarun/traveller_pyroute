@@ -78,10 +78,11 @@ class TradeCalculation(RouteCalculation):
         # Track inter-sector trade imbalances
         self.sector_trade_balance = TradeBalance(stat_field="tradeExt", region=galaxy, target="trade")
         # Track inter-allegiance passenger imbalances
-        self.allegiance_passenger_balance = TradeBalance(stat_field="passengers", region="galaxy", field="allegiances", star_field="allegiance_base")
+        self.allegiance_passenger_balance = TradeBalance(stat_field="passengers", region=galaxy, field="alg",
+                                                         star_field="allegiance_base", target_property="code")
         # Track inter-allegiance trade imbalances
-        self.allegiance_trade_balance = TradeBalance(stat_field="trade", region="galaxy", field="allegiances",
-                                                     star_field="allegiance_base")
+        self.allegiance_trade_balance = TradeBalance(stat_field="trade", region=galaxy, field="alg",
+                                                     star_field="allegiance_base", target_property="code")
 
     def base_route_filter(self, star, neighbor):
         # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
@@ -470,11 +471,19 @@ class TradeCalculation(RouteCalculation):
     def is_sector_pass_balanced(self):
         self.sector_passenger_balance.is_balanced()
 
+    def is_allegiance_trade_balanced(self):
+        self.allegiance_trade_balance.is_balanced()
+
+    def is_allegiance_pass_balanced(self):
+        self.allegiance_passenger_balance.is_balanced()
+
     def multilateral_balance_trade(self):
         self.sector_trade_balance.multilateral_balance()
+        self.allegiance_trade_balance.multilateral_balance()
 
     def multilateral_balance_pass(self):
         self.sector_passenger_balance.multilateral_balance()
+        self.allegiance_passenger_balance.multilateral_balance()
 
     def cross_check_totals(self):
         total_sector_pax = 0
