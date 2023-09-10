@@ -241,12 +241,14 @@ class TradeCalculation(RouteCalculation):
                 star.sector.subsectors[star.subsector()].stats.tradeExt += tradeCr // 2
                 target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr // 2
 
+        starcode = AllyGen.same_align(star.alg_code)
+        targcode = AllyGen.same_align(target.alg_code)
+        double_up = AllyGen.is_nonaligned(starcode) and (starcode == targcode)
+
         if AllyGen.are_allies(star.alg_code, target.alg_code):
-            self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.trade += tradeCr
-            self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.passengers += tradePass
+            self.galaxy.alg[starcode].stats.trade += tradeCr
+            self.galaxy.alg[starcode].stats.passengers += tradePass
         else:
-            starcode = AllyGen.same_align(star.alg_code)
-            targcode = AllyGen.same_align(target.alg_code)
             self.galaxy.alg[starcode].stats.tradeExt += tradeCr // 2
             self.galaxy.alg[targcode].stats.tradeExt += tradeCr // 2
             self.galaxy.alg[starcode].stats.passengers += tradePass // 2
