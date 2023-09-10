@@ -285,6 +285,23 @@ class testDeltaReduce(unittest.TestCase):
 
         reducer.is_initial_state_uninteresting()
 
+    def test_verify_sector_without_subsector_names_allegiance_balances(self):
+        sourcefile = 'DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P - trimmed.sec'
+
+        args = self._make_args()
+        args.interestingline = None
+        args.interestingtype = None
+        args.maps = True
+        args.subsectors = True
+
+        delta = DeltaDictionary()
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+
+        reducer.is_initial_state_uninteresting()
+
     def test_star_having_no_sector_attribute(self):
         sourcefile = 'DeltaFiles/Dagudashaag-star-object-no-sector-attribute.sec'
 
