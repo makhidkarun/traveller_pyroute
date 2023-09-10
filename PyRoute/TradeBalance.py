@@ -79,6 +79,8 @@ class TradeBalance(dict):
             right = comp[1][0] if comp[1][1] == key else comp[1][1]
             adjkey = self._balance_tuple(left, right)
 
+            if adjkey not in self:
+                self[adjkey] = 0
             self[adjkey] += 1
             if 1 < self[adjkey]:
                 self.region[self.field][left].stats[self.stat_field] += 1
