@@ -243,6 +243,10 @@ class TradeCalculation(RouteCalculation):
 
         starcode = AllyGen.same_align(star.alg_code)
         targcode = AllyGen.same_align(target.alg_code)
+        # By definition, _any_ nonalighed system is _not_ allied to anything - even nonaligned systems of the same
+        # allegiance code (eg NaVa, NaHu, etc).  As we're tracking allegiance-level imbalances, we can't just _ignore_
+        # odd passengers/trade units.  The simplest way around this is to directly add the odd unit in to that
+        # allegiance's tradeExt or passenger totals, as needed.
         double_up = AllyGen.is_nonaligned(starcode) and (starcode == targcode)
 
         if AllyGen.are_allies(star.alg_code, target.alg_code):
@@ -254,9 +258,15 @@ class TradeCalculation(RouteCalculation):
             self.galaxy.alg[starcode].stats.passengers += tradePass // 2
             self.galaxy.alg[targcode].stats.passengers += tradePass // 2
             if 1 == (tradeCr & 1):
-                self.allegiance_trade_balance.log_odd_unit(star, target)
+                if double_up:
+                    self.galaxy.alg[starcode].stats.tradeExt += 1
+                else:
+                    self.allegiance_trade_balance.log_odd_unit(star, target)
             if 1 == (tradePass & 1):
-                self.allegiance_passenger_balance.log_odd_unit(star, target)
+                if double_up:
+                    self.galaxy.alg[starcode].stats.passengers += 1
+                else:
+                    self.allegiance_passenger_balance.log_odd_unit(star, target)
 
         self.galaxy.stats.trade += tradeCr
         self.galaxy.stats.passengers += tradePass
