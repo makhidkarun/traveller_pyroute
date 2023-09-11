@@ -136,7 +136,7 @@ class GraphMap(object):
 if __name__ == '__main__':
     route.set_logging('INFO')
     galaxy = Galaxy(8)
-    galaxy.output_path = '.'
+    galaxy.output_path = '../DeltaDebug'
     galaxy.read_sectors(['../sectors_review/Spica.sec'],
                         'fixed', 'collapse')
     galaxy.set_borders('range', 'collapse')
