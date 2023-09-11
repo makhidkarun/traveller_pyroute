@@ -10,6 +10,7 @@ store their font files away from the rest of the project
 from os import path
 import functools
 
+
 class FontLayer(object):
     fontdict = {}
 
