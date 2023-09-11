@@ -1,6 +1,9 @@
+import ast
 import os
 import re
 import unittest
+
+import networkx as nx
 
 from DeltaDictionary import DeltaDictionary, SectorDictionary
 from DeltaGalaxy import DeltaGalaxy
@@ -101,6 +104,95 @@ class testHexMap(testBase):
         self.assertEqual(2, len(matches), 'Should be exactly two MD5 matches')
         result = self.md5line.sub(oldmd5, result)
         self.assertEqual(expected_result, result)
+
+    def test_verify_subsector_trade_write(self):
+        sourcefile = os.path.abspath('../DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
+
+        outfile = os.path.abspath('../OutputFiles/verify_subsector_trade_write/Zao Kfeng Ig Grilokh - subsector P - trade.txt')
+
+        starsfile = os.path.abspath('../OutputFiles/verify_subsector_trade_write/trade stars.txt')
+        if not os.path.isfile(starsfile):
+            starsfile = os.path.abspath('../Tests/OutputFiles/verify_subsector_trade_write/trade stars.txt')
+        rangesfile = os.path.abspath('../OutputFiles/verify_subsector_trade_write/trade ranges.txt')
+        if not os.path.isfile(rangesfile):
+            rangesfile = os.path.abspath('../Tests/OutputFiles/verify_subsector_trade_write/trade ranges.txt')
+
+        args = self._make_args()
+        args.interestingline = None
+        args.interestingtype = None
+        args.maps = True
+        args.subsectors = True
+
+        delta = DeltaDictionary()
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta[sector.name] = sector
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes('trade', 10)
+
+        with open(starsfile, 'rb') as file:
+            galaxy.stars = nx.read_edgelist(file, nodetype=int)
+        self.assertEqual(26, len(galaxy.stars.nodes()), "Unexpected number of stars nodes")
+        self.assertEqual(53, len(galaxy.stars.edges), "Unexpected number of stars edges")
+        for item in galaxy.stars.edges(data=True):
+            self.assertIn('trade', item[2], 'Trade value not set during edgelist read')
+
+        self._load_ranges(galaxy, rangesfile)
+        self.assertEqual(27, len(galaxy.ranges.nodes()), "Unexpected number of ranges nodes")
+        self.assertEqual(44, len(galaxy.ranges.edges), "Unexpected number of ranges edges")
+
+        secname = 'Zao Kfeng Ig Grilokh'
+
+        hexmap = HexMap(galaxy, 'trade')
+
+        oldtime = b'20230912001440'
+        oldmd5 = b'b1f97f6ac37340ab332a9a0568711ec0'
+
+        with open(outfile, 'rb') as file:
+            expected_result = file.read()
+
+        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=False)
+        self.assertIsNotNone(result)
+        # rather than try to mock datetime.now(), patch the output result.
+        # this also lets us check that there's only a single match
+        matches = self.timeline.search(result)
+        self.assertEqual(1, len(matches.groups()), 'Should be exactly one create-date match')
+        result = self.timeline.sub(oldtime, result)
+        # likewise patch md5 output
+        matches = self.md5line.findall(result)
+        self.assertEqual(2, len(matches), 'Should be exactly two MD5 matches')
+        result = self.md5line.sub(oldmd5, result)
+        self.assertEqual(expected_result, result)
+
+
+    def _load_ranges(self, galaxy, sourcefile):
+        with open(sourcefile, "rb") as f:
+            lines = f.readlines()
+            for rawline in lines:
+                line = rawline.strip()
+                bitz = line.split(b') ')
+                source = str(bitz[0]).replace('\'', '').lstrip('b')
+                target = str(bitz[1]).replace('\'', '').lstrip('b')
+                srcbitz = source.split('(')
+                targbitz = target.split('(')
+                hex1 = srcbitz[1][-4:]
+                sec1 = srcbitz[1][0:-5]
+                hex2 = targbitz[1][-4:]
+                sec2 = targbitz[1][0:-5]
+
+                world1 = galaxy.sectors[sec1].find_world_by_pos(hex1)
+                world2 = galaxy.sectors[sec2].find_world_by_pos(hex2)
+                rawdata = str(bitz[2]).lstrip('b')
+                data = ast.literal_eval(ast.literal_eval(rawdata))
+
+                galaxy.ranges.add_edge(world1, world2)
+                for item in data:
+                    galaxy.ranges[world1][world2][item] = data[item]
 
 
 if __name__ == '__main__':

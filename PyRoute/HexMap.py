@@ -40,21 +40,24 @@ class HexMap(object):
         for gal_sector in self.galaxy.sectors.values():
             self.write_sector_pdf_map(gal_sector)
 
-    def write_sector_pdf_map(self, gal_sector):
-        pdf_doc = self.document(gal_sector)
+    def write_sector_pdf_map(self, gal_sector, is_live=True):
+        pdf_doc = self.document(gal_sector, is_live)
         self.write_base_map(pdf_doc, gal_sector)
         self.draw_borders(pdf_doc, gal_sector)
-        comm_routes = [star for star in self.galaxy.stars.edges(gal_sector.worlds, True) \
+        worlds = [item.index for item in gal_sector.worlds]
+        comm_routes = [star for star in self.galaxy.stars.edges(worlds, True) \
                        if star[2].get('xboat', False) or star[2].get('comm', False)]
         for (star, neighbor, data) in comm_routes:
             self.comm_line(pdf_doc, [star, neighbor])
-        sector_trade = [star for star in self.galaxy.stars.edges(gal_sector.worlds, True) \
+        sector_trade = [star for star in self.galaxy.stars.edges(worlds, True) \
                         if star[2]['trade'] > 0 and StatCalculation.trade_to_btn(star[2]['trade']) >= self.min_btn]
         logging.getLogger('PyRoute.HexMap').debug("Worlds with trade: {}".format(len(sector_trade)))
         sector_trade.sort(key=lambda line: line[2]['trade'])
         for (star, neighbor, data) in sector_trade:
             self.galaxy.stars[star][neighbor]['trade btn'] = StatCalculation.trade_to_btn(data['trade'])
-            self.trade_line(pdf_doc, [star, neighbor], data)
+            srcstar = self.galaxy.star_mapping[star]
+            trgstar = self.galaxy.star_mapping[neighbor]
+            self.trade_line(pdf_doc, [srcstar, trgstar], data)
         # Get all the worlds in this sector
         # for (star, neighbor, data) in self.galaxy.stars.edges(sector.worlds, True):
         #    if star.sector != sector:
@@ -78,7 +81,7 @@ class HexMap(object):
             self.spinward_sector(pdf_doc, gal_sector.spinward.name)
         if gal_sector.trailing:
             self.trailing_sector(pdf_doc, gal_sector.trailing.name)
-        self.writer.close()
+        return self.writer.close()
 
     def write_base_map(self, pdf, sector):
         self.sector_name(pdf, sector.name)
