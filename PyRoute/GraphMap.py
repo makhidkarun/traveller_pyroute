@@ -2,7 +2,7 @@ from itertools import product
 import logging
 from PIL import Image, ImageDraw
 from PyRoute.Galaxy import Galaxy
-from PyRoute.HexMap import HexMap
+from PyRoute.Outputs.HexMap import HexMap
 from PyRoute.route import route
 
 

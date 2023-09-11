@@ -7,7 +7,7 @@ import networkx as nx
 
 from DeltaDictionary import DeltaDictionary, SectorDictionary
 from DeltaGalaxy import DeltaGalaxy
-from HexMap import HexMap
+from Outputs.HexMap import HexMap
 from Tests.testBase import testBase
 
 
