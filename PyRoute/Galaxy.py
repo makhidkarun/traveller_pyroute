@@ -46,6 +46,12 @@ class AreaItem(object):
     def world_count(self):
         return len(self.worlds)
 
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+
 
 class Allegiance(AreaItem):
     def __init__(self, code, name, base=False, population='Huma'):
@@ -328,6 +334,8 @@ class Galaxy(AreaItem):
 
                     star.tradeCode.sophont_list.append("{}A".format(self.alg[star.alg_code].population))
                     star.is_redzone = self.trade.unilateral_filter(star)
+                    star.allegiance_base = self.alg[star.alg_base_code]
+                    star.is_well_formed()
 
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds)))

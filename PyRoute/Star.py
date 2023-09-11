@@ -133,6 +133,7 @@ class Star(object):
         self.baseCode = None
         self.zone = None
         self.alg_code = None
+        self.allegiance_base = None
         self.ship_capacity = None
         self.tcs_gwp = None
         self.budget = None
@@ -175,6 +176,12 @@ class Star(object):
         foo.hex = copy.deepcopy(self.hex)
 
         return foo
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
 
     @staticmethod
     def parse_line_into_star(line, sector, pop_code, ru_calc):
@@ -736,6 +743,8 @@ class Star(object):
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
         assert self.hex is not None, "Star " + str(self.name) + " is missing hex attribute"
+        assert hasattr(self, 'allegiance_base'), "Star " + str(self.name) + " is missing base allegiance attribute"
+        assert self.allegiance_base is not None, "Star " + str(self.name) + " has empty base allegiance attribute"
         return True
 
     @property

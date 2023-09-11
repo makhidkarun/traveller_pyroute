@@ -9,7 +9,6 @@ from Star import Star
 from Galaxy import Sector, Galaxy
 
 
-
 class testTradeCalculation(unittest.TestCase):
     def test_negative_route_weight_trips_assertion(self):
         expected = 'Weight of edge between Irkigkhan (Core 0103) and Irkigkhan (Core 0103) must be positive'
@@ -87,6 +86,65 @@ class testTradeCalculation(unittest.TestCase):
         expected_weight = 10
         actual_weight = tradecalc.route_cost(route)
         self.assertEqual(expected_weight, actual_weight, "Route cost unexpected")
+
+    def test_passenger_balance_over_multiple_sectors(self):
+        core = Sector(' Core', ' 0, 0')
+        dagu = Sector(' Dagudashaag', ' -1, 0')
+        gush = Sector(' Gushemege', ' -2, 0')
+
+        galaxy = Galaxy(min_btn=13)
+        galaxy.stats.passengers = 3
+        galaxy.sectors[core.name] = core
+        galaxy.sectors[dagu.name] = dagu
+        galaxy.sectors[gush.name] = gush
+
+        tradecalc = TradeCalculation(galaxy)
+        tradecalc.sector_passenger_balance[(core.name, dagu.name)] = 1
+        tradecalc.sector_passenger_balance[(core.name, gush.name)] = 1
+        tradecalc.sector_passenger_balance[(dagu.name, gush.name)] = 1
+
+        expected = "Uncompensated multilateral passenger imbalance present"
+        actual = None
+
+        try:
+            tradecalc.is_sector_pass_balanced()
+        except AssertionError as e:
+            actual = str(e)
+
+        self.assertEqual(expected, actual, "AssertionError should be thrown")
+
+        tradecalc.multilateral_balance_pass()
+        tradecalc.is_sector_pass_balanced()
+
+    def test_trade_balance_over_multiple_sectors(self):
+        core = Sector(' Core', ' 0, 0')
+        dagu = Sector(' Dagudashaag', ' -1, 0')
+        gush = Sector(' Gushemege', ' -2, 0')
+
+        galaxy = Galaxy(min_btn=13)
+        galaxy.stats.trade = 3
+        galaxy.sectors[core.name] = core
+        galaxy.sectors[dagu.name] = dagu
+        galaxy.sectors[gush.name] = gush
+
+        tradecalc = TradeCalculation(galaxy)
+        tradecalc.sector_trade_balance[(core.name, dagu.name)] = 1
+        tradecalc.sector_trade_balance[(core.name, gush.name)] = 1
+        tradecalc.sector_trade_balance[(dagu.name, gush.name)] = 1
+
+        expected = "Uncompensated multilateral trade imbalance present"
+        actual = None
+
+        try:
+            tradecalc.is_sector_trade_balanced()
+        except AssertionError as e:
+            actual = str(e)
+
+        self.assertEqual(expected, actual, "AssertionError should be thrown")
+
+        tradecalc.multilateral_balance_trade()
+        tradecalc.is_sector_trade_balanced()
+
 
 if __name__ == '__main__':
     unittest.main()

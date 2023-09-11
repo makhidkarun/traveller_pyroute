@@ -12,6 +12,7 @@ import sys
 
 from Position.Hex import Hex
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
+from PyRoute.Galaxy import Allegiance
 
 sys.path.append('../PyRoute')
 from Star import Star
@@ -275,10 +276,12 @@ class TestStar(unittest.TestCase):
             Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
 
     def test_deep_copy(self):
+        alg = Allegiance("am", "name")
         star1 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
             Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
         star1.index = 11
+        star1.allegiance_base = alg
         star1.is_well_formed()
 
         starcopy = copy.deepcopy(star1)

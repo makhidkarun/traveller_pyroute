@@ -7,6 +7,8 @@ from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
+from PyRoute.SpeculativeTrade import SpeculativeTrade
+from PyRoute.StatCalculation import StatCalculation
 from PyRoute.route import set_logging
 
 
@@ -30,10 +32,12 @@ class testDeltaReduce(unittest.TestCase):
         # only one subsector should be non-empty after reduction
         for subsector_name in reducer.sectors['Dagudashaag']:
             expected = 0
+            affix = " not empty after subsector reduction"
             if subsector_name == 'Pact':
                 expected = 40
+                affix = " empty after subsector reduction"
             actual = 0 if reducer.sectors['Dagudashaag'][subsector_name].items is None else len(reducer.sectors['Dagudashaag'][subsector_name].items)
-            self.assertEqual(expected, actual, subsector_name + " not empty")
+            self.assertEqual(expected, actual, subsector_name + affix)
         # verify sector headers got taken across
         self.assertEqual(len(sector.headers), len(reducer.sectors['Dagudashaag'].headers), "Unexpected headers length")
         # verify sector allegiances got taken across
@@ -42,6 +46,26 @@ class testDeltaReduce(unittest.TestCase):
             len(reducer.sectors['Dagudashaag'].allegiances),
             "Unexpected allegiances length"
         )
+
+    def test_subsector_reduction_allegiance_balance(self):
+        sourcefile = 'DeltaFiles/dagudashaag-allegiance-pax-balance/Dagudashaag.sec'
+
+        args = self._make_args_no_line()
+        args.interestingline = ": Allegiance total"
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+
+        # reducer.is_initial_state_interesting()
+        # reducer.reduce_subsector_pass()
+        reducer.reduce_line_pass()
+        reducer.is_initial_state_interesting()
+
+        foo = 1
 
     def test_line_reduction(self):
         sourcefile = 'DeltaFiles/Dagudashaag-subsector-spiked.sec'
@@ -177,23 +201,15 @@ class testDeltaReduce(unittest.TestCase):
     def test_route_costs_balanced_should_be_uninteresting(self):
         sourcefile = 'DeltaFiles/Zarushagar-imbalanced-routes.sec'
 
-        args = self._make_args()
+        args = self._make_args_no_line()
 
         delta = DeltaDictionary()
         zarusector = SectorDictionary.load_traveller_map_file(sourcefile)
         self.assertEqual('# -1,-1', zarusector.position, "Unexpected position value for Zarushagar")
         delta[zarusector.name] = zarusector
 
-        expected = "Original input not interesting - aborting"
-        actual = None
-
         reducer = DeltaReduce(delta, args)
-        try:
-            reducer.is_initial_state_interesting()
-        except AssertionError as e:
-            actual = str(e)
-
-        self.assertEqual(expected, actual)
+        reducer.is_initial_state_uninteresting()
 
     def test_verify_stars_and_shadow_bijection(self):
         sourcefile = 'DeltaFiles/final_result_should_be_independently_interesting/Gushemege.sec'
@@ -267,6 +283,64 @@ class testDeltaReduce(unittest.TestCase):
 
         reducer = DeltaReduce(delta, args)
 
+        reducer.is_initial_state_uninteresting()
+
+    def test_verify_sector_without_subsector_names_allegiance_balances(self):
+        sourcefile = 'DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P - trimmed.sec'
+
+        args = self._make_args()
+        args.interestingline = None
+        args.interestingtype = None
+        args.maps = True
+        args.subsectors = True
+
+        delta = DeltaDictionary()
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+
+        reducer.is_initial_state_uninteresting()
+
+    def test_star_having_no_sector_attribute(self):
+        sourcefile = 'DeltaFiles/Dagudashaag-star-object-no-sector-attribute.sec'
+
+        args = self._make_args_no_line()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_uninteresting()
+
+    def test_population_balance_over_two_sectors(self):
+        args = self._make_args_no_line()
+        sourcefile = 'DeltaFiles/two-sector-pop-balance/Dagudashaag.sec'
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        sourcefile = 'DeltaFiles/two-sector-pop-balance/Zarushagar.sec'
+
+        zarusector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta[zarusector.name] = zarusector
+        self.assertEqual(2, len(delta), "Should only be two sectors in dictionary")
+
+        reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
+        reducer.is_initial_state_uninteresting()
+
+    def test_pax_and_trade_balance_over_reft_sector(self):
+        args = self._make_args_no_line()
+        sourcefile = 'DeltaFiles/reft-allegiance-pax-balance/Reft Sector.sec'
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
         reducer.is_initial_state_uninteresting()
 
     def _make_args(self):

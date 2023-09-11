@@ -74,7 +74,7 @@ class GraphicSubsectorMap(GraphicMap):
     def subsector_grid(self, doc, sector):
         pos = (10, 570)
         name = sector.name + " / " + sector.sector.name
-        size = doc.textsize(name, self.titleFont)
+        size = doc.textlength(name, self.titleFont)
         if size[0] > 340:
             name = sector.name + " /"
             doc.text(pos, name, font=self.titleFont, fill=self.fillBlue)
