@@ -1,0 +1,4 @@
+16 17 {'distance': 1, 'weight': 95, 'trade': 500000000000, 'btn': 9, 'count': 1}
+16 18 {'distance': 2, 'weight': 82, 'trade': 500000000000, 'btn': 13, 'count': 1}
+17 18 {'distance': 1, 'weight': 87, 'trade': 500000000000, 'btn': 9, 'count': 1}
+20 26 {'distance': 1, 'weight': 54, 'trade': 500000000000, 'btn': 19, 'count': 1}

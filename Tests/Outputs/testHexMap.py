@@ -169,6 +169,72 @@ class testHexMap(testBase):
         result = self.md5line.sub(oldmd5, result)
         self.assertEqual(expected_result, result)
 
+    def test_verify_subsector_comm_write(self):
+        sourcefile = os.path.abspath('../DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
+        if not os.path.isfile(sourcefile):
+            sourcefile = os.path.abspath('../Tests/DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
+
+        outfile = os.path.abspath('../OutputFiles/verify_subsector_comm_write/Zao Kfeng Ig Grilokh - subsector P - comm.txt')
+
+        starsfile = os.path.abspath('../OutputFiles/verify_subsector_comm_write/comm stars.txt')
+        if not os.path.isfile(starsfile):
+            starsfile = os.path.abspath('../Tests/OutputFiles/verify_subsector_comm_write/comm stars.txt')
+
+        rangesfile = os.path.abspath('../OutputFiles/verify_subsector_comm_write/comm ranges.txt')
+        if not os.path.isfile(rangesfile):
+            rangesfile = os.path.abspath('../Tests/OutputFiles/verify_subsector_comm_write/comm ranges.txt')
+
+        args = self._make_args()
+        args.interestingline = None
+        args.interestingtype = None
+        args.maps = True
+        args.routes = 'comm'
+        args.subsectors = True
+
+        delta = DeltaDictionary()
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta[sector.name] = sector
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy.output_path = args.output
+
+        galaxy.trade = None
+        galaxy.generate_routes('comm', 10)
+
+        with open(starsfile, 'rb') as file:
+            galaxy.stars = nx.read_edgelist(file, nodetype=int)
+        self.assertEqual(5, len(galaxy.stars.nodes()), "Unexpected number of stars nodes")
+        self.assertEqual(4, len(galaxy.stars.edges), "Unexpected number of stars edges")
+        for item in galaxy.stars.edges(data=True):
+            self.assertIn('trade', item[2], 'Trade value not set during edgelist read')
+
+        self._load_ranges(galaxy, rangesfile)
+        self.assertEqual(27, len(galaxy.ranges.nodes()), "Unexpected number of ranges nodes")
+        self.assertEqual(28, len(galaxy.ranges.edges), "Unexpected number of ranges edges")
+
+        secname = 'Zao Kfeng Ig Grilokh'
+
+        hexmap = HexMap(galaxy, 'trade')
+
+        oldtime = b'20230912013953'
+        oldmd5 = b'ff091edb9d8ca0abacea39e5791a9843'
+
+        with open(outfile, 'rb') as file:
+            expected_result = file.read()
+
+        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=False)
+        self.assertIsNotNone(result)
+        # rather than try to mock datetime.now(), patch the output result.
+        # this also lets us check that there's only a single match
+        matches = self.timeline.search(result)
+        self.assertEqual(1, len(matches.groups()), 'Should be exactly one create-date match')
+        result = self.timeline.sub(oldtime, result)
+        # likewise patch md5 output
+        matches = self.md5line.findall(result)
+        self.assertEqual(2, len(matches), 'Should be exactly two MD5 matches')
+        result = self.md5line.sub(oldmd5, result)
+        self.assertEqual(expected_result, result)
 
     def _load_ranges(self, galaxy, sourcefile):
         with open(sourcefile, "rb") as f:

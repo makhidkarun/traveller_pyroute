@@ -48,7 +48,9 @@ class HexMap(object):
         comm_routes = [star for star in self.galaxy.stars.edges(worlds, True) \
                        if star[2].get('xboat', False) or star[2].get('comm', False)]
         for (star, neighbor, data) in comm_routes:
-            self.comm_line(pdf_doc, [star, neighbor])
+            srcstar = self.galaxy.star_mapping[star]
+            trgstar = self.galaxy.star_mapping[neighbor]
+            self.comm_line(pdf_doc, [srcstar, trgstar])
         sector_trade = [star for star in self.galaxy.stars.edges(worlds, True) \
                         if star[2]['trade'] > 0 and StatCalculation.trade_to_btn(star[2]['trade']) >= self.min_btn]
         logging.getLogger('PyRoute.HexMap').debug("Worlds with trade: {}".format(len(sector_trade)))
