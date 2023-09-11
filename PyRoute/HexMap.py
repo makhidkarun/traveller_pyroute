@@ -461,8 +461,10 @@ class HexMap(object):
         circle = PDFEllipse(pdf.session, pdf.page, point, radius, color, size=2)
         circle._draw()
 
-    def document(self, sector):
+    def document(self, sector, is_live=True):
         path = os.path.join(self.galaxy.output_path, sector.sector_name() + " Sector.pdf")
+        if not is_live:
+            path = "string"
         self.writer = PDFLite(path)
 
         title = "Sector %s" % sector
@@ -471,7 +473,7 @@ class HexMap(object):
         keywords = None
         creator = "PyPDFLite"
         self.writer.set_information(title, subject, author, keywords, creator)
-        self.writer.set_compression(True)
+        self.writer.set_compression(is_live)
         document = self.writer.get_document()
         document.set_margins(4)
         return document
