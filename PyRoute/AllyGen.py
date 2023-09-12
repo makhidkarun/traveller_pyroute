@@ -9,7 +9,7 @@ from operator import itemgetter
 from collections import defaultdict
 import os
 
-from Position.Hex import Hex
+from PyRoute.Position.Hex import Hex
 
 
 class AllyGen(object):

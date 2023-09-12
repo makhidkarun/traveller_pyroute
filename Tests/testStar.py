@@ -10,7 +10,7 @@ import unittest
 import re
 import sys
 
-from Position.Hex import Hex
+from PyRoute.Position.Hex import Hex
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Galaxy import Allegiance
 

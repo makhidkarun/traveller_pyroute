@@ -5,7 +5,7 @@ Created on Aug 09, 2023
 """
 import networkx as nx
 
-from Position.Hex import Hex
+from PyRoute.Position.Hex import Hex
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
