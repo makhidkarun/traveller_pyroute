@@ -13,10 +13,11 @@ class testDeltaGalaxy(baseTest):
         delta = DeltaDictionary()
         delta[sector.name] = sector
 
-        galaxy = DeltaGalaxy(15, 4, 8)
+        galaxy = DeltaGalaxy(15, 4)
 
         with self.assertRaises(Exception) as context:
-            galaxy.read_sectors(delta, 'scaled', 'scaled')
+            galaxy.read_sectors(delta, 'scaled', 'scaled',
+                                10, 'trade', 8, 1, False)
 
         self.assertTrue('duplicated in sector Dagudashaag' in str(context.exception))
 

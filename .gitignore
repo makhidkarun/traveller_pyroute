@@ -29,3 +29,5 @@ Tests/.pytest_cache/
 # ignore downloaded/generated files
 sectors/
 maps/
+diffs/
+test_data/

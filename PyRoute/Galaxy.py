@@ -16,6 +16,7 @@ import networkx as nx
 from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
+from PyRoute.Calculation.TradeMPCalculation import TradeMPCalculation
 from PyRoute.Calculation.CommCalculation import CommCalculation
 from PyRoute.Calculation.OwnedWorldCalculation import OwnedWorldCalculation
 from PyRoute.Calculation.NoneCalculation import NoneCalculation
@@ -239,7 +240,7 @@ class Galaxy(AreaItem):
     classdocs
     """
  
-    def __init__(self, min_btn, max_jump=4, route_btn=8, debug_flag=False, trade_choice='trade', reuse=10):
+    def __init__(self, min_btn, max_jump=4):
         """
        Constructor
         """
@@ -252,14 +253,10 @@ class Galaxy(AreaItem):
         self.output_path = 'maps'
         self.max_jump_range = max_jump
         self.min_btn = min_btn
-        self.route_btn = route_btn
-        self.debug_flag = debug_flag
         self.landmarks = dict()
         self.big_component = None
         self.star_mapping = dict()
         self.trade = None
-        self.trade_choice = trade_choice
-        self.route_reuse = reuse
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -273,8 +270,9 @@ class Galaxy(AreaItem):
         del state['alg_sorted']
         return state
 
-    def read_sectors(self, sectors, pop_code, ru_calc):
-        self._set_trade_object(self.route_reuse, self.trade_choice)
+    def read_sectors(self, sectors, pop_code, ru_calc,
+                     route_reuse, trade_choice, route_btn, mp_threads, debug_flag):
+        self._set_trade_object(route_reuse, trade_choice, route_btn, mp_threads, debug_flag)
         star_counter = 0
         loaded_sectors = set()
         for sector in sectors:
@@ -389,18 +387,18 @@ class Galaxy(AreaItem):
             for subsector in sector.subsectors.values():
                 subsector.set_bounding_subsectors()
 
-    def generate_routes(self, routes, reuse=10):
-        self._set_trade_object(reuse, routes)
-
+    def generate_routes(self):
         self.trade.generate_routes()
 
-    def _set_trade_object(self, reuse, routes):
+    def _set_trade_object(self, reuse, routes, route_btn, mp_threads, debug_flag):
         # if trade object already set, bail out
         if self.trade is not None:
             return
         self.is_well_formed()
         if routes == 'trade':
-            self.trade = TradeCalculation(self, self.min_btn, self.route_btn, reuse, self.debug_flag)
+            self.trade = TradeCalculation(self, self.min_btn, route_btn, reuse, debug_flag)
+        elif routes == 'trade-mp':
+            self.trade = TradeMPCalculation(self, self.min_btn, route_btn, reuse, debug_flag, mp_threads)
         elif routes == 'comm':
             self.trade = CommCalculation(self, reuse)
         elif routes == 'xroute':

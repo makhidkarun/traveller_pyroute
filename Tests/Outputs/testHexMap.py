@@ -13,8 +13,8 @@ from Tests.baseTest import baseTest
 
 
 class testHexMap(baseTest):
-    timestamp_regex = b'(\d{14,})'
-    md5_regex = b'([0-9a-f]{32,})'
+    timestamp_regex = rb'(\d{14,})'
+    md5_regex = rb'([0-9a-f]{32,})'
     timeline = re.compile(timestamp_regex)
     md5line = re.compile(md5_regex)
 
@@ -31,8 +31,9 @@ class testHexMap(baseTest):
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta[sector.name] = sector
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
         secname = 'Zao Kfeng Ig Grilokh'
@@ -73,8 +74,10 @@ class testHexMap(baseTest):
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta[sector.name] = sector
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+
         galaxy.output_path = args.output
 
         secname = 'Zao Kfeng Ig Grilokh'
@@ -113,16 +116,18 @@ class testHexMap(baseTest):
         args.interestingtype = None
         args.maps = True
         args.subsectors = True
+        args.routes = 'trade'
 
         delta = DeltaDictionary()
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta[sector.name] = sector
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes('trade', 10)
+        galaxy.generate_routes()
 
         with open(starsfile, 'rb') as file:
             galaxy.stars = nx.read_edgelist(file, nodetype=int)
@@ -177,12 +182,12 @@ class testHexMap(baseTest):
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta[sector.name] = sector
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.trade = None
-        galaxy.generate_routes('comm', 10)
+        galaxy.generate_routes()
 
         with open(starsfile, 'rb') as file:
             galaxy.stars = nx.read_edgelist(file, nodetype=int)
