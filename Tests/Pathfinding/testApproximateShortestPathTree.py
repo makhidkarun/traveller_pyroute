@@ -15,14 +15,12 @@ import networkx as nx
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
+from Tests.baseTest import baseTest
 
 
-class testApproximateShortestPathTree(unittest.TestCase):
+class testApproximateShortestPathTree(baseTest):
     def test_lower_bound_doesnt_overlap(self):
-        sourcefile = '../DeltaFiles/Zarushagar.sec'
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar.sec')
-
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -52,10 +50,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         self.assertEqual(expected, actual, "Unexpected lower bound value")
 
     def test_lower_bound_does_overlap(self):
-        sourcefile = '../DeltaFiles/Zarushagar.sec'
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar.sec')
-
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -84,10 +79,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         self.assertEqual(expected, actual, "Unexpected lower bound value")
 
     def test_lower_bound_self_to_self(self):
-        sourcefile = '../DeltaFiles/Zarushagar.sec'
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar.sec')
-
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -115,9 +107,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         self.assertEqual(expected, actual, "Unexpected lower bound value")
 
     def test_drop_first_level_intermediate_nodes_in_same_component(self):
-        sourcefile = '../DeltaFiles/Zarushagar.sec'
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar.sec')
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -156,10 +146,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         self.assertEqual(old_num, len(approx._distances))
 
     def test_drop_third_level_intermediate_nodes_in_same_component_and_regenerate(self):
-        sourcefile = '../DeltaFiles/Zarushagar.sec'
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar.sec')
-
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -195,13 +182,8 @@ class testApproximateShortestPathTree(unittest.TestCase):
         self.assertEqual(482, len(approx._distances))
 
     def test_verify_changed_leaf_edge_trip_update(self):
-        sourcefile = '../DeltaFiles/Zarushagar-Ibara.sec'
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar-Ibara.sec')
-
-        jsonfile = '../PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json'
-        if not os.path.isfile(jsonfile):
-            jsonfile = os.path.abspath('../Tests/PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
+        jsonfile = self.unpack_filename('PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -252,13 +234,8 @@ class testApproximateShortestPathTree(unittest.TestCase):
         self.assertEqual(expected_distances[leafnode] - 1, approx._distances[leafnode], "Leaf node distance not updated")
 
     def test_verify_near_root_edge_propagates(self):
-        sourcefile = '../DeltaFiles/Zarushagar-Ibara.sec'
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/Zarushagar-Ibara.sec')
-        jsonfile = '../PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json'
-        if not os.path.isfile(jsonfile):
-            jsonfile = os.path.abspath('../Tests/PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
-
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
+        jsonfile = self.unpack_filename('PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -315,10 +292,7 @@ class testApproximateShortestPathTree(unittest.TestCase):
         self.assertEqual(expected_distances, approx._distances, "Unexpected distances after SPT restart")
 
     def test_verify_multiple_near_root_edges_propagate(self):
-        sourcefile = '../DeltaFiles/dijkstra_restart_blowup/Lishun.sec'
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/dijkstra_restart_blowup/Lishun.sec')
-
+        sourcefile = self.unpack_filename('DeltaFiles/dijkstra_restart_blowup/Lishun.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
