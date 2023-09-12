@@ -4,9 +4,9 @@ import os
 import tempfile
 import unittest
 
-from AllyGen import AllyGen
-from DeltaDictionary import SectorDictionary, DeltaDictionary
-from DeltaGalaxy import DeltaGalaxy
+from PyRoute.AllyGen import AllyGen
+from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 
 
 class testAllyGenBorders(unittest.TestCase):
