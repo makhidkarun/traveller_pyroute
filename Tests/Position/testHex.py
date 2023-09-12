@@ -7,10 +7,10 @@ import unittest
 
 from PyRoute.Galaxy import Sector
 from PyRoute.Position.Hex import Hex
-from Star import Star
+from PyRoute.Star import Star
 
 
-class TestHex(unittest.TestCase):
+class testHex(unittest.TestCase):
     def setUp(self):
         self.coreSector = Sector(' Core', ' 0, 0')
         self.lishunSector = Sector('Lishun', ' 0, 1')
