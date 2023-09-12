@@ -5,9 +5,6 @@ Created on May 14, 2016
 """
 import logging
 
-from PIL import Image, ImageDraw, ImageColor, ImageFont
-
-from PyRoute.Outputs.GraphicMap import GraphicMap
 from PyRoute.StatCalculation import StatCalculation
 
 
@@ -291,23 +288,3 @@ class Map(object):
         else:
             rlineStart.y = self.y_start - 2 * self.ym
             rlineEnd.y = self.y_start - 3 * self.ym
-
-
-class GraphicSectorMap(GraphicMap):
-    def __init__(self, galaxy, routes):
-        super(GraphicSectorMap, self).__init__(galaxy, routes)
-        self.image_size = (612, 792)
-
-    def document(self, sector):
-        self.sector = sector
-        self.image = Image.new("RGB", self.image_size, "white")
-        return ImageDraw.Draw(self.image)
-
-    def sector_name(self, doc, name):
-        """
-        Write name at the top of the document
-        """
-        # get a font
-        size = self.titleFont.getsize(name)
-        pos = (306 - size[0] / 2, 0)
-        doc.text(pos, name, font=self.titleFont, fill=self.fillBlack)
