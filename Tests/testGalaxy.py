@@ -10,8 +10,7 @@ import sys
 
 sys.path.append('../PyRoute')
 
-from Galaxy import Galaxy
-from Galaxy import Sector
+from PyRoute.Galaxy import Galaxy, Sector
 
 
 class testGalaxy(unittest.TestCase):
