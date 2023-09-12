@@ -14,19 +14,6 @@ from PIL import Image, ImageDraw, ImageColor, ImageFont
 from PyRoute.StatCalculation import StatCalculation
 
 
-class GraphicLine(object):
-    def __init__(self, image, lineStart, lineEnd, colorname, width):
-        self.image = image
-        self.lineStart = lineStart
-        self.lineEnd = lineEnd
-        self.color = ImageColor.getrgb(colorname)
-        self.width = max(1, int(width))
-
-    def _draw(self):
-        self.image.line([(self.lineStart.x, self.lineStart.y), (self.lineEnd.x, self.lineEnd.y)], self.color,
-                        self.width)
-
-
 class Map(object):
     x_count = 33
     y_count = 41
