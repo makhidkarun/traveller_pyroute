@@ -6,11 +6,12 @@ from pathlib import Path
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary, SubsectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Galaxy import Allegiance, Galaxy
+from Tests.baseTest import baseTest
 
 sys.path.append('../PyRoute')
 
 
-class testDeltaDictionary(unittest.TestCase):
+class testDeltaDictionary(baseTest):
     def test_add_bad_item_by_index(self):
         expected = 'Values must be SectorDictionary objects'
         actual = None
@@ -199,7 +200,7 @@ class testDeltaDictionary(unittest.TestCase):
         self.assertEqual(expected, actual, "Unexpected subsector list")
 
     def test_sector_subset_blowup_on_vland_empty(self):
-        vland = 'DeltaFiles/sector_subset_blowup_on_vland_empty/Vland.sec'
+        vland = self.unpack_filename('DeltaFiles/sector_subset_blowup_on_vland_empty/Vland.sec')
 
         vland_sec = SectorDictionary.load_traveller_map_file(vland)
 
@@ -210,7 +211,7 @@ class testDeltaDictionary(unittest.TestCase):
         self.assertEqual(1, len(remix))
 
     def test_sector_subset_blowup_on_spinward_marches(self):
-        spinward = 'DeltaFiles/high_pop_worlds_blowup/Spinward Marches.sec'
+        spinward = self.unpack_filename('DeltaFiles/high_pop_worlds_blowup/Spinward Marches.sec')
 
         spinward_sec = SectorDictionary.load_traveller_map_file(spinward)
 
@@ -223,7 +224,7 @@ class testDeltaDictionary(unittest.TestCase):
         self.assertEqual(1, len(remix))
         self.assertListEqual([], remix['Spinward Marches'].allegiances['CsIm'].stats.high_pop_worlds, "Missing high_pop_worlds list not restored")
 
-class testSectorDictionary(unittest.TestCase):
+class testSectorDictionary(baseTest):
     def test_add_bad_item_by_index(self):
         expected = 'Values must be SubsectorDictionary objects'
         actual = None
@@ -273,7 +274,7 @@ class testSectorDictionary(unittest.TestCase):
         self.assertEqual('filename', foo.filename)
 
     def test_load_from_traveller_map_file(self):
-        sourcefile = 'DeltaFiles/Dagudashaag-spiked.sec'
+        sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-spiked.sec')
 
         # load_traveller_map_file is a little slow as it uses Star's parse_line_into_star method
         # to validate the input line
@@ -389,7 +390,7 @@ class testSectorDictionary(unittest.TestCase):
         self.assertTrue(foo.skipped)
 
     def test_sector_file_load_with_no_named_subsectors_has_subsector_dictionaries(self):
-        sourcefile = 'DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec'
+        sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
 
         # load_traveller_map_file is a little slow as it uses Star's parse_line_into_star method
         # to validate the input line
@@ -399,18 +400,18 @@ class testSectorDictionary(unittest.TestCase):
         self.assertEqual(16, len(sector), "Loaded sector file should have 16 subsector dicts")
 
     def test_sector_file_load_with_no_named_subsectors_and_one_subsector_of_data(self):
-        sourcefile = 'DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec'
+        sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
 
         # load_traveller_map_file is a little slow as it uses Star's parse_line_into_star method
         # to validate the input line
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         self.assertTrue(isinstance(sector, SectorDictionary), "SectorDictionary object not created")
-        self.assertEquals(27, len(sector.lines))
+        self.assertEqual(27, len(sector.lines))
 
         self.assertEqual(16, len(sector), "Loaded sector file should have 16 subsector dicts")
 
 
-class testSubsectorDictionary(unittest.TestCase):
+class testSubsectorDictionary(baseTest):
     def test_drop_lines(self):
         foo = SubsectorDictionary('Mimu', 'A')
         foo.items.append('foo')
