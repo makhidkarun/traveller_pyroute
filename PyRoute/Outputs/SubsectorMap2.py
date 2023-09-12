@@ -7,8 +7,8 @@ import os
 import logging
 import math
 
-from Position.Hex import Hex
-from PyRoute.Outputs.Map import GraphicMap
+from PyRoute.Position.Hex import Hex
+from PyRoute.Outputs.GraphicMap import GraphicMap
 from PyRoute.Galaxy import Galaxy
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Outputs.FontLayer import FontLayer
