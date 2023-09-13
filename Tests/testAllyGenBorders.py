@@ -3,6 +3,7 @@ import json
 import os
 import tempfile
 import unittest
+from collections import defaultdict
 
 from PyRoute.AllyGen import AllyGen
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
@@ -352,7 +353,7 @@ class testAllyGenBorders(baseTest):
         # Load expected allymap
         with open(allymap, 'r') as file:
             expected_string = json.load(file)
-        expected_allies = dict()
+        expected_allies = defaultdict(set)
         for key in expected_string:
             trimkey = key.strip('()')
             bitz = trimkey.split(',')
