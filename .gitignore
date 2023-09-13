@@ -3,16 +3,22 @@ PyRoute/DeltaPasses/__pycache__/
 PyRoute/DeltaDebug/__pycache__/
 PyRoute/Pathfinding/__pycache__/
 PyRoute/Calculation/__pycache__/
+PyRoute/Position/__pycache__/
 Tests/__pycache__/
 PyRoute/*.pyc
 PyRoute/DeltaDebug/*.pyc
 PyRoute/Pathfinding/*.pyc
 PyRoute/Calculation/*.pyc
+PyRoute/Position/*.pyc
 Tests/*.pyc
 PyRoute/*.class
 PyRoute/DeltaDebug/*.class
 PyRoute/Pathfinding/*.class
+PyRoute/Position/*.class
 Tests/*.class
+Tests/Pathfinding/__pycache__/
+Tests/Position/__pycache__/
+Tests/.pytest_cache/
 
 # ignore IDE-related detritus
 .idea/
