@@ -3,7 +3,6 @@ Created on Mar 17, 2014
 
 @author: tjoneslo
 """
-import copy
 import logging
 import math
 from PyRoute.wikistats import WikiStats

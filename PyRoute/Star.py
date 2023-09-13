@@ -4,7 +4,6 @@ Created on Mar 5, 2014
 @author: tjoneslo
 """
 import copy
-import functools
 import logging
 import bisect
 import random

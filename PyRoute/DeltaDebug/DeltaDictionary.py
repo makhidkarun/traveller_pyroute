@@ -7,8 +7,6 @@ import codecs
 import copy
 import logging
 import os
-import string
-from pathlib import Path
 
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Galaxy import Sector, Allegiance

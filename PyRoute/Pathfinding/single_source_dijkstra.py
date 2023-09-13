@@ -13,7 +13,6 @@ from heapq import heappush, heappop
 from itertools import count
 
 import networkx as nx
-from networkx.algorithms.shortest_paths.weighted import _weight_function
 
 
 def single_source_dijkstra(G, source, cutoff=None, distances=None, paths=None, frontier=None):

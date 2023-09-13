@@ -6,7 +6,6 @@ Modify this class to add different reduction passes.
 
 @author: CyberiaResurrection
 """
-import functools
 import logging
 import math
 
