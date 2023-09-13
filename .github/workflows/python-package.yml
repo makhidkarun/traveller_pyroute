@@ -29,7 +29,6 @@ jobs:
         run: |
           # now run configured options
           ruff check PyRoute
-        continue-on-error: true
       - name: Test with pytest
         run: |
           pytest
