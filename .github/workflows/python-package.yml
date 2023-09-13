@@ -16,9 +16,9 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install freefonts
+      - name: Install freefonts & symbola
         run: |
-          sudo apt-get -y install fonts-freefont-ttf
+          sudo apt-get -y install fonts-freefont-ttf fonts-symbola
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
