@@ -284,7 +284,7 @@ class testDeltaReduce(baseTest):
 
         reducer = DeltaReduce(delta, args)
 
-        reducer.is_initial_state_uninteresting()
+        reducer.is_initial_state_uninteresting(reraise=True)
 
     def test_verify_sector_without_subsector_names_allegiance_balances(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P - trimmed.sec')
@@ -301,7 +301,7 @@ class testDeltaReduce(baseTest):
 
         reducer = DeltaReduce(delta, args)
 
-        reducer.is_initial_state_uninteresting()
+        reducer.is_initial_state_uninteresting(reraise=True)
 
     def test_star_having_no_sector_attribute(self):
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-star-object-no-sector-attribute.sec')
