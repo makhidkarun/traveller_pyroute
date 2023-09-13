@@ -16,6 +16,12 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Check font locations for FreeMono.ttf
+        run: |
+          cd /usr/share/fonts && find * | grep FreeMono.ttf
+      - name: Check font locations for Symbola-hint.ttf
+        run: |
+          cd /usr/share/fonts && find * | grep Symbola-hint.ttf
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
