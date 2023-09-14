@@ -7,3 +7,4 @@ jinja2
 jsonpickle
 pytest
 pytest-subtests
+pytest-randomly
