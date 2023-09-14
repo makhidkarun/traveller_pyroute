@@ -13,7 +13,7 @@ import itertools
 import math
 import networkx as nx
 
-from Position.Hex import Hex
+from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Calculation.CommCalculation import CommCalculation

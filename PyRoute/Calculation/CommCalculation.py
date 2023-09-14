@@ -71,10 +71,10 @@ class CommCalculation(RouteCalculation):
     def generate_routes(self):
         for alg in self.galaxy.alg.values():
             # No comm routes for the non-aligned worlds.
-            if AllyGen.is_nonaligned(alg):
+            if AllyGen.is_nonaligned(alg.code):
                 continue
             # No comm routes for small empires
-            if len(alg.worlds) < 25:
+            if len(alg.worlds) < 20:
                 self.logger.info("skipping Alg: {} with {} worlds".format(alg.name, len(alg.worlds)))
                 continue
             alg.min_importance = 4

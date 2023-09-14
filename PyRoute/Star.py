@@ -11,7 +11,7 @@ import random
 import math
 import re
 
-from Position.Hex import Hex
+from PyRoute.Position.Hex import Hex
 from PyRoute.AllyGen import AllyGen
 from PyRoute.TradeCodes import TradeCodes
 from collections import OrderedDict

@@ -37,54 +37,53 @@ class HexMap(object):
         Call this to output the trade maps
         """
         logging.getLogger("PyRoute.HexMap").info("writing {:d} sector maps...".format(len(self.galaxy.sectors)))
-        for sector in self.galaxy.sectors.values():
-            pdf = self.document(sector)
-            self.write_base_map(pdf, sector)
+        for gal_sector in self.galaxy.sectors.values():
+            self.write_sector_pdf_map(gal_sector)
 
-            self.draw_borders(pdf, sector)
-
-            comm_routes = [star for star in self.galaxy.stars.edges(sector.worlds, True) \
-                           if star[2].get('xboat', False) or star[2].get('comm', False)]
-            for (star, neighbor, data) in comm_routes:
-                self.comm_line(pdf, [star, neighbor])
-
-            sector_trade = [star for star in self.galaxy.stars.edges(sector.worlds, True) \
-                            if star[2]['trade'] > 0 and StatCalculation.trade_to_btn(star[2]['trade']) >= self.min_btn]
-
-            logging.getLogger('PyRoute.HexMap').debug("Worlds with trade: {}".format(len(sector_trade)))
-
-            sector_trade.sort(key=lambda line: line[2]['trade'])
-
-            for (star, neighbor, data) in sector_trade:
-                self.galaxy.stars[star][neighbor]['trade btn'] = StatCalculation.trade_to_btn(data['trade'])
-                self.trade_line(pdf, [star, neighbor], data)
-
-            # Get all the worlds in this sector
-            # for (star, neighbor, data) in self.galaxy.stars.edges(sector.worlds, True):
-            #    if star.sector != sector:
-            #        continue#
-            #    if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:
-            #        self.galaxy.stars[star][neighbor]['trade btn'] = self.trade_to_btn(data['trade'])
-            #        self.trade_line(pdf, [star, neighbor], data)
-            #    elif star.sector != neighbor.sector:
-            #        data = self.galaxy.stars.get_edge_data(neighbor, star)
-            #        if data is not None and \
-            #            data['trade'] > 0 and \
-            #            self.trade_to_btn(data['trade']) >= self.min_btn:
-            #            self.trade_line(pdf, [star, neighbor], data)
-
-            for star in sector.worlds:
-                self.system(pdf, star)
-            if sector.coreward:
-                self.coreward_sector(pdf, sector.coreward.name)
-            if sector.rimward:
-                self.rimward_sector(pdf, sector.rimward.name)
-            if sector.spinward:
-                self.spinward_sector(pdf, sector.spinward.name)
-            if sector.trailing:
-                self.trailing_sector(pdf, sector.trailing.name)
-
-            self.writer.close()
+    def write_sector_pdf_map(self, gal_sector, is_live=True):
+        pdf_doc = self.document(gal_sector, is_live)
+        self.write_base_map(pdf_doc, gal_sector)
+        self.draw_borders(pdf_doc, gal_sector)
+        worlds = [item.index for item in gal_sector.worlds]
+        comm_routes = [star for star in self.galaxy.stars.edges(worlds, True) \
+                       if star[2].get('xboat', False) or star[2].get('comm', False)]
+        for (star, neighbor, data) in comm_routes:
+            srcstar = self.galaxy.star_mapping[star]
+            trgstar = self.galaxy.star_mapping[neighbor]
+            self.comm_line(pdf_doc, [srcstar, trgstar])
+        sector_trade = [star for star in self.galaxy.stars.edges(worlds, True) \
+                        if star[2]['trade'] > 0 and StatCalculation.trade_to_btn(star[2]['trade']) >= self.min_btn]
+        logging.getLogger('PyRoute.HexMap').debug("Worlds with trade: {}".format(len(sector_trade)))
+        sector_trade.sort(key=lambda line: line[2]['trade'])
+        for (star, neighbor, data) in sector_trade:
+            self.galaxy.stars[star][neighbor]['trade btn'] = StatCalculation.trade_to_btn(data['trade'])
+            srcstar = self.galaxy.star_mapping[star]
+            trgstar = self.galaxy.star_mapping[neighbor]
+            self.trade_line(pdf_doc, [srcstar, trgstar], data)
+        # Get all the worlds in this sector
+        # for (star, neighbor, data) in self.galaxy.stars.edges(sector.worlds, True):
+        #    if star.sector != sector:
+        #        continue#
+        #    if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:
+        #        self.galaxy.stars[star][neighbor]['trade btn'] = self.trade_to_btn(data['trade'])
+        #        self.trade_line(pdf, [star, neighbor], data)
+        #    elif star.sector != neighbor.sector:
+        #        data = self.galaxy.stars.get_edge_data(neighbor, star)
+        #        if data is not None and \
+        #            data['trade'] > 0 and \
+        #            self.trade_to_btn(data['trade']) >= self.min_btn:
+        #            self.trade_line(pdf, [star, neighbor], data)
+        for star in gal_sector.worlds:
+            self.system(pdf_doc, star)
+        if gal_sector.coreward:
+            self.coreward_sector(pdf_doc, gal_sector.coreward.name)
+        if gal_sector.rimward:
+            self.rimward_sector(pdf_doc, gal_sector.rimward.name)
+        if gal_sector.spinward:
+            self.spinward_sector(pdf_doc, gal_sector.spinward.name)
+        if gal_sector.trailing:
+            self.trailing_sector(pdf_doc, gal_sector.trailing.name)
+        return self.writer.close()
 
     def write_base_map(self, pdf, sector):
         self.sector_name(pdf, sector.name)
@@ -467,8 +466,10 @@ class HexMap(object):
         circle = PDFEllipse(pdf.session, pdf.page, point, radius, color, size=2)
         circle._draw()
 
-    def document(self, sector):
+    def document(self, sector, is_live=True):
         path = os.path.join(self.galaxy.output_path, sector.sector_name() + " Sector.pdf")
+        if not is_live:
+            path = "string"
         self.writer = PDFLite(path)
 
         title = "Sector %s" % sector
@@ -477,7 +478,7 @@ class HexMap(object):
         keywords = None
         creator = "PyPDFLite"
         self.writer.set_information(title, subject, author, keywords, creator)
-        self.writer.set_compression(True)
+        self.writer.set_compression(is_live)
         document = self.writer.get_document()
         document.set_margins(4)
         return document

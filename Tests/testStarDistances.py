@@ -1,6 +1,6 @@
 import unittest
 
-from Position.Hex import Hex
+from PyRoute.Position.Hex import Hex
 from PyRoute.Galaxy import Sector
 from PyRoute.Star import Star
 

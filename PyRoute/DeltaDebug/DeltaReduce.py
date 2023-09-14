@@ -12,10 +12,10 @@ import math
 
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.HexMap import HexMap
+from PyRoute.Outputs.HexMap import HexMap
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.StatCalculation import StatCalculation
-from PyRoute.SubsectorMap2 import GraphicSubsectorMap
+from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap
 
 
 class DeltaReduce:

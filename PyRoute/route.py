@@ -11,8 +11,8 @@ import codecs
 import os
 from PyRoute.Galaxy import Galaxy
 from PyRoute.SpeculativeTrade import SpeculativeTrade
-from PyRoute.HexMap import HexMap
-from PyRoute.SubsectorMap2 import GraphicSubsectorMap
+from PyRoute.Outputs.HexMap import HexMap
+from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap
 from PyRoute.StatCalculation import StatCalculation
 
 logger = logging.getLogger('PyRoute')
