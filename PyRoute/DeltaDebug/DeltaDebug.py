@@ -21,10 +21,6 @@ import argparse
 import logging
 import codecs
 import os
-import sys
-import math
-
-sys.path.append(os.path.abspath('../../'))
 
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce

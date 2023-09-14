@@ -1,7 +1,7 @@
 import unittest
 
-from AllyGen import AllyGen
-from Galaxy import Allegiance
+from PyRoute.AllyGen import AllyGen
+from PyRoute.Galaxy import Allegiance
 
 
 class testAllyGen(unittest.TestCase):

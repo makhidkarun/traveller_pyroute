@@ -44,4 +44,6 @@ class FontLayer(object):
                 if not path.isdir(item):
                     return item
 
+        assert False, "Font mapping for " + filename + " not found"
+
         return None

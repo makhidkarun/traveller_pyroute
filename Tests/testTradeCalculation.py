@@ -5,8 +5,8 @@ import sys
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 
 sys.path.append('../PyRoute')
-from Star import Star
-from Galaxy import Sector, Galaxy
+from PyRoute.Star import Star
+from PyRoute.Galaxy import Sector, Galaxy
 
 
 class testTradeCalculation(unittest.TestCase):

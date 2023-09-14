@@ -283,7 +283,7 @@ No information yet available.
                 page_text = str(target_page.getWikiText(), 'utf-8')
                 templates = re.findall(r"{{[^}]*}}", page_text, re.U)
                 era_name = "|era       = {}".format(era)
-                newtemplates = [template if not era_name in template else data
+                newtemplates = [template if era_name not in template else data
                                 for template in templates]
                 newdata = '\n'.join(newtemplates)
                 if era_name not in newdata:

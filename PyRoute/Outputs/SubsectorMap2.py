@@ -420,7 +420,7 @@ class GraphicSubsectorMap(GraphicMap):
     def trade_color(self, trade):
         tcolor = {0: "#0500ff", 1: "#0012ff", 2: "#0094ff", 3: "#00ffa8",
                   4: "#8aff00", 5: "#FFd200", 6: "#FF8200", 7: "#FF3200",
-                  9: "#FF0030", 9: "#FF00B0", 10: "#FF04F0", 11: "#FF0CF0"}
+                  8: "#FF0030", 9: "#FF00B0", 10: "#FF04F0", 11: "#FF0CF0"}
         return tcolor.get(trade, "#000000")
 
     def centerpoint(self, star):

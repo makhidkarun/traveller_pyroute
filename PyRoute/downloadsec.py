@@ -3,11 +3,13 @@ Created on Jun 3, 2014
 
 @author: tjoneslo
 """
-import urllib.request, urllib.error, urllib.parse
-import codecs
-import time
-import os
 import argparse
+import codecs
+import os
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
 
 
 def get_url(url, sector, suffix, output_dir):

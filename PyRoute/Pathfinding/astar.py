@@ -9,7 +9,6 @@ from heapq import heappop, heappush, heapify
 from itertools import count
 
 import networkx as nx
-from networkx.algorithms.shortest_paths.weighted import _weight_function
 
 __all__ = ["astar_path", "astar_path_indexes"]
 

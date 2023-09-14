@@ -4,7 +4,6 @@ Created on Mar 5, 2014
 @author: tjoneslo
 """
 import copy
-import functools
 import logging
 import bisect
 import random
@@ -389,8 +388,8 @@ class Star(object):
     def calculate_gwp(self, pop_code):
         calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400,
                    24400, 39000, 39000]
-        flatGWP = [229, 301, 396, 521, 685, 902, 1186, 1560, 2051, 2698, 3548, 4667, 6138, 8072, 10617, 13964, 18365,
-                   24155, 31769, 41783]
+        #flatGWP = [229, 301, 396, 521, 685, 902, 1186, 1560, 2051, 2698, 3548, 4667, 6138, 8072, 10617, 13964, 18365,
+        #           24155, 31769, 41783]
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
 
         if pop_code == 'scaled':

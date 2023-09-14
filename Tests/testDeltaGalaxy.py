@@ -2,11 +2,12 @@ import unittest
 
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from Tests.baseTest import baseTest
 
 
-class testDeltaGalaxy(unittest.TestCase):
+class testDeltaGalaxy(baseTest):
     def test_read_sectors(self):
-        sourcefile = 'DeltaFiles/Dagudashaag-spiked.sec'
+        sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-spiked.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()

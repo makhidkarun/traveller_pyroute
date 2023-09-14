@@ -9,7 +9,6 @@ from PyRoute.Position.Hex import Hex
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
-from PyRoute.Star import Star
 
 
 class XRouteCalculation(RouteCalculation):

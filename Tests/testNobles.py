@@ -9,7 +9,7 @@ import re
 import sys
 
 sys.path.append('../PyRoute')
-from Star import Nobles
+from PyRoute.Star import Nobles
 
 
 class TestNobles(unittest.TestCase):

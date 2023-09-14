@@ -6,7 +6,6 @@ Modify this class to add different reduction passes.
 
 @author: CyberiaResurrection
 """
-import functools
 import logging
 import math
 
@@ -37,18 +36,20 @@ class DeltaReduce:
         sectors = self.sectors
         args = self.args
 
-        interesting, _ = self._check_interesting(args, sectors)
+        interesting, msg, _ = self._check_interesting(args, sectors)
 
         if not interesting:
             raise AssertionError("Original input not interesting - aborting")
 
-    def is_initial_state_uninteresting(self):
+    def is_initial_state_uninteresting(self, reraise=False):
         sectors = self.sectors
         args = self.args
 
-        interesting, msg = self._check_interesting(args, sectors)
+        interesting, msg, e = self._check_interesting(args, sectors)
 
         if interesting:
+            if reraise:
+                raise e
             raise AssertionError(msg)
 
     def reduce_sector_pass(self, singleton_only=False):
@@ -80,7 +81,7 @@ class DeltaReduce:
 
                 temp_sectors = best_sectors.sector_subset(raw_lines)
 
-                interesting, msg = self._check_interesting(self.args, temp_sectors)
+                interesting, msg, _ = self._check_interesting(self.args, temp_sectors)
                 # We've found a chunk of input and have _demonstrated_ its irrelevance,
                 # empty that chunk, update best so far, and continue
                 if interesting:
@@ -133,7 +134,7 @@ class DeltaReduce:
 
                 temp_sectors = best_sectors.subsector_subset(raw_lines)
 
-                interesting, msg = self._check_interesting(self.args, temp_sectors)
+                interesting, msg, _ = self._check_interesting(self.args, temp_sectors)
                 # We've found a chunk of input and have _demonstrated_ its irrelevance,
                 # empty that chunk, update best so far, and continue
                 if interesting:
@@ -184,7 +185,7 @@ class DeltaReduce:
 
                 temp_sectors = best_sectors.drop_lines(chunks[i])
 
-                interesting, msg = self._check_interesting(self.args, temp_sectors)
+                interesting, msg, _ = self._check_interesting(self.args, temp_sectors)
                 # We've found a chunk of input and have _demonstrated_ its irrelevance,
                 # empty that chunk, update best so far, and continue
                 if interesting:
@@ -230,7 +231,7 @@ class DeltaReduce:
                 lines_to_remove = [segment[i], segment[j]]
                 temp_sectors = best_sectors.drop_lines(lines_to_remove)
 
-                interesting, msg = self._check_interesting(self.args, temp_sectors)
+                interesting, msg, _ = self._check_interesting(self.args, temp_sectors)
 
                 # We've found a chunk of input and have _demonstrated_ its irrelevance,
                 # empty that chunk, update best so far, and continue
@@ -268,6 +269,7 @@ class DeltaReduce:
     def _check_interesting(args, sectors):
         interesting = False
         msg = None
+        q = None
 
         try:
             galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
@@ -302,6 +304,7 @@ class DeltaReduce:
                     graphMap = GraphicSubsectorMap(galaxy, args.routes, args.speculative_version)
                     graphMap.write_maps()
         except Exception as e:
+            q = e
             # check e's message and/or stack trace for interestingness line
             msg = str(e)
             interesting = True
@@ -317,7 +320,7 @@ class DeltaReduce:
                 else:
                     interesting = False
 
-        return interesting, msg
+        return interesting, msg, q
 
     @staticmethod
     def chunk_lines(lines, num_chunks):

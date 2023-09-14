@@ -108,7 +108,7 @@ class WikiReview(object):
     def get_page(self, title):
         try:
             target_page = Page(self.site, title)
-        except NoPage as e:
+        except NoPage:
             self.logger.error("Article {} page does not exist, skipped".format(title))
             return None
         except WikiError as e:
@@ -149,7 +149,7 @@ class WikiReview(object):
                 self.logger.error('Save failed {} - {}'.format(page.title, result))
                 return False
 
-        except NoPage as e:
+        except NoPage:
             self.logger.error("Save Page for page {}, page does not exist, skipped".format(page.title))
             return False
         except WikiError as e:

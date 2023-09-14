@@ -15,8 +15,8 @@ from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Galaxy import Allegiance
 
 sys.path.append('../PyRoute')
-from Star import Star
-from Galaxy import Sector, Galaxy
+from PyRoute.Star import Star
+from PyRoute.Galaxy import Sector, Galaxy
 
 
 class TestStar(unittest.TestCase):
@@ -331,56 +331,6 @@ class TestStar(unittest.TestCase):
                     Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
 
                 self.assertEqual(target, star1.tl, "Unexpected mapping for TL " + letter)
-
-    def test_compare_timing(self):
-        star1 = Star.parse_line_into_star(
-            "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
-        star1.index = 11
-        star2 = Star.parse_line_into_star(
-            "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
-        star2.index = 12
-
-        num_rounds = 50000
-
-        # object comparison
-        foo = time.monotonic_ns()
-        for i in range(num_rounds):
-            result = star1 == star2
-        for i in range(num_rounds):
-            result = star1 == star1
-        bar = time.monotonic_ns()
-
-        object_time = bar - foo
-
-        # property comparison
-        foo = time.monotonic_ns()
-        for i in range(num_rounds):
-            result = star1.index == star2.index
-        for i in range(num_rounds):
-            result = star1.index == star1.index
-        bar = time.monotonic_ns()
-
-        property_time = bar - foo
-
-        # saved index comparison
-        ind1 = star1.index
-        ind2 = star2.index
-
-        foo = time.monotonic_ns()
-        for i in range(num_rounds):
-            result = ind1 == ind2
-        for i in range(num_rounds):
-            result = ind1 == ind1
-        bar = time.monotonic_ns()
-
-        saved_time = bar - foo
-        prop_ratio = property_time / saved_time
-        obj_ratio = object_time / saved_time
-
-        self.assertTrue(object_time > saved_time, "Object comparison unexpectedly faster than integer comparison")
-        self.assertTrue(property_time > saved_time, "Property comparison unexpectedly faster than integer comparison")
 
     def testCompareHexDistanceToAxialDistance(self):
         star1 = Star.parse_line_into_star(

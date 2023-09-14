@@ -3,18 +3,13 @@ Created on Mar 15, 2014
 
 @author: tjoneslo
 """
-import bisect
 import functools
-import logging
-import itertools
-from math import ceil
 
 import networkx as nx
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
-from PyRoute.Pathfinding.astar import astar_path, astar_path_indexes
-from PyRoute.Star import Star
+from PyRoute.Pathfinding.astar import astar_path_indexes
 from PyRoute.TradeBalance import TradeBalance
 
 

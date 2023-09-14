@@ -3,12 +3,7 @@ Created on Aug 08, 2023
 
 @author: CyberiaResurrection
 """
-import copy
-
-import networkx as nx
-
-from PyRoute.Pathfinding.single_source_dijkstra import single_source_dijkstra, implicit_shortest_path_dijkstra, \
-    implicit_shortest_path_dijkstra_indexes
+from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_indexes
 from PyRoute.Star import Star
 
 

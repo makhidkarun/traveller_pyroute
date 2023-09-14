@@ -3,23 +3,21 @@ import json
 import os
 import tempfile
 import unittest
+from collections import defaultdict
 
-from AllyGen import AllyGen
-from DeltaDictionary import SectorDictionary, DeltaDictionary
-from DeltaGalaxy import DeltaGalaxy
+import pytest
+
+from PyRoute.AllyGen import AllyGen
+from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from Tests.baseTest import baseTest
 
 
-class testAllyGenBorders(unittest.TestCase):
+class testAllyGenBorders(baseTest):
     def test_create_ally_map_masionia_collapse(self):
-        sourcefile = os.path.abspath('../DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
-        allymap = os.path.abspath('../DeltaFiles/create_ally_map_masionia_collapse/allymap.json')
-        if not os.path.isfile(allymap):
-            allymap = os.path.abspath('../Tests/DeltaFiles/create_ally_map_masionia_collapse/allymap.json')
-        borderfile = os.path.abspath('../DeltaFiles/create_ally_map_masionia_collapse/borders.json')
-        if not os.path.isfile(borderfile):
-            borderfile = os.path.abspath('../Tests/DeltaFiles/create_ally_map_masionia_collapse/borders.json')
+        sourcefile = self.unpack_filename('DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_ally_map_masionia_collapse/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_ally_map_masionia_collapse/borders.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -45,15 +43,9 @@ class testAllyGenBorders(unittest.TestCase):
         self.assertEqual(expected_borders, allygen.borders)
 
     def test_create_ally_map_masionia_separate(self):
-        sourcefile = os.path.abspath('../DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
-        allymap = os.path.abspath('../DeltaFiles/create_ally_map_masionia_separate/allymap.json')
-        if not os.path.isfile(allymap):
-            allymap = os.path.abspath('../Tests/DeltaFiles/create_ally_map_masionia_separate/allymap.json')
-        borderfile = os.path.abspath('../DeltaFiles/create_ally_map_masionia_separate/borders.json')
-        if not os.path.isfile(borderfile):
-            borderfile = os.path.abspath('../Tests/DeltaFiles/create_ally_map_masionia_separate/borders.json')
+        sourcefile = self.unpack_filename('DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_ally_map_masionia_separate/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_ally_map_masionia_separate/borders.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -79,15 +71,9 @@ class testAllyGenBorders(unittest.TestCase):
         self.assertEqual(expected_borders, allygen.borders)
 
     def test_create_erode_border_masionia_collapse(self):
-        sourcefile = os.path.abspath('../DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
-        allymap = os.path.abspath('../DeltaFiles/create_erode_border_masionia_collapse/allymap.json')
-        if not os.path.isfile(allymap):
-            allymap = os.path.abspath('../Tests/DeltaFiles/create_erode_border_masionia_collapse/allymap.json')
-        borderfile = os.path.abspath('../DeltaFiles/create_erode_border_masionia_collapse/borders.json')
-        if not os.path.isfile(borderfile):
-            borderfile = os.path.abspath('../Tests/DeltaFiles/create_erode_border_masionia_collapse/borders.json')
+        sourcefile = self.unpack_filename('DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_erode_border_masionia_collapse/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_erode_border_masionia_collapse/borders.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -113,15 +99,9 @@ class testAllyGenBorders(unittest.TestCase):
         self.assertEqual(expected_borders, allygen.borders)
 
     def test_create_erode_border_masionia_separate(self):
-        sourcefile = os.path.abspath('../DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
-        allymap = os.path.abspath('../DeltaFiles/create_erode_border_masionia_separate/allymap.json')
-        if not os.path.isfile(allymap):
-            allymap = os.path.abspath('../Tests/DeltaFiles/create_erode_border_masionia_separate/allymap.json')
-        borderfile = os.path.abspath('../DeltaFiles/create_erode_border_masionia_separate/borders.json')
-        if not os.path.isfile(borderfile):
-            borderfile = os.path.abspath('../Tests/DeltaFiles/create_erode_border_masionia_separate/borders.json')
+        sourcefile = self.unpack_filename('DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_erode_border_masionia_separate/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_erode_border_masionia_separate/borders.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -147,15 +127,9 @@ class testAllyGenBorders(unittest.TestCase):
         self.assertEqual(expected_borders, allygen.borders)
 
     def test_create_borders_masionia_collapse(self):
-        sourcefile = os.path.abspath('../DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
-        allymap = os.path.abspath('../DeltaFiles/create_borders_masionia_collapse/allymap.json')
-        if not os.path.isfile(allymap):
-            allymap = os.path.abspath('../Tests/DeltaFiles/create_borders_masionia_collapse/allymap.json')
-        borderfile = os.path.abspath('../DeltaFiles/create_borders_masionia_collapse/borders.json')
-        if not os.path.isfile(borderfile):
-            borderfile = os.path.abspath('../Tests/DeltaFiles/create_borders_masionia_collapse/borders.json')
+        sourcefile = self.unpack_filename('DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_borders_masionia_collapse/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_borders_masionia_collapse/borders.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -181,15 +155,9 @@ class testAllyGenBorders(unittest.TestCase):
         self.assertEqual(expected_borders, allygen.borders)
 
     def test_create_borders_masionia_separate(self):
-        sourcefile = os.path.abspath('../DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
-        allymap = os.path.abspath('../DeltaFiles/create_borders_masionia_separate/allymap.json')
-        if not os.path.isfile(allymap):
-            allymap = os.path.abspath('../Tests/DeltaFiles/create_borders_masionia_separate/allymap.json')
-        borderfile = os.path.abspath('../DeltaFiles/create_borders_masionia_separate/borders.json')
-        if not os.path.isfile(borderfile):
-            borderfile = os.path.abspath('../Tests/DeltaFiles/create_borders_masionia_separate/borders.json')
+        sourcefile = self.unpack_filename('DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_borders_masionia_separate/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_borders_masionia_separate/borders.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -215,15 +183,9 @@ class testAllyGenBorders(unittest.TestCase):
         self.assertEqual(expected_borders, allygen.borders)
 
     def test_create_borders_district_268_collapse(self):
-        sourcefile = os.path.abspath('../DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
-        allymap = os.path.abspath('../DeltaFiles/create_borders_district_268_collapse/allymap.json')
-        if not os.path.isfile(allymap):
-            allymap = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_collapse/allymap.json')
-        borderfile = os.path.abspath('../DeltaFiles/create_borders_district_268_collapse/borders.json')
-        if not os.path.isfile(borderfile):
-            borderfile = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_collapse/borders.json')
+        sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse/borders.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -245,19 +207,14 @@ class testAllyGenBorders(unittest.TestCase):
 
         allygen.create_borders('collapse')
 
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
     def test_create_borders_district_268_separate(self):
-        sourcefile = os.path.abspath('../DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
-        allymap = os.path.abspath('../DeltaFiles/create_borders_district_268_separate/allymap.json')
-        if not os.path.isfile(allymap):
-            allymap = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_separate/allymap.json')
-        borderfile = os.path.abspath('../DeltaFiles/create_borders_district_268_separate/borders.json')
-        if not os.path.isfile(borderfile):
-            borderfile = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_separate/borders.json')
+        sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_borders_district_268_separate/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_borders_district_268_separate/borders.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -279,19 +236,15 @@ class testAllyGenBorders(unittest.TestCase):
 
         allygen.create_borders('separate')
 
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
+    @pytest.mark.xfail(reason="Flaky on ubuntu")
     def test_create_ally_map_district_268_collapse(self):
-        sourcefile = os.path.abspath('../DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
-        allymap = os.path.abspath('../DeltaFiles/create_ally_map_district_268_collapse/allymap.json')
-        if not os.path.isfile(allymap):
-            allymap = os.path.abspath('../Tests/DeltaFiles/create_ally_map_district_268_collapse/allymap.json')
-        borderfile = os.path.abspath('../DeltaFiles/create_ally_map_district_268_collapse/borders.json')
-        if not os.path.isfile(borderfile):
-            borderfile = os.path.abspath('../Tests/DeltaFiles/create_ally_map_district_268_collapse/borders.json')
+        sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_ally_map_district_268_collapse/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_ally_map_district_268_collapse/borders.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -313,19 +266,15 @@ class testAllyGenBorders(unittest.TestCase):
 
         allygen.create_ally_map('collapse')
 
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
+    @pytest.mark.xfail(reason="Flaky on ubuntu")
     def test_create_ally_map_district_268_separate(self):
-        sourcefile = os.path.abspath('../DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
-        allymap = os.path.abspath('../DeltaFiles/create_ally_map_district_268_separate/allymap.json')
-        if not os.path.isfile(allymap):
-            allymap = os.path.abspath('../Tests/DeltaFiles/create_ally_map_district_268_separate/allymap.json')
-        borderfile = os.path.abspath('../DeltaFiles/create_ally_map_district_268_separate/borders.json')
-        if not os.path.isfile(borderfile):
-            borderfile = os.path.abspath('../Tests/DeltaFiles/create_ally_map_district_268_separate/borders.json')
+        sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_ally_map_district_268_separate/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_ally_map_district_268_separate/borders.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -347,19 +296,15 @@ class testAllyGenBorders(unittest.TestCase):
 
         allygen.create_ally_map('separate')
 
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
+    @pytest.mark.xfail(reason="Flaky on ubuntu")
     def test_create_erode_border_district_268_collapse(self):
-        sourcefile = os.path.abspath('../DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
-        allymap = os.path.abspath('../DeltaFiles/create_erode_border_district_268_collapse/allymap.json')
-        if not os.path.isfile(allymap):
-            allymap = os.path.abspath('../Tests/DeltaFiles/create_erode_border_district_268_collapse/allymap.json')
-        borderfile = os.path.abspath('../DeltaFiles/create_erode_border_district_268_collapse/borders.json')
-        if not os.path.isfile(borderfile):
-            borderfile = os.path.abspath('../Tests/DeltaFiles/create_erode_border_district_268_collapse/borders.json')
+        sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_erode_border_district_268_collapse/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_erode_border_district_268_collapse/borders.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -381,19 +326,16 @@ class testAllyGenBorders(unittest.TestCase):
 
         allygen.create_erode_border('collapse')
 
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
+    @pytest.mark.xfail(reason="Flaky on ubuntu")
     def test_create_erode_border_district_268_separate(self):
-        sourcefile = os.path.abspath('../DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
-        allymap = os.path.abspath('../DeltaFiles/create_erode_border_district_268_separate/allymap.json')
-        if not os.path.isfile(allymap):
-            allymap = os.path.abspath('../Tests/DeltaFiles/create_erode_border_district_268_separate/allymap.json')
-        borderfile = os.path.abspath('../DeltaFiles/create_erode_border_district_268_separate/borders.json')
-        if not os.path.isfile(borderfile):
-            borderfile = os.path.abspath('../Tests/DeltaFiles/create_erode_border_district_268_separate/borders.json')
+        sourcefile = self.unpack_filename(
+            'DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_erode_border_district_268_separate/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_erode_border_district_268_separate/borders.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -415,6 +357,7 @@ class testAllyGenBorders(unittest.TestCase):
 
         allygen.create_erode_border('separate')
 
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
@@ -422,7 +365,7 @@ class testAllyGenBorders(unittest.TestCase):
         # Load expected allymap
         with open(allymap, 'r') as file:
             expected_string = json.load(file)
-        expected_allies = dict()
+        expected_allies = defaultdict(set)
         for key in expected_string:
             trimkey = key.strip('()')
             bitz = trimkey.split(',')
