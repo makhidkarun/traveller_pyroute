@@ -5,22 +5,20 @@ import unittest
 
 import networkx as nx
 
-from DeltaDictionary import DeltaDictionary, SectorDictionary
-from DeltaGalaxy import DeltaGalaxy
-from Outputs.HexMap import HexMap
-from Tests.testBase import testBase
+from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
+from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.Outputs.HexMap import HexMap
+from Tests.baseTest import baseTest
 
 
-class testHexMap(testBase):
+class testHexMap(baseTest):
     timestamp_regex = b'(\d{14,})'
     md5_regex = b'([0-9a-f]{32,})'
     timeline = re.compile(timestamp_regex)
     md5line = re.compile(md5_regex)
 
     def test_document_object(self):
-        sourcefile = os.path.abspath('../DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
+        sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
 
         args = self._make_args()
         args.interestingline = None
@@ -60,13 +58,9 @@ class testHexMap(testBase):
                 self.assertEqual(expected_path, hexmap.writer.filepath)
 
     def test_verify_empty_sector_write(self):
-        sourcefile = os.path.abspath('../DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
+        sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
 
-        outfile = os.path.abspath('../OutputFiles/verify_empty_sector_write/Zao Kfeng Ig Grilokh empty.txt')
-        if not os.path.isfile(outfile):
-            outfile = os.path.abspath('../Tests/OutputFiles/verify_empty_sector_write/Zao Kfeng Ig Grilokh empty.txt')
+        outfile = self.unpack_filename('OutputFiles/verify_empty_sector_write/Zao Kfeng Ig Grilokh empty.txt')
 
         args = self._make_args()
         args.interestingline = None
@@ -106,18 +100,11 @@ class testHexMap(testBase):
         self.assertEqual(expected_result, result)
 
     def test_verify_subsector_trade_write(self):
-        sourcefile = os.path.abspath('../DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
+        sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
+        outfile = self.unpack_filename('OutputFiles/verify_subsector_trade_write/Zao Kfeng Ig Grilokh - subsector P - trade.txt')
 
-        outfile = os.path.abspath('../OutputFiles/verify_subsector_trade_write/Zao Kfeng Ig Grilokh - subsector P - trade.txt')
-
-        starsfile = os.path.abspath('../OutputFiles/verify_subsector_trade_write/trade stars.txt')
-        if not os.path.isfile(starsfile):
-            starsfile = os.path.abspath('../Tests/OutputFiles/verify_subsector_trade_write/trade stars.txt')
-        rangesfile = os.path.abspath('../OutputFiles/verify_subsector_trade_write/trade ranges.txt')
-        if not os.path.isfile(rangesfile):
-            rangesfile = os.path.abspath('../Tests/OutputFiles/verify_subsector_trade_write/trade ranges.txt')
+        starsfile = self.unpack_filename('OutputFiles/verify_subsector_trade_write/trade stars.txt')
+        rangesfile = self.unpack_filename('OutputFiles/verify_subsector_trade_write/trade ranges.txt')
 
         args = self._make_args()
         args.interestingline = None
@@ -170,19 +157,12 @@ class testHexMap(testBase):
         self.assertEqual(expected_result, result)
 
     def test_verify_subsector_comm_write(self):
-        sourcefile = os.path.abspath('../DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
+        sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
+        outfile = self.unpack_filename('OutputFiles/verify_subsector_comm_write/Zao Kfeng Ig Grilokh - subsector P - comm.txt')
 
-        outfile = os.path.abspath('../OutputFiles/verify_subsector_comm_write/Zao Kfeng Ig Grilokh - subsector P - comm.txt')
+        starsfile = self.unpack_filename('OutputFiles/verify_subsector_comm_write/comm stars.txt')
 
-        starsfile = os.path.abspath('../OutputFiles/verify_subsector_comm_write/comm stars.txt')
-        if not os.path.isfile(starsfile):
-            starsfile = os.path.abspath('../Tests/OutputFiles/verify_subsector_comm_write/comm stars.txt')
-
-        rangesfile = os.path.abspath('../OutputFiles/verify_subsector_comm_write/comm ranges.txt')
-        if not os.path.isfile(rangesfile):
-            rangesfile = os.path.abspath('../Tests/OutputFiles/verify_subsector_comm_write/comm ranges.txt')
+        rangesfile = self.unpack_filename('OutputFiles/verify_subsector_comm_write/comm ranges.txt')
 
         args = self._make_args()
         args.interestingline = None
