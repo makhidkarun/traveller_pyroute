@@ -205,6 +205,7 @@ class testAllyGenBorders(baseTest):
 
         allygen.create_borders('collapse')
 
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
@@ -233,6 +234,7 @@ class testAllyGenBorders(baseTest):
 
         allygen.create_borders('separate')
 
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
@@ -261,6 +263,7 @@ class testAllyGenBorders(baseTest):
 
         allygen.create_ally_map('collapse')
 
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
@@ -289,6 +292,7 @@ class testAllyGenBorders(baseTest):
 
         allygen.create_ally_map('separate')
 
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
@@ -317,6 +321,7 @@ class testAllyGenBorders(baseTest):
 
         allygen.create_erode_border('collapse')
 
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
@@ -346,6 +351,7 @@ class testAllyGenBorders(baseTest):
 
         allygen.create_erode_border('separate')
 
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
