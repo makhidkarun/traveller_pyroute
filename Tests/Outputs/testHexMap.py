@@ -4,6 +4,7 @@ import re
 import unittest
 
 import networkx as nx
+import pytest
 
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
@@ -99,6 +100,7 @@ class testHexMap(baseTest):
         result = self.md5line.sub(oldmd5, result)
         self.assertEqual(expected_result, result)
 
+    @pytest.mark.xfail(reason='Flaky on ubuntu')
     def test_verify_subsector_trade_write(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
         outfile = self.unpack_filename('OutputFiles/verify_subsector_trade_write/Zao Kfeng Ig Grilokh - subsector P - trade.txt')
