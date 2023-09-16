@@ -95,7 +95,7 @@ class AllyGen(object):
         """
         self.galaxy = galaxy
         self.borders = {}  # 2D array using (q,r) as key, with flags for data
-        self.allyMap = {}
+        self.allyMap = {}  # 2D array using (q,r) as key, with allegiance code as data
         self.logger = logging.getLogger('PyRoute.AllyGen')
 
     @staticmethod
@@ -136,7 +136,7 @@ class AllyGen(object):
 
     @staticmethod
     def population_align(alg, name):
-        # Try get the default cases
+        # Try getting the default cases
         code = AllyGen.default_population.get(alg, AllyGen.default_population.get(AllyGen.same_align(alg), None))
 
         # Handle the special cases.
@@ -165,7 +165,7 @@ class AllyGen(object):
     def sort_allegiances(alg_list, base_match_only):
         # The logic: 
         # base_match_only == true -> --ally-match=collapse
-        # only what the base allegiances
+        # only what matches the base allegiances
         # base_match_only == false -> --ally-match=separate
         # want the non-base code or the base codes for single code allegiances. 
 
@@ -218,6 +218,8 @@ class AllyGen(object):
 
     def _generate_borders(self, allyMap):
         """
+        This is deep, dark magic.  Futzing with this will break the border drawing process.
+
         Convert the allyMap, which is a dict of (q,r) keys with allegiance codes
         as values, into the borders, which is a dict of (q.r) keys with flags
         indicating which side of the hex needs to have a border drawn on:
