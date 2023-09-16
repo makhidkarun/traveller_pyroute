@@ -17,7 +17,7 @@ class AllyGen(object):
     classdocs
     """
     noOne = ['--', '----', '??', 'Xx']
-    nonAligned = ['Na', 'Ns', 'Va', 'Cs', 'Hc',
+    nonAligned = ['Na', 'Ns', 'Va', 'Cs', 'Hc', 'Kc'
                   'NaHv', 'NaDr', 'NaVa', 'NaAs', 'NaXx', 'NaXX', "NaSo",
                   'VaEx',
                   'CsCa', 'CsHv', 'CsIm', 'CsMP', 'CsVa', 'CsZh', 'CsRe', 'CsMo', 'CsRr', "CsTw",
@@ -34,7 +34,7 @@ class AllyGen(object):
                     'JAOz', 'JAsi', 'JCoK', 'JHhk', 'JLum', 'JMen',
                     'JPSt', 'JRar', 'JUkh', 'JuHl', 'JuRu', 'JVug'),
                    ('Ke', 'KoEm'),
-                   ("Kk", "KkTw", "Kc", "KC"),
+                   ("Kk", "KkTw", "KC"),
                    ('So', 'SoCf', 'SoBF', 'SoCT', 'SoFr', 'SoHn', 'SoKv', 'SoNS',
                     'SoQu', 'SoRD', 'SoRz', 'SoWu' ),
                    ('Lp', 'CoLp'),
