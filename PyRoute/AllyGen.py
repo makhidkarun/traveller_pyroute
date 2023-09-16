@@ -18,7 +18,7 @@ class AllyGen(object):
     """
     noOne = ['--', '----', '??', 'Xx']
     nonAligned = ['Na', 'Ns', 'Va', 'Cs', 'Hc', 'Kc'
-                  'NaHv', 'NaDr', 'NaVa', 'NaAs', 'NaXx', 'NaXX', "NaSo",
+                  'NaHu', 'NaHv', 'NaDr', 'NaVa', 'NaAs', 'NaXx', 'NaXX', "NaSo", "NaZh",
                   'VaEx',
                   'CsCa', 'CsHv', 'CsIm', 'CsMP', 'CsVa', 'CsZh', 'CsRe', 'CsMo', 'CsRr', "CsTw",
                   'Wild']
