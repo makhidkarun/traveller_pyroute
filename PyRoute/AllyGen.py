@@ -16,9 +16,9 @@ class AllyGen(object):
     """
     classdocs
     """
-    noOne = ['--', '??', 'Xx']
-    nonAligned = ['Na', 'Ns', 'Va', 'Cs', 'Hc',
-                  'NaHv', 'NaDr', 'NaVa', 'NaAs', 'NaXx', 'NaXX', "NaSo",
+    noOne = ['--', '----', '??', 'Xx']
+    nonAligned = ['Na', 'Ns', 'Va', 'Cs', 'Hc', 'Kc'
+                  'NaHu', 'NaHv', 'NaDr', 'NaVa', 'NaAs', 'NaXx', 'NaXX', "NaSo", "NaZh",
                   'VaEx',
                   'CsCa', 'CsHv', 'CsIm', 'CsMP', 'CsVa', 'CsZh', 'CsRe', 'CsMo', 'CsRr', "CsTw",
                   'Wild']
@@ -34,7 +34,12 @@ class AllyGen(object):
                     'JAOz', 'JAsi', 'JCoK', 'JHhk', 'JLum', 'JMen',
                     'JPSt', 'JRar', 'JUkh', 'JuHl', 'JuRu', 'JVug'),
                    ('Ke', 'KoEm'),
-                   ("Kk", "KkTw", "Kc", "KC"),
+                   ("K1",),
+                   ("K2",),
+                   ("K3",),
+                   ("K4",),
+                   ("KC",),
+                   ("Kk", "KkTw", "KO"),
                    ('So', 'SoCf', 'SoBF', 'SoCT', 'SoFr', 'SoHn', 'SoKv', 'SoNS',
                     'SoQu', 'SoRD', 'SoRz', 'SoWu' ),
                    ('Lp', 'CoLp'),
@@ -47,13 +52,18 @@ class AllyGen(object):
 
     default_population = {
         "As": "Asla",
+        "Cr": "Huma",
+        "Dr": "Droy",
         "Hv": "Hive",
         "JP": "Huma",
-        "Kk": "KXKr",
+        "Kk": "KXkr",
         "Pd": "Piri",
         "Te": "Piri",
         "Tk": "Piri",
+        "TY": "Drak",
         "Va": "Varg",
+        "Vb": "Varg",
+        "Vc": "Varg",
         "Wc": "Droy",
         "Yt": "Yask",
         "Zh": "Zhod",
@@ -74,18 +84,57 @@ class AllyGen(object):
         "KaWo": "Karh",
         "KhLe": "Sydi",
         "KoEm": "Jaib",
+        "KrPr": "Krot",
         "MaEm": "Mask",
         "MaPr": "MalX",
         "NaAs": "Asla",
+        "NaDr": "Droy",
         "NaHv": "Hive",
         "NaVa": "Varg",
         "OcWs": "Stal",
+        "SELK": "Lith",
         "SaCo": "Vlaz",
         "Sark": "Varg",
         "SwFW": "Swan",
         "VaEx": "Varg",
         "ZhAx": "Adda",
         "ZhCa": "Vlaz"
+    }
+
+    alleg_border_colours = {
+        "Im": "red",
+        "As": "yellow",
+        "Cr": "gold",
+        "Dr": None,
+        "Hv": "violet",
+        "JP": "blue",
+        "Kr": "blue",
+        "K1": "emerald",
+        "K2": "emerald",
+        "K3": "emerald",
+        "K4": "darkolive",
+        "KC": "emerald",
+        "Kk": "green",
+        "Rr": "blue",
+        "So": "orange",
+        "TY": "purple",
+        "Va": "olive",
+        "Vb": "olive",
+        "Vc": "olive",
+        "Wc": "lightblue",
+        "Zh": "blue",
+        "--": None,
+        "Na": None,
+        "----": None,
+        "NaHu": None,
+        "NaXX": None,
+        "NaZh": None,
+        "CsIm": None,
+        "DaCf": "lightblue",
+        "SwCf": "blue",
+        "VAug": "olive",
+        "VDzF": "olive",
+        "NONE": "white",  # Default color
     }
 
 
@@ -95,7 +144,7 @@ class AllyGen(object):
         """
         self.galaxy = galaxy
         self.borders = {}  # 2D array using (q,r) as key, with flags for data
-        self.allyMap = {}
+        self.allyMap = {}  # 2D array using (q,r) as key, with allegiance code as data
         self.logger = logging.getLogger('PyRoute.AllyGen')
 
     @staticmethod
@@ -136,7 +185,7 @@ class AllyGen(object):
 
     @staticmethod
     def population_align(alg, name):
-        # Try get the default cases
+        # Try getting the default cases
         code = AllyGen.default_population.get(alg, AllyGen.default_population.get(AllyGen.same_align(alg), None))
 
         # Handle the special cases.
@@ -148,6 +197,8 @@ class AllyGen(object):
                     code = 'Hive'
                 elif 'Vargr' in name:
                     code = 'Varg'
+                elif 'Zhodani' in name:
+                    code = 'Zhod'
                 elif 'Human' in name:
                     code = 'Huma'
                 else:
@@ -165,7 +216,7 @@ class AllyGen(object):
     def sort_allegiances(alg_list, base_match_only):
         # The logic: 
         # base_match_only == true -> --ally-match=collapse
-        # only what the base allegiances
+        # only what matches the base allegiances
         # base_match_only == false -> --ally-match=separate
         # want the non-base code or the base codes for single code allegiances. 
 
@@ -218,6 +269,8 @@ class AllyGen(object):
 
     def _generate_borders(self, allyMap):
         """
+        This is deep, dark magic.  Futzing with this will break the border drawing process.
+
         Convert the allyMap, which is a dict of (q,r) keys with allegiance codes
         as values, into the borders, which is a dict of (q.r) keys with flags
         indicating which side of the hex needs to have a border drawn on:

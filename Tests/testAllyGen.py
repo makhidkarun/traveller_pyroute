@@ -29,5 +29,10 @@ class testAllyGen(unittest.TestCase):
     def test_are_owned_allies_diff_parent(self):
         self.assertFalse(AllyGen.are_owned_allies('ZhAx', 'HvFd'))
 
+    def test_zhodani_in_name_of_population_alignment(self):
+        expected = 'Zhod'
+        actual = AllyGen.population_align('Na', 'Zhodani')
+        self.assertEqual(expected, actual)
+
 if __name__ == '__main__':
     unittest.main()
