@@ -101,6 +101,42 @@ class AllyGen(object):
         "ZhCa": "Vlaz"
     }
 
+    alleg_border_colours = {
+        "Im": "red",
+        "As": "yellow",
+        "Cr": "gold",
+        "Dr": None,
+        "Hv": "violet",
+        "JP": "blue",
+        "Kr": "blue",
+        "K1": "emerald",
+        "K2": "emerald",
+        "K3": "emerald",
+        "K4": "darkolive",
+        "KC": "emerald",
+        "Kk": "green",
+        "Rr": "blue",
+        "So": "orange",
+        "TY": "purple",
+        "Va": "olive",
+        "Vb": "olive",
+        "Vc": "olive",
+        "Wc": "lightblue",
+        "Zh": "blue",
+        "--": None,
+        "Na": None,
+        "----": None,
+        "NaHu": None,
+        "NaXX": None,
+        "NaZh": None,
+        "CsIm": None,
+        "DaCf": "lightblue",
+        "SwCf": "blue",
+        "VAug": "olive",
+        "VDzF": "olive",
+        "NONE": "white",  # Default color
+    }
+
 
     def __init__(self, galaxy):
         """
