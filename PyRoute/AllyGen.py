@@ -161,6 +161,8 @@ class AllyGen(object):
                     code = 'Hive'
                 elif 'Vargr' in name:
                     code = 'Varg'
+                elif 'Zhodani' in name:
+                    code = 'Zhod'
                 elif 'Human' in name:
                     code = 'Huma'
                 else:
