@@ -16,7 +16,10 @@ def get_url(url, sector, suffix, output_dir):
     try:
         f = urllib.request.urlopen(url)
     except urllib.error.HTTPError as ex:
-        print ("get URL failed: {} -> {}".format(url, ex))
+        print("get URL failed: {} -> {}".format(url, ex))
+        return False
+    except urllib.error.URLError as ex:
+        print("get URL failed: {} -> {}".format(url, ex))
         return False
 
     encoding = f.headers['content-type'].split('charset=')[-1]
