@@ -7,8 +7,10 @@ Amdukan
 Angfutsag
 Antares
 Astron
+Ataurre
 Avereguar
 Banners
+Bar'kakr
 Blaskon
 Canopus
 Centrax
@@ -19,6 +21,7 @@ Crucis Margin
 Dagudashaag
 Daibei
 Dark Nebula
+Darret
 Datsatl
 Delphi
 Deneb
@@ -31,8 +34,8 @@ Eiaplial
 Empty Quarter
 Esai'yo
 Extolian
-Faoheiroi'iyhao
 Fa Dzaets
+Faoheiroi'iyhao
 Far Frontiers
 Finggvakhou
 Folgore
@@ -41,23 +44,23 @@ Ftaoiyekyu
 Fulani
 Gashikan
 Gateway
+Genfert
 Gh!hken
 Ghoekhnael
 Glimmerdrift Reaches
 Gn'hk'r
 Grikr!ng
+Gur
 Gushemege
 Gvurrdon
-Katoonah
 Gzaekfueg
 Gzirr!k'l
-Harea
 Hadji
 Hanstone
+Harea
 Hinterworlds
 Hkakhaeaw
 Hlakhoi
-Holowon
 Ianshaplzdier
 Ilelish
 Ingukrax
@@ -65,14 +68,20 @@ Iphigenaia
 Irugangog
 Itvikiastaf
 Iwahfuah
+K'trekreer
 Kaa G!'kul
 Karleaya
+Kruse
+Katoonah
 Kfazz Ghik
 Khaeaw
 Kharrthon
 Kidunal
+Kilong
 Knaeleng
 Knoellighz
+Kolire
+Kring Noor
 Ksinanirz
 Ktiin'gzat
 K'trekreer
@@ -82,25 +91,36 @@ Ley Sector
 Lishun
 Listanaya
 Lorspane
+Lubbock
+Luretiir!girr
 Magyar
 Malorn
 Massilia
+Mbil!!gh
 Mendan
 Meshan
+Mikhail
 Mugheen't
 Neworld
 Ngathksirz
 Nooq
+Numbis
+Nuughe
 Oeghz Vaerrghr
 Old Expanses
 Phlask
+Phlange
 Porlock
 Provence
+Raakaan
 Reaver's Deep
 Reft Sector
 Rfigh
 Ricenden
 Riftspan Reaches
+RimReach
+Ruthless Veil
+Ruupiin
 Rzakki
 Sidiadl
 Solomani Rim
@@ -111,7 +131,6 @@ Staihaia'yo
 Star's End
 Stiatlchepr
 Storr
-Tsadra
 Tar'G'kell'p
 The Beyond
 Theron
@@ -123,7 +142,10 @@ Trojan Reach
 Tsadra
 Tuglikki
 Uistilrao
+Ukaarriit!!b
+Un'k!!k'ng
 Ustral Quadrant
+Uuk
 Vanguard Reaches
 Veg Fergakh
 Verge
@@ -131,12 +153,14 @@ Vland
 Waroatahe
 Windhorn
 Wrenton
+X'kug
+Xaagr
 Yiklerzdanzh
 Zao Kfeng Ig Grilokh
 Zarushagar
 Zdiedeiant
+Zhdant
 Zhiaqrqiats
 Zhodane
-Zhdant
 Ziafrplians
 Zortakh
