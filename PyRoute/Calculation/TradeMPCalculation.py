@@ -5,12 +5,12 @@ import os
 
 import networkx as nx
 from networkx import is_path
-from PyRoute.AllyGen import AllyGen
-from PyRoute.Calculation.RouteCalculation import RouteCalculation
-from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
-from PyRoute.Pathfinding.astar import astar_path_indexes
 from multiprocessing import Queue, Pool
 from queue import Empty
+
+from PyRoute.Calculation.TradeCalculation import TradeCalculation
+from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
+from PyRoute.Pathfinding.astar import astar_path_indexes
 
 # Convert the TradeMPCalculation to a global variable to allow the child processes to access it, and all the data.
 tradeCalculation = None
@@ -33,35 +33,36 @@ def intrasector_process(working_queue, processed_queue):
             break
         count = 0
         tradeCalculation.logger.info(f"starting work in {sector}")
-        for (star, neighbor, data) in tradeCalculation.btn:
 
-            # Here we're just doing the routes that are within the one sector we're currently processing
-            # If other routes are to be done, this will have to change to select the routes from the BTN list.
-            # TODO: Organized the tradeCalculation.btn to divided into sector / galaxy lists.
-            if not (star.sector.name == sector and neighbor.sector.name == sector):
-                continue
+        # Look through the worlds in the sector, then look at their trade neighbors
+        # to determine which routes to process.
+        for star in tradeCalculation.galaxy.sectors[sector].worlds:
+            for neighbor in tradeCalculation.galaxy.ranges.neighbors(star):
+                # Here we're just doing the routes that are within the one sector we're currently processing
+                # If other routes are to be done, this will have to change to select the routes from the BTN list.
+                if not (star.sector.name == sector and neighbor.sector.name == sector):
+                    continue
+                data = tradeCalculation.galaxy.ranges.get_edge_data(star, neighbor)
 
-            # if this route has been processed, skip it, but still count it
-            if data.get('jumps', False):
+                # Skip the worlds already processed, both in the BTN 19+ cases, and in the A->B, now B->A cases.
+                if data.get('jumps', False):
+                    continue
+
+                try:
+                    rawroute, diag = astar_path_indexes(tradeCalculation.galaxy.stars, star.index, neighbor.index,
+                                                        tradeCalculation.galaxy.heuristic_distance_indexes)
+                except nx.NetworkXNoPath:
+                    continue
+
+                # Update the routes in the child's internal list, like we would for the primary one,
+                # But only for the child data. This makes sure the routes are properly reduced in weights for the next
+                # route search.
+                route = [tradeCalculation.galaxy.star_mapping[item] for item in rawroute]
+                tradeCalculation.route_update_simple(route, True)
+
+                # Put the rawroute (list of indexes) on the return queue to the parent process.
+                processed_queue.put(rawroute)
                 count += 1
-                continue
-
-            try:
-                rawroute, diag = astar_path_indexes(tradeCalculation.galaxy.stars, star.index, neighbor.index,
-                                                    tradeCalculation.galaxy.heuristic_distance_indexes)
-            except nx.NetworkXNoPath:
-                continue
-
-
-            # Update the routes in the child's internal list, like we would for the primary one,
-            # But only for the child data. This makes sure the routes are properly reduced in weights for the next
-            # route search.
-            route = [tradeCalculation.galaxy.star_mapping[item] for item in rawroute]
-            tradeCalculation.route_update_simple(route, True)
-
-            # Put the rawroute (list of indexes) on the return queue to the parent process.
-            processed_queue.put(rawroute)
-            count += 1
 
         tradeCalculation.logger.info(f"Process for {sector} completed, {count} routes processed.")
     # And were done. Note this for the user.
@@ -96,123 +97,18 @@ def long_route_process(working_queue, processed_queue):
     tradeCalculation.logger.info(f"child process {os.getpid()} completed, processed {processed} routes")
 
 
-class TradeMPCalculation(RouteCalculation):
+class TradeMPCalculation(TradeCalculation):
     """
     Perform the trade calculations by generating the routes
     between all the trade pairs using a multi-process route finder
     """
-    # Weight for route over a distance. The relative cost for
-    # moving freight between two worlds a given distance apart
-    # in a single jump.
-    # These are made up from whole cloth.          
-    # distance_weight = [0, 30, 50, 70, 90, 120, 140 ]
-
-    # GT Weights based upon one pass estimate
-    # distance_weight = [0, 30, 50, 70, 110, 170, 300]
-
-    # Pure HG weights
-    # distance_weight = [0, 30, 50, 75, 130, 230, 490]
-
-    # MGT weights
-    # distance_weight = [0, 30, 60, 105, 190, 410, 2470]
-
-    # T5 Weights, now with Hop Drive
-    distance_weight = [0, 30, 50, 75, 130, 230, 490, 9999, 9999, 9999, 300]
-
-    # max_connections = [6, 18, 36, 60, 90, 126, 168, 216, 270, 330]
-    max_connections = [6, 12, 18, 30, 45, 63, 84, 108, 135, 165]
-
-    # Set an initial range for influence for worlds based upon their
-    # wtn. For a given world look up the range given by (wtn-8) (min 0), 
-    # and the system checks every other world in that range for trade 
-    # opportunity. See the btn_jump_mod and min btn to see how  
-    # worlds are excluded from this list. 
-    btn_range = [2, 9, 29, 59, 99, 299]
-
-    # Maximum WTN to process routes for
-    max_wtn = 15
 
     def __init__(self, galaxy, min_btn=13, route_btn=8, route_reuse=10, debug_flag=False, mp_threads=os.cpu_count()-1):
-        super(TradeMPCalculation, self).__init__(galaxy)
+        super(TradeMPCalculation, self).__init__(galaxy, min_btn, route_btn, route_reuse, debug_flag)
 
-        # Minimum BTN to calculate routes for. BTN between two worlds less than
-        # this value are ignored. Set lower to have more routes calculated, but
-        # may not have an impact on the overall trade flows.
-        self.min_btn = min_btn
-
-        # Minimum WTN to process routes for
-        self.min_wtn = route_btn
-
-        # Override the default setting for route-reuse from the base class
-        # based upon program arguments. 
-        self.route_reuse = route_reuse
-
-        # Are debugging gubbins turned on?
-        self.debug_flag = debug_flag
         self.btn = []
         self.mp_threads = mp_threads
 
-    def base_route_filter(self, star, neighbor):
-        return False
-
-    def unilateral_filter(self, star):
-        if star.zone in ['R', 'F']:
-            return True
-        if star.tradeCode.barren:
-            return True
-        return False
-
-    def base_range_routes(self, star, neighbor):
-        dist = star.distance(neighbor)
-        max_dist = self.btn_range[min(max(0, max(star.wtn, neighbor.wtn) - self.min_wtn), 5)]
-        btn = self.get_btn(star, neighbor, dist)
-        # add all the stars in the BTN range, but  skip this pair
-        # if there isn't enough trade to warrant a trade check
-        if dist <= max_dist and btn >= self.min_btn:
-            passBTN = self.get_passenger_btn(btn, star, neighbor)
-            self.galaxy.ranges.add_edge(star, neighbor, distance=dist,
-                                        btn=btn,
-                                        passenger_btn=passBTN)
-        return dist
-
-    def generate_routes(self):
-        """
-        Generate the basic routes between all the stars. This creates two sets
-        of routes.
-        - Stars: The basic J4 (max-jump) routes for all pairs of stars.
-        - Ranges: The set of trade routes needing to be calculated.
-        """
-        self.generate_base_routes()
-
-        self.logger.info('calculating routes...')
-        for star in self.galaxy.stars:
-            if len(self.galaxy.stars[star]) < 11:
-                continue
-            neighbor_routes = [(s, n, d) for (s, n, d) in self.galaxy.stars.edges([star], True)]
-            # Need to do two sorts here:
-            # BTN low to high to find them first
-            # Range high to low to find them first 
-            neighbor_routes.sort(key=lambda tn: tn[2]['btn'])
-            neighbor_routes.sort(key=lambda tn: tn[2]['distance'], reverse=True)
-
-            length = len(neighbor_routes)
-
-            # remove edges from the list which are 
-            # A) The most distant first
-            # B) The lowest BTN for equal distant routes
-            # If the neighbor has only a few (<15) connections don't remove that one
-            # until there are 20 connections left. 
-            # This may be reduced by other stars deciding you are too far away.             
-            for (s, n, d) in neighbor_routes:
-                if len(self.galaxy.stars[n]) < 15:
-                    continue
-                if length <= self.max_connections[self.galaxy.max_jump_range - 1]:
-                    break
-                if d.get('xboat', False) or d.get('comm', False):
-                    continue
-                self.galaxy.stars.remove_edge(s, n)
-                length -= 1
-        self.logger.info(f'Final route count {self.galaxy.stars.number_of_edges()}')
 
     def calculate_routes(self):
         """
@@ -226,7 +122,13 @@ class TradeMPCalculation(RouteCalculation):
         # connected components in the underlying galaxy.stars graph - such pathfinding attempts are doomed
         # to failure.
         self.calculate_components()
-        self.btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True) if s.component == n.component]
+
+        btn_skipped = [(s, n) for (s, n) in self.galaxy.ranges.edges() if s.component != n.component]
+        self.logger.debug(f"Found {len(btn_skipped)} non-component linked routes, removing from ranges graph")
+        for s, n in btn_skipped:
+            self.galaxy.ranges.remove_edge(s, n)
+
+        self.btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
         self.btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
@@ -289,27 +191,33 @@ class TradeMPCalculation(RouteCalculation):
                 tradeCr, tradePass = self.route_update_simple(route, True)
                 self.update_statistics(start, target, tradeCr, tradePass)
                 count += 1
-        self.logger.info(f"Intra-sector route processing completed. Process {count} routes")
+        self.logger.info(f"Intra-sector route processing completed. Processed {count} routes")
 
     def process_long_routes(self, btn):
+
+        self.shortest_path_tree = ApproximateShortestPathTree(self.shortest_path_tree._source, self.galaxy.stars,
+                                                              0, sources=self.shortest_path_tree._sources)
         # Create the Queues for sending data between processes.
         find_queue = Queue()
         routes_queue = Queue()
         processed = 0
 
         for (start, target, data) in btn:
-            # skip the routes already that have been processed
+            # skip the routes already that have been processed, in the intra-sector processing
             if data.get('jumps', False):
                 continue
             find_queue.put((start.index, target.index))
 
         total = find_queue.qsize()
-        self.logger.info(f"Starting child processes for long route calculations. processing {total} routes")
+        self.logger.info(f"Starting {self.mp_threads} child processes for long route calculations. processing {total} routes")
 
         with Pool(processes=self.mp_threads, initializer=long_route_process, initargs=(find_queue, routes_queue)):
             # Loop over the routes found by the child processes.
             while True:
                 try:
+                    # Get a route from the child processes. This assumes the child processes (collectively)
+                    # won't take more than 5 seconds to produce a route. And they will produce routes faster
+                    # than the parent process can consume them. Which is why we have the queue.
                     route_list = routes_queue.get(block=True, timeout=5)
                 except Empty:
                     if not find_queue.empty():
@@ -331,7 +239,7 @@ class TradeMPCalculation(RouteCalculation):
 
     def process_routes(self, btn):
         '''
-        Do the other "half" of the routes, the ones not performed by the child process.
+        Do the first "half" of the routes, the ones not performed by the child process.
         :return: None
         '''
         base_btn = 0
@@ -391,126 +299,3 @@ class TradeMPCalculation(RouteCalculation):
         # Update the trade route (edges)
         tradeCr, tradePass = self.route_update_simple(route, True)
         self.update_statistics(star, target, tradeCr, tradePass)
-
-    def update_statistics(self, star, target, tradeCr, tradePass):
-        if star.sector != target.sector:
-            star.sector.stats.tradeExt += tradeCr // 2
-            target.sector.stats.tradeExt += tradeCr // 2
-            star.sector.subsectors[star.subsector()].stats.tradeExt += tradeCr // 2
-            target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr // 2
-            star.sector.stats.passengers += tradePass // 2
-            target.sector.stats.passengers += tradePass // 2
-        else:
-            star.sector.stats.trade += tradeCr
-            star.sector.stats.passengers += tradePass
-            if star.subsector() == target.subsector():
-                star.sector.subsectors[star.subsector()].stats.trade += tradeCr
-            else:
-                star.sector.subsectors[star.subsector()].stats.tradeExt += tradeCr // 2
-                target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr // 2
-
-        if AllyGen.are_allies(star.alg_code, target.alg_code):
-            self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.trade += tradeCr
-            self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.passengers += tradePass
-        else:
-            self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.tradeExt += tradeCr // 2
-            self.galaxy.alg[AllyGen.same_align(target.alg_code)].stats.tradeExt += tradeCr // 2
-            self.galaxy.alg[AllyGen.same_align(star.alg_code)].stats.passengers += tradePass // 2
-            self.galaxy.alg[AllyGen.same_align(target.alg_code)].stats.passengers += tradePass // 2
-
-        self.galaxy.stats.trade += tradeCr
-        self.galaxy.stats.passengers += tradePass
-
-    def route_update_simple(self, route, reweight=True):
-        """
-        Update the trade calculations based upon the route selected.
-        - add the trade values for the worlds, and edges
-        - add a count for the worlds and edges
-        - reduce the weight of routes used to allow more trade to flow
-        """
-        distance = self.route_distance(route)
-
-        source = route[0]
-        target = route[-1]
-
-        # Internal statistics
-        rangedata = self.galaxy.ranges[source][target]
-        rangedata['actual distance'] = distance
-        rangedata['jumps'] = len(route) - 1
-
-        # Gather basic statistics. 
-        tradeBTN = self.get_btn(source, target, distance)
-        tradeCr = self.calc_trade(tradeBTN)
-        source.tradeIn += tradeCr // 2
-        target.tradeIn += tradeCr // 2
-        tradePassBTN = self.get_passenger_btn(tradeBTN, source, target)
-        tradePass = self.calc_passengers(tradePassBTN)
-
-        source.passIn += tradePass
-        target.passIn += tradePass
-
-        edges = []
-        start = source
-        for end in route[1:]:
-            if end != target:
-                end.tradeOver += tradeCr
-                end.tradeCount += 1
-                end.passOver += tradePass
-
-            data = self.galaxy.stars[start.index][end.index]
-            data['trade'] += tradeCr
-            data['count'] += 1
-            if reweight:
-                data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
-            edges.append((start.index, end.index))
-            start = end
-
-        # Feed the list of touched edges into the approximate-shortest-path machinery, so it can update whatever
-        # distance labels it needs to stay within its approximation bound.
-        self.shortest_path_tree.update_edges(edges)
-
-        return (tradeCr, tradePass)
-
-    @staticmethod
-    def route_distance(route):
-        """
-        Given a route, return its line length in parsec
-        """
-        distance = 0
-        start = route[0]
-        for end in route[1:]:
-            distance += start.distance(end)
-            start = end
-        return distance
-
-    def route_cost(self, route):
-        """
-        Given a route, return its total cost via _compensated_ summation
-        """
-        total_weight = 0
-        c = 0
-        start = route[0]
-        for end in route[1:]:
-            y = float(self.galaxy.stars[start][end]['weight']) - c
-            t = total_weight + y
-            c = (t - total_weight) - y
-
-            total_weight = t
-
-            start = end
-        return total_weight
-
-    def route_weight(self, star, target):
-        dist = star.distance(target)
-        weight = self.distance_weight[dist]
-        if target.alg_code != star.alg_code:
-            weight += 25
-        if star.port in 'CDEX':
-            weight += 25
-        if star.port in 'DEX':
-            weight += 25
-        weight -= star.importance + target.importance
-        # Per https://www.baeldung.com/cs/dijkstra-vs-a-pathfinding , to ensure termination in finite time:
-        # "the edges have strictly positive costs"
-        assert 0 < weight, f"Weight of edge between {star} and {target} must be positive"
-        return weight
