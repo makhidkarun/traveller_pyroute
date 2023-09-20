@@ -8,9 +8,9 @@ from networkx import is_path
 from multiprocessing import Queue, Pool
 from queue import Empty
 
-from ApproximateShortestPathTreeZeroCaching import ApproximateShortestPathTreeZeroCaching
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
+from PyRoute.Pathfinding.ApproximateShortestPathTreeZeroCaching import ApproximateShortestPathTreeZeroCaching
 from PyRoute.Pathfinding.astar import astar_path_indexes
 
 # Convert the TradeMPCalculation to a global variable to allow the child processes to access it, and all the data.
@@ -245,10 +245,10 @@ class TradeMPCalculation(TradeCalculation):
         self.logger.info(f"Long route processing completed. process {processed} routes")
 
     def process_routes(self, btn):
-        '''
+        """
         Do the first "half" of the routes, the ones not performed by the child process.
         :return: None
-        '''
+        """
         base_btn = 0
         counter = 0
         processed = 0
