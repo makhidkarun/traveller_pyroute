@@ -149,6 +149,8 @@ class TradeMPCalculation(TradeCalculation):
         self.start_mp_services()
         # Do the remaining routes, which are long and will take a while
         self.process_long_routes(self.btn[large_btn_index:])
+        self.multilateral_balance_trade()
+        self.multilateral_balance_pass()
 
     # This is the multiprocess method, which contains all the logic for using multi-process in the parent (core) process
     # When this is completed, all the child process should be completed.
