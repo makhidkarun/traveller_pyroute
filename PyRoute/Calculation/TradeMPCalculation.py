@@ -78,7 +78,7 @@ def long_route_process(working_queue, processed_queue):
     # Working queue here is sending a pair of star indexes to process.
     while True:
         try:
-            (star,neighbor) = working_queue.get(block=True, timeout=1)
+            (star, neighbor) = working_queue.get(block=True, timeout=1)
         except Empty:
             break
 
@@ -141,7 +141,7 @@ class TradeMPCalculation(TradeCalculation):
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
         self.shortest_path_tree = ApproximateShortestPathTree(source.index, self.galaxy.stars, 0.2, sources=landmarks)
 
-        large_btn_index = next(i for i,v in enumerate(self.btn) if v[2]['btn'] == 18)
+        large_btn_index = next(i for i, v in enumerate(self.btn) if v[2]['btn'] == 18)
 
         # Do the large routes (btn 19 - 26) first. These are short and take only a short amount of time.
         self.process_routes(self.btn[0:large_btn_index-1])

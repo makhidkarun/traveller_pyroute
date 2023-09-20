@@ -35,7 +35,7 @@ def process():
                        help='Minimum BTN used for route calculation, default [13]')
     route.add_argument('--min-route-btn', dest='route_btn', default=8, type=int,
                        help='Minimum btn for drawing on the map, default [8]')
-    route.add_argument('--max-jump', dest='max_jump', default=4, type=int, choices=range(1,11),
+    route.add_argument('--max-jump', dest='max_jump', default=4, type=int, choices=range(1, 11),
                        help='Maximum jump distance for trade routes, default [4]')
     route.add_argument('--pop-code', choices=['fixed', 'scaled', 'benford'], default='scaled',
                        help='Interpretation of the population modifier code, default [scaled]')

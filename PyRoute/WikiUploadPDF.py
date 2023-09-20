@@ -30,7 +30,7 @@ def uploadSummaryText(site, summaryFile, era, area_name):
         lines = f.readlines()
 
     name = 'initial table'
-    stats_text = {name:[]}
+    stats_text = {name: []}
 
     for line in lines:
         if "statistics ==" in line:
