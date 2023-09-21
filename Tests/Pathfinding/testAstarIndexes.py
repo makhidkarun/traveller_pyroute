@@ -3,11 +3,11 @@ Created on Sep 21, 2023
 
 @author: CyberiaResurrection
 """
-from ApproximateShortestPathTree import ApproximateShortestPathTree
-from DeltaDictionary import SectorDictionary, DeltaDictionary
-from DeltaGalaxy import DeltaGalaxy
+from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
+from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from Tests.baseTest import baseTest
-from astar import astar_path_indexes
+from PyRoute.Pathfinding.astar import astar_path_indexes
 
 
 class testAStarIndexes(baseTest):
