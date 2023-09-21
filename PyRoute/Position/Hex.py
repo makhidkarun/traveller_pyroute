@@ -63,6 +63,7 @@ class Hex(object):
     def _hex_core(dx, dy, dz):
         return max(abs(dx), abs(dy), abs(dz))
 
+    @functools.cache
     def hex_position(self):
         return (self.q, self.r)
 
