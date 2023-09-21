@@ -10,7 +10,6 @@ from queue import Empty
 
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
-from PyRoute.Pathfinding.ApproximateShortestPathTreeZeroCaching import ApproximateShortestPathTreeZeroCaching
 from PyRoute.Pathfinding.astar import astar_path_indexes
 
 # Convert the TradeMPCalculation to a global variable to allow the child processes to access it, and all the data.
@@ -198,15 +197,7 @@ class TradeMPCalculation(TradeCalculation):
 
     def process_long_routes(self, btn):
 
-        if 60 > len(self.galaxy.sectors):
-            self.shortest_path_tree = ApproximateShortestPathTreeZeroCaching(
-                self.shortest_path_tree._source,
-                self.galaxy.stars,
-                0,
-                sources=self.shortest_path_tree._sources
-            )
-        else:
-            self.shortest_path_tree = ApproximateShortestPathTree(self.shortest_path_tree._source, self.galaxy.stars,
+        self.shortest_path_tree = ApproximateShortestPathTree(self.shortest_path_tree._source, self.galaxy.stars,
                                                                   0, sources=self.shortest_path_tree._sources)
 
         # Create the Queues for sending data between processes.
