@@ -43,6 +43,11 @@ class Hex(object):
     def axial_distance(Hex1, Hex2):
         dq = Hex1[0] - Hex2[0]
         dr = Hex1[1] - Hex2[1]
+        return Hex._axial_core(dq, dr)
+
+    @staticmethod
+    @functools.cache
+    def _axial_core(dq, dr):
         return (abs(dq) + abs(dr) + abs(dq + dr)) // 2
 
     # Used to calculate distances for the TradeCalculation via the Network Graph, which requires a function
