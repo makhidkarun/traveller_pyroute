@@ -198,12 +198,17 @@ class TradeMPCalculation(TradeCalculation):
 
     def process_long_routes(self, btn):
 
-        self.shortest_path_tree = ApproximateShortestPathTreeZeroCaching(
-            self.shortest_path_tree._source,
-            self.galaxy.stars,
-            0,
-            sources=self.shortest_path_tree._sources
-        )
+        if 60 > len(self.galaxy.sectors):
+            self.shortest_path_tree = ApproximateShortestPathTreeZeroCaching(
+                self.shortest_path_tree._source,
+                self.galaxy.stars,
+                0,
+                sources=self.shortest_path_tree._sources
+            )
+        else:
+            self.shortest_path_tree = ApproximateShortestPathTree(self.shortest_path_tree._source, self.galaxy.stars,
+                                                                  0, sources=self.shortest_path_tree._sources)
+
         # Create the Queues for sending data between processes.
         find_queue = Queue()
         routes_queue = Queue()
