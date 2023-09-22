@@ -121,6 +121,15 @@ class TradeCalculation(RouteCalculation):
                                             passenger_btn=passBTN)
         return dist
 
+    def _raw_ranges(self):
+        ranges = super()._raw_ranges()
+        max_route_dist = max(self.btn_range)
+
+        ranges = ((star, neighbour) for (star, neighbour) in ranges if star.distance(neighbour) <= max_route_dist)
+        self.logger.info("Routes with endpoints more than " + str(max_route_dist) + " pc apart, trimmed")
+
+        return ranges
+
     def generate_routes(self):
         """
         Generate the basic routes between all the stars. This creates two sets
