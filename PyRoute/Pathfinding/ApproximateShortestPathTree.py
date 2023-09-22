@@ -11,15 +11,30 @@ class ApproximateShortestPathTree:
     __slots__ = '_source', '_graph', '_epsilon', '_divisor', '_distances', '_sources'
 
     def __init__(self, source, graph, epsilon, sources=None):
+        seeds, source = self._get_sources(graph, source, sources)
+
+        self._source = source
+        self._graph = graph
+        self._epsilon = epsilon
+        # memoising this because its value gets used _heavily_ in lower bound calcs, called during heuristic generation
+        self._divisor = 1 / (1 + epsilon)
+        self._sources = sources
+
+        # now we're all set up, seed the approximate-SP tree/forest (tree with seeds in 1 component, forest otherwise)
+        self._distances = implicit_shortest_path_dijkstra_indexes(self._graph, self._source, seeds=seeds)
+
+    def _get_sources(self, graph, source, sources):
         seeds = None
         if isinstance(source, Star) and source.component is None:
-            raise ValueError("Source node " + str(source) + " has undefined component.  Has calculate_components() been run?")
+            raise ValueError(
+                "Source node " + str(source) + " has undefined component.  Has calculate_components() been run?")
         if isinstance(source, int):
             if 'star' not in graph.nodes[source]:
                 raise ValueError("Source node # " + str(source) + " does not have star attribute")
             if graph.nodes[source]['star'].component is None:
                 raise ValueError(
-                    "Source node " + str(graph.nodes[source]['star']) + " has undefined component.  Has calculate_components() been run?")
+                    "Source node " + str(graph.nodes[source][
+                                             'star']) + " has undefined component.  Has calculate_components() been run?")
         if sources is not None:
             for source in sources:
                 if isinstance(source, Star) and sources[source].component is None:
@@ -33,16 +48,7 @@ class ApproximateShortestPathTree:
                             "Source node " + str(graph.nodes[source][
                                                      'star']) + " has undefined component.  Has calculate_components() been run?")
             seeds = sources.values()
-
-        self._source = source
-        self._graph = graph
-        self._epsilon = epsilon
-        # memoising this because its value gets used _heavily_ in lower bound calcs, called during heuristic generation
-        self._divisor = 1 / (1 + epsilon)
-        self._sources = sources
-
-        # now we're all set up, seed the approximate-SP tree/forest (tree with seeds in 1 component, forest otherwise)
-        self._distances = implicit_shortest_path_dijkstra_indexes(self._graph, self._source, seeds=seeds)
+        return seeds, source
 
     def lower_bound(self, source, target):
         left = self._distances[source]
