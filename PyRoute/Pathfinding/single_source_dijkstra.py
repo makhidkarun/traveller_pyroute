@@ -312,12 +312,13 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
         # the corresponding node's distance label at the other end of the candidate edge, trim that edge.  Such edges
         # cannot _possibly_ result in smaller distance labels.  By a similar argument, filter the remaining edges
         # when the sum of dist_tail and that edge's weight equals or exceeds the corresponding node's distance label.
-        neighbours = graph._arcs[tail]
+        neighbours = [(head, dist_tail + dist_head) for (head, dist_head) in graph._arcs[tail] if dist_tail <= distance_labels[head]]
+        neighbours = [(head, dist_head) for (head, dist_head) in neighbours if dist_head < distance_labels[head]]
 
-        for head, raw_head in neighbours:
-            dist_head = dist_tail + raw_head
-            if dist_head < distance_labels[head]:
-                distance_labels[head] = dist_head
-                heapq.heappush(heap, (dist_head, head))
+        if 0 == len(neighbours):
+            continue
+        for head, dist_head in neighbours:
+            distance_labels[head] = dist_head
+            heapq.heappush(heap, (dist_head, head))
 
     return distance_labels
