@@ -20,9 +20,7 @@ class DistanceGraph:
             ]
             for u in self._nodes
         ]
-        self._locations = [
-            np.array([node.x, node.y, node.z]) for node in self._nodes
-        ]
+
 
     def lighten_edge(self, u, v, weight):
         self._lighten_arc(u, v, weight)

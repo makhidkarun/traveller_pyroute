@@ -3,8 +3,11 @@ import unittest
 
 from DeltaDictionary import SectorDictionary, DeltaDictionary
 from DeltaGalaxy import DeltaGalaxy
+from DistanceGraph import DistanceGraph
 from Tests.baseTest import baseTest
-from single_source_dijkstra import implicit_shortest_path_dijkstra_indexes
+from single_source_dijkstra import implicit_shortest_path_dijkstra_indexes, \
+    implicit_shortest_path_dijkstra_distance_graph
+import numpy as np
 
 
 class testShortestPathCalc(baseTest):
@@ -30,6 +33,32 @@ class testShortestPathCalc(baseTest):
         actual_distances = implicit_shortest_path_dijkstra_indexes(graph, source)
 
         self.assertEqual(expected_distances, actual_distances, "Unexpected distances after SPT creation")
+
+    def test_shortest_path_by_distance_graph(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
+        jsonfile = self.unpack_filename('PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
+
+        graph, source, stars = self._setup_graph(sourcefile)
+        distgraph = DistanceGraph(graph)
+
+        # seed expected distances
+        with open(jsonfile, 'r') as file:
+            expected_string = json.load(file)
+
+        expected_distances = dict()
+        component = [item for item in stars if graph.nodes[item]['star'].component == graph.nodes[source]['star'].component]
+        for item in component:
+            exp_dist = 0
+            rawstar = graph.nodes[item]['star']
+            if str(rawstar) in expected_string:
+                exp_dist = expected_string[str(rawstar)]
+            expected_distances[item] = exp_dist
+
+        distance_labels = np.ones(len(graph)) * float('+inf')
+        distance_labels[source] = 0
+        actual_distances = implicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
+
+        self.assertEqual(list(expected_distances.values()), list(actual_distances), "Unexpected distances after SPT creation")
 
     def _setup_graph(self, sourcefile):
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
