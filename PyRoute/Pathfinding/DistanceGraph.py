@@ -5,7 +5,6 @@ Created on Sep 23, 2023
 
 Thanks to @GamesByDavidE for original prototype and design discussions
 """
-import numpy as np
 
 
 class DistanceGraph:
