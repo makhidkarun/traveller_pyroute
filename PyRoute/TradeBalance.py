@@ -98,7 +98,7 @@ class TradeBalance(dict):
 
         assert 2 > self.maximum, "Uncompensated " + str(self.target) + " imbalance present"
 
-        assert self.sum <= ceil(num_sector / 2), "Uncompensated multilateral " + str(self.target) + " imbalance present"
+        assert self.sum <= ceil(num_sector / 2), f"Uncompensated multilateral {self.target} imbalance present in {self.field}"
 
     @property
     def maximum(self):

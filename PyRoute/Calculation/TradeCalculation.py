@@ -88,14 +88,16 @@ class TradeCalculation(RouteCalculation):
     def base_range_routes(self, star, neighbor):
         dist = star.distance(neighbor)
         max_dist = self.btn_range[min(max(0, max(star.wtn, neighbor.wtn) - self.min_wtn), 5)]
-        btn = self.get_btn(star, neighbor, dist)
-        # add all the stars in the BTN range, but  skip this pair
+        # add all the stars in the BTN range, but skip this pair
         # if there there isn't enough trade to warrant a trade check
-        if dist <= max_dist and btn >= self.min_btn:
-            passBTN = self.get_passenger_btn(btn, star, neighbor)
-            self.galaxy.ranges.add_edge(star, neighbor, distance=dist,
-                                        btn=btn,
-                                        passenger_btn=passBTN)
+        if dist <= max_dist:
+            # Only bother getting btn if the route is inside max length
+            btn = self.get_btn(star, neighbor, dist)
+            if btn >= self.min_btn:
+                passBTN = self.get_passenger_btn(btn, star, neighbor)
+                self.galaxy.ranges.add_edge(star, neighbor, distance=dist,
+                                            btn=btn,
+                                            passenger_btn=passBTN)
         return dist
 
     def generate_routes(self):
@@ -150,7 +152,13 @@ class TradeCalculation(RouteCalculation):
         # connected components in the underlying galaxy.stars graph - such pathfinding attempts are doomed
         # to failure.
         self.calculate_components()
-        btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True) if s.component == n.component]
+
+        btn_skipped = [(s, n) for (s, n) in self.galaxy.ranges.edges() if s.component != n.component]
+        self.logger.debug(f"Found {len(btn_skipped)} non-component routes, removing from ranges graph")
+        for s, n in btn_skipped:
+            self.galaxy.ranges.remove_edge(s, n)
+
+        btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
 
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
@@ -214,8 +222,10 @@ class TradeCalculation(RouteCalculation):
             raise AssertionError(msg)
 
         # Update the trade route (edges)
-        tradeCr, tradePass = self.route_update_simple(route)
+        tradeCr, tradePass = self.route_update_simple(route, True)
+        self.update_statistics(star, target, tradeCr, tradePass)
 
+    def update_statistics(self, star, target, tradeCr, tradePass):
         if star.sector != target.sector:
             star.sector.stats.tradeExt += tradeCr // 2
             target.sector.stats.tradeExt += tradeCr // 2
@@ -279,7 +289,7 @@ class TradeCalculation(RouteCalculation):
             return (name_from, name_to)
         return (name_to, name_from)
 
-    def route_update_simple(self, route):
+    def route_update_simple(self, route, reweight=True):
         """
         Update the trade calculations based upon the route selected.
         - add the trade values for the worlds, and edges
@@ -320,13 +330,15 @@ class TradeCalculation(RouteCalculation):
             data = self.galaxy.stars[start.index][end.index]
             data['trade'] += tradeCr
             data['count'] += 1
-            data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
+            if reweight:
+                data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
             edges.append((start.index, end.index))
             start = end
 
         # Feed the list of touched edges into the approximate-shortest-path machinery, so it can update whatever
         # distance labels it needs to stay within its approximation bound.
-        self.shortest_path_tree.update_edges(edges)
+        if reweight:
+            self.shortest_path_tree.update_edges(edges)
 
         return (tradeCr, tradePass)
 

@@ -39,76 +39,76 @@ Running the program
 ===================
 
     $ python PyRoute/route.py --help
-    usage: route.py [-h] [--borders {none,range,allygen,erode}]
-                [--ally-match {collapse,separate}]
-                [--routes {trade,comm,xroute,owned,none}] [--min-btn BTN]
-                [--min-route-btn ROUTE_BTN] [--max-jump MAX_JUMP]
-                [--pop-code {fixed,scaled,benford}]
-                [--route-reuse ROUTE_REUSE] [--ru-calc {scaled,negative}]
-                [--speculative-version {CT,T5,None}] [--output OUTPUT]
-                [--owned-worlds] [--no-trade] [--no-maps]
-                [--no-subsector-maps] [--min-ally-count ALLY_COUNT]
-                [--json-data] [--input INPUT] [--sectors SECTORS] [--version]
-                [--log-level LOG_LEVEL]
-                [sector [sector ...]]
+    usage: route.py [-h] [--borders {none,range,allygen,erode}] [--ally-match {collapse,separate}]
+                    [--routes {trade,comm,xroute,owned,none,trade-mp}] [--min-btn BTN] [--min-route-btn ROUTE_BTN]
+                    [--max-jump {1,2,3,4,5,6,7,8,9,10}] [--pop-code {fixed,scaled,benford}] [--route-reuse ROUTE_REUSE]
+                    [--ru-calc {scaled,negative}] [--speculative-version {CT,T5,None}] [--mp-threads MP_THREADS]
+                    [--output OUTPUT] [--owned-worlds | --no-owned-worlds] [--trade | --no-trade] [--maps | --no-maps]
+                    [--subsector-maps | --no-subsector-maps] [--min-ally-count ALLY_COUNT] [--json-data] [--input INPUT]
+                    [--sectors SECTORS] [--debug | --no-debug] [--version] [--log-level LOG_LEVEL]
+                    [sector ...]
     
     Traveller trade route generator.
     
     optional arguments:
       -h, --help            show this help message and exit
       --version             show program's version number and exit
+      --log-level LOG_LEVEL
     
     Allegiance:
       Alter processing of allegiances
     
       --borders {none,range,allygen,erode}
-                        Allegiance border generation, default [range]
+                            Allegiance border generation, default [range]
       --ally-match {collapse,separate}
-                        Allegiance matching for borders, default [collapse]
+                            Allegiance matching for borders, default [collapse]
     
     Routes:
       Route generation options
     
-      --routes {trade,comm,xroute,owned,none}
-                        Route type to be generated, default [trade]
+      --routes {trade,comm,xroute,owned,none,trade-mp}
+                            Route type to be generated, default [trade]
       --min-btn BTN         Minimum BTN used for route calculation, default [13]
       --min-route-btn ROUTE_BTN
-                        Minimum btn for drawing on the map, default [8]
-      --max-jump MAX_JUMP   Maximum jump distance for trade routes, default [4]
+                            Minimum btn for drawing on the map, default [8]
+      --max-jump {1,2,3,4,5,6,7,8,9,10}
+                            Maximum jump distance for trade routes, default [4]
       --pop-code {fixed,scaled,benford}
-                        Interpretation of the population modifier code,
-                        default [scaled]
+                            Interpretation of the population modifier code, default [scaled]
       --route-reuse ROUTE_REUSE
-                        Scale for reusing routes during route generation
+                            Scale for reusing routes during route generation
       --ru-calc {scaled,negative}
-                        RU calculation, default [scaled]
+                            RU calculation, default [scaled]
       --speculative-version {CT,T5,None}
-                        version of the speculative trade calculations, default
-                        [CT]
+                            version of the speculative trade calculations, default [CT]
+      --mp-threads MP_THREADS
+                            Number of processes to use for trade-mp processing, default 7
     
     Output:
       Output options
     
       --output OUTPUT       output directory for maps, statistics
-      --owned-worlds        Generate the owned worlds report, used for review
-                        purposes
-      --no-trade            Do not generate any trade data, only the default
-                        statistical data
-      --no-maps             Do not generate sector level trade maps
-      --no-subsector-maps   Do not generate subsector level maps
+      --owned-worlds, --no-owned-worlds
+                            Generate the owned worlds report, used for review purposes (default: False)
+      --trade, --no-trade   Generate trade data with route information (default: True)
+      --maps, --no-maps     Generate sector level trade maps (default: True)
+      --subsector-maps, --no-subsector-maps
+                            Generate subsector level maps (default: True)
       --min-ally-count ALLY_COUNT
-                        Minimum number of worlds in an allegiance for output,
-                        default [10]
-      --json-data           Dump internal data structures as json for later
-                            further processing
-                        
+                            Minimum number of worlds in an allegiance for output, default [10]
+      --json-data           Dump internal data structures as json for later further processing
     
     Input:
       Source of data options
     
       --input INPUT         input directory for sectors
       --sectors SECTORS     file with list of sector names to process
-    sector                T5SS sector file(s) to process
+      sector                T5SS sector file(s) to process
+    
+    Debug:
+      Debugging flags
+    
+      --debug, --no-debug   Turn on trade-route debugging (default: False)
 
 The default values are scaled for the standards set by the Traveller world generation used in the T5 Second Survey and,
 by extension, the values used by most of the Traveller world generation systems. The parameters are present to allow
@@ -155,6 +155,17 @@ naval depots, and scout way stations within the various empires. `xroute` is a s
 route for the Imperial sectors. `none` produces maps with no routes drawn. The last option is useful for producing the
 statistical output without the longer route production time. 
 
+The `trade-mp` option for the `routes` option generates the routes like the `trade` option does, but does so using
+multiple external processes for the longer route processing. This allows better performance for the lengthy route
+generation process, a 50% improvement has been seen in some testing. There are some things to be aware of before using 
+this option:
+1. The routes generated by the `trade-mp` will be different, though equally valid, from the set generated by the `trade` option
+2. The processes are CPU bound. If you set the `--mp-threads` to a value larger than the default may result in the
+processes waiting for the cpu and taking longer than you expect. 
+3. The extra processes can take significant memory. The Imperial sectors during processing takes 1GB of active RAM, where
+the MP version can take 8GB or more. If you run out of free memory your OS will start swapping to disk and this can
+be slower than just a single threaded process. 
+
 The ``route-reuse`` option affects the `trade` route generation. As routes are generated from larger WTN worlds to
 smaller WTN worlds, the system prefers to use an already established (probably large) route even if it is slightly
 longer (in both parsecs and number of jumps). The default value is 10, and is an arbitrary value. Setting this lower
@@ -197,7 +208,7 @@ each star. This list is trimmed of the longer, or unused routes. This list holds
     * `<sector name>.sector.wiki` has a table of the T5 sector information in wiki table format
     * `<sector nane>.economic.wiki` has a table of the economic information for each world in a wiki table format
     
-1) As an option you can output the input data and generated statistics in json format. This contain the data as loaded
+1) As an option you can output the input data and generated statistics in json format. This contains the data as loaded
 from the source sector files, and the analysis done by the different internal processes. 
     * `galaxy.json` contains the global information, including allegiances and statistics.
     * `<secor name>.json` contains the information about the individual sector, including allegiances, stars, and statistical information. 
@@ -211,7 +222,7 @@ the process takes. Experimentation has shown:
 * Small areas (100-200 stars) take a few seconds
 * Full sectors (400-600 stars) take one to two minutes 
 * Multi-sector areas (around 2000 stars) take 20 to 30 minutes
-* The T5 Second survey area (30 sectors, 12880 stars) takes 3-4 hours
+* The T5 Second survey area (32 sectors, 13370 stars) takes 2 hours
 * The entire of charted space (132 sectors, 50,598 stars) takes 15 to 18 hours. 
 
 Map Borders

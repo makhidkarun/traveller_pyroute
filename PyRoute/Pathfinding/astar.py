@@ -382,25 +382,29 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
                 num_neighbours = len(neighbours)
 
         diagnostics['neighbours_checked'] += num_neighbours
+        diagnostics['heuristic_calls'] += num_neighbours
+        diagnostics['nodes_queued'] += num_neighbours
         for neighbor, ncost in neighbours:
             if neighbor in enqueued:
+                diagnostics['heuristic_calls'] -= 1
                 qcost, h = enqueued[neighbor]
                 # if qcost <= ncost, a less costly path from the
                 # neighbor to the source was already determined.
                 # Therefore, we won't attempt to push this neighbor
                 # to the queue
                 if qcost <= ncost:
+                    diagnostics['nodes_queued'] -= 1
                     continue
                 # if qcost > ncost, we've found a less-costly
                 # path from neighbour to the source, so we'll update it when we re-queue the neighbour
             else:
-                diagnostics['heuristic_calls'] += 1
                 h = heuristic(neighbor, target)
 
             # if ncost + h would bust the current _upper_ bound, there's no point continuing with the neighbour,
             # let alone queueing it
             # If neighbour is the target, h should be zero
             if ncost + h > upbound:
+                diagnostics['nodes_queued'] -= 1
                 continue
 
             # if this completes a path (no matter how _bad_), update the upper bound.
@@ -415,7 +419,6 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
                     queue = [item for item in queue if not (item[1] in enqueued and item[2] > enqueued[item[1]][0])]
                     heapify(queue)
 
-            diagnostics['nodes_queued'] += 1
             enqueued[neighbor] = ncost, h
             push(queue, (ncost + h, neighbor, ncost, curnode))
 

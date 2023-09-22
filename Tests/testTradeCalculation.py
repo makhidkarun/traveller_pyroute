@@ -103,7 +103,7 @@ class testTradeCalculation(unittest.TestCase):
         tradecalc.sector_passenger_balance[(core.name, gush.name)] = 1
         tradecalc.sector_passenger_balance[(dagu.name, gush.name)] = 1
 
-        expected = "Uncompensated multilateral passenger imbalance present"
+        expected = "Uncompensated multilateral passenger imbalance present in sectors"
         actual = None
 
         try:
@@ -132,7 +132,7 @@ class testTradeCalculation(unittest.TestCase):
         tradecalc.sector_trade_balance[(core.name, gush.name)] = 1
         tradecalc.sector_trade_balance[(dagu.name, gush.name)] = 1
 
-        expected = "Uncompensated multilateral trade imbalance present"
+        expected = "Uncompensated multilateral trade imbalance present in sectors"
         actual = None
 
         try:

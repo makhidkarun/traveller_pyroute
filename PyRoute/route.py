@@ -28,13 +28,14 @@ def process():
                        help='Allegiance matching for borders, default [collapse]')
 
     route = parser.add_argument_group('Routes', 'Route generation options')
-    route.add_argument('--routes', dest='routes', choices=['trade', 'comm', 'xroute', 'owned', 'none'], default='trade',
+    route.add_argument('--routes', dest='routes',
+                       choices=['trade', 'comm', 'xroute', 'owned', 'none', 'trade-mp'], default='trade',
                        help='Route type to be generated, default [trade]')
     route.add_argument('--min-btn', dest='btn', default=13, type=int,
                        help='Minimum BTN used for route calculation, default [13]')
     route.add_argument('--min-route-btn', dest='route_btn', default=8, type=int,
                        help='Minimum btn for drawing on the map, default [8]')
-    route.add_argument('--max-jump', dest='max_jump', default=4, type=int,
+    route.add_argument('--max-jump', dest='max_jump', default=4, type=int, choices=range(1, 11),
                        help='Maximum jump distance for trade routes, default [4]')
     route.add_argument('--pop-code', choices=['fixed', 'scaled', 'benford'], default='scaled',
                        help='Interpretation of the population modifier code, default [scaled]')
@@ -44,18 +45,20 @@ def process():
                        help='RU calculation, default [scaled]')
     route.add_argument('--speculative-version', choices=['CT', 'T5', 'None'], default='CT',
                        help='version of the speculative trade calculations, default [CT]')
+    route.add_argument('--mp-threads', default=os.cpu_count()-1, type=int,
+                       help=f"Number of processes to use for trade-mp processing, default {os.cpu_count()-1}")
 
     output = parser.add_argument_group('Output', 'Output options')
 
     output.add_argument('--output', default='maps', help='output directory for maps, statistics')
-    output.add_argument('--owned-worlds', dest='owned', default=False, action='store_true',
+    output.add_argument('--owned-worlds', dest='owned', default=False, action=argparse.BooleanOptionalAction,
                         help='Generate the owned worlds report, used for review purposes')
-    output.add_argument('--no-trade', dest='trade', default=True, action='store_false',
-                        help='Do not generate any trade data, only the default statistical data')
-    output.add_argument('--no-maps', dest='maps', default=True, action='store_false',
-                        help='Do not generate sector level trade maps')
-    output.add_argument('--no-subsector-maps', dest='subsectors', default=True, action='store_false',
-                        help='Do not generate subsector level maps')
+    output.add_argument('--trade', default=True, action=argparse.BooleanOptionalAction,
+                        help='Generate trade data with route information')
+    output.add_argument('--maps', dest='maps', default=True, action=argparse.BooleanOptionalAction,
+                        help='Generate sector level trade maps')
+    output.add_argument('--subsector-maps', dest='subsectors', default=True, action=argparse.BooleanOptionalAction,
+                        help='Generate subsector level maps')
     output.add_argument('--min-ally-count', dest='ally_count', default=10, type=int,
                         help='Minimum number of worlds in an allegiance for output, default [10]')
     output.add_argument('--json-data', dest='json_data', default=False, action='store_true',
@@ -67,10 +70,10 @@ def process():
     source.add_argument('sector', nargs='*', help='T5SS sector file(s) to process')
 
     debugging = parser.add_argument_group('Debug', "Debugging flags")
-    debugging.add_argument('--debug', dest="debug_flag", default=False, action='store_true',
+    debugging.add_argument('--debug', dest="debug_flag", default=False,  action=argparse.BooleanOptionalAction,
                            help="Turn on trade-route debugging")
 
-    parser.add_argument('--version', action='version', version='%(prog)s 0.3')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.4')
     parser.add_argument('--log-level', default='INFO')
 
     args = parser.parse_args()
@@ -79,7 +82,8 @@ def process():
 
     logger.info("starting processing")
 
-    galaxy = Galaxy(args.btn, args.max_jump, args.route_btn, args.debug_flag, trade_choice=args.routes, reuse=args.route_reuse)
+    galaxy = Galaxy(args.btn, args.max_jump)
+
     galaxy.output_path = args.output
 
     raw_sectors_list = args.sector
@@ -93,11 +97,12 @@ def process():
         else:
             logger.warning(sector + " is duplicated")
 
-    galaxy.read_sectors(sectors_list, args.pop_code, args.ru_calc)
+    galaxy.read_sectors(sectors_list, args.pop_code, args.ru_calc,
+                        args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
 
     logger.info("%s sectors read" % len(galaxy.sectors))
 
-    galaxy.generate_routes(args.routes, args.route_reuse)
+    galaxy.generate_routes()
 
     galaxy.set_borders(args.borders, args.ally_match)
 

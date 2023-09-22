@@ -272,11 +272,12 @@ class DeltaReduce:
         q = None
 
         try:
-            galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-            galaxy.read_sectors(sectors, args.pop_code, args.ru_calc)
+            galaxy = DeltaGalaxy(args.btn, args.max_jump)
+            galaxy.read_sectors(sectors, args.pop_code, args.ru_calc,
+                                args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
             galaxy.output_path = args.output
 
-            galaxy.generate_routes(args.routes, args.route_reuse)
+            galaxy.generate_routes()
 
             galaxy.set_borders(args.borders, args.ally_match)
 

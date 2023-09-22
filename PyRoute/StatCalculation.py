@@ -28,14 +28,14 @@ class Populations(object):
         return self.population < other.population
 
 class ObjectStatistics(object):
-    base_mapping = {'C':'Corsair base', 'D':'Naval depot', 'E': 'Embassy', 'K': 'Naval base', 'M': 'Military base',
+    base_mapping = {'C': 'Corsair base', 'D': 'Naval depot', 'E': 'Embassy', 'K': 'Naval base', 'M': 'Military base',
                     'N': 'Naval base', 'O': 'Naval outpost',
-                    'R': 'Clan base', 'S': 'Scout base', 'T':'Tlaukhu base', 'V': 'Scout base', 'W': 'Way station',
+                    'R': 'Clan base', 'S': 'Scout base', 'T': 'Tlaukhu base', 'V': 'Scout base', 'W': 'Way station',
                     '*': 'Unknown', 'I': 'Unknown',
                     'G': 'Vargr Naval base',  'J': 'Naval base',
                     'L': 'Hiver naval base', 'P': 'Droyne Naval base', 'Q': 'Droyne military garrison',
                     'X': 'Zhodani relay station', 'Y': 'Zhodani depot',
-                    'A': 'Split', 'B': 'Split', 'F': 'Split','H': 'Split', 'U': 'Split', 'Z': 'Split' }
+                    'A': 'Split', 'B': 'Split', 'F': 'Split', 'H': 'Split', 'U': 'Split', 'Z': 'Split'}
 
     def __init__(self):
         self.population = 0

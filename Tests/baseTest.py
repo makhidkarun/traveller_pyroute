@@ -37,6 +37,8 @@ class baseTest(unittest.TestCase):
         args.ally_count = 10
         args.json_data = False
         args.output = tempfile.gettempdir()
+        args.mp_threads = 1
+        args.debug_flag = False
         return args
 
     def _make_args_no_line(self):

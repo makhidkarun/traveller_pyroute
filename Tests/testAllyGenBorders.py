@@ -6,7 +6,6 @@ import unittest
 from collections import defaultdict
 
 import pytest
-
 from PyRoute.AllyGen import AllyGen
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
@@ -26,11 +25,12 @@ class testAllyGenBorders(baseTest):
         args = self._make_args()
         args.max_jump = 4
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
@@ -54,11 +54,12 @@ class testAllyGenBorders(baseTest):
         args = self._make_args()
         args.max_jump = 4
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
@@ -82,11 +83,12 @@ class testAllyGenBorders(baseTest):
         args = self._make_args()
         args.max_jump = 4
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
@@ -110,11 +112,12 @@ class testAllyGenBorders(baseTest):
         args = self._make_args()
         args.max_jump = 4
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
@@ -138,11 +141,12 @@ class testAllyGenBorders(baseTest):
         args = self._make_args()
         args.max_jump = 4
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
@@ -166,11 +170,12 @@ class testAllyGenBorders(baseTest):
         args = self._make_args()
         args.max_jump = 4
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
@@ -194,11 +199,12 @@ class testAllyGenBorders(baseTest):
         args = self._make_args()
         args.max_jump = 4
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
@@ -223,11 +229,12 @@ class testAllyGenBorders(baseTest):
         args = self._make_args()
         args.max_jump = 4
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
@@ -253,11 +260,12 @@ class testAllyGenBorders(baseTest):
         args = self._make_args()
         args.max_jump = 4
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
@@ -283,11 +291,12 @@ class testAllyGenBorders(baseTest):
         args = self._make_args()
         args.max_jump = 4
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
@@ -313,11 +322,12 @@ class testAllyGenBorders(baseTest):
         args = self._make_args()
         args.max_jump = 4
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
@@ -344,11 +354,12 @@ class testAllyGenBorders(baseTest):
         args = self._make_args()
         args.max_jump = 4
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
@@ -417,6 +428,8 @@ class testAllyGenBorders(baseTest):
         args.ally_count = 10
         args.json_data = False
         args.output = tempfile.gettempdir()
+        args.debug_flag = False
+        args.mp_threads = 1
         return args
 
 

@@ -28,11 +28,12 @@ class testApproximateShortestPathTree(baseTest):
 
         args = self._make_args()
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debugflag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         graph = galaxy.stars
@@ -58,11 +59,12 @@ class testApproximateShortestPathTree(baseTest):
 
         args = self._make_args()
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debugflag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         graph = galaxy.stars
@@ -87,11 +89,12 @@ class testApproximateShortestPathTree(baseTest):
 
         args = self._make_args()
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debugflag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         graph = galaxy.stars
@@ -115,11 +118,12 @@ class testApproximateShortestPathTree(baseTest):
 
         args = self._make_args()
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debugflag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         graph = galaxy.stars
@@ -154,11 +158,12 @@ class testApproximateShortestPathTree(baseTest):
 
         args = self._make_args()
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debugflag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         graph = galaxy.stars
@@ -191,11 +196,12 @@ class testApproximateShortestPathTree(baseTest):
 
         args = self._make_args()
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debugflag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         graph = galaxy.stars
@@ -243,11 +249,12 @@ class testApproximateShortestPathTree(baseTest):
 
         args = self._make_args()
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debugflag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         graph = galaxy.stars
@@ -300,11 +307,12 @@ class testApproximateShortestPathTree(baseTest):
 
         args = self._make_args()
 
-        galaxy = DeltaGalaxy(args.btn, args.max_jump, args.route_btn)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc)
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debugflag)
         galaxy.output_path = args.output
 
-        galaxy.generate_routes(args.routes, args.route_reuse)
+        galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
         graph = galaxy.stars
@@ -343,6 +351,8 @@ class testApproximateShortestPathTree(baseTest):
         args.ally_count = 10
         args.json_data = False
         args.output = tempfile.gettempdir()
+        args.debugflag = False
+        args.mp_threads = 1
         return args
 
 if __name__ == '__main__':
