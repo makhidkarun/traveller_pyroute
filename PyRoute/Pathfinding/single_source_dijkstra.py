@@ -296,29 +296,64 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
     if seeds is None:
         seeds = {source}
 
-    heap = [(distance_labels[seed], seed) for seed in seeds]
-    heapq.heapify(heap)
+    bucketstruck = True
 
-    while heap:
-        dist_tail, tail = heapq.heappop(heap)
-        if dist_tail > distance_labels[tail]:
-            # Since we've just dequeued a bad node, remove other bad nodes from the list to avoid tripping
-            # over them later
-            heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]
-            heapq.heapify(heap)
-            continue
+    if not bucketstruck:
+        heap = [(distance_labels[seed], seed) for seed in seeds]
+        heapq.heapify(heap)
+
+        while heap:
+            dist_tail, tail = heapq.heappop(heap)
+            if dist_tail > distance_labels[tail]:
+                # Since we've just dequeued a bad node, remove other bad nodes from the list to avoid tripping
+                # over them later
+                heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]
+                heapq.heapify(heap)
+                continue
 
         # Link weights are strictly positive, thus lower bounded by zero. Thus, when the current dist_tail value exceeds
         # the corresponding node's distance label at the other end of the candidate edge, trim that edge.  Such edges
         # cannot _possibly_ result in smaller distance labels.  By a similar argument, filter the remaining edges
         # when the sum of dist_tail and that edge's weight equals or exceeds the corresponding node's distance label.
-        neighbours = [(head, dist_tail + dist_head) for (head, dist_head) in graph._arcs[tail] if dist_tail <= distance_labels[head]]
-        neighbours = [(head, dist_head) for (head, dist_head) in neighbours if dist_head < distance_labels[head]]
+            neighbours = [(head, dist_tail + dist_head) for (head, dist_head) in graph._arcs[tail] if dist_tail <= distance_labels[head]]
+            neighbours = [(head, dist_head) for (head, dist_head) in neighbours if dist_head < distance_labels[head]]
 
-        if 0 == len(neighbours):
-            continue
-        for head, dist_head in neighbours:
-            distance_labels[head] = dist_head
-            heapq.heappush(heap, (dist_head, head))
+            if 0 == len(neighbours):
+                continue
+            for head, dist_head in neighbours:
+                distance_labels[head] = dist_head
+                heapq.heappush(heap, (dist_head, head))
+
+    else:
+        buckets = []
+
+        arcs = graph._arcs
+
+        for seed in seeds:
+            if 0 == len(arcs[seed]):
+                continue
+            dist_seed = distance_labels[seed]
+            i = int(dist_seed)
+            while len(buckets) <= i:
+                buckets.append([])
+            buckets[i].append((dist_seed, seed))
+
+        for bucket in buckets:
+
+            for dist_tail, tail in bucket:
+                if dist_tail > distance_labels[tail]:
+                    continue
+                neighbours = [(head, raw_head + dist_tail) for (head, raw_head) in arcs[tail]
+                              if dist_tail <= distance_labels[head]
+                              and raw_head + dist_tail < distance_labels[head]]
+                if 0 == len(neighbours):
+                    continue
+
+                for head, dist_head in neighbours:
+                    distance_labels[head] = dist_head
+                    i = int(dist_head)
+                    while len(buckets) <= i:
+                        buckets.append([])
+                    buckets[i].append((dist_head, head))
 
     return distance_labels
