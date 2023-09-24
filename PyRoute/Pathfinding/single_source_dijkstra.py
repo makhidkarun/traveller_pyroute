@@ -343,14 +343,23 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
             for dist_tail, tail in bucket:
                 if dist_tail > distance_labels[tail]:
                     continue
-                neighbours = [(head, raw_head + dist_tail) for (head, raw_head) in arcs[tail]
-                              if dist_tail <= distance_labels[head]
-                              and raw_head + dist_tail < distance_labels[head]]
-                if 0 == len(neighbours):
+                active_nodes = arcs[tail][0]
+                if 0 == len(active_nodes):
+                    continue
+                active_weights = arcs[tail][1] + dist_tail
+                keep = active_weights < distance_labels[active_nodes]
+                active_nodes = active_nodes[keep]
+                num_nodes = len(active_nodes)
+                if 0 == num_nodes:
                     continue
 
-                for head, dist_head in neighbours:
-                    distance_labels[head] = dist_head
+                active_weights = active_weights[keep]
+
+                distance_labels[active_nodes] = active_weights
+
+                for index in range(0, num_nodes):
+                    dist_head = active_weights[index]
+                    head = active_nodes[index]
                     i = int(dist_head)
                     while len(buckets) <= i:
                         buckets.append([])

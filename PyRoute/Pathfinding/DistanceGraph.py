@@ -5,6 +5,7 @@ Created on Sep 23, 2023
 
 Thanks to @GamesByDavidE for original prototype and design discussions
 """
+import numpy as np
 
 
 class DistanceGraph:
@@ -13,10 +14,7 @@ class DistanceGraph:
         self._nodes = list(graph.nodes())
         self._indexes = {node: i for (i, node) in enumerate(self._nodes)}
         self._arcs = [
-            [
-                (self._indexes[v], graph.get_edge_data(u, v)["weight"])
-                for v in graph.neighbors(u)
-            ]
+            (np.array(graph.adj[u]), np.array([data['weight'] for data in list(graph.adj[u].values())], dtype=float))
             for u in self._nodes
         ]
 
@@ -27,9 +25,8 @@ class DistanceGraph:
 
     def _lighten_arc(self, u, v, weight):
         arcs = self._arcs[u]
-        for i, (x, _) in enumerate(arcs):
-            if x == v:
-                arcs[i] = (v, weight)
-                break
+        flip = arcs[0] == v
+        if flip.any():
+            arcs[1][flip] = weight
         else:
             assert False
