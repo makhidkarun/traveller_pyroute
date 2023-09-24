@@ -95,5 +95,8 @@ class ApproximateShortestPathTree:
         # but it wasn't worth the time or complexity cost to filter them out here.
         self._distances = implicit_shortest_path_dijkstra_indexes(self._graph, self._source, distance_labels=self._distances, seeds=dropnodes)
 
+    def lighten_edge(self, u, v, weight):
+        pass
+
     def is_well_formed(self):
         return True

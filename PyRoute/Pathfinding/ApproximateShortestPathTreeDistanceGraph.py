@@ -35,8 +35,10 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
             leftdist = self._distances[left]
             rightdist = self._distances[right]
             shelf = self._graph._arcs[left]
-            matches = [dist_head for (head, dist_head) in shelf if head == right]
-            weight = matches[0]
+            keep = shelf[0] == right
+            #matches = [dist_head for (head, dist_head) in shelf if head == right]
+            #weight = matches[0]
+            weight = shelf[1][keep][0]
             delta = abs(leftdist - rightdist)
 
             if delta >= (1 + self._epsilon) * weight:
