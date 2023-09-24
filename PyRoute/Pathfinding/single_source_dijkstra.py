@@ -296,9 +296,11 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
     if seeds is None:
         seeds = {source}
 
-    bucketstruck = True
+    bucketstruck = False
 
     if not bucketstruck:
+        arcs = graph._arcs
+
         heap = [(distance_labels[seed], seed) for seed in seeds]
         heapq.heapify(heap)
 
@@ -315,13 +317,23 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
         # the corresponding node's distance label at the other end of the candidate edge, trim that edge.  Such edges
         # cannot _possibly_ result in smaller distance labels.  By a similar argument, filter the remaining edges
         # when the sum of dist_tail and that edge's weight equals or exceeds the corresponding node's distance label.
-            neighbours = [(head, dist_tail + dist_head) for (head, dist_head) in graph._arcs[tail] if dist_tail <= distance_labels[head]]
-            neighbours = [(head, dist_head) for (head, dist_head) in neighbours if dist_head < distance_labels[head]]
-
-            if 0 == len(neighbours):
+            neighbours = arcs[tail]
+            active_nodes = neighbours[0]
+            if 0 == len(active_nodes):
                 continue
-            for head, dist_head in neighbours:
-                distance_labels[head] = dist_head
+            active_weights = dist_tail + neighbours[1]
+            keep = active_weights < distance_labels[active_nodes]
+            active_nodes = active_nodes[keep]
+            num_nodes = len(active_nodes)
+
+            if 0 == num_nodes:
+                continue
+            active_weights = active_weights[keep]
+            distance_labels[active_nodes] = active_weights
+
+            for index in range(0, num_nodes):
+                head = active_nodes[index]
+                dist_head = active_weights[index]
                 heapq.heappush(heap, (dist_head, head))
 
     else:
