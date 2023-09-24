@@ -329,8 +329,10 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
             active_weights = active_weights[keep]
             distance_labels[active_nodes] = active_weights
 
-            for index in range(0, num_nodes):
-                heapq.heappush(heap, (active_weights[index], active_nodes[index]))
+            heapq.heappush(heap, (active_weights[0], active_nodes[0]))
+            if 1 < num_nodes:  # Only cop the iterator overhead if there's at least 2 neighbours to queue
+                for index in range(1, num_nodes):
+                    heapq.heappush(heap, (active_weights[index], active_nodes[index]))
 
     else:
         buckets = []
