@@ -301,7 +301,7 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
     if not bucketstruck:
         arcs = graph._arcs
 
-        heap = [(distance_labels[seed], seed) for seed in seeds]
+        heap = [(distance_labels[seed], seed) for seed in seeds if 0 < len(arcs[seed][0])]
         heapq.heapify(heap)
 
         while heap:
@@ -319,8 +319,6 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
         # when the sum of dist_tail and that edge's weight equals or exceeds the corresponding node's distance label.
             neighbours = arcs[tail]
             active_nodes = neighbours[0]
-            if 0 == len(active_nodes):
-                continue
             active_weights = dist_tail + neighbours[1]
             keep = active_weights < distance_labels[active_nodes]
             active_nodes = active_nodes[keep]
@@ -332,9 +330,7 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
             distance_labels[active_nodes] = active_weights
 
             for index in range(0, num_nodes):
-                head = active_nodes[index]
-                dist_head = active_weights[index]
-                heapq.heappush(heap, (dist_head, head))
+                heapq.heappush(heap, (active_weights[index], active_nodes[index]))
 
     else:
         buckets = []
