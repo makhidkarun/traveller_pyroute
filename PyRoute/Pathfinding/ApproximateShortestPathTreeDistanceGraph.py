@@ -4,9 +4,9 @@ Created on Sep 23, 2023
 @author: CyberiaResurrection
 """
 import numpy as np
-from ApproximateShortestPathTree import ApproximateShortestPathTree
-from DistanceGraph import DistanceGraph
-from single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph
+from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
+from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
+from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph
 
 
 class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
