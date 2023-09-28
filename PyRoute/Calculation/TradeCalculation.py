@@ -6,9 +6,10 @@ Created on Mar 15, 2014
 import functools
 
 import networkx as nx
+
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
-from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
+from PyRoute.Pathfinding.ApproximateShortestPathTreeDistanceGraph import ApproximateShortestPathTreeDistanceGraph
 from PyRoute.Pathfinding.astar import astar_path_indexes
 from PyRoute.TradeBalance import TradeBalance
 
@@ -168,7 +169,7 @@ class TradeCalculation(RouteCalculation):
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathTree(source.index, self.galaxy.stars, 0.2, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(source.index, self.galaxy.stars, 0.2, sources=landmarks)
 
         base_btn = 0
         counter = 0
@@ -332,6 +333,7 @@ class TradeCalculation(RouteCalculation):
             data['count'] += 1
             if reweight:
                 data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
+                self.shortest_path_tree.lighten_edge(start.index, end.index, data['weight'])
             edges.append((start.index, end.index))
             start = end
 
