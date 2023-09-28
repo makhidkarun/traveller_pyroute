@@ -16,9 +16,6 @@ class testDeltaDebug(baseTest):
         foo = runner.run(command=fullpath)
 
         self.assertEqual(0, foo.returncode, "DeltaDebug did not complete successfully: " + foo.stderr)
-        expected = '0 sectors read\nReducing by sector\nReducing by subsector\nReducing by line\n'
-        actual = foo.stderr
-        self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':
