@@ -17,6 +17,16 @@ class baseTest(unittest.TestCase):
 
         return sourcefile
 
+    def unpack_workdir(self, dirname):
+        # try unpacked directory directly
+        workdir = os.path.abspath(dirname)
+
+        cwd = os.getcwd()
+        if not os.path.isdir(workdir):
+            workdir = os.path.abspath(cwd + dirname)
+
+        return workdir
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
