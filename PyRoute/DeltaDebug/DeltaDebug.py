@@ -58,6 +58,8 @@ def process():
                        help='RU calculation, default [scaled]')
     route.add_argument('--speculative-version', choices=['CT', 'T5', 'None'], default='CT',
                        help='version of the speculative trade calculations, default [CT]')
+    route.add_argument('--mp-threads', default=os.cpu_count()-1, type=int,
+                       help=f"Number of processes to use for trade-mp processing, default {os.cpu_count()-1}")
 
     output = parser.add_argument_group('Output', 'Output options')
 
