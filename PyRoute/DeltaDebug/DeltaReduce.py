@@ -10,6 +10,7 @@ import logging
 import math
 
 from DeltaPasses.SingleLineReducer import SingleLineReducer
+from DeltaPasses.TwoLineReducer import TwoLineReducer
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.HexMap import HexMap
@@ -43,6 +44,7 @@ class DeltaReduce:
         self.sector_reducer = SectorReducer(self)
         self.subsector_reducer = SubsectorReducer(self)
         self.single_line_reducer = SingleLineReducer(self)
+        self.two_line_reducer = TwoLineReducer(self)
 
     def is_initial_state_interesting(self):
         sectors = self.sectors
@@ -74,41 +76,7 @@ class DeltaReduce:
         self.single_line_reducer.run(singleton_only)
 
     def reduce_line_two_minimal(self):
-        segment = self.sectors.lines
-
-        # An interesting less-than-4-element list is 2-minimal by definition
-        if 4 > len(segment):
-            return
-
-        best_sectors = self.sectors
-        gap = 1
-        while gap < len(segment):
-            msg = "# of lines: " + str(len(best_sectors.lines))
-            self.logger.error(msg)
-
-            i = 0
-            j = i + gap
-            while j < len(segment):
-                lines_to_remove = [segment[i], segment[j]]
-                temp_sectors = best_sectors.drop_lines(lines_to_remove)
-
-                interesting, msg, _ = self._check_interesting(self.args, temp_sectors)
-
-                # We've found a chunk of input and have _demonstrated_ its irrelevance,
-                # empty that chunk, update best so far, and continue
-                if interesting:
-                    best_sectors = temp_sectors
-                    segment = best_sectors.lines
-                    msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines"
-                    self.logger.error(msg)
-                else:
-                    i += 1
-                j = i + gap
-
-            gap += 1
-
-        # now that the pass is done, update self.sectors with best reduction found
-        self.sectors = best_sectors
+        self.two_line_reducer.run(False)
 
     def reduce_within_line(self):
         # we're going to be deliberately mangling lines in the process of reducing them, so shut up loggers,
