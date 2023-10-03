@@ -15,11 +15,13 @@ class WidenHoleReducer(object):
             return True
         return False
 
-    def run(self, start_pos, reverse=False):
+    def run(self, start_pos, reverse=False, best_sectors=None):
         found_reduction = True
         chunk_size = 1
 
-        best_sectors = self.reducer.sectors
+        supplied = best_sectors is not None
+
+        best_sectors = self.reducer.sectors if not supplied else best_sectors
 
         msg = "# of lines: " + str(len(best_sectors.lines))
         self.reducer.logger.error(msg)
@@ -27,6 +29,9 @@ class WidenHoleReducer(object):
         while found_reduction:
             segment = best_sectors.lines
             if reverse:
+                if 0 < start_pos:
+                    start_pos = min(start_pos, len(best_sectors.lines))
+
                 raw_start_pos = start_pos + 1 if 0 < start_pos else 0
                 raw_fin_pos = raw_start_pos - chunk_size
                 lines_to_drop = segment[min(raw_start_pos, raw_fin_pos):max(raw_start_pos, raw_fin_pos)]
@@ -49,5 +54,8 @@ class WidenHoleReducer(object):
 
             msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines"
             self.reducer.logger.error(msg)
+
+        if supplied:
+            return best_sectors
 
         self.reducer.sectors = best_sectors

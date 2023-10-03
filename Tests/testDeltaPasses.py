@@ -1,13 +1,13 @@
 import argparse
 import unittest.main
 
-from DeltaPasses.WidenHoleReducer import WidenHoleReducer
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
 from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
 from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
 from PyRoute.DeltaPasses.FullLineReduce import FullLineReduce
 from PyRoute.DeltaPasses.ImportanceLineReduce import ImportanceLineReduce
+from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
 from PyRoute.DeltaStar import DeltaStar
 from Tests.baseTest import baseTest
 

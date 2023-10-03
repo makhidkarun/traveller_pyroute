@@ -3,12 +3,14 @@ Created on Oct 03, 2023
 
 @author: CyberiaResurrection
 """
+from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
 
 
 class SingleLineReducer(object):
 
     def __init__(self, reducer):
         self.reducer = reducer
+        self.breacher = WidenHoleReducer(reducer)
 
     def preflight(self):
         if self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines):
@@ -32,6 +34,12 @@ class SingleLineReducer(object):
             remove = []
             msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks)
             self.reducer.logger.error(msg)
+            start_counter = 0
+            bounds = []
+            for chunk in chunks:
+                final_counter = start_counter + len(chunk) - 1
+                bounds.append((start_counter, final_counter))
+                start_counter = final_counter + 1
 
             for i in range(0, num_chunks):
                 threshold = i + (len(remove) if 2 == num_chunks else 0)
@@ -54,6 +62,13 @@ class SingleLineReducer(object):
                     best_sectors = temp_sectors
                     msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines"
                     self.reducer.logger.error(msg)
+                    if 0 < i:  # if have cleared a later chunk, it's worth trying to expand the hole backwards
+                        msg = "Widening breach backwards"
+                        self.reducer.logger.error(msg)
+                        startloc = bounds[i-1][1]
+                        best_sectors = self.breacher.run(start_pos=startloc, reverse=True, best_sectors=best_sectors)
+                        msg = "Widening breach complete"
+                        self.reducer.logger.error(msg)
 
             if 0 < len(remove):
                 num_chunks -= len(remove)
