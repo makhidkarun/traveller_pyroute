@@ -1,6 +1,7 @@
 import argparse
 import unittest.main
 
+from DeltaPasses.WidenHoleReducer import WidenHoleReducer
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
 from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
@@ -136,6 +137,145 @@ class testDeltaPasses(baseTest):
         # verify each line got aux-reduced
         for line in reducer.sectors.lines:
             self.assertEqual(line, DeltaStar.reduce_auxiliary(line), "Line not auxiliary-line-reduced")
+
+    def test_widen_hole_reducer_on_start_of_spiked_subsector(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
+        args = self._make_args_no_line()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_interesting()
+
+        reduction_pass = WidenHoleReducer(reducer)
+        reduction_pass.run(0)
+
+        reducer.is_initial_state_interesting()
+        new_count = len(reducer.sectors.lines)
+        self.assertEqual(37, new_count, "Unexpected number of lines after widen-hole reduction")
+
+    def test_widen_hole_reducer_near_far_end_of_spiked_subsector(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
+        args = self._make_args_no_line()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_interesting()
+
+        reduction_pass = WidenHoleReducer(reducer)
+        reduction_pass.run(38)
+
+        reducer.is_initial_state_interesting()
+        new_count = len(reducer.sectors.lines)
+        self.assertEqual(38, new_count, "Unexpected number of lines after widen-hole reduction")
+
+    def test_widen_hole_reducer_on_end_of_spiked_subsector(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
+        args = self._make_args_no_line()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_interesting()
+
+        reduction_pass = WidenHoleReducer(reducer)
+        reduction_pass.run(-1, reverse=True)
+
+        reducer.is_initial_state_interesting()
+        new_count = len(reducer.sectors.lines)
+        self.assertEqual(33, new_count, "Unexpected number of lines after widen-hole-at-end reduction")
+
+    def test_widen_hole_reducer_near_start_of_spiked_subsector(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
+        args = self._make_args_no_line()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_interesting()
+
+        reduction_pass = WidenHoleReducer(reducer)
+        reduction_pass.run(-38, reverse=True)
+
+        reducer.is_initial_state_interesting()
+        new_count = len(reducer.sectors.lines)
+        self.assertEqual(38, new_count, "Unexpected number of lines after widen-hole-at-end reduction")
+
+    def test_widen_hole_reducer_reversing_from_positive_location_in_spiked_subsector(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
+        args = self._make_args_no_line()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_interesting()
+
+        reduction_pass = WidenHoleReducer(reducer)
+        reduction_pass.run(21, reverse=True)
+
+        reducer.is_initial_state_interesting()
+        new_count = len(reducer.sectors.lines)
+        self.assertEqual(33, new_count, "Unexpected number of lines after widen-hole-reverse-from-positive reduction")
+
+    def test_widen_hole_reducer_forward_from_negative_location_in_spiked_subsector(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
+        args = self._make_args_no_line()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_interesting()
+
+        reduction_pass = WidenHoleReducer(reducer)
+        reduction_pass.run(-20)
+
+        reducer.is_initial_state_interesting()
+        new_count = len(reducer.sectors.lines)
+        self.assertEqual(33, new_count, "Unexpected number of lines after widen-hole-reverse-from-positive reduction")
+
+    def test_widen_hole_reducer_near_middle_of_spiked_subsector(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
+        args = self._make_args_no_line()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_interesting()
+
+        reduction_pass = WidenHoleReducer(reducer)
+        reduction_pass.run(20)
+
+        reducer.is_initial_state_interesting()
+        new_count = len(reducer.sectors.lines)
+        self.assertEqual(37, new_count, "Unexpected number of lines after widen-middle-hole-foward reduction")
+
+        reduction_pass.run(-17, reverse=True)
+
+        reducer.is_initial_state_interesting()
+        new_count = len(reducer.sectors.lines)
+        self.assertEqual(22, new_count, "Unexpected number of lines after widen-middle-hole-reverse reduction")
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
