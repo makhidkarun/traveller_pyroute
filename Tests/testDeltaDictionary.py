@@ -227,6 +227,29 @@ class testDeltaDictionary(baseTest):
         self.assertTrue('high_pop_worlds' in remix_stats.__dict__, "Missing high_pop_worlds attribute not restored")
         self.assertListEqual([], remix['Spinward Marches'].allegiances['CsIm'].stats.high_pop_worlds, "Missing high_pop_worlds list not restored")
 
+    def test_allegiance_list(self):
+        spinward = self.unpack_filename('DeltaFiles/high_pop_worlds_blowup/Spinward Marches.sec')
+
+        spinward_sec = SectorDictionary.load_traveller_map_file(spinward)
+
+        foo = DeltaDictionary()
+        foo[spinward_sec.name] = spinward_sec
+
+        expected = set()
+        expected.add('CsIm')
+        expected.add('CsZh')
+        expected.add('DaCf')
+        expected.add('Im')
+        expected.add('ImDd')
+        expected.add('NaHu')
+        expected.add('NaXX')
+        expected.add('SwCf')
+        expected.add('Zh')
+        expected.add('ZhIN')
+
+        actual = foo.allegiance_list()
+        self.assertEqual(expected, actual, "Unexpected allegiance list")
+
 class testSectorDictionary(baseTest):
     def test_add_bad_item_by_index(self):
         expected = 'Values must be SubsectorDictionary objects'

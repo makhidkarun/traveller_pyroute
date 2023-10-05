@@ -73,6 +73,15 @@ class DeltaDictionary(dict):
 
         return result
 
+    def allegiance_list(self):
+        result = set()
+
+        for sector_name in self:
+            sublist = self[sector_name].allegiance_list()
+            result.update(sublist)
+
+        return result
+
     @property
     def lines(self):
         result = list()
@@ -180,6 +189,12 @@ class SectorDictionary(dict):
             if not self[subsector_name].skipped:
                 result.append(subsector_name)
 
+        return result
+
+    def allegiance_list(self):
+        result = set()
+        for allegiance_name in self.allegiances:
+            result.add(allegiance_name)
         return result
 
     def drop_lines(self, lines_to_drop):
