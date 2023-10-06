@@ -213,7 +213,7 @@ class testDeltaPasses(baseTest):
 
         reducer.is_initial_state_interesting()
         new_count = len(reducer.sectors.lines)
-        self.assertEqual(38, new_count, "Unexpected number of lines after widen-hole-at-end reduction")
+        self.assertEqual(39, new_count, "Unexpected number of lines after widen-hole-at-end reduction")
 
     def test_widen_hole_reducer_reversing_from_positive_location_in_spiked_subsector(self):
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')

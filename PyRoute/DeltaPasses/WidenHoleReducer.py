@@ -28,11 +28,12 @@ class WidenHoleReducer(object):
 
         while found_reduction:
             segment = best_sectors.lines
+            segment_len = len(segment)
             if reverse:
                 if 0 < start_pos:
                     start_pos = min(start_pos, len(best_sectors.lines))
 
-                raw_start_pos = start_pos + 1 if 0 < start_pos else 0
+                raw_start_pos = start_pos + 1 if 0 < start_pos else segment_len + start_pos
                 raw_fin_pos = raw_start_pos - chunk_size
                 lines_to_drop = segment[min(raw_start_pos, raw_fin_pos):max(raw_start_pos, raw_fin_pos)]
             else:
