@@ -103,6 +103,8 @@ def process():
                        help="Skip line-level reduction.  At least one of sector, subsector, line and two-minimisation must be selected")
     delta.add_argument('--within-line', dest="run_within", default=False, action='store_true',
                        help="Try to remove irrelevant components (eg base codes) from _within_ individual lines")
+    delta.add_argument('--allegiance', dest="run_allegiance", default=False, action='store_true',
+                       help="Try to remove irrelevant allegiances")
     delta.add_argument('--assume-interesting', dest="run_init", default=True, action='store_false',
                        help="Assume initial input is interesting.")
 
@@ -137,6 +139,11 @@ def process():
     if args.run_sector:
         logger.error("Reducing by sector")
         reducer.reduce_sector_pass()
+        reducer.is_initial_state_interesting()
+
+    if args.run_allegiance:
+        logger.error("Reducing by allegiance")
+        reducer.reduce_allegiance_pass()
         reducer.is_initial_state_interesting()
 
     if args.run_subsector:

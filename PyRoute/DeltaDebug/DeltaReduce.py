@@ -9,18 +9,19 @@ Modify this class to add different reduction passes.
 import logging
 import math
 
-from DeltaPasses.SingleLineReducer import SingleLineReducer
-from DeltaPasses.TwoLineReducer import TwoLineReducer
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.HexMap import HexMap
+from PyRoute.DeltaPasses.AllegianceReducer import AllegianceReducer
 from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
 from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
 from PyRoute.DeltaPasses.CapitalLineReduce import CapitalLineReduce
 from PyRoute.DeltaPasses.FullLineReduce import FullLineReduce
 from PyRoute.DeltaPasses.ImportanceLineReduce import ImportanceLineReduce
 from PyRoute.DeltaPasses.SectorReducer import SectorReducer
+from PyRoute.DeltaPasses.SingleLineReducer import SingleLineReducer
 from PyRoute.DeltaPasses.SubsectorReducer import SubsectorReducer
+from PyRoute.DeltaPasses.TwoLineReducer import TwoLineReducer
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.StatCalculation import StatCalculation
 from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap
@@ -42,6 +43,7 @@ class DeltaReduce:
         logging.disable(logging.WARNING)
         self.withinline = [Canonicalisation(self), FullLineReduce(self), ImportanceLineReduce(self), CapitalLineReduce(self), AuxiliaryLineReduce(self)]
         self.sector_reducer = SectorReducer(self)
+        self.allegiance_reducer = AllegianceReducer(self)
         self.subsector_reducer = SubsectorReducer(self)
         self.single_line_reducer = SingleLineReducer(self)
         self.two_line_reducer = TwoLineReducer(self)
@@ -68,6 +70,9 @@ class DeltaReduce:
 
     def reduce_sector_pass(self, singleton_only=False):
         self.sector_reducer.run(singleton_only)
+
+    def reduce_allegiance_pass(self, singleton_only=False):
+        self.allegiance_reducer.run(singleton_only)
 
     def reduce_subsector_pass(self):
         self.subsector_reducer.run(False)
