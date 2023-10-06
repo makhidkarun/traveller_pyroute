@@ -1,7 +1,7 @@
 import argparse
 import unittest.main
 
-from DeltaPasses.AllegianceReducer import AllegianceReducer
+from PyRoute.DeltaPasses.AllegianceReducer import AllegianceReducer
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
 from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
