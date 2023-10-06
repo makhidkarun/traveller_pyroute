@@ -1,6 +1,7 @@
 import argparse
 import unittest.main
 
+from DeltaPasses.AllegianceReducer import AllegianceReducer
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
 from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
@@ -276,6 +277,31 @@ class testDeltaPasses(baseTest):
         reducer.is_initial_state_interesting()
         new_count = len(reducer.sectors.lines)
         self.assertEqual(22, new_count, "Unexpected number of lines after widen-middle-hole-reverse reduction")
+
+    def test_allegiance_reduction_of_sector(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-spiked.sec')
+        args = self._make_args_no_line()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+        reducer.is_initial_state_interesting()
+
+        reduction_pass = AllegianceReducer(reducer)
+
+        self.assertTrue(reduction_pass.preflight(), "Input should be reducible")
+        reduction_pass.run()
+
+        reducer.is_initial_state_interesting()
+        # verify final-state summary
+        expected_allegiances = set(["ImDv"])
+        actual_allegiances = reducer.sectors.allegiance_list()
+        self.assertEqual(expected_allegiances, actual_allegiances, "Unexpected allegiance set after reduction")
+        self.assertEqual(508, len(reducer.sectors.lines), "Unexpected number of lines after reduction")
+
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
