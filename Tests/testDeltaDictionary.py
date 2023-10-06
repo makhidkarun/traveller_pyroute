@@ -250,6 +250,26 @@ class testDeltaDictionary(baseTest):
         actual = foo.allegiance_list()
         self.assertEqual(expected, actual, "Unexpected allegiance list")
 
+    def test_allegiance_subset(self):
+        zarushagar = self.unpack_filename('DeltaFiles/Zarushagar.sec')
+
+        zaru_sec = SectorDictionary.load_traveller_map_file(zarushagar)
+
+        foo = DeltaDictionary()
+        foo[zaru_sec.name] = zaru_sec
+
+        rawlines = foo.lines
+        keep_alg = ' CsIm '
+        keep_lines = [line for line in rawlines if keep_alg in line]
+        expected_count = len(keep_lines)
+
+        subset = ['CsIm']
+
+        nuFoo = foo.allegiance_subset(subset)
+        self.assertEqual(set(subset), nuFoo.allegiance_list(), "Unexpected allegiance set after allegiance reduction")
+        self.assertEqual(expected_count, len(nuFoo.lines), "Unexpected line count after allegiance reduction")
+
+
 class testSectorDictionary(baseTest):
     def test_add_bad_item_by_index(self):
         expected = 'Values must be SubsectorDictionary objects'

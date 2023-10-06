@@ -56,6 +56,13 @@ class DeltaDictionary(dict):
 
         return new_dict
 
+    def allegiance_subset(self, allegiances):
+        new_dict = DeltaDictionary()
+        for sector_name in self:
+            new_dict[sector_name] = self[sector_name].allegiance_subset(allegiances)
+
+        return new_dict
+
     def sector_list(self):
         result = list(self.keys())
         result.sort()
@@ -182,6 +189,17 @@ class SectorDictionary(dict):
             new_dict[subsector_name].items = None
 
         return new_dict
+
+    def allegiance_subset(self, allegiances):
+        raw_lines = self.lines
+
+        for alg in allegiances:
+            raw_lines = [line for line in raw_lines if ' ' + alg + ' ' not in line]
+
+        result = self.drop_lines(raw_lines)
+        result.allegiances = {key:alg for (key, alg) in self.allegiances.items() if key in allegiances }
+
+        return result
 
     def subsector_list(self):
         result = list()
