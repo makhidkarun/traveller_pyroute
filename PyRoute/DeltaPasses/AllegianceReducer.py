@@ -25,7 +25,6 @@ class AllegianceReducer(object):
         num_chunks = len(segment) if singleton_only else 2
         short_msg = None
         best_sectors = self.reducer.sectors
-        singleton_run = singleton_only
 
         while num_chunks <= len(segment):
             chunks = self.reducer.chunk_lines(segment, num_chunks)
