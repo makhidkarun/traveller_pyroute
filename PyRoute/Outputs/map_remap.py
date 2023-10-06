@@ -38,33 +38,33 @@ def prettify(elem):
     return reparsed.toprettyxml(indent="  ")
 
 
-def output_link(start, end, color, routeType, sectorStart, sectorEnd):
-    output = ET.Element('Route', {'Start': start, 'End': end, 'Color': color, 'Type': routeType})
+def output_link(route_start, route_end, route_color, route_type, sector_start, sector_end):
+    output = ET.Element('Route', {'Start': route_start, 'End': route_end, 'Color': route_color, 'Type': route_type})
 
-    if sectorStart == sectorEnd:
+    if sector_start == sector_end:
         return (output, None)
 
-    outStart = output
-    outEnd = ET.Element('Route', {'Start': end, 'End': start, 'Color': color, 'Type': routeType})
-    startx = int(start[0:2])
-    starty = int(start[2:4])
-    endx = int(end[0:2])
-    endy = int(end[2:4])
+    output_start = output
+    output_end = ET.Element('Route', {'Start': route_end, 'End': route_start, 'Color': route_color, 'Type': route_type})
+    startx = int(route_start[0:2])
+    starty = int(route_start[2:4])
+    endx = int(route_end[0:2])
+    endy = int(route_end[2:4])
 
     if startx <= 4 and endx >= 28:
-        outStart.attrib['EndOffsetX'] = '-1'
-        outEnd.attrib['EndOffsetX'] = '1'
+        output_start.attrib['EndOffsetX'] = '-1'
+        output_end.attrib['EndOffsetX'] = '1'
     elif startx >= 28 and endx <= 4:
-        outStart.attrib['EndOffsetX'] = '1'
-        outEnd.attrib['EndOffsetX'] = '-1'
+        output_start.attrib['EndOffsetX'] = '1'
+        output_end.attrib['EndOffsetX'] = '-1'
     if starty <= 4 and endy >= 36:
-        outStart.attrib['EndOffsetY'] = '-1'
-        outEnd.attrib['EndOffsetY'] = '1'
+        output_start.attrib['EndOffsetY'] = '-1'
+        output_end.attrib['EndOffsetY'] = '1'
     elif starty >= 36 and endy <= 4:
-        outStart.attrib['EndOffsetY'] = '1'
-        outEnd.attrib['EndOffsetY'] = '-1'
+        output_start.attrib['EndOffsetY'] = '1'
+        output_end.attrib['EndOffsetY'] = '-1'
 
-    return (outStart, outEnd)
+    return (output_start, output_end)
 
 
 if __name__ == '__main__':
