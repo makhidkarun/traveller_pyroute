@@ -50,7 +50,15 @@ class SingleLineReducer(object):
                     # nothing to do, move on
                     continue
 
+                old_len = len(best_sectors.lines)
                 temp_sectors = best_sectors.drop_lines(chunks[i])
+                new_len = len(temp_sectors.lines)
+                chunk_len = old_len - new_len
+
+                # if no lines were removed, the status quo prevails
+                if 0 == chunk_len:
+                    remove.append(i)
+                    continue
 
                 interesting, msg, _ = self.reducer._check_interesting(self.reducer.args, temp_sectors)
                 # We've found a chunk of input and have _demonstrated_ its irrelevance,
@@ -62,13 +70,18 @@ class SingleLineReducer(object):
                     best_sectors = temp_sectors
                     msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines"
                     self.reducer.logger.error(msg)
-                    if 0 < i:  # if have cleared a later chunk, it's worth trying to expand the hole backwards
-                        msg = "Widening breach backwards"
-                        self.reducer.logger.error(msg)
-                        startloc = bounds[i-1][1]
-                        best_sectors = self.breacher.run(start_pos=startloc, reverse=True, best_sectors=best_sectors)
-                        msg = "Widening breach complete"
-                        self.reducer.logger.error(msg)
+                    if 1 < chunk_len:
+                        if 0 < i:  # if have cleared a later chunk, it's worth trying to expand the hole backwards
+                            msg = "Widening breach backwards"
+                            self.reducer.logger.error(msg)
+                            startloc = bounds[i-1][1]
+                            best_sectors = self.breacher.run(
+                                start_pos=startloc,
+                                reverse=True,
+                                best_sectors=best_sectors
+                            )
+                            msg = "Widening breach complete"
+                            self.reducer.logger.error(msg)
 
             if 0 < len(remove):
                 num_chunks -= len(remove)
