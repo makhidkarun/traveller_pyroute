@@ -322,11 +322,11 @@ class Star(object):
         str_tl = self._int_to_ehex(tl)
         result += uwp + "-" + str(str_tl)
         imp_chunk = "{ " + str(self.importance) + " }"
-        result += " " + str(self.tradeCode).ljust(38) + imp_chunk.ljust(6) + " "
+        result += " " + str(self.tradeCode).ljust(26) + imp_chunk.ljust(6) + " "
         result += str(self.economics) + " " + str(self.social) + " " + str(self.nobles).ljust(4) + " "
         result += str(self.baseCode).ljust(2) + " " + str(self.zone).ljust(1) + " " + str(self.popM) + str(self.belts) + str(self.ggCount) + " "
         result += str(self.worlds).ljust(2) + " " + str(self.alg_code).ljust(4) + " "
-        result += str(" ".join(self.star_list)).ljust(15) + " " + " ".join(self.routes).ljust(41)
+        result += str(" ".join(self.star_list)).ljust(14) + " " + " ".join(self.routes).ljust(41)
 
         return result
 
