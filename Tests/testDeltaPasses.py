@@ -34,7 +34,8 @@ class testDeltaPasses(baseTest):
         reducer.is_initial_state_interesting()
         # verify each line got reduced
         for line in reducer.sectors.lines:
-            self.assertEqual(line, DeltaStar.reduce(line), "Line not canonicalised")
+            reduced = DeltaStar.reduce(line)
+            self.assertEqual(line, reduced, "Line not canonicalised")
 
     def test_full_line_reduction_of_subsector(self):
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')

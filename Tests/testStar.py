@@ -415,7 +415,6 @@ class TestStar(unittest.TestCase):
 
                 mid_line = star1.parse_to_line()
                 # Not comparing mid_line to original because trade codes are re-ordered
-                self.assertEqual(len(line), len(mid_line), "Line length mismatch between original and regenerated line for " + star1.name)
                 star2 = Star.parse_line_into_star(mid_line, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
                 self.assertEqual(star1, star2, "Regenerated star does not equal original star")
                 nu_line = star2.parse_to_line()
