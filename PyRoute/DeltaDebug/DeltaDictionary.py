@@ -59,7 +59,10 @@ class DeltaDictionary(dict):
     def allegiance_subset(self, allegiances):
         new_dict = DeltaDictionary()
         for sector_name in self:
-            new_dict[sector_name] = self[sector_name].allegiance_subset(allegiances)
+            subset_sector = self[sector_name].allegiance_subset(allegiances)
+            if 0 == len(subset_sector.allegiances):
+                continue
+            new_dict[sector_name] = subset_sector
 
         return new_dict
 
