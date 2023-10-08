@@ -37,5 +37,60 @@ class testDeltaStarReduction(baseTest):
 
         self.assertEqual(exp, actual)
 
+    def test_three_way_combinations_of_reductions(self):
+        src = "0627 Taku                 AA676AD-C Ag Ni Ri Cp Da            { 4 }  (B58+5) [AA9G] BCF  NS A 912 14 ImDa K1 V M1 V      Xb:0524 Xb:1029"
+
+        blurb = [
+            ("drop_routes, drop_noble_codes, drop_base_codes, drop_trade_zone, reset_pbg, reset_port, reset_tl, reset_capitals",
+             "0627 Taku                 CA676AD-8 Ag Da Ni Ri               { 0 }  (B58+5) [AA9G]      -  - 100 14 ImDa K1 V M1 V                                               "),
+            ("drop_extra_stars, reset_worlds, reset_tl, reset_sophont",
+             "0627 Taku                 AA676AD-8 Ag Cp Da Ni Ri            { 2 }  (B58+5) [AA9G] BCF  NS A 912 1  ImDa K1 V           Xb:0524 Xb:1029                          "),
+            ("drop_trade_codes, drop_noble_codes, drop_base_codes, drop_trade_zone, drop_extra_stars, reset_pbg, reset_sophont",
+             "0627 Taku                 AA676AD-C                           { 1 }  (B58+5) [AA9G]      -  - 100 14 ImDa K1 V           Xb:0524 Xb:1029                          "),
+            ("drop_routes, drop_trade_codes, drop_noble_codes, drop_trade_zone, drop_extra_stars, reset_worlds, reset_port, reset_sophont, reset_capitals",
+             "0627 Taku                 CA676AD-C                           { 1 }  (B58+5) [AA9G]      NS - 912 1  ImDa K1 V                                                    "),
+            ("drop_routes, drop_trade_codes, reset_pbg, reset_worlds, reset_capitals",
+             "0627 Taku                 AA676AD-C                           { 2 }  (B58+5) [AA9G] BCF  NS A 100 1  ImDa K1 V M1 V                                               "),
+            ("drop_noble_codes, drop_base_codes, reset_worlds, reset_port",
+             "0627 Taku                 CA676AD-C Ag Cp Da Ni Ri            { 2 }  (B58+5) [AA9G]      -  A 912 1  ImDa K1 V M1 V      Xb:0524 Xb:1029                          "),
+            ("drop_routes, drop_trade_codes, drop_trade_zone, drop_extra_stars, reset_tl",
+             "0627 Taku                 AA676AD-8                           { 0 }  (B58+5) [AA9G] BCF  NS - 912 14 ImDa K1 V                                                    "),
+            ("drop_trade_codes, drop_base_codes, reset_port, reset_tl, reset_sophont, reset_capitals",
+             "0627 Taku                 CA676AD-8                           { -2 } (B58+5) [AA9G] BCF  -  A 912 14 ImDa K1 V M1 V      Xb:0524 Xb:1029                          "),
+            ("drop_routes, reset_pbg, reset_port, reset_sophont",
+             "0627 Taku                 CA676AD-C Ag Cp Da Ni Ri            { 3 }  (B58+5) [AA9G] BCF  NS A 100 14 ImDa K1 V M1 V                                               "),
+            ("drop_noble_codes, drop_base_codes, drop_extra_stars, reset_pbg, reset_worlds, reset_tl, reset_capitals",
+             "0627 Taku                 AA676AD-8 Ag Da Ni Ri               { 1 }  (B58+5) [AA9G]      -  A 100 1  ImDa K1 V           Xb:0524 Xb:1029                          "),
+            ("drop_trade_codes, drop_trade_zone, drop_extra_stars, reset_pbg, reset_worlds, reset_port, reset_tl",
+             "0627 Taku                 CA676AD-8                           { -1 } (B58+5) [AA9G] BCF  NS - 100 1  ImDa K1 V           Xb:0524 Xb:1029                          "),
+            ("drop_routes, drop_base_codes, drop_trade_zone, drop_extra_stars, reset_pbg, reset_worlds, reset_tl, reset_sophont, reset_capitals",
+             "0627 Taku                 AA676AD-8 Ag Da Ni Ri               { 1 }  (B58+5) [AA9G] BCF  -  - 100 1  ImDa K1 V                                                    "),
+            ("drop_noble_codes, drop_trade_zone, reset_capitals",
+             "0627 Taku                 AA676AD-C Ag Da Ni Ri               { 4 }  (B58+5) [AA9G]      NS - 912 14 ImDa K1 V M1 V      Xb:0524 Xb:1029                          "),
+            ("drop_routes, drop_base_codes, drop_extra_stars, reset_port, reset_capitals",
+             "0627 Taku                 CA676AD-C Ag Da Ni Ri               { 2 }  (B58+5) [AA9G] BCF  -  A 912 14 ImDa K1 V                                                    "),
+            ("drop_trade_codes, drop_base_codes, drop_trade_zone, reset_pbg, reset_worlds",
+             "0627 Taku                 AA676AD-C                           { 1 }  (B58+5) [AA9G] BCF  -  - 100 1  ImDa K1 V M1 V      Xb:0524 Xb:1029                          "),
+            ("drop_routes, drop_trade_codes, drop_noble_codes, drop_extra_stars, reset_pbg, reset_tl",
+             "0627 Taku                 AA676AD-8                           { 0 }  (B58+5) [AA9G]      NS A 100 14 ImDa K1 V                                                    "),
+            ("drop_routes, drop_trade_codes, drop_noble_codes, reset_worlds, reset_port, reset_tl, reset_sophont, reset_capitals",
+             "0627 Taku                 CA676AD-8                           { -1 } (B58+5) [AA9G]      NS A 912 1  ImDa K1 V M1 V                                               "),
+            ("drop_routes, drop_trade_codes, drop_base_codes, drop_trade_zone, reset_worlds, reset_port",
+             "0627 Taku                 CA676AD-C                           { 0 }  (B58+5) [AA9G] BCF  -  - 912 1  ImDa K1 V M1 V                                               ")
+        ]
+
+        for msg, expected in blurb:
+            with self.subTest(msg):
+                bitz = msg.split(', ')
+                args = dict()
+                for bit in bitz:
+                    args[bit] = True
+                # Check first pass
+                actual = DeltaStar.reduce(src, **args)
+                self.assertEqual(expected, actual)
+                # Verify reduction is idempotent
+                new_actual = DeltaStar.reduce(actual, **args)
+                self.assertEqual(actual, new_actual)
+
 if __name__ == '__main__':
     unittest.main()
