@@ -302,7 +302,11 @@ class testDeltaPasses(baseTest):
         actual_allegiances = reducer.sectors.allegiance_list()
         self.assertEqual(expected_allegiances, actual_allegiances, "Unexpected allegiance set after reduction")
         self.assertEqual(508, len(reducer.sectors.lines), "Unexpected number of lines after reduction")
-
+        # verify sector allegiance list got trimmed down
+        headers = reducer.sectors['Dagudashaag'].headers
+        allegiance_lines = [line for line in headers if "Alleg:" in line]
+        self.assertEqual(len(actual_allegiances), len(allegiance_lines), "Allegiance-list length mismatch")
+        self.assertTrue("ImDv" in allegiance_lines[0], "Unexpected remaining allegiance")
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')

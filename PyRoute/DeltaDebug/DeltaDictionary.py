@@ -199,6 +199,19 @@ class SectorDictionary(dict):
         result = self.drop_lines(raw_lines)
         result.allegiances = {key: alg for (key, alg) in self.allegiances.items() if key in allegiances }
 
+        nu_headers = []
+
+        for line in self.headers:
+            if 'Alleg:' not in line:
+                nu_headers.append(line)
+                continue
+            for alg in allegiances:
+                if alg in line:
+                    nu_headers.append(line)
+                    continue
+
+        result.headers = nu_headers
+
         return result
 
     def subsector_list(self):
