@@ -20,6 +20,10 @@ class WithinLineReducer(object):
 
     def run(self):
         segment, subs_list = self._build_subs_list()
+        if 0 == len(subs_list):
+            # nothing to do, bail out early
+            return
+
         self.reducer.logger.error(self.start_msg)
 
         msg = "start - # of unreduced lines: " + str(len(segment))

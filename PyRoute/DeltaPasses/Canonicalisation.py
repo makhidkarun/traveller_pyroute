@@ -24,6 +24,10 @@ class Canonicalisation(object):
             assert isinstance(canon, str), "Candidate line " + line + " was not reduced to a string.  Got " + canon + " instead."
             subs_list.append((line, canon))
 
+        if 0 == len(subs_list):
+            # nothing to do, bail out early
+            return
+
         temp_sectors = self.reducer.sectors.switch_lines(subs_list)
 
         interesting, msg, _ = self.reducer._check_interesting(self.reducer.args, temp_sectors)
