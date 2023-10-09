@@ -35,6 +35,8 @@ class SubsectorReducer(object):
             for i in range(0, num_chunks):
                 if i + len(remove) >= len(chunks):
                     continue
+                msg = "Subsector reduction: Attempting chunk " + str(i+1) + "/" + str(num_chunks)
+                self.reducer.logger.error(msg)
                 raw_lines = self.reducer._assemble_all_but_ith_chunk(chunks, i)
                 if 0 == len(raw_lines):
                     # nothing to do, move on
