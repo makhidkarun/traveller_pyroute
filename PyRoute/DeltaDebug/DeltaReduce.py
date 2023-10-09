@@ -22,6 +22,7 @@ from PyRoute.DeltaPasses.SectorReducer import SectorReducer
 from PyRoute.DeltaPasses.SingleLineReducer import SingleLineReducer
 from PyRoute.DeltaPasses.SubsectorReducer import SubsectorReducer
 from PyRoute.DeltaPasses.TwoLineReducer import TwoLineReducer
+from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.StatCalculation import StatCalculation
 from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap
@@ -47,6 +48,7 @@ class DeltaReduce:
         self.subsector_reducer = SubsectorReducer(self)
         self.single_line_reducer = SingleLineReducer(self)
         self.two_line_reducer = TwoLineReducer(self)
+        self.breacher = WidenHoleReducer(self)
 
     def is_initial_state_interesting(self):
         sectors = self.sectors
@@ -103,6 +105,12 @@ class DeltaReduce:
         reduce = self.withinline[1]
         if reduce.preflight():
             reduce.run()
+
+    def reduce_end_of_lines(self, reverse=True):
+        if reverse:
+            self.breacher.run(start_pos=-1, reverse=True)
+        else:
+            self.breacher.run(start_pos=0, reverse=False)
 
     def _assemble_all_but_ith_chunk(self, chunks, i):
         # Assemble all _but_ the ith chunk
