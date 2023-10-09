@@ -33,6 +33,18 @@ class Canonicalisation(object):
         interesting, msg, _ = self.reducer._check_interesting(self.reducer.args, temp_sectors)
 
         if interesting:
+            new_hex = 'Hex  Name                 UWP       Remarks                               {Ix}   (Ex)    [Cx]   N    B  Z PBG W  A    Stellar         Routes                                   '
+            new_dash = '---- -------------------- --------- ------------------------------------- ------ ------- ------ ---- -- - --- -- ---- --------------- -----------------------------------------'
+            for sec_name in temp_sectors:
+                num_headers = len(temp_sectors[sec_name].headers)
+                for i in range(0, num_headers):
+                    raw_line = temp_sectors[sec_name].headers[i]
+                    if raw_line.startswith('Hex  '):
+                        temp_sectors[sec_name].headers[i] = new_hex
+                    elif raw_line.startswith('---- --'):
+                        temp_sectors[sec_name].headers[i] = new_dash
+
+
             self.reducer.sectors = temp_sectors
             msg = "Reduction found with full canonicalisation"
             self.reducer.logger.error(msg)

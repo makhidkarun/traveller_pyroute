@@ -10,6 +10,7 @@ from PyRoute.DeltaPasses.FullLineReduce import FullLineReduce
 from PyRoute.DeltaPasses.ImportanceLineReduce import ImportanceLineReduce
 from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
 from PyRoute.DeltaStar import DeltaStar
+from Tests.Dummy.DeltaDebug.DummyReduce import DummyReduce
 from Tests.baseTest import baseTest
 
 
@@ -36,6 +37,29 @@ class testDeltaPasses(baseTest):
         for line in reducer.sectors.lines:
             reduced = DeltaStar.reduce(line)
             self.assertEqual(line, reduced, "Line not canonicalised")
+
+    def test_canonicalisation_resets_hex_block(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-imbalanced-routes.sec')
+        args = self._make_args_no_line()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DummyReduce(delta, args)
+        reducer.jam_interesting = True
+
+        reduction_pass = Canonicalisation(reducer)
+
+        self.assertTrue(reduction_pass.preflight(), "Input should be reducible")
+        reduction_pass.run()
+
+        expected_hex_line = 'Hex  Name                 UWP       Remarks                               {Ix}   (Ex)    [Cx]   N    B  Z PBG W  A    Stellar         Routes                                   '
+        expected_dash_line = '---- -------------------- --------- ------------------------------------- ------ ------- ------ ---- -- - --- -- ---- --------------- -----------------------------------------'
+
+        headers = reducer.sectors['Zarushagar'].headers
+        self.assertEqual(expected_hex_line, headers[38])
+        self.assertEqual(expected_dash_line, headers[39])
 
     def test_full_line_reduction_of_subsector(self):
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
