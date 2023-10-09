@@ -93,6 +93,17 @@ class DeltaReduce:
             if reducer.preflight():
                 reducer.run()
 
+    def reduce_full_within_line(self):
+        logger = logging.getLogger('PyRoute.TradeCodes')
+        logger.setLevel(logging.CRITICAL)
+        reduce = self.withinline[0]
+        if reduce.preflight():
+            reduce.run()
+
+        reduce = self.withinline[1]
+        if reduce.preflight():
+            reduce.run()
+
     def _assemble_all_but_ith_chunk(self, chunks, i):
         # Assemble all _but_ the ith chunk
         nulines = [item for ind, item in enumerate(chunks) if ind != i and ind < len(chunks)]
