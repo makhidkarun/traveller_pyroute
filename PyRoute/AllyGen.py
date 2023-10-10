@@ -235,6 +235,18 @@ class AllyGen(object):
         algs.sort(key=lambda alg: alg.stats.number, reverse=True)
         return algs
 
+    @staticmethod
+    def allegiance_valid(alg):
+        if alg in AllyGen.noOne:
+            return True
+        if alg in AllyGen.nonAligned:
+            return True
+        for line in AllyGen.sameAligned:
+            if alg in line:
+                return True
+
+        return False
+
     def create_borders(self, match, enforce=True):
         """
             Create borders around various allegiances, Algorithm one.
