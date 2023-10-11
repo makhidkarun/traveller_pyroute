@@ -112,6 +112,7 @@ class Star(object):
         foo.index = self.index
         foo.calc_hash()
         foo.hex = copy.deepcopy(self.hex)
+        foo.tradeCode = copy.deepcopy(self.tradeCode)
 
         return foo
 
@@ -656,6 +657,8 @@ class Star(object):
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
         assert self.hex is not None, "Star " + str(self.name) + " is missing hex attribute"
+        result, msg = self.tradeCode.is_well_formed()
+        assert result, msg
         result, msg = self.hex.is_well_formed()
         assert result, msg
         assert hasattr(self, 'allegiance_base'), "Star " + str(self.name) + " is missing base allegiance attribute"
