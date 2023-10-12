@@ -16,10 +16,10 @@ class testStar(unittest.TestCase):
     """
     @given(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
-    @example('0000 000000000000000 00000O0-0 000000000000000       - - 0 000   00')
-    @example('0000 000000000000000 ???????-? 000000000000000 {0} (000-0)  - - - 0 000   00')
-    @example('0000 000000000000000 00000ź0-0 000000000000000 {0} -  [0000] - - 0 000   00')
-    @example('0000 000000000000000 ?000000-0 000000000000000 {0} (000-0) [0000] - - 0 000   00')
+    @example('0101 000000000000000 00000O0-0 000000000000000       - - 0 000   00')
+    @example('0101 000000000000000 ???????-? 000000000000000 {0} (000-0)  - - - 0 000   00')
+    @example('0101 000000000000000 00000ź0-0 000000000000000 {0} -  [0000] - - 0 000   00')
+    @example('0101 000000000000000 ?000000-0 000000000000000 {0} (000-0) [0000] - - 0 000   00')
     @example('0100 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   00')
     @example('0150 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   00')
     @example('0101 000000000000000 ?000000-0 000000000000000 {0} (000-0) [0000] - - 0 000   00')
@@ -74,6 +74,34 @@ class testStar(unittest.TestCase):
         nu_line = nu_foo.parse_to_line()
         self.assertEqual(line, nu_line, "Reparsed line not equal to original line.  " + hyp_line)
 
+    """
+    Given a regex-matching string that results in a Star object when parsed, that Star should parse cleanly to an input
+    line
+    """
+    @given(from_regex(regex=ParseStarInput.starline,
+                      alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    @settings(
+        suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
+    @example('0000 000000000000000 ???????-? 000000000000000       - - 0 000   0000D')
+    @example('0101 000000000000000 ???????-? 000000000000000 {0} (000-0) [0000]       - 0   000   0000D')
+    @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00')
+    def test_parse_line_to_star_and_back(self, s):
+        sector = Sector('# Core', '# 0, 0')
+        pop_code = 'scaled'
+        ru_calc = 'scaled'
+        foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
+        assume(foo is not None)
+
+        foo.index = 0
+        foo.allegiance_base = foo.alg_base_code
+        self.assertTrue(foo.is_well_formed())
+
+        parsed_line = foo.parse_to_line()
+        self.assertIsNotNone(parsed_line)
+        self.assertLessEqual(80, len(parsed_line), "Round-trip line unexpectedly short")
+
+        nu_foo = Star.parse_line_into_star(parsed_line, sector, pop_code, ru_calc)
+        self.assertTrue(isinstance(nu_foo, Star), "Round-trip line did not re-parse")
 
 if __name__ == '__main__':
     unittest.main()

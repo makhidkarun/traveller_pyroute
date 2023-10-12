@@ -46,6 +46,9 @@ class ParseStarInput:
 
         star.position = data[0].strip()
         star.set_location()
+        result, _ = star.hex.is_well_formed()
+        if not result:
+            return None  # If hex position is bad, bail out - error is fatal
         star.name = data[1].strip()
 
         try:
