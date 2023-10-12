@@ -146,7 +146,7 @@ class Star(object):
 
         result += str(self.baseCode).ljust(2) + " " + str(self.zone).ljust(1) + " " + popM + belts + ggCount + " "
         result += str(self.worlds).ljust(2) + " " + str(self.alg_code).ljust(4) + " "
-        result += str(star_list).ljust(14) + " " + " ".join(self.routes).ljust(41)
+        result += star_list.ljust(14) + " " + " ".join(self.routes).ljust(41)
 
         return result
 
