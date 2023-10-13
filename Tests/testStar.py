@@ -186,6 +186,15 @@ class TestStar(unittest.TestCase):
         star1 = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
         self.assertIsInstance(star1, Star)
 
+    def testParseBarrelOfWeird(self):
+        # This was a weird intermediate value that _kept_ turning up in round-trip testing, so it was worth breaking it
+        # out as a separate unit test to try to figure out _where_ it fires up the hyperdrive.
+        weird_line = '0101 000000000000000      ???????-?                                       { -2 } (000-0) -      -    -  - 000 0  00                                                           '
+        sector = Sector('# Core', '# 0, 0')
+
+        star1 = Star.parse_line_into_star(weird_line, sector, 'fixed', 'fixed')
+        self.assertIsInstance(star1, Star)
+
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
         cwtn = [3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11, 12, 13, 13, 14]
