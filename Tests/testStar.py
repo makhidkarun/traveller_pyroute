@@ -189,7 +189,7 @@ class TestStar(unittest.TestCase):
     def testParseBarrelOfWeird(self):
         # This was a weird intermediate value that _kept_ turning up in round-trip testing, so it was worth breaking it
         # out as a separate unit test to try to figure out _where_ it fires up the hyperdrive.
-        weird_line = '0101 000000000000000      ???????-?                                       { -2 } (000-0) -      -    -  - 000 0  00                                                           '
+        weird_line = '0101 000000000000000      ???????-?                                       { -2 } (000-0) -      -    -  - 000 0  00  D                                                        '
         sector = Sector('# Core', '# 0, 0')
 
         star1 = Star.parse_line_into_star(weird_line, sector, 'fixed', 'fixed')
