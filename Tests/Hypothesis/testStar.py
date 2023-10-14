@@ -1,3 +1,4 @@
+import re
 import unittest
 from datetime import timedelta
 
@@ -101,6 +102,7 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 000000000000000000000000000000000000()       - - 0 000   00')
     @example('0101 000000000000000 ???????-? [0000000000000000000000000000000000000       - - 0 000   00')
     @example('0101 000000000000000 ???????-? {0000000000000000000000000000000000000       - - 0 000   00')
+    @example('0110 000000000000000 ???????-? 000000000000000 {0} (000-0)  -  Bc - 0 000   00')
     def test_parse_line_to_star_and_back(self, s):
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
@@ -130,6 +132,43 @@ class testStar(unittest.TestCase):
             str(nu_foo.tradeCode),
             "Re-parsed trade codes not equal to original trade codes."
         )
+
+    def test_fallback_regexen_base_ix_ex_cx(self):
+        regex = r"((\{ *[+-]?[0-6] ?\}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]|-)|( ) ( ) ( )) +(\w{1,5}|-| ) +(.*)"
+
+        test_str = "{ -2 } (000-0) -      Bc   -  - 000 0  00 '\n"
+
+        self._show_matches(regex, test_str)
+
+    def test_fallback_regexen_ix_ex_cx_with_trade_code(self):
+        regex = r"((.{15,}) +(\{ *[+-]?[0-6] ?\}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]|-)|( ) ( ) ( )) +(\w{1,5}|-| ) +(.*)"
+
+        test_str = 'A0000                                 { -2 } (000-0) -      -    -  - 000 0  00 '
+
+        self._show_matches(regex, test_str)
+
+    def test_fallback_regex_noble_line(self):
+        regex = r"(\w{1,3}|-|\*) +(\w|-| ) +(.*)"
+
+        test_str = '-  - 000 0  00 '
+
+        self._show_matches(regex, test_str)
+
+    @staticmethod
+    def _show_matches(regex, test_str):
+        matches = re.finditer(regex, test_str, re.MULTILINE)
+        for matchNum, match in enumerate(matches, start=1):
+
+            print("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum=matchNum, start=match.start(),
+                                                                                end=match.end(), match=match.group()))
+
+            for groupNum in range(0, len(match.groups())):
+                groupNum = groupNum + 1
+
+                print("Group {groupNum} found at {start}-{end}: {group}".format(groupNum=groupNum,
+                                                                                start=match.start(groupNum),
+                                                                                end=match.end(groupNum),
+                                                                                group=match.group(groupNum)))
 
 if __name__ == '__main__':
     unittest.main()
