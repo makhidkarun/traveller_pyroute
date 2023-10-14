@@ -98,6 +98,9 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 0000000000 0000 {0} (000-0)  - - - 0 000   00')
     @example('0101 000000000000000 ???????-? 0000000000000000000000000000000000000)       - - 0 000   00')
     @example('0101 000000000000000 A000000-I 000000000000000       - - 0 000   00')
+    @example('0101 000000000000000 ???????-? 000000000000000000000000000000000000()       - - 0 000   00')
+    @example('0101 000000000000000 ???????-? [0000000000000000000000000000000000000       - - 0 000   00')
+    @example('0101 000000000000000 ???????-? {0000000000000000000000000000000000000       - - 0 000   00')
     def test_parse_line_to_star_and_back(self, s):
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
@@ -122,6 +125,11 @@ class testStar(unittest.TestCase):
         self.assertIsNotNone(foo._hash, "Hash not calculated for re-parsed star")
 
         self.assertEqual(foo, nu_foo, "Re-parsed star not __eq__ to original star.  Hypothesis input: " + s)
+        self.assertEqual(
+            str(foo.tradeCode),
+            str(nu_foo.tradeCode),
+            "Re-parsed trade codes not equal to original trade codes."
+        )
 
 if __name__ == '__main__':
     unittest.main()
