@@ -102,6 +102,7 @@ class testStar(unittest.TestCase):
         ru_calc = 'scaled'
         foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
         assume(foo is not None)
+        self.assertIsNotNone(foo._hash, "Hash not calculated for original star")
 
         foo.index = 0
         foo.allegiance_base = foo.alg_base_code
@@ -116,6 +117,7 @@ class testStar(unittest.TestCase):
         nu_foo.index = 0
         nu_foo.allegiance_base = nu_foo.alg_base_code
         self.assertTrue(foo.is_well_formed())
+        self.assertIsNotNone(foo._hash, "Hash not calculated for re-parsed star")
 
 if __name__ == '__main__':
     unittest.main()
