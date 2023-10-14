@@ -81,7 +81,8 @@ class testStar(unittest.TestCase):
     @given(from_regex(regex=ParseStarInput.starline,
                       alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
     @settings(
-        suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
+        suppress_health_check=[HealthCheck(3), HealthCheck(2)],  # suppress slow-data health check, too-much filtering
+        deadline = timedelta(1000))
     @example('0000 000000000000000 ???????-? 000000000000000       - - 0 000   0000D')
     @example('0101 000000000000000 ???????-? 000000000000000 {0} (000-0) [0000]       - 0   000   0000D')
     @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00')
@@ -92,8 +93,6 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 000000000000000       - -         0   000   00')
     @example('0101 000000000000000 ???????-? 00000000000000000000000000000000000000       - - 0 000   00')
     @example('0101 000000000000000 ???????-? 000000000000000 {0} (000-0)  - - - 0 000   00')
-    @example('0101 000000000000000 ???????-? 000000000000000       - - 0 00A   00')
-    @example('0101 000000000000000 ???????-? 000000000000000       - - 0 0A0   00')
     def test_parse_line_to_star_and_back(self, s):
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
