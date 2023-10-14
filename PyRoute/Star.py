@@ -657,6 +657,8 @@ class Star(object):
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
         assert self.hex is not None, "Star " + str(self.name) + " is missing hex attribute"
+        assert self._hash is not None, "Star " + str(self.name) + " has empty _hash attribute"
+        assert self._key is not None, "Star " + str(self.name) + " has empty _key attribute"
         result, msg = self.tradeCode.is_well_formed()
         assert result, msg
         result, msg = self.hex.is_well_formed()
