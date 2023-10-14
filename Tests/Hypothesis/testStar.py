@@ -113,6 +113,9 @@ class testStar(unittest.TestCase):
 
         nu_foo = Star.parse_line_into_star(parsed_line, sector, pop_code, ru_calc)
         self.assertTrue(isinstance(nu_foo, Star), "Round-trip line did not re-parse")
+        nu_foo.index = 0
+        nu_foo.allegiance_base = nu_foo.alg_base_code
+        self.assertTrue(foo.is_well_formed())
 
 if __name__ == '__main__':
     unittest.main()
