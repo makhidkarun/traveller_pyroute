@@ -171,5 +171,25 @@ class testStar(unittest.TestCase):
                                                                                 end=match.end(groupNum),
                                                                                 group=match.group(groupNum)))
 
+    def test_fallback_regex_noble_line(self):
+        regex = r"(\w{1,3}|-|\*) +(\w|-| ) +(.*)"
+
+        test_str = '-  - 000 0  00 '
+
+        matches = re.finditer(regex, test_str, re.MULTILINE)
+
+        for matchNum, match in enumerate(matches, start=1):
+
+            print("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum=matchNum, start=match.start(),
+                                                                                end=match.end(), match=match.group()))
+
+            for groupNum in range(0, len(match.groups())):
+                groupNum = groupNum + 1
+
+                print("Group {groupNum} found at {start}-{end}: {group}".format(groupNum=groupNum,
+                                                                                start=match.start(groupNum),
+                                                                                end=match.end(groupNum),
+                                                                                group=match.group(groupNum)))
+
 if __name__ == '__main__':
     unittest.main()
