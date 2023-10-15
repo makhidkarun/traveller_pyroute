@@ -7,6 +7,7 @@ from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Galaxy import Allegiance, Galaxy
 from Tests.baseTest import baseTest
+from PyRoute.DeltaStar import DeltaStar
 
 sys.path.append('../PyRoute')
 
@@ -222,7 +223,69 @@ class testDeltaDictionary(baseTest):
 
         remix = foo.sector_subset(['Spinward Marches', 'Deneb', 'Trojan Reach'])
         self.assertEqual(1, len(remix))
+        remix_stats = remix['Spinward Marches'].allegiances['CsIm'].stats
+        self.assertTrue('high_pop_worlds' in remix_stats.__dict__, "Missing high_pop_worlds attribute not restored")
         self.assertListEqual([], remix['Spinward Marches'].allegiances['CsIm'].stats.high_pop_worlds, "Missing high_pop_worlds list not restored")
+
+    def test_allegiance_list(self):
+        spinward = self.unpack_filename('DeltaFiles/high_pop_worlds_blowup/Spinward Marches.sec')
+
+        spinward_sec = SectorDictionary.load_traveller_map_file(spinward)
+
+        foo = DeltaDictionary()
+        foo[spinward_sec.name] = spinward_sec
+
+        expected = set()
+        expected.add('CsIm')
+        expected.add('CsZh')
+        expected.add('DaCf')
+        expected.add('Im')
+        expected.add('ImDd')
+        expected.add('NaHu')
+        expected.add('NaXX')
+        expected.add('SwCf')
+        expected.add('Zh')
+        expected.add('ZhIN')
+
+        actual = foo.allegiance_list()
+        self.assertEqual(expected, actual, "Unexpected allegiance list")
+
+    def test_allegiance_subset(self):
+        zarushagar = self.unpack_filename('DeltaFiles/Zarushagar.sec')
+
+        zaru_sec = SectorDictionary.load_traveller_map_file(zarushagar)
+
+        foo = DeltaDictionary()
+        foo[zaru_sec.name] = zaru_sec
+
+        rawlines = foo.lines
+        keep_alg = ' CsIm '
+        keep_lines = [line for line in rawlines if keep_alg in line]
+        expected_count = len(keep_lines)
+
+        subset = ['CsIm']
+
+        nuFoo = foo.allegiance_subset(subset)
+        self.assertEqual(set(subset), nuFoo.allegiance_list(), "Unexpected allegiance set after allegiance reduction")
+        self.assertEqual(expected_count, len(nuFoo.lines), "Unexpected line count after allegiance reduction")
+
+    def test_allegiance_subset_drops_sector(self):
+        zarushagar = self.unpack_filename('DeltaFiles/Zarushagar.sec')
+        dagudashaag = self.unpack_filename('DeltaFiles/Dagudashaag.sec')
+
+        zaru_sec = SectorDictionary.load_traveller_map_file(zarushagar)
+        dagu_sec = SectorDictionary.load_traveller_map_file(dagudashaag)
+
+        subset = ['ImAp']
+
+        foo = DeltaDictionary()
+        foo[zaru_sec.name] = zaru_sec
+        foo[dagu_sec.name] = dagu_sec
+
+        nuFoo = foo.allegiance_subset(subset)
+        self.assertEqual(set(subset), nuFoo.allegiance_list(), "Unexpected allegiance set after allegiance reduction")
+        self.assertEqual(['Dagudashaag'], nuFoo.sector_list(), "Unexpected sector list after allegiance reduction")
+
 
 class testSectorDictionary(baseTest):
     def test_add_bad_item_by_index(self):
@@ -438,6 +501,29 @@ class testSubsectorDictionary(baseTest):
         lines_to_drop = ['foo', 'bar', 'baz']
         remix = foo.drop_lines(lines_to_drop)
         self.assertTrue(remix.skipped)
+
+    def test_replace_lines(self):
+        star1 = "2123 Medurma              A9D7954-C Hi An Cs Di(Miyavine) Asla1 S'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V            Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322  "
+        star2 = "2123 Kediiga              B778411-8 Ni Pa                                 { -1 } (832-5) [1314] Bc   -  - 920 9  ImDv G6 V                                                     "
+        # star3 doesn't start in the dictionary, so it shouldn't be added
+        star3 = "3111 Luramsum             A7A7325-D Fl Lo                                 { 1 }  (A21-1) [143B] B    N  - 805 13 ImDv M3 V            Xb:3008 Xb:3014 Xb:Core-0112             "
+
+        star1reduce = DeltaStar.reduce_all(star1)
+        star3reduce = DeltaStar.reduce_all(star3)
+
+        foo = SubsectorDictionary('Mimu', 'A')
+        foo.items.append(star1)
+        foo.items.append(star2)
+
+        lines_to_switch = [(star3, star3reduce), (star1, star1reduce)]
+
+        remix = foo.switch_lines(lines_to_switch)
+        self.assertEqual(2, len(remix.lines), "Unexpected items count after line switch")
+        self.assertNotIn(star1, remix.items, "First starline not replaced in remix")
+        self.assertIn(star2, remix.items, "Second starline not retained in remix")
+        self.assertNotIn(star3, remix.items, "Third starline added to remix")
+        self.assertIn(star1reduce, remix.items, "First reduced line not added to remix")
+        self.assertNotIn(star3reduce, remix.items, "Third reduced line added to remix")
 
 
 if __name__ == '__main__':

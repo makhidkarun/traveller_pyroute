@@ -179,6 +179,12 @@ class TestStar(unittest.TestCase):
         self.assertEqual(20, star1.row)
         self.assertEqual(28, star1.col)
 
+    def testParseUnchin(self):
+        sector = Sector(' Zarushagar', ' -1, -1')
+        line = '0522 Unchin               A437743-E                            { 2 }  (B6D-1) [492B] B     N  - 620 9  ImDi K0 III                                                       '
+        star1 = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
+        self.assertIsInstance(star1, Star)
+
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
         cwtn = [3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11, 12, 13, 13, 14]
@@ -347,6 +353,73 @@ class TestStar(unittest.TestCase):
         self.assertEqual(hex_dist, axial_dist, "Unexpected axial distance")
         distance = star1.distance(star2)
         self.assertEqual(hex_dist, distance, "Unexpected distance")
+
+    def test_ehex_to_int_and_back(self):
+        tech_list = [
+            (0, 0),
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+            (5, 5),
+            (6, 6),
+            (7, 7),
+            (8, 8),
+            (9, 9),
+            ('A', 10),
+            ('B', 11),
+            ('C', 12),
+            ('D', 13),
+            ('E', 14),
+            ('F', 15),
+            ('G', 16),
+            ('H', 17),
+            ('J', 18),
+            ('K', 19),
+            ('L', 20),
+            ('M', 21),
+            ('N', 22),
+            ('P', 23),
+            ('Q', 24),
+            ('R', 25),
+            ('S', 26),
+            ('T', 27),
+            ('U', 28),
+            ('V', 29),
+            ('W', 30),
+            ('X', 31),
+            ('Y', 32),
+            ('Z', 33)
+        ]
+
+        for ehex, intvalue in tech_list:
+            with self.subTest():
+                star = Star()
+                act_int = star._ehex_to_int(str(ehex))
+                self.assertEqual(intvalue, act_int, "Ehex-to-int mapping failed for TL " + str(ehex))
+                act_ehex = star._int_to_ehex(act_int)
+                self.assertEqual(ehex, act_ehex, "Int-to-ehex mapping failed for TL " + str(ehex))
+
+    def test_parse_to_line(self):
+        line_list = [
+            "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+            "3030 Khaammumlar          E430761-6 De Na Po O:3032                       { -2 } (965-5) [3512] B    -  - 520 6  ImDv M0 V M5 V                                                ",
+            "1840 Mashuu               D725413-8 Ni                                    { -3 } (731-5) [1125] B    -  - 401 14 ImDv M0 V                                                     "
+        ]
+        for line in line_list:
+            with self.subTest():
+                star1 = Star.parse_line_into_star(line, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                star1.index = 0
+                star1.allegiance_base = star1.alg_code
+                star1.is_well_formed()
+
+                mid_line = star1.parse_to_line()
+                # Not comparing mid_line to original because trade codes are re-ordered
+                star2 = Star.parse_line_into_star(mid_line, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                self.assertEqual(star1, star2, "Regenerated star does not equal original star")
+                nu_line = star2.parse_to_line()
+                self.assertEqual(mid_line, nu_line, "Regenerated star line does not match round-trip star line")
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

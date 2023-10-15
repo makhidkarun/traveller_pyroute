@@ -12,6 +12,17 @@ import math
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.HexMap import HexMap
+from PyRoute.DeltaPasses.AllegianceReducer import AllegianceReducer
+from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
+from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
+from PyRoute.DeltaPasses.CapitalLineReduce import CapitalLineReduce
+from PyRoute.DeltaPasses.FullLineReduce import FullLineReduce
+from PyRoute.DeltaPasses.ImportanceLineReduce import ImportanceLineReduce
+from PyRoute.DeltaPasses.SectorReducer import SectorReducer
+from PyRoute.DeltaPasses.SingleLineReducer import SingleLineReducer
+from PyRoute.DeltaPasses.SubsectorReducer import SubsectorReducer
+from PyRoute.DeltaPasses.TwoLineReducer import TwoLineReducer
+from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.StatCalculation import StatCalculation
 from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap
@@ -31,6 +42,13 @@ class DeltaReduce:
         self.interesting_type = interesting_type
         self.logger = logging.getLogger('PyRoute.Star')
         logging.disable(logging.WARNING)
+        self.withinline = [Canonicalisation(self), FullLineReduce(self), ImportanceLineReduce(self), CapitalLineReduce(self), AuxiliaryLineReduce(self)]
+        self.sector_reducer = SectorReducer(self)
+        self.allegiance_reducer = AllegianceReducer(self)
+        self.subsector_reducer = SubsectorReducer(self)
+        self.single_line_reducer = SingleLineReducer(self)
+        self.two_line_reducer = TwoLineReducer(self)
+        self.breacher = WidenHoleReducer(self)
 
     def is_initial_state_interesting(self):
         sectors = self.sectors
@@ -53,201 +71,46 @@ class DeltaReduce:
             raise AssertionError(msg)
 
     def reduce_sector_pass(self, singleton_only=False):
-        segment = self.sectors.sector_list()
+        self.sector_reducer.run(singleton_only)
 
-        # An interesting single-element list is 1-minimal by definition
-        if 2 > len(segment):
-            return
-
-        num_chunks = len(segment) if singleton_only else 2
-        short_msg = None
-        best_sectors = self.sectors
-        singleton_run = singleton_only
-
-        while num_chunks <= len(segment):
-            chunks = self.chunk_lines(segment, num_chunks)
-            remove = []
-            msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks) + ", # of sectors: " + str(len(segment))
-            self.logger.error(msg)
-
-            for i in range(0, num_chunks):
-                threshold = i + (len(remove) if 2 == num_chunks else 0)
-                if threshold >= len(chunks):
-                    continue
-                raw_lines = self._assemble_all_but_ith_chunk(chunks, i)
-                if 0 == len(raw_lines):
-                    # nothing to do, move on
-                    continue
-
-                temp_sectors = best_sectors.sector_subset(raw_lines)
-
-                interesting, msg, _ = self._check_interesting(self.args, temp_sectors)
-                # We've found a chunk of input and have _demonstrated_ its irrelevance,
-                # empty that chunk, update best so far, and continue
-                if interesting:
-                    short_msg = self.update_short_msg(msg, short_msg)
-                    chunks[i] = []
-                    remove.append(i)
-                    best_sectors = temp_sectors
-                    msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines and " + str(len(best_sectors)) + " sectors"
-                    self.logger.error(msg)
-
-            if 0 < len(remove):
-                num_chunks -= len(remove)
-
-            num_chunks *= 2
-            # if we're about to bust our loop condition, make sure we verify 1-minimality as our last hurrah
-            if num_chunks > len(segment) and not singleton_run:
-                singleton_run = True
-                num_chunks = len(segment)
-
-            segment = best_sectors.sector_list()
-
-        # now that the pass is done, update self.sectors with best reduction found
-        self.sectors = best_sectors
-        if short_msg is not None:
-            self.logger.error("Shortest error message: " + short_msg)
+    def reduce_allegiance_pass(self, singleton_only=False):
+        self.allegiance_reducer.run(singleton_only)
 
     def reduce_subsector_pass(self):
-        segment = self.sectors.subsector_list()
-
-        # An interesting single-element list is 1-minimal by definition
-        if 2 > len(segment):
-            return
-
-        num_chunks = 2
-        short_msg = None
-        best_sectors = self.sectors
-
-        while num_chunks <= len(segment):
-            chunks = self.chunk_lines(segment, num_chunks)
-            remove = []
-            msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks) + ", # of subsectors: " + str(len(segment))
-            self.logger.error(msg)
-            for i in range(0, num_chunks):
-                if i + len(remove) >= len(chunks):
-                    continue
-                raw_lines = self._assemble_all_but_ith_chunk(chunks, i)
-                if 0 == len(raw_lines):
-                    # nothing to do, move on
-                    continue
-
-                temp_sectors = best_sectors.subsector_subset(raw_lines)
-
-                interesting, msg, _ = self._check_interesting(self.args, temp_sectors)
-                # We've found a chunk of input and have _demonstrated_ its irrelevance,
-                # empty that chunk, update best so far, and continue
-                if interesting:
-                    short_msg = self.update_short_msg(msg, short_msg)
-                    chunks[i] = []
-                    remove.append(i)
-                    best_sectors = temp_sectors
-                    msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines and " + str(len(raw_lines)) + " subsectors"
-                    self.logger.error(msg)
-
-            if 0 < len(remove):
-                num_chunks -= len(remove)
-
-            num_chunks *= 2
-            segment = best_sectors.subsector_list()
-
-        # now that the pass is done, update self.sectors with best reduction found
-        self.sectors = best_sectors
-        if short_msg is not None:
-            self.logger.error("Shortest error message: " + short_msg)
+        self.subsector_reducer.run(False)
 
     def reduce_line_pass(self, singleton_only=False):
-        segment = self.sectors.lines
-
-        # An interesting single-element list is 1-minimal by definition
-        if 2 > len(segment):
-            return
-
-        num_chunks = len(segment) if singleton_only else 2
-        short_msg = None
-        best_sectors = self.sectors
-        singleton_run = singleton_only
-
-        while num_chunks <= len(segment):
-            chunks = self.chunk_lines(segment, num_chunks)
-            remove = []
-            msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks)
-            self.logger.error(msg)
-
-            for i in range(0, num_chunks):
-                threshold = i + (len(remove) if 2 == num_chunks else 0)
-                if threshold >= len(chunks):
-                    continue
-                raw_lines = self._assemble_all_but_ith_chunk(chunks, i)
-                if 0 == len(raw_lines):
-                    # nothing to do, move on
-                    continue
-
-                temp_sectors = best_sectors.drop_lines(chunks[i])
-
-                interesting, msg, _ = self._check_interesting(self.args, temp_sectors)
-                # We've found a chunk of input and have _demonstrated_ its irrelevance,
-                # empty that chunk, update best so far, and continue
-                if interesting:
-                    short_msg = self.update_short_msg(msg, short_msg)
-                    chunks[i] = []
-                    remove.append(i)
-                    best_sectors = temp_sectors
-                    msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines"
-                    self.logger.error(msg)
-
-            if 0 < len(remove):
-                num_chunks -= len(remove)
-
-            num_chunks *= 2
-
-            segment = best_sectors.lines
-            # if we're about to bust our loop condition, make sure we verify 1-minimality as our last hurrah
-            if num_chunks > len(segment) and not singleton_run:
-                singleton_run = True
-                num_chunks = len(segment)
-
-        # now that the pass is done, update self.sectors with best reduction found
-        self.sectors = best_sectors
-        if short_msg is not None:
-            self.logger.error("Shortest error message: " + short_msg)
+        self.single_line_reducer.run(singleton_only)
 
     def reduce_line_two_minimal(self):
-        segment = self.sectors.lines
+        self.two_line_reducer.run(False)
 
-        # An interesting less-than-4-element list is 2-minimal by definition
-        if 4 > len(segment):
-            return
+    def reduce_within_line(self):
+        # we're going to be deliberately mangling lines in the process of reducing them, so shut up loggers,
+        # such as the TradeCodes logger, that will complain, to stop flooding stdout.
+        logger = logging.getLogger('PyRoute.TradeCodes')
+        logger.setLevel(logging.CRITICAL)
 
-        best_sectors = self.sectors
-        gap = 1
-        while gap < len(segment):
-            msg = "# of lines: " + str(len(best_sectors.lines))
-            self.logger.error(msg)
+        for reducer in self.withinline:
+            if reducer.preflight():
+                reducer.run()
 
-            i = 0
-            j = i + gap
-            while j < len(segment):
-                lines_to_remove = [segment[i], segment[j]]
-                temp_sectors = best_sectors.drop_lines(lines_to_remove)
+    def reduce_full_within_line(self):
+        logger = logging.getLogger('PyRoute.TradeCodes')
+        logger.setLevel(logging.CRITICAL)
+        reduce = self.withinline[0]
+        if reduce.preflight():
+            reduce.run()
 
-                interesting, msg, _ = self._check_interesting(self.args, temp_sectors)
+        reduce = self.withinline[1]
+        if reduce.preflight():
+            reduce.run()
 
-                # We've found a chunk of input and have _demonstrated_ its irrelevance,
-                # empty that chunk, update best so far, and continue
-                if interesting:
-                    best_sectors = temp_sectors
-                    segment = best_sectors.lines
-                    msg = "Reduction found: new input has " + str(len(best_sectors.lines)) + " lines"
-                    self.logger.error(msg)
-                else:
-                    i += 1
-                j = i + gap
-
-            gap += 1
-
-        # now that the pass is done, update self.sectors with best reduction found
-        self.sectors = best_sectors
+    def reduce_end_of_lines(self, reverse=True):
+        if reverse:
+            self.breacher.run(start_pos=-1, reverse=True)
+        else:
+            self.breacher.run(start_pos=0, reverse=False)
 
     def _assemble_all_but_ith_chunk(self, chunks, i):
         # Assemble all _but_ the ith chunk

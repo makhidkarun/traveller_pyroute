@@ -56,6 +56,16 @@ class DeltaDictionary(dict):
 
         return new_dict
 
+    def allegiance_subset(self, allegiances):
+        new_dict = DeltaDictionary()
+        for sector_name in self:
+            subset_sector = self[sector_name].allegiance_subset(allegiances)
+            if 0 == len(subset_sector.allegiances):
+                continue
+            new_dict[sector_name] = subset_sector
+
+        return new_dict
+
     def sector_list(self):
         result = list(self.keys())
         result.sort()
@@ -70,6 +80,15 @@ class DeltaDictionary(dict):
             result.extend(list(keys))
 
         result.sort()
+
+        return result
+
+    def allegiance_list(self):
+        result = set()
+
+        for sector_name in self:
+            sublist = self[sector_name].allegiance_list()
+            result.update(sublist)
 
         return result
 
@@ -88,6 +107,16 @@ class DeltaDictionary(dict):
                 continue
             else:
                 foo[sector_name] = self[sector_name].drop_lines(lines_to_drop)
+
+        return foo
+
+    def switch_lines(self, lines_to_drop):
+        foo = DeltaDictionary()
+        for sector_name in self:
+            if self[sector_name].skipped:
+                continue
+            else:
+                foo[sector_name] = self[sector_name].switch_lines(lines_to_drop)
 
         return foo
 
@@ -127,20 +156,18 @@ class SectorDictionary(dict):
         super().__setitem__(item, value)
 
     def __deepcopy__(self, memodict={}):
-        foo = SectorDictionary(self.name, self.filename)
-        foo.allegiances = copy.deepcopy(self.allegiances)
-        for alg in foo.allegiances:
-            foo.allegiances[alg].homeworlds = []
-            foo.allegiances[alg].stats.homeworlds = []
-            foo.allegiances[alg].stats.passengers = 0
-            foo.allegiances[alg].stats.trade = 0
-            foo.allegiances[alg].stats.tradeExt = 0
+        foo = self._setup_clone_sector_dict()
 
         foo.headers = copy.deepcopy(self.headers)
         foo.position = self.position
 
         for subsector_name in self:
             foo[subsector_name] = copy.deepcopy(self[subsector_name])
+
+        for label in foo.allegiances:
+            allegiance = foo.allegiances[label]
+            if not hasattr(allegiance.stats, 'high_pop_worlds'):
+                allegiance.stats.high_pop_worlds = []
 
         return foo
 
@@ -155,16 +182,7 @@ class SectorDictionary(dict):
             if subsector_name not in overlap:
                 missed.append(subsector_name)
 
-        new_dict = SectorDictionary(self.name, self.filename)
-        new_dict.position = self.position
-        new_dict.headers = self.headers
-        new_dict.allegiances = self.allegiances
-        for alg in new_dict.allegiances:
-            new_dict.allegiances[alg].homeworlds = []
-            new_dict.allegiances[alg].stats.homeworlds = []
-            new_dict.allegiances[alg].stats.passengers = 0
-            new_dict.allegiances[alg].stats.trade = 0
-            new_dict.allegiances[alg].stats.tradeExt = 0
+        new_dict = self._setup_clone_sector_dict()
 
         for subsector_name in overlap:
             new_dict[subsector_name] = copy.deepcopy(self[subsector_name])
@@ -175,6 +193,30 @@ class SectorDictionary(dict):
 
         return new_dict
 
+    def allegiance_subset(self, allegiances):
+        raw_lines = self.lines
+
+        for alg in allegiances:
+            raw_lines = [line for line in raw_lines if ' ' + alg + ' ' not in line]
+
+        result = self.drop_lines(raw_lines)
+        result.allegiances = {key: alg for (key, alg) in self.allegiances.items() if key in allegiances }
+
+        nu_headers = []
+
+        for line in self.headers:
+            if 'Alleg:' not in line:
+                nu_headers.append(line)
+                continue
+            for alg in allegiances:
+                if alg in line:
+                    nu_headers.append(line)
+                    continue
+
+        result.headers = nu_headers
+
+        return result
+
     def subsector_list(self):
         result = list()
         for subsector_name in self:
@@ -183,20 +225,40 @@ class SectorDictionary(dict):
 
         return result
 
+    def allegiance_list(self):
+        result = set()
+        for allegiance_name in self.allegiances:
+            result.add(allegiance_name)
+        return result
+
     def drop_lines(self, lines_to_drop):
+        new_dict = self._setup_clone_sector_dict()
+
+        for subsector_name in self:
+            new_dict[subsector_name] = self[subsector_name].drop_lines(lines_to_drop)
+
+        return new_dict
+
+    def _setup_clone_sector_dict(self):
         new_dict = SectorDictionary(self.name, self.filename)
         new_dict.position = self.position
         new_dict.headers = self.headers
         new_dict.allegiances = self.allegiances
         for alg in new_dict.allegiances:
             new_dict.allegiances[alg].homeworlds = []
-            new_dict.allegiances[alg].stats.homeworlds = []
-            new_dict.allegiances[alg].stats.passengers = 0
-            new_dict.allegiances[alg].stats.trade = 0
-            new_dict.allegiances[alg].stats.tradeExt = 0
+            stats = new_dict.allegiances[alg].stats
+            stats.homeworlds = []
+            stats.passengers = 0
+            stats.trade = 0
+            stats.tradeExt = 0
+
+        return new_dict
+
+    def switch_lines(self, lines_to_switch):
+        new_dict = self._setup_clone_sector_dict()
 
         for subsector_name in self:
-            new_dict[subsector_name] = self[subsector_name].drop_lines(lines_to_drop)
+            new_dict[subsector_name] = self[subsector_name].switch_lines(lines_to_switch)
 
         return new_dict
 
@@ -242,6 +304,7 @@ class SectorDictionary(dict):
             handle.write(line)
 
         for line in self.lines:
+            line = line.strip() + '\n'
             handle.write(line)
 
         handle.close()
@@ -322,7 +385,7 @@ class SectorDictionary(dict):
                 if line.startswith('----'):
                     isheader = False
             else:
-                starlines.append(line)
+                starlines.append(line.strip())
         return headers, starlines
 
 
@@ -373,5 +436,29 @@ class SubsectorDictionary(dict):
 
         if nonempty and 0 == len(foo.items):
             foo.items = None
+
+        return foo
+
+    def switch_lines(self, lines_to_switch):
+        foo = SubsectorDictionary(self.name, self.position)
+        if self.skipped:
+            foo.items = None
+            return foo
+
+        # assemble shortlist
+        shortlist = []
+        switchlist = []
+        # assuming lines_to_switch is a list of 2-element tuples
+        for line in lines_to_switch:
+            if line[0] in self.items:
+                shortlist.append(line[0])
+                switchlist.append(line[1])
+
+        for line in self.items:
+            if line not in shortlist:
+                foo.items.append(line)
+
+        for line in switchlist:
+            foo.items.append(line)
 
         return foo

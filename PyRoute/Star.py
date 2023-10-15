@@ -11,6 +11,7 @@ import math
 import re
 
 from PyRoute.Position.Hex import Hex
+
 from PyRoute.AllyGen import AllyGen
 from PyRoute.TradeCodes import TradeCodes
 from collections import OrderedDict
@@ -102,6 +103,13 @@ class Star(object):
     __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code', 'hex'
 
     def __init__(self):
+        self.worlds = None
+        self.ggCount = None
+        self.belts = None
+        self.nobles = None
+        self.law = None
+        self.gov = None
+        self.pop = None
         self.logger = logging.getLogger('PyRoute.Star')
         self._hash = None
         self._key = None
@@ -185,6 +193,10 @@ class Star(object):
     @staticmethod
     def parse_line_into_star(line, sector, pop_code, ru_calc):
         star = Star()
+        return Star._parse_line_into_star_core(star, line, sector, pop_code, ru_calc)
+
+    @staticmethod
+    def _parse_line_into_star_core(star, line, sector, pop_code, ru_calc):
         star.sector = sector
         star.logger.debug(line)
         # Cache regex lookup to avoid doing it once for check, and again to extract data
@@ -300,6 +312,23 @@ class Star(object):
         star.calc_hash()
         star.calc_passenger_btn_mod()
         return star
+
+    def parse_to_line(self):
+        result = str(self.position) + " "
+        result += self.name.ljust(20) + " "
+
+        uwp = str(self.port) + str(self.size) + str(self.atmo) + str(self.hydro) + str(self.pop) + str(self.gov) + str(self.law)
+        tl = self.tl
+        str_tl = self._int_to_ehex(tl)
+        result += uwp + "-" + str(str_tl)
+        imp_chunk = "{ " + str(self.importance) + " }"
+        result += " " + str(self.tradeCode).ljust(38) + imp_chunk.ljust(6) + " "
+        result += str(self.economics) + " " + str(self.social) + " " + str(self.nobles).ljust(4) + " "
+        result += str(self.baseCode).ljust(2) + " " + str(self.zone).ljust(1) + " " + str(self.popM) + str(self.belts) + str(self.ggCount) + " "
+        result += str(self.worlds).ljust(2) + " " + str(self.alg_code).ljust(4) + " "
+        result += str(" ".join(self.star_list)).ljust(14) + " " + " ".join(self.routes).ljust(41)
+
+        return result
 
     def __unicode__(self):
         return "{} ({} {})".format(self.name, self.sector.name, self.position)
@@ -704,6 +733,18 @@ class Star(object):
         val -= 1 if val > 18 else 0
         val -= 1 if val > 22 else 0
         return val
+
+    def _int_to_ehex(self, value):
+        if 10 > value:
+            return value
+        # Ehex doesn't use I, as it's too easily confused with the numeric 1, likewise with 0 and O
+        if 9 < value < 18:
+            valstring = 'ABCDEFGH'
+            return valstring[value-10]
+        if 17 < value:
+            valstring = 'JKLMNOPQRSTUVWXYZ'
+            value += 1 if 22 < value else 0
+            return valstring[value-18]
 
     def split_stellar_data(self):
         star_parts = self.stars.split()
