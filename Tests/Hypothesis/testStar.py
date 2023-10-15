@@ -104,6 +104,7 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? {0000000000000000000000000000000000000       - - 0 000   00')
     @example('0110 000000000000000 ???????-? 000000000000000 {0} (000-0)  -  Bc - 0 000   00')
     @example('0101 000000000000000 ???????-? 000000000 A0000 {0} (000-0)  - - - 0 000   00')
+    @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00000 0 0 ')
     def test_parse_line_to_star_and_back(self, s):
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
@@ -132,6 +133,13 @@ class testStar(unittest.TestCase):
             str(foo.tradeCode),
             str(nu_foo.tradeCode),
             "Re-parsed trade codes not equal to original trade codes."
+        )
+
+        nu_parsed_line = nu_foo.parse_to_line()
+        self.assertEqual(
+            parsed_line,
+            nu_parsed_line,
+            "New reparsed starline does not equal original parse-to-line output.  Hypothesis input: " + s
         )
 
     def test_fallback_regexen_base_ix_ex_cx(self):
