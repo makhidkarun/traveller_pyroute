@@ -128,7 +128,7 @@ class testStar(unittest.TestCase):
         self.assertTrue(foo.is_well_formed())
         self.assertIsNotNone(foo._hash, "Hash not calculated for re-parsed star")
 
-        self.assertEqual(foo, nu_foo, "Re-parsed star not __eq__ to original star.  Hypothesis input: " + s)
+        self.assertEqual(foo, nu_foo, "Re-parsed star not __eq__ to original star.  Hypothesis input: " + s + '\n')
         self.assertEqual(
             str(foo.tradeCode),
             str(nu_foo.tradeCode),
@@ -139,7 +139,7 @@ class testStar(unittest.TestCase):
         self.assertEqual(
             parsed_line,
             nu_parsed_line,
-            "New reparsed starline does not equal original parse-to-line output.  Hypothesis input: " + s
+            "New reparsed starline does not equal original parse-to-line output.  Hypothesis input: " + s + '\n'
         )
 
     def test_fallback_regexen_base_ix_ex_cx(self):
