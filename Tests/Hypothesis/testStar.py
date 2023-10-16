@@ -3,7 +3,7 @@ import unittest
 from datetime import timedelta
 
 from hypothesis import given, assume, example, HealthCheck, settings
-from hypothesis.strategies import text, from_regex
+from hypothesis.strategies import text, from_regex, none
 
 from PyRoute.Galaxy import Sector
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
@@ -146,6 +146,48 @@ class testStar(unittest.TestCase):
             nu_parsed_line,
             "New reparsed starline does not equal original parse-to-line output.  Hypothesis input: " + s + '\n'
         )
+
+    @given(from_regex(regex=r"(.{4,41})",
+                      alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'),
+           none())
+    @example('0 0', '')
+    @example('0', '')
+    @example('A0 II', 'A0 II')
+    @example('0BDD', 'D BD')
+    @example('A0', 'A0 V')
+    @example('M2 D F3 V M0 D M5 D', 'F3 V M2 D M0 D M5 D')
+    @example('0000 V', '')
+    def test_split_stellar_data(self, s, expected):
+        sector = Sector('# Core', '# 0, 0')
+        star = None
+
+        allowed_messages = [
+            'No stars found'
+        ]
+
+        try:
+            star = Star()
+            star.name = "Test Split Star"
+            star.index = 0
+            star.sector = sector
+            star.allegiance_base = 'NaXX'
+            star.stars = s
+            star.split_stellar_data()
+        except ValueError as e:
+            if str(e) in allowed_messages:
+                # reset generation attempt
+                star = None
+                pass
+            else:
+                raise e
+        assume(star is not None)
+        self.assertIsNotNone(star.star_list_object, "StarList object not set after parsing")
+
+        result, msg = star.star_list_object.is_well_formed()
+        self.assertTrue(result, msg)
+
+        if expected is not None:
+            self.assertEqual(expected, str(star.star_list_object))
 
     def test_fallback_regexen_base_ix_ex_cx(self):
         regex = r"((\{ *[+-]?[0-6] ?\}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]|-)|( ) ( ) ( )) +(\w{1,5}|-| ) +(.*)"
