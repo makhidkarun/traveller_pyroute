@@ -436,7 +436,13 @@ class TestStar(unittest.TestCase):
             ("2133                      C631563-6 Ni Po Cy O:2132 IyuokW Pz { -2 } (640+1) [4386] - N  A 515 14 Iy   K2 V", 'K'),
             ("0922 Celetron             A575242-F Lo RsO                               { 1 }  (611-3) [1319] B     N  - 302 8  ImDc M1 V            Xb:0622 Xb:1123", 'M'),
             ("1708                      E32579A-7 Pi X!tkW Pz                  { -2 } (761+2) [3566] - -  A 705 14 KkTw A0 V", 'A'),
-            ("2926                      B8B2413-C He Fl Ni HakW Pz             {  1 } (735+3) [458B] - M  A 514 16 HvFd G4 V M1 V", 'G')
+            ("2926                      B8B2413-C He Fl Ni HakW Pz             {  1 } (735+3) [458B] - M  A 514 16 HvFd G4 V M1 V", 'G'),
+            ("1917 Iaplebl              XAD0000-0 Ba Sa                       {-3} (900-5) [0000] - -  - 023 10 NaXX M7 VI M9 VI", 'M'),
+            ("2526 Shadowsand           C000416-B As Ni Va                      { 0 }  (733-1) [344A] - -  - 510 10 NaHu BH", 'BH'),
+            ("1901                      D335213-6 Lo                            { -3 } (811+5) [1167] - -  - 723 13 HvFd G7 M4 V        ", 'G'),
+            ("1317 Chegu                X544000-0 Ba Sa                       {-3} (800-5) [0000] - -  - 002 12 NaXX G8 V BD        ", 'G'),
+            ("0620 Shajzdenchta         C5699DB-9 Hi Pr                { 1 }  (D89-3) [CA26] - -  - 123 14 ZhMe M9 V BD BD M3 VI            ", 'M'),
+            ("0138 Plech-45             X574000-0 Ba                   { -3 } (800-3) [0000] - -  - 024 16 NaXX M1 V D BD BD              ", 'M')
         ]
         for line, expected_primary_type in line_list:
             with self.subTest():
