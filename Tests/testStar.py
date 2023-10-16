@@ -200,6 +200,27 @@ class TestStar(unittest.TestCase):
                 star1 = Star.parse_line_into_star(base_line, sector, 'fixed', 'fixed')
                 self.assertIsInstance(star1, Star)
 
+    def testParseExplicitHomeworlds(self):
+        sector = Sector('# Core', '# 0, 0')
+
+        homeworlds = [
+            ('Terra', '1827 Terra                A867A69-F Hi Ga [Solomani] Dolp0 Mr       { 4 }  (H9C+4) [BE6G] BEf  NW - 114 10 ImDs G2 V                         ', ['Dolp0', 'SoloW']),
+            ('Vland', '1717 Vland                A967A9A-F Hi Cs [Vilani]            { 3 }  (D9F+5) [CD7H] BEFG N  - 310 7  ImDv F8 V           ', ['VilaW']),
+            ('Kusyu', '1226 Kusyu                A876976-E Hi In Cx [Aslan]                       { 5 }  (F8H+4) [9E4D] - RT - 403 8  AsSc G4 V D             ', ['AslaW']),
+            ('Lair', '2402 Lair                 A8859B9-E Hi Ga Cx Pr Pz [Vargr] { 3 }  (F8F+4) [AC6F] - K  A 213 12 VLPr G5 V        ', ['VargW'])
+        ]
+
+        for msg, star_line, expected_sophonts in homeworlds:
+            with self.subTest(msg):
+                star1 = Star.parse_line_into_star(star_line, sector, 'fixed', 'fixed')
+                star1.index = 0
+                star1.allegiance_base = star1.alg_code
+                self.assertIsInstance(star1, Star)
+                self.assertTrue(star1.is_well_formed())
+
+                self.assertEqual(expected_sophonts, star1.tradeCode.sophont_list)
+
+
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
         cwtn = [3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11, 12, 13, 13, 14]
