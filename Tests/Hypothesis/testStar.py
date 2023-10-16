@@ -105,6 +105,7 @@ class testStar(unittest.TestCase):
     @example('0110 000000000000000 ???????-? 000000000000000 {0} (000-0)  -  Bc - 0 000   00')
     @example('0101 000000000000000 ???????-? 000000000 A0000 {0} (000-0)  - - - 0 000   00')
     @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00000 0 0 ')
+    @example('1717 Vland                A967A9A-F Hi Cs [Vilani]            { 3 }  (D9F+5) [CD7H] BEFG N  - 310 7  ImDv F8 V           ')
     def test_parse_line_to_star_and_back(self, s):
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
