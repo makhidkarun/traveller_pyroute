@@ -134,7 +134,7 @@ class Star(object):
 
         result += str(self.uwp)
         imp_chunk = "{ " + str(self.importance) + " }"
-        star_list = str(self.star_list_object)
+        star_list = str(self.star_list_object).ljust(14)
         result += " " + str(self.tradeCode).ljust(38) + imp_chunk.ljust(6) + " "
         econ = str(self.economics) if self.economics is not None else '-'
         social = str(self.social) if self.social is not None else '-'

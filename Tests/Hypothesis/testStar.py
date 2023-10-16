@@ -134,6 +134,11 @@ class testStar(unittest.TestCase):
             str(nu_foo.tradeCode),
             "Re-parsed trade codes not equal to original trade codes."
         )
+        self.assertEqual(
+            len(foo.star_list),
+            len(nu_foo.star_list),
+            "Re-parsed star list different length to original star list"
+        )
 
         nu_parsed_line = nu_foo.parse_to_line()
         self.assertEqual(
