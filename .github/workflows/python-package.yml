@@ -31,7 +31,7 @@ jobs:
       - name: Lint with ruff - configured options
         run: |
           # now run configured options
-          ruff check PyRoute
+          ruff check --preview PyRoute
       - name: Test with pytest
         run: |
           pytest
