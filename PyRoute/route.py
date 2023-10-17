@@ -70,7 +70,7 @@ def process():
     source.add_argument('sector', nargs='*', help='T5SS sector file(s) to process')
 
     debugging = parser.add_argument_group('Debug', "Debugging flags")
-    debugging.add_argument('--debug', dest="debug_flag", default=False,  action=argparse.BooleanOptionalAction,
+    debugging.add_argument('--debug', dest="debug_flag", default=False, action=argparse.BooleanOptionalAction,
                            help="Turn on trade-route debugging")
 
     parser.add_argument('--version', action='version', version='%(prog)s 0.4')

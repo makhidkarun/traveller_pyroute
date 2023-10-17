@@ -606,7 +606,7 @@ class Star(object):
                     'M': 1.1, 'N': 1.2,
                     # Unknown Gov Codes
                     'I': 1.0, 'P': 1.0, 'Q': 1.0, 'R': 1.0, 'S': 1.0, 'T': 1.0,
-                    '': 1.0,  'U': 1.0, 'V': 1.0, 'W': 1.0, 'X': 1.0, '?': 0.0
+                    '': 1.0, 'U': 1.0, 'V': 1.0, 'W': 1.0, 'X': 1.0, '?': 0.0
                     }
         self.ship_capacity = int(self.population * tax_rate[self.uwpCodes['Government']] * 1000)
         gwp_base = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 28, 32]
