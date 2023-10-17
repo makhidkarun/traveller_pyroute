@@ -10,7 +10,7 @@ fixable = ["ALL"]
 unfixable = []
 
 # Specify github format
-format = "github"
+output-format = "github"
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
