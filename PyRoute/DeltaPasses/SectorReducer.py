@@ -37,7 +37,7 @@ class SectorReducer(object):
                 threshold = i + (len(remove) if 2 == num_chunks else 0)
                 if threshold >= len(chunks):
                     continue
-                msg = "Sector reduction: Attempting chunk " + str(i+1) + "/" + str(num_chunks)
+                msg = "Sector reduction: Attempting chunk " + str(i + 1) + "/" + str(num_chunks)
                 self.reducer.logger.error(msg)
                 raw_lines = self.reducer._assemble_all_but_ith_chunk(chunks, i)
                 if 0 == len(raw_lines):

@@ -103,7 +103,7 @@ class TradeMPCalculation(TradeCalculation):
     between all the trade pairs using a multi-process route finder
     """
 
-    def __init__(self, galaxy, min_btn=13, route_btn=8, route_reuse=10, debug_flag=False, mp_threads=os.cpu_count()-1):
+    def __init__(self, galaxy, min_btn=13, route_btn=8, route_reuse=10, debug_flag=False, mp_threads=os.cpu_count() - 1):
         super(TradeMPCalculation, self).__init__(galaxy, min_btn, route_btn, route_reuse, debug_flag)
 
         self.btn = []
@@ -143,7 +143,7 @@ class TradeMPCalculation(TradeCalculation):
         large_btn_index = next(i for i, v in enumerate(self.btn) if v[2]['btn'] == 18)
 
         # Do the large routes (btn 19 - 26) first. These are short and take only a short amount of time.
-        self.process_routes(self.btn[0:large_btn_index-1])
+        self.process_routes(self.btn[0:(large_btn_index - 1)])
         # Do the in-sector routes next. Again short, and famed across multiple processor to make this faster.
         self.start_mp_services()
         # Do the remaining routes, which are long and will take a while

@@ -101,7 +101,7 @@ class Hex(object):
 
     @property
     def y(self):
-        return -self.q -self.r
+        return -self.q - self.r
 
     @property
     def z(self):

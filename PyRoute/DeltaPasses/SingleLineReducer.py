@@ -45,7 +45,7 @@ class SingleLineReducer(object):
                 threshold = i + (len(remove) if 2 == num_chunks else 0)
                 if threshold >= len(chunks):
                     continue
-                msg = "Line reduction: Attempting chunk " + str(i+1) + "/" + str(num_chunks)
+                msg = "Line reduction: Attempting chunk " + str(i + 1) + "/" + str(num_chunks)
                 self.reducer.logger.error(msg)
                 raw_lines = self.reducer._assemble_all_but_ith_chunk(chunks, i)
                 if 0 == len(raw_lines):
@@ -76,7 +76,7 @@ class SingleLineReducer(object):
                         if 0 < i:  # if have cleared a later chunk, it's worth trying to expand the hole backwards
                             msg = "Widening breach backwards"
                             self.reducer.logger.error(msg)
-                            startloc = bounds[i-1][1]
+                            startloc = bounds[i - 1][1]
                             best_sectors = self.breacher.run(
                                 start_pos=startloc,
                                 reverse=True,

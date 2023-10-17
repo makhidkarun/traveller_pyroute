@@ -740,11 +740,11 @@ class Star(object):
         # Ehex doesn't use I, as it's too easily confused with the numeric 1, likewise with 0 and O
         if 9 < value < 18:
             valstring = 'ABCDEFGH'
-            return valstring[value-10]
+            return valstring[value - 10]
         if 17 < value:
             valstring = 'JKLMNOPQRSTUVWXYZ'
             value += 1 if 22 < value else 0
-            return valstring[value-18]
+            return valstring[value - 18]
 
     def split_stellar_data(self):
         star_parts = self.stars.split()
