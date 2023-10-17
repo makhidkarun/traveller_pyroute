@@ -174,8 +174,66 @@ don't care about AssertionErrors, NotImplementedErrors, etc.  In this case, supp
 Likewise, if your run blows up with the error message "This route from Arglebargle to Bargleargle has already been processed",
 supplying ```--interesting-line "This route from Arglebargle to Bargleargle has already been processed"``` will focus
 delta debugging on that _specific_ route being processed twice, or using ```--interesting-line " has already been processed"```
-if you want it to chase down _any_ route being processed twice, no matter the source or destination.
+if you want delta debugging to chase down _any_ route being processed twice, no matter the source or destination.
 
+Third, the reduction passes themselves, which fall into two groups:
+
+Non-experimental, on by default, in their running order:
+
+```--no-sector``` :  Disable sector-level reduction.  Sectors are the coarsest reduction units used, with finer-grained
+reductions (eg subsector, line, etc) intended to happen _after_ coarser passes have run.
+
+You can definitely skip sector level reduction, but it's not a good idea on your first attempt to reduce a given
+problem's input.
+
+This will have no effect if you are reducing exactly one sector file.
+
+```--no-subsector``` :  Disable subsector-level reduction.  Subsectors are the second-coarsest reduction units
+routinely used.
+
+Like with sector level reduction, it's not a good idea to skip subsector reduction on your first attempt reducing a given
+problem's input.
+
+This will have no effect if you are reducing exactly one sector file with stars in exactly one subsector.
+
+```--no-line``` :  Disable single-starline-level reduction.  Starlines are the finest reduction units routinely used.
+
+Leaving sector and subsector reduction enabled while disabling single-line reduction often results in a reasonable
+first, rough, reduction that can either be manually investigated further, or fed back in to a full reduction.
+
+Experimental, off by default:
+
+```--allegiance``` :  Enable allegiance-level reduction, running between sector and subsector reduction.
+
+Sub-allegiances - such as "ImDd" and "ImDv" - are counted as different from both each other, and the parent "Im"
+allegiance for this pass.
+
+Allegiances vary in coarseness - "ImDs" ranges across multiple sectors (let alone the various non-aligned allegiances),
+but (for instance) "Sb" (Serendip Belt) is limited to two systems in Reft sector.
+
+```--two-minimise``` :  Enable double-starline-level reduction, running after single-line reduction.
+
+It is a _really_ daft idea to run just this pass on 1 or more un-reduced sectors, as the number of reduction attempts
+is quadratic in the number of total star lines in the input.
+
+For instance, running just this pass on Dagudashaag (558 stars) could result, worst case, in approx 155,400 reduction
+attempts.
+
+Two-minimisation, as its name suggests, looks for any combinations of _two_ starlines that can be removed from the
+current input, which can often enable further reductions after single-line reduction has stalled.
+
+```--within-line``` : Enable within-line reduction, running after double-line reduction.
+
+Unlike the other passes, this pass concentrates on removing elements _within_ a given starline - in effect, simplifying
+each starline.
+
+For example:
+
+```"0627 Taku                 AA676AD-C Ag Ni Ri Cp Da            { 4 }  (B58+5) [AA9G] BCF  NS A 912 14 ImDa K1 V M1 V      Xb:0524 Xb:1029"```
+
+could get shrunk to (dropping capitals, other trade codes, nobles, bases, and setting PBG back to 100):
+
+```0627 Taku                 AA676AD-C                                       { 1 }  (B58+5) [AA9G]      -  - 100 14 ImDa K1 V           Xb:0524 Xb:1029                          ```
 
 
 What does it do?
