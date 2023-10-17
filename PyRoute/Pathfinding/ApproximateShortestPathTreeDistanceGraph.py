@@ -36,8 +36,6 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
             rightdist = self._distances[right]
             shelf = self._graph._arcs[left]
             keep = shelf[0] == right
-            #matches = [dist_head for (head, dist_head) in shelf if head == right]
-            #weight = matches[0]
             weight = shelf[1][keep][0]
             delta = abs(leftdist - rightdist)
 
