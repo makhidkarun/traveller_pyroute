@@ -41,7 +41,7 @@ class AllyGen(object):
                    ("KC",),
                    ("Kk", "KkTw", "KO"),
                    ('So', 'SoCf', 'SoBF', 'SoCT', 'SoFr', 'SoHn', 'SoKv', 'SoNS',
-                    'SoQu', 'SoRD', 'SoRz', 'SoWu' ),
+                    'SoQu', 'SoRD', 'SoRz', 'SoWu'),
                    ('Lp', 'CoLp'),
                    ('Vd', 'VDeG'),
                    ('Vo', 'VOpA'),

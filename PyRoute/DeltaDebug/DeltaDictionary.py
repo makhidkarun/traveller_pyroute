@@ -200,7 +200,7 @@ class SectorDictionary(dict):
             raw_lines = [line for line in raw_lines if ' ' + alg + ' ' not in line]
 
         result = self.drop_lines(raw_lines)
-        result.allegiances = {key: alg for (key, alg) in self.allegiances.items() if key in allegiances }
+        result.allegiances = {key: alg for (key, alg) in self.allegiances.items() if key in allegiances}
 
         nu_headers = []
 
