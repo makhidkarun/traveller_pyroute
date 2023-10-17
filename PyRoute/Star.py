@@ -659,6 +659,7 @@ class Star(object):
         assert self.hex is not None, "Star " + str(self.name) + " is missing hex attribute"
         assert self._hash is not None, "Star " + str(self.name) + " has empty _hash attribute"
         assert self._key is not None, "Star " + str(self.name) + " has empty _key attribute"
+        assert self.tradeCode is not None, "Star " + str(self.name) + " has empty tradeCode attribute"
         result, msg = self.tradeCode.is_well_formed()
         assert result, msg
         result, msg = self.hex.is_well_formed()
