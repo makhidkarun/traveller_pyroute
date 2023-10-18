@@ -99,8 +99,8 @@ def process():
                        help="Skip subsector-level reduction")
     delta.add_argument('--no-line', dest="run_line", default=True, action='store_false',
                        help="Skip line-level reduction.")
-    delta.add_argument('--two-minimise', dest="two_min", default=False, action='store_true',
-                       help="Try all pairs of star lines to see if any can be removed.  At least one of sector, subsector, line and two-minimisation must be selected")
+    delta.add_argument('--two-reduce', dest="two_min", default=False, action='store_true',
+                       help="Try all pairs of star lines to see if any can be removed.  At least one of sector, subsector, line and two-line reduction must be selected")
     delta.add_argument('--within-line', dest="run_within", default=False, action='store_true',
                        help="Try to remove irrelevant components (eg base codes) from _within_ individual lines")
     delta.add_argument('--allegiance', dest="run_allegiance", default=False, action='store_true',
@@ -159,7 +159,7 @@ def process():
 
     # enforce 2-minimality
     if args.two_min:
-        logger.error("Reducing by line - 2 minimality")
+        logger.error("Reducing by two-line")
         reducer.reduce_line_two_minimal()
 
     if args.run_within:

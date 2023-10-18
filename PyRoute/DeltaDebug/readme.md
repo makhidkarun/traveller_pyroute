@@ -211,7 +211,7 @@ allegiance for this pass.
 Allegiances vary in coarseness - "ImDs" ranges across multiple sectors (let alone the various non-aligned allegiances),
 but (for instance) "Sb" (Serendip Belt) is limited to two systems in Reft sector.
 
-```--two-minimise``` :  Enable double-starline-level reduction, running after single-line reduction.
+```--two-reduce``` :  Enable double-starline-level reduction, running after single-line reduction.
 
 It is a _really_ daft idea to run just this pass on 1 or more un-reduced sectors, as the number of reduction attempts
 is quadratic in the number of total star lines in the input.
