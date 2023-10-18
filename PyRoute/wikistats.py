@@ -44,7 +44,7 @@ class WikiStats(object):
 
         self.env = Environment(
             loader=FileSystemLoader(templatedir),
-            #loader=PackageLoader('PyRoute', 'templates'),
+            # loader=PackageLoader('PyRoute', 'templates'),
             autoescape=select_autoescape(['html', 'xml'])
             )
 
@@ -55,13 +55,13 @@ class WikiStats(object):
         self.sector_data_template()
         self.allegiance_statistics_template()
 
-        #self.top_summary()
-        #self.tcs_statistics()
-        #self.subsector_statistics()
-        #self.write_allegiances(self.galaxy.alg)
-        #self.write_worlds_wiki_stats()
-        #self.write_sector_wiki()
-        #self.write_world_statistics()
+        # self.top_summary()
+        # self.tcs_statistics()
+        # self.subsector_statistics()
+        # self.write_allegiances(self.galaxy.alg)
+        # self.write_worlds_wiki_stats()
+        # self.write_sector_wiki()
+        # self.write_world_statistics()
 
         self.write_summary_lists()
         if self.json_data:

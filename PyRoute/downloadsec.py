@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     for sector in sectorsList:
         sector = sector.rstrip()
-        print ('Downloading %s' % sector)
+        print('Downloading %s' % sector)
         params = {'sector': sector, 'type': 'SecondSurvey'}
         if args.routes:
             params['routes'] = '1'

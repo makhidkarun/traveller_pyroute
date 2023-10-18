@@ -45,8 +45,8 @@ def process():
                        help='RU calculation, default [scaled]')
     route.add_argument('--speculative-version', choices=['CT', 'T5', 'None'], default='CT',
                        help='version of the speculative trade calculations, default [CT]')
-    route.add_argument('--mp-threads', default=os.cpu_count()-1, type=int,
-                       help=f"Number of processes to use for trade-mp processing, default {os.cpu_count()-1}")
+    route.add_argument('--mp-threads', default=os.cpu_count() - 1, type=int,
+                       help=f"Number of processes to use for trade-mp processing, default {os.cpu_count() - 1}")
 
     output = parser.add_argument_group('Output', 'Output options')
 
@@ -70,7 +70,7 @@ def process():
     source.add_argument('sector', nargs='*', help='T5SS sector file(s) to process')
 
     debugging = parser.add_argument_group('Debug', "Debugging flags")
-    debugging.add_argument('--debug', dest="debug_flag", default=False,  action=argparse.BooleanOptionalAction,
+    debugging.add_argument('--debug', dest="debug_flag", default=False, action=argparse.BooleanOptionalAction,
                            help="Turn on trade-route debugging")
 
     parser.add_argument('--version', action='version', version='%(prog)s 0.4')

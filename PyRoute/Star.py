@@ -417,7 +417,7 @@ class Star(object):
     def calculate_gwp(self, pop_code):
         calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400,
                    24400, 39000, 39000]
-        #flatGWP = [229, 301, 396, 521, 685, 902, 1186, 1560, 2051, 2698, 3548, 4667, 6138, 8072, 10617, 13964, 18365,
+        # flatGWP = [229, 301, 396, 521, 685, 902, 1186, 1560, 2051, 2698, 3548, 4667, 6138, 8072, 10617, 13964, 18365,
         #           24155, 31769, 41783]
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
 
@@ -606,7 +606,7 @@ class Star(object):
                     'M': 1.1, 'N': 1.2,
                     # Unknown Gov Codes
                     'I': 1.0, 'P': 1.0, 'Q': 1.0, 'R': 1.0, 'S': 1.0, 'T': 1.0,
-                    '': 1.0,  'U': 1.0, 'V': 1.0, 'W': 1.0, 'X': 1.0, '?': 0.0
+                    '': 1.0, 'U': 1.0, 'V': 1.0, 'W': 1.0, 'X': 1.0, '?': 0.0
                     }
         self.ship_capacity = int(self.population * tax_rate[self.uwpCodes['Government']] * 1000)
         gwp_base = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 28, 32]
@@ -740,11 +740,11 @@ class Star(object):
         # Ehex doesn't use I, as it's too easily confused with the numeric 1, likewise with 0 and O
         if 9 < value < 18:
             valstring = 'ABCDEFGH'
-            return valstring[value-10]
+            return valstring[value - 10]
         if 17 < value:
             valstring = 'JKLMNOPQRSTUVWXYZ'
             value += 1 if 22 < value else 0
-            return valstring[value-18]
+            return valstring[value - 18]
 
     def split_stellar_data(self):
         star_parts = self.stars.split()

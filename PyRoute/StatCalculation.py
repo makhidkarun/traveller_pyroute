@@ -32,7 +32,7 @@ class ObjectStatistics(object):
                     'N': 'Naval base', 'O': 'Naval outpost',
                     'R': 'Clan base', 'S': 'Scout base', 'T': 'Tlaukhu base', 'V': 'Scout base', 'W': 'Way station',
                     '*': 'Unknown', 'I': 'Unknown',
-                    'G': 'Vargr Naval base',  'J': 'Naval base',
+                    'G': 'Vargr Naval base', 'J': 'Naval base',
                     'L': 'Hiver naval base', 'P': 'Droyne Naval base', 'Q': 'Droyne military garrison',
                     'X': 'Zhodani relay station', 'Y': 'Zhodani depot',
                     'A': 'Split', 'B': 'Split', 'F': 'Split', 'H': 'Split', 'U': 'Split', 'Z': 'Split'}
