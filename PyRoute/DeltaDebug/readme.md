@@ -238,7 +238,211 @@ could get shrunk to (dropping capitals, other trade codes, nobles, bases, and se
 
 What does it do?
 ----------------
+That might be a lot to take in.  It's time for a simple worked example.
 
+We'll be using the following pathfinding settings:
+- min-btn: 15
+- max-jump: 2
+- routes: trade
+- borders: erode
+- pop-code: scaled
+- input: ./deltasectors
+- output: ./deltamaps
+- no-subsector-maps
+
+All paths will be relative to the repo root directory.
+
+1.  Create the ```./deltasectors``` directory.
+2.  Copy the ```./Tests/DeltaFiles/Dagudashaag-spiked.sec``` and ```./Tests/DeltaFiles/Zarushagar.sec``` files to ```./deltasectors/```.
+3.  Create the ```./deltalist.txt``` file and add ```Dagudashaag-spiked``` and ```Zarushagar``` to it, on separate lines.
+4.  From the repo root, run ```python ./PyRoute/route.py --min-btn 15 --max-jump 2 --routes trade --borders erode --pop-code scaled --input ./deltasectors --output ./deltamaps --sectors ./deltalist.txt --no-subsector-maps```
+
+You should rapidly get something like the following:
+```
+2023-10-19 01:51:49,608 - INFO - starting processing
+2023-10-19 01:51:49,609 - INFO - ['/home/alex/gitstuf/traveller_pyroute/deltasectors/Zarushagar.sec', '/home/alex/gitstuf/traveller_pyroute/deltasectors/Dagudashaag-spiked.sec']
+2023-10-19 01:51:52,086 - INFO - Sector Zarushagar (-1,-1) loaded 496 worlds
+Traceback (most recent call last):
+  File "/home/alex/gitstuf/traveller_pyroute/PyRoute/route.py", line 159, in <module>
+    process()
+  File "/home/alex/gitstuf/traveller_pyroute/PyRoute/route.py", line 100, in process
+    galaxy.read_sectors(sectors_list, args.pop_code, args.ru_calc,
+  File "/home/alex/gitstuf/traveller_pyroute/PyRoute/Galaxy.py", line 320, in read_sectors
+    assert star not in sec.worlds, "Star " + str(star) + " duplicated in sector " + str(sec)
+AssertionError: Star Kashmiir (Dagudashaag 0103) duplicated in sector Dagudashaag (-1,0)
+
+```
+
+You'll need somewhere to _store_ the reduced sector files.  For this pass, you'll just be using the default settings.
+
+1.  Create the ```./reduced``` directory.
+2.  Run delta debugging from the repo root: ```python ./PyRoute/DeltaDebug/DeltaDebug.py --min-btn 15 --max-jump 4 --routes trade --borders erode --pop-code scaled --min-dir ./reduced/ --output ./prof-maps/ --sectors ./deltalist.txt --input ./deltasectors/ --interesting-line=duplicated```
+
+The output will take longer this time, and _be_ longer.  Something like:
+
+```
+2 sectors read
+Reducing by sector
+# of lines: 1057, # of chunks: 2, # of sectors: 2
+Sector reduction: Attempting chunk 1/2
+Sector reduction: Attempting chunk 2/2
+Reduction found: new input has 561 lines and 1 sectors
+Shortest error message: Star Kashmiir (Dagudashaag 0103) duplicated in sector Dagudashaag (-1,0)
+Reducing by subsector
+# of lines: 561, # of chunks: 2, # of subsectors: 16
+Subsector reduction: Attempting chunk 1/2
+Reduction found: new input has 293 lines and 8 subsectors
+# of lines: 293, # of chunks: 2, # of subsectors: 8
+Subsector reduction: Attempting chunk 1/2
+Subsector reduction: Attempting chunk 2/2
+Reduction found: new input has 147 lines and 4 subsectors
+# of lines: 147, # of chunks: 2, # of subsectors: 4
+Subsector reduction: Attempting chunk 1/2
+Subsector reduction: Attempting chunk 2/2
+Reduction found: new input has 69 lines and 2 subsectors
+# of lines: 69, # of chunks: 2, # of subsectors: 2
+Subsector reduction: Attempting chunk 1/2
+Subsector reduction: Attempting chunk 2/2
+Reduction found: new input has 37 lines and 1 subsectors
+Shortest error message: Star Kashmiir (Dagudashaag 0103) duplicated in sector Dagudashaag (-1,0)
+Reducing by line
+# of lines: 37, # of chunks: 2
+Line reduction: Attempting chunk 1/2
+Line reduction: Attempting chunk 2/2
+# of lines: 37, # of chunks: 4
+Line reduction: Attempting chunk 1/4
+Line reduction: Attempting chunk 2/4
+Reduction found: new input has 27 lines
+Widening breach backwards
+# of lines: 27
+Reduction found: new input has 26 lines
+Reduction found: new input has 24 lines
+Reduction found: new input has 20 lines
+Reduction found: new input has 12 lines
+Reduction found: new input has 8 lines
+Widening breach complete
+Line reduction: Attempting chunk 3/4
+Reduction found: new input has 5 lines
+Widening breach backwards
+# of lines: 5
+Reduction found: new input has 5 lines
+Widening breach complete
+Line reduction: Attempting chunk 4/4
+# of lines: 5, # of chunks: 4
+Line reduction: Attempting chunk 1/4
+Line reduction: Attempting chunk 2/4
+Reduction found: new input has 3 lines
+Widening breach backwards
+# of lines: 3
+Reduction found: new input has 2 lines
+Widening breach complete
+Line reduction: Attempting chunk 3/4
+# of lines: 2, # of chunks: 2
+Line reduction: Attempting chunk 1/2
+Line reduction: Attempting chunk 2/2
+Shortest error message: Star Kashmiir (Dagudashaag 0103) duplicated in sector Dagudashaag (-1,0)
+
+Process finished with exit code 0
+```
+
+After that's done, you should have one file in ```./reduced```, namely ```Dagudashaag-spiked.sec-min```.
+
+The last few lines of that file should be:
+```
+Hex  Name                 UWP       Remarks                               {Ix}   (Ex)    [Cx]   N    B  Z PBG W  A    Stellar         Routes                                   
+---- -------------------- --------- ------------------------------------- ------ ------- ------ ---- -- - --- -- ---- --------------- -----------------------------------------
+0103 Kashmiir             A9687BB-C Ag Ri Cp Pz                           { 4 }  (D6E+5) [9B7E] BCF  N  A 313 10 ImDv M1 V M2 V
+0103 Kashmiir             A9687BB-C Ag Ri Cp Pz                           { 4 }  (D6E+5) [9B7E] BCF  N  A 313 10 ImDv M1 V M2 V
+```
+
+This is a somewhat simplified example, but the general result should be clear.
+
+Instead of having 1,057 starlines to wade through over 2 sectors, you now have 2 starlines in 1 sector - approx 500x less to look through. 
+
+If you want to keep that file, copy it somewhere.  Let's now do a second run, but this time skipping single-line reduction and enabling within-line reduction.
+
+The command line you will need is:
+```python ./PyRoute/DeltaDebug/DeltaDebug.py --min-btn 15 --max-jump 4 --routes trade --borders erode --pop-code scaled --min-dir ./reduced/ --output ./prof-maps/ --sectors ./deltalist.txt --input ./deltasectors/ --interesting-line=duplicated --no-line --within-line```
+
+That will result in something like the following output:
+```
+2 sectors read
+Reducing by sector
+# of lines: 1057, # of chunks: 2, # of sectors: 2
+Sector reduction: Attempting chunk 1/2
+Sector reduction: Attempting chunk 2/2
+Reduction found: new input has 561 lines and 1 sectors
+Shortest error message: Star Kashmiir (Dagudashaag 0103) duplicated in sector Dagudashaag (-1,0)
+Reducing by subsector
+# of lines: 561, # of chunks: 2, # of subsectors: 16
+Subsector reduction: Attempting chunk 1/2
+Reduction found: new input has 293 lines and 8 subsectors
+# of lines: 293, # of chunks: 2, # of subsectors: 8
+Subsector reduction: Attempting chunk 1/2
+Subsector reduction: Attempting chunk 2/2
+Reduction found: new input has 147 lines and 4 subsectors
+# of lines: 147, # of chunks: 2, # of subsectors: 4
+Subsector reduction: Attempting chunk 1/2
+Subsector reduction: Attempting chunk 2/2
+Reduction found: new input has 69 lines and 2 subsectors
+# of lines: 69, # of chunks: 2, # of subsectors: 2
+Subsector reduction: Attempting chunk 1/2
+Subsector reduction: Attempting chunk 2/2
+Reduction found: new input has 37 lines and 1 subsectors
+Shortest error message: Star Kashmiir (Dagudashaag 0103) duplicated in sector Dagudashaag (-1,0)
+Reducing within lines
+Reduction found with full canonicalisation
+Commencing full within-line reduction
+start - # of unreduced lines: 37
+Reduction found with full line reduction
+
+Process finished with exit code 0
+```
+
+The resulting file should have these lines at its end:
+```
+Hex  Name                 UWP       Remarks                               {Ix}   (Ex)    [Cx]   N    B  Z PBG W  A    Stellar         Routes                                   
+---- -------------------- --------- ------------------------------------- ------ ------- ------ ---- -- - --- -- ---- --------------- -----------------------------------------
+0103 Kashmiir             C9687BB-8                                       { -1 } (D6E+5) [9B7E]      -  - 100 1  ImDv M1 V
+0105 Kedaa                C551410-8                                       { -2 } (834-3) [1515]      -  - 100 1  ImLc M0 V
+0106 Akimu                C9B69CC-8                                       { 0 }  (E8C+5) [CB8C]      -  - 100 1  ImLc K9 V
+0108 Zukchurukh           C582867-8                                       { -1 } (G78+1) [8858]      -  - 100 1  ImLc M2 V
+0109 Tscho                C685767-8                                       { -1 } (D69+1) [7858]      -  - 100 1  ImLc K2 V
+0110 Kaza                 C542510-8                                       { -2 } (D43-5) [1414]      -  - 100 1  ImLc G4 V
+0201 Nuikh                C310200-8                                       { -2 } (511-3) [131A]      -  - 100 1  ImDv K9 V
+0202 Osakis               C675723-8                                       { -1 } (966-4) [4623]      -  - 100 1  ImDv M2 V
+0208 Mimu                 C583AC9-8                                       { 0 }  (H9F+4) [BD6G]      -  - 100 1  ImLc F8 V
+0210 Rathas               C95A8DB-8                                       { -1 } (D7C+4) [AA7D]      -  - 100 1  ImLc M2 V
+0301 Halimaa              C6B85AA-8                                       { -2 } (A41-1) [727A]      -  - 100 1  ImDv F7 V
+0302 Karrana'ch           C555541-8                                       { -2 } (A44-4) [1515]      -  - 100 1  ImDv M0 V
+0307 Manoh                C000667-8                                       { -2 } (C54+1) [665A]      -  - 100 1  ImLc M7 V
+0401 Ges                  C868431-8                                       { -2 } (631-5) [1111]      -  - 100 1  ImDv G4 V
+0402 Serpent's Reach      C66975A-8                                       { -1 } (E6E+5) [9A7G]      -  - 100 1  ImDv K1 V
+0405 Tree'chuakh          C789753-8                                       { -1 } (A6D+1) [4A29]      -  - 100 1  ImLc M1 V
+0406 Muikha               C000524-8                                       { -2 } (B45-1) [363C]      -  - 100 1  ImLc K4 V
+0407 Kaldi                C94736B-8                                       { -2 } (920+1) [517A]      -  - 100 1  ImLc M0 V
+0408 Tae                  C552664-8                                       { -2 } (C52-4) [4436]      -  - 100 1  ImLc K0 V
+0502 Ushkhuur             CA7A774-8                                       { -1 } (A69-2) [5737]      -  - 100 1  ImDv G2 V
+0503 Geka                 C311553-8                                       { -2 } (B43-4) [2427]      -  - 100 1  ImDv M9 III
+0504 Gushnemasha          C888778-8                                       { -1 } (967+1) [7756]      -  - 100 1  ImLc M2 V
+0505 Iiu                  C5A689B-8                                       { -1 } (C7B+4) [AA7C]      -  - 100 1  ImLc M4 V
+0506 Siakmasfa            C540233-8                                       { -2 } (811-2) [132A]      -  - 100 1  ImLc K2 V
+0509 Refuge               C578664-8                                       { -2 } (852-4) [4433]      -  - 100 1  ImLc K1 V
+0601 Ninaan               C544543-8                                       { -2 } (F44-3) [2526]      -  - 100 1  ImDv M1 V
+0604 Seminary             C422425-8                                       { -2 } (633-2) [2439]      -  - 100 1  ImLc M1 V
+0610 Zishku               C7A5776-8                                       { -1 } (F69-1) [6748]      -  - 100 1  ImDv K0 V
+0705 Zuiar                C550967-8                                       { 0 }  (G8E+3) [9C5C]      -  - 100 1  ImLc K0 V
+0707 Khumara              C561520-8                                       { -2 } (741-5) [1212]      -  - 100 1  ImLc M1 V
+0708 Ssi                  C75886A-8                                       { -1 } (D7C+4) [AA7E]      -  - 100 1  ImLc K6 V
+0709 Irshe                C94A100-8                                       { -2 } (701-3) [1218]      -  - 100 1  ImLc M2 V
+0801 Shéaniki             C612521-8                                       { -2 } (742-5) [1313]      -  - 100 1  ImDv M2 V
+0802 Khan                 C89A5A9-8                                       { -2 } (742-1) [6368]      -  - 100 1  ImLc K2 V
+0803 Chiauk               C431557-8                                       { -2 } (A45+1) [565F]      -  - 100 1  ImLc M2 V
+0810 Andalusia            C572348-8                                       { -2 } (521+1) [345B]      -  - 100 1  ImDv G4 V
+0103 Kashmiir             C9687BB-8                                       { -1 } (D6E+5) [9B7E]      -  - 100 1  ImDv M1 V
+```
+
+In this run, note how a lot of the within-line stuff (trade codes, base codes, noble codes, etc) was _shown_ to be irrelevant.
 
 What do I do with the result?
 ---------
