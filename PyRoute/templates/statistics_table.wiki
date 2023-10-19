@@ -2,7 +2,7 @@
 {% macro stats_table(stats, global_stats) -%}
 |align="right"|{{stats.number}}
 |align="right"|{{'{:,d}'.format(stats.population)}}
-|align="right"|{{"{:5.2f}".format(stats.population / (global_stats.population / 100.0)) }}%
+|align="right"|{{"{:5.2f}".format(stats.population / ([global_stats.population, 1]|max / 100.0)) }}%
 |align="right"|{{'{:,d}'.format(stats.economy)}}
 |align="right"|{{'{:,d}'.format(stats.percapita)}}
 |align="right"|{{'{:,d}'.format(stats.sum_ru)}}
