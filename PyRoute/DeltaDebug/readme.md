@@ -446,3 +446,7 @@ In this run, note how a lot of the within-line stuff (trade codes, base codes, n
 
 What do I do with the result?
 ---------
+Once you have your minimised result and verified that it still produces your problem, the next step is open an issue on PyRoute, describe what you were doing, and attach the reduced results from
+delta debugging.
+
+For example, https://github.com/makhidkarun/traveller_pyroute/issues/67 , describing your pathfinding settings, and the attached reduced result.
