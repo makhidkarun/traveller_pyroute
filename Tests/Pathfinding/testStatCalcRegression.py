@@ -5,7 +5,7 @@ Created on Oct 19, 2023
 """
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from StatCalculation import StatCalculation
+from PyRoute.StatCalculation import StatCalculation
 from Tests.baseTest import baseTest
 
 
