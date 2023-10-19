@@ -234,6 +234,60 @@ class Sector(AreaItem):
                 return world
         return None
 
+    def is_well_formed(self):
+        msg = ""
+        # Check reciprocity of adjacent sectors
+        if self.coreward is not None:
+            neighbour = self.coreward
+            other = neighbour.rimward
+            if other is None or other != self:
+                msg = "Coreward sector mismatch for " + self.name
+                return False, msg
+            if self.x != neighbour.x:
+                msg = "Coreward sector x co-ord mismatch for " + self.name
+                return False, msg
+            if self.y + 1 != neighbour.y:
+                msg = "Coreward sector y co-ord mismatch for " + self.name
+                return False, msg
+        if self.rimward is not None:
+            neighbour = self.rimward
+            other = neighbour.coreward
+            if other is None or other != self:
+                msg = "Rimward sector mismatch for " + self.name
+                return False, msg
+            if self.x != neighbour.x:
+                msg = "Rimward sector x co-ord mismatch for " + self.name
+                return False, msg
+            if self.y - 1 != neighbour.y:
+                msg = "Rimward sector y co-ord mismatch for " + self.name
+                return False, msg
+        if self.spinward is not None:
+            neighbour = self.spinward
+            other = neighbour.trailing
+            if other is None or other != self:
+                msg = "Spinward sector mismatch for " + self.name
+                return False, msg
+            if self.x - 1 != neighbour.x:
+                msg = "Spinward sector x co-ord mismatch for " + self.name
+                return False, msg
+            if self.y != neighbour.y:
+                msg = "Spinward sector y co-ord mismatch for " + self.name
+                return False, msg
+        if self.trailing is not None:
+            neighbour = self.trailing
+            other = neighbour.spinward
+            if other is None or other != self:
+                msg = "Trailing sector mismatch for " + self.name
+                return False, msg
+            if self.x + 1 != neighbour.x:
+                msg = "Trailing sector x co-ord mismatch for " + self.name
+                return False, msg
+            if self.y != neighbour.y:
+                msg = "Trailing sector y co-ord mismatch for " + self.name
+                return False, msg
+
+        return True, msg
+
 
 class Galaxy(AreaItem):
     """
@@ -550,6 +604,12 @@ class Galaxy(AreaItem):
                 worldstar.ownedBy = (owner, ownedBy[0:4])
 
     def is_well_formed(self):
+        for item in self.sectors:
+            sector = self.sectors[item]
+            assert isinstance(sector, Sector), "Galaxy sectors must be instance of Sector object"
+            result, msg = sector.is_well_formed()
+            assert result, msg
+
         for item in self.stars.nodes:
             assert isinstance(item, int), "Star nodes must be integers"
             assert 'star' in self.stars.nodes[item], "Star attribute not set for item " + str(item)
