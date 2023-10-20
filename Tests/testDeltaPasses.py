@@ -307,6 +307,7 @@ class testDeltaPasses(baseTest):
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-spiked.sec')
         args = self._make_args_no_line()
         args.interesting_line = 'duplicated'
+        args.interesting_type = 'AssertionError'
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
