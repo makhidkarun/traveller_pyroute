@@ -521,6 +521,38 @@ class TestStar(unittest.TestCase):
                 star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
                 self.assertIsNotNone(star, "Starline should parse cleanly")
 
+    def test_owning_self_is_not_well_formed(self):
+        line = '3138 Andula               C542468-8 He Ni Po O:3138                       { -2 } (931-2) [4258] B    -  - 121 9  ImDv G4 V'
+        star1 = Star.parse_line_into_star(line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
+        star1.index = 0
+        star1.allegiance_base = star1.alg_code
+
+        msg = None
+
+        try:
+            star1.is_well_formed(log=False)
+        except AssertionError as e:
+            msg = str(e)
+
+        expected_msg = "Star " + str(star1.name) + " cannot own itself"
+        self.assertEqual(expected_msg, msg)
+
+    def test_colonising_self_is_not_well_formed(self):
+        line = '3138 Andula               C542468-8 He Ni Po C:3138                       { -2 } (931-2) [4258] B    -  - 121 9  ImDv G4 V'
+        star1 = Star.parse_line_into_star(line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
+        star1.index = 0
+        star1.allegiance_base = star1.alg_code
+
+        msg = None
+
+        try:
+            star1.is_well_formed(log=False)
+        except AssertionError as e:
+            msg = str(e)
+
+        expected_msg = "Star " + str(star1.name) + " cannot colonise itself"
+        self.assertEqual(expected_msg, msg)
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
