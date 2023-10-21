@@ -211,7 +211,8 @@ class SectorDictionary(dict):
                 continue
             for alg in allegiances:
                 if alg in line:
-                    assert alg not in processed, "Allegiance " + str(alg) + " has already been added to " + str(self.name)
+                    if alg in processed:
+                        continue
                     nu_headers.append(line)
                     processed.add(alg)
                     continue

@@ -350,6 +350,12 @@ class testDeltaPasses(baseTest):
 
         nu_sector = sector.allegiance_subset(allegiance_set)
 
+        expected_headers = [
+            '# Alleg: ImAp: "Third Imperium, Amec Protectorate"',
+            '# Alleg: ImDv: "Third Imperium, Domain of Vland"',
+        ]
+        self.assertEqual(expected_headers, nu_sector.headers)
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
