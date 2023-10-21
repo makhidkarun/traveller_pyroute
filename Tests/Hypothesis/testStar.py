@@ -107,6 +107,7 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00000 0 0 ')
     @example('1717 Vland                A967A9A-F Hi Cs [Vilani]            { 3 }  (D9F+5) [CD7H] BEFG N  - 310 7  ImDv F8 V           ')
     @example('0101 000000000000000 ???????-? (000000000000000000000000000000000000)       - - 0 000   00')
+    @example('0101 000000000000000 ???????-? 00000000000000( {1} (000-0)  -         - 0 000   00')
     def test_parse_line_to_star_and_back(self, s):
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
@@ -134,12 +135,12 @@ class testStar(unittest.TestCase):
         self.assertEqual(
             str(foo.tradeCode),
             str(nu_foo.tradeCode),
-            "Re-parsed trade codes not equal to original trade codes."
+            "Re-parsed trade codes not equal to original trade codes.  Hypothesis input: " + s + '\n'
         )
         self.assertEqual(
             len(foo.star_list),
             len(nu_foo.star_list),
-            "Re-parsed star list different length to original star list"
+            "Re-parsed star list different length to original star list.  Hypothesis input: " + s + '\n'
         )
 
         nu_parsed_line = nu_foo.parse_to_line()
