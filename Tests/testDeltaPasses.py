@@ -334,6 +334,22 @@ class testDeltaPasses(baseTest):
         self.assertEqual(len(actual_allegiances), len(allegiance_lines), "Allegiance-list length mismatch")
         self.assertTrue("ImDv" in allegiance_lines[0], "Unexpected remaining allegiance")
 
+    def test_allegiance_reduction_deduplicates_allegiance_lines(self):
+        headers = [
+            '# Alleg: ImAp: "Third Imperium, Amec Protectorate"',
+            '# Alleg: ImDv: "Third Imperium, Domain of Vland"',
+            '# Alleg: ImLc: "Third Imperium, Lancian Cultural Region"',
+            '# Alleg: ImAp: "Third Imperium, Amec Protectorate"',
+            '# Alleg: ImDv: "Third Imperium, Domain of Vland"',
+        ]
+
+        sector = SectorDictionary('Dagudashaag', '')
+        sector.headers = headers
+
+        allegiance_set = ["ImAp", "ImDv"]
+
+        nu_sector = sector.allegiance_subset(allegiance_set)
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8

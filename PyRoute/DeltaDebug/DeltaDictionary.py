@@ -203,6 +203,7 @@ class SectorDictionary(dict):
         result.allegiances = {key: alg for (key, alg) in self.allegiances.items() if key in allegiances}
 
         nu_headers = []
+        processed = set()
 
         for line in self.headers:
             if 'Alleg:' not in line:
@@ -210,7 +211,9 @@ class SectorDictionary(dict):
                 continue
             for alg in allegiances:
                 if alg in line:
+                    assert alg not in processed, "Allegiance " + str(alg) + " has already been added to " + str(self.name)
                     nu_headers.append(line)
+                    processed.add(alg)
                     continue
 
         result.headers = nu_headers
