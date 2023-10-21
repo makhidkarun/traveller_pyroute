@@ -652,7 +652,7 @@ class Star(object):
         if len(self.routes) > 0:
             self.logger.debug("{} - routes: {}".format(self, self.routes))
 
-    def is_well_formed(self):
+    def is_well_formed(self, log=True):
         assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
@@ -664,6 +664,14 @@ class Star(object):
         assert result, msg
         result, msg = self.hex.is_well_formed()
         assert result, msg
+        if log:
+            if self.hex.position == self.tradeCode.ownedBy:
+                self.logger.error("Star " + str(self.name) + " cannot own itself")
+            if ('C:' + self.hex.position) in self.tradeCode.colony:
+                self.logger.error("Star " + str(self.name) + " cannot colonise itself")
+        else:
+            assert self.hex.position != self.tradeCode.ownedBy, "Star " + str(self.name) + " cannot own itself"
+            assert ('C:' + self.hex.position) not in self.tradeCode.colony, "Star " + str(self.name) + " cannot colonise itself"
         assert hasattr(self, 'allegiance_base'), "Star " + str(self.name) + " is missing base allegiance attribute"
         assert self.allegiance_base is not None, "Star " + str(self.name) + " has empty base allegiance attribute"
         result, msg = self.uwp.is_well_formed()
