@@ -219,7 +219,7 @@ is quadratic in the number of total star lines in the input.
 For instance, running just this pass on Dagudashaag (558 stars) could result, worst case, in approx 155,400 reduction
 attempts.
 
-Two-minimisation, as its name suggests, looks for any combinations of _two_ starlines that can be removed from the
+Two-reduction, as its name suggests, looks for any combinations of _two_ starlines that can be removed from the
 current input, which can often enable further reductions after single-line reduction has stalled.
 
 ```--within-line``` : Enable within-line reduction, running after double-line reduction.
@@ -229,11 +229,15 @@ each starline.
 
 For example:
 
-```"0627 Taku                 AA676AD-C Ag Ni Ri Cp Da            { 4 }  (B58+5) [AA9G] BCF  NS A 912 14 ImDa K1 V M1 V      Xb:0524 Xb:1029"```
+```
+0627 Taku                 AA676AD-C Ag Ni Ri Cp Da            { 4 }  (B58+5) [AA9G] BCF  NS A 912 14 ImDa K1 V M1 V      Xb:0524 Xb:1029
+```
 
 could get shrunk to (dropping capitals, other trade codes, nobles, bases, and setting PBG back to 100):
 
-```0627 Taku                 AA676AD-C                                       { 1 }  (B58+5) [AA9G]      -  - 100 14 ImDa K1 V           Xb:0524 Xb:1029                          ```
+```
+0627 Taku                 AA676AD-C                                       { 1 }  (B58+5) [AA9G]      -  - 100 14 ImDa K1 V           Xb:0524 Xb:1029                          
+```
 
 
 What does it do?

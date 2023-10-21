@@ -87,7 +87,7 @@ Hex  Name                 UWP       Remarks                               {Ix}  
 2123 Kediiga              B778411-8 Ni Pa                                 { -1 } (832-5) [1314] Bc   -  - 920 9  ImDv G6 V
 ```
 
-Renaming the result from ```Dagudashaag-spieked.sec-min``` to ```Dagudashaag-zero.sec``` and feeding it into plain PyRoute gave:
+Renaming the result from ```Dagudashaag-spiked.sec-min``` to ```Dagudashaag-zero.sec``` and feeding it into plain PyRoute gave:
 ```
 2023-10-19 03:41:49,419 - INFO - starting processing
 2023-10-19 03:41:49,420 - INFO - ['/home/alex/gitstuf/traveller_pyroute/deltasectors/Dagudashaag-zero.sec']
