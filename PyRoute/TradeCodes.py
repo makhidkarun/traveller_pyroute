@@ -80,6 +80,41 @@ class TradeCodes(object):
         self.dcode = list(self.dcode) + self.colony + self.owner
         self.dcode = sorted(self.dcode)
 
+    def _process_homeworld(self, homeworld, homeworlds_found, initial_codes):
+        full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
+        homeworlds_found.append(homeworld)
+        match = re.match(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W)?', homeworld)
+        if match is None:
+            self.logger.error("Unable to process %s", initial_codes)
+            sys.exit(1)
+        if full_name.startswith("Di"):
+            sophont = "{code: <4}{pop}".format(code=match.group(1), pop='X')
+        else:
+            sophont = "{code: <4}{pop}".format(code=match.group(1), pop=match.group(2) if match.group(2) else 'W')
+        sophont = sophont.replace("'", "X")
+        sophont = sophont.replace("!", "X")
+        sophont = sophont.replace(" ", "X")
+        self.sophont_list.append(sophont)
+        self.homeworld_list.append(sophont)
+        self.codes = [code for code in self.codes if code != homeworld]
+
+    def _process_major_race_homeworld(self, homeworld, homeworlds_found):
+        """
+        Homeworld processing using codes like [Solomani] - can make more assumptions than in the original case
+
+        @type homeworld: string
+        @type homeworlds_found: list
+        """
+        full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
+        homeworlds_found.append(homeworld)
+        sophont = "{code: <4}{pop}".format(code=full_name[0:4], pop='W')
+        sophont = sophont.replace("'", "X")
+        sophont = sophont.replace("!", "X")
+        sophont = sophont.replace(" ", "X")
+        self.sophont_list.append(sophont)
+        self.homeworld_list.append(sophont)
+        self.codes = [code for code in self.codes if code != '[' + homeworld + "]"]
+
     def __str__(self):
         return " ".join(sorted(self.codes))
 
