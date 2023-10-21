@@ -106,6 +106,7 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 000000000 A0000 {0} (000-0)  - - - 0 000   00')
     @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00000 0 0 ')
     @example('1717 Vland                A967A9A-F Hi Cs [Vilani]            { 3 }  (D9F+5) [CD7H] BEFG N  - 310 7  ImDv F8 V           ')
+    @example('0101 000000000000000 ???????-? (000000000000000000000000000000000000)       - - 0 000   00')
     def test_parse_line_to_star_and_back(self, s):
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
@@ -126,8 +127,8 @@ class testStar(unittest.TestCase):
         self.assertTrue(isinstance(nu_foo, Star), "Round-trip line did not re-parse")
         nu_foo.index = 0
         nu_foo.allegiance_base = nu_foo.alg_base_code
-        self.assertTrue(foo.is_well_formed())
-        self.assertIsNotNone(foo._hash, "Hash not calculated for re-parsed star")
+        self.assertTrue(nu_foo.is_well_formed())
+        self.assertIsNotNone(nu_foo._hash, "Hash not calculated for re-parsed star")
 
         self.assertEqual(foo, nu_foo, "Re-parsed star not __eq__ to original star.  Hypothesis input: " + s + '\n')
         self.assertEqual(
