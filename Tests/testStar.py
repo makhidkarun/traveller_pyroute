@@ -561,6 +561,15 @@ class TestStar(unittest.TestCase):
         expected_msg = "Star " + str(star1.name) + " cannot colonise itself"
         self.assertEqual(expected_msg, msg)
 
+    def testParseAnjeChadr(self):
+        line = '0123 Anje Chadr           B568778-A Ag Ri Sa C:0124            {+4 } (G6C+4) [4B38] - V  - 222 11 Zh K6 V'
+        star1 = Star.parse_line_into_star(line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
+        star1.index = 0
+        star1.allegiance_base = star1.alg_code
+
+        star1.is_well_formed(log=False)
+        self.assertEqual(1, len(star1.tradeCode.colony))
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
