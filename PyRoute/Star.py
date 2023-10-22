@@ -664,6 +664,8 @@ class Star(object):
         assert result, msg
         result, msg = self.hex.is_well_formed()
         assert result, msg
+        assert not (0 < len(self.tradeCode.owner) and 0 < len(self.tradeCode.colony)), "Star " + str(
+            self.name) + " cannot both be owned by another system and have colonies"
         if log:
             if self.hex.position == self.tradeCode.ownedBy:
                 self.logger.error("Star " + str(self.name) + " cannot own itself")
