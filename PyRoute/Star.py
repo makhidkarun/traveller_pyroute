@@ -695,3 +695,15 @@ class Star(object):
         capital = 2 if self.tradeCode.sector_capital or self.tradeCode.other_capital else 1 if \
             self.tradeCode.subsector_capital else 0
         self._pax_btn_mod = rich + capital
+
+    def trim_self_ownership(self):
+        posn = self.hex.position
+        if posn == self.tradeCode.ownedBy:
+            msg = "Star " + self.name + " should not own itself"
+            self.logger.warning(msg)
+            self.tradeCode.ownedBy = None
+            ownstring = 'O:' + posn
+            self.tradeCode.owner = [item for item in self.tradeCode.owner if ownstring != item]
+            self.tradeCode.owned = [item for item in self.tradeCode.owned if ownstring != item]
+            self.tradeCode.codes = [item for item in self.tradeCode.codes if ownstring != item]
+            self.tradeCode.dcode = [item for item in self.tradeCode.dcode if ownstring != item]
