@@ -39,6 +39,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual('Im', star1.alg_code)
         self.assertEqual(10, star1.population, "Population %s" % star1.population)
         self.assertEqual(9, star1.wtn, "wtn %s" % star1.wtn)
+        self.assertEqual('Fl', str(star1.tradeCode))
         self.assertFalse(star1.tradeCode.industrial)
         self.assertFalse(star1.tradeCode.agricultural)
         self.assertFalse(star1.tradeCode.poor)
@@ -89,6 +90,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual('Im', star1.alg_code)
         self.assertEqual(0, star1.population, "Population %s" % star1.population)
         self.assertEqual(2, star1.wtn, "wtn %s" % star1.wtn)
+        self.assertEqual('Lo Po', str(star1.tradeCode))
         self.assertFalse(star1.tradeCode.industrial)
         self.assertFalse(star1.tradeCode.agricultural)
         self.assertTrue(star1.tradeCode.poor)
@@ -113,7 +115,8 @@ class TestStar(unittest.TestCase):
         self.assertEqual('Core', star1.sector.name, star1.sector.name)
         self.assertEqual(star1.position, '2323')
         self.assertEqual(star1.name, 'Syss')
-        self.assertEqual('C400746-8', str(star1.uwp))
+        self.assertEqual(star1.uwp, 'C400746-8')
+        self.assertEqual('Na Pi Va', str(star1.tradeCode))
         self.assertEqual(star1.stars, 'M9 III D M5 V')
         self.assertEqual('M9 III D M5 V', str(star1.star_list_object))
         self.assertEqual(22, star1.x)
@@ -130,6 +133,7 @@ class TestStar(unittest.TestCase):
             "2719 Zhdant               A6547C8-F Ag An Cx                            - KM - 811   Zh K0 V                        ",
             sector, 'fixed', 'fixed')
 
+        self.assertEqual('Ag An Cx', str(star1.tradeCode))
         self.assertEqual(-198, star1.x)
         self.assertEqual(-2, star1.y)
         self.assertEqual(200, star1.z)
@@ -144,6 +148,7 @@ class TestStar(unittest.TestCase):
             "2720 Vlazzhden            C210143-8 Lo Ni                               - -  - 303   Zh G1 IV                       ",
             sector, 'fixed', 'fixed')
 
+        self.assertEqual('Lo Ni', str(star1.tradeCode))
         self.assertEqual(-198, star1.x)
         self.assertEqual(-1, star1.y)
         self.assertEqual(199, star1.z)
@@ -158,6 +163,7 @@ class TestStar(unittest.TestCase):
             "2819 Tlapinsh             B569854-C Ri                                  - -  - 622   Zh F7 V                        ",
             sector, 'fixed', 'fixed')
 
+        self.assertEqual('Ri', str(star1.tradeCode))
         self.assertEqual(-197, star1.x)
         self.assertEqual(-2, star1.y)
         self.assertEqual(199, star1.z)
@@ -172,6 +178,7 @@ class TestStar(unittest.TestCase):
             "2820 Ezevrtlad            C120000-B De Ba Po                            - -  - 900   Zh K2 III                      ",
             sector, 'fixed', 'fixed')
 
+        self.assertEqual('Ba De Po', str(star1.tradeCode))
         self.assertEqual(-197, star1.x)
         self.assertEqual(-1, star1.y)
         self.assertEqual(198, star1.z)
@@ -185,6 +192,7 @@ class TestStar(unittest.TestCase):
         line = '0522 Unchin               A437743-E                            { 2 }  (B6D-1) [492B] B     N  - 620 9  ImDi K0 III                                                       '
         star1 = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
         self.assertIsInstance(star1, Star)
+        self.assertEqual('', str(star1.tradeCode))
 
     def testParseBarrelOfWeird(self):
         # These were weird intermediate values that _kept_ turning up in round-trip testing, so it was worth breaking it
@@ -204,13 +212,13 @@ class TestStar(unittest.TestCase):
         sector = Sector('# Core', '# 0, 0')
 
         homeworlds = [
-            ('Terra', '1827 Terra                A867A69-F Hi Ga [Solomani] Dolp0 Mr       { 4 }  (H9C+4) [BE6G] BEf  NW - 114 10 ImDs G2 V                         ', ['Dolp0', 'SoloW']),
-            ('Vland', '1717 Vland                A967A9A-F Hi Cs [Vilani]            { 3 }  (D9F+5) [CD7H] BEFG N  - 310 7  ImDv F8 V           ', ['VilaW']),
-            ('Kusyu', '1226 Kusyu                A876976-E Hi In Cx [Aslan]                       { 5 }  (F8H+4) [9E4D] - RT - 403 8  AsSc G4 V D             ', ['AslaW']),
-            ('Lair', '2402 Lair                 A8859B9-E Hi Ga Cx Pr Pz [Vargr] { 3 }  (F8F+4) [AC6F] - K  A 213 12 VLPr G5 V        ', ['VargW'])
+            ('Terra', '1827 Terra                A867A69-F Hi Ga [Solomani] Dolp0 Mr       { 4 }  (H9C+4) [BE6G] BEf  NW - 114 10 ImDs G2 V                         ', ['Dolp0', 'SoloW'], 'Dolp0 Ga Hi Mr [Solomani]'),
+            ('Vland', '1717 Vland                A967A9A-F Hi Cs [Vilani]            { 3 }  (D9F+5) [CD7H] BEFG N  - 310 7  ImDv F8 V           ', ['VilaW'], 'Cs Hi [Vilani]'),
+            ('Kusyu', '1226 Kusyu                A876976-E Hi In Cx [Aslan]                       { 5 }  (F8H+4) [9E4D] - RT - 403 8  AsSc G4 V D             ', ['AslaW'], 'Cx Hi In [Aslan]'),
+            ('Lair', '2402 Lair                 A8859B9-E Hi Ga Cx Pr Pz [Vargr] { 3 }  (F8F+4) [AC6F] - K  A 213 12 VLPr G5 V        ', ['VargW'], 'Cx Ga Hi Pr Pz [Vargr]')
         ]
 
-        for msg, star_line, expected_sophonts in homeworlds:
+        for msg, star_line, expected_sophonts, expected_trade in homeworlds:
             with self.subTest(msg):
                 star1 = Star.parse_line_into_star(star_line, sector, 'fixed', 'fixed')
                 star1.index = 0
@@ -219,7 +227,7 @@ class TestStar(unittest.TestCase):
                 self.assertTrue(star1.is_well_formed())
 
                 self.assertEqual(expected_sophonts, star1.tradeCode.sophont_list)
-
+                self.assertEqual(expected_trade, str(star1.tradeCode), 'Unexpected trade code list')
 
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
