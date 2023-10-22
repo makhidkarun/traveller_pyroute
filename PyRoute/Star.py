@@ -707,3 +707,14 @@ class Star(object):
             self.tradeCode.owned = [item for item in self.tradeCode.owned if ownstring != item]
             self.tradeCode.codes = [item for item in self.tradeCode.codes if ownstring != item]
             self.tradeCode.dcode = [item for item in self.tradeCode.dcode if ownstring != item]
+
+    def trim_self_colonisation(self):
+        posn = self.hex.position
+        colstring = 'C:' + posn
+        if colstring in self.tradeCode.colony:
+            msg = "Star " + self.name + " should not colonise itself"
+            self.logger.warning(msg)
+            self.tradeCode.colony = [item for item in self.tradeCode.owner if colstring != item]
+            self.tradeCode.owned = [item for item in self.tradeCode.owned if colstring != item]
+            self.tradeCode.codes = [item for item in self.tradeCode.codes if colstring != item]
+            self.tradeCode.dcode = [item for item in self.tradeCode.dcode if colstring != item]

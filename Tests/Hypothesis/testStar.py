@@ -115,6 +115,7 @@ class testStar(unittest.TestCase):
     @example('0000 000000000000000 ???????-? 0000000000000 0 {0} -       -   - 0 000   00')
     @example('0101 000000000000000 ???????-? 00000000000000( { +0 } (000-0)  -         - 0 000   00')
     @example('2723 Lyndon               C9C68B7-9 Fl Ph Varg6 O:2723         { 0 }  (F79+1) [8859] - M  - 723 15 JuHl F0 V          ')
+    @example('1627 Ricelun              C858598-9 Ag Ni C:1627                { 0 } (641+1) [4598] - -  - 802 9  Pd G6 V         ')
     def test_parse_line_to_star_and_back(self, s):
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
@@ -122,6 +123,7 @@ class testStar(unittest.TestCase):
         foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
         assume(foo is not None)
         foo.trim_self_ownership()
+        foo.trim_self_colonisation()
         self.assertIsNotNone(foo._hash, "Hash not calculated for original star")
 
         foo.index = 0
