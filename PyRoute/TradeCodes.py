@@ -70,7 +70,7 @@ class TradeCodes(object):
                 ("D2", "Wa"), ("C8", "Ri"), ("C8", "Wa"), ("Ex", "Lo"), ("Ex", "Ni"), ("Ex", "Pr"), ("Lo", "Pr"),
                 ("C2", "Ri"), ("D2", "Ri"), ("C7", "Ni"), ("D8", "Hi"), ("C2", "Po"), ("Ag", "C4"), ("D0", "Hi"),
                 ("C0", "Hi"), ("C0", "Po"), ("C2", "Na"), ("C6", "Ri"), ("Po", "Wa"), ("Ag", "D2"), ("C1", "Ri"),
-                ("D3", "Ni"), ("C5", "Ni"), ("Ag", "N1"), ("D6", "Ni"), }
+                ("D3", "Ni"), ("C5", "Ni"), ("Ag", "N1"), ("D6", "Ni"), ("As", "Ic")}
 
     __slots__ = '__dict__', 'codeset', 'pcode', 'dcode', 'xcode'
 
@@ -475,8 +475,8 @@ class TradeCodes(object):
     def _check_code_pairs_allowed(self):
         msg = ""
 
-        # Exclude weird and sophont codes straight-up
-        sortset = sorted([code for code in self.codeset if code not in TradeCodes.weird_codes and code[0] not in '(['])
+        # Exclude weird codes, sophont codes and military rule straight-up
+        sortset = sorted([code for code in self.codeset if code not in TradeCodes.weird_codes and code[0] not in '([' and not code.startswith('Mr')])
         outside = set()
 
         for code, other in itertools.combinations(sortset, 2):
