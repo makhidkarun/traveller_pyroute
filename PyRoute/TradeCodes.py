@@ -79,7 +79,7 @@ class TradeCodes(object):
         Constructor
         """
         self.logger = logging.getLogger('PyRoute.TradeCodes')
-        self.codes = initial_codes.split()
+        self.codes = self._preprocess_initial_codes(initial_codes)
         self.pcode = set(TradeCodes.pcodes) & set(self.codes)
         self.dcode = set(TradeCodes.dcodes) & set(self.codes)
         self.xcode = TradeCodes.ext_codes & set(self.codes)
@@ -125,6 +125,31 @@ class TradeCodes(object):
         self.dcode = list(self.dcode) + self.colony + self.owner
         self.dcode = sorted(self.dcode)
 
+    def _preprocess_initial_codes(self, initial_codes):
+        raw_codes = initial_codes.split()
+        # look for successive codes that should be part of the same name (eg  "(Carte" , then "Blanche)", becoming
+        # "(Carte Blanche)" ) and bolt them together
+        num_codes = len(raw_codes)
+        codes = []
+        for i in range(0, num_codes):
+            raw = raw_codes[i]
+            if '' == raw:
+                continue
+            if not raw.startswith('(') and not raw.startswith('['):  # this isn't a sophont code
+                codes.append(raw)
+                continue
+            if raw.endswith(')') or raw.endswith(']'):  # this _is_ a sophont code
+                codes.append(raw)
+                continue
+            if i < num_codes - 1:
+                next = raw_codes[i + 1]
+                if next.endswith(')') or next.endswith(']'):
+                    combo = raw + ' ' + next
+                    codes.append(combo)
+                    raw_codes[i + 1] = ''
+
+        return codes
+
     def _process_homeworld(self, homeworld, homeworlds_found, initial_codes):
         full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
         homeworlds_found.append(homeworld)
@@ -135,13 +160,14 @@ class TradeCodes(object):
         if full_name.startswith("Di"):
             sophont = "{code: <4}{pop}".format(code=match.group(1), pop='X')
         else:
-            sophont = "{code: <4}{pop}".format(code=match.group(1), pop=match.group(2) if match.group(2) else 'W')
+            sophont = "({code: <4}){pop}".format(code=match.group(1), pop=match.group(2) if match.group(2) else 'W')
         sophont = sophont.replace("'", "X")
         sophont = sophont.replace("!", "X")
         sophont = sophont.replace(" ", "X")
         self.sophont_list.append(sophont)
         self.homeworld_list.append(sophont)
         self.codes = [code for code in self.codes if code != homeworld]
+        self.codes.append(sophont)
 
     def _process_major_race_homeworld(self, homeworld, homeworlds_found):
         """
@@ -409,6 +435,7 @@ class TradeCodes(object):
 
     def _check_residual_code_well_formed(self, code):
         max_code_len = 12
+        max_sophont_len = 35
         if code not in TradeCodes.ext_codes and code not in TradeCodes.ex_codes:
             if code in TradeCodes.weird_codes:
                 return True
@@ -426,11 +453,20 @@ class TradeCodes(object):
             if open_squares != close_squares:
                 return False
 
-            if len(code) > max_code_len:
+            if code.startswith('['):
+                if len(code) > max_sophont_len:
+                    return False
+                return True
+            elif len(code) > max_code_len:
                 return False
-            if code.startswith('Di(') or code.startswith('(') or code.endswith(')') or code.endswith(')?'):
+
+            if len(code) > max_code_len or (code.startswith('[') and len(code) > max_sophont_len):
+                return False
+            if code.startswith('Di(') or code.startswith('(') or code.endswith(')') or code.endswith(')?'):  # minor race homeworld
                 if ')' not in code:
                     return False
+                return True
+            if code.startswith('[') and code.endswith(']'):  # major race homeworld
                 return True
             if code not in TradeCodes.allowed_residual_codes:
                 return False
@@ -439,7 +475,8 @@ class TradeCodes(object):
     def _check_code_pairs_allowed(self):
         msg = ""
 
-        sortset = sorted([code for code in self.codeset if code not in TradeCodes.weird_codes])
+        # Exclude weird and sophont codes straight-up
+        sortset = sorted([code for code in self.codeset if code not in TradeCodes.weird_codes and code[0] not in '(['])
         outside = set()
 
         for code, other in itertools.combinations(sortset, 2):

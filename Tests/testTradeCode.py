@@ -133,6 +133,25 @@ class TestTradeCode(unittest.TestCase):
                 log.output
             )
 
+    def testSophontHomeworldWithSpaces(self):
+        cases = [
+            ('Minor race', 'Ni Pa (Ashdak Meshukiiba) Sa ', '(Ashdak Meshukiiba) Ni Pa Sa'),
+            ('Major race', 'Ni Pa [Ashdak Meshukiiba] Sa ', '[Ashdak Meshukiiba] Ni Pa Sa')
+        ]
+
+        for msg, line, expected_line in cases:
+            with self.subTest(msg):
+                code = TradeCodes(line)
+                result, msg = code.is_well_formed()
+                self.assertTrue(result, msg)
+                self.assertEqual(1, len(code.sophont_list))
+                self.assertEqual(1, len(code.homeworld_list))
+                self.assertEqual(
+                    code.homeworld_list, code.sophont_list,
+                    "Ashdak Meshukiiba not equally in homeworld and sophont list"
+                )
+                self.assertEqual(expected_line, str(code))
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
