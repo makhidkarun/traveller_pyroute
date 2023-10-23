@@ -3,7 +3,7 @@ Created on Oct 3, 2017
 
 @author: tjoneslo
 """
-
+import itertools
 import re
 import logging
 import sys
@@ -26,6 +26,51 @@ class TradeCodes(object):
     pcolor = {'As': '#8E9397', 'De': '#d17533', 'Fl': '#e37dff', 'He': '#ff6f0c', 'Ic': '#A5F2F3',
               'Oc': '#0094ED', 'Po': '#6a986a', 'Va': '#c9c9c9', 'Wa': '#4abef4'}
     ext_codes = {'Lt', 'Ht', 'Lg', 'Hg'}
+    weird_codes = {'{Anomaly}', '{Fuel}', '{Ringworld}', '{Rosette}'}
+    allowed_residual_codes = {'Ag', 'Ba', 'Bo', 'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'Cl', 'Cw',
+                              'Cy', 'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'Dw', 'Ex', 'Fr', 'Ga',
+                              'Hi', 'In', 'Lo', 'N1', 'Na', 'Ni', 'o', 'Pa', 'Ph', 'Pi', 'Po', 'Pr', 'Ri', 'Rn', 'Rv',
+                              's', 'Sp', 'St', 'Tn', 'Za'}
+    ok_pairs = {('Ni', 'Po'), ('Ni', 'Pa'), ('Ni', 'Wa'), ('Ph', 'Ri'), ('Lo', 'Va'), ('Ni', 'Va'), ('Lo', 'Po'),
+                ('De', 'He'), ('De', 'Ni'), ('De', 'Po'), ('He', 'Ni'), ('He', 'Po'), ('Hi', 'In'), ('De', 'Lo'),
+                ('Ic', 'Na'), ('Ic', 'Ni'), ('Ic', 'Va'), ('Na', 'Ni'), ('Na', 'Va'), ('As', 'Ni'), ('As', 'Va'),
+                ('De', 'Na'), ('He', 'Na'), ('Na', 'Po'), ('Hi', 'Pr'), ('Ga', 'Hi'), ('Ag', 'Ni'), ('Na', 'Pi'),
+                ('Ni', 'Oc'), ('Ag', 'Ga'), ("Ag", "Ri"), ("Ga", "Ni"), ("Ga", "Ri"), ("Ni", "Ri"), ("Ag", "Pi"),
+                ("He", "Lo"), ("Ag", "Pr"), ("Ni", "Pr"), ("As", "Hi"), ("As", "In"), ("As", "Na"), ("Hi", "Na"),
+                ("Hi", "Va"), ("In", "Na"), ("In", "Va"), ("De", "Ph"), ("De", "Pi"), ("He", "Ph"), ("He", "Pi"),
+                ("Na", "Ph"), ("Ph", "Pi"), ("Ph", "Po"), ("Pi", "Po"), ("Ic", "Lo"), ("Fl", "He"), ("Fl", "Ni"),
+                ("As", "Lo"), ("Pa", "Ph"), ("Pa", "Ri"), ("Pa", "Pi"), ("Hi", "Wa"), ("In", "Wa"), ("Ga", "Lo"),
+                ("Ga", "Pa"), ("Ph", "Va"), ("Pi", "Va"), ("As", "Ph"), ("As", "Pi"), ("Ga", "Pr"), ("Ic", "Pi"),
+                ("Ba", "Va"), ("Hi", "Po"), ("Hi", "Ic"), ("Ic", "In"), ("Fl", "Lo"), ("De", "Ri"), ("Pi", "Wa"),
+                ("Ga", "Ph"), ("Ba", "Fl"), ("Ba", "Lo"), ("Ba", "Ni"), ("De", "Hi"), ("De", "In"), ("He", "Hi"),
+                ("He", "In"), ("In", "Po"), ("Ph", "Wa"), ("Ri", "Wa"), ("Pr", "Wa"), ("Ba", "Wa"), ("Lo", "Ni"),
+                ("Ic", "Ph"), ("Ba", "Po"), ("Lo", "Wa"), ("Ba", "De"), ("Fl", "Ph"), ("Oc", "Ri"), ("Lo", "Oc"),
+                ("Fl", "Hi"), ("Fl", "In"), ("De", "Pr"), ("Oc", "Ph"), ("Oc", "Pi"), ("Hi", "Oc"), ("In", "Oc"),
+                ("Oc", "Pr"), ("Ba", "Ic"), ("Ba", "He"), ("Ba", "Ga"), ("Ba", "Oc"), ("As", "Ba"), ("Ag", "Hi"),
+                ("Ag", "D3"), ("De", "Va"), ("Ag", "In"), ("Fl", "Wa"), ("Hi", "Sp"), ("In", "Sp"), ("Po", "Pr"),
+                ("Fl", "Pr"), ("Ic", "Wa"), ("Ba", "Bo"), ("Bo", "De"), ("Bo", "He"), ("Ba", "o"), ("Bo", "Lo"),
+                ("Oc", "Wa"), ("Bo", "Fl"), ("Ag", "Cy"), ("Cy", "Ni"), ("Cy", "Fl"), ("Cy", "Pr"), ("Cy", "Po"),
+                ("Cy", "He"), ("Cy", "Pi"), ("Cy", "Ri"), ("Cy", "Wa"), ("Cy", "Pa"), ("Cy", "Ph"), ("Cy", "De"),
+                ("Ag", "Po"), ("As", "Cy"), ("Cy", "Na"), ("Cy", "Va"), ("Cy", "Ga"), ("Cy", "Ic"), ("Cy", "Hi"),
+                ("Cy", "In"), ("Bo", "Ni"), ("Bo", "Va"), ("Cy", "Lo"), ("Ag", "Lo"), ("Hi", "s"), ("Ag", "Wa"),
+                ("Hi", "Ri"), ("In", "Ri"), ("Ag", "Fl"), ("Lo", "Na"), ("Lo", "Ri"), ("Fl", "Ri"), ("In", "Lo"),
+                ("Ag", "Va"), ("Na", "Wa"), ("Fl", "Na"), ("Ag", "C1"), ("C1", "Ni"), ("Dw", "Hi"), ("Dw", "Na"),
+                ("Dw", "Po"), ("Ag", "St"), ("Ag", "Tn"), ("Ni", "St"), ("Ni", "Tn"), ("St", "Tn"), ("Ag", "C3"),
+                ("C3", "Ni"), ("Lo", "St"), ("C0", "Lo"), ("C0", "Ni"), ("Ag", "C6"), ("C6", "Ni"), ("C1", "Fl"),
+                ("D1", "Lo"), ("D1", "Ni"), ("C4", "Ni"), ("C4", "Po"), ("Ag", "D1"), ("D1", "Ri"), ("Ri", "Tn"),
+                ("Hi", "St"), ("C5", "Po"), ("D3", "Ri"), ("D3", "Tn"), ("C1", "Lo"), ("C9", "Lo"), ("C9", "Ni"),
+                ("C9", "Po"), ("D1", "Po"), ("Dw", "Lo"), ("Dw", "Ni"), ("Ag", "C9"), ("Ag", "C5"), ("Hi", "Tn"),
+                ("C4", "Lo"), ("Ag", "Dw"), ("Lo", "Tn"), ("C1", "Wa"), ("C4", "Wa"), ("C9", "Na"), ("C9", "Va"),
+                ("D0", "Ni"), ("Ag", "Cw"), ("Cw", "Ri"), ("D4", "Lo"), ("D4", "Ni"), ("C2", "Lo"), ("C2", "Ni"),
+                ("C0", "Fl"), ("Cy", "Oc"), ("Hi", "Ni"), ("Hi", "Lo"), ("Va", "Wa"), ("Ba", "Na"), ("Na", "Ri"),
+                ("De", "Fl"), ("As", "Po"), ("Ic", "Po"), ("Hi", "Za"), ("Pr", "Za"), ("Ag", "D0"), ("Cw", "Ni"),
+                ("D4", "De"), ("Ag", "D7"), ("D7", "Ni"), ("D7", "Ri"), ("Ag", "C0"), ("Ag", "D8"), ("D8", "Ni"),
+                ("D8", "Ri"), ("Hi", "Rn"), ("Ic", "Rn"), ("In", "Rn"), ("Rn", "Va"), ("C3", "Lo"), ("C3", "Hi"),
+                ("Ag", "C2"), ("Fl", "Rv"), ("Lo", "Rv"), ("Ni", "Rv"), ("C2", "Hi"), ("D2", "Lo"), ("D2", "Ni"),
+                ("D2", "Wa"), ("C8", "Ri"), ("C8", "Wa"), ("Ex", "Lo"), ("Ex", "Ni"), ("Ex", "Pr"), ("Lo", "Pr"),
+                ("C2", "Ri"), ("D2", "Ri"), ("C7", "Ni"), ("D8", "Hi"), ("C2", "Po"), ("Ag", "C4"), ("D0", "Hi"),
+                ("C0", "Hi"), ("C0", "Po"), ("C2", "Na"), ("C6", "Ri"), ("Po", "Wa"), ("Ag", "D2"), ("C1", "Ri"),
+                ("D3", "Ni"), ("C5", "Ni"), ("Ag", "N1"), ("D6", "Ni"), }
 
     __slots__ = '__dict__', 'codeset', 'pcode', 'dcode', 'xcode'
 
@@ -339,3 +384,76 @@ class TradeCodes(object):
     @property
     def low_per_capita_gwp(self):
         return self.extreme or self.poor or self.nonindustrial or self.low
+
+    def is_well_formed(self):
+        msg = ""
+        for code in self.codeset:
+            if not self._check_residual_code_well_formed(code):
+                msg = "Residual code " + str(code) + " not in allowed residual list"
+                return False, msg
+
+        result, msg = self._check_code_pairs_allowed()
+
+        return result, msg
+
+    def trim_ill_formed_residual_codes(self):
+        nu_set = set()
+        for code in self.codeset:
+            if not self._check_residual_code_well_formed(code):
+                msg = "Residual code " + str(code) + " not in allowed residual list - removing"
+                self.logger.warning(msg)
+                self.codes = [topcode for topcode in self.codes if topcode != code]
+            else:
+                nu_set.add(code)
+        self.codeset = sorted(list(nu_set))
+
+    def _check_residual_code_well_formed(self, code):
+        max_code_len = 12
+        if code not in TradeCodes.ext_codes and code not in TradeCodes.ex_codes:
+            if code in TradeCodes.weird_codes:
+                return True
+
+            open_brackets = code.count('(')
+            close_brackets = code.count(')')
+            if open_brackets != close_brackets:
+                return False
+            open_braces = code.count('{')
+            close_braces = code.count('}')
+            if open_braces != close_braces:
+                return False
+            open_squares = code.count('[')
+            close_squares = code.count(']')
+            if open_squares != close_squares:
+                return False
+
+            if len(code) > max_code_len:
+                return False
+            if code.startswith('Di(') or code.startswith('(') or code.endswith(')') or code.endswith(')?'):
+                if ')' not in code:
+                    return False
+                return True
+            if code not in TradeCodes.allowed_residual_codes:
+                return False
+        return True
+
+    def _check_code_pairs_allowed(self):
+        msg = ""
+
+        sortset = sorted([code for code in self.codeset if code not in TradeCodes.weird_codes])
+        outside = set()
+
+        for code, other in itertools.combinations(sortset, 2):
+            pair = (code, other) if code < other else (other, code)
+            if pair not in TradeCodes.ok_pairs:
+                outside.add(pair)
+
+        if 0 < len(outside):
+            msg = "Code pair(s)"
+            for pair in outside:
+                pairline = ' ("' + pair[0] + '", "' + pair[1] + '"),'
+                msg += pairline
+            msg = msg.strip(',')
+            msg += " not in allowed list"
+            return False, msg
+
+        return True, msg
