@@ -235,6 +235,10 @@ class StatCalculation(object):
         for sophont in star.tradeCode.sophonts:
             soph_code = sophont[0:4]
             soph_pct = sophont[4:]
+            if 2 < len(soph_pct):
+                soph_pct = soph_pct[-2:]
+                soph_code = sophont[:-1]
+            soph_pct = soph_pct.strip(')')
 
             if 4 == len(sophont):
                 soph_code = sophont[0:3]
@@ -249,6 +253,8 @@ class StatCalculation(object):
 
             if any([soph for soph in star.tradeCode.homeworld if soph.startswith(soph_code)]):
                 home = star
+
+            soph_code = soph_code.strip('()')
 
             # Soph_pct == 'X' is dieback or extinct.
             if soph_pct == 'X':
