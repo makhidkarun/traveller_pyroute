@@ -570,6 +570,17 @@ class TestStar(unittest.TestCase):
         star1.is_well_formed(log=False)
         self.assertEqual(1, len(star1.tradeCode.colony))
 
+    def testParseGlisten(self):
+        line = '2036 Glisten              A000986-F As Hi In Na Va Cp                        { 5 }  (D8H+4) [8E4E] BEF   NS - 811 13 ImDd K9 V          '
+        star1 = Star.parse_line_into_star(line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
+        star1.index = 0
+        star1.allegiance_base = star1.alg_code
+
+        star1.is_well_formed(log=False)
+
+        parse_line = star1.parse_to_line()
+        foo = 1
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
