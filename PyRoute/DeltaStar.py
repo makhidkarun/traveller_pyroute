@@ -119,9 +119,115 @@ class DeltaStar(Star):
         self.tradeCode = TradeCodes(' '.join(nu_codes))
 
     def check_canonical(self):
-        msg = ""
+        msg = []
+        result = True
 
-        return True, msg
+        infrastructure = self._ehex_to_int(self.economics[3])
+
+        if self.tradeCode.low and infrastructure != max(self.importance, 0):
+            line = '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self, infrastructure, 0)
+            msg.append(line)
+            result = False
+
+        if '0' == str(self.atmo) and 'Va' not in self.tradeCode.codeset:
+            code = 'Va'
+            line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)
+            msg.append(line)
+            result = False
+
+        if '0' == str(self.atmo) and '0' == str(self.size) and '0' == str(self.hydro) and 'As' not in self.tradeCode.codeset:
+            code = 'As'
+            line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)
+            msg.append(line)
+            result = False
+
+        symbols = self._ehex_to_int(self.social[4] if self.social is not None else '1')  # TL + flux, min 1
+        strangeness = self._ehex_to_int(self.social[3] if self.social is not None else '1')  # flux + 5
+        acceptance = self._ehex_to_int(self.social[2] if self.social is not None else '1')  # pop + Ix, min 1
+        homogeneity = self._ehex_to_int(self.social[1] if self.social is not None else '1')  # pop + flux, min 1
+        pop = self.popCode
+        if pop == 0 and symbols != 0:
+            line = '{} - CX calculated symbols {} should be 0 for barren worlds'.format(self, symbols)
+            msg.append(line)
+            result = False
+        elif pop != 0 and not max(1, self.tl - 5) <= symbols <= self.tl + 5:
+            line = '{} - CX calculated symbols {} not in range {} - {}'.format(self, symbols, max(1, self.tl - 5), self.tl + 5)
+            msg.append(line)
+            result = False
+        if pop == 0 and strangeness != 0:
+            line = '{} - CX calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness)
+            msg.append(line)
+            result = False
+        elif pop != 0 and not 1 <= strangeness <= 10:
+            line = '{} - CX calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10)
+            msg.append(line)
+            result = False
+        if pop == 0 and acceptance != 0:
+            line = '{} - CX calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance)
+            msg.append(line)
+            result = False
+        elif pop != 0 and not max(1, pop + self.importance) == acceptance:
+            line = '{} - CX Calculated acceptance {} does not match generated acceptance {}'.format(self, acceptance, max(1, pop + self.importance))
+            msg.append(line)
+            result = False
+        if pop == 0 and homogeneity != 0:
+            line = '{} - CX calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity)
+            msg.append(line)
+            result = False
+        elif pop != 0 and not max(1, pop - 5) <= homogeneity <= pop + 5:
+            line = '{} - CX calculated homogeneity {} not in range {} - {}'.format(self, homogeneity, max(1, pop - 5), pop + 5)
+            msg.append(line)
+            result = False
+
+        atmo = '23456789'
+        size = '0123456789ABC'
+        hydro = '0'
+        code = 'De'
+        result = self._check_trade_code(atmo, code, hydro, msg, result, size)
+
+        atmo = '568'
+        size = '678'
+        hydro = '567'
+        code = 'Ga'
+        result = self._check_trade_code(atmo, code, hydro, msg, result, size)
+
+        code = 'Ba'
+        pop = '0'
+        result = self._check_pop_code(msg, code, pop)
+
+        code = 'Lo'
+        pop = '123'
+        result = self._check_pop_code(msg, code, pop)
+
+        code = 'Ni'
+        pop = '456'
+        result = self._check_pop_code(msg, code, pop)
+
+        code = 'Hi'
+        pop = '9ABCDEF'
+        result = self._check_pop_code(msg, code, pop)
+
+        return result, msg
+
+    def _check_trade_code(self, atmo, code, hydro, msg, result, size):
+        if code in self.tradeCode.codeset and \
+                not (self.size in size and self.atmo in atmo and self.hydro in hydro):
+            line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode.codeset)
+            msg.append(line)
+            result = False
+        return result
+
+    def _check_pop_code(self, msg, code, pop):
+        check = True
+        if self.pop in pop and code not in self.tradeCode.codeset:
+            line = '{} - Calculated "{}" not in trade codes {}'.format(self, code, self.tradeCode.codeset)
+            msg.append(line)
+        if code in self.tradeCode.codeset and self.pop not in pop:
+            line = '{} - Found invalid "{}" code on world with {} population: {}'.format(self, code, self.pop,
+                                                                                       self.tradeCode.codeset)
+            msg.append(line)
+            check = False
+        return check
 
     def canonicalise(self):
         pass
