@@ -20,7 +20,7 @@ class Canonicalisation(object):
         # build substitution list - canonicalise _everything_
         subs_list = []
         for line in self.reducer.sectors.lines:
-            canon = DeltaStar.reduce(line)
+            canon = DeltaStar.reduce(line, canonicalise=True)
             assert isinstance(canon, str), "Candidate line " + line + " was not reduced to a string.  Got " + canon + " instead."
             subs_list.append((line, canon))
 
