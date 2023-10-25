@@ -13,12 +13,14 @@ from PyRoute.TradeCodes import TradeCodes
 class DeltaStar(Star):
 
     @staticmethod
-    def reduce(starline, drop_routes=False, drop_trade_codes=False, drop_noble_codes=False, drop_base_codes=False, drop_trade_zone=False, drop_extra_stars=False, reset_pbg=False, reset_worlds=False, reset_port=False, reset_tl=False, reset_sophont=False, reset_capitals=False):
+    def reduce(starline, drop_routes=False, drop_trade_codes=False, drop_noble_codes=False, drop_base_codes=False, drop_trade_zone=False, drop_extra_stars=False, reset_pbg=False, reset_worlds=False, reset_port=False, reset_tl=False, reset_sophont=False, reset_capitals=False, canonicalise=False):
         sector = Sector("# dummy", "# 0, 0")
         star = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
         if not isinstance(star, DeltaStar):
             return None
 
+        if canonicalise:
+            star.canonicalise()
         if drop_routes:
             star.reduce_routes()
         if drop_trade_codes:
@@ -115,3 +117,11 @@ class DeltaStar(Star):
                 nu_codes.append(code)
 
         self.tradeCode = TradeCodes(' '.join(nu_codes))
+
+    def check_canonical(self):
+        msg = ""
+
+        return True, msg
+
+    def canonicalise(self):
+        pass
