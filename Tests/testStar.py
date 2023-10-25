@@ -199,7 +199,8 @@ class TestStar(unittest.TestCase):
         # out as a separate unit test to try to figure out _where_ they fire up the hyperdrive.
         weird_line = [
             '0101 000000000000000      ???????-?                                       { -2 } (000-0) -      -    -  - 000 0  00  D                                                        ',
-            '0110 000000000000000      ???????-?                                       { -2 } (000-0) -      Bc   -  - 000 0  00  D                                                        '
+            '0110 000000000000000      ???????-?                                       { -2 } (000-0) -      Bc   -  - 000 0  00  D                                                        ',
+            '0101 0                    A000000-0                                       { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V '
         ]
         sector = Sector('# Core', '# 0, 0')
 
