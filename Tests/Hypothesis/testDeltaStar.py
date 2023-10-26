@@ -100,6 +100,11 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A000100-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000200-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A00B000-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000400-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 Fl                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 As                                     { 0 } (00C+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A001000-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000600-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     def test_check_canonicalisation(self, starline):
         outer_logger = logging.getLogger("PyRoute.Star")
         inner_logger = logging.getLogger("PyRoute.TradeCodes")
