@@ -105,6 +105,20 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A000000-0 As                                     { 0 } (00C+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A001000-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000600-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000700-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000900-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A020000-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 He                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 Wa                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A060500-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A044400-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 Oc                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A010000-0 Va                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 Ri                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 \n                    A000000-0 As                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 Ag                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000900-0 Lo                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A00B000-0 Va                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     def test_check_canonicalisation(self, starline):
         outer_logger = logging.getLogger("PyRoute.Star")
         inner_logger = logging.getLogger("PyRoute.TradeCodes")
@@ -113,6 +127,8 @@ class testDeltaStar(unittest.TestCase):
 
         with self.assertLogs(outer_logger, "DEBUG") as outer_logs:
             with self.assertLogs(inner_logger, "DEBUG") as inner_logs:
+                outer_logger.debug('Dummy message to keep assertLogs happy')
+                inner_logger.debug('Dummy message to keep assertLogs happy')
                 star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
                 self.assertIsNotNone(star1, "Fatal failure parsing line: " + starline)
                 self.assertTrue(isinstance(star1, DeltaStar), "Error parsing line: " + starline)
