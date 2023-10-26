@@ -120,11 +120,17 @@ class testDeltaStar(unittest.TestCase):
                 # trim log lines of less than warning severity - "DEBUG" is set to ensure there will be output to grab
                 output = [line for line in output if 'DEBUG:' not in line and 'INFO:' not in line]
 
-                num_output = len(output)
-
                 canonical_result, canonical_messages = star1.check_canonical()
-                num_messages = len(canonical_messages)
-                self.assertEqual(num_output, num_messages, "Mismatch between parsing logs and canonical-check: " + starline)
+                for msg in canonical_messages:
+                    output = [line for line in output if msg not in line]
+
+                num_output = len(output)
+                tail = output[0] if 0 < len(output) else ''
+                self.assertEqual(
+                    0,
+                    num_output,
+                    "Mismatch between parsing logs and canonical-check: " + starline + '\n' + tail
+                )
 
 
 if __name__ == '__main__':
