@@ -126,15 +126,15 @@ class DeltaStar(Star):
         if self.tradeCode.barren and infrastructure != 0:
             line = '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self, infrastructure, 0)
             msg.append(line)
+        elif self.tradeCode.low and infrastructure != max(self.importance, 0):
+            generated = max(self.importance, 0)
+            line = '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self, infrastructure, generated)
+            msg.append(line)
         elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= 6 + self.importance:
             line = '{} - EX Calculated infrastructure {} not in NI range 0 - {}'.format(self, infrastructure, 6 + self.importance)
             msg.append(line)
         elif not 0 <= infrastructure <= 12 + self.importance:
             line = '{} - EX Calculated infrastructure {} not in range 0 - {}'.format(self, infrastructure, 12 + self.importance)
-            msg.append(line)
-
-        if self.tradeCode.low and infrastructure != max(self.importance, 0):
-            line = '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self, infrastructure, 0)
             msg.append(line)
 
         if '0' == str(self.atmo) and 'Va' not in self.tradeCode.codeset:
@@ -189,6 +189,11 @@ class DeltaStar(Star):
         self._check_trade_code(msg, 'Ga', '678', '568', '567')
         self._check_trade_code(msg, 'Fl', None, 'ABC', '123456789A')
         self._check_trade_code(msg, 'Ic', None, '01', '123456789A')
+        self._check_trade_code(msg, 'Po', None, '2345', '0123')
+        self._check_trade_code(msg, 'He', '3456789ABC', '2479ABC', '012')
+        self._check_trade_code(msg, 'Wa', '3456789', '3456789DEF', 'A')
+        self._check_trade_code(msg, 'Oc', 'ABCD', '3456789DEF', 'A')
+        self._check_trade_code(msg, 'Va', None, '0', None)
 
         code = 'Ba'
         pop = '0'
@@ -209,6 +214,14 @@ class DeltaStar(Star):
         code = 'Hi'
         pop = '9ABCD'
         self._check_pop_code(msg, code, pop)
+
+        self._check_econ_code(msg, 'Na', '0123', '0123', '6789ABCD')
+        self._check_econ_code(msg, 'Pi', '012479', None, '78')
+        self._check_econ_code(msg, 'In', '012479ABC', None, '9ABCD')
+        self._check_econ_code(msg, 'Pr', '68', None, '59')
+        self._check_econ_code(msg, 'Pa', '456789', '45678', '48')
+        self._check_econ_code(msg, 'Ri', '68', None, '678')
+        self._check_econ_code(msg, 'Ag', '456789', '45678', '567')
 
         return 0 == len(msg), msg
 
@@ -236,6 +249,20 @@ class DeltaStar(Star):
             msg.append(line)
             check = False
         return check
+
+    def _check_econ_code(self, msg, code, atmo, hydro, pop):
+        atmo = '0123456789ABCDEF' if atmo is None else atmo
+        hydro = '0123456789A' if hydro is None else hydro
+        pop = '0123456789ABCD' if pop is None else pop
+
+        if self.atmo in atmo and self.hydro in hydro and self.pop in pop \
+                and code not in self.tradeCode.codeset:
+            line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)
+            msg.append(line)
+        if code in self.tradeCode.codeset and \
+                not (self.atmo in atmo and self.hydro in hydro and self.pop in pop):
+            line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode.codeset)
+            msg.append(line)
 
     def canonicalise(self):
         pass
