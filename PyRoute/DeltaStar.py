@@ -130,6 +130,9 @@ class DeltaStar(Star):
         elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= 6 + self.importance:
             line = '{} - EX Calculated infrastructure {} not in NI range 0 - {}'.format(self, infrastructure, 6 + self.importance)
             msg.append(line)
+        elif not 0 <= infrastructure <= 12 + self.importance:
+            line = '{} - EX Calculated infrastructure {} not in range 0 - {}'.format(self, infrastructure, 12 + self.importance)
+            msg.append(line)
 
         if self.tradeCode.low and infrastructure != max(self.importance, 0):
             line = '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self, infrastructure, 0)
@@ -146,7 +149,10 @@ class DeltaStar(Star):
             code = 'As'
             line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)
             msg.append(line)
-            result = False
+        elif 'As' in self.tradeCode.codeset and not ('0' == str(self.atmo) and '0' == str(self.size) and '0' == str(self.hydro)):
+            code = 'As'
+            line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode.codeset)
+            msg.append(line)
 
         symbols = self._ehex_to_int(self.social[4] if self.social is not None else '1')  # TL + flux, min 1
         strangeness = self._ehex_to_int(self.social[3] if self.social is not None else '1')  # flux + 5
@@ -202,6 +208,18 @@ class DeltaStar(Star):
         code = 'Ga'
         result = self._check_trade_code(atmo, code, hydro, msg, result, size)
 
+        atmo = 'ABC'
+        size = None
+        hydro = '123456789A'
+        code = 'Fl'
+        self._check_trade_code(atmo, code, hydro, msg, result, size)
+
+        atmo = '01'
+        size = None
+        hydro = '123456789A'
+        code = 'Ic'
+        self._check_trade_code(atmo, code, hydro, msg, result, size)
+
         code = 'Ba'
         pop = '0'
         result = self._check_pop_code(msg, code, pop)
@@ -214,18 +232,31 @@ class DeltaStar(Star):
         pop = '456'
         result = self._check_pop_code(msg, code, pop)
 
+        code = 'Ph'
+        pop = '8'
+        self._check_pop_code(msg, code, pop)
+
         code = 'Hi'
-        pop = '9ABCDEF'
-        result = self._check_pop_code(msg, code, pop)
+        pop = '9ABCD'
+        self._check_pop_code(msg, code, pop)
 
         return 0 == len(msg), msg
 
     def _check_trade_code(self, atmo, code, hydro, msg, result, size):
+        size = '0123456789ABC' if size is None else size
+        atmo = '0123456789ABCDEF' if atmo is None else atmo
+        hydro = '0123456789A' if hydro is None else hydro
+
         if code in self.tradeCode.codeset and \
                 not (self.size in size and self.atmo in atmo and self.hydro in hydro):
             line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode.codeset)
             msg.append(line)
             result = False
+        elif (self.size in size and self.atmo in atmo and self.hydro in hydro) and code not in self.tradeCode.codeset:
+            line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)
+            msg.append(line)
+            result = False
+
         return result
 
     def _check_pop_code(self, msg, code, pop):
