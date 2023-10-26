@@ -124,6 +124,13 @@ class DeltaStar(Star):
 
         infrastructure = self._ehex_to_int(self.economics[3])
 
+        if self.tradeCode.barren and infrastructure != 0:
+            line = '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self, infrastructure, 0)
+            msg.append(line)
+        elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= 6 + self.importance:
+            line = '{} - EX Calculated infrastructure {} not in NI range 0 - {}'.format(self, infrastructure, 6 + self.importance)
+            msg.append(line)
+
         if self.tradeCode.low and infrastructure != max(self.importance, 0):
             line = '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self, infrastructure, 0)
             msg.append(line)
@@ -145,6 +152,7 @@ class DeltaStar(Star):
         strangeness = self._ehex_to_int(self.social[3] if self.social is not None else '1')  # flux + 5
         acceptance = self._ehex_to_int(self.social[2] if self.social is not None else '1')  # pop + Ix, min 1
         homogeneity = self._ehex_to_int(self.social[1] if self.social is not None else '1')  # pop + flux, min 1
+        labor = self._ehex_to_int(self.economics[2])
         pop = self.popCode
         if pop == 0 and symbols != 0:
             line = '{} - CX calculated symbols {} should be 0 for barren worlds'.format(self, symbols)
@@ -178,6 +186,9 @@ class DeltaStar(Star):
             line = '{} - CX calculated homogeneity {} not in range {} - {}'.format(self, homogeneity, max(1, pop - 5), pop + 5)
             msg.append(line)
             result = False
+        if labor != max(self.popCode - 1, 0):
+            line = '{} - EX Calculated labor {} does not match generated labor {}'.format(self, labor, max(self.popCode - 1, 0))
+            msg.append(line)
 
         atmo = '23456789'
         size = '0123456789ABC'
@@ -207,7 +218,7 @@ class DeltaStar(Star):
         pop = '9ABCDEF'
         result = self._check_pop_code(msg, code, pop)
 
-        return result, msg
+        return 0 == len(msg), msg
 
     def _check_trade_code(self, atmo, code, hydro, msg, result, size):
         if code in self.tradeCode.codeset and \
