@@ -230,20 +230,26 @@ class DeltaStar(Star):
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
 
-        if code in self.tradeCode.codeset and \
-                not (self.size in size and self.atmo in atmo and self.hydro in hydro):
+        code_match = code in self.tradeCode.codeset
+        system_match = self.size in size and self.atmo in atmo and self.hydro in hydro
+
+        if code_match and not system_match:
             line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode.codeset)
             msg.append(line)
-        elif (self.size in size and self.atmo in atmo and self.hydro in hydro) and code not in self.tradeCode.codeset:
+        elif system_match and not code_match:
             line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)
             msg.append(line)
 
     def _check_pop_code(self, msg, code, pop):
         check = True
-        if self.pop in pop and code not in self.tradeCode.codeset:
+
+        pop_match = self.pop in pop
+        code_match = code in self.tradeCode.codeset
+
+        if pop_match and not code_match:
             line = '{} - Calculated "{}" not in trade codes {}'.format(self, code, self.tradeCode.codeset)
             msg.append(line)
-        if code in self.tradeCode.codeset and self.pop not in pop:
+        if code_match and not pop_match:
             line = '{} - Found invalid "{}" code on world with {} population: {}'.format(self, code, self.pop,
                                                                                        self.tradeCode.codeset)
             msg.append(line)
@@ -255,12 +261,13 @@ class DeltaStar(Star):
         hydro = '0123456789A' if hydro is None else hydro
         pop = '0123456789ABCD' if pop is None else pop
 
-        if self.atmo in atmo and self.hydro in hydro and self.pop in pop \
-                and code not in self.tradeCode.codeset:
+        code_match = code in self.tradeCode.codeset
+        phys_match = self.atmo in atmo and self.hydro in hydro and self.pop in pop
+
+        if phys_match and not code_match:
             line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)
             msg.append(line)
-        if code in self.tradeCode.codeset and \
-                not (self.atmo in atmo and self.hydro in hydro and self.pop in pop):
+        if code_match and not phys_match:
             line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode.codeset)
             msg.append(line)
 
