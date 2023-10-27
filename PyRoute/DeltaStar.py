@@ -240,6 +240,21 @@ class DeltaStar(Star):
             line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)
             msg.append(line)
 
+    def _fix_trade_code(self, code, size, atmo, hydro):
+        size = '0123456789ABC' if size is None else size
+        atmo = '0123456789ABCDEF' if atmo is None else atmo
+        hydro = '0123456789A' if hydro is None else hydro
+
+        code_match = code in self.tradeCode.codeset
+        system_match = self.size in size and self.atmo in atmo and self.hydro in hydro
+        if code_match == system_match:
+            return
+
+        if code_match and not system_match:
+            self._drop_invalid_trade_code(code)
+        elif system_match and not code_match:
+            self._add_missing_trade_code(code)
+
     def _check_pop_code(self, msg, code, pop):
         check = True
 
@@ -256,6 +271,18 @@ class DeltaStar(Star):
             check = False
         return check
 
+    def _fix_pop_code(self, code, pop):
+        pop_match = self.pop in pop
+        code_match = code in self.tradeCode.codeset
+
+        if pop_match == code_match:
+            return
+
+        if code_match and not pop_match:
+            self._drop_invalid_trade_code(code)
+        elif pop_match and not code_match:
+            self._add_missing_trade_code(code)
+
     def _check_econ_code(self, msg, code, atmo, hydro, pop):
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
@@ -271,5 +298,52 @@ class DeltaStar(Star):
             line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode.codeset)
             msg.append(line)
 
+    def _fix_econ_code(self, code, atmo, hydro, pop):
+        atmo = '0123456789ABCDEF' if atmo is None else atmo
+        hydro = '0123456789A' if hydro is None else hydro
+        pop = '0123456789ABCD' if pop is None else pop
+
+        code_match = code in self.tradeCode.codeset
+        phys_match = self.atmo in atmo and self.hydro in hydro and self.pop in pop
+
+        if code_match == phys_match:
+            return
+
+        if code_match and not phys_match:
+            self._drop_invalid_trade_code(code)
+        elif phys_match and not code_match:
+            self._add_missing_trade_code(code)
+
     def canonicalise(self):
-        pass
+        self._fix_trade_code('De', '0123456789ABC', '23456789', '0')
+        self._fix_trade_code('Ga', '678', '568', '567')
+        self._fix_trade_code('Fl', None, 'ABC', '123456789A')
+        self._fix_trade_code('He', '3456789ABC', '2479ABC', '012')
+        self._fix_trade_code('As', '0', '0', '0')
+        self._fix_trade_code('Ic', None, '01', '123456789A')
+        self._fix_trade_code('Oc', 'ABCD', '3456789DEF', 'A')
+        self._fix_trade_code('Po', None, '2345', '0123')
+        self._fix_trade_code('Va', None, '0', None)
+        self._fix_trade_code('Wa', '3456789', '3456789DEF', 'A')
+
+        self._fix_econ_code('Na', '0123', '0123', '6789ABCD')
+        self._fix_econ_code('Ag', '456789', '45678', '567')
+        self._fix_econ_code('Pa', '456789', '45678', '48')
+        self._fix_econ_code('Pi', '012479', None, '78')
+        self._fix_econ_code('Pr', '68', None, '59')
+        self._fix_econ_code('In', '012479ABC', None, '9ABCD')
+        self._fix_econ_code('Ri', '68', None, '678')
+
+        self._fix_pop_code('Ba', '0')
+        self._fix_pop_code('Lo', '123')
+        self._fix_pop_code('Ni', '456')
+        self._fix_pop_code('Ph', '8')
+        self._fix_pop_code('Hi', '9ABCD')
+
+    def _drop_invalid_trade_code(self, targcode):
+        self.tradeCode.codes = [code for code in self.tradeCode.codes if code != targcode]
+        self.tradeCode.codeset = [code for code in self.tradeCode.codeset if code != targcode]
+
+    def _add_missing_trade_code(self, targcode):
+        self.tradeCode.codes.append(targcode)
+        self.tradeCode.codeset.append(targcode)
