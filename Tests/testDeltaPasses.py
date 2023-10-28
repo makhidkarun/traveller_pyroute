@@ -54,8 +54,8 @@ class testDeltaPasses(baseTest):
         self.assertTrue(reduction_pass.preflight(), "Input should be reducible")
         reduction_pass.run()
 
-        expected_hex_line = 'Hex  Name                 UWP       Remarks                               {Ix}   (Ex)    [Cx]   N    B  Z PBG W  A    Stellar         Routes                                   '
-        expected_dash_line = '---- -------------------- --------- ------------------------------------- ------ ------- ------ ---- -- - --- -- ---- --------------- -----------------------------------------'
+        expected_hex_line = 'Hex  Name                 UWP       Remarks                               {Ix}   (Ex)    [Cx]   N    B  Z PBG W  A    Stellar         Routes                                   \n'
+        expected_dash_line = '---- -------------------- --------- ------------------------------------- ------ ------- ------ ---- -- - --- -- ---- --------------- -----------------------------------------\n'
 
         headers = reducer.sectors['Zarushagar'].headers
         self.assertEqual(expected_hex_line, headers[38])
@@ -307,6 +307,7 @@ class testDeltaPasses(baseTest):
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-spiked.sec')
         args = self._make_args_no_line()
         args.interesting_line = 'duplicated'
+        args.interesting_type = 'AssertionError'
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
@@ -332,6 +333,28 @@ class testDeltaPasses(baseTest):
         allegiance_lines = [line for line in headers if "Alleg:" in line]
         self.assertEqual(len(actual_allegiances), len(allegiance_lines), "Allegiance-list length mismatch")
         self.assertTrue("ImDv" in allegiance_lines[0], "Unexpected remaining allegiance")
+
+    def test_allegiance_reduction_deduplicates_allegiance_lines(self):
+        headers = [
+            '# Alleg: ImAp: "Third Imperium, Amec Protectorate"',
+            '# Alleg: ImDv: "Third Imperium, Domain of Vland"',
+            '# Alleg: ImLc: "Third Imperium, Lancian Cultural Region"',
+            '# Alleg: ImAp: "Third Imperium, Amec Protectorate"',
+            '# Alleg: ImDv: "Third Imperium, Domain of Vland"',
+        ]
+
+        sector = SectorDictionary('Dagudashaag', '')
+        sector.headers = headers
+
+        allegiance_set = ["ImAp", "ImDv"]
+
+        nu_sector = sector.allegiance_subset(allegiance_set)
+
+        expected_headers = [
+            '# Alleg: ImAp: "Third Imperium, Amec Protectorate"',
+            '# Alleg: ImDv: "Third Imperium, Domain of Vland"',
+        ]
+        self.assertEqual(expected_headers, nu_sector.headers)
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
