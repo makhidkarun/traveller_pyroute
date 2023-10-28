@@ -368,10 +368,8 @@ class DeltaStar(Star):
             if infrastructure > 12 + self.importance:
                 infrastructure = str(self._int_to_ehex(12 + self.importance))
                 econ = econ[:3] + infrastructure + econ[4:]
-
         labour = str(self._int_to_ehex(max(self.popCode - 1, 0)))
         econ = econ[:2] + labour + econ[3:]
-
         self.economics = econ
 
     def _fix_social(self):
