@@ -161,7 +161,7 @@ class DeltaStar(Star):
             line = '{} - CX Calculated symbols {} should be 0 for barren worlds'.format(self, symbols)
             msg.append(line)
         elif pop != 0 and not max(1, self.tl - 5) <= symbols <= self.tl + 5:
-            line = '{} - CX calculated symbols {} not in range {} - {}'.format(self, symbols, max(1, self.tl - 5), self.tl + 5)
+            line = '{} - CX Calculated symbols {} not in range {} - {}'.format(self, symbols, max(1, self.tl - 5), self.tl + 5)
             msg.append(line)
         if pop == 0 and strangeness != 0:
             line = '{} - CX Calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness)
