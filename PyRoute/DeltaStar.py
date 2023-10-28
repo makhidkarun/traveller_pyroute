@@ -378,6 +378,7 @@ class DeltaStar(Star):
 
         old_strangeness = self._ehex_to_int(social[3])
         old_homogeneity = self._ehex_to_int(self.social[1])
+        old_symbols = self._ehex_to_int(social[4])
 
         if '0' == str(self.pop):
             pass
@@ -402,6 +403,16 @@ class DeltaStar(Star):
             strangeness = str(self._int_to_ehex(strangeness))
 
             social = social[:3] + strangeness + social[4:]
+
+            symbols = old_symbols
+            if max(1, self.tl - 5) > symbols:
+                symbols = max(1, self.tl - 5)
+            elif self.tl + 5 < symbols:
+                symbols = self.tl + 5
+
+            symbols = str(self._int_to_ehex(symbols))
+
+            social = social[:4] + symbols + social[5:]
 
         assert 6 == len(social), "Unexpected social code length"
 
