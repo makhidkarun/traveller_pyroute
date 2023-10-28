@@ -438,16 +438,16 @@ class Star(object):
         homogeneity = self._ehex_to_int(self.social[1] if self.social is not None else '1')  # pop + flux, min 1
         if pop == 0 and homogeneity != 0:
             self.logger.warning(
-                '{} - CX calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity))
+                '{} - CX Calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity))
         elif pop != 0 and not max(1, pop - 5) <= homogeneity <= pop + 5:
             self.logger.warning(
-                '{} - CX calculated homogeneity {} not in range {} - {}'.
+                '{} - CX Calculated homogeneity {} not in range {} - {}'.
                 format(self, homogeneity, max(1, pop - 5), pop + 5))
 
         acceptance = self._ehex_to_int(self.social[2] if self.social is not None else '1')  # pop + Ix, min 1
         if pop == 0 and acceptance != 0:
             self.logger.warning(
-                '{} - CX calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
+                '{} - CX Calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
         elif pop != 0 and not max(1, pop + self.importance) == acceptance:
             self.logger.warning(
                 '{} - CX Calculated acceptance {} does not match generated acceptance {}'.
@@ -456,17 +456,17 @@ class Star(object):
         strangeness = self._ehex_to_int(self.social[3] if self.social is not None else '1')  # flux + 5
         if pop == 0 and strangeness != 0:
             self.logger.warning(
-                '{} - CX calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness))
+                '{} - CX Calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness))
         elif pop != 0 and not 1 <= strangeness <= 10:
             self.logger.warning(
-                '{} - CX calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10))
+                '{} - CX Calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10))
 
         symbols = self._ehex_to_int(self.social[4] if self.social is not None else '1')  # TL + flux, min 1
         if pop == 0 and symbols != 0:
-            self.logger.warning('{} - CX calculated symbols {} should be 0 for barren worlds'.format(self, symbols))
+            self.logger.warning('{} - CX Calculated symbols {} should be 0 for barren worlds'.format(self, symbols))
         elif pop != 0 and not max(1, self.tl - 5) <= symbols <= self.tl + 5:
             self.logger.warning(
-                '{} - CX calculated symbols {} not in range {} - {}'.
+                '{} - CX Calculated symbols {} not in range {} - {}'.
                 format(self, symbols, max(1, self.tl - 5), self.tl + 5))
 
     def calculate_ru(self, ru_calc):
