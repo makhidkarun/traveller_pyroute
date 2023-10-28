@@ -158,28 +158,28 @@ class DeltaStar(Star):
         labor = self._ehex_to_int(self.economics[2])
         pop = self.popCode
         if pop == 0 and symbols != 0:
-            line = '{} - CX calculated symbols {} should be 0 for barren worlds'.format(self, symbols)
+            line = '{} - CX Calculated symbols {} should be 0 for barren worlds'.format(self, symbols)
             msg.append(line)
         elif pop != 0 and not max(1, self.tl - 5) <= symbols <= self.tl + 5:
             line = '{} - CX calculated symbols {} not in range {} - {}'.format(self, symbols, max(1, self.tl - 5), self.tl + 5)
             msg.append(line)
         if pop == 0 and strangeness != 0:
-            line = '{} - CX calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness)
+            line = '{} - CX Calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness)
             msg.append(line)
         elif pop != 0 and not 1 <= strangeness <= 10:
-            line = '{} - CX calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10)
+            line = '{} - CX Calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10)
             msg.append(line)
         if pop == 0 and acceptance != 0:
-            line = '{} - CX calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance)
+            line = '{} - CX Calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance)
             msg.append(line)
         elif pop != 0 and not max(1, pop + self.importance) == acceptance:
             line = '{} - CX Calculated acceptance {} does not match generated acceptance {}'.format(self, acceptance, max(1, pop + self.importance))
             msg.append(line)
         if pop == 0 and homogeneity != 0:
-            line = '{} - CX calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity)
+            line = '{} - CX Calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity)
             msg.append(line)
         elif pop != 0 and not max(1, pop - 5) <= homogeneity <= pop + 5:
-            line = '{} - CX calculated homogeneity {} not in range {} - {}'.format(self, homogeneity, max(1, pop - 5), pop + 5)
+            line = '{} - CX Calculated homogeneity {} not in range {} - {}'.format(self, homogeneity, max(1, pop - 5), pop + 5)
             msg.append(line)
         if labor != max(self.popCode - 1, 0):
             line = '{} - EX Calculated labor {} does not match generated labor {}'.format(self, labor, max(self.popCode - 1, 0))
@@ -339,6 +339,76 @@ class DeltaStar(Star):
         self._fix_pop_code('Ni', '456')
         self._fix_pop_code('Ph', '8')
         self._fix_pop_code('Hi', '9ABCD')
+
+        self._fix_economics()
+        self._fix_social()
+
+    def _fix_economics(self):
+        econ = self.economics
+        if '0' == str(self.pop):
+            self.social = '[0000]'
+
+            econ = econ[:2] + '00' + econ[4:]
+
+        elif self.tradeCode.low:
+            econ = self.economics
+            infrastructure = str(self._int_to_ehex(max(0, self.importance)))
+            econ = econ[:3] + infrastructure + econ[4:]
+
+        elif self.tradeCode.nonindustrial:
+            old_infrastructure = self._ehex_to_int(self.economics[3])
+            infrastructure = old_infrastructure
+            if infrastructure > 6 + self.importance:
+                infrastructure = str(self._int_to_ehex(6 + self.importance))
+                econ = econ[:3] + infrastructure + econ[4:]
+
+        else:
+            old_infrastructure = self._ehex_to_int(self.economics[3])
+            infrastructure = old_infrastructure
+            if infrastructure > 12 + self.importance:
+                infrastructure = str(self._int_to_ehex(12 + self.importance))
+                econ = econ[:3] + infrastructure + econ[4:]
+
+        labour = str(self._int_to_ehex(max(self.popCode - 1, 0)))
+        econ = econ[:2] + labour + econ[3:]
+
+        self.economics = econ
+
+    def _fix_social(self):
+        social = self.social
+        pop = self.popCode
+
+        old_acceptance = self._ehex_to_int(social[2])
+        old_strangeness = self._ehex_to_int(social[3])
+        old_homogeneity = self._ehex_to_int(self.social[1])
+
+        if '0' == str(self.pop):
+            pass
+        else:
+            homogeneity = old_homogeneity
+            if max(1, pop - 5) > homogeneity:
+                homogeneity = max(1, pop - 5)
+            elif (pop + 5) < homogeneity:
+                homogeneity = pop + 5
+            homogeneity = str(self._int_to_ehex(homogeneity))
+            social = social[:1] + homogeneity + social[2:]
+
+            acceptance = str(self._int_to_ehex(max(1, pop + self.importance)))
+            social = social[:2] + acceptance + social[3:]
+
+            strangeness = old_strangeness
+            if 1 > strangeness:
+                strangeness = 1
+            elif 10 < strangeness:
+                strangeness = 10
+
+            strangeness = str(self._int_to_ehex(strangeness))
+
+            social = social[:3] + strangeness + social[4:]
+
+        assert 6 == len(social), "Unexpected social code length"
+
+        self.social = social
 
     def _drop_invalid_trade_code(self, targcode):
         self.tradeCode.codes = [code for code in self.tradeCode.codes if code != targcode]
