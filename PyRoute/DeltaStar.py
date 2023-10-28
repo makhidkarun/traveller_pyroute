@@ -376,7 +376,6 @@ class DeltaStar(Star):
         social = self.social
         pop = self.popCode
 
-        old_acceptance = self._ehex_to_int(social[2])
         old_strangeness = self._ehex_to_int(social[3])
         old_homogeneity = self._ehex_to_int(self.social[1])
 
