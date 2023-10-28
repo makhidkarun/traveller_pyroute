@@ -139,6 +139,7 @@ class testDeltaStar(unittest.TestCase):
 
                 output = outer_logs.output
                 output.extend(inner_logs.output)
+                self.assertTrue(0 < len(output), "At least one log message expected")
                 # trim complaints about calculated importance - that's fixed on import
                 output = [line for line in output if "Calculated importance" not in line]
                 # trim log lines of less than warning severity - "DEBUG" is set to ensure there will be output to grab
