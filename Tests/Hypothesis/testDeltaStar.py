@@ -1,3 +1,4 @@
+import copy
 import logging
 import re
 import unittest
@@ -123,24 +124,33 @@ class testDeltaStar(unittest.TestCase):
         outer_logger = logging.getLogger("PyRoute.Star")
         inner_logger = logging.getLogger("PyRoute.TradeCodes")
 
-        outer_logger.setLevel("DEBUG")
-        inner_logger.setLevel("DEBUG")
+        outer_logger.manager.disable = 0
+        outer_logger.setLevel(10)
+        inner_logger.manager.disable = 0
+        inner_logger.setLevel(10)
 
         sector = Sector('# Core', '# 0, 0')
 
         with self.assertLogs(outer_logger, "DEBUG") as outer_logs:
+            self.assertTrue(outer_logger.isEnabledFor(10), "Outer logger disabled for DEBUG")
+            self.assertTrue(inner_logger.isEnabledFor(10), "Inner logger disabled for DEBUG")
             with self.assertLogs(inner_logger, "DEBUG") as inner_logs:
-                outer_logger.debug('Dummy message to keep assertLogs happy')
-                inner_logger.debug('Dummy message to keep assertLogs happy')
+                outer_logger.debug(
+                    'Dummy log entry to shut assertion up now that canonicalisation has been straightened out'
+                )
+                self.assertEqual(1, len(outer_logs.output), "Dummy log message not in outer_logs")
+                inner_logger.debug(
+                    'Dummy log entry to shut assertion up now that canonicalisation has been straightened out'
+                )
+                self.assertEqual(1, len(inner_logs.output), "Dummy log message not in inner_logs")
+
                 star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
                 star1.index = 0
                 star1.allegiance_base = 'NaHu'
                 self.assertIsNotNone(star1, "Fatal failure parsing line: " + starline)
                 self.assertTrue(isinstance(star1, DeltaStar), "Error parsing line: " + starline)
 
-                assume(0 < len(inner_logs.output))
-
-                output = outer_logs.output
+                output = copy.deepcopy(outer_logs.output)
                 output.extend(inner_logs.output)
                 self.assertTrue(0 < len(output), "At least one log message expected")
                 # trim complaints about calculated importance - that's fixed on import
