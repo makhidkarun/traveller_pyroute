@@ -123,6 +123,9 @@ class testDeltaStar(unittest.TestCase):
         outer_logger = logging.getLogger("PyRoute.Star")
         inner_logger = logging.getLogger("PyRoute.TradeCodes")
 
+        outer_logger.setLevel("DEBUG")
+        inner_logger.setLevel("DEBUG")
+
         sector = Sector('# Core', '# 0, 0')
 
         with self.assertLogs(outer_logger, "DEBUG") as outer_logs:
