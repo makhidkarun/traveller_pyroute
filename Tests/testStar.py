@@ -198,16 +198,19 @@ class TestStar(unittest.TestCase):
         # These were weird intermediate values that _kept_ turning up in round-trip testing, so it was worth breaking it
         # out as a separate unit test to try to figure out _where_ they fire up the hyperdrive.
         weird_line = [
-            '0101 000000000000000      ???????-?                                       { -2 } (000-0) -      -    -  - 000 0  00  D                                                        ',
-            '0110 000000000000000      ???????-?                                       { -2 } (000-0) -      Bc   -  - 000 0  00  D                                                        ',
-            '0101 0                    A000000-0                                       { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V '
+            ('0101 000000000000000      ???????-?                                       { -2 } (000-0) -      -    -  - 000 0  00  D                                                        ', ''),
+            ('0110 000000000000000      ???????-?                                       { -2 } (000-0) -      Bc   -  - 000 0  00  D                                                        ', ''),
+            ('0101 0                    A000000-0                                       { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V ', ''),
+            ('0110 000000000000000 ???????-? 00000000000000( {1} (000-0)       -   - 0 000   00 D', '')
         ]
         sector = Sector('# Core', '# 0, 0')
 
-        for base_line in weird_line:
+        for base_line, expected_trade in weird_line:
             with self.subTest():
                 star1 = Star.parse_line_into_star(base_line, sector, 'fixed', 'fixed')
                 self.assertIsInstance(star1, Star)
+                actual_trade = str(star1.tradeCode)
+                self.assertEqual(expected_trade, actual_trade)
 
     def testParseExplicitHomeworlds(self):
         sector = Sector('# Core', '# 0, 0')
