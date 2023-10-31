@@ -8,6 +8,7 @@ from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, from_regex, composite, integers, floats, lists, sampled_from
 
 from PyRoute.DeltaStar import DeltaStar
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Galaxy import Sector
 from PyRoute.TradeCodes import TradeCodes
 
@@ -341,6 +342,35 @@ class testDeltaStar(unittest.TestCase):
         )
         badline = '' if 0 == len(invalid) else invalid[0]
         self.assertEqual(0, len(invalid), 'At least one characteristic not canonicalised: \n' + starline + '\n' + badline)
+
+    """
+    Given a regex-matching string that results in a Star object when parsed, that Star should cleanly canonicalise
+    """
+    @given(from_regex(regex=ParseStarInput.starline,
+                      alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    @settings(
+        suppress_health_check=[HealthCheck(3), HealthCheck(2)],  # suppress slow-data health check, too-much filtering
+        deadline=timedelta(1000))
+    @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00')
+    def test_canonicalise_from_regex_match(self, starline):
+        sector = Sector(' Core', ' 0, 0')
+        foo = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        assume(foo is not None)
+
+        foo.index = 0
+        foo.allegiance_base = 'NaHu'
+
+        foo.trim_self_ownership()
+        foo.trim_self_colonisation()
+        self.assertIsNotNone(foo._hash, "Hash not calculated for original star")
+        self.assertTrue(foo.is_well_formed())
+
+        foo.canonicalise()
+        nu_result, nu_messages = foo.check_canonical()  # Should be in canonical form after canonicalise call
+
+        badline = '' if 0 == len(nu_messages) else nu_messages[0]
+        self.assertEqual(0, len(nu_messages), 'At least one characteristic not canonicalised: \n' + starline + '\n' + badline)
+
 
 if __name__ == '__main__':
     unittest.main()
