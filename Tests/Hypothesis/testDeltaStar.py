@@ -352,6 +352,8 @@ class testDeltaStar(unittest.TestCase):
         suppress_health_check=[HealthCheck(3), HealthCheck(2)],  # suppress slow-data health check, too-much filtering
         deadline=timedelta(1000))
     @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00')
+    @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   00')
+    @example('0101 000000000000000 A000200-0 000000000000000 {0} -  [0000] - - 0 000   00')
     def test_canonicalise_from_regex_match(self, starline):
         sector = Sector(' Core', ' 0, 0')
         foo = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
