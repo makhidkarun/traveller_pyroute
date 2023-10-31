@@ -212,6 +212,15 @@ class TestStar(unittest.TestCase):
                 actual_trade = str(star1.tradeCode)
                 self.assertEqual(expected_trade, actual_trade)
 
+    def testParseLowercaseUWP(self):
+        line = '0101 000000000000000 AffaFxj-z 000000000000000 {0} (000-0) [0000] - - 0 000   00 D'
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
+        self.assertIsInstance(star1, Star)
+        self.assertEqual(33, star1.tl)
+        expected_uwp = 'AFFAFXJ-Z'
+        self.assertEqual(expected_uwp, str(star1.uwp), "Unexpected UWP value after parsing")
+
     def testParseExplicitHomeworlds(self):
         sector = Sector('# Core', '# 0, 0')
 
