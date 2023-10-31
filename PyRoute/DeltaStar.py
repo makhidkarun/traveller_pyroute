@@ -192,7 +192,7 @@ class DeltaStar(Star):
                 line = '{} - CX Calculated homogeneity {} not in range {} - {}'.format(self, homogeneity, max(1, pop - 5),
                                                                                    pop + 5)
                 msg.append(line)
-            if labor != max(self.popCode - 1, 0):
+            if self.economics is not None and labor != max(self.popCode - 1, 0):
                 line = '{} - EX Calculated labor {} does not match generated labor {}'.format(self, labor,
                                                                                           max(self.popCode - 1, 0))
                 msg.append(line)
@@ -396,8 +396,8 @@ class DeltaStar(Star):
         old_homogeneity = self._ehex_to_int(self.social[1])
         old_symbols = self._ehex_to_int(social[4])
 
-        if '0' == str(self.pop):
-            pass
+        if '0' == str(self.pop) or '?' == str(self.pop):
+            social = '[0000]'
         else:
             homogeneity = old_homogeneity
             if max(1, pop - 5) > homogeneity:
