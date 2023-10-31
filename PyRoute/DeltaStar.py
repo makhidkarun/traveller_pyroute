@@ -177,10 +177,11 @@ class DeltaStar(Star):
             elif pop != 0 and not 1 <= strangeness <= 10:
                 line = '{} - CX Calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10)
                 msg.append(line)
+            pop_plus_imp = min(33, max(1, pop + self.importance))  # Cap out at 33 - converts to ehex as Z
             if pop == 0 and acceptance != 0:
                 line = '{} - CX Calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance)
                 msg.append(line)
-            elif pop != 0 and not max(1, pop + self.importance) == acceptance:
+            elif pop != 0 and not pop_plus_imp == acceptance:
                 line = '{} - CX Calculated acceptance {} does not match generated acceptance {}'.format(self, acceptance,
                                                                                                     max(1,
                                                                                                         pop + self.importance))
@@ -407,7 +408,8 @@ class DeltaStar(Star):
             homogeneity = str(self._int_to_ehex(homogeneity))
             social = social[:1] + homogeneity + social[2:]
 
-            acceptance = str(self._int_to_ehex(max(1, pop + self.importance)))
+            pop_plus_imp = min(33, max(1, pop + self.importance))  # Cap out at 33 - converts to ehex as Z
+            acceptance = str(self._int_to_ehex(pop_plus_imp))
             social = social[:2] + acceptance + social[3:]
 
             strangeness = old_strangeness

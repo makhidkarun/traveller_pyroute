@@ -354,6 +354,8 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00')
     @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   00')
     @example('0101 000000000000000 A000200-0 000000000000000 {0} -  [0000] - - 0 000   00')
+    @example('0101 000000000000000 A000a00-0 000000000000000 {0} (000-0) [0000] - - 0 000   00')
+    @example('0101 000000000000000 A000Z00-0 000000000000000 {0} (000-0) [0000] - - 0 000   00')
     def test_canonicalise_from_regex_match(self, starline):
         sector = Sector(' Core', ' 0, 0')
         foo = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
