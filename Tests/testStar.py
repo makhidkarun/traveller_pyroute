@@ -253,6 +253,10 @@ class TestStar(unittest.TestCase):
 
         self.assertTrue(star1.is_well_formed())
 
+        line = star1.parse_to_line()
+        self.assertTrue('?478???-?' in line, "UWP not regenerated")
+        self.assertEqual(0, star1.wtn)
+
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
         cwtn = [3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11, 12, 13, 13, 14]
