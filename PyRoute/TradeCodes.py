@@ -92,23 +92,10 @@ class TradeCodes(object):
 
         self.sophont_list = [code for code in self.codes if re.match(r"[\w\']{4}(\d|W)", code, re.U)]
 
-        for homeworld in re.findall(r"[Di]*\([^)]+\)\d?", initial_codes, re.U):
-            full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
-            homeworlds_found.append(homeworld)
-            match = re.match(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W)?', homeworld)
-            if match is None:
-                self.logger.error("Unable to process %s", initial_codes)
-                sys.exit(1)
-            if full_name.startswith("Di"):
-                sophont = "{code: <4}{pop}".format(code=match.group(1), pop='X')
-            else:
-                sophont = "{code: <4}{pop}".format(code=match.group(1), pop=match.group(2) if match.group(2) else 'W')
+        homeworld_match = re.findall(r"[Di]*\([^)]+\)\d?", initial_codes, re.U)
 
-            sophont = sophont.replace("'", "X")
-            sophont = sophont.replace("!", "X")
-            sophont = sophont.replace(" ", "X")
-            self.sophont_list.append(sophont)
-            self.homeworld_list.append(sophont)
+        for homeworld in homeworld_match:
+            self._process_homeworld(homeworld, homeworlds_found, initial_codes)
 
         self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.sophont_list)\
             - set(homeworlds_found) - self.xcode
@@ -153,14 +140,18 @@ class TradeCodes(object):
     def _process_homeworld(self, homeworld, homeworlds_found, initial_codes):
         full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
         homeworlds_found.append(homeworld)
-        match = re.match(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W)?', homeworld)
+        match = re.match(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W|\?)?', homeworld)
         if match is None:
             self.logger.error("Unable to process %s", initial_codes)
             sys.exit(1)
         if full_name.startswith("Di"):
             sophont = "{code: <4}{pop}".format(code=match.group(1), pop='X')
         else:
-            sophont = "({code: <4}){pop}".format(code=match.group(1), pop=match.group(2) if match.group(2) else 'W')
+            pop = match.group(2) if match.group(2) else 'W'
+            if homeworld + '?' in initial_codes:
+                homeworld += "?"
+                pop = '0'
+            sophont = "({code: <4}){pop}".format(code=match.group(1), pop=pop)
         sophont = sophont.replace("'", "X")
         sophont = sophont.replace("!", "X")
         sophont = sophont.replace(" ", "X")

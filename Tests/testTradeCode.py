@@ -152,6 +152,16 @@ class TestTradeCode(unittest.TestCase):
                 )
                 self.assertEqual(expected_line, str(code))
 
+    def testVerifyHomeworldWithUnknownPopCountsAsZero(self):
+        line = 'Pi (Feime)? Re Sa'
+        code = TradeCodes(line)
+        self.assertEqual(1, len(code.sophont_list), "Actual homeworld code should result in sophont")
+        self.assertEqual(1, len(code.homeworld_list), "Actual homeworld code should result in sophont")
+
+        result, msg = code.is_well_formed()
+        self.assertTrue(result, msg)
+        expected_line = '(Feim)0 Pi Re Sa'
+        self.assertEqual(expected_line, str(code), "Unexpected parsed trade code")
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

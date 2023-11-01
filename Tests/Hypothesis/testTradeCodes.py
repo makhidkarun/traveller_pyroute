@@ -17,6 +17,7 @@ class testTradeCodes(unittest.TestCase):
     @given(text(min_size=15, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
     @example('(000000000000000000000000000000000000)')
     @example('000000000000000')
+    @example('Pi (Feime)? Re Sa ')
     def test_parse_text_to_trade_code(self, s):
         trade = TradeCodes(s)
         trade.trim_ill_formed_residual_codes()
