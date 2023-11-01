@@ -257,6 +257,21 @@ class TestStar(unittest.TestCase):
         self.assertTrue('?478???-?' in line, "UWP not regenerated")
         self.assertEqual(0, star1.wtn)
 
+    def testParseStarlineWithOnlyKnownPhysicalsAndHasTradeCodes(self):
+        starline = '1732                      ?AFA???-? Fl Wa                               - - - ?13   Na        '
+        sector = Sector('# Core', '# 0, 0')
+
+        star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        self.assertIsInstance(star1, Star)
+        star1.index = 0
+        star1.allegiance_base = star1.alg_code
+
+        self.assertTrue(star1.is_well_formed())
+
+        line = star1.parse_to_line()
+        self.assertTrue('?AFA???-?' in line, "UWP not regenerated")
+        self.assertEqual(0, star1.wtn)
+
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
         cwtn = [3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11, 12, 13, 13, 14]
