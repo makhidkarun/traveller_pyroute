@@ -242,6 +242,17 @@ class TestStar(unittest.TestCase):
                 self.assertEqual(expected_sophonts, star1.tradeCode.sophont_list)
                 self.assertEqual(expected_trade, str(star1.tradeCode), 'Unexpected trade code list')
 
+    def testParseStarlineWithOnlyKnownPhysicalsAndNoTradeCodes(self):
+        starline = '3135                      ?478???-?                                     - - - ?02   Na'
+        sector = Sector('# Core', '# 0, 0')
+
+        star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        self.assertIsInstance(star1, Star)
+        star1.index = 0
+        star1.allegiance_base = star1.alg_code
+
+        self.assertTrue(star1.is_well_formed())
+
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
         cwtn = [3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11, 12, 13, 13, 14]
