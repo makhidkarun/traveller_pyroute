@@ -299,6 +299,30 @@ class TestStar(unittest.TestCase):
                 self.assertTrue(expected_uwp in line, "UWP not regenerated")
                 self.assertEqual(0, star1.wtn)
 
+    def testParseStarlineWithUnknownSocials(self):
+        sector = Sector('# Core', '# 0, 0')
+
+        unknown_socials = [
+            ('Unknown port, known TL, no codes', '0810                      ?124???-F                                     - - - ?03   Kk', '?124???-F', '-', 3),
+            ('Unknown port, known TL, codes', '0401                      ?342???-B Po                                  - - - ?14   Kk        ', '?342???-B', '-', 2),
+            ('Known port, known TL, codes', '1204 Barnett 0404         E756???-1 Ga Lt (minor)                         - - A 401   Na G9 V                 ', 'E756???-1', 'A', 1)
+        ]
+
+        for msg, starline, expected_uwp, expected_trade_zone, expected_wtn in unknown_socials:
+            with self.subTest(msg):
+
+                star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+                self.assertIsInstance(star1, Star)
+                star1.index = 0
+                star1.allegiance_base = star1.alg_code
+
+                self.assertTrue(star1.is_well_formed())
+
+                line = star1.parse_to_line()
+                self.assertTrue(expected_uwp in line, "UWP not regenerated")
+                self.assertEqual(expected_wtn, star1.wtn)
+                self.assertEqual(expected_trade_zone, star1.zone, "Unexpected trade zone value")
+
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
         cwtn = [3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11, 12, 13, 13, 14]
