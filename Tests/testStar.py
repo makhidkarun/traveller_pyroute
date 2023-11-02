@@ -194,6 +194,15 @@ class TestStar(unittest.TestCase):
         self.assertIsInstance(star1, Star)
         self.assertEqual('', str(star1.tradeCode))
 
+    def testParseBespin(self):
+        sector = Sector('# Core', '# 0, 0')
+        line = '0615 Bespin II            EAA19AC-4 Fl Hi He In          {+0} (98b-1) [a935] - - - 223 9  Na G1 V           '
+        star1 = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
+        self.assertIsInstance(star1, Star)
+        self.assertEqual('Fl He Hi In', str(star1.tradeCode))
+        self.assertEqual('(98B-1)', star1.economics)
+        self.assertEqual('[A935]', star1.social)
+
     def testParseBarrelOfWeird(self):
         # These were weird intermediate values that _kept_ turning up in round-trip testing, so it was worth breaking it
         # out as a separate unit test to try to figure out _where_ they fire up the hyperdrive.
