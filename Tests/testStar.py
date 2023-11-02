@@ -246,11 +246,14 @@ class TestStar(unittest.TestCase):
         sector = Sector('# Core', '# 0, 0')
 
         only_physicals = [
-            ('Nonaligned', '3135                      ?478???-?                                     - - - ?02   Na', '?478???-?'),
-            ('K\'kree', '0310                      ?776???-?                                     - - - ?03   Kk        ', '?776???-?')
+            ('Nonaligned', '3135                      ?478???-?                                     - - - ?02   Na', '?478???-?', '-'),
+            ('K\'kree', '0310                      ?776???-?                                     - - - ?03   Kk        ', '?776???-?', '-'),
+            ('X port plus questions', '1001 Barnett 0201         X??????-?                                       - - A 013   Na K4 V                 ', 'X??????-?', 'A'),
+            ('X port plus one known physical', '0302 Adams 0302           X3?????-?                                       - - - 001   Na K6 V                 ', 'X3?????-?', '-'),
+            ('X port plus two known physicals', '0610 Adams 0610           X21????-?                                       - - - 001   Na G8 V M3 V K2 V       ', 'X21????-?', '-')
         ]
 
-        for msg, starline, expected_uwp in only_physicals:
+        for msg, starline, expected_uwp, expected_trade_zone in only_physicals:
             with self.subTest(msg):
 
                 star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
@@ -263,6 +266,7 @@ class TestStar(unittest.TestCase):
                 line = star1.parse_to_line()
                 self.assertTrue(expected_uwp in line, "UWP not regenerated")
                 self.assertEqual(0, star1.wtn)
+                self.assertEqual(expected_trade_zone, star1.zone, "Unexpected trade zone value")
 
     def testParseStarlineWithOnlyKnownPhysicalsAndHasTradeCodes(self):
         sector = Sector('# Core', '# 0, 0')
