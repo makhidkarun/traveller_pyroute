@@ -350,6 +350,33 @@ class TestStar(unittest.TestCase):
                 self.assertEqual(expected_wtn, star1.wtn)
                 self.assertEqual(expected_trade_zone, star1.zone, "Unexpected trade zone value")
 
+    def testParseResidualStarlines(self):
+        sector = Sector('# Core', '# 0, 0')
+
+        residual_lines = [
+            ('Wonky bracket',
+             '0631 Closser              X100755-6 Na Va Pi Tz          {-2} (665+1) [5597} - - - 810 6  Na M5 V M7 V          ',
+             'X100755-6', '-', 1),
+            ('Unknown port, unknown TL',
+             '1036                      ?6319EJ-? Lk Po Sa                            - - - 601 7 Na G8 V G0 V K1 V K4 V     ',
+             '?6319EJ-0', '-', 8)
+        ]
+
+        for msg, starline, expected_uwp, expected_trade_zone, expected_wtn in residual_lines:
+            with self.subTest(msg):
+
+                star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+                self.assertIsInstance(star1, Star)
+                star1.index = 0
+                star1.allegiance_base = star1.alg_code
+
+                self.assertTrue(star1.is_well_formed())
+
+                line = star1.parse_to_line()
+                self.assertTrue(expected_uwp in line, "UWP not regenerated")
+                self.assertEqual(expected_wtn, star1.wtn)
+                self.assertEqual(expected_trade_zone, star1.zone, "Unexpected trade zone value")
+
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
         cwtn = [3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11, 12, 13, 13, 14]
