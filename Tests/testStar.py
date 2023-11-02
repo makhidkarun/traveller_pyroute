@@ -243,34 +243,48 @@ class TestStar(unittest.TestCase):
                 self.assertEqual(expected_trade, str(star1.tradeCode), 'Unexpected trade code list')
 
     def testParseStarlineWithOnlyKnownPhysicalsAndNoTradeCodes(self):
-        starline = '3135                      ?478???-?                                     - - - ?02   Na'
         sector = Sector('# Core', '# 0, 0')
 
-        star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
-        self.assertIsInstance(star1, Star)
-        star1.index = 0
-        star1.allegiance_base = star1.alg_code
+        only_physicals = [
+            ('Nonaligned', '3135                      ?478???-?                                     - - - ?02   Na', '?478???-?'),
+            ('K\'kree', '0310                      ?776???-?                                     - - - ?03   Kk        ', '?776???-?')
+        ]
 
-        self.assertTrue(star1.is_well_formed())
+        for msg, starline, expected_uwp in only_physicals:
+            with self.subTest(msg):
 
-        line = star1.parse_to_line()
-        self.assertTrue('?478???-?' in line, "UWP not regenerated")
-        self.assertEqual(0, star1.wtn)
+                star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+                self.assertIsInstance(star1, Star)
+                star1.index = 0
+                star1.allegiance_base = star1.alg_code
+
+                self.assertTrue(star1.is_well_formed())
+
+                line = star1.parse_to_line()
+                self.assertTrue(expected_uwp in line, "UWP not regenerated")
+                self.assertEqual(0, star1.wtn)
 
     def testParseStarlineWithOnlyKnownPhysicalsAndHasTradeCodes(self):
-        starline = '1732                      ?AFA???-? Fl Wa                               - - - ?13   Na        '
         sector = Sector('# Core', '# 0, 0')
 
-        star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
-        self.assertIsInstance(star1, Star)
-        star1.index = 0
-        star1.allegiance_base = star1.alg_code
+        only_physicals = [
+            ("Nonaligned", '1732                      ?AFA???-? Fl Wa                               - - - ?13   Na        ', '?AFA???-?'),
+            ("With stars and X starport", '1937 Osthoff 0307         X9C0???-? Pz                                    - - A 001   Na K1 V K4 V K2 V       ', 'X9C0???-?')
+        ]
 
-        self.assertTrue(star1.is_well_formed())
+        for msg, starline, expected_uwp in only_physicals:
+            with self.subTest(msg):
 
-        line = star1.parse_to_line()
-        self.assertTrue('?AFA???-?' in line, "UWP not regenerated")
-        self.assertEqual(0, star1.wtn)
+                star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+                self.assertIsInstance(star1, Star)
+                star1.index = 0
+                star1.allegiance_base = star1.alg_code
+
+                self.assertTrue(star1.is_well_formed())
+
+                line = star1.parse_to_line()
+                self.assertTrue(expected_uwp in line, "UWP not regenerated")
+                self.assertEqual(0, star1.wtn)
 
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
