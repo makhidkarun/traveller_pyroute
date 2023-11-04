@@ -39,6 +39,9 @@ class testHexGubbins(unittest.TestCase):
         restart_pos = Hex.get_neighbor(neighbour, rev_direction, distance)
 
         self.assertEqual(start_pos, restart_pos, "Restart should be same hex as starting position")
+        nu_neighbour = start.get_neighbour(direction, distance)
+        restart = nu_neighbour.get_neighbour(rev_direction, distance)
+        self.assertEqual(start, restart, "Restart should be equal to starting position")
 
     @given(integers(min_value=-200, max_value=200), integers(min_value=-200, max_value=200))
     @example(1, 0)
