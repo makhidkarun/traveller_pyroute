@@ -112,7 +112,7 @@ class Hex(object):
         return (self.q, self.r)
 
     @staticmethod
-    def get_neighbor(hex_pos, direction, distance=1):
+    def get_neighbor(hex_pos, direction, distance=1, as_hex=False):
         """
         determine neighboring hex from the q,r position and direction.
         Direction index is:
@@ -128,9 +128,11 @@ class Hex(object):
             [-1, +1], [-1, 0], [0, -1]
         ]
         d = neighbors[direction]
-        qn = hex_pos[0] + (d[0] * distance)
-        rn = hex_pos[1] + (d[1] * distance)
-        return (int(qn), int(rn))
+        qn = int(hex_pos[0] + (d[0] * distance))
+        rn = int(hex_pos[1] + (d[1] * distance))
+        if as_hex:
+            return Hex.parse_from_axial(qn, rn)
+        return qn, rn
 
     @staticmethod
     def hex_to_axial(row, col):
