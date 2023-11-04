@@ -33,12 +33,54 @@ class Hex(object):
         self.dx = sector.x * 32 + self.col - 1
         self.dy = sector.y * 40 + self.row - 1
         self.q, self.r = Hex.hex_to_axial(self.dx, Hex.dy_offset(self.row, sector.y))
+        self._hash = hash((self.dx, self.dy))
 
     def distance(self, other):
         return Hex.axial_distance((self.q, self.r), (other.q, other.r))
 
     def __str__(self):
         return f"{self.col:02d}{self.row:02d}"
+
+    def __hash__(self):
+        return self._hash
+
+    def __eq__(self, other):
+        if self.__hash__() != other.__hash__():
+            return False
+        if not isinstance(other, Hex):
+            return False
+
+        if self.position != other.position:
+            return False
+        if self.dx != other.dx:
+            return False
+        if self.dy != other.dy:
+            return False
+        return True
+
+    @staticmethod
+    def parse_from_axial(q, r):
+        from PyRoute.Galaxy import Sector
+
+        back_row, back_col = Hex.axial_to_hex(q, r)
+
+        d_col = back_row % 32 + 1
+        sector_x = back_row // 32
+
+        sector_y = back_col // 40
+        dy_offset = back_col % 40
+        d_row = 40 - dy_offset
+
+        position = str(d_col).rjust(2, '0') + str(d_row).rjust(2, '0')
+        sector_string = '# ' + str(sector_x) + ', ' + str(sector_y)
+        sector = Sector('# dummy', sector_string)
+
+        final_hex = Hex(sector, position)
+        result, msg = final_hex.is_well_formed()
+        assert result, msg
+
+        return final_hex
+
 
     # Used to calculate distances for the AllyGen, which keeps only the q/r (axial) coordinates.
     @staticmethod

@@ -58,6 +58,60 @@ class testHexGubbins(unittest.TestCase):
         self.assertEqual(row, nu_row, "Row co-ordinate not round-tripped.  Hypothesis input: " + inputs)
         self.assertEqual(col, nu_col, "Column co-ordinate not round-tripped.  Hypothesis input: " + inputs)
 
+    @given(star_pos(), integers(min_value=0, max_value=4), integers(min_value=0, max_value=4))
+    @example('0101', 0, 0)
+    @example('0101', 0, 1)
+    def test_self_equality(self, pos_string, sector_choice, nu_choice):
+        sector = self.choose_sector(sector_choice)
+        self.assertIsNotNone(sector, "Source sector not picked")
+
+        nu_sector = self.choose_sector(nu_choice)
+        self.assertIsNotNone(nu_sector, "Nu sector not picked")
+
+        cand_hex = Hex(sector, pos_string)
+        nu_hex = Hex(nu_sector, pos_string)
+
+        inputs = str((pos_string, sector_choice, nu_choice))
+
+        if sector_choice == nu_choice:
+            msg = str(sector) + " " + str(pos_string) + " not equal to self.\nHypothesis input: " + inputs
+            self.assertEqual(cand_hex, nu_hex, msg)
+        else:
+            msg = "Hex with position " + str(pos_string) + " should not be equal in different sectors.\nHypothesis input: " + inputs
+            self.assertNotEqual(cand_hex, nu_hex, msg)
+
+    @given(star_pos(), integers(min_value=0, max_value=4))
+    @example('0202', 0)
+    @example('0101', 0)
+    @example('0101', 1)
+    def test_parse_from_axial_around_core(self, pos_string, sector_choice):
+        sector = self.choose_sector(sector_choice)
+        self.assertIsNotNone(sector, "Source sector not picked")
+
+        cand_hex = Hex(sector, pos_string)
+
+        nu_hex = Hex.parse_from_axial(cand_hex.q, cand_hex.r)
+        self.assertIsNotNone(nu_hex)
+
+        inputs = str((pos_string, sector_choice))
+
+        self.assertEqual(cand_hex, nu_hex, str(cand_hex) + " vs " + str(nu_hex) + '\nHypothesis input:' + inputs)
+
+    @given(star_pos(), integers(max_value=5, min_value=-5), integers(max_value=5, min_value=-5))
+    @settings(max_examples=300)
+    def test_parse_from_axial_beyond_core(self, pos_string, sector_x, sector_y):
+        assume(1 < abs(sector_x) + abs(sector_y))
+        sector = Sector('# dummy', '# ' + str(sector_x) + ", " + str(sector_y))
+
+        cand_hex = Hex(sector, pos_string)
+
+        nu_hex = Hex.parse_from_axial(cand_hex.q, cand_hex.r)
+        self.assertIsNotNone(nu_hex)
+
+        inputs = str((pos_string, sector_x, sector_y))
+
+        self.assertEqual(cand_hex, nu_hex, str(cand_hex) + " vs " + str(nu_hex) + '\nHypothesis input:' + inputs)
+
     def choose_sector(self, sector_choice):
         return self.sectors[sector_choice]
 
