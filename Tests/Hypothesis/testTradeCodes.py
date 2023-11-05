@@ -125,11 +125,17 @@ class testTradeCodes(unittest.TestCase):
         ru_calc = 'scaled'
 
         foo = None
+        allowed = ['Input UWP malformed']
 
         try:
             foo = Star.parse_line_into_star(starline, sector, pop_code, ru_calc)
         except KeyError:
             pass
+        except ValueError as e:
+            if str(e) in allowed:
+                pass
+            else:
+                raise e
         assume(foo is not None)
         # filter out malformed tradeCode objects while we're at it
         result, _ = foo.tradeCode.is_well_formed()

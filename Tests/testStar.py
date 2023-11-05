@@ -255,8 +255,8 @@ class TestStar(unittest.TestCase):
         sector = Sector('# Core', '# 0, 0')
 
         only_physicals = [
-            ('Nonaligned', '3135                      ?478???-?                                     - - - ?02   Na', '?478???-?', '-'),
-            ('K\'kree', '0310                      ?776???-?                                     - - - ?03   Kk        ', '?776???-?', '-'),
+            ('Nonaligned', '3135                      ?478???-?                                     - - - ?02   Na D', '?478???-?', '-'),
+            ('K\'kree', '0310                      ?776???-?                                     - - - ?03   Kk D      ', '?776???-?', '-'),
             ('X port plus questions', '1001 Barnett 0201         X??????-?                                       - - A 013   Na K4 V                 ', 'X??????-?', 'A'),
             ('X port plus one known physical', '0302 Adams 0302           X3?????-?                                       - - - 001   Na K6 V                 ', 'X3?????-?', '-'),
             ('X port plus two known physicals', '0610 Adams 0610           X21????-?                                       - - - 001   Na G8 V M3 V K2 V       ', 'X21????-?', '-')
@@ -281,7 +281,7 @@ class TestStar(unittest.TestCase):
         sector = Sector('# Core', '# 0, 0')
 
         only_physicals = [
-            ("Nonaligned", '1732                      ?AFA???-? Fl Wa                               - - - ?13   Na        ', '?AFA???-?'),
+            ("Nonaligned", '1732                      ?AFA???-? Fl Wa                               - - - ?13   Na D      ', '?AFA???-?'),
             ("With stars and X starport", '1937 Osthoff 0307         X9C0???-? Pz                                    - - A 001   Na K1 V K4 V K2 V       ', 'X9C0???-?')
         ]
 
@@ -303,8 +303,8 @@ class TestStar(unittest.TestCase):
         sector = Sector('# Core', '# 0, 0')
 
         unknown_socials = [
-            ('Unknown port, known TL, no codes', '0810                      ?124???-F                                     - - - ?03   Kk', '?124???-F', '-', 3),
-            ('Unknown port, known TL, codes', '0401                      ?342???-B Po                                  - - - ?14   Kk        ', '?342???-B', '-', 2),
+            ('Unknown port, known TL, no codes', '0810                      ?124???-F                                     - - - ?03   Kk D', '?124???-F', '-', 3),
+            ('Unknown port, known TL, codes', '0401                      ?342???-B Po                                  - - - ?14   Kk D      ', '?342???-B', '-', 2),
             ('Known port, known TL, codes', '1204 Barnett 0404         E756???-1 Ga Lt (minor)                         - - A 401   Na G9 V                 ', 'E756???-1', 'A', 1)
         ]
 
@@ -328,11 +328,11 @@ class TestStar(unittest.TestCase):
 
         unknown_tls = [
             ('No codes',
-             '0101 Raktegham            C529767-?                                      - K - 921   K3        ',
-             'C529767-0', '-', 6),
+             '0101 Raktegham            C529767-?                                      - K - 921   K3 D      ',
+             'C529767-?', '-', 6),
             ('Codes',
-             '0403 Kirrughee            C110314-? Lo                                   - O - 223   K3        ',
-             'C110314-0', '-', 3),
+             '0403 Kirrughee            C110314-? Lo                                   - O - 223   K3 D      ',
+             'C110314-?', '-', 3),
         ]
 
         for msg, starline, expected_uwp, expected_trade_zone, expected_wtn in unknown_tls:
@@ -359,7 +359,7 @@ class TestStar(unittest.TestCase):
              'X100755-6', '-', 1),
             ('Unknown port, unknown TL',
              '1036                      ?6319EJ-? Lk Po Sa                            - - - 601 7 Na G8 V G0 V K1 V K4 V     ',
-             '?6319EJ-0', '-', 8)
+             '?6319EJ-?', '-', 8)
         ]
 
         for msg, starline, expected_uwp, expected_trade_zone, expected_wtn in residual_lines:
@@ -367,6 +367,7 @@ class TestStar(unittest.TestCase):
 
                 star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
                 self.assertIsInstance(star1, Star)
+                star1.star_list_object.move_biggest_to_primary()
                 star1.index = 0
                 star1.allegiance_base = star1.alg_code
 
