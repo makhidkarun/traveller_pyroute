@@ -6,9 +6,8 @@ Created on Nov 06, 2023
 import re
 
 from PyRoute.Nobles import Nobles
-from PyRoute.SystemData.UWP import UWP
-from PyRoute.SystemData.Utilities import Utilities
 from PyRoute.Inputs.ParseStarInputFallback import ParseStarInputFallback
+from PyRoute.SystemData.Utilities import Utilities
 from PyRoute.SystemData.UWP import UWP
 from PyRoute.TradeCodes import TradeCodes
 
