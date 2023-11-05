@@ -10,9 +10,8 @@ from lark import UnexpectedCharacters, UnexpectedEOF
 from PyRoute.Inputs.StarlineTransformer import StarlineTransformer
 from PyRoute.Inputs.StarlineParser import StarlineParser
 from PyRoute.Nobles import Nobles
-from PyRoute.SystemData.UWP import UWP
-from PyRoute.SystemData.Utilities import Utilities
 from PyRoute.Inputs.ParseStarInputFallback import ParseStarInputFallback
+from PyRoute.SystemData.Utilities import Utilities
 from PyRoute.SystemData.UWP import UWP
 from PyRoute.TradeCodes import TradeCodes
 
