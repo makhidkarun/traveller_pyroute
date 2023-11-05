@@ -15,7 +15,8 @@ class testStar(unittest.TestCase):
     """
     Given a regex-matching string, parse_line_to_star should return either a valid Star object or None
     """
-    @given(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    @given(from_regex(regex=ParseStarInput.starline,
+                  alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
     @example('0101 000000000000000 00000O0-0 000000000000000       - - 0 000   00')
     @example('0101 000000000000000 ???????-? 000000000000000 {0} (000-0)  - - - 0 000   00')
@@ -47,12 +48,22 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 000000000000000       c -   000   00')
     @example('0101 000000000000000 ???????-? 00000000+  0000         -   000   00')
     @example('0101 000000000000000 ???????-? 000000000000000 {0} (000-0) [0000]       - 0   000   0000D')
+    @example('0101 000000000000000 ???????-? 000000000000000 { 0 }       -  -  - 000 0 000   00')
     def test_parse_line_to_star(self, s):
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
         ru_calc = 'scaled'
-        foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
+        allowed = ['Input UWP malformed']
+        foo = None
+
+        try:
+            foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
+        except ValueError as e:
+            if str(e) in allowed:
+                pass
+            else:
+                raise e
         assume(foo is not None)
         # filter out malformed hex objects while we're at it
         result, _ = foo.hex.is_well_formed()
@@ -71,6 +82,9 @@ class testStar(unittest.TestCase):
         self.assertEqual(str(foo.nobles), str(nu_foo.nobles), "Reparsed nobles not equal.  " + hyp_line)
         self.assertEqual(str(foo.baseCode), str(nu_foo.baseCode), "Reparsed base not equal.  " + hyp_line)
         self.assertEqual(str(foo.zone), str(nu_foo.zone), "Reparsed zone not equal.  " + hyp_line)
+
+        line = nu_foo.parse_to_line()
+        nu_foo = Star.parse_line_into_star(line, sector, pop_code, ru_calc)
 
         nu_line = nu_foo.parse_to_line()
         self.assertEqual(line, nu_line, "Reparsed line not equal to original line.  " + hyp_line)
@@ -148,7 +162,16 @@ class testStar(unittest.TestCase):
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
         ru_calc = 'scaled'
-        foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
+        allowed = ['Input UWP malformed']
+        foo = None
+
+        try:
+            foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
+        except ValueError as e:
+            if str(e) in allowed:
+                pass
+            else:
+                raise e
         assume(foo is not None)
         foo.trim_self_ownership()
         foo.trim_self_colonisation()

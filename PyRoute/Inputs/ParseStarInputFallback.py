@@ -235,14 +235,14 @@ class ParseStarInputFallback:
                         if ('-' == next[0] or '+' == next[0]) and next[1:].isdigit():
                             bitz[i] += next
                             bitz[i] += far
-                            del bitz[i + 1]
                             del bitz[i + 2]
+                            del bitz[i + 1]
                             return i, bitz
                         if next.isdigit():
                             bitz[i] += next
                             bitz[i] += far
-                            del bitz[i + 1]
                             del bitz[i + 2]
+                            del bitz[i + 1]
                             return i, bitz
 
         return None, bitz

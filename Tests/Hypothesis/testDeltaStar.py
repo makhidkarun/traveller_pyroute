@@ -7,7 +7,7 @@ from datetime import timedelta
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, from_regex, composite, integers, floats, lists, sampled_from
 
-from PyRoute.Star import Star
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.DeltaStar import DeltaStar
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Galaxy import Sector
