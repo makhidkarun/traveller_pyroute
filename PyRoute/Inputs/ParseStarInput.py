@@ -85,9 +85,12 @@ class ParseStarInput:
         star.baseCode = data[12].strip()
         rawzone = data[13].strip().upper()
         star.zone = rawzone if 1 == len(rawzone) and rawzone in ParseStarInput.allowed_trade_zones else '-'
-        star.ggCount = int(data[14][2], 16) if data[14][2] not in 'X?' else 0
-        star.popM = int(data[14][0]) if data[14][0] not in 'X?' else 0
-        star.belts = int(data[14][1], 16) if data[14][1] not in 'X?' else 0
+        star.popM = 0
+        star.belts = 0
+        datalen = len(data[14])
+        star.ggCount = 0 if 3 > datalen or not data[14][2].isalnum() else (int(data[14][2], 16) if data[14][2] not in 'X?' else 0)
+        star.popM = 0 if 2 > datalen or not data[14][1].isalnum() else (int(data[14][0]) if data[14][0] not in 'X?' else 0)
+        star.belts = 0 if 1 > datalen or not data[14][0].isalnum() else (int(data[14][1], 16) if data[14][1] not in 'X?' else 0)
 
         star.worlds = int(data[15]) if data[15].strip().isdigit() else 0
 
