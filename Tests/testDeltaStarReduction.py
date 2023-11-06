@@ -102,14 +102,14 @@ class testDeltaStarReduction(baseTest):
         nu_actual = DeltaStar.reduce(actual, canonicalise=True)
         self.assertEqual(actual, nu_actual, "Canonicalisation did not round trip")
 
-    def test_canonicalisation_of_dagudashaag_2124(self):
+    def test_canonicalisation_of_dagudashaag_2123(self):
         src = "2123 Medurma              A9D7954-C Hi An Cs Di(Miyavine) Asla1 S'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V            Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322"
         exp = "2123 Medurma              A9D7954-C An Asla1 Cs Di(Miyavine) Hi S'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V           Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322  "
 
-        actual = DeltaStar.reduce(src)
-        self.assertEqual(exp, actual)
+        actual = DeltaStar.reduce(src, canonicalise=True)
+        self.assertEqual(exp, actual, "Unexpected canonicalisation result")
 
-        nu_actual = DeltaStar.reduce(actual)
+        nu_actual = DeltaStar.reduce(actual, canonicalise=True)
         self.assertEqual(actual, nu_actual, "Canonicalisation did not round trip")
 
 if __name__ == '__main__':
