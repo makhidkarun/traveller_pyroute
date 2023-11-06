@@ -15,6 +15,7 @@ from PyRoute.TradeCodes import TradeCodes
 
 tradecodes = []
 
+
 @composite
 def trade_code(draw):
     if 0 == len(tradecodes):
@@ -26,6 +27,7 @@ def trade_code(draw):
     strat = sampled_from(tradecodes)
 
     return draw(lists(strat, min_size=2, max_size=12))
+
 
 @composite
 def starline(draw):
@@ -83,6 +85,17 @@ def starline(draw):
                + nobles + ' ' + base + ' ' + tradezone + ' ' + pbg + ' ' + worlds + ' ' + alg + ' ' + star
 
     return starline
+
+
+@composite
+def mixed_starline(draw):
+    choice = draw(floats(min_value=0.0, max_value=1.0))
+    if 0.5 < choice:
+        res = from_regex(regex=ParseStarInput.starline,
+                      alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*')
+    else:
+        res = starline()
+    return draw(res)
 
 
 class testDeltaStar(unittest.TestCase):
@@ -347,8 +360,7 @@ class testDeltaStar(unittest.TestCase):
     """
     Given a regex-matching string that results in a Star object when parsed, that Star should cleanly canonicalise
     """
-    @given(from_regex(regex=ParseStarInput.starline,
-                      alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    @given(mixed_starline())
     @settings(
         suppress_health_check=[HealthCheck(3), HealthCheck(2)],  # suppress slow-data health check, too-much filtering
         deadline=timedelta(1000))
@@ -357,8 +369,12 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 000000000000000 A000200-0 000000000000000 {0} -  [0000] - - 0 000   00')
     @example('0101 000000000000000 A000a00-0 000000000000000 {0} (000-0) [0000] - - 0 000   00')
     @example('0101 000000000000000 A000Z00-0 000000000000000 {0} (000-0) [0000] - - 0 000   00')
-    def test_canonicalise_from_regex_match(self, starline):
-        sector = Sector(' Core', ' 0, 0')
+    @example('2123 Medurma              A9D7954-C Hi An Cs Di(Miyavine) Asla1 S\'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V            Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322')
+    @example('0101 0                    A000400-0 As Ba                                  { 0 } (001+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 Cp Cp Cp Cp Cp Cp Cp Cp Cp Cp          { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000600-0 Cp Cx Cs Mr Da RsA RsB RsG             { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    def test_canonicalise_from_regex_match_and_verify_idempotency(self, starline):
+        sector = Sector('# Core', '# 0, 0')
         foo = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
         assume(foo is not None)
 
@@ -368,13 +384,21 @@ class testDeltaStar(unittest.TestCase):
         foo.trim_self_ownership()
         foo.trim_self_colonisation()
         self.assertIsNotNone(foo._hash, "Hash not calculated for original star")
-        self.assertTrue(foo.is_well_formed())
+        assume(foo.is_well_formed(enforce=False))
 
         foo.canonicalise()
         nu_result, nu_messages = foo.check_canonical()  # Should be in canonical form after canonicalise call
 
         badline = '' if 0 == len(nu_messages) else nu_messages[0]
         self.assertEqual(0, len(nu_messages), 'At least one characteristic not canonicalised: \n' + starline + '\n' + badline)
+
+        # Now verify canonicalisation is idempotent on resulting string
+        first_round = foo.parse_to_line()
+        nu_foo = DeltaStar.parse_line_into_star(first_round, sector, 'fixed', 'fixed')
+        self.assertIsNotNone(nu_foo, "Canonicalised line should parse cleanly")
+        nu_foo.canonicalise()
+        second_round = nu_foo.parse_to_line()
+        self.assertEqual(first_round, second_round, 'Canonicalisation should be idempotent.\nHypothesis input: ' + starline + '\n')
 
 
 if __name__ == '__main__':

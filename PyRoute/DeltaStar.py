@@ -353,8 +353,12 @@ class DeltaStar(Star):
         self._fix_pop_code('Ph', '8')
         self._fix_pop_code('Hi', '9ABCD')
 
+        self.calculate_importance()
+
         self._fix_economics()
         self._fix_social()
+        # Now all's squared up, recalculate importance as something might have changed
+        self.calculate_importance()
 
     def _fix_economics(self):
         if self.economics is None:

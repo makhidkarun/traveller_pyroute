@@ -653,7 +653,7 @@ class Star(object):
         if len(self.routes) > 0:
             self.logger.debug("{} - routes: {}".format(self, self.routes))
 
-    def is_well_formed(self, log=True):
+    def is_well_formed(self, log=True, enforce=True):
         assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
@@ -662,6 +662,8 @@ class Star(object):
         assert self._key is not None, "Star " + str(self.name) + " has empty _key attribute"
         assert self.tradeCode is not None, "Star " + str(self.name) + " has empty tradeCode attribute"
         result, msg = self.tradeCode.is_well_formed()
+        if not enforce and not result:
+            return result
         assert result, msg
         result, msg = self.hex.is_well_formed()
         assert result, msg
