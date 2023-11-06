@@ -96,10 +96,10 @@ class testDeltaStarReduction(baseTest):
         src = "1722 Campbell             B99A200-E Lo Wa                                 { 2 }  (812-2) [1419] B    W  - 204 7  ImDv M1 V            Xb:1420 Xb:1823 Xb:2020"
         exp = "1722 Campbell             B99A200-E Lo Wa                                 { 2 }  (812-2) [1419] B    W  - 204 7  ImDv M1 V           Xb:1420 Xb:1823 Xb:2020                  "
 
-        actual = DeltaStar.reduce(src)
+        actual = DeltaStar.reduce(src, canonicalise=True)
         self.assertEqual(exp, actual)
 
-        nu_actual = DeltaStar.reduce(actual)
+        nu_actual = DeltaStar.reduce(actual, canonicalise=True)
         self.assertEqual(actual, nu_actual, "Canonicalisation did not round trip")
 
     def test_canonicalisation_of_dagudashaag_2124(self):

@@ -35,7 +35,7 @@ class testDeltaPasses(baseTest):
         reducer.is_initial_state_interesting()
         # verify each line got reduced
         for line in reducer.sectors.lines:
-            reduced = DeltaStar.reduce(line)
+            reduced = DeltaStar.reduce(line, canonicalise=True)
             self.assertEqual(line, reduced, "Line not canonicalised")
 
     def test_canonicalisation_resets_hex_block(self):
