@@ -9,9 +9,10 @@ import bisect
 import random
 import math
 
-from PyRoute.Position.Hex import Hex
 
 from PyRoute.AllyGen import AllyGen
+from PyRoute.Position.Hex import Hex
+
 from PyRoute.SystemData.Utilities import Utilities
 from collections import OrderedDict
 
