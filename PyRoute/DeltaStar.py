@@ -385,6 +385,8 @@ class DeltaStar(Star):
                 econ = econ[:3] + infrastructure + econ[4:]
         labour = str(self._int_to_ehex(max(self.popCode - 1, 0)))
         econ = econ[:2] + labour + econ[3:]
+
+        assert 7 == len(econ), "Unexpected econ code length"
         self.economics = econ
 
     def _fix_social(self):
