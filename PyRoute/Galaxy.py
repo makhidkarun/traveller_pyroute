@@ -30,6 +30,9 @@ from PyRoute.AllyGen import AllyGen
 
 class AreaItem(object):
     def __init__(self, name):
+        if not isinstance(name, str):
+            raise ValueError("Name must be string - received " + str(name))
+
         self.name = name
         self.worlds = []
         self.stats = ObjectStatistics()
