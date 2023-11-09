@@ -11,4 +11,4 @@ pytest
 pytest-console-scripts
 pytest-randomly
 pytest-subtests
-ruff >= 0.1.0
+ruff >= 0.1.5
