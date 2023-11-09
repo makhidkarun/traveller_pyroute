@@ -37,7 +37,7 @@ class PageReviewSearch(PageReview):
         super(PageReviewSearch, self).__init__(search, replace, text, replace_count)
 
     def review(self, page, formats):
-        (s, r, t) = self.update_formats(formats)
+        (s, _, _) = self.update_formats(formats)
         logger.debug("searching for {} in {}".format(s, page.title))
         if re.search(s, page.getWikiText()):
             logger.info("Article {} has match search {}".format(page.title, self.search))
@@ -51,7 +51,7 @@ class PageReviewReplace(PageReview):
 
     def review(self, page, formats):
         logger.debug('Searching for replacements in {}'.format(page.title))
-        (s, r, t) = self.update_formats(formats)
+        (s, r, _) = self.update_formats(formats)
         page_text = re.sub(s, r, page.getWikiText(), count=self.replace_count)
         return page_text
 
@@ -209,7 +209,7 @@ class WikiReview(object):
         titles = []
         for r in results:
             pages = r['query']['pages']
-            key, values = pages.popitem()
+            _, values = pages.popitem()
             for value in values['linkshere']:
                 # logger.debug(value)
                 titles.append(value['title'])

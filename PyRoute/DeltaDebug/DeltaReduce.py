@@ -54,7 +54,7 @@ class DeltaReduce:
         sectors = self.sectors
         args = self.args
 
-        interesting, msg, _ = self._check_interesting(args, sectors)
+        interesting, _, _ = self._check_interesting(args, sectors)
 
         if not interesting:
             raise AssertionError("Original input not interesting - aborting")
