@@ -467,6 +467,12 @@ class TradeCodes(object):
                 msg = "Residual code " + str(code) + " not in allowed residual list"
                 return False, msg
 
+        # Check no duplicate codes
+        codes_set = set(self.codes)
+        if len(self.codes) != len(codes_set):
+            msg = "At least one trade code duplicated"
+            return False, msg
+
         research_stations = [code for code in self.codes if code.startswith('Rs')]
         if 1 < len(research_stations):
             msg = "At most one research station allowed"
