@@ -224,6 +224,29 @@ class TestTradeCode(unittest.TestCase):
         expected = '(Miya)X An Asla1 Cs Hi S\'mr0'
         self.assertEqual(expected, str(code), "Unexpected trade code result")
 
+    def testVerifyCompactChirperCodeProcessing(self):
+        poplevel = '0123456789W'
+
+        for rawcode in poplevel:
+            with self.subTest("Population code " + rawcode):
+                line = 'C' + rawcode
+                code = TradeCodes(line)
+                expected = 'Chir' + rawcode
+                self.assertEqual(1, len(code.sophont_list), "Compacted Chirper code should result in sophont")
+                self.assertEqual(expected, str(code))
+
+    def testVerifyCompactDroyneCodeProcessing(self):
+        poplevel = '0123456789W'
+
+        for rawcode in poplevel:
+            with self.subTest("Population code " + rawcode):
+                line = 'D' + rawcode
+                code = TradeCodes(line)
+                expected = 'Droy' + rawcode
+                self.assertEqual(1, len(code.sophont_list), "Compacted Droyne code should result in sophont")
+                self.assertEqual(expected, str(code))
+
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

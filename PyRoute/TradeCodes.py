@@ -33,43 +33,34 @@ class TradeCodes(object):
                               's', 'Sp', 'St', 'Tn', 'Za'}
 
     ok_pairs = {
-        ('Ag', 'Bo'), ('Ag', 'C0'), ('Ag', 'C1'), ('Ag', 'C2'), ('Ag', 'C3'), ('Ag', 'C4'), ('Ag', 'C5'), ('Ag', 'C6'),
-        ('Ag', 'C9'), ('Ag', 'Cw'), ('Ag', 'Cy'), ('Ag', 'D0'), ('Ag', 'D1'), ('Ag', 'D2'), ('Ag', 'D3'), ('Ag', 'D7'),
-        ('Ag', 'D8'), ('Ag', 'Dw'), ('Ag', 'Fl'), ('Ag', 'Ga'), ('Ag', 'Hi'), ('Ag', 'In'), ('Ag', 'Lo'), ('Ag', 'N1'),
-        ('Ag', 'Ni'), ('Ag', 'Pi'), ('Ag', 'Po'), ('Ag', 'Pr'), ('Ag', 'Ri'), ('Ag', 'St'), ('Ag', 'Tn'), ('Ag', 'Va'),
-        ('Ag', 'Wa'), ('As', 'Ba'), ('As', 'Bo'), ('As', 'Cy'), ('As', 'Hi'), ('As', 'Ic'), ('As', 'In'), ('As', 'Lo'),
-        ('As', 'Na'), ('As', 'Ni'), ('As', 'Ph'), ('As', 'Pi'), ('As', 'Po'), ('As', 'Va'), ('Ba', 'Bo'), ('Ba', 'De'),
-        ('Ba', 'Fl'), ('Ba', 'Ga'), ('Ba', 'He'), ('Ba', 'Ic'), ('Ba', 'Lo'), ('Ba', 'Na'), ('Ba', 'Ni'), ('Ba', 'Oc'),
-        ('Ba', 'Po'), ('Ba', 'Va'), ('Ba', 'Wa'), ('Ba', 'o'), ('Bo', 'De'), ('Bo', 'Fl'), ('Bo', 'Ga'), ('Bo', 'He'),
-        ('Bo', 'Hi'), ('Bo', 'Ic'), ('Bo', 'In'), ('Bo', 'Lo'), ('Bo', 'Na'), ('Bo', 'Ni'), ('Bo', 'Oc'), ('Bo', 'Pa'),
-        ('Bo', 'Ph'), ('Bo', 'Pi'), ('Bo', 'Po'), ('Bo', 'Ri'), ('Bo', 'Va'), ('C0', 'Fl'), ('C0', 'Hi'), ('C0', 'Lo'),
-        ('C0', 'Ni'), ('C0', 'Po'), ('C1', 'Fl'), ('C1', 'Lo'), ('C1', 'Ni'), ('C1', 'Ri'), ('C1', 'Wa'), ('C2', 'Hi'),
-        ('C2', 'Lo'), ('C2', 'Na'), ('C2', 'Ni'), ('C2', 'Po'), ('C2', 'Ri'), ('C3', 'Hi'), ('C3', 'Lo'), ('C3', 'Ni'),
-        ('C4', 'Lo'), ('C4', 'Ni'), ('C4', 'Po'), ('C4', 'Wa'), ('C5', 'Ni'), ('C5', 'Po'), ('C6', 'Ni'), ('C6', 'Ri'),
-        ('C7', 'Ni'), ('C8', 'Ri'), ('C8', 'Wa'), ('C9', 'Lo'), ('C9', 'Na'), ('C9', 'Ni'), ('C9', 'Po'), ('C9', 'Va'),
-        ('Cw', 'Ni'), ('Cw', 'Ri'), ('Cy', 'De'), ('Cy', 'Fl'), ('Cy', 'Ga'), ('Cy', 'He'), ('Cy', 'Hi'), ('Cy', 'Ic'),
-        ('Cy', 'In'), ('Cy', 'Lo'), ('Cy', 'Na'), ('Cy', 'Ni'), ('Cy', 'Oc'), ('Cy', 'Pa'), ('Cy', 'Ph'), ('Cy', 'Pi'),
-        ('Cy', 'Po'), ('Cy', 'Pr'), ('Cy', 'Ri'), ('Cy', 'Va'), ('Cy', 'Wa'), ('D0', 'Hi'), ('D0', 'Ni'), ('D1', 'Lo'),
-        ('D1', 'Ni'), ('D1', 'Po'), ('D1', 'Ri'), ('D2', 'Lo'), ('D2', 'Ni'), ('D2', 'Ri'), ('D2', 'Wa'), ('D3', 'Ni'),
-        ('D3', 'Ri'), ('D3', 'Tn'), ('D4', 'De'), ('D4', 'Lo'), ('D4', 'Ni'), ('D6', 'Ni'), ('D7', 'Ni'), ('D7', 'Ri'),
-        ('D8', 'Hi'), ('D8', 'Ni'), ('D8', 'Ri'), ('De', 'Fl'), ('De', 'He'), ('De', 'Hi'), ('De', 'Ic'), ('De', 'In'),
-        ('De', 'Lo'), ('De', 'Na'), ('De', 'Ni'), ('De', 'Ph'), ('De', 'Pi'), ('De', 'Po'), ('De', 'Pr'), ('De', 'Ri'),
-        ('De', 'Va'), ('Dw', 'Hi'), ('Dw', 'Lo'), ('Dw', 'Na'), ('Dw', 'Ni'), ('Dw', 'Po'), ('Ex', 'Lo'), ('Ex', 'Ni'),
-        ('Ex', 'Pr'), ('Fl', 'He'), ('Fl', 'Hi'), ('Fl', 'In'), ('Fl', 'Lo'), ('Fl', 'Na'), ('Fl', 'Ni'), ('Fl', 'Oc'),
-        ('Fl', 'Ph'), ('Fl', 'Pr'), ('Fl', 'Ri'), ('Fl', 'Rv'), ('Fl', 'Wa'), ('Ga', 'Hi'), ('Ga', 'Lo'), ('Ga', 'Ni'),
-        ('Ga', 'Pa'), ('Ga', 'Ph'), ('Ga', 'Pr'), ('Ga', 'Ri'), ('He', 'Hi'), ('He', 'In'), ('He', 'Lo'), ('He', 'Na'),
-        ('He', 'Ni'), ('He', 'Ph'), ('He', 'Pi'), ('He', 'Po'), ('Hi', 'Ic'), ('Hi', 'In'), ('Hi', 'Lo'), ('Hi', 'Na'),
-        ('Hi', 'Ni'), ('Hi', 'Oc'), ('Hi', 'Po'), ('Hi', 'Pr'), ('Hi', 'Ri'), ('Hi', 'Rn'), ('Hi', 'Sp'), ('Hi', 'St'),
-        ('Hi', 'Tn'), ('Hi', 'Va'), ('Hi', 'Wa'), ('Hi', 'Za'), ('Hi', 's'), ('Ic', 'In'), ('Ic', 'Lo'), ('Ic', 'Na'),
-        ('Ic', 'Ni'), ('Ic', 'Ph'), ('Ic', 'Pi'), ('Ic', 'Po'), ('Ic', 'Rn'), ('Ic', 'Va'), ('Ic', 'Wa'), ('In', 'Lo'),
-        ('In', 'Na'), ('In', 'Oc'), ('In', 'Po'), ('In', 'Ri'), ('In', 'Rn'), ('In', 'Sp'), ('In', 'Va'), ('In', 'Wa'),
-        ('Lo', 'Na'), ('Lo', 'Ni'), ('Lo', 'Oc'), ('Lo', 'Po'), ('Lo', 'Pr'), ('Lo', 'Ri'), ('Lo', 'Rv'), ('Lo', 'St'),
-        ('Lo', 'Tn'), ('Lo', 'Va'), ('Lo', 'Wa'), ('Na', 'Ni'), ('Na', 'Ph'), ('Na', 'Pi'), ('Na', 'Po'), ('Na', 'Ri'),
-        ('Na', 'Va'), ('Na', 'Wa'), ('Ni', 'Oc'), ('Ni', 'Pa'), ('Ni', 'Po'), ('Ni', 'Pr'), ('Ni', 'Ri'), ('Ni', 'Rv'),
-        ('Ni', 'St'), ('Ni', 'Tn'), ('Ni', 'Va'), ('Ni', 'Wa'), ('Oc', 'Ph'), ('Oc', 'Pi'), ('Oc', 'Pr'), ('Oc', 'Ri'),
-        ('Oc', 'Wa'), ('Pa', 'Ph'), ('Pa', 'Pi'), ('Pa', 'Ri'), ('Ph', 'Pi'), ('Ph', 'Po'), ('Ph', 'Ri'), ('Ph', 'Va'),
-        ('Ph', 'Wa'), ('Pi', 'Po'), ('Pi', 'Va'), ('Pi', 'Wa'), ('Po', 'Pr'), ('Po', 'Va'), ('Po', 'Wa'), ('Pr', 'Wa'),
-        ('Pr', 'Za'), ('Ri', 'Tn'), ('Ri', 'Wa'), ('Rn', 'Va'), ('St', 'Tn'), ('Va', 'Wa')
+        ('Ag', 'Bo'), ('Ag', 'Cw'), ('Ag', 'Cy'), ('Ag', 'Dw'), ('Ag', 'Fl'), ('Ag', 'Ga'), ('Ag', 'Hi'), ('Ag', 'In'),
+        ('Ag', 'Lo'), ('Ag', 'N1'), ('Ag', 'Ni'), ('Ag', 'Pi'), ('Ag', 'Po'), ('Ag', 'Pr'), ('Ag', 'Ri'), ('Ag', 'St'),
+        ('Ag', 'Tn'), ('Ag', 'Va'), ('Ag', 'Wa'), ('As', 'Ba'), ('As', 'Bo'), ('As', 'Cy'), ('As', 'Hi'), ('As', 'Ic'),
+        ('As', 'In'), ('As', 'Lo'), ('As', 'Na'), ('As', 'Ni'), ('As', 'Ph'), ('As', 'Pi'), ('As', 'Po'), ('As', 'Va'),
+        ('Ba', 'Bo'), ('Ba', 'De'), ('Ba', 'Fl'), ('Ba', 'Ga'), ('Ba', 'He'), ('Ba', 'Ic'), ('Ba', 'Lo'), ('Ba', 'Na'),
+        ('Ba', 'Ni'), ('Ba', 'Oc'), ('Ba', 'Po'), ('Ba', 'Va'), ('Ba', 'Wa'), ('Ba', 'o'), ('Bo', 'De'), ('Bo', 'Fl'),
+        ('Bo', 'Ga'), ('Bo', 'He'), ('Bo', 'Hi'), ('Bo', 'Ic'), ('Bo', 'In'), ('Bo', 'Lo'), ('Bo', 'Na'), ('Bo', 'Ni'),
+        ('Bo', 'Oc'), ('Bo', 'Pa'), ('Bo', 'Ph'), ('Bo', 'Pi'), ('Bo', 'Po'), ('Bo', 'Ri'), ('Bo', 'Va'), ('Cw', 'Ni'),
+        ('Cw', 'Ri'), ('Cy', 'De'), ('Cy', 'Fl'), ('Cy', 'Ga'), ('Cy', 'He'), ('Cy', 'Hi'), ('Cy', 'Ic'), ('Cy', 'In'),
+        ('Cy', 'Lo'), ('Cy', 'Na'), ('Cy', 'Ni'), ('Cy', 'Oc'), ('Cy', 'Pa'), ('Cy', 'Ph'), ('Cy', 'Pi'), ('Cy', 'Po'),
+        ('Cy', 'Pr'), ('Cy', 'Ri'), ('Cy', 'Va'), ('Cy', 'Wa'), ('De', 'Fl'), ('De', 'He'), ('De', 'Hi'), ('De', 'Ic'),
+        ('De', 'In'), ('De', 'Lo'), ('De', 'Na'), ('De', 'Ni'), ('De', 'Ph'), ('De', 'Pi'), ('De', 'Po'), ('De', 'Pr'),
+        ('De', 'Ri'), ('De', 'Va'), ('Dw', 'Hi'), ('Dw', 'Lo'), ('Dw', 'Na'), ('Dw', 'Ni'), ('Dw', 'Po'), ('Ex', 'Lo'),
+        ('Ex', 'Ni'), ('Ex', 'Pr'), ('Fl', 'He'), ('Fl', 'Hi'), ('Fl', 'In'), ('Fl', 'Lo'), ('Fl', 'Na'), ('Fl', 'Ni'),
+        ('Fl', 'Oc'), ('Fl', 'Ph'), ('Fl', 'Pr'), ('Fl', 'Ri'), ('Fl', 'Rv'), ('Fl', 'Wa'), ('Ga', 'Hi'), ('Ga', 'Lo'),
+        ('Ga', 'Ni'), ('Ga', 'Pa'), ('Ga', 'Ph'), ('Ga', 'Pr'), ('Ga', 'Ri'), ('He', 'Hi'), ('He', 'In'), ('He', 'Lo'),
+        ('He', 'Na'), ('He', 'Ni'), ('He', 'Ph'), ('He', 'Pi'), ('He', 'Po'), ('Hi', 'Ic'), ('Hi', 'In'), ('Hi', 'Lo'),
+        ('Hi', 'Na'), ('Hi', 'Ni'), ('Hi', 'Oc'), ('Hi', 'Po'), ('Hi', 'Pr'), ('Hi', 'Ri'), ('Hi', 'Rn'), ('Hi', 'Sp'),
+        ('Hi', 'St'), ('Hi', 'Tn'), ('Hi', 'Va'), ('Hi', 'Wa'), ('Hi', 'Za'), ('Hi', 's'), ('Ic', 'In'), ('Ic', 'Lo'),
+        ('Ic', 'Na'), ('Ic', 'Ni'), ('Ic', 'Ph'), ('Ic', 'Pi'), ('Ic', 'Po'), ('Ic', 'Rn'), ('Ic', 'Va'), ('Ic', 'Wa'),
+        ('In', 'Lo'), ('In', 'Na'), ('In', 'Oc'), ('In', 'Po'), ('In', 'Ri'), ('In', 'Rn'), ('In', 'Sp'), ('In', 'Va'),
+        ('In', 'Wa'), ('Lo', 'Na'), ('Lo', 'Ni'), ('Lo', 'Oc'), ('Lo', 'Po'), ('Lo', 'Pr'), ('Lo', 'Ri'), ('Lo', 'Rv'),
+        ('Lo', 'St'), ('Lo', 'Tn'), ('Lo', 'Va'), ('Lo', 'Wa'), ('Na', 'Ni'), ('Na', 'Ph'), ('Na', 'Pi'), ('Na', 'Po'),
+        ('Na', 'Ri'), ('Na', 'Va'), ('Na', 'Wa'), ('Ni', 'Oc'), ('Ni', 'Pa'), ('Ni', 'Po'), ('Ni', 'Pr'), ('Ni', 'Ri'),
+        ('Ni', 'Rv'), ('Ni', 'St'), ('Ni', 'Tn'), ('Ni', 'Va'), ('Ni', 'Wa'), ('Oc', 'Ph'), ('Oc', 'Pi'), ('Oc', 'Pr'),
+        ('Oc', 'Ri'), ('Oc', 'Wa'), ('Pa', 'Ph'), ('Pa', 'Pi'), ('Pa', 'Ri'), ('Ph', 'Pi'), ('Ph', 'Po'), ('Ph', 'Ri'),
+        ('Ph', 'Va'), ('Ph', 'Wa'), ('Pi', 'Po'), ('Pi', 'Va'), ('Pi', 'Wa'), ('Po', 'Pr'), ('Po', 'Va'), ('Po', 'Wa'),
+        ('Pr', 'Wa'), ('Pr', 'Za'), ('Ri', 'Tn'), ('Ri', 'Wa'), ('Rn', 'Va'), ('St', 'Tn'), ('Va', 'Wa')
     }
 
     __slots__ = '__dict__', 'codeset', 'pcode', 'dcode', 'xcode'
@@ -142,6 +133,15 @@ class TradeCodes(object):
             if 7 < len(raw) and '(' == raw[0] and ')' == raw[-2]:  # Let older-style sophont codes through
                 codes.append(raw)
                 continue
+            if 2 == len(raw):
+                if 'C' == raw[0]:  # Compact chirper population
+                    pop = raw[1]
+                    codes.append('Chir' + pop)
+                    continue
+                if 'D' == raw[0]:  # Compact Droyne population
+                    pop = raw[1]
+                    codes.append('Droy' + pop)
+                    continue
             if not raw.startswith('(') and '(' in raw and raw.endswith(')'):
                 continue
             if not raw.endswith(')') and ')' in raw and raw.startswith('(') and 7 > len(raw):
@@ -163,6 +163,7 @@ class TradeCodes(object):
                     combo = raw + ' ' + next
                     codes.append(combo)
                     raw_codes[i + 1] = ''
+                continue
 
         initial_codes = ' '.join(codes)
 
