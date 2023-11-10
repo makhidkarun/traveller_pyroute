@@ -195,15 +195,46 @@ class Subsector(AreaItem):
 
 class Sector(AreaItem):
     def __init__(self, name, position):
+        name = name.rstrip()
+        if 2 > len(name):
+            raise ValueError("Name string too short")
+        if 2 > len(position):
+            raise ValueError("Position string too short")
+
+        # Pre-trim input values
+
         # The name as passed from the Galaxy read include the comment marker at the start of the line
         # So strip the comment marker, then strip spaces.
-        super(Sector, self).__init__(name[1:].strip())
-        self._wiki_name = '[[{0} Sector|{0}]]'.format(self.sector_name())
+        name = name[1:].strip()
 
         # Same here, the position has a leading comment marker
-        self.x = int(position[1:].split(',')[0])
-        self.y = int(position[1:].split(',')[1])
-        
+        position = position[1:]
+        pos_bits = position.split(',')
+
+        if 2 != len(pos_bits):
+            raise ValueError("Position string malformed")
+
+        # spin thru pos_bits strings and validate by character
+        valid_list = '+- 0123456789'
+        head_list = '0123456789'
+        pos_trim, pos_bits[0] = self._trim_position(head_list, pos_bits[0], valid_list)
+
+        if pos_trim or '-' == pos_bits[0] or '+' == pos_bits[0]:
+            pos_bits[0] = ''
+
+        pos_trim, pos_bits[1] = self._trim_position(head_list, pos_bits[1], valid_list)
+        if pos_trim or '-' == pos_bits[1] or '+' == pos_bits[1]:
+            pos_bits[1] = ''
+
+        if 0 == len(pos_bits[0]) or 0 == len(pos_bits[1]):
+            raise ValueError("Position string malformed")
+
+        super(Sector, self).__init__(name)
+        self._wiki_name = '[[{0} Sector|{0}]]'.format(self.sector_name())
+
+        self.x = int(pos_bits[0])
+        self.y = int(pos_bits[1])
+
         self.dx = self.x * 32
         self.dy = self.y * 40
         self.subsectors = {}
@@ -211,6 +242,21 @@ class Sector(AreaItem):
         self.trailing = None
         self.coreward = None
         self.rimward = None
+
+    def _trim_position(self, head_list, pos_bit, valid_list):
+        pos_bit = pos_bit.strip().replace(' ', '')
+        if 0 == len(pos_bit):
+            return True, pos_bit
+        pos_trim = False
+        if 0 < len(pos_bit) and (pos_bit[0] not in valid_list):
+            pos_trim = True
+        if not pos_trim:
+            for i in range(1, len(pos_bit)):
+                char = pos_bit[i]
+                if (char not in head_list):
+                    pos_trim = True
+                    break
+        return pos_trim, pos_bit
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -236,6 +282,11 @@ class Sector(AreaItem):
 
     def is_well_formed(self):
         msg = ""
+        # check name
+        if self.name is None or '' == self.name.strip():
+            msg = "Name cannot be empty"
+            return False, msg
+
         # Check reciprocity of adjacent sectors
         if self.coreward is not None:
             neighbour = self.coreward
