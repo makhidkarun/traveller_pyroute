@@ -109,7 +109,7 @@ class Allegiance(AreaItem):
         return '[[{}]]'.format(name.strip())
 
     def __str__(self):
-        return '{} ([{})'.format(self.name, self.code)
+        return '{} ({})'.format(self.name, self.code)
 
     def is_unclaimed(self):
         return AllyGen.is_unclaimed(self)
@@ -122,6 +122,20 @@ class Allegiance(AreaItem):
 
     def are_allies(self, other):
         return AllyGen.are_allies(self.code, other.code)
+
+    def is_well_formed(self):
+        msg = ''
+        if '' == self.name.strip():
+            msg = "Allegiance name should not be empty"
+            return False, msg
+        if '  ' in self.name:
+            msg = "Should not have successive spaces in allegiance name"
+            return False, msg
+        if 1 < self.name.count(','):
+            msg = "Should be at most one comma in allegiance name"
+            return False, msg
+
+        return True, msg
 
 class Subsector(AreaItem):
     def __init__(self, name, position, sector):
