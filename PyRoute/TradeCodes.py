@@ -16,7 +16,7 @@ class TradeCodes(object):
     pcodes = ['As', 'De', 'Ga', 'Fl', 'He', 'Ic', 'Oc', 'Po', 'Va', 'Wa']
     dcodes = ['Cp', 'Cx', 'Cs', 'Mr', 'Da', 'Di', 'Pz', 'An', 'Ab', 'Fo', 'Px',
               'Re', 'Rs', 'Sa', 'Tz', 'Lk',
-              'RsA', 'RsB', 'RsG', 'RsD', 'RsE', 'RsZ', 'RsT', 'RsI', 'RsK',
+              'RsA', 'RsB', 'RsG', 'RsD', 'RsE', 'RsZ', 'RsT', 'RsI', 'RsK', 'RsO',
               'Fr', 'Co', 'Tp', 'Ho', 'Tr', 'Tu',
               'Cm', 'Tw']
     ex_codes = {'As', 'Fl', 'Ic', 'De', 'Na', 'Va', 'Wa', 'He', 'Oc'}
@@ -31,46 +31,46 @@ class TradeCodes(object):
                               'Cy', 'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'Dw', 'Ex', 'Fr', 'Ga',
                               'Hi', 'In', 'Lo', 'N1', 'Na', 'Ni', 'o', 'Pa', 'Ph', 'Pi', 'Po', 'Pr', 'Ri', 'Rn', 'Rv',
                               's', 'Sp', 'St', 'Tn', 'Za'}
-    ok_pairs = {('Ni', 'Po'), ('Ni', 'Pa'), ('Ni', 'Wa'), ('Ph', 'Ri'), ('Lo', 'Va'), ('Ni', 'Va'), ('Lo', 'Po'),
-                ('De', 'He'), ('De', 'Ni'), ('De', 'Po'), ('He', 'Ni'), ('He', 'Po'), ('Hi', 'In'), ('De', 'Lo'),
-                ('Ic', 'Na'), ('Ic', 'Ni'), ('Ic', 'Va'), ('Na', 'Ni'), ('Na', 'Va'), ('As', 'Ni'), ('As', 'Va'),
-                ('De', 'Na'), ('He', 'Na'), ('Na', 'Po'), ('Hi', 'Pr'), ('Ga', 'Hi'), ('Ag', 'Ni'), ('Na', 'Pi'),
-                ('Ni', 'Oc'), ('Ag', 'Ga'), ("Ag", "Ri"), ("Ga", "Ni"), ("Ga", "Ri"), ("Ni", "Ri"), ("Ag", "Pi"),
-                ("He", "Lo"), ("Ag", "Pr"), ("Ni", "Pr"), ("As", "Hi"), ("As", "In"), ("As", "Na"), ("Hi", "Na"),
-                ("Hi", "Va"), ("In", "Na"), ("In", "Va"), ("De", "Ph"), ("De", "Pi"), ("He", "Ph"), ("He", "Pi"),
-                ("Na", "Ph"), ("Ph", "Pi"), ("Ph", "Po"), ("Pi", "Po"), ("Ic", "Lo"), ("Fl", "He"), ("Fl", "Ni"),
-                ("As", "Lo"), ("Pa", "Ph"), ("Pa", "Ri"), ("Pa", "Pi"), ("Hi", "Wa"), ("In", "Wa"), ("Ga", "Lo"),
-                ("Ga", "Pa"), ("Ph", "Va"), ("Pi", "Va"), ("As", "Ph"), ("As", "Pi"), ("Ga", "Pr"), ("Ic", "Pi"),
-                ("Ba", "Va"), ("Hi", "Po"), ("Hi", "Ic"), ("Ic", "In"), ("Fl", "Lo"), ("De", "Ri"), ("Pi", "Wa"),
-                ("Ga", "Ph"), ("Ba", "Fl"), ("Ba", "Lo"), ("Ba", "Ni"), ("De", "Hi"), ("De", "In"), ("He", "Hi"),
-                ("He", "In"), ("In", "Po"), ("Ph", "Wa"), ("Ri", "Wa"), ("Pr", "Wa"), ("Ba", "Wa"), ("Lo", "Ni"),
-                ("Ic", "Ph"), ("Ba", "Po"), ("Lo", "Wa"), ("Ba", "De"), ("Fl", "Ph"), ("Oc", "Ri"), ("Lo", "Oc"),
-                ("Fl", "Hi"), ("Fl", "In"), ("De", "Pr"), ("Oc", "Ph"), ("Oc", "Pi"), ("Hi", "Oc"), ("In", "Oc"),
-                ("Oc", "Pr"), ("Ba", "Ic"), ("Ba", "He"), ("Ba", "Ga"), ("Ba", "Oc"), ("As", "Ba"), ("Ag", "Hi"),
-                ("Ag", "D3"), ("De", "Va"), ("Ag", "In"), ("Fl", "Wa"), ("Hi", "Sp"), ("In", "Sp"), ("Po", "Pr"),
-                ("Fl", "Pr"), ("Ic", "Wa"), ("Ba", "Bo"), ("Bo", "De"), ("Bo", "He"), ("Ba", "o"), ("Bo", "Lo"),
-                ("Oc", "Wa"), ("Bo", "Fl"), ("Ag", "Cy"), ("Cy", "Ni"), ("Cy", "Fl"), ("Cy", "Pr"), ("Cy", "Po"),
-                ("Cy", "He"), ("Cy", "Pi"), ("Cy", "Ri"), ("Cy", "Wa"), ("Cy", "Pa"), ("Cy", "Ph"), ("Cy", "De"),
-                ("Ag", "Po"), ("As", "Cy"), ("Cy", "Na"), ("Cy", "Va"), ("Cy", "Ga"), ("Cy", "Ic"), ("Cy", "Hi"),
-                ("Cy", "In"), ("Bo", "Ni"), ("Bo", "Va"), ("Cy", "Lo"), ("Ag", "Lo"), ("Hi", "s"), ("Ag", "Wa"),
-                ("Hi", "Ri"), ("In", "Ri"), ("Ag", "Fl"), ("Lo", "Na"), ("Lo", "Ri"), ("Fl", "Ri"), ("In", "Lo"),
-                ("Ag", "Va"), ("Na", "Wa"), ("Fl", "Na"), ("Ag", "C1"), ("C1", "Ni"), ("Dw", "Hi"), ("Dw", "Na"),
-                ("Dw", "Po"), ("Ag", "St"), ("Ag", "Tn"), ("Ni", "St"), ("Ni", "Tn"), ("St", "Tn"), ("Ag", "C3"),
-                ("C3", "Ni"), ("Lo", "St"), ("C0", "Lo"), ("C0", "Ni"), ("Ag", "C6"), ("C6", "Ni"), ("C1", "Fl"),
-                ("D1", "Lo"), ("D1", "Ni"), ("C4", "Ni"), ("C4", "Po"), ("Ag", "D1"), ("D1", "Ri"), ("Ri", "Tn"),
-                ("Hi", "St"), ("C5", "Po"), ("D3", "Ri"), ("D3", "Tn"), ("C1", "Lo"), ("C9", "Lo"), ("C9", "Ni"),
-                ("C9", "Po"), ("D1", "Po"), ("Dw", "Lo"), ("Dw", "Ni"), ("Ag", "C9"), ("Ag", "C5"), ("Hi", "Tn"),
-                ("C4", "Lo"), ("Ag", "Dw"), ("Lo", "Tn"), ("C1", "Wa"), ("C4", "Wa"), ("C9", "Na"), ("C9", "Va"),
-                ("D0", "Ni"), ("Ag", "Cw"), ("Cw", "Ri"), ("D4", "Lo"), ("D4", "Ni"), ("C2", "Lo"), ("C2", "Ni"),
-                ("C0", "Fl"), ("Cy", "Oc"), ("Hi", "Ni"), ("Hi", "Lo"), ("Va", "Wa"), ("Ba", "Na"), ("Na", "Ri"),
-                ("De", "Fl"), ("As", "Po"), ("Ic", "Po"), ("Hi", "Za"), ("Pr", "Za"), ("Ag", "D0"), ("Cw", "Ni"),
-                ("D4", "De"), ("Ag", "D7"), ("D7", "Ni"), ("D7", "Ri"), ("Ag", "C0"), ("Ag", "D8"), ("D8", "Ni"),
-                ("D8", "Ri"), ("Hi", "Rn"), ("Ic", "Rn"), ("In", "Rn"), ("Rn", "Va"), ("C3", "Lo"), ("C3", "Hi"),
-                ("Ag", "C2"), ("Fl", "Rv"), ("Lo", "Rv"), ("Ni", "Rv"), ("C2", "Hi"), ("D2", "Lo"), ("D2", "Ni"),
-                ("D2", "Wa"), ("C8", "Ri"), ("C8", "Wa"), ("Ex", "Lo"), ("Ex", "Ni"), ("Ex", "Pr"), ("Lo", "Pr"),
-                ("C2", "Ri"), ("D2", "Ri"), ("C7", "Ni"), ("D8", "Hi"), ("C2", "Po"), ("Ag", "C4"), ("D0", "Hi"),
-                ("C0", "Hi"), ("C0", "Po"), ("C2", "Na"), ("C6", "Ri"), ("Po", "Wa"), ("Ag", "D2"), ("C1", "Ri"),
-                ("D3", "Ni"), ("C5", "Ni"), ("Ag", "N1"), ("D6", "Ni"), ("As", "Ic")}
+
+    ok_pairs = {
+        ('Ag', 'Bo'), ('Ag', 'C0'), ('Ag', 'C1'), ('Ag', 'C2'), ('Ag', 'C3'), ('Ag', 'C4'), ('Ag', 'C5'), ('Ag', 'C6'),
+        ('Ag', 'C9'), ('Ag', 'Cw'), ('Ag', 'Cy'), ('Ag', 'D0'), ('Ag', 'D1'), ('Ag', 'D2'), ('Ag', 'D3'), ('Ag', 'D7'),
+        ('Ag', 'D8'), ('Ag', 'Dw'), ('Ag', 'Fl'), ('Ag', 'Ga'), ('Ag', 'Hi'), ('Ag', 'In'), ('Ag', 'Lo'), ('Ag', 'N1'),
+        ('Ag', 'Ni'), ('Ag', 'Pi'), ('Ag', 'Po'), ('Ag', 'Pr'), ('Ag', 'Ri'), ('Ag', 'St'), ('Ag', 'Tn'), ('Ag', 'Va'),
+        ('Ag', 'Wa'), ('As', 'Ba'), ('As', 'Bo'), ('As', 'Cy'), ('As', 'Hi'), ('As', 'Ic'), ('As', 'In'), ('As', 'Lo'),
+        ('As', 'Na'), ('As', 'Ni'), ('As', 'Ph'), ('As', 'Pi'), ('As', 'Po'), ('As', 'Va'), ('Ba', 'Bo'), ('Ba', 'De'),
+        ('Ba', 'Fl'), ('Ba', 'Ga'), ('Ba', 'He'), ('Ba', 'Ic'), ('Ba', 'Lo'), ('Ba', 'Na'), ('Ba', 'Ni'), ('Ba', 'Oc'),
+        ('Ba', 'Po'), ('Ba', 'Va'), ('Ba', 'Wa'), ('Ba', 'o'), ('Bo', 'De'), ('Bo', 'Fl'), ('Bo', 'Ga'), ('Bo', 'He'),
+        ('Bo', 'Hi'), ('Bo', 'Ic'), ('Bo', 'In'), ('Bo', 'Lo'), ('Bo', 'Na'), ('Bo', 'Ni'), ('Bo', 'Oc'), ('Bo', 'Pa'),
+        ('Bo', 'Ph'), ('Bo', 'Pi'), ('Bo', 'Po'), ('Bo', 'Ri'), ('Bo', 'Va'), ('C0', 'Fl'), ('C0', 'Hi'), ('C0', 'Lo'),
+        ('C0', 'Ni'), ('C0', 'Po'), ('C1', 'Fl'), ('C1', 'Lo'), ('C1', 'Ni'), ('C1', 'Ri'), ('C1', 'Wa'), ('C2', 'Hi'),
+        ('C2', 'Lo'), ('C2', 'Na'), ('C2', 'Ni'), ('C2', 'Po'), ('C2', 'Ri'), ('C3', 'Hi'), ('C3', 'Lo'), ('C3', 'Ni'),
+        ('C4', 'Lo'), ('C4', 'Ni'), ('C4', 'Po'), ('C4', 'Wa'), ('C5', 'Ni'), ('C5', 'Po'), ('C6', 'Ni'), ('C6', 'Ri'),
+        ('C7', 'Ni'), ('C8', 'Ri'), ('C8', 'Wa'), ('C9', 'Lo'), ('C9', 'Na'), ('C9', 'Ni'), ('C9', 'Po'), ('C9', 'Va'),
+        ('Cw', 'Ni'), ('Cw', 'Ri'), ('Cy', 'De'), ('Cy', 'Fl'), ('Cy', 'Ga'), ('Cy', 'He'), ('Cy', 'Hi'), ('Cy', 'Ic'),
+        ('Cy', 'In'), ('Cy', 'Lo'), ('Cy', 'Na'), ('Cy', 'Ni'), ('Cy', 'Oc'), ('Cy', 'Pa'), ('Cy', 'Ph'), ('Cy', 'Pi'),
+        ('Cy', 'Po'), ('Cy', 'Pr'), ('Cy', 'Ri'), ('Cy', 'Va'), ('Cy', 'Wa'), ('D0', 'Hi'), ('D0', 'Ni'), ('D1', 'Lo'),
+        ('D1', 'Ni'), ('D1', 'Po'), ('D1', 'Ri'), ('D2', 'Lo'), ('D2', 'Ni'), ('D2', 'Ri'), ('D2', 'Wa'), ('D3', 'Ni'),
+        ('D3', 'Ri'), ('D3', 'Tn'), ('D4', 'De'), ('D4', 'Lo'), ('D4', 'Ni'), ('D6', 'Ni'), ('D7', 'Ni'), ('D7', 'Ri'),
+        ('D8', 'Hi'), ('D8', 'Ni'), ('D8', 'Ri'), ('De', 'Fl'), ('De', 'He'), ('De', 'Hi'), ('De', 'Ic'), ('De', 'In'),
+        ('De', 'Lo'), ('De', 'Na'), ('De', 'Ni'), ('De', 'Ph'), ('De', 'Pi'), ('De', 'Po'), ('De', 'Pr'), ('De', 'Ri'),
+        ('De', 'Va'), ('Dw', 'Hi'), ('Dw', 'Lo'), ('Dw', 'Na'), ('Dw', 'Ni'), ('Dw', 'Po'), ('Ex', 'Lo'), ('Ex', 'Ni'),
+        ('Ex', 'Pr'), ('Fl', 'He'), ('Fl', 'Hi'), ('Fl', 'In'), ('Fl', 'Lo'), ('Fl', 'Na'), ('Fl', 'Ni'), ('Fl', 'Oc'),
+        ('Fl', 'Ph'), ('Fl', 'Pr'), ('Fl', 'Ri'), ('Fl', 'Rv'), ('Fl', 'Wa'), ('Ga', 'Hi'), ('Ga', 'Lo'), ('Ga', 'Ni'),
+        ('Ga', 'Pa'), ('Ga', 'Ph'), ('Ga', 'Pr'), ('Ga', 'Ri'), ('He', 'Hi'), ('He', 'In'), ('He', 'Lo'), ('He', 'Na'),
+        ('He', 'Ni'), ('He', 'Ph'), ('He', 'Pi'), ('He', 'Po'), ('Hi', 'Ic'), ('Hi', 'In'), ('Hi', 'Lo'), ('Hi', 'Na'),
+        ('Hi', 'Ni'), ('Hi', 'Oc'), ('Hi', 'Po'), ('Hi', 'Pr'), ('Hi', 'Ri'), ('Hi', 'Rn'), ('Hi', 'Sp'), ('Hi', 'St'),
+        ('Hi', 'Tn'), ('Hi', 'Va'), ('Hi', 'Wa'), ('Hi', 'Za'), ('Hi', 's'), ('Ic', 'In'), ('Ic', 'Lo'), ('Ic', 'Na'),
+        ('Ic', 'Ni'), ('Ic', 'Ph'), ('Ic', 'Pi'), ('Ic', 'Po'), ('Ic', 'Rn'), ('Ic', 'Va'), ('Ic', 'Wa'), ('In', 'Lo'),
+        ('In', 'Na'), ('In', 'Oc'), ('In', 'Po'), ('In', 'Ri'), ('In', 'Rn'), ('In', 'Sp'), ('In', 'Va'), ('In', 'Wa'),
+        ('Lo', 'Na'), ('Lo', 'Ni'), ('Lo', 'Oc'), ('Lo', 'Po'), ('Lo', 'Pr'), ('Lo', 'Ri'), ('Lo', 'Rv'), ('Lo', 'St'),
+        ('Lo', 'Tn'), ('Lo', 'Va'), ('Lo', 'Wa'), ('Na', 'Ni'), ('Na', 'Ph'), ('Na', 'Pi'), ('Na', 'Po'), ('Na', 'Ri'),
+        ('Na', 'Va'), ('Na', 'Wa'), ('Ni', 'Oc'), ('Ni', 'Pa'), ('Ni', 'Po'), ('Ni', 'Pr'), ('Ni', 'Ri'), ('Ni', 'Rv'),
+        ('Ni', 'St'), ('Ni', 'Tn'), ('Ni', 'Va'), ('Ni', 'Wa'), ('Oc', 'Ph'), ('Oc', 'Pi'), ('Oc', 'Pr'), ('Oc', 'Ri'),
+        ('Oc', 'Wa'), ('Pa', 'Ph'), ('Pa', 'Pi'), ('Pa', 'Ri'), ('Ph', 'Pi'), ('Ph', 'Po'), ('Ph', 'Ri'), ('Ph', 'Va'),
+        ('Ph', 'Wa'), ('Pi', 'Po'), ('Pi', 'Va'), ('Pi', 'Wa'), ('Po', 'Pr'), ('Po', 'Va'), ('Po', 'Wa'), ('Pr', 'Wa'),
+        ('Pr', 'Za'), ('Ri', 'Tn'), ('Ri', 'Wa'), ('Rn', 'Va'), ('St', 'Tn'), ('Va', 'Wa')
+    }
 
     __slots__ = '__dict__', 'codeset', 'pcode', 'dcode', 'xcode'
 
@@ -79,7 +79,7 @@ class TradeCodes(object):
         Constructor
         """
         self.logger = logging.getLogger('PyRoute.TradeCodes')
-        self.codes = self._preprocess_initial_codes(initial_codes)
+        self.codes, initial_codes = self._preprocess_initial_codes(initial_codes)
         self.pcode = set(TradeCodes.pcodes) & set(self.codes)
         self.dcode = set(TradeCodes.dcodes) & set(self.codes)
         self.xcode = TradeCodes.ext_codes & set(self.codes)
@@ -90,12 +90,21 @@ class TradeCodes(object):
         self.sophont_list = []
         homeworlds_found = []
 
-        self.sophont_list = [code for code in self.codes if re.match(r"[\w\']{4}(\d|W)", code, re.U)]
+        self.sophont_list = [code for code in self.codes if re.match(r"[A-Za-z\'!]{1}[\w\'!]{2,4}(\d|W|\?)", code, re.U)]
 
-        homeworld_match = re.findall(r"[Di]*\([^)]+\)\d?", initial_codes, re.U)
+        # Trim out overly-long values from sophont_list and return them to codeset later on
+        self.sophont_list = [code for code in self.sophont_list if 5 >= len(code)]
 
-        for homeworld in homeworld_match:
+        homeworld_matches = re.findall(r"[Di]*\([^)]+\)\d?", initial_codes, re.U)
+        # bolt on direct [homeworld] candidates
+        homeworld_new = [item.strip('[]') for item in self.codes if item.startswith('[') and item.endswith(']') and 1 == item.count('[') and 1 == item.count(']')]
+        deadworlds = [item for item in self.codes if 5 == len(item) and 'X' == item[4]]
+        for homeworld in homeworld_matches:
             self._process_homeworld(homeworld, homeworlds_found, initial_codes)
+        for homeworld in homeworld_new:
+            self._process_major_race_homeworld(homeworld, homeworlds_found)
+        for deadworld in deadworlds:
+            self._process_deadworld(deadworld, homeworlds_found)
 
         self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.sophont_list)\
             - set(homeworlds_found) - self.xcode
@@ -115,12 +124,32 @@ class TradeCodes(object):
     def _preprocess_initial_codes(self, initial_codes):
         raw_codes = initial_codes.split()
         # look for successive codes that should be part of the same name (eg  "(Carte" , then "Blanche)", becoming
-        # "(Carte Blanche)" ) and bolt them together
+        # "(Carte Blanche)", and bolt them together
         num_codes = len(raw_codes)
         codes = []
         for i in range(0, num_codes):
             raw = raw_codes[i]
+            # Filter duplicates
+            if raw in codes:
+                continue
             if '' == raw:
+                continue
+            if ')' == raw:
+                continue
+            if raw.startswith('Di('):
+                codes.append(raw)
+                continue
+            if 7 < len(raw) and '(' == raw[0] and ')' == raw[-2]:  # Let older-style sophont codes through
+                codes.append(raw)
+                continue
+            if not raw.startswith('(') and '(' in raw and raw.endswith(')'):
+                continue
+            if not raw.endswith(')') and ')' in raw and raw.startswith('(') and 7 > len(raw):
+                continue
+            if not raw.startswith('(') and not raw.endswith(')') and '(' in raw and ')' in raw:
+                continue
+            if 7 == len(raw) and '(' == raw[0] and ')' == raw[5]:  # Let preprocessed sophont codes through
+                codes.append(raw)
                 continue
             if not raw.startswith('(') and not raw.startswith('['):  # this isn't a sophont code
                 codes.append(raw)
@@ -135,7 +164,9 @@ class TradeCodes(object):
                     codes.append(combo)
                     raw_codes[i + 1] = ''
 
-        return codes
+        initial_codes = ' '.join(codes)
+
+        return codes, initial_codes
 
     def _process_homeworld(self, homeworld, homeworlds_found, initial_codes):
         full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
@@ -145,20 +176,23 @@ class TradeCodes(object):
             self.logger.error("Unable to process %s", initial_codes)
             sys.exit(1)
         if full_name.startswith("Di"):
-            sophont = "{code: <4}{pop}".format(code=match.group(1), pop='X')
+            code = match.group(1)
+            pop = 'X'
         else:
+            code = match.group(1)
             pop = match.group(2) if match.group(2) else 'W'
             if homeworld + '?' in initial_codes:
                 homeworld += "?"
                 pop = '0'
-            sophont = "({code: <4}){pop}".format(code=match.group(1), pop=pop)
-        sophont = sophont.replace("'", "X")
-        sophont = sophont.replace("!", "X")
-        sophont = sophont.replace(" ", "X")
-        self.sophont_list.append(sophont)
-        self.homeworld_list.append(sophont)
+            elif homeworld + 'X' in initial_codes:
+                pop = 'X'
+                homeworld += str(pop)
+            elif homeworld + str(pop) in initial_codes:
+                homeworld += str(pop)
+        sophont = self._process_sophont_homeworld(code, pop)
         self.codes = [code for code in self.codes if code != homeworld]
-        self.codes.append(sophont)
+        if sophont not in self.codes:
+            self.codes.append(sophont)
 
     def _process_major_race_homeworld(self, homeworld, homeworlds_found):
         """
@@ -169,13 +203,27 @@ class TradeCodes(object):
         """
         full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
         homeworlds_found.append(homeworld)
-        sophont = "{code: <4}{pop}".format(code=full_name[0:4], pop='W')
+        code = full_name[0:4]
+        pop = 'W'
+        self._process_sophont_homeworld(code, pop)
+        self.codes = [code for code in self.codes if code != '[' + homeworld + "]"]
+
+    def _process_deadworld(self, deadworld, homeworlds_found):
+        full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', deadworld)
+        homeworlds_found.append(deadworld)
+        code = full_name[0:4]
+        pop = 'X'
+        self._process_sophont_homeworld(code, pop)
+
+    def _process_sophont_homeworld(self, code, pop):
+        sophont = "{code: <4}{pop}".format(code=code, pop=pop)
         sophont = sophont.replace("'", "X")
         sophont = sophont.replace("!", "X")
         sophont = sophont.replace(" ", "X")
         self.sophont_list.append(sophont)
         self.homeworld_list.append(sophont)
-        self.codes = [code for code in self.codes if code != '[' + homeworld + "]"]
+
+        return sophont
 
     def __str__(self):
         return " ".join(sorted(self.codes))
@@ -185,6 +233,16 @@ class TradeCodes(object):
         del state['logger']
         del state['ownedBy']
         return state
+
+    def __deepcopy__(self, memodict={}):
+        state = self.__dict__.copy()
+
+        foo = TradeCodes('')
+        for key in state:
+            item = state[key]
+            setattr(foo, key, item)
+
+        return foo
 
     def planet_codes(self):
         return " ".join(self.codeset)
@@ -408,6 +466,11 @@ class TradeCodes(object):
             if not self._check_residual_code_well_formed(code):
                 msg = "Residual code " + str(code) + " not in allowed residual list"
                 return False, msg
+
+        research_stations = [code for code in self.codes if code.startswith('Rs')]
+        if 1 < len(research_stations):
+            msg = "At most one research station allowed"
+            return False, msg
 
         result, msg = self._check_code_pairs_allowed()
 

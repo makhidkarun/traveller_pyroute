@@ -56,13 +56,13 @@ class TestTradeCode(unittest.TestCase):
 
     def testSophonts(self):
         code = TradeCodes(u"(Wiki)")
-        self.assertEqual([u'WikiW'], code.homeworld, code.homeworld)
-        self.assertEqual([u'WikiW'], code.sophonts, code.sophonts)
+        self.assertEqual([u'(Wiki)W'], code.homeworld, code.homeworld)
+        self.assertEqual([u'(Wiki)W'], code.sophonts, code.sophonts)
 
     def testSophontsPartial(self):
         code = TradeCodes(u"(Wiki)4")
-        self.assertEqual([u'Wiki4'], code.homeworld, code.homeworld)
-        self.assertEqual([u'Wiki4'], code.sophonts)
+        self.assertEqual([u'(Wiki)4'], code.homeworld, code.homeworld)
+        self.assertEqual([u'(Wiki)4'], code.sophonts)
 
     def testWorldSophont(self):
         code = TradeCodes("Ag Huma4")
@@ -94,8 +94,8 @@ class TestTradeCode(unittest.TestCase):
     def testSophontCombined(self):
         code = TradeCodes("Ri (Wiki) Huma4 Alph2 (Deneb)2")
         self.assertTrue(len(code.homeworld) > 0)
-        self.assertEqual(['Huma4', 'Alph2', 'WikiW', 'Dene2'], code.sophonts, msg=code.sophonts)
-        self.assertEqual(['WikiW', 'Dene2'], code.homeworld, msg=code.homeworld)
+        self.assertEqual(['Huma4', 'Alph2', '(Wiki)W', '(Dene)2'], code.sophonts, msg=code.sophonts)
+        self.assertEqual(['(Wiki)W', '(Dene)2'], code.homeworld, msg=code.homeworld)
         self.assertEqual(['Ri'], code.codeset, code.codeset)
 
     def testCodeCheck(self):
@@ -146,22 +146,83 @@ class TestTradeCode(unittest.TestCase):
                 self.assertTrue(result, msg)
                 self.assertEqual(1, len(code.sophont_list))
                 self.assertEqual(1, len(code.homeworld_list))
-                self.assertEqual(
-                    code.homeworld_list, code.sophont_list,
-                    "Ashdak Meshukiiba not equally in homeworld and sophont list"
-                )
+                self.assertEqual(['AshdW'], code.sophonts, 'Unexpected sophont list')
+                self.assertEqual(['Ashdak Meshukiiba'], code.homeworld_list, 'Unexpected homeworld list')
                 self.assertEqual(expected_line, str(code))
+
+    def testSophontDiebackAlongsideActivePopulations(self):
+        line = 'An Asla1 Cs Hi MiyaX S\'mr0'
+        code = TradeCodes(line)
+        result, msg = code.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def testAvoidFakeoutHomeworldAtEnd(self):
+        line = '000000000(0) 00'
+        code = TradeCodes(line)
+        self.assertEqual(0, len(code.sophont_list), "Fake homeworld code should not result in sophont")
+        self.assertEqual(0, len(code.homeworld_list), "Fake homeworld code should not result in homeworld")
+
+    def testAvoidFakeoutHomeworldAtStart(self):
+        line = '(0)000000000 00'
+        code = TradeCodes(line)
+        self.assertEqual(0, len(code.sophont_list), "Fake homeworld code should not result in sophont")
+        self.assertEqual(0, len(code.homeworld_list), "Fake homeworld code should not result in homeworld")
+
+    def testAvoidFakeoutHomeworldInMiddle(self):
+        line = '00000000000(0)0'
+        code = TradeCodes(line)
+        self.assertEqual(0, len(code.sophont_list), "Fake homeworld code should not result in sophont")
+        self.assertEqual(0, len(code.homeworld_list), "Fake homeworld code should not result in homeworld")
+
+    def testAvoidFakeoutHomeworldWithSpace(self):
+        line = '000000000000( )'
+        code = TradeCodes(line)
+        self.assertEqual(0, len(code.sophont_list), "Fake homeworld code should not result in sophont")
+        self.assertEqual(0, len(code.homeworld_list), "Fake homeworld code should not result in homeworld")
+
+    def testVerifyActualHomeworld(self):
+        line = '(0000)W'
+        code = TradeCodes(line)
+        self.assertEqual(1, len(code.sophont_list), "Actual homeworld code should result in sophont")
+        self.assertEqual(1, len(code.homeworld_list), "Actual homeworld code should result in sophont")
+
+    def testVerifyHomeworldDoesNotDuplicate(self):
+        line = '(Ashd)W Ni Pa Sa'
+        code = TradeCodes(line)
+        self.assertEqual(1, len(code.sophont_list), "Actual homeworld code should result in sophont")
+        self.assertEqual(1, len(code.homeworld_list), "Actual homeworld code should result in sophont")
+
+        nuline = str(code)
+        self.assertEqual(line, nuline)
 
     def testVerifyHomeworldWithUnknownPopCountsAsZero(self):
         line = 'Pi (Feime)? Re Sa'
         code = TradeCodes(line)
         self.assertEqual(1, len(code.sophont_list), "Actual homeworld code should result in sophont")
-        self.assertEqual(1, len(code.homeworld_list), "Actual homeworld code should result in sophont")
+        self.assertEqual(1, len(code.homeworld_list), "Actual homeworld code should result in homeworld")
 
         result, msg = code.is_well_formed()
         self.assertTrue(result, msg)
         expected_line = '(Feim)0 Pi Re Sa'
         self.assertEqual(expected_line, str(code), "Unexpected parsed trade code")
+
+    def testVerifyHomeworldOldStyleCode(self):
+        line = 'Hi In (Anixii)W Da'
+        code = TradeCodes(line)
+        self.assertEqual(1, len(code.sophont_list), "Actual homeworld code should result in sophont")
+        self.assertEqual(1, len(code.homeworld_list), "Actual homeworld code should result in homeworld")
+
+        result, msg = code.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def testVerifyDeadworldDoesntSpawnHomeworld(self):
+        line = '(Miya)X An Asla1 Cs Hi S\'mr0'
+        code = TradeCodes(line)
+        self.assertEqual(3, len(code.sophont_list), "Actual homeworld code should result in sophont")
+        self.assertEqual(1, len(code.homeworld_list), "Actual homeworld code should result in homeworld")
+
+        expected = '(Miya)X An Asla1 Cs Hi S\'mr0'
+        self.assertEqual(expected, str(code), "Unexpected trade code result")
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
