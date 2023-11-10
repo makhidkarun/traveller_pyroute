@@ -31,7 +31,8 @@ class TradeCodes(object):
                               'Cy', 'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'Dw', 'Ex', 'Fr', 'Ga',
                               'Hi', 'In', 'Lo', 'N1', 'Na', 'Ni', 'o', 'Pa', 'Ph', 'Pi', 'Po', 'Pr', 'Ri', 'Rn', 'Rv',
                               's', 'Sp', 'St', 'Tn', 'Za'}
-
+    # Whether any of these pairs are _permitted_ to occur together is _irrelevant_.  They _do_ occur together in the
+    # TravellerMap raw data.
     ok_pairs = {
         ('Ag', 'Bo'), ('Ag', 'Cw'), ('Ag', 'Cy'), ('Ag', 'Dw'), ('Ag', 'Fl'), ('Ag', 'Ga'), ('Ag', 'Hi'), ('Ag', 'In'),
         ('Ag', 'Lo'), ('Ag', 'N1'), ('Ag', 'Ni'), ('Ag', 'Pi'), ('Ag', 'Po'), ('Ag', 'Pr'), ('Ag', 'Ri'), ('Ag', 'St'),
