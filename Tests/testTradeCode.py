@@ -246,6 +246,21 @@ class TestTradeCode(unittest.TestCase):
                 self.assertEqual(1, len(code.sophont_list), "Compacted Droyne code should result in sophont")
                 self.assertEqual(expected, str(code))
 
+    def testSharedHomeworld(self):
+        line = 'Hi Pz (S\'mrii)7 (Kiakh\'iee)3 '
+        code = TradeCodes(line)
+        result, msg = code.is_well_formed()
+        self.assertTrue(result, msg)
+
+        self.assertEqual(2, len(code.sophont_list), "Shared homeworld should result in two sophont")
+        self.assertEqual(2, len(code.homeworld_list), "Shared homeworld should result in two homeworld entries")
+
+        expected_line = '(Kiak)3 (SXmr)7 Hi Pz'
+        self.assertEqual(expected_line, str(code), "Unexpected string representation")
+
+        nu_code = TradeCodes(str(code))
+        result, msg = nu_code.is_well_formed()
+        self.assertTrue(result, msg)
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

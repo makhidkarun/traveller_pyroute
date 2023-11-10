@@ -132,7 +132,7 @@ class TradeCodes(object):
             if 7 < len(raw) and '(' == raw[0] and ')' == raw[-2]:  # Let older-style sophont codes through
                 codes.append(raw)
                 continue
-            if 2 == len(raw):
+            if 2 == len(raw) and ('W' == raw[1] or raw[1].isdigit()):
                 if 'C' == raw[0]:  # Compact chirper population
                     pop = raw[1]
                     codes.append('Chir' + pop)
