@@ -27,10 +27,8 @@ class TradeCodes(object):
               'Oc': '#0094ED', 'Po': '#6a986a', 'Va': '#c9c9c9', 'Wa': '#4abef4'}
     ext_codes = {'Lt', 'Ht', 'Lg', 'Hg'}
     weird_codes = {'{Anomaly}', '{Fuel}', '{Ringworld}', '{Rosette}'}
-    allowed_residual_codes = {'Ag', 'Ba', 'Bo', 'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'Cl', 'Cw',
-                              'Cy', 'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'Dw', 'Ex', 'Fr', 'Ga',
-                              'Hi', 'In', 'Lo', 'N1', 'Na', 'Ni', 'o', 'Pa', 'Ph', 'Pi', 'Po', 'Pr', 'Ri', 'Rn', 'Rv',
-                              's', 'Sp', 'St', 'Tn', 'Za'}
+    allowed_residual_codes = {'Ag', 'Ba', 'Bo', 'Cl', 'Cw', 'Cy', 'Dw', 'Ex', 'Fr', 'Ga', 'Hi', 'In', 'Lo', 'N1', 'Na',
+                              'Ni', 'o', 'Pa', 'Ph', 'Pi', 'Po', 'Pr', 'Ri', 'Rn', 'Rv', 's', 'Sp', 'St', 'Tn', 'Za'}
     # Whether any of these pairs are _permitted_ to occur together is _irrelevant_.  They _do_ occur together in the
     # TravellerMap raw data.
     ok_pairs = {
