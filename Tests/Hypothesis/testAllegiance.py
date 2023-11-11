@@ -182,7 +182,8 @@ class testAllegiance(unittest.TestCase):
         allowed = [
             "Name must not be pair of empty strings",
             'First part of name string must not be an empty string itself',
-            'Second part of name string must not be an empty string itself'
+            'Second part of name string must not be an empty string itself',
+            'Name must not contain square brackets'
         ]
 
         try:
