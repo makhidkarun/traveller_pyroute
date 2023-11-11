@@ -228,7 +228,6 @@ class StatCalculation(object):
         self.max_tl(algStats, star)
 
     def add_pop_to_sophont(self, stats, star):
-
         total_pct = 100
         default_soph = 'Huma'
         home = None
@@ -237,7 +236,7 @@ class StatCalculation(object):
             soph_pct = sophont[4:]
 
             if 1 < len(soph_pct) and '(' == soph_code[0]:
-                soph_code = sophont[0:6]
+                soph_code = sophont[1:5]
                 soph_pct = sophont[6:]
 
             if soph_pct == 'A':
