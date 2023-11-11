@@ -76,25 +76,7 @@ class TradeCodes(object):
 
         self.owned = [code for code in self.codes if code.startswith('O:') or code.startswith('C:')]
 
-        self.homeworld_list = []
-        self.sophont_list = []
-        homeworlds_found = []
-
-        self.sophont_list = [code for code in self.codes if re.match(r"[A-Za-z\'!]{1}[\w\'!]{2,4}(\d|W|\?)", code, re.U)]
-
-        # Trim out overly-long values from sophont_list and return them to codeset later on
-        self.sophont_list = [code for code in self.sophont_list if 5 >= len(code)]
-
-        homeworld_matches = re.findall(r"[Di]*\([^)]+\)\d?", initial_codes, re.U)
-        # bolt on direct [homeworld] candidates
-        homeworld_new = [item.strip('[]') for item in self.codes if item.startswith('[') and item.endswith(']') and 1 == item.count('[') and 1 == item.count(']')]
-        deadworlds = [item for item in self.codes if 5 == len(item) and 'X' == item[4]]
-        for homeworld in homeworld_matches:
-            self._process_homeworld(homeworld, homeworlds_found, initial_codes)
-        for homeworld in homeworld_new:
-            self._process_major_race_homeworld(homeworld, homeworlds_found)
-        for deadworld in deadworlds:
-            self._process_deadworld(deadworld, homeworlds_found)
+        homeworlds_found = self._process_sophonts_and_homeworlds(initial_codes)
 
         self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.sophont_list)\
             - set(homeworlds_found) - self.xcode
@@ -112,6 +94,27 @@ class TradeCodes(object):
         self.dcode = sorted(self.dcode)
 
         self.trim_ill_formed_residual_codes()
+
+    def _process_sophonts_and_homeworlds(self, initial_codes):
+        self.homeworld_list = []
+        self.sophont_list = []
+        homeworlds_found = []
+        self.sophont_list = [code for code in self.codes if
+                             re.match(r"[A-Za-z\'!]{1}[\w\'!]{2,4}(\d|W|\?)", code, re.U)]
+        # Trim out overly-long values from sophont_list and return them to codeset later on
+        self.sophont_list = [code for code in self.sophont_list if 5 >= len(code)]
+        homeworld_matches = re.findall(r"[Di]*\([^)]+\)\d?", initial_codes, re.U)
+        # bolt on direct [homeworld] candidates
+        homeworld_new = [item.strip('[]') for item in self.codes if
+                         item.startswith('[') and item.endswith(']') and 1 == item.count('[') and 1 == item.count(']')]
+        deadworlds = [item for item in self.codes if 5 == len(item) and 'X' == item[4]]
+        for homeworld in homeworld_matches:
+            self._process_homeworld(homeworld, homeworlds_found, initial_codes)
+        for homeworld in homeworld_new:
+            self._process_major_race_homeworld(homeworld, homeworlds_found)
+        for deadworld in deadworlds:
+            self._process_deadworld(deadworld, homeworlds_found)
+        return homeworlds_found
 
     def _preprocess_initial_codes(self, initial_codes):
         raw_codes = initial_codes.split()
@@ -165,6 +168,8 @@ class TradeCodes(object):
                     codes.append(combo)
                     raw_codes[i + 1] = ''
                 continue
+
+        codes = sorted(codes)
 
         initial_codes = ' '.join(codes)
 

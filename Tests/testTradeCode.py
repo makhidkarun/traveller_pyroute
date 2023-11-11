@@ -88,14 +88,14 @@ class TestTradeCode(unittest.TestCase):
     def testWorldSophontsMultiple(self):
         code = TradeCodes("Ag Wiki4 Huma2")
         self.assertFalse(code.homeworld)
-        self.assertEqual(['Wiki4', 'Huma2'], code.sophonts)
+        self.assertEqual(['Huma2', 'Wiki4'], code.sophonts)
         self.assertEqual(['Ag'], code.codeset)
 
     def testSophontCombined(self):
         code = TradeCodes("Ri (Wiki) Huma4 Alph2 (Deneb)2")
         self.assertTrue(len(code.homeworld) > 0)
-        self.assertEqual(['Huma4', 'Alph2', '(Wiki)W', '(Dene)2'], code.sophonts, msg=code.sophonts)
-        self.assertEqual(['(Wiki)W', '(Dene)2'], code.homeworld, msg=code.homeworld)
+        self.assertEqual(['Alph2', 'Huma4', '(Dene)2', '(Wiki)W'], code.sophonts, msg=code.sophonts)
+        self.assertEqual(['(Dene)2', '(Wiki)W'], code.homeworld, msg=code.homeworld)
         self.assertEqual(['Ri'], code.codeset, code.codeset)
 
     def testCodeCheck(self):
