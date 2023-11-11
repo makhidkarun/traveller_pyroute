@@ -111,6 +111,8 @@ class TradeCodes(object):
         self.dcode = list(self.dcode) + self.colony + self.owner
         self.dcode = sorted(self.dcode)
 
+        self.trim_ill_formed_residual_codes()
+
     def _preprocess_initial_codes(self, initial_codes):
         raw_codes = initial_codes.split()
         # look for successive codes that should be part of the same name (eg  "(Carte" , then "Blanche)", becoming

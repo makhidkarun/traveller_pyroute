@@ -231,7 +231,6 @@ class Star(object):
             star.popCode = 12
 
         star.tradeCode = TradeCodes(data[3].strip())
-        star.tradeCode.trim_ill_formed_residual_codes()
         star.ownedBy = star.tradeCode.owned_by(star)
 
         star.economics = data[6].strip() if data[6] and data[6].strip() != '-' else None

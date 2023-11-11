@@ -44,7 +44,6 @@ class testTradeCodes(unittest.TestCase):
     @example(' Ga Lt (minor)  ')
     def test_parse_text_to_trade_code(self, s):
         trade = TradeCodes(s)
-        trade.trim_ill_formed_residual_codes()
 
         result, msg = trade.is_well_formed()
         self.assertTrue(result, msg)
@@ -52,7 +51,6 @@ class testTradeCodes(unittest.TestCase):
         trade_string = str(trade)
 
         nu_trade = TradeCodes(trade_string)
-        nu_trade.trim_ill_formed_residual_codes()
         result, msg = nu_trade.is_well_formed()
         self.assertTrue(result, msg)
 
