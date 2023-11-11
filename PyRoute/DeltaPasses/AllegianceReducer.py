@@ -42,6 +42,10 @@ class AllegianceReducer(object):
                     continue
 
                 temp_sectors = best_sectors.allegiance_subset(raw_lines)
+                temp_lines = len(temp_sectors.lines)
+                if 0 == temp_lines:
+                    # nothing to do, move on
+                    continue
 
                 interesting, msg, _ = self.reducer._check_interesting(self.reducer.args, temp_sectors)
                 # We've found a chunk of input and have _demonstrated_ its irrelevance,
