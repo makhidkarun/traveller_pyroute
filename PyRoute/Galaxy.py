@@ -114,7 +114,6 @@ class Allegiance(AreaItem):
             return '{}, {}'.format(names[0], names[1])
         return '{}'.format(name.strip())
 
-
     @staticmethod
     def set_wiki_name(name, code, base):
         if not isinstance(name, str):

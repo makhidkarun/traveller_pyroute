@@ -9,6 +9,7 @@ from hypothesis.strategies import text, from_regex, composite, integers, floats,
 
 from PyRoute.Galaxy import Allegiance
 
+
 @composite
 def text_or_none(draw, alphabet=None):
     choice = draw(floats(min_value=0.0, max_value=1.0))
@@ -19,6 +20,7 @@ def text_or_none(draw, alphabet=None):
     if alphabet is not None:
         return draw(text(alphabet=alphabet))
     return draw(text())
+
 
 @composite
 def text_starts_with(draw, starts="Na", min_size=2, max_size=4):
@@ -31,10 +33,11 @@ def text_starts_with(draw, starts="Na", min_size=2, max_size=4):
 
     return starts + add
 
+
 @composite
 def text_flanking_comma(draw):
-    before = draw(text(min_size=1, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()?\'+*'))
-    after = draw(text(min_size=1, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()?\'+*'))
+    before = draw(text(min_size=1, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    after = draw(text(min_size=1, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
 
     return before + ',' + after
 
@@ -206,7 +209,7 @@ class testAllegiance(unittest.TestCase):
         text_starts_with(starts="Na"),
         booleans()
     )
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)])
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], max_examples=1100)
     @example(None, None, True)
     @example(None, None, False)
     @example('', None, True)
@@ -260,6 +263,7 @@ class testAllegiance(unittest.TestCase):
         alg = Allegiance(code, name)
         expected = 'Aslan Hierate, Tlaukhu control (AsT0)'
         self.assertEqual(expected, str(alg), "Unexpected string representation")
+
 
 if __name__ == '__main__':
     unittest.main()
