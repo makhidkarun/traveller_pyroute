@@ -211,14 +211,14 @@ class Sector(AreaItem):
         super(Sector, self).__init__(name[1:].strip())
 
         # Same here, the position has a leading comment marker
-        position = position[1:]
+        position = position[1:].replace(' ', '')
         pos_bits = position.split(',')
 
         if 2 != len(pos_bits):
             raise ValueError("Position string malformed")
 
         # spin thru pos_bits strings and validate by character
-        valid_list = '+- 0123456789'
+        valid_list = '+-0123456789'
         head_list = '0123456789'
         pos_trim, pos_bits[0] = self._trim_position(head_list, pos_bits[0], valid_list)
 
@@ -246,7 +246,6 @@ class Sector(AreaItem):
         self.rimward = None
 
     def _trim_position(self, head_list, pos_bit, valid_list):
-        pos_bit = pos_bit.strip().replace(' ', '')
         if 0 == len(pos_bit):
             return True, pos_bit
         pos_trim = False

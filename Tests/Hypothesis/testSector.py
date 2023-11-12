@@ -49,6 +49,7 @@ class testSector(unittest.TestCase):
     @example('00', '0 ,0')
     @example('00', '00, ')
     @example('0 ', '00,0')
+    @example('Woop Woop Sector', '864+,059 -')
     def test_create_sector(self, s, t):
         sector = None
         allowed_value_errors = ["Name string too short", "Position string too short", "Position string malformed"]
