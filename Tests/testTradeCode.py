@@ -136,7 +136,7 @@ class TestTradeCode(unittest.TestCase):
     def testSophontHomeworldWithSpaces(self):
         cases = [
             ('Minor race', 'Ni Pa (Ashdak Meshukiiba) Sa ', '(Ashdak Meshukiiba) Ni Pa Sa'),
-            ('Major race', 'Ni Pa [Ashdak Meshukiiba] Sa ', '[Ashdak Meshukiiba] Ni Pa Sa')
+            ('Major race', 'Ni Pa [Ashdak Meshukiiba] Sa ', 'Ni Pa Sa [Ashdak Meshukiiba]')
         ]
 
         for msg, line, expected_line in cases:

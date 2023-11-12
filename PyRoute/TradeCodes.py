@@ -62,8 +62,10 @@ class TradeCodes(object):
         ('Pr', 'Wa'), ('Pr', 'Za'), ('Ri', 'Tn'), ('Ri', 'Wa'), ('Rn', 'Va'), ('St', 'Tn'), ('Va', 'Wa')
     }
 
-    # Search regex
+    # Search regexen
     search = re.compile(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W|\?)?')
+    sophont = re.compile(r"[A-Za-z\'!]{1}[\w\'!]{2,4}(\d|W|\?)")
+    dieback = re.compile(r"[Di]*\([^)]+\)\d?")
 
     __slots__ = '__dict__', 'codeset', 'pcode', 'dcode', 'xcode'
 
@@ -102,11 +104,10 @@ class TradeCodes(object):
         self.homeworld_list = []
         self.sophont_list = []
         homeworlds_found = []
-        self.sophont_list = [code for code in self.codes if
-                             re.match(r"[A-Za-z\'!]{1}[\w\'!]{2,4}(\d|W|\?)", code, re.U)]
+        self.sophont_list = [code for code in self.codes if TradeCodes.sophont.match(code)]
         # Trim out overly-long values from sophont_list and return them to codeset later on
         self.sophont_list = [code for code in self.sophont_list if 5 >= len(code)]
-        homeworld_matches = re.findall(r"[Di]*\([^)]+\)\d?", initial_codes, re.U)
+        homeworld_matches = TradeCodes.dieback.findall(initial_codes)
         # bolt on direct [homeworld] candidates
         homeworld_new = [item.strip('[]') for item in self.codes if
                          item.startswith('[') and item.endswith(']') and 1 == item.count('[') and 1 == item.count(']')]
@@ -199,10 +200,7 @@ class TradeCodes(object):
                 homeworld += str(pop)
             elif homeworld + str(pop) in initial_codes:
                 homeworld += str(pop)
-        sophont = self._process_sophont_homeworld(code, pop)
-        self.codes = [code for code in self.codes if code != homeworld]
-        if sophont not in self.codes:
-            self.codes.append(sophont)
+        self._process_sophont_homeworld(code, pop, full_name=full_name)
 
     def _process_major_race_homeworld(self, homeworld, homeworlds_found):
         """
@@ -215,23 +213,22 @@ class TradeCodes(object):
         homeworlds_found.append(homeworld)
         code = full_name[0:4]
         pop = 'W'
-        self._process_sophont_homeworld(code, pop)
-        self.codes = [code for code in self.codes if code != '[' + homeworld + "]"]
+        self._process_sophont_homeworld(code, pop, full_name=full_name)
 
     def _process_deadworld(self, deadworld, homeworlds_found):
         full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', deadworld)
         homeworlds_found.append(deadworld)
         code = full_name[0:4]
         pop = 'X'
-        self._process_sophont_homeworld(code, pop)
+        self._process_sophont_homeworld(code, pop, full_name=full_name)
 
-    def _process_sophont_homeworld(self, code, pop):
+    def _process_sophont_homeworld(self, code, pop, full_name=None):
         sophont = "{code: <4}{pop}".format(code=code, pop=pop)
         sophont = sophont.replace("'", "X")
         sophont = sophont.replace("!", "X")
         sophont = sophont.replace(" ", "X")
         self.sophont_list.append(sophont)
-        self.homeworld_list.append(sophont)
+        self.homeworld_list.append(full_name)
 
         return sophont
 
