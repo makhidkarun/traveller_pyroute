@@ -254,6 +254,8 @@ class Sector(AreaItem):
                 return True, pos_bit
             else:
                 return False, pos_bit
+        if not pos_bit[1:].isdigit():  # if trailing chars aren't digits, bail out - pos_bit is bad
+            return True, pos_bit
         pos_trim = False
         if 0 < len(pos_bit) and (pos_bit[0] not in valid_list):
             pos_trim = True
