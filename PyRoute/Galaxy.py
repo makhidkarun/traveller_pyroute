@@ -53,6 +53,9 @@ class AreaItem(object):
     def __setitem__(self, key, value):
         setattr(self, key, value)
 
+    def is_well_formed(self):
+        return True
+
 
 class Allegiance(AreaItem):
     def __init__(self, code, name, base=False, population='Huma'):
