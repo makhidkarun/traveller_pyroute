@@ -256,16 +256,9 @@ class Sector(AreaItem):
                 return False, pos_bit
         if not pos_bit[1:].isdigit():  # if trailing chars aren't digits, bail out - pos_bit is bad
             return True, pos_bit
-        pos_trim = False
-        if 0 < len(pos_bit) and (pos_bit[0] not in valid_list):
-            pos_trim = True
-        if not pos_trim:
-            for i in range(1, len(pos_bit)):
-                char = pos_bit[i]
-                if (char not in head_list):
-                    pos_trim = True
-                    break
-        return pos_trim, pos_bit
+        if pos_bit[0] in '+-' or pos_bit[0].isdigit():  # first char has to be either digit or positive/negative sign
+            return False, pos_bit
+        return True, pos_bit
 
     # For the JSONPickel work
     def __getstate__(self):
