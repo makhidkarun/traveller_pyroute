@@ -217,6 +217,9 @@ class Sector(AreaItem):
         if 2 != len(pos_bits):
             raise ValueError("Position string malformed")
 
+        if 0 == len(pos_bits[0]) or 0 == len(pos_bits[1]):
+            raise ValueError("Position string malformed")
+
         # spin thru pos_bits strings and validate by character
         valid_list = '+-0123456789'
         head_list = '0123456789'
@@ -246,8 +249,11 @@ class Sector(AreaItem):
         self.rimward = None
 
     def _trim_position(self, head_list, pos_bit, valid_list):
-        if 0 == len(pos_bit):
-            return True, pos_bit
+        if 1 == len(pos_bit):
+            if not pos_bit.isdigit():
+                return True, pos_bit
+            else:
+                return False, pos_bit
         pos_trim = False
         if 0 < len(pos_bit) and (pos_bit[0] not in valid_list):
             pos_trim = True
