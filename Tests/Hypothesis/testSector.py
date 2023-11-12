@@ -3,7 +3,7 @@ import unittest
 from datetime import timedelta
 
 from hypothesis import given, assume, example, HealthCheck, settings, reproduce_failure
-from hypothesis.strategies import text, from_regex, composite, floats
+from hypothesis.strategies import text, from_regex, composite, floats, integers
 
 from PyRoute.Galaxy import Sector
 
@@ -23,6 +23,23 @@ def sector_name(draw):
     if 0.9 > flip:
         return stem + " Sector"
     return stem
+
+
+@composite
+def two_sectors(draw):
+    sx = draw(integers())
+    sy = draw(integers())
+
+    tx = draw(integers())
+    ty = draw(integers())
+    manhattan = abs(sx - tx) + abs(sy - ty)
+    assume(manhattan > 1)
+
+    direction = draw(integers(min_value=0, max_value=3))
+
+    result = {'sx': sx, 'sy': sy, 'tx': tx, 'ty': ty, 'direction': direction}
+
+    return result
 
 
 class testSector(unittest.TestCase):
@@ -72,6 +89,41 @@ class testSector(unittest.TestCase):
 
         to_string = str(sector)
         self.assertIsNotNone(to_string)
+
+    @given(two_sectors())
+    @example({'sx': -23106, 'sy': 117, 'tx': 107, 'ty': 30507, 'direction': 1})
+    def test_non_adjacent_sectors_hooked_together_are_not_ok(self, payload):
+        source_pos = ' ' + str(payload['sx']) + ", " + str(payload['sy'])
+        target_pos = ' ' + str(payload['tx']) + ", " + str(payload['ty'])
+
+        source = Sector(' Source', source_pos)
+        target = Sector(' Target', target_pos)
+
+        # assert both sectors are well-formed before the hookup
+        result, msg = source.is_well_formed()
+        self.assertTrue(result)
+        result, msg = target.is_well_formed()
+        self.assertTrue(result)
+
+
+        direct = payload['direction']
+        if 0 == direct:
+            source.coreward = target
+            target.rimward = source
+        elif 1 == direct:
+            source.spinward = target
+            target.trailing = source
+        elif 2 == direct:
+            source.rimward = target
+            target.coreward = source
+        elif 3 == direct:
+            source.trailing = target
+            target.spinward = source
+
+        result, msg = source.is_well_formed()
+        self.assertFalse(result)
+        result, msg = target.is_well_formed()
+        self.assertFalse(result)
 
 
 if __name__ == '__main__':
