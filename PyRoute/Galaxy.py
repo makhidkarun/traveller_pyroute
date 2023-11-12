@@ -220,15 +220,13 @@ class Sector(AreaItem):
         if 0 == len(pos_bits[0]) or 0 == len(pos_bits[1]):
             raise ValueError("Position string malformed")
 
-        # spin thru pos_bits strings and validate by character
-        valid_list = '+-0123456789'
-        head_list = '0123456789'
-        pos_trim, pos_bits[0] = self._trim_position(head_list, pos_bits[0], valid_list)
+        # spin thru pos_bits strings
+        pos_trim = self._trim_position(pos_bits[0])
 
         if pos_trim or '-' == pos_bits[0] or '+' == pos_bits[0]:
             pos_bits[0] = ''
 
-        pos_trim, pos_bits[1] = self._trim_position(head_list, pos_bits[1], valid_list)
+        pos_trim = self._trim_position(pos_bits[1])
         if pos_trim or '-' == pos_bits[1] or '+' == pos_bits[1]:
             pos_bits[1] = ''
 
@@ -248,17 +246,17 @@ class Sector(AreaItem):
         self.coreward = None
         self.rimward = None
 
-    def _trim_position(self, head_list, pos_bit, valid_list):
+    def _trim_position(self, pos_bit):
         if 1 == len(pos_bit):
             if not pos_bit.isdigit():
-                return True, pos_bit
+                return True,
             else:
-                return False, pos_bit
+                return False
         if not pos_bit[1:].isdigit():  # if trailing chars aren't digits, bail out - pos_bit is bad
-            return True, pos_bit
+            return True
         if pos_bit[0] in '+-' or pos_bit[0].isdigit():  # first char has to be either digit or positive/negative sign
-            return False, pos_bit
-        return True, pos_bit
+            return False
+        return True
 
     # For the JSONPickel work
     def __getstate__(self):
