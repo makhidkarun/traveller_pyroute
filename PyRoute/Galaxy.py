@@ -208,7 +208,7 @@ class Sector(AreaItem):
 
         # The name as passed from the Galaxy read include the comment marker at the start of the line
         # So strip the comment marker, then strip spaces.
-        name = name[1:].strip()
+        super(Sector, self).__init__(name[1:].strip())
 
         # Same here, the position has a leading comment marker
         position = position[1:]
@@ -232,7 +232,6 @@ class Sector(AreaItem):
         if 0 == len(pos_bits[0]) or 0 == len(pos_bits[1]):
             raise ValueError("Position string malformed")
 
-        super(Sector, self).__init__(name)
         self._wiki_name = '[[{0} Sector|{0}]]'.format(self.sector_name())
 
         self.x = int(pos_bits[0])
