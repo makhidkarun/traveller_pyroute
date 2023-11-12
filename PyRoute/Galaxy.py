@@ -221,16 +221,10 @@ class Sector(AreaItem):
             raise ValueError("Position string malformed")
 
         # spin thru pos_bits strings
-        pos_trim = self._trim_position(pos_bits[0])
+        if self._is_position_element_bad(pos_bits[0]):
+            raise ValueError("Position string malformed")
 
-        if pos_trim or '-' == pos_bits[0] or '+' == pos_bits[0]:
-            pos_bits[0] = ''
-
-        pos_trim = self._trim_position(pos_bits[1])
-        if pos_trim or '-' == pos_bits[1] or '+' == pos_bits[1]:
-            pos_bits[1] = ''
-
-        if 0 == len(pos_bits[0]) or 0 == len(pos_bits[1]):
+        if self._is_position_element_bad(pos_bits[1]):
             raise ValueError("Position string malformed")
 
         self._wiki_name = '[[{0} Sector|{0}]]'.format(self.sector_name())
@@ -246,7 +240,7 @@ class Sector(AreaItem):
         self.coreward = None
         self.rimward = None
 
-    def _trim_position(self, pos_bit):
+    def _is_position_element_bad(self, pos_bit):
         if 1 == len(pos_bit):
             if not pos_bit.isdigit():
                 return True,
