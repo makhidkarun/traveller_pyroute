@@ -62,6 +62,9 @@ class TradeCodes(object):
         ('Pr', 'Wa'), ('Pr', 'Za'), ('Ri', 'Tn'), ('Ri', 'Wa'), ('Rn', 'Va'), ('St', 'Tn'), ('Va', 'Wa')
     }
 
+    # Search regex
+    search = re.compile(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W|\?)?')
+
     __slots__ = '__dict__', 'codeset', 'pcode', 'dcode', 'xcode'
 
     def __init__(self, initial_codes):
@@ -178,7 +181,7 @@ class TradeCodes(object):
     def _process_homeworld(self, homeworld, homeworlds_found, initial_codes):
         full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
         homeworlds_found.append(homeworld)
-        match = re.match(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W|\?)?', homeworld)
+        match = TradeCodes.search.match(homeworld)
         if match is None:
             self.logger.error("Unable to process %s", initial_codes)
             sys.exit(1)
