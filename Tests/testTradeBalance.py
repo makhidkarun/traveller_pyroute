@@ -15,8 +15,8 @@ class testTradeBalance(unittest.TestCase):
         self.assertEqual(1, foo[key])
 
     def test_log_odd_trade_unit(self):
-        core = Sector(' Core', ' 0, 0')
-        dagu = Sector(' Dagudashaag', ' -1, 0')
+        core = Sector('# Core', '# 0, 0')
+        dagu = Sector('# Dagudashaag', '# -1, 0')
 
         star1 = Star()
         star1.sector = core

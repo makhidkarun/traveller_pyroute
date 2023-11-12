@@ -108,7 +108,7 @@ class testDeltaStar(unittest.TestCase):
 
                 self.assertEqual(expected, actual, "Reduce-all reduction unexpected result")
                 # check if actual can be parsed back into a star
-                remix_star = Star.parse_line_into_star(actual, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                remix_star = Star.parse_line_into_star(actual, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
                 self.assertIsInstance(remix_star, Star)
 
     def test_reduce_sophont_codes(self):
@@ -127,7 +127,7 @@ class testDeltaStar(unittest.TestCase):
 
                 self.assertEqual(expected, actual, "Reset-sophont reduction unexpected result")
                 # check if actual can be parsed back into a star
-                remix_star = Star.parse_line_into_star(actual, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                remix_star = Star.parse_line_into_star(actual, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
                 self.assertIsInstance(remix_star, Star)
 
     def test_reduce_capitals(self):
@@ -143,7 +143,7 @@ class testDeltaStar(unittest.TestCase):
         for chunk in check_list:
             with self.subTest():
                 original = chunk[0]
-                old_star = Star.parse_line_into_star(original, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                old_star = Star.parse_line_into_star(original, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
                 self.assertTrue(old_star.tradeCode.capital, "Original star should be a capital")
 
                 actual = DeltaStar.reduce(original, reset_capitals=True)
@@ -151,7 +151,7 @@ class testDeltaStar(unittest.TestCase):
 
                 self.assertEqual(expected, actual, "Reset-capital reduction unexpected result")
                 # check if actual can be parsed back into a star
-                remix_star = Star.parse_line_into_star(actual, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                remix_star = Star.parse_line_into_star(actual, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
                 self.assertIsInstance(remix_star, Star)
                 self.assertFalse(remix_star.tradeCode.capital, "Remixed star should not be a capital")
 

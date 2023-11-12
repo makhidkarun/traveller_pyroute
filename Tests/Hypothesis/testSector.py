@@ -13,11 +13,11 @@ def position_string(draw):
     left = draw(text(min_size=2, alphabet='+- 0123456789'))
     right = draw(text(min_size=1, alphabet='+- 0123456789'))
 
-    return left + ',' + right
+    return '# ' + left + ',' + right
 
 @composite
 def sector_name(draw):
-    stem = draw(text(min_size=1))
+    stem = '#' + draw(text(min_size=1))
     flip = draw(floats(min_value=0.0, max_value=1.0))
 
     if 0.9 > flip:
@@ -49,27 +49,28 @@ class testSector(unittest.TestCase):
         suppress_health_check=[HealthCheck(3), HealthCheck(2)],  # suppress slow-data health check, too-much filtering
         deadline=timedelta(1000))
     @example('00', '0:,0')
-    @example('00', '00,:')
-    @example('00', '0A,0')
-    @example('00', '0\x1f,0')
-    @example('00', '0,0\x1f')
-    @example('00', '00,0Ā')
-    @example('00', '0-,0')
-    @example('00', '0+,0')
-    @example('00', '00,-')
-    @example('00', '00,+')
-    @example('00', '00-,0')
-    @example('00', '00,0-')
-    @example('00', '0 - 1, -1')
-    @example('00', '0 -1, - 1')
-    @example('00', '0 - 1, - 1')
-    @example('00', '0 ,0')
-    @example('00', '00, ')
-    @example('0 ', '00,0')
-    @example('Woop Woop Sector', '864+,059 -')
+    @example('#00', '#00,:')
+    @example('#00', '#0A,0')
+    @example('#00', '#0\x1f,0')
+    @example('#00', '#0,0\x1f')
+    @example('#00', '#00,0Ā')
+    @example('#00', '#0-,0')
+    @example('#00', '#0+,0')
+    @example('#00', '#00,-')
+    @example('#00', '#00,+')
+    @example('#00', '#00-,0')
+    @example('#00', '#00,0-')
+    @example('#00', '#0 - 1, -1')
+    @example('#00', '#0 -1, - 1')
+    @example('#00', '#0 - 1, - 1')
+    @example('#00', '#0 ,0')
+    @example('#00', '# 00, ')
+    @example('#0 ', '# 00,0')
+    @example('# Woop Woop Sector', '# 864+,059 -')
     def test_create_sector(self, s, t):
         sector = None
-        allowed_value_errors = ["Name string too short", "Position string too short", "Position string malformed"]
+        allowed_value_errors = ["Name string too short", "Position string too short", "Position string malformed",
+                                "Name string should start with #", "Position string should start with #"]
 
         try:
             sector = Sector(s, t)
@@ -93,11 +94,11 @@ class testSector(unittest.TestCase):
     @given(two_sectors())
     @example({'sx': -23106, 'sy': 117, 'tx': 107, 'ty': 30507, 'direction': 1})
     def test_non_adjacent_sectors_hooked_together_are_not_ok(self, payload):
-        source_pos = ' ' + str(payload['sx']) + ", " + str(payload['sy'])
-        target_pos = ' ' + str(payload['tx']) + ", " + str(payload['ty'])
+        source_pos = '# ' + str(payload['sx']) + ", " + str(payload['sy'])
+        target_pos = '# ' + str(payload['tx']) + ", " + str(payload['ty'])
 
-        source = Sector(' Source', source_pos)
-        target = Sector(' Target', target_pos)
+        source = Sector('# Source', source_pos)
+        target = Sector('# Target', target_pos)
 
         # assert both sectors are well-formed before the hookup
         result, msg = source.is_well_formed()

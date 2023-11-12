@@ -199,10 +199,14 @@ class Subsector(AreaItem):
 class Sector(AreaItem):
     def __init__(self, name, position):
         name = name.rstrip()
-        if 2 > len(name):
+        if 3 > len(name):
             raise ValueError("Name string too short")
-        if 2 > len(position):
+        if 5 > len(position):
             raise ValueError("Position string too short")
+        if '#' != name[0]:
+            raise ValueError("Name string should start with #")
+        if '#' != position[0]:
+            raise ValueError("Position string should start with #")
 
         # Pre-trim input values
 

@@ -21,7 +21,7 @@ class DeltaGalaxy(Galaxy):
         sectors.skip_void_subsectors_if_half()
         for sector_name in sectors:
             sector = sectors[sector_name]
-            sec = Sector(" " + sector.name, sector.position)
+            sec = Sector("# " + sector.name, sector.position)
             sec.filename = sector.filename
 
             # load up subsectors

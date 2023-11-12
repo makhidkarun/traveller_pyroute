@@ -14,7 +14,7 @@ class testTradeCalculation(unittest.TestCase):
         expected = 'Weight of edge between Irkigkhan (Core 0103) and Irkigkhan (Core 0103) must be positive'
         actual = None
         try:
-            sector = Sector(' Core', ' 0, 0')
+            sector = Sector('# Core', '# 0, 0')
             star1 = Star.parse_line_into_star(
                 "0103 Irkigkhan            B9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
                 sector, 'fixed', 'fixed')
@@ -33,7 +33,7 @@ class testTradeCalculation(unittest.TestCase):
         expected = 'Weight of edge between Irkigkhan (Core 0103) and Irkigkhan (Core 0103) must be positive'
         actual = None
         try:
-            sector = Sector(' Core', ' 0, 0')
+            sector = Sector('# Core', '# 0, 0')
             star1 = Star.parse_line_into_star(
                 "0103 Irkigkhan            B9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
                 sector, 'fixed', 'fixed')
@@ -50,7 +50,7 @@ class testTradeCalculation(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_positive_route_weight_doesnt_trip_assertion(self):
-            sector = Sector(' Core', ' 0, 0')
+            sector = Sector('# Core', '# 0, 0')
             star1 = Star.parse_line_into_star(
                 "0103 Irkigkhan            B9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
                 sector, 'fixed', 'fixed')
@@ -62,14 +62,14 @@ class testTradeCalculation(unittest.TestCase):
             self.assertEqual(2, tradecalc.route_weight(star1, star1))
 
     def test_single_link_route_weight(self):
-        sector = Sector(' Core', ' 0, 0')
+        sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            B9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
             sector, 'fixed', 'fixed')
         star1.index = 1
         star2 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+            Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
         star2.index = 2
 
         galaxy = Galaxy(min_btn=13)
@@ -88,9 +88,9 @@ class testTradeCalculation(unittest.TestCase):
         self.assertEqual(expected_weight, actual_weight, "Route cost unexpected")
 
     def test_passenger_balance_over_multiple_sectors(self):
-        core = Sector(' Core', ' 0, 0')
-        dagu = Sector(' Dagudashaag', ' -1, 0')
-        gush = Sector(' Gushemege', ' -2, 0')
+        core = Sector('# Core', '# 0, 0')
+        dagu = Sector('# Dagudashaag', '# -1, 0')
+        gush = Sector('# Gushemege', '# -2, 0')
 
         galaxy = Galaxy(min_btn=13)
         galaxy.stats.passengers = 3
@@ -117,9 +117,9 @@ class testTradeCalculation(unittest.TestCase):
         tradecalc.is_sector_pass_balanced()
 
     def test_trade_balance_over_multiple_sectors(self):
-        core = Sector(' Core', ' 0, 0')
-        dagu = Sector(' Dagudashaag', ' -1, 0')
-        gush = Sector(' Gushemege', ' -2, 0')
+        core = Sector('# Core', '# 0, 0')
+        dagu = Sector('# Dagudashaag', '# -1, 0')
+        gush = Sector('# Gushemege', '# -2, 0')
 
         galaxy = Galaxy(min_btn=13)
         galaxy.stats.trade = 3

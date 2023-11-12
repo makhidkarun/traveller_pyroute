@@ -22,11 +22,11 @@ class testGalaxy(unittest.TestCase):
     def testVerticalOrdering(self):
         galaxy = Galaxy(0)
 
-        reft = Sector("Reft", "# -3, 0")
+        reft = Sector("# Reft", "# -3, 0")
         self.assertEqual(-3, reft.x)
         self.assertEqual(0, reft.y)
 
-        verge = Sector("Verge", "# -3, -1")
+        verge = Sector("# Verge", "# -3, -1")
         self.assertEqual(-3, verge.x)
         self.assertEqual(-1, verge.y)
 
@@ -64,11 +64,11 @@ class testGalaxy(unittest.TestCase):
     def testHorizontalOrdering(self):
         galaxy = Galaxy(0)
 
-        core = Sector("Core", "# 0, 0")
+        core = Sector("# Core", "# 0, 0")
         self.assertEqual(0, core.x)
         self.assertEqual(0, core.y)
 
-        dagudashaag = Sector("Dagudashaag", "# -1, 0")
+        dagudashaag = Sector("# Dagudashaag", "# -1, 0")
         self.assertEqual(-1, dagudashaag.x)
         self.assertEqual(0, dagudashaag.y)
 

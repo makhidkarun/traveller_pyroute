@@ -360,7 +360,7 @@ class SectorDictionary(dict):
 
         # now subsectors are seeded, run thru the elements of starlines and deal them out to their respective subsector
         # dicts
-        dummy = Sector(' dummy', '# 0,0')
+        dummy = Sector('# dummy', '# 0,0')
         logging.disable(logging.WARNING)
 
         for line in starlines:

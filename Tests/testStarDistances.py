@@ -114,7 +114,7 @@ param_list = [
 class testStarDistances(unittest.TestCase):
 
     def test_core_0101(self):
-        sector = Sector('Core', ' 0, 0')
+        sector = Sector('# Core', '# 0, 0')
         starline = '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V'
 
         star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
@@ -124,10 +124,10 @@ class testStarDistances(unittest.TestCase):
     def test_core_0140(self):
         origin = Star.parse_line_into_star(
             '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
-            Sector('Core', ' 0, 0'), 'fixed', 'fixed'
+            Sector('# Core', '# 0, 0'), 'fixed', 'fixed'
         )
 
-        sector = Sector('Core', ' 0, 0')
+        sector = Sector('# Core', '# 0, 0')
         starline = '0140 Reference            B100727-C Na Va Pi RsA Ab                      { 3 }  (B6D+3) [7A5C] BD    NS - 302 12 ImDc K0 V'
 
         star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
@@ -138,10 +138,10 @@ class testStarDistances(unittest.TestCase):
     def test_lishun_0101(self):
         origin = Star.parse_line_into_star(
             '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
-            Sector('Core', ' 0, 0'), 'fixed', 'fixed'
+            Sector('# Core', '# 0, 0'), 'fixed', 'fixed'
         )
 
-        sector = Sector('Lishun', ' 0, 1')
+        sector = Sector('# Lishun', '# 0, 1')
         starline = '0101 Ishimaga             A734433-9 Ni                       { 0 }  (933-3) [1426] B    -  - 603 10 ImDa K4 V M2 V'
 
         star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
@@ -152,10 +152,10 @@ class testStarDistances(unittest.TestCase):
     def test_lishun_0140(self):
         origin = Star.parse_line_into_star(
             '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
-            Sector('Core', ' 0, 0'), 'fixed', 'fixed'
+            Sector('# Core', '# 0, 0'), 'fixed', 'fixed'
         )
 
-        sector = Sector('Lishun', ' 0, 1')
+        sector = Sector('# Lishun', '# 0, 1')
         starline = '0140 Vodyr                B782999-A Hi Pr                    { 3 }  (G8D+4) [AC6B] BcE  -  - 414 12 ImDa G8 V'
 
         star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
@@ -166,10 +166,10 @@ class testStarDistances(unittest.TestCase):
     def test_massilia_0101(self):
         origin = Star.parse_line_into_star(
             '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
-            Sector('Core', ' 0, 0'), 'fixed', 'fixed'
+            Sector('# Core', '# 0, 0'), 'fixed', 'fixed'
         )
 
-        sector = Sector('Massilia', ' 0, -1')
+        sector = Sector('# Massilia', '# 0, -1')
         starline = '0101 Ishimaga             A734433-9 Ni                       { 0 }  (933-3) [1426] B    -  - 603 10 ImDa K4 V M2 V'
 
         star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
@@ -180,10 +180,10 @@ class testStarDistances(unittest.TestCase):
     def test_massilia_0140(self):
         origin = Star.parse_line_into_star(
             '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
-            Sector('Core', ' 0, 0'), 'fixed', 'fixed'
+            Sector('# Core', '# 0, 0'), 'fixed', 'fixed'
         )
 
-        sector = Sector('Massilia', ' 0, -1')
+        sector = Sector('# Massilia', '# 0, -1')
         starline = '0140 Sekeltin             B633447-B Ni Po Da                   { 1 }  (734+1) [455B] B    N  A 101 12 ImDc M2 V M4 V'
 
         star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
@@ -194,7 +194,7 @@ class testStarDistances(unittest.TestCase):
     def test_straight_distance(self):
         for blurb, sectorname, sectorloc, starthex, finhex, dx, dy, expected_straight_distance in distance_list:
             with self.subTest(msg=blurb):
-                sector = Sector(sectorname, sectorloc)
+                sector = Sector('# ' + sectorname, '# ' + sectorloc)
 
                 basex = int(starthex[0:2])
                 basey = int(starthex[2:])
@@ -257,11 +257,11 @@ class testStarDistances(unittest.TestCase):
         zhdant_offset = (-7, +2)
 
         for source_x, source_y, target_x, target_y, sector_x, sector_y, source_quad, target_quad in inter_distance_list:
-            source_secname = " Zhdant"
-            sourcesectorloc = ' -7, 2'
-            target_secname = ' ' + sector_dict[(sector_x, sector_y)]
+            source_secname = "# Zhdant"
+            sourcesectorloc = '# -7, 2'
+            target_secname = '# ' + sector_dict[(sector_x, sector_y)]
             sector_offset = (zhdant_offset[0] + sector_x, zhdant_offset[1] + sector_y)
-            targetsectorloc = ' ' + str(sector_offset[0]) + ', ' + str(sector_offset[1])
+            targetsectorloc = '# ' + str(sector_offset[0]) + ', ' + str(sector_offset[1])
             source_raw = system_base[source_quad]
             source_star = (source_raw[0] + (1 if source_x == "odd" else 0), source_raw[1] + (1 if source_y == "odd" else 0))
             target_raw = system_base[target_quad]
@@ -301,10 +301,10 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(hexdist, straight_dist, msg)
 
     def test_trans_sector_border_distances_spinward_marches_to_gvurrdon(self):
-        spin = Sector(' Spinward Marches', ' -4, 1')
+        spin = Sector('# Spinward Marches', '# -4, 1')
         self.assertEqual(-128, spin.dx, "Unexpected sector dx")
         self.assertEqual(40, spin.dy, "Unexpected sector dy")
-        gvur = Sector(' Gvurrdon', ' -4, 2')
+        gvur = Sector('# Gvurrdon', '# -4, 2')
         self.assertEqual(-128, gvur.dx, "Unexpected sector dx")
         self.assertEqual(80, gvur.dy, "Unexpected sector dy")
 
@@ -332,10 +332,10 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
     def test_trans_sector_border_distances_core_to_massilia(self):
-        core = Sector(' Core', ' 0, 0')
+        core = Sector('# Core', '# 0, 0')
         self.assertEqual(0, core.dx, "Unexpected sector dx")
         self.assertEqual(0, core.dy, "Unexpected sector dy")
-        mass = Sector(' Massilia', ' 0, -1')
+        mass = Sector('# Massilia', '# 0, -1')
         self.assertEqual(0, mass.dx, "Unexpected sector dx")
         self.assertEqual(-40, mass.dy, "Unexpected sector dy")
 
@@ -360,10 +360,10 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
     def test_trans_sector_border_distances_massilia_to_diaspora(self):
-        mass = Sector(' Massilia', ' 0, -1')
+        mass = Sector('# Massilia', '# 0, -1')
         self.assertEqual(0, mass.dx, "Unexpected sector dx")
         self.assertEqual(-40, mass.dy, "Unexpected sector dy")
-        dias = Sector(' Diaspora', ' 0, -2')
+        dias = Sector('# Diaspora', '# 0, -2')
         self.assertEqual(0, dias.dx, "Unexpected sector dx")
         self.assertEqual(-80, dias.dy, "Unexpected sector dy")
 
@@ -388,10 +388,10 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
     def test_trans_sector_border_distances_core_to_dagudashaag(self):
-        core = Sector(' Core', ' 0, 0')
+        core = Sector('# Core', '# 0, 0')
         self.assertEqual(0, core.dx, "Unexpected sector dx")
         self.assertEqual(0, core.dy, "Unexpected sector dy")
-        dagu = Sector(' Dagudashaag', ' -1, 0')
+        dagu = Sector('# Dagudashaag', '# -1, 0')
         self.assertEqual(-32, dagu.dx, "Unexpected sector dx")
         self.assertEqual(0, dagu.dy, "Unexpected sector dy")
 
@@ -416,10 +416,10 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
     def test_distance_from_core_0101(self):
-        core = Sector(' Core', ' 0, 0')
-        dagu = Sector(' Dagudashaag', ' -1, 0')
-        vland = Sector(' Vland', ' -1, 1')
-        lishun = Sector(' Lishun', ' 0, 1')
+        core = Sector('# Core', '# 0, 0')
+        dagu = Sector('# Dagudashaag', '# -1, 0')
+        vland = Sector('# Vland', '# -1, 1')
+        lishun = Sector('# Lishun', '# 0, 1')
 
         starline = '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V'
 
@@ -510,10 +510,10 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(distance, targstar.distance(base), "Reverse straight distance unexpected")
 
     def test_hop_1_odd_column_offsets_and_hexagon_vertices_from_core_3240(self):
-        core = Sector(' Core', ' 0, 0')
-        massilia = Sector(' Massilia', ' 0, -1')
-        fornast = Sector(' Fornast', ' 1, 0')
-        delphi = Sector(' Delphi', ' 1, -1')
+        core = Sector('# Core', '# 0, 0')
+        massilia = Sector('# Massilia', '# 0, -1')
+        fornast = Sector('# Fornast', '# 1, 0')
+        delphi = Sector('# Delphi', '# 1, -1')
 
         starline = '3240 Reference            B100727-C Na Va Pi RsA Ab                      { 3 }  (B6D+3) [7A5C] BD    NS - 302 12 ImDc K0 V'
 
@@ -562,8 +562,8 @@ class testStarDistances(unittest.TestCase):
     def test_star_distances(self):
         for blurb, x_sector, y_sector, expected_distance, expected_alt_distance in param_list:
             with self.subTest(msg=blurb):
-                sector1 = Sector(' Core', ' 0, 0')
-                sector2 = Sector(' ' + str(x_sector) + ', ' + str(y_sector) + ' Sector', ' ' + str(x_sector) + ', ' + str(y_sector))
+                sector1 = Sector('# Core', '# 0, 0')
+                sector2 = Sector('# ' + str(x_sector) + ', ' + str(y_sector) + ' Sector', '# ' + str(x_sector) + ', ' + str(y_sector))
 
                 star1 = Star.parse_line_into_star(
                     "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
