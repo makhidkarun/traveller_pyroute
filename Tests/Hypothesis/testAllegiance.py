@@ -256,6 +256,8 @@ class testAllegiance(unittest.TestCase):
 
         expected = 'Test Allegiance Plz Ignore (Test)'
         self.assertEqual(expected, str(alg), "Unexpected string representation")
+        result, msg = alg.is_well_formed()
+        self.assertTrue(result, msg)
 
     def test_long_aslan_allegiance(self):
         code = 'AsT0'
@@ -264,6 +266,8 @@ class testAllegiance(unittest.TestCase):
         alg = Allegiance(code, name)
         expected = 'Aslan Hierate, Tlaukhu control (AsT0)'
         self.assertEqual(expected, str(alg), "Unexpected string representation")
+        result, msg = alg.is_well_formed()
+        self.assertTrue(result, msg)
 
 
 if __name__ == '__main__':
