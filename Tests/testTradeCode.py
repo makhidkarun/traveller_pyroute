@@ -56,13 +56,13 @@ class TestTradeCode(unittest.TestCase):
 
     def testSophonts(self):
         code = TradeCodes(u"(Wiki)")
-        self.assertEqual([u'(Wiki)W'], code.homeworld, code.homeworld)
-        self.assertEqual([u'(Wiki)W'], code.sophonts, code.sophonts)
+        self.assertEqual([u'Wiki'], code.homeworld, code.homeworld)
+        self.assertEqual([u'WikiW'], code.sophonts, code.sophonts)
 
     def testSophontsPartial(self):
         code = TradeCodes(u"(Wiki)4")
-        self.assertEqual([u'(Wiki)4'], code.homeworld, code.homeworld)
-        self.assertEqual([u'(Wiki)4'], code.sophonts)
+        self.assertEqual([u'Wiki'], code.homeworld, code.homeworld)
+        self.assertEqual([u'Wiki4'], code.sophonts)
 
     def testWorldSophont(self):
         code = TradeCodes("Ag Huma4")
@@ -94,8 +94,8 @@ class TestTradeCode(unittest.TestCase):
     def testSophontCombined(self):
         code = TradeCodes("Ri (Wiki) Huma4 Alph2 (Deneb)2")
         self.assertTrue(len(code.homeworld) > 0)
-        self.assertEqual(['Alph2', 'Huma4', '(Dene)2', '(Wiki)W'], code.sophonts, msg=code.sophonts)
-        self.assertEqual(['(Dene)2', '(Wiki)W'], code.homeworld, msg=code.homeworld)
+        self.assertEqual(['Alph2', 'Huma4', 'Dene2', 'WikiW'], code.sophonts, msg=code.sophonts)
+        self.assertEqual(['Deneb', 'Wiki'], code.homeworld, msg=code.homeworld)
         self.assertEqual(['Ri'], code.codeset, code.codeset)
 
     def testCodeCheck(self):
@@ -200,20 +200,39 @@ class TestTradeCode(unittest.TestCase):
         code = TradeCodes(line)
         self.assertEqual(1, len(code.sophont_list), "Actual homeworld code should result in sophont")
         self.assertEqual(1, len(code.homeworld_list), "Actual homeworld code should result in homeworld")
+        self.assertEqual(['Feim0'], code.sophont_list)
+        self.assertEqual(['Feime'], code.homeworld_list)
 
         result, msg = code.is_well_formed()
         self.assertTrue(result, msg)
-        expected_line = '(Feim)0 Pi Re Sa'
+        expected_line = '(Feime)? Pi Re Sa'
         self.assertEqual(expected_line, str(code), "Unexpected parsed trade code")
 
-    def testVerifyHomeworldOldStyleCode(self):
+    def testVerifyHomeworldMinorRace(self):
         line = 'Hi In (Anixii)W Da'
         code = TradeCodes(line)
         self.assertEqual(1, len(code.sophont_list), "Actual homeworld code should result in sophont")
         self.assertEqual(1, len(code.homeworld_list), "Actual homeworld code should result in homeworld")
+        self.assertEqual(['AnixW'], code.sophont_list)
+        self.assertEqual(['Anixii'], code.homeworld_list)
 
         result, msg = code.is_well_formed()
         self.assertTrue(result, msg)
+        expected_line = '(Anixii)W Da Hi In'
+        self.assertEqual(expected_line, str(code), "Unexpected string representation")
+
+    def testVerifyHomeworldMajorRace(self):
+        line = 'Hi In [Anixii]W Da'
+        code = TradeCodes(line)
+        self.assertEqual(1, len(code.sophont_list), "Actual homeworld code should result in sophont")
+        self.assertEqual(1, len(code.homeworld_list), "Actual homeworld code should result in homeworld")
+        self.assertEqual(['AnixW'], code.sophont_list)
+        self.assertEqual(['Anixii'], code.homeworld_list)
+
+        result, msg = code.is_well_formed()
+        self.assertTrue(result, msg)
+        expected_line = '[Anixii]W Da Hi In'
+        self.assertEqual(expected_line, str(code), "Unexpected string representation")
 
     def testVerifyDeadworldDoesntSpawnHomeworld(self):
         line = '(Miya)X An Asla1 Cs Hi S\'mr0'
