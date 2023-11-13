@@ -255,7 +255,12 @@ class TestTradeCode(unittest.TestCase):
         self.assertEqual(2, len(code.sophont_list), "Shared homeworld should result in two sophont")
         self.assertEqual(2, len(code.homeworld_list), "Shared homeworld should result in two homeworld entries")
 
-        expected_line = '(Kiak)3 (SXmr)7 Hi Pz'
+        expected_sophont = ['Kiak3', 'SXmr7']
+        self.assertEqual(expected_sophont, code.sophonts, "Unexpected sophont list")
+        expected_homeworld = ['Kiakh\'iee', 'S\'mrii']
+        self.assertEqual(expected_homeworld, code.homeworld, "Unexpected homeworld list")
+
+        expected_line = '(Kiakh\'iee)3 (S\'mrii)7 Hi Pz'
         self.assertEqual(expected_line, str(code), "Unexpected string representation")
 
         nu_code = TradeCodes(str(code))
