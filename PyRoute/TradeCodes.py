@@ -487,6 +487,12 @@ class TradeCodes(object):
 
         result, msg = self._check_code_pairs_allowed()
 
+        # now check that sophont list is well-formed
+        bad_sophonts = [code for code in self.sophont_list if 5 != len(code)]
+        if 0 < len(bad_sophonts):
+            msg = "Sophont codes must be 5 chars each - got at least " + bad_sophonts[0]
+            return False, msg
+
         return result, msg
 
     def trim_ill_formed_residual_codes(self):
