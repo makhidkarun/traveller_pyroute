@@ -498,6 +498,13 @@ class TradeCodes(object):
             msg = "Sophont codes must be 5 chars each - got at least " + bad_sophonts[0]
             return False, msg
 
+        # explicitly exclude multiple W-pop (ie, 95+%) sophonts
+        big_sophs = [code for code in self.sophont_list if code.endswith('W')]
+        if 1 < len(big_sophs):
+            sophs = ' '.join(big_sophs)
+            msg = "Can have at most one W-pop sophont.  Have " + sophs
+            return False, msg
+
         return result, msg
 
     def trim_ill_formed_residual_codes(self):
