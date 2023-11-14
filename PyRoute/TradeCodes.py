@@ -493,9 +493,9 @@ class TradeCodes(object):
         result, msg = self._check_code_pairs_allowed()
 
         # now check that sophont list is well-formed
-        bad_sophonts = [code for code in self.sophont_list if 5 != len(code)]
+        bad_sophonts = [code for code in self.sophont_list if 5 < len(code)]
         if 0 < len(bad_sophonts):
-            msg = "Sophont codes must be 5 chars each - got at least " + bad_sophonts[0]
+            msg = "Sophont codes must be no more than 5 chars each - got at least " + bad_sophonts[0]
             return False, msg
 
         # explicitly exclude multiple W-pop (ie, 95+%) sophonts

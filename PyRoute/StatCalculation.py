@@ -149,11 +149,13 @@ class StatCalculation(object):
         self.imp_uwp = UWPCollection()
 
     def calculate_statistics(self, ally_match):
-        self.galaxy.trade.is_sector_trade_balanced()
-        self.galaxy.trade.is_sector_pass_balanced()
-        self.galaxy.trade.is_allegiance_trade_balanced()
-        self.galaxy.trade.is_allegiance_pass_balanced()
-        self.galaxy.trade.cross_check_totals()
+        from PyRoute.Calculation.NoneCalculation import NoneCalculation
+        if not isinstance(self.galaxy.trade, NoneCalculation):
+            self.galaxy.trade.is_sector_trade_balanced()
+            self.galaxy.trade.is_sector_pass_balanced()
+            self.galaxy.trade.is_allegiance_trade_balanced()
+            self.galaxy.trade.is_allegiance_pass_balanced()
+            self.galaxy.trade.cross_check_totals()
 
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
         for sector in self.galaxy.sectors.values():
@@ -235,11 +237,15 @@ class StatCalculation(object):
             soph_code = sophont[0:4]
             soph_pct = sophont[4:]
 
+            if 4 == len(sophont):
+                soph_code = sophont[0:3]
+                soph_pct = sophont[3:]
+
             if soph_pct == 'A':
                 default_soph = soph_code
                 continue
 
-            soph_pct = 100.0 if soph_pct == 'W' else 0.0 if soph_pct in ['X', 'A'] else \
+            soph_pct = 100.0 if soph_pct == 'W' else 0.0 if soph_pct in ['X', 'A', '?'] else \
                 5.0 if soph_pct == '0' else 10.0 * int(soph_pct)
 
             if any([soph for soph in star.tradeCode.homeworld if soph.startswith(soph_code)]):
