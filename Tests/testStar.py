@@ -13,7 +13,7 @@ import sys
 from PyRoute.Position.Hex import Hex
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Galaxy import Allegiance
-from StatCalculation import StatCalculation
+from PyRoute.StatCalculation import StatCalculation
 
 sys.path.append('../PyRoute')
 from PyRoute.Star import Star

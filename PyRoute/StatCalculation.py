@@ -149,13 +149,11 @@ class StatCalculation(object):
         self.imp_uwp = UWPCollection()
 
     def calculate_statistics(self, ally_match):
-        from PyRoute.Calculation.NoneCalculation import NoneCalculation
-        if not isinstance(self.galaxy.trade, NoneCalculation):
-            self.galaxy.trade.is_sector_trade_balanced()
-            self.galaxy.trade.is_sector_pass_balanced()
-            self.galaxy.trade.is_allegiance_trade_balanced()
-            self.galaxy.trade.is_allegiance_pass_balanced()
-            self.galaxy.trade.cross_check_totals()
+        self.galaxy.trade.is_sector_trade_balanced()
+        self.galaxy.trade.is_sector_pass_balanced()
+        self.galaxy.trade.is_allegiance_trade_balanced()
+        self.galaxy.trade.is_allegiance_pass_balanced()
+        self.galaxy.trade.cross_check_totals()
 
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
         for sector in self.galaxy.sectors.values():
