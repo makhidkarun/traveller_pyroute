@@ -215,9 +215,9 @@ class TradeCodes(object):
         @type homeworlds_found: list
         """
         full_name = re.sub(r'\[([^)]+)\][\d|W]?', r'\1', homeworld)
+        pop = 'W' if ']' == homeworld[-1] else homeworld[-1]
         homeworlds_found.append(homeworld)
         code = full_name[0:4]
-        pop = 'W'
         self._process_sophont_homeworld(code, pop, full_name=full_name)
 
     def _process_deadworld(self, deadworld, homeworlds_found):
