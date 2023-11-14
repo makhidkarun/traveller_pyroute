@@ -279,25 +279,38 @@ class TestTradeCode(unittest.TestCase):
                 self.assertEqual(expected, str(code))
 
     def testSharedHomeworld(self):
-        line = 'Hi Pz (S\'mrii)7 (Kiakh\'iee)3 '
-        code = TradeCodes(line)
-        result, msg = code.is_well_formed()
-        self.assertTrue(result, msg)
+        cases = [
+            ('Both minor, both populations explicit', 'Hi Pz (S\'mrii)7 (Kiakh\'iee)3 ', '(Kiakh\'iee)3 (S\'mrii)7 Hi Pz', ['Kiak3', 'SXmr7']),
+            ('Both major, both populations explicit', 'Hi Pz [S\'mrii]7 [Kiakh\'iee]3 ', 'Hi Pz [Kiakh\'iee]3 [S\'mrii]7', ['Kiak3', 'SXmr7']),
+            ('First major, both populations explicit', 'Hi Pz [S\'mrii]7 (Kiakh\'iee)3 ', '(Kiakh\'iee)3 Hi Pz [S\'mrii]7', ['Kiak3', 'SXmr7']),
+            ('Second major, both populations explicit', 'Hi Pz (S\'mrii)7 [Kiakh\'iee]3 ', '(S\'mrii)7 Hi Pz [Kiakh\'iee]3', ['Kiak3', 'SXmr7']),
+            ('Second major, first population zero, second population implicit', 'Hi Pz (S\'mrii)0 [Kiakh\'iee] ', '(S\'mrii)0 Hi Pz [Kiakh\'iee]', ['KiakW', 'SXmr0']),
+            ('First major, both populations zero', 'Hi Pz [S\'mrii]0 (Kiakh\'iee)0 ', '(Kiakh\'iee)0 Hi Pz [S\'mrii]0', ['Kiak0', 'SXmr0']),
+            ('Second major, first population explicit, second population zero', 'Hi Pz (S\'mrii)7 [Kiakh\'iee]0 ', '(S\'mrii)7 Hi Pz [Kiakh\'iee]0', ['Kiak0', 'SXmr7']),
+            ('Both minor, first population implicit, second population zero', 'Hi Pz (S\'mrii) (Kiakh\'iee)0 ', '(Kiakh\'iee)0 (S\'mrii) Hi Pz', ['Kiak0', 'SXmrW']),
+            ('Both major, first population implicit, second population zero', 'Hi Pz [S\'mrii] [Kiakh\'iee]0 ', 'Hi Pz [Kiakh\'iee]0 [S\'mrii]', ['Kiak0', 'SXmrW']),
+            ('First major, first population zero, second population implicit', 'Hi Pz [S\'mrii]0 (Kiakh\'iee) ', '(Kiakh\'iee) Hi Pz [S\'mrii]0', ['KiakW', 'SXmr0']),
+            ('First major, first population zero, second population explicit', 'Hi Pz [S\'mrii]0 (Kiakh\'iee)3 ', '(Kiakh\'iee)3 Hi Pz [S\'mrii]0', ['Kiak3', 'SXmr0'])
+        ]
 
-        self.assertEqual(2, len(code.sophont_list), "Shared homeworld should result in two sophont")
-        self.assertEqual(2, len(code.homeworld_list), "Shared homeworld should result in two homeworld entries")
+        for label, line, expected_line, expected_sophont in cases:
+            with self.subTest(label):
+                code = TradeCodes(line)
+                result, msg = code.is_well_formed()
+                self.assertTrue(result, msg)
 
-        expected_sophont = ['Kiak3', 'SXmr7']
-        self.assertEqual(expected_sophont, code.sophonts, "Unexpected sophont list")
-        expected_homeworld = ['Kiakh\'iee', 'S\'mrii']
-        self.assertEqual(expected_homeworld, code.homeworld, "Unexpected homeworld list")
+                self.assertEqual(2, len(code.sophont_list), "Shared homeworld should result in two sophont")
+                self.assertEqual(2, len(code.homeworld_list), "Shared homeworld should result in two homeworld entries")
 
-        expected_line = '(Kiakh\'iee)3 (S\'mrii)7 Hi Pz'
-        self.assertEqual(expected_line, str(code), "Unexpected string representation")
+                self.assertEqual(expected_sophont, code.sophonts, "Unexpected sophont list")
+                expected_homeworld = ['Kiakh\'iee', 'S\'mrii']
+                self.assertEqual(expected_homeworld, code.homeworld, "Unexpected homeworld list")
 
-        nu_code = TradeCodes(str(code))
-        result, msg = nu_code.is_well_formed()
-        self.assertTrue(result, msg)
+                self.assertEqual(expected_line, str(code), "Unexpected string representation")
+
+                nu_code = TradeCodes(str(code))
+                result, msg = nu_code.is_well_formed()
+                self.assertTrue(result, msg)
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

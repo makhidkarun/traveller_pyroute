@@ -369,11 +369,11 @@ class TradeCodes(object):
 
     @property
     def homeworld(self):
-        return self.homeworld_list
+        return sorted(self.homeworld_list)
 
     @property
     def sophonts(self):
-        return self.sophont_list
+        return sorted(self.sophont_list)
 
     @property
     def rich(self):
