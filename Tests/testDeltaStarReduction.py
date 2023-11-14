@@ -24,7 +24,7 @@ class testDeltaStarReduction(baseTest):
     def test_reduce_routes_on_none(self):
         src = "0216 Ambemshan            A5457BC-B Ag Cp Pi Pz (Cassilldans) { 4 }  (D6E+5) [AB8E] BCDF NS A 913 10 ImDa M3 V M6 V"
 
-        exp = "0216 Ambemshan            A5457BC-B (Cass)W Ag Cp Pi Pz                   { 4 }  (D6E+5) [AB8E] BCDF NS A 913 10 ImDa M3 V M6 V                                               "
+        exp = "0216 Ambemshan            A5457BC-B (Cassilldans) Ag Cp Pi Pz             { 4 }  (D6E+5) [AB8E] BCDF NS A 913 10 ImDa M3 V M6 V                                               "
         actual = DeltaStar.reduce(src, drop_routes=True)
 
         self.assertEqual(exp, actual)
@@ -104,7 +104,7 @@ class testDeltaStarReduction(baseTest):
 
     def test_canonicalisation_of_dagudashaag_2124(self):
         src = "2123 Medurma              A9D7954-C Hi An Cs Di(Miyavine) Asla1 S'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V            Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322"
-        exp = "2123 Medurma              A9D7954-C (Miya)X An Asla1 Cs Hi S'mr0          { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V           Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322  "
+        exp = "2123 Medurma              A9D7954-C An Asla1 Cs Di(Miyavine) Hi S'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V           Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322  "
 
         actual = DeltaStar.reduce(src)
         self.assertEqual(exp, actual)

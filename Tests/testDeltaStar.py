@@ -137,7 +137,7 @@ class testDeltaStar(unittest.TestCase):
             ("2123 Medurma              A9D7954-C An Cs Hi                             { 3 }  (G8E+1) [7C3A]      -  - 100 0  ImDv G0 V                                                     ",
              "2123 Medurma              A9D7954-C An Hi                                 { 3 }  (G8E+1) [7C3A]      -  - 100 0  ImDv G0 V                                                    "),
             ("2118 Capital              A586A98-F Hi Cx (Syleans)5                     { 4 }  (H9G+4) [AE5F] BEFG  NW - 605 15 ImSy G2 V           Xb:1916 Xb:2021 Xb:2115 Xb:2216 Xb:2218",
-             "2118 Capital              A586A98-F (Syle)5 Hi                            { 4 }  (H9G+4) [AE5F] BEFG NW - 605 15 ImSy G2 V           Xb:1916 Xb:2021 Xb:2115 Xb:2216 Xb:2218  ")
+             "2118 Capital              A586A98-F (Syleans)5 Hi                         { 4 }  (H9G+4) [AE5F] BEFG NW - 605 15 ImSy G2 V           Xb:1916 Xb:2021 Xb:2115 Xb:2216 Xb:2218  ")
         ]
 
         for chunk in check_list:
