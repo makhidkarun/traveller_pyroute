@@ -235,10 +235,6 @@ class StatCalculation(object):
             soph_code = sophont[0:4]
             soph_pct = sophont[4:]
 
-            if 1 < len(soph_pct) and '(' == soph_code[0]:
-                soph_code = sophont[1:5]
-                soph_pct = sophont[6:]
-
             if soph_pct == 'A':
                 default_soph = soph_code
                 continue
