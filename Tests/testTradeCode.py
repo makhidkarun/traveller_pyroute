@@ -221,7 +221,20 @@ class TestTradeCode(unittest.TestCase):
         expected_line = '(Anixii)W Da Hi In'
         self.assertEqual(expected_line, str(code), "Unexpected string representation")
 
-    def testVerifyHomeworldMajorRace(self):
+    def testVerifyHomeworldMajorRaceImplicitPop(self):
+        line = 'Hi In [Anixii] Da'
+        code = TradeCodes(line)
+        self.assertEqual(1, len(code.sophont_list), "Actual homeworld code should result in sophont")
+        self.assertEqual(1, len(code.homeworld_list), "Actual homeworld code should result in homeworld")
+        self.assertEqual(['AnixW'], code.sophont_list)
+        self.assertEqual(['Anixii'], code.homeworld_list)
+
+        result, msg = code.is_well_formed()
+        self.assertTrue(result, msg)
+        expected_line = 'Da Hi In [Anixii]'
+        self.assertEqual(expected_line, str(code), "Unexpected string representation")
+
+    def testVerifyHomeworldMajorRaceExplicitPop(self):
         line = 'Hi In [Anixii]W Da'
         code = TradeCodes(line)
         self.assertEqual(1, len(code.sophont_list), "Actual homeworld code should result in sophont")
@@ -231,7 +244,7 @@ class TestTradeCode(unittest.TestCase):
 
         result, msg = code.is_well_formed()
         self.assertTrue(result, msg)
-        expected_line = '[Anixii]W Da Hi In'
+        expected_line = 'Da Hi In [Anixii]W'
         self.assertEqual(expected_line, str(code), "Unexpected string representation")
 
     def testVerifyDeadworldDoesntSpawnHomeworld(self):

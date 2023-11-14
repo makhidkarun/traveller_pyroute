@@ -64,6 +64,7 @@ class TradeCodes(object):
 
     # Search regexen
     search = re.compile(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W|\?)?')
+    search_major = re.compile(r'\w{,2}\[([^)]{,4})[^)]*\](\d|W|\?)?')
     sophont = re.compile(r"[A-Za-z\'!]{1}[\w\'!]{2,4}(\d|W|\?)")
     dieback = re.compile(r"[Di]*\([^)]+\)\d?")
 
@@ -109,12 +110,11 @@ class TradeCodes(object):
         self.sophont_list = [code for code in self.sophont_list if 5 >= len(code)]
         homeworld_matches = TradeCodes.dieback.findall(initial_codes)
         # bolt on direct [homeworld] candidates
-        homeworld_new = [item.strip('[]') for item in self.codes if
-                         item.startswith('[') and item.endswith(']') and 1 == item.count('[') and 1 == item.count(']')]
+        homeworld_major = [item for item in self.codes if item.startswith('[') and 1 == item.count('[') and 1 == item.count(']')]
         deadworlds = [item for item in self.codes if 5 == len(item) and 'X' == item[4]]
         for homeworld in homeworld_matches:
             self._process_homeworld(homeworld, homeworlds_found, initial_codes)
-        for homeworld in homeworld_new:
+        for homeworld in homeworld_major:
             self._process_major_race_homeworld(homeworld, homeworlds_found)
         for deadworld in deadworlds:
             self._process_deadworld(deadworld, homeworlds_found)
@@ -139,6 +139,9 @@ class TradeCodes(object):
                 codes.append(raw)
                 continue
             if 7 < len(raw) and '(' == raw[0] and ')' == raw[-2]:  # Let older-style sophont codes through
+                codes.append(raw)
+                continue
+            if 7 < len(raw) and '[' == raw[0] and ']' == raw[-2]:  # Let older-style sophont codes through
                 codes.append(raw)
                 continue
             if 2 == len(raw) and ('W' == raw[1] or raw[1].isdigit()):
@@ -183,6 +186,8 @@ class TradeCodes(object):
         full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
         homeworlds_found.append(homeworld)
         match = TradeCodes.search.match(homeworld)
+        if match is None:  # try again with major-raceversion
+            match = TradeCodes.search_major.match(homeworld)
         if match is None:
             self.logger.error("Unable to process %s", initial_codes)
             sys.exit(1)
@@ -209,7 +214,7 @@ class TradeCodes(object):
         @type homeworld: string
         @type homeworlds_found: list
         """
-        full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
+        full_name = re.sub(r'\[([^)]+)\][\d|W]?', r'\1', homeworld)
         homeworlds_found.append(homeworld)
         code = full_name[0:4]
         pop = 'W'
@@ -539,7 +544,9 @@ class TradeCodes(object):
                 if ')' not in code:
                     return False
                 return True
-            if code.startswith('[') and code.endswith(']'):  # major race homeworld
+            if code.startswith('[') and (code.endswith(']') or ']' == code[-2]):  # major race homeworld
+                if ']' not in code:
+                    return False
                 return True
             if code not in TradeCodes.allowed_residual_codes:
                 return False
