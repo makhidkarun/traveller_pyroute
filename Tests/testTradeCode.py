@@ -312,6 +312,29 @@ class TestTradeCode(unittest.TestCase):
                 result, msg = nu_code.is_well_formed()
                 self.assertTrue(result, msg)
 
+    def testHandleOverlyLongSophontName(self):
+        cases = [
+            ('Minor race', '(', ')'),
+            ('Major race', '(', ')')
+        ]
+
+        for msg, left_bracket, right_bracket in cases:
+            with self.subTest(msg):
+                line = left_bracket + '000000000000000000000000000000000000' + right_bracket
+                code = TradeCodes(line)
+                sophont = line[1:36]  # strip the brackets and trim what's left to 35 characters
+
+                self.assertEqual(1, len(code.sophont_list), "Actual homeworld code should result in sophont")
+                self.assertEqual(1, len(code.homeworld_list), "Actual homeworld code should result in homeworld")
+                self.assertEqual(['0000W'], code.sophont_list)
+                self.assertEqual([sophont], code.homeworld_list)
+
+                # verify shortened soph code turns up
+                expected_sophont = left_bracket + sophont + right_bracket
+                nu_line = str(code)
+                self.assertEqual(expected_sophont, nu_line)
+
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

@@ -166,6 +166,10 @@ class TradeCodes(object):
                 codes.append(raw)
                 continue
             if raw.endswith(')') or raw.endswith(']'):  # this _is_ a sophont code
+                if raw.startswith('[') and raw.endswith(']'):
+                    raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _major_ race homeworld
+                elif raw.startswith('(') and raw.endswith(')'):
+                    raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _minor_ race homeworld
                 codes.append(raw)
                 continue
             if i < num_codes - 1:
@@ -182,8 +186,22 @@ class TradeCodes(object):
 
         return codes, initial_codes
 
+    def _trim_overlong_homeworld_code(self, raw):
+        # We're assuming raw is a (homeworld) code - not handling pop codes at the moment
+        # If the homeworld string itself exceeds 35 characters in length, it will jam up against the left side of
+        # the importance code in the starline, which both looks ugly and causes re-parsing havoc.
+        left_bracket = raw[0]
+        right_bracket = ']' if '[' == left_bracket else ')'
+
+        trim = raw[1:-1]
+        if 35 < len(trim):
+            trim = trim[0:35]
+
+        return left_bracket + trim + right_bracket
+
     def _process_homeworld(self, homeworld, homeworlds_found, initial_codes):
         full_name = re.sub(r'\(([^)]+)\)\d?', r'\1', homeworld)
+
         homeworlds_found.append(homeworld)
         match = TradeCodes.search.match(homeworld)
         if match is None:  # try again with major-raceversion
