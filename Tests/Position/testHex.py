@@ -12,11 +12,11 @@ from PyRoute.Star import Star
 
 class testHex(unittest.TestCase):
     def setUp(self):
-        self.coreSector = Sector(' Core', ' 0, 0')
-        self.lishunSector = Sector('Lishun', ' 0, 1')
-        self.daguSector = Sector('Dagudashaag', ' -1, 0')
-        self.fornastSector = Sector('Fornast', ' 1, 0')
-        self.massiliaSector = Sector('Massilia', ' 0, -1')
+        self.coreSector = Sector('# Core', '# 0, 0')
+        self.lishunSector = Sector('# Lishun', '# 0, 1')
+        self.daguSector = Sector('# Dagudashaag', '# -1, 0')
+        self.fornastSector = Sector('# Fornast', '# 1, 0')
+        self.massiliaSector = Sector('# Massilia', '# 0, -1')
 
     def testSetupOddColEvenRow(self):
         pos = Hex(self.coreSector, "0140")

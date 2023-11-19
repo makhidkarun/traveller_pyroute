@@ -53,6 +53,9 @@ class AreaItem(object):
     def __setitem__(self, key, value):
         setattr(self, key, value)
 
+    def is_well_formed(self):
+        return True
+
 
 class Allegiance(AreaItem):
     def __init__(self, code, name, base=False, population='Huma'):
@@ -194,16 +197,38 @@ class Subsector(AreaItem):
 
 
 class Sector(AreaItem):
+    position_match = re.compile(r"([-+ ]?\d{1,4})\s*[,]\s*([-+ ]?\d{1,4})")
+
     def __init__(self, name, position):
+        name = name.rstrip()
+        if 3 > len(name):
+            raise ValueError("Name string too short")
+        if 5 > len(position):
+            raise ValueError("Position string too short")
+        if '#' != name[0]:
+            raise ValueError("Name string should start with #")
+        if '#' != position[0]:
+            raise ValueError("Position string should start with #")
+
+        # Pre-trim input values
+
         # The name as passed from the Galaxy read include the comment marker at the start of the line
         # So strip the comment marker, then strip spaces.
         super(Sector, self).__init__(name[1:].strip())
+
+        # Same here, the position has a leading comment marker.  Strip that, and then any flanking whitespace.
+        position = position[1:].strip().replace(' ', '')
+        positions = Sector.position_match.match(position)
+        if not positions:
+            raise ValueError("Position string malformed")
+
+        pos_bits = positions.groups()
+
         self._wiki_name = '[[{0} Sector|{0}]]'.format(self.sector_name())
 
-        # Same here, the position has a leading comment marker
-        self.x = int(position[1:].split(',')[0])
-        self.y = int(position[1:].split(',')[1])
-        
+        self.x = int(pos_bits[0])
+        self.y = int(pos_bits[1])
+
         self.dx = self.x * 32
         self.dy = self.y * 40
         self.subsectors = {}
@@ -233,6 +258,65 @@ class Sector(AreaItem):
             if world.position == pos:
                 return world
         return None
+
+    def is_well_formed(self):
+        msg = ""
+        # check name
+        if self.name is None or '' == self.name.strip():
+            msg = "Name cannot be empty"
+            return False, msg
+
+        # Check reciprocity of adjacent sectors
+        if self.coreward is not None:
+            neighbour = self.coreward
+            other = neighbour.rimward
+            if other is None or other != self:
+                msg = "Coreward sector mismatch for " + self.name
+                return False, msg
+            if self.x != neighbour.x:
+                msg = "Coreward sector x co-ord mismatch for " + self.name
+                return False, msg
+            if self.y + 1 != neighbour.y:
+                msg = "Coreward sector y co-ord mismatch for " + self.name
+                return False, msg
+        if self.rimward is not None:
+            neighbour = self.rimward
+            other = neighbour.coreward
+            if other is None or other != self:
+                msg = "Rimward sector mismatch for " + self.name
+                return False, msg
+            if self.x != neighbour.x:
+                msg = "Rimward sector x co-ord mismatch for " + self.name
+                return False, msg
+            if self.y - 1 != neighbour.y:
+                msg = "Rimward sector y co-ord mismatch for " + self.name
+                return False, msg
+        if self.spinward is not None:
+            neighbour = self.spinward
+            other = neighbour.trailing
+            if other is None or other != self:
+                msg = "Spinward sector mismatch for " + self.name
+                return False, msg
+            if self.x - 1 != neighbour.x:
+                msg = "Spinward sector x co-ord mismatch for " + self.name
+                return False, msg
+            if self.y != neighbour.y:
+                msg = "Spinward sector y co-ord mismatch for " + self.name
+                return False, msg
+        if self.trailing is not None:
+            neighbour = self.trailing
+            other = neighbour.spinward
+            if other is None or other != self:
+                msg = "Trailing sector mismatch for " + self.name
+                return False, msg
+            if self.x + 1 != neighbour.x:
+                msg = "Trailing sector x co-ord mismatch for " + self.name
+                return False, msg
+            if self.y != neighbour.y:
+                msg = "Trailing sector y co-ord mismatch for " + self.name
+                return False, msg
+
+        return True, msg
 
 
 class Galaxy(AreaItem):
@@ -550,6 +634,12 @@ class Galaxy(AreaItem):
                 worldstar.ownedBy = (owner, ownedBy[0:4])
 
     def is_well_formed(self):
+        for item in self.sectors:
+            sector = self.sectors[item]
+            assert isinstance(sector, Sector), "Galaxy sectors must be instance of Sector object"
+            result, msg = sector.is_well_formed()
+            assert result, msg
+
         for item in self.stars.nodes:
             assert isinstance(item, int), "Star nodes must be integers"
             assert 'star' in self.stars.nodes[item], "Star attribute not set for item " + str(item)

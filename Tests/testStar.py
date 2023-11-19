@@ -26,7 +26,7 @@ class TestStar(unittest.TestCase):
         pass
 
     def testParseIrkigkhan(self):
-        sector = Sector(' Core', ' 0, 0')
+        sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
             sector, 'fixed', 'fixed')
@@ -54,7 +54,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(1, star1.col)
 
     def testParseIrkigkhanRUCollapse(self):
-        sector = Sector(' Core', ' 0, 0')
+        sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
             sector, 'fixed', 'fixed')
@@ -65,7 +65,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def testParseIrkigkhanRUScaled(self):
-        sector = Sector(' Core', ' 0, 0')
+        sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
             sector, 'fixed', 'fixed')
@@ -76,7 +76,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def testParseShanaMa(self):
-        sector = Sector(' Core', ' 0, 0')
+        sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
             sector, 'fixed', 'fixed')
@@ -105,7 +105,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(1, star1.col)
 
     def testParseSyss(self):
-        sector = Sector(' Core', ' 0, 0')
+        sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
             "2323 Syss                 C400746-8 Na Va Pi                   { -1 } (A67-2) [6647] BD   S  - 510 5  ImDv M9 III D M5 V",
             sector, 'fixed', 'fixed')
@@ -125,7 +125,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(23, star1.col)
 
     def testParseZhdant(self):
-        sector = Sector(' Zhdant', ' -7, 2')
+        sector = Sector('# Zhdant', '# -7, 2')
         star1 = Star.parse_line_into_star(
             "2719 Zhdant               A6547C8-F Ag An Cx                            - KM - 811   Zh K0 V                        ",
             sector, 'fixed', 'fixed')
@@ -139,7 +139,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(27, star1.col)
 
     def testParseVlazzhden(self):
-        sector = Sector(' Zhdant', ' -7, 2')
+        sector = Sector('# Zhdant', '# -7, 2')
         star1 = Star.parse_line_into_star(
             "2720 Vlazzhden            C210143-8 Lo Ni                               - -  - 303   Zh G1 IV                       ",
             sector, 'fixed', 'fixed')
@@ -153,7 +153,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(27, star1.col)
 
     def testParseTlapinsh(self):
-        sector = Sector(' Zhdant', ' -7, 2')
+        sector = Sector('# Zhdant', '# -7, 2')
         star1 = Star.parse_line_into_star(
             "2819 Tlapinsh             B569854-C Ri                                  - -  - 622   Zh F7 V                        ",
             sector, 'fixed', 'fixed')
@@ -167,7 +167,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(28, star1.col)
 
     def testParseEzevrtlad(self):
-        sector = Sector(' Zhdant', ' -7, 2')
+        sector = Sector('# Zhdant', '# -7, 2')
         star1 = Star.parse_line_into_star(
             "2820 Ezevrtlad            C120000-B De Ba Po                            - -  - 900   Zh K2 III                      ",
             sector, 'fixed', 'fixed')
@@ -181,7 +181,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(28, star1.col)
 
     def testParseUnchin(self):
-        sector = Sector(' Zarushagar', ' -1, -1')
+        sector = Sector('# Zarushagar', '# -1, -1')
         line = '0522 Unchin               A437743-E                            { 2 }  (B6D-1) [492B] B     N  - 620 9  ImDi K0 III                                                       '
         star1 = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
         self.assertIsInstance(star1, Star)
@@ -254,7 +254,7 @@ class TestStar(unittest.TestCase):
     def testHashValueSameAfterCaching(self):
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V  ",
-            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+            Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
 
         # Grabbing hash value twice, once to seed Star._hash, second to dig it out of that cache
         oldHash = star1.__hash__()
@@ -264,13 +264,13 @@ class TestStar(unittest.TestCase):
     def testEquals(self):
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+            Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
         star2 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+            Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
         star3 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+            Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
 
         self.assertEqual(star1, star2)
         self.assertNotEqual(star1, star3)
@@ -280,13 +280,13 @@ class TestStar(unittest.TestCase):
     def testStarSize(self):
         star1 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+            Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
 
     def test_deep_copy(self):
         alg = Allegiance("am", "name")
         star1 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+            Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
         star1.index = 11
         star1.allegiance_base = alg
         star1.is_well_formed()
@@ -315,7 +315,7 @@ class TestStar(unittest.TestCase):
 
                 star1 = Star.parse_line_into_star(
                     "0104 Shana Ma             E551112-"+letter+" Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-                    Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                    Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
 
                 self.assertEqual(target, star1.tl, "Unexpected mapping for TL " + letter)
 
@@ -335,16 +335,16 @@ class TestStar(unittest.TestCase):
 
                 star1 = Star.parse_line_into_star(
                     "0104 Shana Ma             E551112-"+letter+" Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-                    Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                    Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
 
                 self.assertEqual(target, star1.tl, "Unexpected mapping for TL " + letter)
 
     def testCompareHexDistanceToAxialDistance(self):
         star1 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
-            Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+            Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
 
-        sector = Sector(' Zhdant', ' -7, 2')
+        sector = Sector('# Zhdant', '# -7, 2')
         star2 = Star.parse_line_into_star(
             "2720 Vlazzhden            C210143-8 Lo Ni                               - -  - 303   Zh G1 IV                       ",
             sector, 'fixed', 'fixed')
@@ -409,14 +409,14 @@ class TestStar(unittest.TestCase):
         ]
         for line in line_list:
             with self.subTest():
-                star1 = Star.parse_line_into_star(line, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                star1 = Star.parse_line_into_star(line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
                 star1.index = 0
                 star1.allegiance_base = star1.alg_code
                 star1.is_well_formed()
 
                 mid_line = star1.parse_to_line()
                 # Not comparing mid_line to original because trade codes are re-ordered
-                star2 = Star.parse_line_into_star(mid_line, Sector(' Core', ' 0, 0'), 'fixed', 'fixed')
+                star2 = Star.parse_line_into_star(mid_line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
                 self.assertEqual(star1, star2, "Regenerated star does not equal original star")
                 nu_line = star2.parse_to_line()
                 self.assertEqual(mid_line, nu_line, "Regenerated star line does not match round-trip star line")
