@@ -197,6 +197,8 @@ class Subsector(AreaItem):
 
 
 class Sector(AreaItem):
+    position_match = re.compile(r"([-+ ]?\d{1,4})\s*[,]\s*([-+ ]?\d{1,4})")
+
     def __init__(self, name, position):
         name = name.rstrip()
         if 3 > len(name):
@@ -214,22 +216,13 @@ class Sector(AreaItem):
         # So strip the comment marker, then strip spaces.
         super(Sector, self).__init__(name[1:].strip())
 
-        # Same here, the position has a leading comment marker
-        position = position[1:].replace(' ', '')
-        pos_bits = position.split(',')
-
-        if 2 != len(pos_bits):
+        # Same here, the position has a leading comment marker.  Strip that, and then any flanking whitespace.
+        position = position[1:].strip().replace(' ', '')
+        positions = Sector.position_match.match(position)
+        if not positions:
             raise ValueError("Position string malformed")
 
-        if 0 == len(pos_bits[0]) or 0 == len(pos_bits[1]):
-            raise ValueError("Position string malformed")
-
-        # spin thru pos_bits strings
-        if self._is_position_element_bad(pos_bits[0]):
-            raise ValueError("Position string malformed")
-
-        if self._is_position_element_bad(pos_bits[1]):
-            raise ValueError("Position string malformed")
+        pos_bits = positions.groups()
 
         self._wiki_name = '[[{0} Sector|{0}]]'.format(self.sector_name())
 
@@ -243,18 +236,6 @@ class Sector(AreaItem):
         self.trailing = None
         self.coreward = None
         self.rimward = None
-
-    def _is_position_element_bad(self, pos_bit):
-        if 1 == len(pos_bit):
-            if not pos_bit.isdigit():
-                return True,
-            else:
-                return False
-        if not pos_bit[1:].isdigit():  # if trailing chars aren't digits, bail out - pos_bit is bad
-            return True
-        if pos_bit[0] in '+-' or pos_bit[0].isdigit():  # first char has to be either digit or positive/negative sign
-            return False
-        return True
 
     # For the JSONPickel work
     def __getstate__(self):

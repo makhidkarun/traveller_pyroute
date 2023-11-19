@@ -27,11 +27,11 @@ def sector_name(draw):
 
 @composite
 def two_sectors(draw):
-    sx = draw(integers())
-    sy = draw(integers())
+    sx = draw(integers(min_value=-9999, max_value=9999))
+    sy = draw(integers(min_value=-9999, max_value=9999))
 
-    tx = draw(integers())
-    ty = draw(integers())
+    tx = draw(integers(min_value=-9999, max_value=9999))
+    ty = draw(integers(min_value=-9999, max_value=9999))
     manhattan = abs(sx - tx) + abs(sy - ty)
     assume(manhattan > 1)
 
@@ -92,7 +92,7 @@ class testSector(unittest.TestCase):
         self.assertIsNotNone(to_string)
 
     @given(two_sectors())
-    @example({'sx': -23106, 'sy': 117, 'tx': 107, 'ty': 30507, 'direction': 1})
+    @example({'sx': -2316, 'sy': 117, 'tx': 107, 'ty': 3057, 'direction': 1})
     def test_non_adjacent_sectors_hooked_together_are_not_ok(self, payload):
         source_pos = '# ' + str(payload['sx']) + ", " + str(payload['sy'])
         target_pos = '# ' + str(payload['tx']) + ", " + str(payload['ty'])
@@ -105,7 +105,6 @@ class testSector(unittest.TestCase):
         self.assertTrue(result)
         result, msg = target.is_well_formed()
         self.assertTrue(result)
-
 
         direct = payload['direction']
         if 0 == direct:
@@ -126,6 +125,16 @@ class testSector(unittest.TestCase):
         result, msg = target.is_well_formed()
         self.assertFalse(result)
 
+    def testSectorPositionRegressions(self):
+        cases = [
+            ('Zarushagar', '# Zarushagar', '# -1,-1')
+        ]
+
+        for msg, name, position in cases:
+            with self.subTest(msg):
+                sector = Sector(name, position)
+                result, msg = sector.is_well_formed()
+                self.assertTrue(result)
 
 if __name__ == '__main__':
     unittest.main()
