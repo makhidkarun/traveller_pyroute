@@ -49,7 +49,7 @@ def intrasector_process(working_queue, processed_queue):
                     continue
 
                 try:
-                    rawroute, diag = astar_path_indexes(tradeCalculation.galaxy.stars, star.index, neighbor.index,
+                    rawroute, _ = astar_path_indexes(tradeCalculation.galaxy.stars, star.index, neighbor.index,
                                                         tradeCalculation.galaxy.heuristic_distance_indexes)
                 except nx.NetworkXNoPath:
                     continue
@@ -82,7 +82,7 @@ def long_route_process(working_queue, processed_queue):
             break
 
         try:
-            route, diag = astar_path_indexes(tradeCalculation.galaxy.stars, star, neighbor,
+            route, _ = astar_path_indexes(tradeCalculation.galaxy.stars, star, neighbor,
                                              tradeCalculation.galaxy.heuristic_distance_indexes)
         except nx.NetworkXNoPath:
             continue
@@ -153,7 +153,7 @@ class TradeMPCalculation(TradeCalculation):
 
     # This is the multiprocess method, which contains all the logic for using multi-process in the parent (core) process
     # When this is completed, all the child process should be completed.
-    def start_mp_services (self):
+    def start_mp_services(self):
         global tradeCalculation
         tradeCalculation = self
 
@@ -281,7 +281,7 @@ class TradeMPCalculation(TradeCalculation):
             f"This route from {star} to {target} has already been processed in reverse"
 
         try:
-            rawroute, diag = astar_path_indexes(self.galaxy.stars, star.index, target.index, self.galaxy.heuristic_distance_indexes)
+            rawroute, _ = astar_path_indexes(self.galaxy.stars, star.index, target.index, self.galaxy.heuristic_distance_indexes)
         except nx.NetworkXNoPath:
             return
 

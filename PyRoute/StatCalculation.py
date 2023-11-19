@@ -228,7 +228,6 @@ class StatCalculation(object):
         self.max_tl(algStats, star)
 
     def add_pop_to_sophont(self, stats, star):
-
         total_pct = 100
         default_soph = 'Huma'
         home = None
@@ -236,11 +235,15 @@ class StatCalculation(object):
             soph_code = sophont[0:4]
             soph_pct = sophont[4:]
 
+            if 4 == len(sophont):
+                soph_code = sophont[0:3]
+                soph_pct = sophont[3:]
+
             if soph_pct == 'A':
                 default_soph = soph_code
                 continue
 
-            soph_pct = 100.0 if soph_pct == 'W' else 0.0 if soph_pct in ['X', 'A'] else \
+            soph_pct = 100.0 if soph_pct == 'W' else 0.0 if soph_pct in ['X', 'A', '?'] else \
                 5.0 if soph_pct == '0' else 10.0 * int(soph_pct)
 
             if any([soph for soph in star.tradeCode.homeworld if soph.startswith(soph_code)]):

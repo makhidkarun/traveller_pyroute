@@ -212,3 +212,21 @@ class RouteCalculation(object):
         @return: Whether the star can be unilaterally filtered
         """
         return False
+
+    def is_sector_trade_balanced(self):
+        pass
+
+    def is_sector_pass_balanced(self):
+        pass
+
+    def is_allegiance_trade_balanced(self):
+        pass
+
+    def is_allegiance_pass_balanced(self):
+        pass
+
+    def multilateral_balance_trade(self):
+        pass
+
+    def multilateral_balance_pass(self):
+        pass

@@ -67,8 +67,7 @@ class WikiStats(object):
         if self.json_data:
             self.write_json()
 
-
-    def output_template (self, template, filename, parameters):
+    def output_template(self, template, filename, parameters):
         template = self.env.get_template(template)
         path = os.path.join(self.galaxy.output_path, filename)
         with open(path, 'w+', encoding='utf-8') as f:

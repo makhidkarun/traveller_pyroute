@@ -13,6 +13,7 @@ import sys
 from PyRoute.Position.Hex import Hex
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Galaxy import Allegiance
+from PyRoute.StatCalculation import StatCalculation
 
 sys.path.append('../PyRoute')
 from PyRoute.Star import Star
@@ -419,6 +420,26 @@ class TestStar(unittest.TestCase):
                 self.assertEqual(star1, star2, "Regenerated star does not equal original star")
                 nu_line = star2.parse_to_line()
                 self.assertEqual(mid_line, nu_line, "Regenerated star line does not match round-trip star line")
+
+    def testShortSophontCodeIntoStatsCalculation(self):
+        line = '2926                      B8B2613-C He Fl Ni HakW Pz             {  1 } (735+3) [458B] - M  A 514 16 HvFd G4 V M1 V     '
+        sector = Sector('# Phlask', '# 3,-3')
+
+        star = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
+        star.index = 0
+        star.allegiance_base = star.alg_code
+        self.assertEqual(5, star.population, "Expected star population")
+        result, msg = star.tradeCode.is_well_formed()
+        self.assertTrue(result, msg)
+        galaxy = Galaxy(0)
+        stat_calc = StatCalculation(galaxy)
+
+        stat_calc.add_pop_to_sophont(galaxy.stats, star)
+        stats = galaxy.stats
+        self.assertTrue('Hak' in stats.populations)
+        self.assertTrue('Huma' in stats.populations)
+        self.assertEqual(5, stats.populations['Hak'].population)
+        self.assertEqual(0, stats.populations['Huma'].population)
 
 
 if __name__ == "__main__":

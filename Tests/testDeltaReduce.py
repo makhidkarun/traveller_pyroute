@@ -317,7 +317,7 @@ class testDeltaReduce(baseTest):
         delta[sector.name] = sector
 
         reducer = DeltaReduce(delta, args)
-        reducer.is_initial_state_uninteresting()
+        reducer.is_initial_state_uninteresting(reraise=True)
 
     def test_population_balance_over_two_sectors(self):
         args = self._make_args_no_line()
@@ -334,7 +334,7 @@ class testDeltaReduce(baseTest):
         self.assertEqual(2, len(delta), "Should only be two sectors in dictionary")
 
         reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
-        reducer.is_initial_state_uninteresting()
+        reducer.is_initial_state_uninteresting(reraise=True)
 
     def test_pax_and_trade_balance_over_reft_sector(self):
         args = self._make_args_no_line()
@@ -345,7 +345,7 @@ class testDeltaReduce(baseTest):
         delta[sector.name] = sector
 
         reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
-        reducer.is_initial_state_uninteresting()
+        reducer.is_initial_state_uninteresting(reraise=True)
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
