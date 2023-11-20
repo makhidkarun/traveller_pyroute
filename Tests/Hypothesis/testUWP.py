@@ -41,6 +41,38 @@ class testUWP(unittest.TestCase):
         self.assertEqual(uwp_line[6].upper(), uwp.law, hyp_input)
         self.assertEqual(uwp_line[8].upper(), uwp.tl, hyp_input)
 
+    """
+    Given an otherwise valid input string that needs canonicalisation, verify that canonicalisation does what it says
+    on the tin, and that canonicalisation is itself idempotent
+    """
+    @given(from_regex(UWP.match))
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
+    @example('?010000-0')
+    def test_check_canonicalisation_and_verify_canonicalisation(self, uwp_line):
+        uwp = UWP(uwp_line)
+        old_rep = str(uwp)
+        hyp_input = 'Hypothesis input: ' + uwp_line
+
+        result, msg = uwp.check_canonical()
+        assume(not result)  # ONLY care about UWP lines that _need_ canonicalisation - if they're (by chance) canonical, move on
+
+        uwp.canonicalise()
+        mid_rep = str(uwp)
+        result, msg = uwp.check_canonical()
+        badline = '' if result else msg[0]
+        badline += '\n  ' + hyp_input
+        self.assertTrue(result, 'Canonicalisation failed.  ' + badline)
+        self.assertNotEqual(old_rep, mid_rep, "String rep unchanged despite requiring and receiving canonicalisation.")
+
+        # verify canonicalisation is idempotent
+        uwp.canonicalise()
+        new_rep = str(uwp)
+        result, msg = uwp.check_canonical()
+        badline = '' if result else msg[0]
+        badline += '\n  ' + hyp_input
+        self.assertTrue(result, 'Re-canonicalisation failed.  ' + badline)
+        self.assertEqual(mid_rep, new_rep, "Canonicalisation not idempotent.  " + badline)
+
 
 if __name__ == '__main__':
     unittest.main()

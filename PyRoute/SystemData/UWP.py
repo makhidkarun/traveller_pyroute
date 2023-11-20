@@ -32,6 +32,9 @@ class UWP(object):
     def __str__(self):
         return self.line
 
+    def _regenerate_line(self):
+        self.line = str(self.port) + str(self.size) + str(self.atmo) + str(self.hydro) + str(self.pop) + str(self.gov) + str(self.law) + '-' + str(self.tl)
+
     def is_well_formed(self):
         msg = ""
         rep = str(self)
@@ -43,3 +46,18 @@ class UWP(object):
             return False, msg
 
         return True, msg
+
+    def check_canonical(self):
+        msg = []
+
+        if '0' == str(self.size) and '0' != str(self.atmo):
+            line = "Size 0 implies atmo 0 - have " + str(self.atmo)
+            msg.append(line)
+
+        return 0 == len(msg), msg
+
+    def canonicalise(self):
+        if '0' == str(self.size) and '0' != str(self.atmo):
+            self.atmo = '0'
+
+        self._regenerate_line()
