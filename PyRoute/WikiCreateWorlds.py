@@ -224,7 +224,7 @@ No information yet available.
             classification += ' / ' + ' '.join(star.tradeCode.xcode)
 
         formatting = {'sector': star.sector.name, 'subsector': subsector, 'pos': star.position,
-                      'uwp': star.uwp, 'popc': star.uwpCodes['Pop Code'], 'zone': star.zone,
+                      'uwp': str(star.uwp), 'popc': star.uwpCodes['Pop Code'], 'zone': star.zone,
                       'alg': star.alg, 'pcode': pcode, 'nobility': str(star.nobles),
                       'bases': star.baseCode, 'stars': star.stars, 'belt': str(star.belts), 'worlds': star.worlds,
                       'ggcount': str(star.ggCount), 'trade': trade, 'class': classification,
