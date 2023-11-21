@@ -30,15 +30,15 @@ class UWP(object):
         matches = UWP.match.match(uwp_line)
         if not matches:
             raise ValueError('Input UWP malformed')
-        self.line = str(matches[0]).upper()
-        self.port = self.line[0]
-        self.size = self.line[1]
-        self.atmo = self.line[2]
-        self.hydro = self.line[3]
-        self.pop = self.line[4]
-        self.gov = self.line[5]
-        self.law = self.line[6]
-        self.tl = self.line[8]
+        line = str(matches[0]).upper()
+        self.port = line[0]
+        self.size = line[1]
+        self.atmo = line[2]
+        self.hydro = line[3]
+        self.pop = line[4]
+        self.gov = line[5]
+        self.law = line[6]
+        self.tl = line[8]
         self._size_code = self._ehex_to_int(self.size)
         self._atmo_code = self._ehex_to_int(self.atmo)
         self._hydro_code = self._ehex_to_int(self.hydro)
@@ -53,8 +53,11 @@ class UWP(object):
     def __repr__(self):
         return self.line
 
+    @property
+    def line(self):
+        return str(self.port) + str(self.size) + str(self.atmo) + str(self.hydro) + str(self.pop) + str(self.gov) + str(self.law) + '-' + str(self.tl)
+
     def _regenerate_line(self):
-        self.line = str(self.port) + str(self.size) + str(self.atmo) + str(self.hydro) + str(self.pop) + str(self.gov) + str(self.law) + '-' + str(self.tl)
         self._size_code = self._ehex_to_int(str(self.size))
         self._atmo_code = self._ehex_to_int(str(self.atmo))
         self._hydro_code = self._ehex_to_int(str(self.hydro))
