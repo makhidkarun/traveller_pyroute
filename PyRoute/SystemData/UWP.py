@@ -50,6 +50,9 @@ class UWP(object):
     def __str__(self):
         return self.line
 
+    def __repr__(self):
+        return self.line
+
     def _regenerate_line(self):
         self.line = str(self.port) + str(self.size) + str(self.atmo) + str(self.hydro) + str(self.pop) + str(self.gov) + str(self.law) + '-' + str(self.tl)
         self._size_code = self._ehex_to_int(str(self.size))
