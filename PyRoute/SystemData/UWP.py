@@ -75,8 +75,7 @@ class UWP(object):
             line = 'UWP Calculated hydro "{}" does not match generated hydro {}'.format(str(self.hydro), 0)
             msg.append(line)
         if not size_is_zero and '?' != self.atmo:
-            min_atmo = max(0, self._size_code - UWP.flux)
-            max_atmo = min(UWP.atmo_limit, self._size_code + UWP.flux)
+            max_atmo, min_atmo = self._get_atmo_bounds()
             if not min_atmo <= self._atmo_code <= max_atmo:
                 line = 'UWP Calculated atmo "{}" not in expected range {}-{}'.format(self.atmo, min_atmo, max_atmo)
                 msg.append(line)
@@ -85,13 +84,22 @@ class UWP(object):
                 line = 'UWP Calculated hydro "{}" does not match generated hydro {}'.format(str(self.hydro), 0)
                 msg.append(line)
         elif not size_is_zero and '?' != self.atmo and '?' != self.hydro:
-            min_hydro = max(0, self._atmo_code - UWP.flux)
-            max_hydro = min(UWP.hydro_limit, self._atmo_code + UWP.flux)
+            max_hydro, min_hydro = self._get_hydro_bounds()
             if not min_hydro <= self._hydro_code <= max_hydro:
                 line = 'UWP Calculated hydro "{}" not in expected range {}-{}'.format(self.hydro, min_hydro, max_hydro)
                 msg.append(line)
 
         return 0 == len(msg), msg
+
+    def _get_hydro_bounds(self):
+        min_hydro = max(0, self._atmo_code - UWP.flux)
+        max_hydro = min(UWP.hydro_limit, self._atmo_code + UWP.flux)
+        return max_hydro, min_hydro
+
+    def _get_atmo_bounds(self):
+        min_atmo = max(0, self._size_code - UWP.flux)
+        max_atmo = min(UWP.atmo_limit, self._size_code + UWP.flux)
+        return max_atmo, min_atmo
 
     def canonicalise(self):
         size_is_zero = self.size_is_zero
@@ -100,8 +108,7 @@ class UWP(object):
         if '0' == str(self.size) and '0' != str(self.hydro):
             self.hydro = '0'
         if not size_is_zero and '?' != self.atmo:
-            min_atmo = max(0, self._size_code - UWP.flux)
-            max_atmo = min(UWP.atmo_limit, self._size_code + UWP.flux)
+            max_atmo, min_atmo = self._get_atmo_bounds()
             if self._atmo_code < min_atmo:
                 self.atmo = self._int_to_ehex(min_atmo)
             elif self._atmo_code > max_atmo:
@@ -115,8 +122,7 @@ class UWP(object):
                 self.hydro = '0'
 
         elif not size_is_zero and '?' != self.atmo and '?' != self.hydro:
-            min_hydro = max(0, self._atmo_code - UWP.flux)
-            max_hydro = min(UWP.hydro_limit, self._atmo_code + UWP.flux)
+            max_hydro, min_hydro = self._get_hydro_bounds()
             if self._hydro_code < min_hydro:
                 self.hydro = self._int_to_ehex(min_hydro)
             elif self._hydro_code > max_hydro:
