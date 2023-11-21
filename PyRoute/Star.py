@@ -262,7 +262,6 @@ class Star(object):
                          'Population': star.pop,
                          'Government': star.gov,
                          'Law Level': star.law,
-                         #'Tech Level': star.uwp[8],
                          'Tech Level': star.tl,
                          'Pop Code': str(star.popM),
                          'Starport Size': star.starportSize,
