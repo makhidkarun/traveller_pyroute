@@ -8,6 +8,8 @@ rather than the multiple concerns the Star class has evolved to embody.
 """
 import re
 
+from PyRoute.SystemData.Utilities import Utilities
+
 
 class UWP(object):
     # Port code, size, atmo, hydro, pop, gov, law, the all-important hyphen, then TL
@@ -28,12 +30,18 @@ class UWP(object):
         self.gov = self.line[5]
         self.law = self.line[6]
         self.tl = self.line[8]
+        self._size_code = self._ehex_to_int(self.size)
+        self._atmo_code = self._ehex_to_int(self.atmo)
+        self._hydro_code = self._ehex_to_int(self.hydro)
 
     def __str__(self):
         return self.line
 
     def _regenerate_line(self):
         self.line = str(self.port) + str(self.size) + str(self.atmo) + str(self.hydro) + str(self.pop) + str(self.gov) + str(self.law) + '-' + str(self.tl)
+        self._size_code = self._ehex_to_int(self.size)
+        self._atmo_code = self._ehex_to_int(self.atmo)
+        self._hydro_code = self._ehex_to_int(self.hydro)
 
     def is_well_formed(self):
         msg = ""
@@ -49,9 +57,16 @@ class UWP(object):
 
     def check_canonical(self):
         msg = []
+        size_is_zero = '?' != self.size and 0 == self._size_code
 
-        if '0' == str(self.size) and '0' != str(self.atmo):
-            line = "Size 0 implies atmo 0 - have " + str(self.atmo)
+        if size_is_zero and 0 != self._atmo_code:
+            line = 'UWP Calculated atmo "{}" does not match generated atmo {}'.format(str(self.atmo), 0)
+            msg.append(line)
+        if size_is_zero and 0 != self._hydro_code:
+            line = 'UWP Calculated hydro "{}" does not match generated hydro {}'.format(str(self.hydro), 0)
+            msg.append(line)
+        if 1 == self._size_code and 0 != self._hydro_code:
+            line = 'UWP Calculated hydro "{}" does not match generated hydro {}'.format(str(self.hydro), 0)
             msg.append(line)
 
         return 0 == len(msg), msg
@@ -59,5 +74,15 @@ class UWP(object):
     def canonicalise(self):
         if '0' == str(self.size) and '0' != str(self.atmo):
             self.atmo = '0'
+        if '0' == str(self.size) and '0' != str(self.hydro):
+            self.hydro = '0'
+        if '1' == str(self.size) and '0' != str(self.hydro):
+            self.hydro = '0'
 
         self._regenerate_line()
+
+    def _ehex_to_int(self, value):
+        return Utilities.ehex_to_int(value)
+
+    def _int_to_ehex(self, value):
+        return Utilities.int_to_ehex(value)

@@ -48,6 +48,9 @@ class testUWP(unittest.TestCase):
     @given(from_regex(UWP.match))
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
     @example('?010000-0')
+    @example('?001000-0')
+    @example('?101000-0')
+    @example('??01000-0')
     def test_check_canonicalisation_and_verify_canonicalisation(self, uwp_line):
         uwp = UWP(uwp_line)
         old_rep = str(uwp)
