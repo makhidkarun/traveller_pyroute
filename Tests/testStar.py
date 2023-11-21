@@ -399,7 +399,7 @@ class TestStar(unittest.TestCase):
                 act_int = star._ehex_to_int(str(ehex))
                 self.assertEqual(intvalue, act_int, "Ehex-to-int mapping failed for TL " + str(ehex))
                 act_ehex = star._int_to_ehex(act_int)
-                self.assertEqual(ehex, act_ehex, "Int-to-ehex mapping failed for TL " + str(ehex))
+                self.assertEqual(str(ehex), act_ehex, "Int-to-ehex mapping failed for TL " + str(ehex))
 
     def test_parse_to_line(self):
         line_list = [
