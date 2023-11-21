@@ -80,9 +80,16 @@ class UWP(object):
             if not min_atmo <= self._atmo_code <= max_atmo:
                 line = 'UWP Calculated atmo "{}" not in expected range {}-{}'.format(self.atmo, min_atmo, max_atmo)
                 msg.append(line)
-        if 1 == self._size_code and 0 != self._hydro_code:
-            line = 'UWP Calculated hydro "{}" does not match generated hydro {}'.format(str(self.hydro), 0)
-            msg.append(line)
+        if 1 == self._size_code:
+            if 0 != self._hydro_code:
+                line = 'UWP Calculated hydro "{}" does not match generated hydro {}'.format(str(self.hydro), 0)
+                msg.append(line)
+        elif not size_is_zero and '?' != self.atmo and '?' != self.hydro:
+            min_hydro = max(0, self._atmo_code - UWP.flux)
+            max_hydro = min(UWP.hydro_limit, self._atmo_code + UWP.flux)
+            if not min_hydro <= self._hydro_code <= max_hydro:
+                line = 'UWP Calculated hydro "{}" not in expected range {}-{}'.format(self.hydro, min_hydro, max_hydro)
+                msg.append(line)
 
         return 0 == len(msg), msg
 
@@ -100,8 +107,20 @@ class UWP(object):
             elif self._atmo_code > max_atmo:
                 self.atmo = self._int_to_ehex(max_atmo)
 
-        if '1' == str(self.size) and '0' != str(self.hydro):
-            self.hydro = '0'
+        self._regenerate_line()
+
+        # Handle short-circuit values first, then (if needed) drop to the general case
+        if '1' == str(self.size):
+            if '0' != str(self.hydro):
+                self.hydro = '0'
+
+        elif not size_is_zero and '?' != self.atmo and '?' != self.hydro:
+            min_hydro = max(0, self._atmo_code - UWP.flux)
+            max_hydro = min(UWP.hydro_limit, self._atmo_code + UWP.flux)
+            if self._hydro_code < min_hydro:
+                self.hydro = self._int_to_ehex(min_hydro)
+            elif self._hydro_code > max_hydro:
+                self.hydro = self._int_to_ehex(max_hydro)
 
         self._regenerate_line()
 
