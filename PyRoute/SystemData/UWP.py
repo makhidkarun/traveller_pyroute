@@ -310,10 +310,8 @@ class UWP(object):
             self.hydro = '0'
         if not size_is_zero and '?' != self.atmo:
             max_atmo, min_atmo = self._get_atmo_bounds()
-            if self.atmo_code < min_atmo:
-                self.atmo = self._int_to_ehex(min_atmo)
-            elif self.atmo_code > max_atmo:
-                self.atmo = self._int_to_ehex(max_atmo)
+            self.atmo_code = max(min_atmo, min(max_atmo, self.atmo_code))
+
         # Handle short-circuit values first, then (if needed) drop to the general case
         if '1' == str(self.size):
             if '0' != str(self.hydro):
@@ -321,35 +319,23 @@ class UWP(object):
 
         elif not size_is_zero and '?' != self.atmo and '?' != self.hydro:
             max_hydro, min_hydro = self._get_hydro_bounds()
-            if self.hydro_code < min_hydro:
-                self.hydro = self._int_to_ehex(min_hydro)
-            elif self.hydro_code > max_hydro:
-                self.hydro = self._int_to_ehex(max_hydro)
+            self.hydro_code = max(min_hydro, min(max_hydro, self.hydro_code))
 
     def _canonicalise_socials(self):
         if 'X' == self.gov:
             pass
         elif '?' != self.pop and '?' != self.gov:
             max_gov, min_gov = self._get_gov_bounds()
-            if self.gov_code < min_gov:
-                self.gov = self._int_to_ehex(min_gov)
-            elif self.gov_code > max_gov:
-                self.gov = self._int_to_ehex(max_gov)
+            self.gov_code = max(min_gov, min(max_gov, self.gov_code))
 
         if '?' != self.pop and '?' != self.law:
             max_law, min_law = self._get_law_bounds()
-            if self.law_code < min_law:
-                self.law = self._int_to_ehex(min_law)
-            elif self.law_code > max_law:
-                self.law = self._int_to_ehex(max_law)
+            self.law_code = max(min_law, min(max_law, self.law_code))
 
     def _canonicalise_tl(self):
         if '?' != self.tl:
             max_tl, min_tl = self._get_tl_bounds()
-            if self.tl_code < min_tl:
-                self.tl = self._int_to_ehex(min_tl)
-            elif self.tl_code > max_tl:
-                self.tl = self._int_to_ehex(max_tl)
+            self.tl_code = max(min_tl, min(max_tl, self.tl_code))
 
     def _ehex_to_int(self, value):
         return Utilities.ehex_to_int(value)
