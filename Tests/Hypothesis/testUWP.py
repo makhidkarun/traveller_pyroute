@@ -51,6 +51,7 @@ class testUWP(unittest.TestCase):
     @example('?001000-0')
     @example('?101000-0')
     @example('??01000-0')
+    @example('?600000-0')
     def test_check_canonicalisation_and_verify_canonicalisation(self, uwp_line):
         uwp = UWP(uwp_line)
         old_rep = str(uwp)

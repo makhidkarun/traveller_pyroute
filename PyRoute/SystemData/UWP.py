@@ -39,9 +39,9 @@ class UWP(object):
 
     def _regenerate_line(self):
         self.line = str(self.port) + str(self.size) + str(self.atmo) + str(self.hydro) + str(self.pop) + str(self.gov) + str(self.law) + '-' + str(self.tl)
-        self._size_code = self._ehex_to_int(self.size)
-        self._atmo_code = self._ehex_to_int(self.atmo)
-        self._hydro_code = self._ehex_to_int(self.hydro)
+        self._size_code = self._ehex_to_int(str(self.size))
+        self._atmo_code = self._ehex_to_int(str(self.atmo))
+        self._hydro_code = self._ehex_to_int(str(self.hydro))
 
     def is_well_formed(self):
         msg = ""
@@ -57,6 +57,9 @@ class UWP(object):
 
     def check_canonical(self):
         msg = []
+        flux = 5
+        atmo_limit = 15
+        hydro_limit = 10
         size_is_zero = '?' != self.size and 0 == self._size_code
 
         if size_is_zero and 0 != self._atmo_code:
@@ -65,6 +68,12 @@ class UWP(object):
         if size_is_zero and 0 != self._hydro_code:
             line = 'UWP Calculated hydro "{}" does not match generated hydro {}'.format(str(self.hydro), 0)
             msg.append(line)
+        if not size_is_zero and '?' != self.atmo:
+            min_atmo = max(0, self._size_code - flux)
+            max_atmo = min(atmo_limit, self._size_code + flux)
+            if not min_atmo <= self._atmo_code <= max_atmo:
+                line = 'UWP Calculated atmo "{}" not in expected range {}-{}'.format(self.atmo, min_atmo, max_atmo)
+                msg.append(line)
         if 1 == self._size_code and 0 != self._hydro_code:
             line = 'UWP Calculated hydro "{}" does not match generated hydro {}'.format(str(self.hydro), 0)
             msg.append(line)
@@ -72,10 +81,23 @@ class UWP(object):
         return 0 == len(msg), msg
 
     def canonicalise(self):
+        flux = 5
+        atmo_limit = 15
+        hydro_limit = 10
+
+        size_is_zero = '?' != self.size and 0 == self._size_code
         if '0' == str(self.size) and '0' != str(self.atmo):
             self.atmo = '0'
         if '0' == str(self.size) and '0' != str(self.hydro):
             self.hydro = '0'
+        if not size_is_zero and '?' != self.atmo:
+            min_atmo = max(0, self._size_code - flux)
+            max_atmo = min(atmo_limit, self._size_code + flux)
+            if self._atmo_code < min_atmo:
+                self.atmo = self._int_to_ehex(min_atmo)
+            elif self._atmo_code > max_atmo:
+                self.atmo = self._int_to_ehex(max_atmo)
+
         if '1' == str(self.size) and '0' != str(self.hydro):
             self.hydro = '0'
 
