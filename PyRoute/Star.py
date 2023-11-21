@@ -800,6 +800,8 @@ class Star(object):
         assert self.hex is not None, "Star " + str(self.name) + " is missing hex attribute"
         assert hasattr(self, 'allegiance_base'), "Star " + str(self.name) + " is missing base allegiance attribute"
         assert self.allegiance_base is not None, "Star " + str(self.name) + " has empty base allegiance attribute"
+        result, msg = self.uwp.is_well_formed()
+        assert result, msg
         return True
 
     @property
