@@ -24,6 +24,7 @@ class UWP(object):
     hydro_atm_mod = -4
     gov_limit = 15
     law_limit = 18
+    tl_limit = 33
 
     def __init__(self, uwp_line):
         matches = UWP.match.match(uwp_line)
@@ -44,6 +45,7 @@ class UWP(object):
         self._pop_code = self._ehex_to_int(self.pop)
         self._gov_code = self._ehex_to_int(self.gov)
         self._law_code = self._ehex_to_int(self.law)
+        self._tl_code = self._ehex_to_int(self.tl)
 
     def __str__(self):
         return self.line
@@ -56,6 +58,7 @@ class UWP(object):
         self._pop_code = self._ehex_to_int(str(self.pop))
         self._gov_code = self._ehex_to_int(str(self.gov))
         self._law_code = self._ehex_to_int(str(self.law))
+        self._tl_code = self._ehex_to_int(str(self.tl))
 
     def is_well_formed(self):
         msg = ""
@@ -77,6 +80,7 @@ class UWP(object):
         msg = []
         self._check_canonical_physicals(msg)
         self._check_canonical_socials(msg)
+        self._check_canonical_tl(msg)
 
         return 0 == len(msg), msg
 
@@ -119,6 +123,13 @@ class UWP(object):
                 line = 'UWP Calculated law "{}" not in expected range {}-{}'.format(self.law, min_law, max_law)
                 msg.append(line)
 
+    def _check_canonical_tl(self, msg):
+        if '?' != self.tl:
+            max_tl, min_tl = self._get_tl_bounds()
+            if not min_tl <= self._tl_code <= max_tl:
+                line = 'UWP Calculated TL "{}" not in expected range {}-{}'.format(self.tl, min_tl, max_tl)
+                msg.append(line)
+
     def _get_hydro_bounds(self):
         # Mod is _already_ negative - it gets _added_ to the bounds!
         mod = UWP.hydro_atm_mod if 2 > self._atmo_code or 9 < self._atmo_code else 0
@@ -148,9 +159,38 @@ class UWP(object):
 
         return max_law, min_law
 
+    def _get_tl_bounds(self):
+        mod = 0
+        if self.gov in '01X':
+            mod += 1
+        elif 'D' == self.gov:
+            mod -= 1
+        if self.pop in '12345':
+            mod += 1
+        elif '9' == self.pop:
+            mod += 2
+        elif self.pop in 'ABCDEF':
+            mod += 4
+        if '9' == self.hydro:
+            mod += 1
+        elif 'A' == self.hydro:
+            mod += 2
+        if self.atmo in '0123ABCDEF':
+            mod += 1
+        if self.size in '01':
+            mod += 2
+        elif self.size in '234':
+            mod += 1
+
+        min_tl = max(mod + 1, 0)
+        max_tl = min(UWP.tl_limit, mod + 6)
+
+        return max_tl, min_tl
+
     def canonicalise(self):
         self._canonicalise_physicals()
         self._canonicalise_socials()
+        self._canonicalise_tl()
 
     def _canonicalise_physicals(self):
         size_is_zero = self.size_is_zero
@@ -196,6 +236,16 @@ class UWP(object):
                 self.law = self._int_to_ehex(min_law)
             elif self._law_code > max_law:
                 self.law = self._int_to_ehex(max_law)
+
+        self._regenerate_line()
+
+    def _canonicalise_tl(self):
+        if '?' != self.tl:
+            max_tl, min_tl = self._get_tl_bounds()
+            if self._tl_code < min_tl:
+                self.tl = self._int_to_ehex(min_tl)
+            elif self._tl_code > max_tl:
+                self.tl = self._int_to_ehex(max_tl)
 
         self._regenerate_line()
 
