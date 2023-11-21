@@ -389,7 +389,6 @@ class Star(object):
     @port.setter
     def port(self, value):
         self.uwp.port = str(value)
-        self.uwp._regenerate_line()
 
     @property
     def size(self):
@@ -426,7 +425,6 @@ class Star(object):
     @tl.setter
     def tl(self, value):
         self.uwp.tl = value
-        self.uwp._regenerate_line()
 
     def distance(self, star):
         hex1 = self.hex.hex_position()

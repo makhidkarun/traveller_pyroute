@@ -31,21 +31,14 @@ class UWP(object):
         if not matches:
             raise ValueError('Input UWP malformed')
         line = str(matches[0]).upper()
-        self.port = line[0]
-        self.size = line[1]
-        self.atmo = line[2]
-        self.hydro = line[3]
-        self.pop = line[4]
-        self.gov = line[5]
-        self.law = line[6]
-        self.tl = line[8]
-        self.size_code = self._ehex_to_int(self.size)
-        self.atmo_code = self._ehex_to_int(self.atmo)
-        self.hydro_code = self._ehex_to_int(self.hydro)
-        self.pop_code = self._ehex_to_int(self.pop)
-        self.gov_code = self._ehex_to_int(self.gov)
-        self.law_code = self._ehex_to_int(self.law)
-        self.tl_code = self._ehex_to_int(self.tl)
+        self._port = line[0]
+        self._size = line[1]
+        self._atmo = line[2]
+        self._hydro = line[3]
+        self._pop = line[4]
+        self._gov = line[5]
+        self._law = line[6]
+        self._tl = line[8]
 
     def __str__(self):
         return self.line
@@ -56,15 +49,6 @@ class UWP(object):
     @property
     def line(self):
         return str(self.port) + str(self.size) + str(self.atmo) + str(self.hydro) + str(self.pop) + str(self.gov) + str(self.law) + '-' + str(self.tl)
-
-    def _regenerate_line(self):
-        self.size_code = self._ehex_to_int(str(self.size))
-        self.atmo_code = self._ehex_to_int(str(self.atmo))
-        self.hydro_code = self._ehex_to_int(str(self.hydro))
-        self.pop_code = self._ehex_to_int(str(self.pop))
-        self.gov_code = self._ehex_to_int(str(self.gov))
-        self.law_code = self._ehex_to_int(str(self.law))
-        self.tl_code = self._ehex_to_int(str(self.tl))
 
     def is_well_formed(self):
         msg = ""
@@ -81,6 +65,126 @@ class UWP(object):
     @property
     def size_is_zero(self):
         return '?' != self.size and 0 == self.size_code
+
+    @property
+    def port(self):
+        return self._port
+
+    @port.setter
+    def port(self, value):
+        self._port = value
+
+    @property
+    def size(self):
+        return self._size
+
+    @size.setter
+    def size(self, value):
+        self._size = str(value)
+
+    @property
+    def size_code(self):
+        return self._ehex_to_int(self._size)
+
+    @size_code.setter
+    def size_code(self, value):
+        self._size = self._int_to_ehex(value)
+
+    @property
+    def atmo(self):
+        return self._atmo
+
+    @atmo.setter
+    def atmo(self, value):
+        self._atmo = str(value)
+
+    @property
+    def atmo_code(self):
+        return self._ehex_to_int(self._atmo)
+
+    @atmo_code.setter
+    def atmo_code(self, value):
+        self._atmo = self._int_to_ehex(value)
+
+    @property
+    def hydro(self):
+        return self._hydro
+
+    @hydro.setter
+    def hydro(self, value):
+        self._hydro = str(value)
+
+    @property
+    def hydro_code(self):
+        return self._ehex_to_int(self._hydro)
+
+    @hydro_code.setter
+    def hydro_code(self, value):
+        self._hydro = self._int_to_ehex(value)
+
+    @property
+    def pop(self):
+        return self._pop
+
+    @pop.setter
+    def pop(self, value):
+        self._pop = str(value)
+
+    @property
+    def pop_code(self):
+        return self._ehex_to_int(self._pop)
+
+    @pop_code.setter
+    def pop_code(self, value):
+        self._pop = self._int_to_ehex(value)
+
+    @property
+    def gov(self):
+        return self._gov
+
+    @gov.setter
+    def gov(self, value):
+        self._gov = str(value)
+
+    @property
+    def gov_code(self):
+        return self._ehex_to_int(self._gov)
+
+    @gov_code.setter
+    def gov_code(self, value):
+        self._gov = self._int_to_ehex(value)
+
+    @property
+    def law(self):
+        return self._law
+
+    @law.setter
+    def law(self, value):
+        self._law = str(value)
+
+    @property
+    def law_code(self):
+        return self._ehex_to_int(self._law)
+
+    @law_code.setter
+    def law_code(self, value):
+        self._law = self._int_to_ehex(value)
+
+    @property
+    def tl(self):
+        return self._tl
+
+    @tl.setter
+    def tl(self, value):
+        self._tl = str(value)
+
+    @property
+    def tl_code(self):
+        return self._ehex_to_int(self._tl)
+
+    @tl_code.setter
+    def tl_code(self, value):
+        self._tl = self._int_to_ehex(value)
 
     def check_canonical(self):
         msg = []
@@ -210,7 +314,6 @@ class UWP(object):
                 self.atmo = self._int_to_ehex(min_atmo)
             elif self.atmo_code > max_atmo:
                 self.atmo = self._int_to_ehex(max_atmo)
-        self._regenerate_line()
         # Handle short-circuit values first, then (if needed) drop to the general case
         if '1' == str(self.size):
             if '0' != str(self.hydro):
@@ -222,7 +325,6 @@ class UWP(object):
                 self.hydro = self._int_to_ehex(min_hydro)
             elif self.hydro_code > max_hydro:
                 self.hydro = self._int_to_ehex(max_hydro)
-        self._regenerate_line()
 
     def _canonicalise_socials(self):
         if 'X' == self.gov:
@@ -234,16 +336,12 @@ class UWP(object):
             elif self.gov_code > max_gov:
                 self.gov = self._int_to_ehex(max_gov)
 
-        self._regenerate_line()
-
         if '?' != self.pop and '?' != self.law:
             max_law, min_law = self._get_law_bounds()
             if self.law_code < min_law:
                 self.law = self._int_to_ehex(min_law)
             elif self.law_code > max_law:
                 self.law = self._int_to_ehex(max_law)
-
-        self._regenerate_line()
 
     def _canonicalise_tl(self):
         if '?' != self.tl:
@@ -252,8 +350,6 @@ class UWP(object):
                 self.tl = self._int_to_ehex(min_tl)
             elif self.tl_code > max_tl:
                 self.tl = self._int_to_ehex(max_tl)
-
-        self._regenerate_line()
 
     def _ehex_to_int(self, value):
         return Utilities.ehex_to_int(value)
