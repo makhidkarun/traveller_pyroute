@@ -417,11 +417,11 @@ class Star(object):
 
     @property
     def popCode(self):
-        return int(self.uwp._pop_code)
+        return int(self.uwp.pop_code)
 
     @property
     def tl(self):
-        return int(self.uwp._tl_code)
+        return int(self.uwp.tl_code)
 
     @tl.setter
     def tl(self, value):

@@ -39,13 +39,13 @@ class UWP(object):
         self.gov = line[5]
         self.law = line[6]
         self.tl = line[8]
-        self._size_code = self._ehex_to_int(self.size)
-        self._atmo_code = self._ehex_to_int(self.atmo)
-        self._hydro_code = self._ehex_to_int(self.hydro)
-        self._pop_code = self._ehex_to_int(self.pop)
-        self._gov_code = self._ehex_to_int(self.gov)
-        self._law_code = self._ehex_to_int(self.law)
-        self._tl_code = self._ehex_to_int(self.tl)
+        self.size_code = self._ehex_to_int(self.size)
+        self.atmo_code = self._ehex_to_int(self.atmo)
+        self.hydro_code = self._ehex_to_int(self.hydro)
+        self.pop_code = self._ehex_to_int(self.pop)
+        self.gov_code = self._ehex_to_int(self.gov)
+        self.law_code = self._ehex_to_int(self.law)
+        self.tl_code = self._ehex_to_int(self.tl)
 
     def __str__(self):
         return self.line
@@ -58,13 +58,13 @@ class UWP(object):
         return str(self.port) + str(self.size) + str(self.atmo) + str(self.hydro) + str(self.pop) + str(self.gov) + str(self.law) + '-' + str(self.tl)
 
     def _regenerate_line(self):
-        self._size_code = self._ehex_to_int(str(self.size))
-        self._atmo_code = self._ehex_to_int(str(self.atmo))
-        self._hydro_code = self._ehex_to_int(str(self.hydro))
-        self._pop_code = self._ehex_to_int(str(self.pop))
-        self._gov_code = self._ehex_to_int(str(self.gov))
-        self._law_code = self._ehex_to_int(str(self.law))
-        self._tl_code = self._ehex_to_int(str(self.tl))
+        self.size_code = self._ehex_to_int(str(self.size))
+        self.atmo_code = self._ehex_to_int(str(self.atmo))
+        self.hydro_code = self._ehex_to_int(str(self.hydro))
+        self.pop_code = self._ehex_to_int(str(self.pop))
+        self.gov_code = self._ehex_to_int(str(self.gov))
+        self.law_code = self._ehex_to_int(str(self.law))
+        self.tl_code = self._ehex_to_int(str(self.tl))
 
     def is_well_formed(self):
         msg = ""
@@ -80,7 +80,7 @@ class UWP(object):
 
     @property
     def size_is_zero(self):
-        return '?' != self.size and 0 == self._size_code
+        return '?' != self.size and 0 == self.size_code
 
     def check_canonical(self):
         msg = []
@@ -92,24 +92,24 @@ class UWP(object):
 
     def _check_canonical_physicals(self, msg):
         size_is_zero = self.size_is_zero
-        if size_is_zero and 0 != self._atmo_code:
+        if size_is_zero and 0 != self.atmo_code:
             line = 'UWP Calculated atmo "{}" does not match generated atmo {}'.format(str(self.atmo), 0)
             msg.append(line)
-        if size_is_zero and 0 != self._hydro_code:
+        if size_is_zero and 0 != self.hydro_code:
             line = 'UWP Calculated hydro "{}" does not match generated hydro {}'.format(str(self.hydro), 0)
             msg.append(line)
         if not size_is_zero and '?' != self.atmo:
             max_atmo, min_atmo = self._get_atmo_bounds()
-            if not min_atmo <= self._atmo_code <= max_atmo:
+            if not min_atmo <= self.atmo_code <= max_atmo:
                 line = 'UWP Calculated atmo "{}" not in expected range {}-{}'.format(self.atmo, min_atmo, max_atmo)
                 msg.append(line)
-        if 1 == self._size_code:
-            if 0 != self._hydro_code:
+        if 1 == self.size_code:
+            if 0 != self.hydro_code:
                 line = 'UWP Calculated hydro "{}" does not match generated hydro {}'.format(str(self.hydro), 0)
                 msg.append(line)
         elif not size_is_zero and '?' != self.atmo and '?' != self.hydro:
             max_hydro, min_hydro = self._get_hydro_bounds()
-            if not min_hydro <= self._hydro_code <= max_hydro:
+            if not min_hydro <= self.hydro_code <= max_hydro:
                 line = 'UWP Calculated hydro "{}" not in expected range {}-{}'.format(self.hydro, min_hydro, max_hydro)
                 msg.append(line)
 
@@ -119,49 +119,49 @@ class UWP(object):
             pass
         elif '?' != self.pop and '?' != self.gov:
             max_gov, min_gov = self._get_gov_bounds()
-            if not min_gov <= self._gov_code <= max_gov:
+            if not min_gov <= self.gov_code <= max_gov:
                 line = 'UWP Calculated gov "{}" not in expected range {}-{}'.format(self.gov, min_gov, max_gov)
                 msg.append(line)
 
         if '?' != self.pop and '?' != self.law:
             max_law, min_law = self._get_law_bounds()
-            if not min_law <= self._law_code <= max_law:
+            if not min_law <= self.law_code <= max_law:
                 line = 'UWP Calculated law "{}" not in expected range {}-{}'.format(self.law, min_law, max_law)
                 msg.append(line)
 
     def _check_canonical_tl(self, msg):
         if '?' != self.tl:
             max_tl, min_tl = self._get_tl_bounds()
-            if not min_tl <= self._tl_code <= max_tl:
+            if not min_tl <= self.tl_code <= max_tl:
                 line = 'UWP Calculated TL "{}" not in expected range {}-{}'.format(self.tl, min_tl, max_tl)
                 msg.append(line)
 
     def _get_hydro_bounds(self):
         # Mod is _already_ negative - it gets _added_ to the bounds!
-        mod = UWP.hydro_atm_mod if 2 > self._atmo_code or 9 < self._atmo_code else 0
-        min_hydro = max(0, self._atmo_code - UWP.flux + mod)
-        max_hydro = min(UWP.hydro_limit, self._atmo_code + UWP.flux + mod)
+        mod = UWP.hydro_atm_mod if 2 > self.atmo_code or 9 < self.atmo_code else 0
+        min_hydro = max(0, self.atmo_code - UWP.flux + mod)
+        max_hydro = min(UWP.hydro_limit, self.atmo_code + UWP.flux + mod)
         return max_hydro, min_hydro
 
     def _get_atmo_bounds(self):
-        min_atmo = max(0, self._size_code - UWP.flux)
-        max_atmo = min(UWP.atmo_limit, self._size_code + UWP.flux)
+        min_atmo = max(0, self.size_code - UWP.flux)
+        max_atmo = min(UWP.atmo_limit, self.size_code + UWP.flux)
         return max_atmo, min_atmo
 
     def _get_gov_bounds(self):
-        min_gov = max(0, self._pop_code - UWP.flux)
-        max_gov = min(UWP.gov_limit, self._pop_code + UWP.flux)
+        min_gov = max(0, self.pop_code - UWP.flux)
+        max_gov = min(UWP.gov_limit, self.pop_code + UWP.flux)
 
         return max_gov, min_gov
 
     def _get_law_bounds(self):
         # Flux is doubled because gov is pop + flux, and law is then gov + flux
-        min_law = max(0, self._pop_code - 2 * UWP.flux)
-        max_law = min(UWP.law_limit, self._pop_code + 2 * UWP.flux)
+        min_law = max(0, self.pop_code - 2 * UWP.flux)
+        max_law = min(UWP.law_limit, self.pop_code + 2 * UWP.flux)
 
         if str(self.gov) not in '?X':
-            min_law = max(min_law, self._gov_code - UWP.flux)
-            max_law = min(max_law, self._gov_code + UWP.flux)
+            min_law = max(min_law, self.gov_code - UWP.flux)
+            max_law = min(max_law, self.gov_code + UWP.flux)
 
         return max_law, min_law
 
@@ -206,9 +206,9 @@ class UWP(object):
             self.hydro = '0'
         if not size_is_zero and '?' != self.atmo:
             max_atmo, min_atmo = self._get_atmo_bounds()
-            if self._atmo_code < min_atmo:
+            if self.atmo_code < min_atmo:
                 self.atmo = self._int_to_ehex(min_atmo)
-            elif self._atmo_code > max_atmo:
+            elif self.atmo_code > max_atmo:
                 self.atmo = self._int_to_ehex(max_atmo)
         self._regenerate_line()
         # Handle short-circuit values first, then (if needed) drop to the general case
@@ -218,9 +218,9 @@ class UWP(object):
 
         elif not size_is_zero and '?' != self.atmo and '?' != self.hydro:
             max_hydro, min_hydro = self._get_hydro_bounds()
-            if self._hydro_code < min_hydro:
+            if self.hydro_code < min_hydro:
                 self.hydro = self._int_to_ehex(min_hydro)
-            elif self._hydro_code > max_hydro:
+            elif self.hydro_code > max_hydro:
                 self.hydro = self._int_to_ehex(max_hydro)
         self._regenerate_line()
 
@@ -229,18 +229,18 @@ class UWP(object):
             pass
         elif '?' != self.pop and '?' != self.gov:
             max_gov, min_gov = self._get_gov_bounds()
-            if self._gov_code < min_gov:
+            if self.gov_code < min_gov:
                 self.gov = self._int_to_ehex(min_gov)
-            elif self._gov_code > max_gov:
+            elif self.gov_code > max_gov:
                 self.gov = self._int_to_ehex(max_gov)
 
         self._regenerate_line()
 
         if '?' != self.pop and '?' != self.law:
             max_law, min_law = self._get_law_bounds()
-            if self._law_code < min_law:
+            if self.law_code < min_law:
                 self.law = self._int_to_ehex(min_law)
-            elif self._law_code > max_law:
+            elif self.law_code > max_law:
                 self.law = self._int_to_ehex(max_law)
 
         self._regenerate_line()
@@ -248,9 +248,9 @@ class UWP(object):
     def _canonicalise_tl(self):
         if '?' != self.tl:
             max_tl, min_tl = self._get_tl_bounds()
-            if self._tl_code < min_tl:
+            if self.tl_code < min_tl:
                 self.tl = self._int_to_ehex(min_tl)
-            elif self._tl_code > max_tl:
+            elif self.tl_code > max_tl:
                 self.tl = self._int_to_ehex(max_tl)
 
         self._regenerate_line()
