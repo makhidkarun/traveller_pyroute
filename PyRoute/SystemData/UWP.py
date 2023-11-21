@@ -60,9 +60,13 @@ class UWP(object):
 
         return True, msg
 
+    @property
+    def size_is_zero(self):
+        return '?' != self.size and 0 == self._size_code
+
     def check_canonical(self):
         msg = []
-        size_is_zero = '?' != self.size and 0 == self._size_code
+        size_is_zero = self.size_is_zero
 
         if size_is_zero and 0 != self._atmo_code:
             line = 'UWP Calculated atmo "{}" does not match generated atmo {}'.format(str(self.atmo), 0)
@@ -83,7 +87,7 @@ class UWP(object):
         return 0 == len(msg), msg
 
     def canonicalise(self):
-        size_is_zero = '?' != self.size and 0 == self._size_code
+        size_is_zero = self.size_is_zero
         if '0' == str(self.size) and '0' != str(self.atmo):
             self.atmo = '0'
         if '0' == str(self.size) and '0' != str(self.hydro):
