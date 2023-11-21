@@ -22,6 +22,7 @@ class UWP(object):
     atmo_limit = 15
     hydro_limit = 10
     hydro_atm_mod = -4
+    gov_limit = 15
 
     def __init__(self, uwp_line):
         matches = UWP.match.match(uwp_line)
@@ -39,6 +40,8 @@ class UWP(object):
         self._size_code = self._ehex_to_int(self.size)
         self._atmo_code = self._ehex_to_int(self.atmo)
         self._hydro_code = self._ehex_to_int(self.hydro)
+        self._pop_code = self._ehex_to_int(self.pop)
+        self._gov_code = self._ehex_to_int(self.gov)
 
     def __str__(self):
         return self.line
@@ -48,6 +51,8 @@ class UWP(object):
         self._size_code = self._ehex_to_int(str(self.size))
         self._atmo_code = self._ehex_to_int(str(self.atmo))
         self._hydro_code = self._ehex_to_int(str(self.hydro))
+        self._pop_code = self._ehex_to_int(str(self.pop))
+        self._gov_code = self._ehex_to_int(str(self.gov))
 
     def is_well_formed(self):
         msg = ""
@@ -68,6 +73,7 @@ class UWP(object):
     def check_canonical(self):
         msg = []
         self._check_canonical_physicals(msg)
+        self._check_canonical_socials(msg)
 
         return 0 == len(msg), msg
 
@@ -94,6 +100,16 @@ class UWP(object):
                 line = 'UWP Calculated hydro "{}" not in expected range {}-{}'.format(self.hydro, min_hydro, max_hydro)
                 msg.append(line)
 
+    def _check_canonical_socials(self, msg):
+        # For some reason, Lintsec treats gov code X as 0 _for TL calc_, so we need to do the same here
+        if 'X' == self.gov:
+            pass
+        elif '?' != self.pop and '?' != self.gov:
+            max_gov, min_gov = self._get_gov_bounds()
+            if not min_gov <= self._gov_code <= max_gov:
+                line = 'UWP Calculated gov "{}" not in expected range {}-{}'.format(self.gov, min_gov, max_gov)
+                msg.append(line)
+
     def _get_hydro_bounds(self):
         # Mod is _already_ negative - it gets _added_ to the bounds!
         mod = UWP.hydro_atm_mod if 2 > self._atmo_code or 9 < self._atmo_code else 0
@@ -106,8 +122,15 @@ class UWP(object):
         max_atmo = min(UWP.atmo_limit, self._size_code + UWP.flux)
         return max_atmo, min_atmo
 
+    def _get_gov_bounds(self):
+        min_gov = max(0, self._pop_code - UWP.flux)
+        max_gov = min(UWP.gov_limit, self._pop_code + UWP.flux)
+
+        return max_gov, min_gov
+
     def canonicalise(self):
         self._canonicalise_physicals()
+        self._canonicalise_socials()
 
     def _canonicalise_physicals(self):
         size_is_zero = self.size_is_zero
@@ -133,6 +156,18 @@ class UWP(object):
                 self.hydro = self._int_to_ehex(min_hydro)
             elif self._hydro_code > max_hydro:
                 self.hydro = self._int_to_ehex(max_hydro)
+        self._regenerate_line()
+
+    def _canonicalise_socials(self):
+        if 'X' == self.gov:
+            pass
+        elif '?' != self.pop and '?' != self.gov:
+            max_gov, min_gov = self._get_gov_bounds()
+            if self._gov_code < min_gov:
+                self.gov = self._int_to_ehex(min_gov)
+            elif self._gov_code > max_gov:
+                self.gov = self._int_to_ehex(max_gov)
+
         self._regenerate_line()
 
     def _ehex_to_int(self, value):
