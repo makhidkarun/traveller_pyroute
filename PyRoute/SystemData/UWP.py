@@ -67,8 +67,12 @@ class UWP(object):
 
     def check_canonical(self):
         msg = []
-        size_is_zero = self.size_is_zero
+        self._check_canonical_physicals(msg)
 
+        return 0 == len(msg), msg
+
+    def _check_canonical_physicals(self, msg):
+        size_is_zero = self.size_is_zero
         if size_is_zero and 0 != self._atmo_code:
             line = 'UWP Calculated atmo "{}" does not match generated atmo {}'.format(str(self.atmo), 0)
             msg.append(line)
@@ -90,8 +94,6 @@ class UWP(object):
                 line = 'UWP Calculated hydro "{}" not in expected range {}-{}'.format(self.hydro, min_hydro, max_hydro)
                 msg.append(line)
 
-        return 0 == len(msg), msg
-
     def _get_hydro_bounds(self):
         # Mod is _already_ negative - it gets _added_ to the bounds!
         mod = UWP.hydro_atm_mod if 2 > self._atmo_code or 9 < self._atmo_code else 0
@@ -105,6 +107,9 @@ class UWP(object):
         return max_atmo, min_atmo
 
     def canonicalise(self):
+        self._canonicalise_physicals()
+
+    def _canonicalise_physicals(self):
         size_is_zero = self.size_is_zero
         if '0' == str(self.size) and '0' != str(self.atmo):
             self.atmo = '0'
@@ -116,9 +121,7 @@ class UWP(object):
                 self.atmo = self._int_to_ehex(min_atmo)
             elif self._atmo_code > max_atmo:
                 self.atmo = self._int_to_ehex(max_atmo)
-
         self._regenerate_line()
-
         # Handle short-circuit values first, then (if needed) drop to the general case
         if '1' == str(self.size):
             if '0' != str(self.hydro):
@@ -130,7 +133,6 @@ class UWP(object):
                 self.hydro = self._int_to_ehex(min_hydro)
             elif self._hydro_code > max_hydro:
                 self.hydro = self._int_to_ehex(max_hydro)
-
         self._regenerate_line()
 
     def _ehex_to_int(self, value):
