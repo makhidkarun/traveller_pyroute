@@ -2,7 +2,7 @@ import unittest
 from datetime import timedelta
 
 from hypothesis import given, assume, example, HealthCheck, settings
-from hypothesis.strategies import text, from_regex
+from hypothesis.strategies import text, from_regex, none
 
 from PyRoute.SystemData.UWP import UWP
 
@@ -45,25 +45,25 @@ class testUWP(unittest.TestCase):
     Given an otherwise valid input string that needs canonicalisation, verify that canonicalisation does what it says
     on the tin, and that canonicalisation is itself idempotent
     """
-    @given(from_regex(UWP.match))
+    @given(from_regex(UWP.match), none())
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
-    @example('?010000-0')
-    @example('?001000-0')
-    @example('?101000-0')
-    @example('??01000-0')
-    @example('?600000-0')
-    @example('?160000-0')
-    @example('?006000-0')
-    @example('?B00000-0')
-    @example('?170000-0')
-    @example('?000060-0')
-    @example('?0005X0-0')
-    @example('?000F00-0')
-    @example('?000?x0-0')
-    @example('?0006X0-0')  # Not sure exactly what to do with this one - Lintsec likes treating gov X as gov 0
-    @example('?000F00-0')
-    @example('?0000G0-0')
-    def test_check_canonicalisation_and_verify_canonicalisation(self, uwp_line):
+    @example('?010000-0', '?000000-5')
+    @example('?001000-0', '?000000-5')
+    @example('?101000-0', '?100000-5')
+    @example('??01000-0', '??01000-3')
+    @example('?600000-0', '?610000-3')
+    @example('?160000-0', '?160000-4')
+    @example('?006000-0', '?000000-5')
+    @example('?B00000-0', '?B61000-2')
+    @example('?170000-0', '?160000-4')
+    @example('?000060-0', '?000050-4')
+    @example('?0005X0-0', '?0005X0-6')
+    @example('?000F00-0', '?000FA5-8')
+    @example('?000?x0-0', '?000?X0-5')
+    @example('?0006X0-0', '?0006X0-5')  # Not sure exactly what to do with this one - Lintsec likes treating gov X as gov 0
+    @example('?000F00-0', '?000FA5-8')
+    @example('?0000G0-0', '?000050-4')
+    def test_check_canonicalisation_and_verify_canonicalisation(self, uwp_line, expected):
         uwp = UWP(uwp_line)
         old_rep = str(uwp)
         hyp_input = 'Hypothesis input: ' + uwp_line
@@ -87,6 +87,10 @@ class testUWP(unittest.TestCase):
         badline += '\n  ' + hyp_input
         self.assertTrue(result, 'Re-canonicalisation failed.  ' + badline)
         self.assertEqual(mid_rep, new_rep, "Canonicalisation not idempotent.  " + badline)
+
+        # finally, if an expected value was supplied, check it
+        if expected is not None:
+            self.assertEqual(expected, new_rep)
 
 
 if __name__ == '__main__':
