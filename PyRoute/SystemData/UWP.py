@@ -23,6 +23,7 @@ class UWP(object):
     hydro_limit = 10
     hydro_atm_mod = -4
     gov_limit = 15
+    law_limit = 18
 
     def __init__(self, uwp_line):
         matches = UWP.match.match(uwp_line)
@@ -42,6 +43,7 @@ class UWP(object):
         self._hydro_code = self._ehex_to_int(self.hydro)
         self._pop_code = self._ehex_to_int(self.pop)
         self._gov_code = self._ehex_to_int(self.gov)
+        self._law_code = self._ehex_to_int(self.law)
 
     def __str__(self):
         return self.line
@@ -53,6 +55,7 @@ class UWP(object):
         self._hydro_code = self._ehex_to_int(str(self.hydro))
         self._pop_code = self._ehex_to_int(str(self.pop))
         self._gov_code = self._ehex_to_int(str(self.gov))
+        self._law_code = self._ehex_to_int(str(self.law))
 
     def is_well_formed(self):
         msg = ""
@@ -110,6 +113,12 @@ class UWP(object):
                 line = 'UWP Calculated gov "{}" not in expected range {}-{}'.format(self.gov, min_gov, max_gov)
                 msg.append(line)
 
+        if '?' != self.pop and '?' != self.law:
+            max_law, min_law = self._get_law_bounds()
+            if not min_law <= self._law_code <= max_law:
+                line = 'UWP Calculated law "{}" not in expected range {}-{}'.format(self.law, min_law, max_law)
+                msg.append(line)
+
     def _get_hydro_bounds(self):
         # Mod is _already_ negative - it gets _added_ to the bounds!
         mod = UWP.hydro_atm_mod if 2 > self._atmo_code or 9 < self._atmo_code else 0
@@ -127,6 +136,13 @@ class UWP(object):
         max_gov = min(UWP.gov_limit, self._pop_code + UWP.flux)
 
         return max_gov, min_gov
+
+    def _get_law_bounds(self):
+        # Flux is doubled because gov is pop + flux, and law is then gov + flux
+        min_law = max(0, self._pop_code - 2 * UWP.flux)
+        max_law = min(UWP.law_limit, self._pop_code + 2 * UWP.flux)
+
+        return max_law, min_law
 
     def canonicalise(self):
         self._canonicalise_physicals()
@@ -167,6 +183,13 @@ class UWP(object):
                 self.gov = self._int_to_ehex(min_gov)
             elif self._gov_code > max_gov:
                 self.gov = self._int_to_ehex(max_gov)
+
+        if '?' != self.pop and '?' != self.law:
+            max_law, min_law = self._get_law_bounds()
+            if self._law_code < min_law:
+                self.law = self._int_to_ehex(min_law)
+            elif self._law_code > max_law:
+                self.law = self._int_to_ehex(max_law)
 
         self._regenerate_line()
 
