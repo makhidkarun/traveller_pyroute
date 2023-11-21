@@ -21,6 +21,7 @@ class UWP(object):
     flux = 5
     atmo_limit = 15
     hydro_limit = 10
+    hydro_atm_mod = -4
 
     def __init__(self, uwp_line):
         matches = UWP.match.match(uwp_line)
@@ -92,8 +93,10 @@ class UWP(object):
         return 0 == len(msg), msg
 
     def _get_hydro_bounds(self):
-        min_hydro = max(0, self._atmo_code - UWP.flux)
-        max_hydro = min(UWP.hydro_limit, self._atmo_code + UWP.flux)
+        # Mod is _already_ negative - it gets _added_ to the bounds!
+        mod = UWP.hydro_atm_mod if 2 > self._atmo_code or 9 < self._atmo_code else 0
+        min_hydro = max(0, self._atmo_code - UWP.flux + mod)
+        max_hydro = min(UWP.hydro_limit, self._atmo_code + UWP.flux + mod)
         return max_hydro, min_hydro
 
     def _get_atmo_bounds(self):
