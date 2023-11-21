@@ -142,6 +142,10 @@ class UWP(object):
         min_law = max(0, self._pop_code - 2 * UWP.flux)
         max_law = min(UWP.law_limit, self._pop_code + 2 * UWP.flux)
 
+        if str(self.gov) not in '?X':
+            min_law = max(min_law, self._gov_code - UWP.flux)
+            max_law = min(max_law, self._gov_code + UWP.flux)
+
         return max_law, min_law
 
     def canonicalise(self):
@@ -183,6 +187,8 @@ class UWP(object):
                 self.gov = self._int_to_ehex(min_gov)
             elif self._gov_code > max_gov:
                 self.gov = self._int_to_ehex(max_gov)
+
+        self._regenerate_line()
 
         if '?' != self.pop and '?' != self.law:
             max_law, min_law = self._get_law_bounds()
