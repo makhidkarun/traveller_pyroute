@@ -221,17 +221,18 @@ class UWP(object):
         # For some reason, Lintsec treats gov code X as 0 _for TL calc_, so we need to do the same here
         if 'X' == self.gov:
             pass
-        elif '?' != self.pop and '?' != self.gov:
+        elif '?' != self.gov:
             max_gov, min_gov = self._get_gov_bounds()
             if not min_gov <= self.gov_code <= max_gov:
                 line = 'UWP Calculated gov "{}" not in expected range {}-{}'.format(self.gov, min_gov, max_gov)
                 msg.append(line)
 
-        if '?' != self.pop and '?' != self.law:
+        if ('?' != self.pop or '?' != self.gov) and '?' != self.law:
             max_law, min_law = self._get_law_bounds()
             if not min_law <= self.law_code <= max_law:
                 line = 'UWP Calculated law "{}" not in expected range {}-{}'.format(self.law, min_law, max_law)
                 msg.append(line)
+
 
     def _check_canonical_tl(self, msg):
         if '?' != self.tl:
@@ -253,15 +254,23 @@ class UWP(object):
         return max_atmo, min_atmo
 
     def _get_gov_bounds(self):
-        min_gov = max(0, self.pop_code - UWP.flux)
-        max_gov = min(UWP.gov_limit, self.pop_code + UWP.flux)
+        min_gov = 0
+        max_gov = UWP.gov_limit
+
+        if '?' != self.pop:
+            min_gov = max(min_gov, self.pop_code - UWP.flux)
+            max_gov = min(max_gov, self.pop_code + UWP.flux)
 
         return max_gov, min_gov
 
     def _get_law_bounds(self):
-        # Flux is doubled because gov is pop + flux, and law is then gov + flux
-        min_law = max(0, self.pop_code - 2 * UWP.flux)
-        max_law = min(UWP.law_limit, self.pop_code + 2 * UWP.flux)
+        min_law = 0
+        max_law = UWP.law_limit
+
+        if '?' != self.pop:
+            # Flux is doubled because gov is pop + flux, and law is then gov + flux
+            min_law = max(min_law, self.pop_code - 2 * UWP.flux)
+            max_law = min(max_law, self.pop_code + 2 * UWP.flux)
 
         if str(self.gov) not in '?X':
             min_law = max(min_law, self.gov_code - UWP.flux)
@@ -323,11 +332,11 @@ class UWP(object):
     def _canonicalise_socials(self):
         if 'X' == self.gov:
             pass
-        elif '?' != self.pop and '?' != self.gov:
+        elif '?' != self.gov:
             max_gov, min_gov = self._get_gov_bounds()
             self.gov_code = max(min_gov, min(max_gov, self.gov_code))
 
-        if '?' != self.pop and '?' != self.law:
+        if ('?' != self.pop or '?' != self.gov) and '?' != self.law:
             max_law, min_law = self._get_law_bounds()
             self.law_code = max(min_law, min(max_law, self.law_code))
 

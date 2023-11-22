@@ -63,6 +63,8 @@ class testUWP(unittest.TestCase):
     @example('?0006X0-0', '?0006X0-5')  # Not sure exactly what to do with this one - Lintsec likes treating gov X as gov 0
     @example('?000F00-0', '?000FA5-8')
     @example('?0000G0-0', '?000050-4')
+    @example('?000?F0-0', '?000?FA-4')
+    @example('?000?Q0-0', '?000?FA-4')
     def test_check_canonicalisation_and_verify_canonicalisation(self, uwp_line, expected):
         uwp = UWP(uwp_line)
         old_rep = str(uwp)
