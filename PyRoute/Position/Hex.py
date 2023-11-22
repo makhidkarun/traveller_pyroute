@@ -27,10 +27,7 @@ class Hex(object):
         self.row = int(self.position[2:4])
         self.dx = sector.x * 32 + self.col - 1
         self.dy = sector.y * 40 + self.row - 1
-        dy_offset = 41 - int(self.position[2:4]) - 1
-        adjusted_dy = sector.y * 40 + dy_offset
-
-        self.q, self.r = Hex.hex_to_axial(self.dx, adjusted_dy)
+        self.q, self.r = Hex.hex_to_axial(self.dx, Hex.dy_offset(self.row, sector.y))
 
     def distance(self, other):
         return Hex.axial_distance((self.q, self.r), (other.q, other.r))
