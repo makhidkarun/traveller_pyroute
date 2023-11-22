@@ -95,6 +95,11 @@ class Hex(object):
         r = col - q_offset
         return q, r
 
+    @staticmethod
+    def dy_offset(row: int, sector_y: int) -> int:
+        offset = 41 - row - 1
+        return sector_y * 40 + offset
+
     @property
     def x(self):
         return self.q
