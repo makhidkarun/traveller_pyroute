@@ -101,6 +101,14 @@ class Hex(object):
         return row, col
 
     @staticmethod
+    def axial_to_sector(q, r):
+        (raw_row, raw_col) = Hex.axial_to_hex(q, r)
+
+        row = Hex.dy_offset(raw_row, 0)
+
+        return row, raw_col
+
+    @staticmethod
     def dy_offset(row: int, sector_y: int) -> int:
         offset = 41 - row - 1
         return sector_y * 40 + offset
