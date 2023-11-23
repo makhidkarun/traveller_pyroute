@@ -36,6 +36,15 @@ class testHexHypothesis(unittest.TestCase):
         self.assertEqual(y, col, 'Col co-ord not unpacked.  ' + hyp_line)
         self.assertEqual(x, row, 'Row co-ord not unpacked.  ' + hyp_line)
 
+    @given(integers(), integers(min_value=1, max_value=40))
+    @example(0, 1)
+    def test_dy_offset_and_reverse(self, sector_y, row):
+        hyp_line = "Hypothesis input: " + str(sector_y) + ", " + str(row)
+        dy_offset = Hex.dy_offset(row, sector_y)
+        nu_row, nu_sector_y = Hex.dy_reverse(dy_offset)
+
+        self.assertEqual(row, nu_row, "Row not round-tripped.  " + hyp_line)
+        self.assertEqual(sector_y, nu_sector_y, "Sector_y not round-tripped.  " + hyp_line)
 
 if __name__ == '__main__':
     unittest.main()

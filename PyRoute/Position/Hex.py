@@ -113,6 +113,14 @@ class Hex(object):
         offset = 41 - row - 1
         return sector_y * 40 + offset
 
+    @staticmethod
+    def dy_reverse(dy_offset: int):
+        sector_y = dy_offset // 40
+        offset = dy_offset % 40
+
+        row = 40 - offset
+        return row, sector_y
+
     @property
     def x(self):
         return self.q
