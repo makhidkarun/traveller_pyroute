@@ -25,16 +25,24 @@ class testHexHypothesis(unittest.TestCase):
 
     @given(integers(min_value=-10, max_value=10), integers(min_value=-10, max_value=10), integers(min_value=1, max_value=32), integers(min_value=1, max_value=40))
     @example(0, 0, 1, 1)
+    @example(0, 0, 1, 40)
+    @example(0, 0, 32, 1)
+    @example(0, 0, 32, 40)
+    @example(0, 0, 16, 20)
+    @example(1, 0, 1, 1)
     def test_axial_to_sector_co_ords(self, sec_x, sec_y, x, y):
         hyp_line = "Hypothesis input: " + str(sec_x) + ", " + str(sec_y) + ', ' + str(x) + ', ' + str(y)
         sec_co_ords = '# ' + str(sec_x) + ', ' + str(sec_y)
         sector = Sector('# dummy', sec_co_ords)
         hex_co_ords = str(x).rjust(2, '0') + str(y).rjust(2, '0')
-        hex = Hex(sector, hex_co_ords)
+        cand_hex = Hex(sector, hex_co_ords)
 
-        row, col = Hex.axial_to_sector(hex.q, hex.r)
-        self.assertEqual(y, col, 'Col co-ord not unpacked.  ' + hyp_line)
-        self.assertEqual(x, row, 'Row co-ord not unpacked.  ' + hyp_line)
+        col, row = Hex.axial_to_sector(cand_hex.q, cand_hex.r)
+        self.assertEqual(x, col, 'Col co-ord not unpacked.  ' + hyp_line)
+        self.assertEqual(y, row, 'Row co-ord not unpacked.  ' + hyp_line)
+
+        nu_hex_co_ords = str(col).rjust(2, '0') + str(row).rjust(2, '0')
+        self.assertEqual(hex_co_ords, nu_hex_co_ords, "Position string did not round trip.  " + hyp_line)
 
     @given(integers(), integers(min_value=1, max_value=40))
     @example(0, 1)
