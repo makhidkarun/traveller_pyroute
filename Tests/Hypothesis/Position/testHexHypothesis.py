@@ -9,6 +9,9 @@ from PyRoute.Position.Hex import Hex
 
 class testHexHypothesis(unittest.TestCase):
 
+    """
+    Given a hex co-ord pair, verify it converts cleanly to axial co-ordinates, and then back to the original hex co-ords
+    """
     @given(integers(), integers())
     @example(1, 0)
     def test_axial_to_hex_and_hex_to_axial_round_trip(self, row, col):
@@ -23,6 +26,10 @@ class testHexHypothesis(unittest.TestCase):
         self.assertEqual(q, nu_q, "Q co-ord did not round-trip.  " + hyp_line)
         self.assertEqual(r, nu_r, "R co-ord did not round-trip.  " + hyp_line)
 
+    """
+    Given a set of sector and within-sector co-ords, verify conversion to axial co-ords and that extracted sector
+    co-ords match the original values
+    """
     @given(integers(min_value=-10, max_value=10), integers(min_value=-10, max_value=10), integers(min_value=1, max_value=32), integers(min_value=1, max_value=40))
     @example(0, 0, 1, 1)
     @example(0, 0, 1, 40)
