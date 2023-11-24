@@ -36,7 +36,10 @@ class StarList(object):
             if s == "D" or s == "NS" or s == "PSR" or s == "BH" or s == "BD":
                 item = SystemStar(s)
             else:
-                bitz = s.split(' ')
+                if ' ' in s:
+                    bitz = s.split(' ')
+                else:
+                    bitz = [s[0:2], s[2:]]
                 item = SystemStar(bitz[1], bitz[0][0], int(bitz[0][1]))
             self.stars_list.append(item)
 
