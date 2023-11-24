@@ -8,8 +8,8 @@ from PyRoute.SystemData.StarList import StarList
 
 
 @composite
-def star_list(draw):
-    num_stars = draw(integers(min_value=1, max_value=10))
+def star_list(draw, max_stars=10):
+    num_stars = draw(integers(min_value=1, max_value=max_stars))
     starline = ''
 
     for i in range(num_stars):
@@ -71,3 +71,24 @@ class testStarList(unittest.TestCase):
 
         result, msg = list.is_well_formed()
         self.assertTrue(result, msg + '.  ' + hyp_line)
+
+    """
+    Given an otherwise valid input string that needs canonicalisation, verify that canonicalisation does what it says
+    on the tin, and that canonicalisation is itself idempotent
+    """
+    @given(star_list(max_stars=8))
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
+    @example('K9 Ib ')
+    def test_star_list_canonical(self, star_line):
+        hyp_line = "Hypothesis input: " + star_line
+
+        list = StarList(star_line)
+        result, msg = list.check_canonical()
+        assume(not result)
+
+        list.canonicalise()
+
+        result, msg = list.check_canonical()
+        badline = '' if result else msg[0]
+        badline += '\n  ' + hyp_line
+        self.assertTrue(result, "Canonicalisation failed. " + badline)

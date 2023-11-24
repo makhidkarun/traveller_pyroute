@@ -72,3 +72,15 @@ class StarList(object):
                 return False, msg
 
         return True, msg
+
+    def check_canonical(self):
+        msg = []
+        for star in self.stars_list:
+            _, starmsg = star.check_canonical()
+            msg.extend(starmsg)
+
+        return 0 == len(msg), msg
+
+    def canonicalise(self):
+        for star in self.stars_list:
+            star.canonicalise()
