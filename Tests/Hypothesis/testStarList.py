@@ -29,10 +29,13 @@ class testStarList(unittest.TestCase):
     @example('OD ')
     @example('D ')
     @example('G5 V A4 V')
+    @example('D D D D D D D D D')
+    @example('A0Ia ')
     def test_star_list_generation(self, star_line):
         hyp_line = "Hypothesis input: " + star_line
         allowed_value_errors = [
-            "No stars found"
+            "No stars found",
+            "Max number of stars is 8"
         ]
         list = None
 
@@ -44,6 +47,8 @@ class testStarList(unittest.TestCase):
             else:
                 raise e
         assume(isinstance(list, StarList))
+
+        list.move_biggest_to_primary()
 
         result, msg = list.is_well_formed()
         self.assertTrue(result, msg + '.  ' + hyp_line)

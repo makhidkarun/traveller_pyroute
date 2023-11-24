@@ -28,6 +28,8 @@ class StarList(object):
         stars = StarList.stellar_match.findall(stars_line)
         if not stars:
             raise ValueError("No stars found")
+        if 8 < len(stars):
+            raise ValueError("Max number of stars is 8")
 
         self.stars_list = []
         for s in stars:
@@ -38,6 +40,19 @@ class StarList(object):
                 item = SystemStar(bitz[1], bitz[0][0], int(bitz[0][1]))
             self.stars_list.append(item)
 
+    def move_biggest_to_primary(self):
+        num_stars = len(self.stars_list)
+        if 2 > num_stars:  # nothing to do, bail out now
+            return
+        biggest = self.stars_list[0]
+        bigdex = 0
+        for i in range(1, num_stars):
+            if not biggest.is_bigger(self.stars_list[i]):
+                biggest = self.stars_list[i]
+                bigdex = i
+
+        if 0 != bigdex:
+            self.stars_list[0], self.stars_list[bigdex] = self.stars_list[bigdex], self.stars_list[0]
 
     def is_well_formed(self):
         msg = ""
