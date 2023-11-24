@@ -9,7 +9,7 @@ stars, rather than the multi-concern mashup that is the Star class
 """
 import re
 
-from SystemData.SystemStar import SystemStar
+from PyRoute.SystemData.SystemStar import SystemStar
 
 
 class StarList(object):
@@ -25,23 +25,32 @@ class StarList(object):
 
     def __init__(self, stars_line):
         self.stars_line = stars_line
-        stars = StarList.stellar_match.match(stars_line)
+        stars = StarList.stellar_match.findall(stars_line)
         if not stars:
             raise ValueError("No stars found")
 
         self.stars_list = []
-        matches = stars.groups()
-        for match in matches:
-            item = SystemStar(match)
+        for s in stars:
+            if s == "D" or s == "NS" or s == "PSR" or s == "BH" or s == "BD":
+                item = SystemStar(s)
+            else:
+                bitz = s.split(' ')
+                item = SystemStar(bitz[1], bitz[0][0], int(bitz[0][1]))
             self.stars_list.append(item)
+
 
     def is_well_formed(self):
         msg = ""
-        if 8 < len(self.stars_list):
+        num_stars = len(self.stars_list)
+        if 8 < num_stars:
             msg = "Max stars exceeded"
             return False, msg
-        if 0 == len(self.stars_list):
+        if 0 == num_stars:
             msg = "Star list must not be empty"
             return False, msg
+        for i in range(1, num_stars):
+            if not self.stars_list[0].is_bigger(self.stars_list[i]):
+                msg = "Index " + str(i) + " better primary candidate than index 0"
+                return False, msg
 
         return True, msg

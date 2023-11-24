@@ -28,6 +28,7 @@ class testStarList(unittest.TestCase):
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
     @example('OD ')
     @example('D ')
+    @example('G5 V A4 V')
     def test_star_list_generation(self, star_line):
         hyp_line = "Hypothesis input: " + star_line
         allowed_value_errors = [
