@@ -250,3 +250,13 @@ class testStarList(unittest.TestCase):
 
         if expected is not None:
             self.assertEqual(expected, str(list), "Unexpected final starline.  " + hyp_line)
+
+    def test_stargen_class_ordering(self):
+        cases = [
+            ('O6 VI', 'O6 VI')
+        ]
+
+        for star_line, expected in cases:
+            list = StarList(star_line)
+            self.assertEqual(expected, str(list))
+
