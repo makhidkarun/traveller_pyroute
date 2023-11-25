@@ -254,7 +254,7 @@ class testStarList(unittest.TestCase):
     def test_stargen_class_ordering(self):
         cases = [
             ('O6 VI', 'O6 VI'),
-            ('O6 VII', 'O6 VII'),
+            ('O6 VII', 'O6 D'),
             ('A9 III', 'A9 III'),
             ('A9 IV', 'A9 IV'),
             ('M3 V', 'M3 V')
