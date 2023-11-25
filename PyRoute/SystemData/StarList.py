@@ -110,6 +110,9 @@ class StarList(object):
                     if 'F' == current.spectral and current.size in ['II', 'III']:
                         line = 'Supergiant primary precludes F-class with sizes II and III - bright and regular giants - is ' + str(current)
                         msg.append(line)
+                    if 'G' == current.spectral and current.size in ['II', 'III']:
+                        line = 'Supergiant primary precludes G-class with sizes II and III - bright and regular giants - is ' + str(current)
+                        msg.append(line)
 
         return 0 == len(msg), msg
 
@@ -135,4 +138,6 @@ class StarList(object):
                         current.size = 'II'
                 if primary_supergiant:
                     if 'F' == current.spectral and current.size in ['II', 'III']:
+                        current.size = 'IV'
+                    if 'G' == current.spectral and current.size in ['II', 'III']:
                         current.size = 'IV'
