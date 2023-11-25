@@ -116,6 +116,16 @@ class StarList(object):
                     if 'K' == current.spectral and current.size in ['II', 'III']:
                         line = 'Supergiant primary precludes K-class with sizes II and III - bright and regular giants - is ' + str(current)
                         msg.append(line)
+                    if 'Ib' == self.stars_list[0].size:
+                        if 'O' == current.spectral and current.size in ['II']:
+                            line = 'Ib supergiant primary precludes O-class bright giants - size II - is ' + str(current)
+                            msg.append(line)
+                        if 'B' == current.spectral and current.size in ['II']:
+                            line = 'Ib supergiant primary precludes B-class bright giants - size II - is ' + str(current)
+                            msg.append(line)
+                        if 'A' == current.spectral and current.size in ['II', 'III']:
+                            line = 'Ib supergiant primary precludes A-class bright and regular giants - size II and III - is ' + str(current)
+                            msg.append(line)
 
         return 0 == len(msg), msg
 
@@ -127,8 +137,9 @@ class StarList(object):
         if 1 < num_stars:
             # per T5.10 Book 3 p28, _other_ stars' sizes are based off the primary's flux roll, then (1d6+2) is added
             # - a minimum of 3, a maximum of 8
-            # Supergiants only happen on flux rolls of -6 thru 4 - so the _smallest_ possible other-star flux value is
+            # Supergiants only happen on flux rolls of -6 thru -4 - so the _smallest_ possible other-star flux value is
             # -3
+            # Ib supergiants only happen on a flux roll of -4, so the smallest possible other-star flux value is -1
             primary_supergiant = self.stars_list[0].is_supergiant
             for i in range(1, num_stars):
                 current = self.stars_list[i]
@@ -146,3 +157,15 @@ class StarList(object):
                         current.size = 'IV'
                     if 'K' == current.spectral and current.size in ['II', 'III']:
                         current.size = 'IV' if int(current.digit) < 4 else 'V'
+                    # M-class stars aren't constrained by a supergiant primary _per se_
+                    # A Ib primary _further_ constrains the following:
+                    # OB class to size III and smaller
+                    # A class to size IV and smaller
+                    # FGKM class to size V and smaller
+                    if 'Ib' == self.stars_list[0].size:
+                        if 'O' == current.spectral and current.size in ['II']:
+                            current.size = 'III'
+                        if 'B' == current.spectral and current.size in ['II']:
+                            current.size = 'III'
+                        if 'A' == current.spectral and current.size in ['II', 'III']:
+                            current.size = 'IV'
