@@ -16,6 +16,8 @@ class SystemStar(object):
         self.size = size
         self.spectral = spectral
         self.digit = digit
+        if 'VII' == self.size:  # Reclassify archaic degenerate dwarfs as plain dwarfs
+            self.size = 'D'
 
     def __str__(self):
         if self.spectral is None or self.digit is None:
@@ -53,6 +55,9 @@ class SystemStar(object):
             msg.append(line)
         if 'D' == self.size and self.spectral is not None and self.digit is not None:
             line = "D-size stars with non-empty spectral class _and_ spectral decimal should be V-size, not " + str(self)
+            msg.append(line)
+        if 'VI' == self.size and self.spectral in 'OBA':
+            line = "OBA class stars cannot be size VI, is " + str(self)
             msg.append(line)
 
         return 0 == len(msg), msg
