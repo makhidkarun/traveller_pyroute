@@ -51,9 +51,15 @@ class SystemStar(object):
         if self.is_stellar_not_dwarf and (self.spectral not in 'OBA' and self.size in ['Ia', 'Ib']):
             line = "Only OBA class stars can be supergiants (Ia/Ib), not " + str(self)
             msg.append(line)
+        if 'D' == self.size and self.spectral is not None and self.digit is not None:
+            line = "D-size stars with non-empty spectral class _and_ spectral decimal should be V-size, not " + str(self)
+            msg.append(line)
 
         return 0 == len(msg), msg
 
     def canonicalise(self):
         if self.is_stellar_not_dwarf and (self.spectral not in 'OBA' and self.size in ['Ia', 'Ib']):
             self.size = 'II'
+
+        if 'D' == self.size and self.spectral is not None and self.digit is not None:
+            self.size = 'V'

@@ -106,6 +106,7 @@ class testStarList(unittest.TestCase):
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
     @example('K9 Ib ')
     @example('D ')
+    @example('A0 D ')
     def test_star_list_canonical(self, star_line):
         hyp_line = "Hypothesis input: " + star_line
 
