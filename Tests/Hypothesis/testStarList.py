@@ -127,6 +127,9 @@ class testStarList(unittest.TestCase):
     @example('A0Ib G0Ib ')
     @example('A0Ib K0Ib ')
     @example('A0Ib M0Ib ')
+    @example('A0Ia BD ')
+    @example('F0Ia BD ')
+    @example('G0Ia BD ')
     def test_star_list_canonical(self, star_line):
         hyp_line = "Hypothesis input: " + star_line
 

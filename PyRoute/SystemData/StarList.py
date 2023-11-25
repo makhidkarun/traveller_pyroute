@@ -89,6 +89,15 @@ class StarList(object):
 
         return True, msg
 
+    @property
+    def primary(self):
+        return self.stars_list[0]
+
+    @property
+    def preclude_brown_dwarfs(self):
+        primary = self.primary
+        return primary.spectral is not None and primary.spectral in 'OBAFG'
+
     def check_canonical(self):
         msg = []
         num_stars = len(self.stars_list)
@@ -98,7 +107,9 @@ class StarList(object):
 
         # now check inter-star constraints
         if 1 < num_stars:
-            primary_supergiant = self.stars_list[0].is_supergiant
+            primary = self.primary
+            primary_supergiant = primary.is_supergiant
+            preclude_brown_dwarfs = self.preclude_brown_dwarfs
             for i in range(1, num_stars):
                 current = self.stars_list[i]
                 # only primary can be supergiant
@@ -132,6 +143,9 @@ class StarList(object):
                         if current.spectral in 'FGKM' and current.size in ['II', 'III', 'IV']:
                             line = 'Ib supergiant primary precludes {}-class bright, regular and subgiants - size II, III and IV - is {}'.format(current.spectral, str(current))
                             msg.append(line)
+                if preclude_brown_dwarfs and 'BD' == current.size:
+                    line = "OBAFG-class primaries preclude brown dwarfs"
+                    msg.append(line)
 
         return 0 == len(msg), msg
 
@@ -141,12 +155,16 @@ class StarList(object):
 
         num_stars = len(self.stars_list)
         if 1 < num_stars:
+            primary = self.primary
             # per T5.10 Book 3 p28, _other_ stars' sizes are based off the primary's flux roll, then (1d6+2) is added
             # - a minimum of 3, a maximum of 8
             # Supergiants only happen on flux rolls of -6 thru -4 - so the _smallest_ possible other-star flux value is
             # -3
             # Ib supergiants only happen on a flux roll of -4, so the smallest possible other-star flux value is -1
-            primary_supergiant = self.stars_list[0].is_supergiant
+            primary_supergiant = primary.is_supergiant
+            # Brown dwarfs require a minimum flux roll of +6, and secondary stars roll the primary's flux + (1d6-1), or max 5
+            # Thus a primary flux roll of at least +1 (K-class) is needed to not rule brown dwarfs out
+            preclude_brown_dwarfs = self.preclude_brown_dwarfs
             for i in range(1, num_stars):
                 current = self.stars_list[i]
                 if current.is_supergiant:
@@ -180,3 +198,6 @@ class StarList(object):
 
             if primary_supergiant:  # Supergiant primary precludes D-class stars, so out the window they go
                 self.stars_list = [star for star in self.stars_list if 'D' != star.size]
+
+            if preclude_brown_dwarfs:
+                self.stars_list = [star for star in self.stars_list if 'BD' != star.size]
