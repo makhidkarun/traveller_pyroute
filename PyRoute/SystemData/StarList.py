@@ -14,9 +14,9 @@ from PyRoute.SystemData.SystemStar import SystemStar
 
 class StarList(object):
 
-    stellar_line = '([OBAFGKM][0-9] ?(?:Ia|Ib|II|III|IV|V|VI|VII|D)|D|NS|PSR|BH|BD)'
-    star_line = '^([OBAFGKM])([0-9]) ?(Ia|Ib|II|III|IV|V|VI)'
-    mid_star_line = '([OBAFGKM])([0-9]) ?(Ia|Ib|II|III|IV|V|VI)'
+    stellar_line = '([OBAFGKM][0-9] ?(?:Ia|Ib|III|II|IV|VII|VI|V|D)|D|NS|PSR|BH|BD)'
+    star_line = '^([OBAFGKM])([0-9]) ?(Ia|Ib|III|II|IV|VI|V)'
+    mid_star_line = '([OBAFGKM])([0-9]) ?(Ia|Ib|III|II|IV|VI|V)'
 
     stellar_match = re.compile(stellar_line)
     star_match = re.compile(star_line)
