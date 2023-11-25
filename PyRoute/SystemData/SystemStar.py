@@ -59,6 +59,9 @@ class SystemStar(object):
         if 'VI' == self.size and self.spectral in 'OBA':
             line = "OBA class stars cannot be size VI, is " + str(self)
             msg.append(line)
+        if 'VI' == self.size and 'F' == self.spectral and str(self.digit) in '01234':
+            line = "F0-F4 class stars cannot be size VI, is " + str(self)
+            msg.append(line)
         if 'IV' == self.size and 'M' == self.spectral:
             line = "M class stars cannot be size IV, is " + str(self)
             msg.append(line)
@@ -76,6 +79,9 @@ class SystemStar(object):
             self.size = 'V'
 
         if 'VI' == self.size and self.spectral in 'OBA':
+            self.size = 'V'
+
+        if 'VI' == self.size and 'F' == self.spectral and str(self.digit) in '01234':
             self.size = 'V'
 
         if 'IV' == self.size and 'M' == self.spectral:
