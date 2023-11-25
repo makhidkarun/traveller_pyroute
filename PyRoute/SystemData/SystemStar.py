@@ -26,6 +26,10 @@ class SystemStar(object):
     def is_stellar(self):
         return self.size in SystemStar.starsizes
 
+    @property
+    def is_stellar_not_dwarf(self):
+        return self.is_stellar and self.size != 'D'
+
     def is_bigger(self, other):
         if self.size != other.size:
             return SystemStar.sizes.index(self.size) < SystemStar.sizes.index(other.size)
@@ -44,11 +48,12 @@ class SystemStar(object):
 
         # Most of these checks are implied by the "Spectral Type And Size" table on p28 of T5.10 Book 3
 
-        if self.is_stellar and (self.spectral not in 'OBA' and self.size in ['Ia', 'Ib']):
+        if self.is_stellar_not_dwarf and (self.spectral not in 'OBA' and self.size in ['Ia', 'Ib']):
             line = "Only OBA class stars can be supergiants (Ia/Ib), not " + str(self)
             msg.append(line)
 
         return 0 == len(msg), msg
 
     def canonicalise(self):
-        pass
+        if self.is_stellar_not_dwarf and (self.spectral not in 'OBA' and self.size in ['Ia', 'Ib']):
+            self.size = 'II'
