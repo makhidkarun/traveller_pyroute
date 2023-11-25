@@ -253,10 +253,13 @@ class testStarList(unittest.TestCase):
 
     def test_stargen_class_ordering(self):
         cases = [
-            ('O6 VI', 'O6 VI')
+            ('O6 VI', 'O6 VI'),
+            ('O6 VII', 'O6 VII'),
+            ('A9 III', 'A9 III'),
+            ('A9 IV', 'A9 IV'),
+            ('M3 V', 'M3 V')
         ]
 
         for star_line, expected in cases:
-            list = StarList(star_line)
-            self.assertEqual(expected, str(list))
-
+            starlist = StarList(star_line)
+            self.assertEqual(expected, str(starlist))
