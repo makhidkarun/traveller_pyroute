@@ -98,6 +98,7 @@ class StarList(object):
 
         # now check inter-star constraints
         if 1 < num_stars:
+            primary_supergiant = self.stars_list[0].is_supergiant
             for i in range(1, num_stars):
                 current = self.stars_list[i]
                 # only primary can be supergiant
@@ -105,6 +106,10 @@ class StarList(object):
                 if is_super:
                     line = "Star " + str(i) + " cannot be supergiant - is " + str(current)
                     msg.append(line)
+                if primary_supergiant:
+                    if 'F' == current.spectral and current.size in ['II', 'III']:
+                        line = 'Supergiant primary precludes F-class with sizes II and III - bright and regular giants - is ' + str(current)
+                        msg.append(line)
 
         return 0 == len(msg), msg
 
@@ -114,6 +119,10 @@ class StarList(object):
 
         num_stars = len(self.stars_list)
         if 1 < num_stars:
+            # per T5.10 Book 3 p28, _other_ stars' sizes are based off the primary's flux roll, then (1d6+2) is added
+            # - a minimum of 3, a maximum of 8
+            # Supergiants only happen on flux rolls of -6 thru 4 - so the _smallest_ possible other-star flux value is
+            # -3
             primary_supergiant = self.stars_list[0].is_supergiant
             for i in range(1, num_stars):
                 current = self.stars_list[i]
@@ -124,3 +133,6 @@ class StarList(object):
                         current.size = 'II'
                     elif 'O' == current.spectral:
                         current.size = 'II'
+                if primary_supergiant:
+                    if 'F' == current.spectral and current.size in ['II', 'III']:
+                        current.size = 'IV'
