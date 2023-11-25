@@ -111,6 +111,11 @@ class testStarList(unittest.TestCase):
     @example('A0Ia M0IV')
     @example('K5IV')
     @example('F0VI')
+    @example('D A0Ia')
+    @example('A0Ia A0Ia ')
+    @example('A0Ia B0Ib ')
+    @example('O0Ia O0Ia ')
+    @example('O0Ia F0Ia ')
     def test_star_list_canonical(self, star_line):
         hyp_line = "Hypothesis input: " + star_line
 
@@ -121,6 +126,7 @@ class testStarList(unittest.TestCase):
             self.assertTrue(False, hyp_line)
         result, msg = list.check_canonical()
         assume(not result)
+        list.move_biggest_to_primary()
 
         list.canonicalise()
 

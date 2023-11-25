@@ -78,6 +78,10 @@ class StarList(object):
         if 0 == num_stars:
             msg = "Star list must not be empty"
             return False, msg
+        for item in self.stars_list:
+            if not isinstance(item, SystemStar):
+                msg = "Item " + str(item) + " not a SystemStar"
+                return False, msg
         for i in range(1, num_stars):
             if not self.stars_list[0].is_bigger(self.stars_list[i]):
                 msg = "Index " + str(i) + " better primary candidate than index 0"
@@ -87,12 +91,36 @@ class StarList(object):
 
     def check_canonical(self):
         msg = []
+        num_stars = len(self.stars_list)
         for star in self.stars_list:
             _, starmsg = star.check_canonical()
             msg.extend(starmsg)
+
+        # now check inter-star constraints
+        if 1 < num_stars:
+            for i in range(1, num_stars):
+                current = self.stars_list[i]
+                # only primary can be supergiant
+                is_super = current.is_supergiant
+                if is_super:
+                    line = "Star " + str(i) + " cannot be supergiant - is " + str(current)
+                    msg.append(line)
 
         return 0 == len(msg), msg
 
     def canonicalise(self):
         for star in self.stars_list:
             star.canonicalise()
+
+        num_stars = len(self.stars_list)
+        if 1 < num_stars:
+            primary_supergiant = self.stars_list[0].is_supergiant
+            for i in range(1, num_stars):
+                current = self.stars_list[i]
+                if current.is_supergiant:
+                    if 'A' == current.spectral:
+                        current.size = 'II'
+                    elif 'B' == current.spectral:
+                        current.size = 'II'
+                    elif 'O' == current.spectral:
+                        current.size = 'II'

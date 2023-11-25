@@ -11,6 +11,7 @@ class SystemStar(object):
     sizes = ["Ia", "Ib", "II", "III", "IV", "V", "VI", "D", "NS", "PSR", "BH", "BD"]
     starsizes = ["Ia", "Ib", "II", "III", "IV", "V", "VI", "D"]
     spectrals = ['O', 'B', 'A', 'F', 'G', 'K', 'M']
+    supersizes = ['Ia', 'Ib']
 
     def __init__(self, size, spectral=None, digit=None):
         self.size = size
@@ -31,6 +32,10 @@ class SystemStar(object):
     @property
     def is_stellar_not_dwarf(self):
         return self.is_stellar and self.size != 'D'
+
+    @property
+    def is_supergiant(self):
+        return self.size in SystemStar.supersizes
 
     def is_bigger(self, other):
         if self.size != other.size:
