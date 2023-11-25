@@ -107,6 +107,9 @@ class StarList(object):
                     line = "Star " + str(i) + " cannot be supergiant - is " + str(current)
                     msg.append(line)
                 if primary_supergiant:
+                    if 'D' == current.size:
+                        line = 'Supergiant primary precludes D-class stars'
+                        msg.append(line)
                     if 'F' == current.spectral and current.size in ['II', 'III']:
                         line = 'Supergiant primary precludes F-class with sizes II and III - bright and regular giants - is ' + str(current)
                         msg.append(line)
@@ -174,3 +177,6 @@ class StarList(object):
                             current.size = 'IV'
                         if current.spectral is not None and current.spectral in 'FGKM' and current.size in ['II', 'III', 'IV']:
                             current.size = 'V'
+
+            if primary_supergiant:  # Supergiant primary precludes D-class stars, so out the window they go
+                self.stars_list = [star for star in self.stars_list if 'D' != star.size]
