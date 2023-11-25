@@ -59,6 +59,12 @@ class SystemStar(object):
         if 'VI' == self.size and self.spectral in 'OBA':
             line = "OBA class stars cannot be size VI, is " + str(self)
             msg.append(line)
+        if 'IV' == self.size and 'M' == self.spectral:
+            line = "M class stars cannot be size IV, is " + str(self)
+            msg.append(line)
+        if 'IV' == self.size and 'K' == self.spectral and str(self.digit) in '56789':
+            line = "K5-K9 class stars cannot be size IV, is " + str(self)
+            msg.append(line)
 
         return 0 == len(msg), msg
 
@@ -67,4 +73,13 @@ class SystemStar(object):
             self.size = 'II'
 
         if 'D' == self.size and self.spectral is not None and self.digit is not None:
+            self.size = 'V'
+
+        if 'VI' == self.size and self.spectral in 'OBA':
+            self.size = 'V'
+
+        if 'IV' == self.size and 'M' == self.spectral:
+            self.size = 'V'
+
+        if 'IV' == self.size and 'K' == self.spectral and str(self.digit) in '56789':
             self.size = 'V'
