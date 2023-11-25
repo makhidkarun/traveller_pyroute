@@ -8,13 +8,32 @@ from PyRoute.SystemData.StarList import StarList
 
 
 @composite
-def star_list(draw, max_stars=10):
+def star_list(draw, max_stars=10, cleanup=False):
     num_stars = draw(integers(min_value=1, max_value=max_stars))
     starline = ''
 
     for i in range(num_stars):
         starchunk = draw(from_regex(StarList.stellar_match))
+        if cleanup:
+            if 1 < len(starchunk) and ' ' not in starchunk and 'DD' in starchunk:
+                starchunk = starchunk.replace('DD', 'D ')
+            elif 1 < len(starchunk) and ' ' not in starchunk and starchunk.endswith('D') and not starchunk.endswith('BD'):
+                starchunk = starchunk[:-1]
+
+            if 5 < len(starchunk):
+                match = StarList.stellar_match.findall(starchunk)
+                if match:
+                    headroom = max_stars - i
+                    match = match[:headroom]
+                    extra_matches = len(match) - 1
+                    i += extra_matches
+                    starchunk = ' '.join(match)
+
         starline += starchunk + ' '
+
+    if cleanup:  # if we've gotten this far, we then assume that there's at least one stellar match
+        matches = StarList.stellar_match.findall(starline)
+        assume(0 < len(matches))
 
     return starline
 
@@ -50,6 +69,13 @@ class testStarList(unittest.TestCase):
     @example('F9 V M7 D')
     @example('F7 V M0 D M2 D')
     @example('F7 V M3 D M0 D')
+    @example('A0Ia A0Ia D D D D D DD ')
+    @example('A0Ia A0Ia D D D D D NSD ')
+    @example('A0Ia D D D D D D DD0 ')
+    @example('A0Ia A0IaD0 D D D D D D ')
+    @example('A0Ia D D D D D NSD0D0 ')
+    @example('A0Ia D D D D D 0NSD0D0 ')
+    @example('0 ')
     def test_star_list_generation(self, star_line):
         hyp_line = "Hypothesis input: " + star_line
         allowed_value_errors = [
@@ -76,13 +102,18 @@ class testStarList(unittest.TestCase):
     Given an otherwise valid input string that needs canonicalisation, verify that canonicalisation does what it says
     on the tin, and that canonicalisation is itself idempotent
     """
-    @given(star_list(max_stars=8))
+    @given(star_list(max_stars=8, cleanup=True))
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
     @example('K9 Ib ')
+    @example('D ')
     def test_star_list_canonical(self, star_line):
         hyp_line = "Hypothesis input: " + star_line
 
-        list = StarList(star_line)
+        list = None
+        try:
+            list = StarList(star_line, trim_stars=True)
+        except Exception:
+            self.assertTrue(False, hyp_line)
         result, msg = list.check_canonical()
         assume(not result)
 

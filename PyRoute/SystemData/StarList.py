@@ -16,20 +16,25 @@ class StarList(object):
 
     stellar_line = '([OBAFGKM][0-9] ?(?:Ia|Ib|II|III|IV|V|VI|VII|D)|D|NS|PSR|BH|BD)'
     star_line = '^([OBAFGKM])([0-9]) ?(Ia|Ib|II|III|IV|V|VI)'
+    mid_star_line = '([OBAFGKM])([0-9]) ?(Ia|Ib|II|III|IV|V|VI)'
 
     stellar_match = re.compile(stellar_line)
     star_match = re.compile(star_line)
+    mid_star_match = re.compile(mid_star_line)
 
     # Limits
     max_stars = 8  # T5.10 book 3 p 21, "A system may to have up to eight stars:"
 
-    def __init__(self, stars_line):
+    def __init__(self, stars_line, trim_stars=False):
         self.stars_line = stars_line
         stars = StarList.stellar_match.findall(stars_line)
         if not stars:
             raise ValueError("No stars found")
         if 8 < len(stars):
-            raise ValueError("Max number of stars is 8")
+            if trim_stars:
+                stars = stars[0:8]
+            else:
+                raise ValueError("Max number of stars is 8")
 
         self.stars_list = []
         for s in stars:
