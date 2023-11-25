@@ -149,6 +149,7 @@ class testStarList(unittest.TestCase):
             self.assertTrue(False, hyp_line)
         result, msg = list.check_canonical()
         assume(not result)
+        list.move_biggest_to_primary()
 
         list.canonicalise()
 
