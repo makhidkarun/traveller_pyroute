@@ -48,6 +48,13 @@ class StarList(object):
                 item = SystemStar(bitz[1], bitz[0][0], int(bitz[0][1]))
             self.stars_list.append(item)
 
+    def __str__(self):
+        base = ''
+        for item in self.stars_list:
+            base += str(item) + ' '
+
+        return base.strip()
+
     def move_biggest_to_primary(self):
         num_stars = len(self.stars_list)
         if 2 > num_stars:  # nothing to do, bail out now

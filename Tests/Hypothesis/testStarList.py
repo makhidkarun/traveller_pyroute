@@ -107,6 +107,7 @@ class testStarList(unittest.TestCase):
     @example('K9 Ib ')
     @example('D ')
     @example('A0 D ')
+    @example('O6 VI')
     def test_star_list_canonical(self, star_line):
         hyp_line = "Hypothesis input: " + star_line
 
@@ -124,3 +125,12 @@ class testStarList(unittest.TestCase):
         badline = '' if result else msg[0]
         badline += '\n  ' + hyp_line
         self.assertTrue(result, "Canonicalisation failed. " + badline)
+
+    def test_stargen_class_ordering(self):
+        cases = [
+            ('O6 VI', 'O6 VI')
+        ]
+
+        for star_line, expected in cases:
+            list = StarList(star_line)
+            self.assertEqual(expected, str(list))
