@@ -163,12 +163,14 @@ class StarList(object):
                         if current.spectral in 'FGKM' and current.size in ['II', 'III', 'IV']:
                             line = 'Ib supergiant primary precludes {}-class bright, regular and subgiants - size II, III and IV - is {}'.format(current.spectral, str(current))
                             msg.append(line)
+                self.check_star_size_against_primary(current, msg)
 
         return 0 == len(msg), msg
 
     def canonicalise(self):
         for star in self.stars_list:
             star.canonicalise()
+        self.move_biggest_to_primary()
 
         num_stars = len(self.stars_list)
         if 1 < num_stars:
@@ -212,5 +214,33 @@ class StarList(object):
                         if current.spectral is not None and current.spectral in 'FGKM' and current.size in ['II', 'III', 'IV']:
                             current.size = 'V'
 
+                self.fix_star_size_against_primary(current)
+
             if primary_supergiant:  # Supergiant primary precludes D-class stars, so out the window they go
                 self.stars_list = [star for star in self.stars_list if 'D' != star.size]
+
+    def check_star_size_against_primary(self, current, msg):
+        if not current.is_stellar_not_dwarf:
+            return
+
+        max_pri, min_pri = self.primary_flux_bounds
+        if max_pri is None or min_pri is None:
+            return
+        max_flux = min(8, max_pri + 8)
+        min_flux = min_pri + 3
+        line = current.check_canonical_size(max_flux, min_flux)
+        if line:
+            msg.append(line)
+
+    def fix_star_size_against_primary(self, current):
+        if not current.is_stellar_not_dwarf:
+            return
+
+        max_pri, min_pri = self.primary_flux_bounds
+        if max_pri is None or min_pri is None:
+            return
+        max_flux = min(8, max_pri + 8)
+        min_flux = min_pri + 3
+        current.fix_canonical_size(max_flux, min_flux)
+        if current.spectral in 'FK':
+            current.canonicalise()

@@ -8,8 +8,8 @@ from PyRoute.SystemData.StarList import StarList
 
 
 @composite
-def star_list(draw, max_stars=10, cleanup=False):
-    num_stars = draw(integers(min_value=1, max_value=max_stars))
+def star_list(draw, min_stars=1, max_stars=10, cleanup=False):
+    num_stars = draw(integers(min_value=min_stars, max_value=max_stars))
     starline = ''
 
     for i in range(num_stars):
@@ -130,6 +130,10 @@ class testStarList(unittest.TestCase):
     @example('A0Ia BD ')
     @example('F0Ia BD ')
     @example('G0Ia BD ')
+    @example('B0III K5III')
+    @example('B0III K0III')
+    @example('F0Ib K0Ia ')
+    @example('F0III K0Ia')
     def test_star_list_canonical(self, star_line):
         hyp_line = "Hypothesis input: " + star_line
 
@@ -140,7 +144,6 @@ class testStarList(unittest.TestCase):
             self.assertTrue(False, hyp_line)
         result, msg = list.check_canonical()
         assume(not result)
-        list.move_biggest_to_primary()
 
         list.canonicalise()
 
@@ -185,3 +188,57 @@ class testStarList(unittest.TestCase):
         else:
             self.assertIsNotNone(min_flux, "if max-flux is not None, so must be min-flux.  " + hyp_line)
             self.assertTrue(max_flux >= min_flux, "Min-flux cannot exceed max-flux.  " + hyp_line)
+
+    @given(star_list(min_stars=2, max_stars=2, cleanup=True), none())
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)]
+              )  # suppress slow-data health check, too-much filtering
+    @example('O0Ia O0Ia ', 'O0 Ia O0 II')
+    @example('O0Ia B0Ia ', 'O0 Ia B0 II')
+    @example('O0Ia A0Ia ', 'O0 Ia A0 II')
+    @example('O0Ia F0Ia ', 'O0 Ia F0 IV')
+    @example('O0Ia G0Ia ', 'O0 Ia G0 IV')
+    @example('O0Ia K0Ia ', 'O0 Ia K0 IV')
+    @example('O0Ia M0Ia ', 'O0 Ia M0 II')
+    @example('D A0Ia ', None)
+    @example('B0Ia B0Ia ', 'B0 Ia B0 II')
+    @example('B0Ia A0Ia ', 'B0 Ia A0 II')
+    @example('B0Ia F0Ia ', 'B0 Ia F0 IV')
+    @example('B0Ia G0Ia ', 'B0 Ia G0 IV')
+    @example('B0Ia K0Ia ', 'B0 Ia K0 IV')
+    @example('B0Ia M0Ia ', 'B0 Ia M0 II')
+    @example('A0Ia A0Ia ', 'A0 Ia A0 III')
+    @example('A0Ia F0Ia ', 'A0 Ia F0 V')
+    @example('A0Ia G0Ia ', 'A0 Ia G0 V')
+    @example('A0Ia K0Ia ', 'A0 Ia K0 V')
+    @example('A0Ia M0Ia ', 'A0 Ia M0 III')
+    @example('F0Ia F0Ia ', 'F0 II F0 V')
+    @example('F0Ia G0Ia ', 'F0 II G0 V')
+    @example('F0Ia K0Ia ', 'F0 II K0 V')
+    @example('F0Ia M0Ia ', 'F0 II M0 V')
+    @example('G0Ia G0Ia ', 'G0 II G0 V')
+    @example('G0Ia K0Ia ', 'G0 II K0 V')
+    @example('G0Ia M0Ia ', 'G0 II M0 V')
+    @example('K0Ia K0Ia ', 'K0 II K0 VI')
+    @example('K0Ia M0Ia ', 'K0 II M0 VI')
+    @example('M0Ia M0Ia ', 'M0 II M0 VI')
+    def test_check_star_size_against_primary(self, star_line, expected):
+        hyp_line = "Hypothesis input: " + star_line
+
+        list = StarList(star_line)
+        assume(2 == len(list.stars_list))
+        assume(list.stars_list[1].is_stellar_not_dwarf)
+        list.move_biggest_to_primary()
+        list.primary.canonicalise()
+
+        msg = []
+        list.check_star_size_against_primary(list.stars_list[1], msg)
+        assume(1 == len(msg))
+
+        list.fix_star_size_against_primary(list.stars_list[1])
+
+        nu_msg = []
+        list.check_star_size_against_primary(list.stars_list[1], msg)
+        self.assertEqual(0, len(nu_msg), "Incorrect star-size messages should be cleared by fix")
+
+        if expected is not None:
+            self.assertEqual(expected, str(list), "Unexpected final starline.  " + hyp_line)

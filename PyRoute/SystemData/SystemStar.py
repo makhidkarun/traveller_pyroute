@@ -13,6 +13,24 @@ class SystemStar(object):
     spectrals = ['O', 'B', 'A', 'F', 'G', 'K', 'M']
     supersizes = ['Ia', 'Ib']
 
+    star_fluxen = {
+        'O': {-6: 'Ia', -5: 'Ia', -4: 'Ib', -3: 'II', -2: 'III', -1: 'III', 0: 'III', 1: 'V', 2: 'V', 3: 'V', 4: 'IV', 5: 'D', 6: 'IV', 7: 'IV', 8: 'IV'},
+        'B': {-6: 'Ia', -5: 'Ia', -4: 'Ib', -3: 'II', -2: 'III', -1: 'III', 0: 'III', 1: 'III', 2: 'V', 3: 'V', 4: 'IV',
+              5: 'D', 6: 'IV', 7: 'IV', 8: 'IV'},
+        'A': {-6: 'Ia', -5: 'Ia', -4: 'Ib', -3: 'II', -2: 'III', -1: 'IV', 0: 'V', 1: 'V', 2: 'V', 3: 'V', 4: 'V',
+              5: 'D', 6: 'V', 7: 'V', 8: 'V'},
+        'F0-4': {-6: 'II', -5: 'II', -4: 'III', -3: 'IV', -2: 'V', -1: 'V', 0: 'V', 1: 'V', 2: 'V', 3: 'V', 4: 'V',
+              5: 'D', 6: 'V', 7: 'V', 8: 'V'},
+        'F5-9': {-6: 'II', -5: 'II', -4: 'III', -3: 'IV', -2: 'V', -1: 'V', 0: 'V', 1: 'V', 2: 'V', 3: 'V', 4: 'VI',
+              5: 'D', 6: 'VI', 7: 'VI', 8: 'VI'},
+        'G': {-6: 'II', -5: 'II', -4: 'III', -3: 'IV', -2: 'V', -1: 'V', 0: 'V', 1: 'V', 2: 'V', 3: 'V', 4: 'VI',
+              5: 'D', 6: 'VI', 7: 'VI', 8: 'VI'},
+        'K': {-6: 'II', -5: 'II', -4: 'III', -3: 'IV', -2: 'V', -1: 'V', 0: 'V', 1: 'V', 2: 'V', 3: 'V', 4: 'VI',
+              5: 'D', 6: 'VI', 7: 'VI', 8: 'VI'},
+        'M': {-6: 'II', -5: 'II', -4: 'II', -3: 'II', -2: 'III', -1: 'V', 0: 'V', 1: 'V', 2: 'V', 3: 'V', 4: 'VI',
+              5: 'D', 6: 'VI', 7: 'VI', 8: 'VI'}
+    }
+
     def __init__(self, size, spectral=None, digit=None):
         self.size = size
         self.spectral = spectral
@@ -94,3 +112,35 @@ class SystemStar(object):
 
         if 'IV' == self.size and 'K' == self.spectral and str(self.digit) in '56789':
             self.size = 'V'
+
+    @property
+    def flux_choice(self):
+        if 'F' != self.spectral:
+            return self.spectral
+        else:
+            if int(self.digit) < 5:
+                return 'F0-4'
+            else:
+                return 'F5-9'
+
+    def check_canonical_size(self, max_flux, min_flux):
+        choice = self.flux_choice
+        flux_line = SystemStar.star_fluxen[choice]
+        trim_line = {v for (k, v) in flux_line.items() if max_flux >= k >= min_flux}
+        msg = None
+        if self.size not in trim_line:
+            msg = "Flux values {} to {} only permit sizes {} of {} class star - not {}".format(min_flux, max_flux, ' '.join(trim_line), choice, self.size)
+
+        return msg
+
+    def fix_canonical_size(self, max_flux, min_flux):
+        choice = self.flux_choice
+        flux_line = SystemStar.star_fluxen[choice]
+        current_flux = [k for (k, v) in flux_line.items() if v == self.size]
+        if not current_flux:
+            current_flux = [-6]
+
+        if max(current_flux) < min_flux:
+            self.size = flux_line[min_flux]
+        elif min(current_flux) > max_flux:
+            self.size = flux_line[max_flux]
