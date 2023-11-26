@@ -102,39 +102,44 @@ class testStarList(unittest.TestCase):
     Given an otherwise valid input string that needs canonicalisation, verify that canonicalisation does what it says
     on the tin, and that canonicalisation is itself idempotent
     """
-    @given(star_list(max_stars=8, cleanup=True))
+    @given(star_list(max_stars=8, cleanup=True), none())
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
-    @example('K9 Ib ')
-    @example('D ')
-    @example('A0 D ')
-    @example('O6 VI')
-    @example('A0Ia M0IV')
-    @example('K5IV')
-    @example('F0VI')
-    @example('D A0Ia')
-    @example('A0Ia A0Ia ')
-    @example('A0Ia B0Ib ')
-    @example('O0Ia O0Ia ')
-    @example('O0Ia F0Ia ')
-    @example('A0Ia G0Ia ')
-    @example('A0Ia K0Ia ')
-    @example('A0Ia K5Ia ')
-    @example('O0Ib O0Ib ')
-    @example('B0Ib B0Ib ')
-    @example('A0Ib A0Ib ')
-    @example('A0Ib F0Ib ')
-    @example('D A0Ib ')
-    @example('A0Ib G0Ib ')
-    @example('A0Ib K0Ib ')
-    @example('A0Ib M0Ib ')
-    @example('A0Ia BD ')
-    @example('F0Ia BD ')
-    @example('G0Ia BD ')
-    @example('B0III K5III')
-    @example('B0III K0III')
-    @example('F0Ib K0Ia ')
-    @example('F0III K0Ia')
-    def test_star_list_canonical(self, star_line):
+    @example('K9 Ib ', 'K9 II')
+    @example('D ', '')  # Examples with expected value of '' do not make it far enough to check their starline
+    @example('A0 D ', 'A0 V')
+    @example('O6 VI', 'O6 V')
+    @example('A0Ia M0IV', 'A0 Ia M0 V')
+    @example('K5IV', 'K5 V')
+    @example('F0VI', 'F0 V')
+    @example('D A0Ia', 'A0 Ia')
+    @example('A0Ia A0Ia ', 'A0 Ia A0 III')
+    @example('A0Ia B0Ib ', 'A0 Ia B0 III')
+    @example('O0Ia O0Ia ', 'O0 Ia O0 II')
+    @example('O0Ia F0Ia ', 'O0 Ia F0 IV')
+    @example('A0Ia G0Ia ', 'A0 Ia G0 V')
+    @example('A0Ia K0Ia ', 'A0 Ia K0 V')
+    @example('A0Ia K5Ia ', 'A0 Ia K5 V')
+    @example('O0Ib O0Ib ', 'O0 Ib O0 III')
+    @example('B0Ib B0Ib ', 'B0 Ib B0 III')
+    @example('A0Ib A0Ib ', 'A0 Ib A0 IV')
+    @example('A0Ib F0Ib ', 'A0 Ib F0 V')
+    @example('D A0Ib ', 'A0 Ib')
+    @example('A0Ib G0Ib ', 'A0 Ib G0 V')
+    @example('A0Ib K0Ib ', 'A0 Ib K0 V')
+    @example('A0Ib K6Ib ', 'A0 Ib K6 V')
+    @example('A0Ib M0Ib ', 'A0 Ib M0 V')
+    @example('A0Ia BD ', '')
+    @example('F0Ia BD ', 'F0 II BD')
+    @example('F5Ia BD ', 'F5 II BD')
+    @example('G0Ia BD ', 'G0 II BD')
+    @example('K0Ia BD ', 'K0 II BD')
+    @example('K5Ia BD ', 'K5 II BD')
+    @example('B0III K5III', 'B0 III K5 V')
+    @example('B0III K0III', 'B0 III K0 IV')
+    @example('F0Ib K0Ia ', 'F0 II K0 V')
+    @example('F0III K0Ia', 'K0 II F0 V')
+    @example('BH \U0008082aNS NS BD K9 IV BH PSR BH\U0008299e\xa0 ', 'K9 V NS NS BD BH BH PSR BH')
+    def test_star_list_canonical(self, star_line, expected):
         hyp_line = "Hypothesis input: " + star_line
 
         list = None
@@ -151,6 +156,9 @@ class testStarList(unittest.TestCase):
         badline = '' if result else msg[0]
         badline += '\n  ' + hyp_line
         self.assertTrue(result, "Canonicalisation failed. " + badline)
+
+        if expected is not None:
+            self.assertEqual(expected, str(list), "Unexpected final starline.  " + hyp_line)
 
     def test_stargen_class_ordering(self):
         cases = [
