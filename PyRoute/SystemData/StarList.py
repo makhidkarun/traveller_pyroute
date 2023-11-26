@@ -24,6 +24,20 @@ class StarList(object):
 
     # Limits
     max_stars = 8  # T5.10 book 3 p 21, "A system may to have up to eight stars:"
+    primary_flux = {
+        'PSR': (None, None),
+        'D': (None, None),
+        'NS': (None, None),
+        'BH': (None, None),
+        'BD': (None, None),
+        'O': (-6, -6),
+        'B': (-6, -6),
+        'A': (-4, -5),
+        'F': (-2, -3),
+        'G': (0, -1),
+        'K': (2, 1),
+        'M': (5, 3)
+    }
 
     def __init__(self, stars_line, trim_stars=False):
         self.stars_line = stars_line
@@ -97,6 +111,13 @@ class StarList(object):
     def preclude_brown_dwarfs(self):
         primary = self.primary
         return primary.spectral is not None and primary.spectral in 'OBAFG'
+
+    @property
+    def primary_flux_bounds(self):
+        primary = self.primary
+        lookup = primary.spectral if primary.spectral is not None else primary.size
+        line = StarList.primary_flux[lookup]
+        return line[0], line[1]
 
     def check_canonical(self):
         msg = []
