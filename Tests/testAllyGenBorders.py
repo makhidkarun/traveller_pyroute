@@ -286,9 +286,6 @@ class testAllyGenBorders(baseTest):
         allymap = self.unpack_filename('DeltaFiles/create_ally_map_district_268_collapse_trim/allymap.json')
         borderfile = self.unpack_filename('DeltaFiles/create_ally_map_district_268_collapse_trim/borders.json')
 
-        foo = platform.platform()
-        is_fnorda = '.fc' in foo
-
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
         delta[sector.name] = sector
@@ -308,21 +305,16 @@ class testAllyGenBorders(baseTest):
 
         allygen.create_ally_map('collapse')
 
-        if is_fnorda:  # Write out current gubbins
-            self.dump_expected_values(allygen, allymap, borderfile)
-        else:  # Check stored gubbins
-            expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
-            self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
-            self.assertDictEqual(expected_allies, allygen.allyMap)
-            self.assertDictEqual(expected_borders, allygen.borders)
+        # Check stored gubbins
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
+        self.assertDictEqual(expected_allies, allygen.allyMap)
+        self.assertDictEqual(expected_borders, allygen.borders)
 
     def test_create_borders_district_268_collapse_trim(self):
         sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse_trim/Spinward Marches-District 268.sec')
         allymap = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse_trim/allymap.json')
         borderfile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse_trim/borders.json')
-
-        foo = platform.platform()
-        is_fnorda = '.fc' in foo
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -343,21 +335,16 @@ class testAllyGenBorders(baseTest):
 
         allygen.create_borders('collapse')
 
-        if is_fnorda:  # Write out current gubbins
-            self.dump_expected_values(allygen, allymap, borderfile)
-        else:  # Check stored gubbins
-            expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
-            self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
-            self.assertDictEqual(expected_allies, allygen.allyMap)
-            self.assertDictEqual(expected_borders, allygen.borders)
+        # Check stored gubbins
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
+        self.assertDictEqual(expected_allies, allygen.allyMap)
+        self.assertDictEqual(expected_borders, allygen.borders)
 
     def test_create_erode_border_district_268_collapse_trim(self):
         sourcefile = self.unpack_filename('DeltaFiles/create_erode_border_district_268_collapse_trim/Spinward Marches-District 268.sec')
         allymap = self.unpack_filename('DeltaFiles/create_erode_border_district_268_collapse_trim/allymap.json')
         borderfile = self.unpack_filename('DeltaFiles/create_erode_border_district_268_collapse_trim/borders.json')
-
-        foo = platform.platform()
-        is_fnorda = '.fc' in foo
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -378,13 +365,11 @@ class testAllyGenBorders(baseTest):
 
         allygen.create_erode_border('collapse')
 
-        if is_fnorda:  # Write out current gubbins
-            self.dump_expected_values(allygen, allymap, borderfile)
-        else:  # Check stored gubbins
-            expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
-            #self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
-            self.assertDictEqual(dict(expected_allies), allygen.allyMap)
-            self.assertDictEqual(dict(expected_borders), allygen.borders)
+        # Check stored gubbins
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
+        self.assertDictEqual(dict(expected_allies), allygen.allyMap)
+        self.assertDictEqual(dict(expected_borders), allygen.borders)
 
     def test_create_ally_map_district_268_separate(self):
         sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
