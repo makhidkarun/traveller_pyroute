@@ -430,6 +430,8 @@ class AllyGen(object):
                         neighbor = Hex.get_neighbor(neighbor, direction)
 
         # self._output_map(allyMap, 1)
+        mults = {k: v for k, v in allyMap.items() if 1 < len(v)}
+        self.logger.error("Multi-claimed hexen: " + str(mults))
 
         # Pass 2: find overlapping areas and reduce
         # 0: hexes with only one claimant, give it to them
@@ -463,6 +465,10 @@ class AllyGen(object):
                         allyMap[cand_hex] = maxAlly
 
         # self._output_map(allyMap, 2)
+        mults_two = {}
+        for cand_hex in mults:
+            mults_two[cand_hex] = allyMap[cand_hex]
+        self.logger.error("Multi-claimed hexen, stage 2: " + str(mults_two))
 
         # Pass 3: find lonely claimed hexes and remove them
         # Do two passes through the data
@@ -482,6 +488,11 @@ class AllyGen(object):
                     allyMap[cand_hex] = algList[0][0]
                 else:
                     allyMap[cand_hex] = self.nonAligned[0]
+
+        mults_three = {}
+        for cand_hex in mults:
+            mults_three[cand_hex] = allyMap[cand_hex]
+        self.logger.error("Multi-claimed hexen, stage 3: " + str(mults_three))
         return allyMap
 
     def create_erode_border(self, match):
