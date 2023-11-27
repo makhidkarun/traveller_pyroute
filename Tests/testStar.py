@@ -35,7 +35,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual('0103', star1.position)
         self.assertTrue(star1.q == 0 and star1.r == 37, "%s, %s" % (star1.q, star1.r))
         self.assertEqual('Irkigkhan', star1.name)
-        self.assertEqual('C9C4733-9', star1.uwp)
+        self.assertEqual('C9C4733-9', str(star1.uwp))
         self.assertEqual('Im', star1.alg_code)
         self.assertEqual(10, star1.population, "Population %s" % star1.population)
         self.assertEqual(9, star1.wtn, "wtn %s" % star1.wtn)
@@ -85,7 +85,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual('0104', star1.position)
         self.assertTrue(star1.q == 0 and star1.r == 36, "%s, %s" % (star1.q, star1.r))
         self.assertEqual('Shana Ma', star1.name)
-        self.assertEqual('E551112-7', star1.uwp)
+        self.assertEqual('E551112-7', str(star1.uwp))
         self.assertEqual('Im', star1.alg_code)
         self.assertEqual(0, star1.population, "Population %s" % star1.population)
         self.assertEqual(2, star1.wtn, "wtn %s" % star1.wtn)
@@ -113,7 +113,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual('Core', star1.sector.name, star1.sector.name)
         self.assertEqual(star1.position, '2323')
         self.assertEqual(star1.name, 'Syss')
-        self.assertEqual(star1.uwp, 'C400746-8')
+        self.assertEqual('C400746-8', str(star1.uwp))
         self.assertEqual(star1.stars, 'M9 III D M5 V')
         self.assertEqual(star1.star_list, ['M9 III', 'D', 'M5 V'])
         self.assertEqual(22, star1.x)
@@ -399,7 +399,7 @@ class TestStar(unittest.TestCase):
                 act_int = star._ehex_to_int(str(ehex))
                 self.assertEqual(intvalue, act_int, "Ehex-to-int mapping failed for TL " + str(ehex))
                 act_ehex = star._int_to_ehex(act_int)
-                self.assertEqual(ehex, act_ehex, "Int-to-ehex mapping failed for TL " + str(ehex))
+                self.assertEqual(str(ehex), act_ehex, "Int-to-ehex mapping failed for TL " + str(ehex))
 
     def test_parse_to_line(self):
         line_list = [

@@ -129,10 +129,10 @@ class PDFSectorMap(Map):
         point = PDFCursor(col, row)
         self.zone(pdf, star, point.copy())
 
-        width = self.string_width(pdf.get_font(), star.uwp)
+        width = self.string_width(pdf.get_font(), str(star.uwp))
         point.y_plus(7)
         point.x_plus(self.ym - (width / 2))
-        pdf.add_text(star.uwp.encode('ascii', 'replace'), point)
+        pdf.add_text(str(star.uwp).encode('ascii', 'replace'), point)
 
         if len(star.name) > 0:
             for chars in range(len(star.name), 0, -1):

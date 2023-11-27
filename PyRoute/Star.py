@@ -14,6 +14,8 @@ from PyRoute.Position.Hex import Hex
 
 from PyRoute.AllyGen import AllyGen
 from PyRoute.TradeCodes import TradeCodes
+from PyRoute.SystemData.Utilities import Utilities
+from PyRoute.SystemData.UWP import UWP
 from collections import OrderedDict
 
 
@@ -107,9 +109,6 @@ class Star(object):
         self.ggCount = None
         self.belts = None
         self.nobles = None
-        self.law = None
-        self.gov = None
-        self.pop = None
         self.logger = logging.getLogger('PyRoute.Star')
         self._hash = None
         self._key = None
@@ -126,15 +125,9 @@ class Star(object):
         self.sector = None
         self.position = None
         self.uwp = None
-        self.popCode = None
         self.popM = None
         self.uwpCodes = None
         self.tradeCode = None
-        self.tl = None
-        self.atmo = None
-        self.size = None
-        self.hydro = None
-        self.port = None
         self.economics = None
         self.social = None
         self.baseCode = None
@@ -216,20 +209,7 @@ class Star(object):
         star.set_location()
         star.name = data[1].strip()
 
-        star.uwp = data[2].strip()
-        star.port = star.uwp[0]
-        star.size = star.uwp[1]
-        star.atmo = star.uwp[2]
-        star.hydro = star.uwp[3]
-        star.pop = star.uwp[4]
-        star.gov = star.uwp[5]
-        star.law = star.uwp[6]
-        star.tl = star._ehex_to_int(star.uwp[8])
-        try:
-            star.popCode = star._ehex_to_int(star.pop)
-        except ValueError:
-            star.popCode = 12
-
+        star.uwp = UWP(data[2].strip())
         star.tradeCode = TradeCodes(data[3].strip())
         star.ownedBy = star.tradeCode.owned_by(star)
 
@@ -282,7 +262,7 @@ class Star(object):
                          'Population': star.pop,
                          'Government': star.gov,
                          'Law Level': star.law,
-                         'Tech Level': star.uwp[8],
+                         'Tech Level': star.tl,
                          'Pop Code': str(star.popM),
                          'Starport Size': star.starportSize,
                          'Primary Type': star.star_list[0][0] if star.star_list else 'X',
@@ -354,7 +334,7 @@ class Star(object):
         return self._hash
 
     def calc_hash(self):
-        self._key = (self.position, self.name, self.uwp, self.sector.name)
+        self._key = (self.position, self.name, str(self.uwp), self.sector.name)
         self._hash = hash(self._key)
 
     def wiki_name(self):
@@ -401,6 +381,50 @@ class Star(object):
     @property
     def row(self):
         return self.hex.row
+
+    @property
+    def port(self):
+        return str(self.uwp.port)
+
+    @port.setter
+    def port(self, value):
+        self.uwp.port = str(value)
+
+    @property
+    def size(self):
+        return self.uwp.size
+
+    @property
+    def atmo(self):
+        return self.uwp.atmo
+
+    @property
+    def hydro(self):
+        return self.uwp.hydro
+
+    @property
+    def pop(self):
+        return self.uwp.pop
+
+    @property
+    def gov(self):
+        return self.uwp.gov
+
+    @property
+    def law(self):
+        return self.uwp.law
+
+    @property
+    def popCode(self):
+        return int(self.uwp.pop_code)
+
+    @property
+    def tl(self):
+        return int(self.uwp.tl_code)
+
+    @tl.setter
+    def tl(self, value):
+        self.uwp.tl = value
 
     def distance(self, star):
         hex1 = self.hex.hex_position()
@@ -729,22 +753,10 @@ class Star(object):
             self.im_be = 0
 
     def _ehex_to_int(self, value):
-        val = int(value, 36) if value in '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ' else 0
-        val -= 1 if val > 18 else 0
-        val -= 1 if val > 22 else 0
-        return val
+        return Utilities.ehex_to_int(value)
 
     def _int_to_ehex(self, value):
-        if 10 > value:
-            return value
-        # Ehex doesn't use I, as it's too easily confused with the numeric 1, likewise with 0 and O
-        if 9 < value < 18:
-            valstring = 'ABCDEFGH'
-            return valstring[value - 10]
-        if 17 < value:
-            valstring = 'JKLMNOPQRSTUVWXYZ'
-            value += 1 if 22 < value else 0
-            return valstring[value - 18]
+        return Utilities.int_to_ehex(value)
 
     def split_stellar_data(self):
         star_parts = self.stars.split()
@@ -785,6 +797,8 @@ class Star(object):
         assert self.hex is not None, "Star " + str(self.name) + " is missing hex attribute"
         assert hasattr(self, 'allegiance_base'), "Star " + str(self.name) + " is missing base allegiance attribute"
         assert self.allegiance_base is not None, "Star " + str(self.name) + " has empty base allegiance attribute"
+        result, msg = self.uwp.is_well_formed()
+        assert result, msg
         return True
 
     @property

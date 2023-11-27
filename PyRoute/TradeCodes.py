@@ -287,11 +287,11 @@ class TradeCodes(object):
         check = True
         if star.size in size and star.atmo in atmo and star.hydro in hydro \
                 and code not in self.codeset:
-            self.logger.error('{}-{} Calculated "{}" not in trade codes {}'.format(star, star.uwp, code, self.codeset))
+            self.logger.error('{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset))
             check = False
         if code in self.codeset and \
                 not (star.size in size and star.atmo in atmo and star.hydro in hydro):
-            self.logger.error('{}-{} Found invalid "{}" in trade codes: {}'.format(star, star.uwp, code, self.codeset))
+            self.logger.error('{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset))
             check = False
         return check
 
@@ -314,11 +314,11 @@ class TradeCodes(object):
         check = True
         if star.atmo in atmo and star.hydro in hydro and star.pop in pop \
                 and code not in self.codeset:
-            self.logger.error('{}-{} Calculated "{}" not in trade codes {}'.format(star, star.uwp, code, self.codeset))
+            self.logger.error('{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset))
             check = False
         if code in self.codeset and \
                 not (star.atmo in atmo and star.hydro in hydro and star.pop in pop):
-            self.logger.error('{}-{} Found invalid "{}" in trade codes: {}'.format(star, star.uwp, code, self.codeset))
+            self.logger.error('{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset))
             check = False
         return check
 
