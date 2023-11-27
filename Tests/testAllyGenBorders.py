@@ -13,6 +13,9 @@ from Tests.baseTest import baseTest
 
 
 class testAllyGenBorders(baseTest):
+
+    maxDiff = None
+
     def test_create_ally_map_masionia_collapse(self):
         sourcefile = self.unpack_filename('DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
         allymap = self.unpack_filename('DeltaFiles/create_ally_map_masionia_collapse/allymap.json')
