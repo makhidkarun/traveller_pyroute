@@ -247,7 +247,6 @@ class testAllyGenBorders(baseTest):
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
-    @pytest.mark.xfail(reason="Flaky on ubuntu")
     def test_create_ally_map_district_268_collapse(self):
         sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
         allymap = self.unpack_filename('DeltaFiles/create_ally_map_district_268_collapse/allymap.json')
@@ -275,8 +274,8 @@ class testAllyGenBorders(baseTest):
         allygen.create_ally_map('collapse')
 
         self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
-        self.assertEqual(expected_allies, allygen.allyMap)
-        self.assertEqual(expected_borders, allygen.borders)
+        self.assertDictEqual(expected_allies, allygen.allyMap)
+        self.assertDictEqual(expected_borders, allygen.borders)
 
     @pytest.mark.xfail(reason="Flaky on ubuntu")
     def test_create_ally_map_district_268_separate(self):
