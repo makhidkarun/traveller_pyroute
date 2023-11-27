@@ -4,6 +4,9 @@ PyRoute/DeltaDebug/__pycache__/
 PyRoute/Pathfinding/__pycache__/
 PyRoute/Calculation/__pycache__/
 PyRoute/Position/__pycache__/
+PyRoute/Inputs/__pycache__/
+PyRoute/Outputs/__pycache__/
+PyRoute/SystemData/__pycache__/
 Tests/__pycache__/
 PyRoute/*.pyc
 PyRoute/DeltaDebug/*.pyc
@@ -22,11 +25,16 @@ Tests/Pathfinding/__pycache__/
 Tests/Position/__pycache__/
 Tests/.pytest_cache/
 
+# ignore venvs
+venv/
+venv2/
+
 # ignore IDE-related detritus
 .idea/
 .project
 .pydevproject
 .settings/
+.hypothesis/
 
 # ignore downloaded/generated files
 sectors/
