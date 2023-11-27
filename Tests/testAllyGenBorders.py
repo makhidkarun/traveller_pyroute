@@ -386,12 +386,10 @@ class testAllyGenBorders(baseTest):
             self.assertDictEqual(dict(expected_allies), allygen.allyMap)
             self.assertDictEqual(dict(expected_borders), allygen.borders)
 
-
-    @pytest.mark.xfail(reason="Flaky on ubuntu")
     def test_create_ally_map_district_268_separate(self):
-        sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse_trim/Spinward Marches-District 268.sec')
-        allymap = self.unpack_filename('DeltaFiles/create_ally_map_district_268_separate_trim/allymap.json')
-        borderfile = self.unpack_filename('DeltaFiles/create_ally_map_district_268_separate_trim/borders.json')
+        sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_ally_map_district_268_separate/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_ally_map_district_268_separate/borders.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -448,7 +446,6 @@ class testAllyGenBorders(baseTest):
         self.assertEqual(dict(expected_allies), allygen.allyMap)
         self.assertEqual(dict(expected_borders), allygen.borders)
 
-    @pytest.mark.xfail(reason="Flaky on ubuntu")
     def test_create_erode_border_district_268_separate(self):
         sourcefile = self.unpack_filename(
             'DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
