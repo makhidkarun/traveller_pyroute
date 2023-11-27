@@ -258,11 +258,14 @@ class AllyGen(object):
             self.allyMap[(star.q, star.r)] = alg
 
         # self._output_map(allyMap, 0)
+        self.logger.error("Create-borders hexen, stage 1: " + str(self.allyMap))
 
         self.allyMap = self.step_map(self.allyMap)
+        self.logger.error("Create-borders hexen, stage 2: " + str(self.allyMap))
         # self._output_map(allyMap, 1)
 
         self.allyMap = self.step_map(self.allyMap)
+        self.logger.error("Create-borders hexen, stage 3: " + str(self.allyMap))
         # self._output_map(allyMap, 2)
 
         self._generate_borders(self.allyMap)
@@ -502,6 +505,7 @@ class AllyGen(object):
         """
         self.logger.info('Processing worlds for erode map drawing')
         allyMap, starMap = self._erode_map(match)
+        self.logger.error("Create-erode-borders hexen, stage 1:" + str(allyMap))
         changed = True
         change_count = 0
         while changed:
@@ -512,9 +516,11 @@ class AllyGen(object):
             if not changed:
                 changed, allyMap = self._break_spans(allyMap, starMap)
             change_count += 1
+        self.logger.error("Create-erode-borders hexen, stage 2:" + str(allyMap))
 
         self.logger.debug('Change Count: {}'.format(change_count))
         self._build_bridges(allyMap, starMap)
+        self.logger.error("Create-erode-borders hexen, stage 3:" + str(allyMap))
 
         self.allyMap = allyMap
         self._generate_borders(allyMap)
