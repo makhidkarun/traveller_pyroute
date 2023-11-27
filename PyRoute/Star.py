@@ -8,14 +8,11 @@ import logging
 import bisect
 import random
 import math
-import re
 
 from PyRoute.Position.Hex import Hex
 
 from PyRoute.AllyGen import AllyGen
-from PyRoute.TradeCodes import TradeCodes
 from PyRoute.SystemData.Utilities import Utilities
-from PyRoute.SystemData.UWP import UWP
 from collections import OrderedDict
 
 from PyRoute.SystemData.StarList import StarList
@@ -88,22 +85,6 @@ class Nobles(object):
 
 
 class Star(object):
-    regex = """
-^(\d\d\d\d) +
-(.{15,}) +
-(\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?) +
-(.{15,}) +
-((\{ *[+-]?[0-6] ?\}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]| -)|( ) ( ) ( )) +
-(\w{1,5}|-| ) +
-(\w{1,3}|-|\*) +
-(\w|-| ) +
-([0-9X?][0-9A-FX?][0-9A-FX?]) +
-(\d{1,}| ) +
-([A-Z0-9?-][A-Za-z0-9?-]{1,3})
-(.*)
-"""
-    starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
-
     __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code', 'hex'
 
     def __init__(self):

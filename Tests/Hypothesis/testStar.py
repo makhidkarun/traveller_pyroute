@@ -3,6 +3,7 @@ from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, from_regex
 
 from PyRoute.Galaxy import Sector
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Star import Star
 
 
@@ -11,7 +12,7 @@ class testStar(unittest.TestCase):
     """
     Given a regex-matching string, parse_line_to_star should return either a valid Star object or None
     """
-    @given(from_regex(regex=Star.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    @given(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
     @example('0000 000000000000000 00000O0-0 000000000000000       - - 0 000   00')
     @example('0000 000000000000000 ???????-? 000000000000000 {0} (000-0)  - - - 0 000   00')
