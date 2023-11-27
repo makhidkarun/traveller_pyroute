@@ -429,6 +429,7 @@ class Star(object):
     def tl(self, value):
         self.uwp.tl = value
 
+    @property
     def star_list(self):
         return self.star_list_object.stars_list
 
