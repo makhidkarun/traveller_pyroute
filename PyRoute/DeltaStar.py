@@ -79,7 +79,7 @@ class DeltaStar(Star):
 
     def reduce_extra_stars(self):
         if 0 < len(self.star_list):
-            self.star_list = [self.star_list[0]]
+            self.star_list_object.stars_list = [self.star_list_object.stars_list[0]]
 
     def reduce_pbg(self):
         self.popM = 1

@@ -18,6 +18,8 @@ from PyRoute.SystemData.Utilities import Utilities
 from PyRoute.SystemData.UWP import UWP
 from collections import OrderedDict
 
+from PyRoute.SystemData.StarList import StarList
+
 
 class UWPCodes(object):
     uwpCodes = ['Starport',
@@ -143,7 +145,7 @@ class Star(object):
         self.raw_be = None
         self.im_be = None
         self.col_be = None
-        self.star_list = None
+        self.star_list_object = None
         self.routes = None
         self.stars = None
         self.is_enqueued = False
@@ -265,7 +267,7 @@ class Star(object):
                          'Tech Level': star.tl,
                          'Pop Code': str(star.popM),
                          'Starport Size': star.starportSize,
-                         'Primary Type': star.star_list[0][0] if star.star_list else 'X',
+                         'Primary Type': star.star_list[0].spectral if star.star_list[0].spectral else 'X',
                          'Importance': star.importance,
                          'Resources': star._ehex_to_int(star.economics[1]) if star.economics else 0
                          }
@@ -302,11 +304,12 @@ class Star(object):
         str_tl = self._int_to_ehex(tl)
         result += uwp + "-" + str(str_tl)
         imp_chunk = "{ " + str(self.importance) + " }"
+        star_list = str(self.star_list_object)
         result += " " + str(self.tradeCode).ljust(38) + imp_chunk.ljust(6) + " "
         result += str(self.economics) + " " + str(self.social) + " " + str(self.nobles).ljust(4) + " "
         result += str(self.baseCode).ljust(2) + " " + str(self.zone).ljust(1) + " " + str(self.popM) + str(self.belts) + str(self.ggCount) + " "
         result += str(self.worlds).ljust(2) + " " + str(self.alg_code).ljust(4) + " "
-        result += str(" ".join(self.star_list)).ljust(14) + " " + " ".join(self.routes).ljust(41)
+        result += str(star_list).ljust(14) + " " + " ".join(self.routes).ljust(41)
 
         return result
 
@@ -425,6 +428,10 @@ class Star(object):
     @tl.setter
     def tl(self, value):
         self.uwp.tl = value
+
+    @property
+    def star_list(self):
+        return self.star_list_object.stars_list
 
     def distance(self, star):
         hex1 = self.hex.hex_position()
@@ -759,20 +766,7 @@ class Star(object):
         return Utilities.int_to_ehex(value)
 
     def split_stellar_data(self):
-        star_parts = self.stars.split()
-        stars = []
-
-        if len(star_parts) == 1:
-            stars = star_parts
-        else:
-            for (prev, current) in zip([None] + star_parts[:-1], star_parts):
-                if prev in [None, 'V', 'IV', 'Ia', 'Ib', 'II', 'III']:
-                    continue
-                if prev in ['D']:
-                    stars.append(prev)
-                else:
-                    stars.append(' '.join((prev, current)))
-        self.star_list = stars
+        self.star_list_object = StarList(self.stars)
 
     def extract_routes(self):
         str_split = self.stars.split()
@@ -798,6 +792,9 @@ class Star(object):
         assert hasattr(self, 'allegiance_base'), "Star " + str(self.name) + " is missing base allegiance attribute"
         assert self.allegiance_base is not None, "Star " + str(self.name) + " has empty base allegiance attribute"
         result, msg = self.uwp.is_well_formed()
+        assert result, msg
+        assert self.star_list_object is not None, "Star " + str(self.name) + " has empty star_list_object attribute"
+        result, msg = self.star_list_object.is_well_formed()
         assert result, msg
         return True
 

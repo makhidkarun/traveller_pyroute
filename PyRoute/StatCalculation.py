@@ -299,7 +299,7 @@ class StatCalculation(object):
         if star.star_list:
             stats.stars += len(star.star_list)
             stats.star_count[len(star.star_list)] += 1
-            stats.primary_count[star.star_list[0][0]] += 1
+            stats.primary_count[star.star_list[0].spectral] += 1
 
         for code in star.baseCode:
             if code != '-':
