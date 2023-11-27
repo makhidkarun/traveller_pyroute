@@ -7,6 +7,7 @@ import re
 
 from PyRoute.Star import Nobles
 from PyRoute.SystemData.UWP import UWP
+from PyRoute.SystemData.Utilities import Utilities
 from PyRoute.TradeCodes import TradeCodes
 
 
@@ -116,7 +117,7 @@ class ParseStarInput:
                          'Starport Size': star.starportSize,
                          'Primary Type': star.star_list[0].spectral if star.star_list[0].spectral else 'X',
                          'Importance': star.importance,
-                         'Resources': star._ehex_to_int(star.economics[1]) if star.economics else 0
+                         'Resources': Utilities.ehex_to_int(star.economics[1]) if star.economics else 0
                          }
 
         star.check_ex()
