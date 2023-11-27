@@ -11,6 +11,9 @@ class testAllyGen(unittest.TestCase):
     def test_is_nonaligned_nadr(self):
         self.assertTrue(AllyGen.is_nonaligned('NaDr'))
 
+    def test_is_nonaligned_nahu(self):
+        self.assertTrue(AllyGen.is_nonaligned('NaHu'))
+
     def test_are_allies_one_none(self):
         self.assertFalse(AllyGen.are_allies(None, 'ImDd'))
 
