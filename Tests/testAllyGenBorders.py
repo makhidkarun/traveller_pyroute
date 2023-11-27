@@ -15,7 +15,7 @@ from Tests.baseTest import baseTest
 
 class testAllyGenBorders(baseTest):
 
-    maxDiff = None
+    maxDiff = 9001
 
     def test_create_ally_map_masionia_collapse(self):
         sourcefile = self.unpack_filename('DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
@@ -444,7 +444,7 @@ class testAllyGenBorders(baseTest):
 
         allygen.create_erode_border('collapse')
 
-        #self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
         self.assertEqual(dict(expected_allies), allygen.allyMap)
         self.assertEqual(dict(expected_borders), allygen.borders)
 
