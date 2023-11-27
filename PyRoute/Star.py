@@ -565,6 +565,8 @@ class Star(object):
     def check_cx(self):
         if not self.economics:
             return
+        if not self.social:
+            return
         pop = self.popCode
 
         homogeneity = self._ehex_to_int(self.social[1])  # pop + flux, min 1
