@@ -211,7 +211,12 @@ class Star(object):
         star.set_location()
         star.name = data[1].strip()
 
-        star.uwp = UWP(data[2].strip())
+        try:
+            star.uwp = UWP(data[2].strip())
+        except ValueError as e:
+            if 'Input UWP malformed' == str(e):
+                return None
+            raise e
         star.tradeCode = TradeCodes(data[3].strip())
         star.ownedBy = star.tradeCode.owned_by(star)
 
@@ -234,7 +239,12 @@ class Star(object):
 
         star.stars = data[17].strip()
         star.extract_routes()
-        star.split_stellar_data()
+        try:
+            star.split_stellar_data()
+        except ValueError as e:
+            if 'No stars found' == str(e):
+                return None
+            raise e
 
         star.tradeIn = 0
         star.tradeOver = 0
