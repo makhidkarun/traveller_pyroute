@@ -779,6 +779,7 @@ class Star(object):
 
     def split_stellar_data(self):
         self.star_list_object = StarList(self.stars)
+        self.star_list_object.move_biggest_to_primary()
 
     def extract_routes(self):
         str_split = self.stars.split()
