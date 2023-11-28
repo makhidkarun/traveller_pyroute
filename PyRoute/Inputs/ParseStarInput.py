@@ -65,8 +65,10 @@ class ParseStarInput:
         star.nobles.count(data[11])
 
         star.baseCode = data[12].strip()
+        if '-' != star.baseCode and 1 == len(star.baseCode) and not star.baseCode.isalpha():
+            star.baseCode = '-'
         star.zone = data[13].strip()
-        if star.zone not in 'ARUF-':
+        if not star.zone or star.zone not in 'arufARUF-':
             star.zone = '-'
         star.zone = star.zone.upper()
         star.ggCount = int(data[14][2], 16) if data[14][2] not in 'X?' else 0
