@@ -176,10 +176,7 @@ class Star(object):
         result = str(self.position) + " "
         result += self.name.ljust(20) + " "
 
-        uwp = str(self.port) + str(self.size) + str(self.atmo) + str(self.hydro) + str(self.pop) + str(self.gov) + str(self.law)
-        tl = self.tl
-        str_tl = self._int_to_ehex(tl)
-        result += uwp + "-" + str(str_tl)
+        result += str(self.uwp)
         imp_chunk = "{ " + str(self.importance) + " }"
         star_list = str(self.star_list_object)
         result += " " + str(self.tradeCode).ljust(38) + imp_chunk.ljust(6) + " "
