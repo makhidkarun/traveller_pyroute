@@ -26,6 +26,7 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   0000BDD')
     @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   0000D')
     def test_parse_line_to_star(self, s):
+        hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
         ru_calc = 'scaled'
@@ -39,6 +40,11 @@ class testStar(unittest.TestCase):
         foo.index = 0
         foo.allegiance_base = foo.alg_base_code
         self.assertTrue(foo.is_well_formed())
+
+        line = foo.parse_to_line()
+
+        nu_foo = Star.parse_line_into_star(line, sector, pop_code, ru_calc)
+        self.assertIsNotNone(nu_foo, "Output line did not reparse.  " + hyp_line)
 
 
 if __name__ == '__main__':
