@@ -63,6 +63,10 @@ class Nobles(object):
                       'H': 'Emperor'}
 
     def __str__(self):
+        # If there's absolutely no nobles, return '-':
+        if 0 == max(self.nobles.values()):
+            return '-'
+
         nobility = ""
         for rank, count in self.nobles.items():
             if count > 0:
@@ -184,7 +188,11 @@ class Star(object):
         social = str(self.social) if self.social is not None else '-'
 
         result += econ.ljust(7) + " " + social.ljust(6) + " " + str(self.nobles).ljust(4) + " "
-        result += str(self.baseCode).ljust(2) + " " + str(self.zone).ljust(1) + " " + str(self.popM) + str(self.belts) + str(self.ggCount) + " "
+        popM = str(Utilities.int_to_ehex(self.popM))
+        belts = str(Utilities.int_to_ehex(self.belts))
+        ggCount = str(Utilities.int_to_ehex(self.ggCount))
+
+        result += str(self.baseCode).ljust(2) + " " + str(self.zone).ljust(1) + " " + popM + belts + ggCount + " "
         result += str(self.worlds).ljust(2) + " " + str(self.alg_code).ljust(4) + " "
         result += str(star_list).ljust(14) + " " + " ".join(self.routes).ljust(41)
 
