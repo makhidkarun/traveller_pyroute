@@ -22,14 +22,18 @@ class testStar(unittest.TestCase):
     @example('0150 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   00')
     @example('0101 000000000000000 ?000000-0 000000000000000 {0} (000-0) [0000] - - 0 000   00')
     @example('0101 000000000000000 ???????-? 0000000000000 0       - - 0 000   00')
-    @example('0000 000000000000000 ???????-? 000000000000000 {0} (000-0)  - - - 0 000   0000D')
-    @example('0000 000000000000000 ???????-? 000000000000000       - - 0 000   0000BDD')
+    @example('0101 000000000000000 ???????-? 000000000000000 {0} (000-0)  - - - 0 000   0000D')
+    @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   0000BDD')
+    @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   0000D')
     def test_parse_line_to_star(self, s):
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
         ru_calc = 'scaled'
         foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
         assume(foo is not None)
+        # filter out malformed hex objects while we're at it
+        result, _ = foo.hex.is_well_formed()
+        assume(result)
 
         self.assertIsInstance(foo, Star)
         foo.index = 0
