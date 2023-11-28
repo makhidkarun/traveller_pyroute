@@ -66,6 +66,9 @@ class ParseStarInput:
 
         star.baseCode = data[12].strip()
         star.zone = data[13].strip()
+        if star.zone not in 'ARUF-':
+            star.zone = '-'
+        star.zone = star.zone.upper()
         star.ggCount = int(data[14][2], 16) if data[14][2] not in 'X?' else 0
         star.popM = int(data[14][0]) if data[14][0] not in 'X?' else 0
         star.belts = int(data[14][1], 16) if data[14][1] not in 'X?' else 0
