@@ -180,7 +180,10 @@ class Star(object):
         imp_chunk = "{ " + str(self.importance) + " }"
         star_list = str(self.star_list_object)
         result += " " + str(self.tradeCode).ljust(38) + imp_chunk.ljust(6) + " "
-        result += str(self.economics) + " " + str(self.social) + " " + str(self.nobles).ljust(4) + " "
+        econ = str(self.economics) if self.economics is not None else '-'
+        social = str(self.social) if self.social is not None else '-'
+
+        result += econ.ljust(7) + " " + social.ljust(6) + " " + str(self.nobles).ljust(4) + " "
         result += str(self.baseCode).ljust(2) + " " + str(self.zone).ljust(1) + " " + str(self.popM) + str(self.belts) + str(self.ggCount) + " "
         result += str(self.worlds).ljust(2) + " " + str(self.alg_code).ljust(4) + " "
         result += str(star_list).ljust(14) + " " + " ".join(self.routes).ljust(41)
