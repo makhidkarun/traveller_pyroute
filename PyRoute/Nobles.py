@@ -34,9 +34,11 @@ class Nobles(object):
             return '-'
 
         nobility = ""
+        key_list = list(self.codes.keys())
+        value_list = list(self.codes.values())
         for rank, count in self.nobles.items():
             if count > 0:
-                nobility += list(self.codes.keys())[list(self.codes.values()).index(rank)]
+                nobility += key_list[value_list.index(rank)]
         return ''.join(sorted(nobility, key=lambda v: (v.lower(), v[0].isupper())))
 
     def __getstate__(self):
@@ -52,3 +54,23 @@ class Nobles(object):
     def accumulate(self, nobles):
         for rank, count in nobles.nobles.items():
             self.nobles[rank] += count
+
+    @property
+    def max_value(self):
+        return max(self.nobles.values())
+
+    @property
+    def min_value(self):
+        return min(self.nobles.values())
+
+    @property
+    def sum_value(self):
+        return sum(self.nobles.values())
+
+    def is_well_formed(self):
+        msg = ''
+        if 0 > self.max_value:
+            msg = 'Noble count values cannot be negative'
+            return False, msg
+
+        return True, msg
