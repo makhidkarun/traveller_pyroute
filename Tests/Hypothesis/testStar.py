@@ -49,6 +49,7 @@ class testStar(unittest.TestCase):
 
         nu_foo = Star.parse_line_into_star(line, sector, pop_code, ru_calc)
         self.assertIsNotNone(nu_foo, "Output line did not reparse.  " + hyp_line)
+        self.assertEqual(foo, nu_foo, "Reparsed star not _eq_ to original parsed star.  " + hyp_line)
 
 
 if __name__ == '__main__':
