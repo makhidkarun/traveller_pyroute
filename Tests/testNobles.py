@@ -15,7 +15,7 @@ from PyRoute.Star import Nobles
 class TestNobles(unittest.TestCase):
     def testDefaultString(self):
         nobles = Nobles()
-        expected = ''
+        expected = '-'
         self.assertEqual(expected, nobles.__str__())
 
     def testStringWithOneViscount(self):

@@ -405,7 +405,11 @@ class TestStar(unittest.TestCase):
         line_list = [
             "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
             "3030 Khaammumlar          E430761-6 De Na Po O:3032                       { -2 } (965-5) [3512] B    -  - 520 6  ImDv M0 V M5 V                                                ",
-            "1840 Mashuu               D725413-8 Ni                                    { -3 } (731-5) [1125] B    -  - 401 14 ImDv M0 V                                                     "
+            "1840 Mashuu               D725413-8 Ni                                    { -3 } (731-5) [1125] B    -  - 401 14 ImDv M0 V                                                     ",
+            "0101 000000000000000      ???????-?                                       { -2 } -       -      -    -  - 000 0  0000 D                                                        ",
+            "0101 000000000000000      ???????-?                                       { -2 } (731-5) [1125] -    -  - 000 0  0000 D                                                        ",
+            "0101 000000000000000      ???????-?                                       { -2 } -       [1125] -    -  - 000 0  0000 D                                                        ",
+            "0101 000000000000000      ???????-?                                       { -2 } (731-5) -      -    -  - 000 0  0000 D                                                        "
         ]
         for line in line_list:
             with self.subTest():
