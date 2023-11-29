@@ -2,7 +2,7 @@ import unittest
 from datetime import timedelta
 
 from hypothesis import given, assume, example, HealthCheck, settings
-from hypothesis.strategies import text, from_regex, composite, sampled_from, lists, floats
+from hypothesis.strategies import text, from_regex, composite, sampled_from, lists, floats, none
 
 from PyRoute.Galaxy import Sector
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
@@ -42,37 +42,36 @@ class testTradeCodes(unittest.TestCase):
     Given an otherwise-valid input string, it should parse cleanly to a well-formed TradeCodes object that then should
     cleanly round-trip to/from string
     """
-    @given(text(min_size=15, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
-    @example('(000000000000000000000000000000000000)')
-    @example('000000000000000')
-    @example('Pi (Feime)? Re Sa ')
-    @example('Cp Cp ')
-    @example('000000000000000')
-    @example('00000000000000000000000000000000000000')
-    @example('(0000000000000000000000000000000000000')
-    @example('0000000000 0000')
-    @example('0000000000000000000000000000000000000)')
-    @example('000000000000000000000000000000000000()')
-    @example('[0000000000000000000000000000000000000')
-    @example('{0000000000000000000000000000000000000')
-    @example('000000000000000')
-    @example('000000000 A0000 ')
-    @example('000000000000000      ')
-    @example('Hi Cs [Vilani]   ')
-    @example(' Fl Ph Varg6 O:2723      ')
-    @example('Ag Ni C:1627     ')
-    @example('00000000000000( ')
-    @example(' Ni Pa (Ashdak Meshukiiba) Sa     ')
-    @example('000000000000 {} ')
-    @example('00000000000 { } ')
-    @example('000000000(0) 00   ')
-    @example(' (0)000000000 00 ')
-    @example('00000000000(0)0  ')
-    @example(' 000000000000( )   ')
-    @example(' Ga Lt (minor)  ')
-    @example('Cp Cp Cp Cp Cp Cp Cp Cp Cp Cp')
-    @example('Cp Cx Cs Mr Da RsA RsB RsG ')
-    def test_parse_text_to_trade_code(self, s):
+    @given(text(min_size=15, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'), none())
+    @example('(000000000000000000000000000000000000)', '(00000000000000000000000000000000000)')
+    @example('000000000000000', '')
+    @example('Pi (Feime)? Re Sa ', '(Feime)? Pi Re Sa')
+    @example('Cp Cp ', 'Cp')
+    @example('000000000000000', '')
+    @example('00000000000000000000000000000000000000', '')
+    @example('(0000000000000000000000000000000000000', '')
+    @example('0000000000 0000', '')
+    @example('0000000000000000000000000000000000000)', '')
+    @example('000000000000000000000000000000000000()', '')
+    @example('[0000000000000000000000000000000000000', '')
+    @example('{0000000000000000000000000000000000000', '')
+    @example('000000000000000', '')
+    @example('000000000 A0000 ', 'A0000')
+    @example('000000000000000      ', '')
+    @example('Hi Cs [Vilani]   ', 'Cs Hi [Vilani]')
+    @example(' Fl Ph Varg6 O:2723      ', 'Fl O:2723 Ph Varg6')
+    @example('Ag Ni C:1627     ', 'Ag C:1627 Ni')
+    @example('00000000000000( ', '')
+    @example(' Ni Pa (Ashdak Meshukiiba) Sa     ', '(Ashdak Meshukiiba) Ni Pa Sa')
+    @example('000000000000 {} ', '')
+    @example('00000000000 { } ', '')
+    @example('000000000(0) 00   ', '')
+    @example(' (0)000000000 00 ', '')
+    @example('00000000000(0)0  ', '')
+    @example(' 000000000000( )   ', '')
+    @example(' Ga Lt (minor)  ', '(minor) Ga Lt')
+    @example('Cp Cp Cp Cp Cp Cp Cp Cp Cp Cp', 'Cp')
+    def test_parse_text_to_trade_code(self, s, expected):
         trade = TradeCodes(s)
 
         result, msg = trade.is_well_formed()
@@ -89,28 +88,28 @@ class testTradeCodes(unittest.TestCase):
         self.assertEqual(trade_string, nu_trade_string, msg)
 
     @given(from_regex(regex=UWP.match, alphabet='0123456789abcdefghjklmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWYXZ -{}()[]?\'+*'),
-          trade_line())
+          trade_line(), none())
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
-    @example('A000000-0', '000000000000000')
-    @example('A000100-0', '000000000000000')
-    @example('A000400-0', '000000000000000')
-    @example('A001000-0', '000000000000000')
-    @example('A000600-0', '000000000000000')
-    @example('A000700-0', '000000000000000')
-    @example('A020000-0', '000000000000000')
-    @example('A0A1000-0', '000000000000000')
-    @example('A320000-0', '000000000000000')
-    @example('A044400-0', '000000000000000')
-    @example('A044500-0', '000000000000000')
-    @example('A060500-0', '000000000000000')
-    @example('A000800-0', '000000000000000')
-    @example('A000900-0', '000000000000000')
-    @example('A060600-0', '000000000000000')
-    @example('A33A000-0', '000000000000000')
-    @example('A655000-0', '000000000000000')
-    @example('A000000-0', 'Ba')
-    @example('ABDA000-0', '000000000000000')
-    def test_verify_canonicalisation_is_idempotent(self, s, trade_line):
+    @example('A000000-0', '000000000000000', 'As Ba Va')
+    @example('A000100-0', '000000000000000', 'As Lo Va')
+    @example('A000400-0', '000000000000000', 'As Ni Va')
+    @example('A001000-0', '000000000000000', 'Ba Ic Va')
+    @example('A000600-0', '000000000000000', 'As Na Ni Va')
+    @example('A000700-0', '000000000000000', 'As Na Pi Va')
+    @example('A020000-0', '000000000000000', 'Ba De Po')
+    @example('A0A1000-0', '000000000000000', 'Ba Fl')
+    @example('A320000-0', '000000000000000', 'Ba De He Po')
+    @example('A044400-0', '000000000000000', 'Ni Pa')
+    @example('A044500-0', '000000000000000', 'Ag Ni')
+    @example('A060500-0', '000000000000000', 'De Ni Pr')
+    @example('A000800-0', '000000000000000', 'As Na Ph Pi Va')
+    @example('A000900-0', '000000000000000', 'As Hi In Na Va')
+    @example('A060600-0', '000000000000000', 'De Ni Ri')
+    @example('A33A000-0', '000000000000000', 'Ba Wa')
+    @example('A655000-0', '000000000000000', 'Ba Ga')
+    @example('A000000-0', 'Ba', 'As Ba Va')
+    @example('ABDA000-0', '000000000000000', 'Ba Oc')
+    def test_verify_canonicalisation_is_idempotent(self, s, trade_line, expected):
         s = s[0:9]
         if isinstance(trade_line, list):
             trade_line = ' '.join(trade_line)
@@ -139,6 +138,9 @@ class testTradeCodes(unittest.TestCase):
         result, msg = trade.check_canonical(foo)
         badline = '' if result else msg[0]
         self.assertEqual(0, len(msg), "Canonicalisation failed.  " + badline + '\n' + hyp_input)
+
+        if expected is not None:
+            self.assertEqual(expected, str(trade))
 
 
 if __name__ == '__main__':
