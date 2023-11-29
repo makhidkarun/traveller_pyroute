@@ -149,6 +149,7 @@ class testStarList(unittest.TestCase):
             self.assertTrue(False, hyp_line)
         result, msg = list.check_canonical()
         assume(not result)
+        list.move_biggest_to_primary()
 
         list.canonicalise()
 
@@ -250,3 +251,40 @@ class testStarList(unittest.TestCase):
 
         if expected is not None:
             self.assertEqual(expected, str(list), "Unexpected final starline.  " + hyp_line)
+
+    def test_stargen_class_ordering(self):
+        cases = [
+            ('O6 VI', 'O6 VI'),
+            ('O6 VII', 'O6 D'),
+            ('A9 III', 'A9 III'),
+            ('A9 IV', 'A9 IV'),
+            ('M3 V', 'M3 V')
+        ]
+
+        for star_line, expected in cases:
+            starlist = StarList(star_line)
+            self.assertEqual(expected, str(starlist))
+
+    @given(star_list(max_stars=1))
+    @example('PSR ')
+    @example('A0Ia ')
+    @example('D')
+    @example('NS ')
+    @example('BH ')
+    @example('O0Ia ')
+    @example('B0Ia ')
+    @example('BD ')
+    @example('F0Ia ')
+    @example('G0Ia ')
+    @example('K0Ia ')
+    @example('M0Ia ')
+    def test_primary_flux_bounds(self, star_line):
+        hyp_line = "Hypothesis input: " + star_line
+
+        list = StarList(star_line)
+        max_flux, min_flux = list.primary_flux_bounds
+        if max_flux is None:
+            self.assertIsNone(min_flux, "If max-flux is None, so must be min-flux.  " + hyp_line)
+        else:
+            self.assertIsNotNone(min_flux, "if max-flux is not None, so must be min-flux.  " + hyp_line)
+            self.assertTrue(max_flux >= min_flux, "Min-flux cannot exceed max-flux.  " + hyp_line)

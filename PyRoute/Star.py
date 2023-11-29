@@ -8,14 +8,11 @@ import logging
 import bisect
 import random
 import math
-import re
 
 from PyRoute.Position.Hex import Hex
 
 from PyRoute.AllyGen import AllyGen
-from PyRoute.TradeCodes import TradeCodes
 from PyRoute.SystemData.Utilities import Utilities
-from PyRoute.SystemData.UWP import UWP
 from collections import OrderedDict
 
 from PyRoute.SystemData.StarList import StarList
@@ -66,6 +63,10 @@ class Nobles(object):
                       'H': 'Emperor'}
 
     def __str__(self):
+        # If there's absolutely no nobles, return '-':
+        if 0 == max(self.nobles.values()):
+            return '-'
+
         nobility = ""
         for rank, count in self.nobles.items():
             if count > 0:
@@ -88,22 +89,6 @@ class Nobles(object):
 
 
 class Star(object):
-    regex = """
-^(\d\d\d\d) +
-(.{15,}) +
-(\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?) +
-(.{15,}) +
-((\{ *[+-]?[0-6] ?\}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]| -)|( ) ( ) ( )) +
-(\w{1,5}|-| ) +
-(\w{1,3}|-|\*) +
-(\w|-| ) +
-([0-9X?][0-9A-FX?][0-9A-FX?]) +
-(\d{1,}| ) +
-([A-Z0-9?-][A-Za-z0-9?-]{1,3})
-(.*)
-"""
-    starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
-
     __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code', 'hex'
 
     def __init__(self):
@@ -187,127 +172,27 @@ class Star(object):
 
     @staticmethod
     def parse_line_into_star(line, sector, pop_code, ru_calc):
+        from PyRoute.Inputs.ParseStarInput import ParseStarInput
         star = Star()
-        return Star._parse_line_into_star_core(star, line, sector, pop_code, ru_calc)
-
-    @staticmethod
-    def _parse_line_into_star_core(star, line, sector, pop_code, ru_calc):
-        star.sector = sector
-        star.logger.debug(line)
-        # Cache regex lookup to avoid doing it once for check, and again to extract data
-        matches = Star.starline.match(line)
-        if matches:
-            data = matches.groups()
-        elif '{Anomaly}' in line:
-            star.logger.info("Found anomaly, skipping processing: {}".format(line))
-            return None
-        else:
-            star.logger.error("Unmatched line: {}".format(line))
-            return None
-
-        star.logger.debug(data)
-
-        star.position = data[0].strip()
-        star.set_location()
-        star.name = data[1].strip()
-
-        star.uwp = UWP(data[2].strip())
-        star.tradeCode = TradeCodes(data[3].strip())
-        star.ownedBy = star.tradeCode.owned_by(star)
-
-        star.economics = data[6].strip() if data[6] and data[6].strip() != '-' else None
-        star.social = data[7].strip() if data[7] and data[7].strip() != '-' else None
-
-        star.nobles = Nobles()
-        star.nobles.count(data[11])
-
-        star.baseCode = data[12].strip()
-        star.zone = data[13].strip()
-        star.ggCount = int(data[14][2], 16) if data[14][2] not in 'X?' else 0
-        star.popM = int(data[14][0]) if data[14][0] not in 'X?' else 0
-        star.belts = int(data[14][1], 16) if data[14][1] not in 'X?' else 0
-
-        star.worlds = int(data[15]) if data[15].strip().isdigit() else 0
-
-        star.alg_code = data[16].strip()
-        star.alg_base_code = star.alg_code
-
-        star.stars = data[17].strip()
-        star.extract_routes()
-        star.split_stellar_data()
-
-        star.tradeIn = 0
-        star.tradeOver = 0
-        star.tradeCount = 0
-        star.passIn = 0
-        star.passOver = 0
-        star.starportSize = 0
-        star.starportBudget = 0
-        star.starportPop = 0
-
-        star.tradeCode.check_world_codes(star)
-
-        if data[5]:
-            imp = int(data[5][1:-1].strip())
-            star.calculate_importance()
-            if imp != star.importance:
-                star.logger.warning(
-                    '{}-{} Calculated importance {} does not match generated importance {}'.
-                    format(star, star.baseCode, star.importance, imp))
-        else:
-            star.calculate_importance()
-
-        star.uwpCodes = {'Starport': star.port,
-                         'Size': star.size,
-                         'Atmosphere': star.atmo,
-                         'Hydrographics': star.hydro,
-                         'Population': star.pop,
-                         'Government': star.gov,
-                         'Law Level': star.law,
-                         'Tech Level': star.tl,
-                         'Pop Code': str(star.popM),
-                         'Starport Size': star.starportSize,
-                         'Primary Type': star.star_list[0].spectral if star.star_list[0].spectral else 'X',
-                         'Importance': star.importance,
-                         'Resources': star._ehex_to_int(star.economics[1]) if star.economics else 0
-                         }
-
-        star.check_ex()
-        star.check_cx()
-
-        star.calculate_wtn()
-        star.calculate_mspr()
-        star.calculate_gwp(pop_code)
-
-        star.calculate_TCS()
-        star.calculate_army()
-        star.calculate_ru(ru_calc)
-
-        star.eti_cargo_volume = 0
-        star.eti_pass_volume = 0
-        star.eti_cargo = 0
-        star.eti_passenger = 0
-        star.eti_worlds = 0
-        star.calculate_eti()
-
-        star.trade_id = None  # Used by the Speculative Trade
-        star.calc_hash()
-        star.calc_passenger_btn_mod()
-        return star
+        return ParseStarInput.parse_line_into_star_core(star, line, sector, pop_code, ru_calc)
 
     def parse_to_line(self):
         result = str(self.position) + " "
         result += self.name.ljust(20) + " "
 
-        uwp = str(self.port) + str(self.size) + str(self.atmo) + str(self.hydro) + str(self.pop) + str(self.gov) + str(self.law)
-        tl = self.tl
-        str_tl = self._int_to_ehex(tl)
-        result += uwp + "-" + str(str_tl)
+        result += str(self.uwp)
         imp_chunk = "{ " + str(self.importance) + " }"
         star_list = str(self.star_list_object)
         result += " " + str(self.tradeCode).ljust(38) + imp_chunk.ljust(6) + " "
-        result += str(self.economics) + " " + str(self.social) + " " + str(self.nobles).ljust(4) + " "
-        result += str(self.baseCode).ljust(2) + " " + str(self.zone).ljust(1) + " " + str(self.popM) + str(self.belts) + str(self.ggCount) + " "
+        econ = str(self.economics) if self.economics is not None else '-'
+        social = str(self.social) if self.social is not None else '-'
+
+        result += econ.ljust(7) + " " + social.ljust(6) + " " + str(self.nobles).ljust(4) + " "
+        popM = str(Utilities.int_to_ehex(self.popM))
+        belts = str(Utilities.int_to_ehex(self.belts))
+        ggCount = str(Utilities.int_to_ehex(self.ggCount))
+
+        result += str(self.baseCode).ljust(2) + " " + str(self.zone).ljust(1) + " " + popM + belts + ggCount + " "
         result += str(self.worlds).ljust(2) + " " + str(self.alg_code).ljust(4) + " "
         result += str(star_list).ljust(14) + " " + " ".join(self.routes).ljust(41)
 
@@ -555,6 +440,8 @@ class Star(object):
     def check_cx(self):
         if not self.economics:
             return
+        if not self.social:
+            return
         pop = self.popCode
 
         homogeneity = self._ehex_to_int(self.social[1])  # pop + flux, min 1
@@ -767,6 +654,7 @@ class Star(object):
 
     def split_stellar_data(self):
         self.star_list_object = StarList(self.stars)
+        self.star_list_object.move_biggest_to_primary()
 
     def extract_routes(self):
         str_split = self.stars.split()
@@ -789,6 +677,8 @@ class Star(object):
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
         assert self.hex is not None, "Star " + str(self.name) + " is missing hex attribute"
+        result, msg = self.hex.is_well_formed()
+        assert result, msg
         assert hasattr(self, 'allegiance_base'), "Star " + str(self.name) + " is missing base allegiance attribute"
         assert self.allegiance_base is not None, "Star " + str(self.name) + " has empty base allegiance attribute"
         result, msg = self.uwp.is_well_formed()

@@ -133,3 +133,14 @@ class Hex(object):
     @property
     def z(self):
         return self.r
+
+    def is_well_formed(self):
+        msg = ""
+        if not (1 <= self.col <= 32):
+            msg = "Column must be in range 1-32 - is " + str(self.col)
+            return False, msg
+        if not (1 <= self.row <= 40):
+            msg = "Row must be in range 1-40 - is " + str(self.row)
+            return False, msg
+
+        return True, msg

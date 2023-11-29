@@ -3,6 +3,7 @@ Created on Jun 13, 2023
 
 @author: CyberiaResurrection
 """
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Galaxy import Sector
 from PyRoute.Star import Star, Nobles
 from PyRoute.TradeCodes import TradeCodes
@@ -60,7 +61,7 @@ class DeltaStar(Star):
     @staticmethod
     def parse_line_into_star(line, sector, pop_code, ru_calc):
         star = DeltaStar()
-        return Star._parse_line_into_star_core(star, line, sector, pop_code, ru_calc)
+        return ParseStarInput.parse_line_into_star_core(star, line, sector, pop_code, ru_calc)
 
     def reduce_routes(self):
         self.routes = []
