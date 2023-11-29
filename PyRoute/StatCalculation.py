@@ -300,7 +300,7 @@ class StatCalculation(object):
             star_list = star.star_list
             stats.stars += len(star_list)
             stats.star_count[len(star_list)] += 1
-            primary_type = star_list[0].spectral
+            primary_type = star_list[0].spectral if star_list[0].spectral is not None else star_list[0].size
             stats.primary_count[primary_type] += 1
 
         for code in star.baseCode:
