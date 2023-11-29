@@ -92,6 +92,26 @@ class testHex(unittest.TestCase):
         self.assertEqual(34, pos4.r)
         self.assertEqual(-31, pos4.q)
 
+    def testCoreSector(self):
+        pos = [
+            Hex(self.coreSector, "0101"),
+            Hex(self.coreSector, "0140"),
+            Hex(self.coreSector, "3201"),
+            Hex(self.coreSector, "3240"),
+            Hex(self.coreSector, "1620")
+        ]
+
+        self.assertEqual(pos[0].hex_position(), (0, 39))
+        self.assertEqual(pos[1].hex_position(), (0, 0))
+        self.assertEqual(pos[2].hex_position(), (31, 23))
+        self.assertEqual(pos[3].hex_position(), (31, -16))
+        self.assertEqual(pos[4].hex_position(), (15, 12))
+
+        for idx, (x, y) in enumerate([(1, 1), (1, 40), (32, 1), (32, 40), (16, 20)]):
+            offset = Hex.dy_offset(y, (self.coreSector.dy // 40))
+            q, r = Hex.hex_to_axial(x + self.coreSector.dx - 1, offset)
+            self.assertEqual(pos[idx].hex_position(), (q, r))
+
     def testSectorDistances(self):
         pos1 = Hex(self.coreSector, "0140")
         pos2 = Hex(self.coreSector, "0220")

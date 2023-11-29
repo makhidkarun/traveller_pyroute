@@ -27,10 +27,7 @@ class Hex(object):
         self.row = int(self.position[2:4])
         self.dx = sector.x * 32 + self.col - 1
         self.dy = sector.y * 40 + self.row - 1
-        dy_offset = 41 - int(self.position[2:4]) - 1
-        adjusted_dy = sector.y * 40 + dy_offset
-
-        self.q, self.r = Hex.hex_to_axial(self.dx, adjusted_dy)
+        self.q, self.r = Hex.hex_to_axial(self.dx, Hex.dy_offset(self.row, sector.y))
 
     def distance(self, other):
         return Hex.axial_distance((self.q, self.r), (other.q, other.r))
@@ -94,6 +91,36 @@ class Hex(object):
         q_offset = (q + (q & 1)) // 2
         r = col - q_offset
         return q, r
+
+    @staticmethod
+    def axial_to_hex(q, r):
+        row = q
+        q_offset = (q + (q & 1)) // 2
+        col = r + q_offset
+
+        return row, col
+
+    @staticmethod
+    def axial_to_sector(q, r):
+        (raw_row, raw_col) = Hex.axial_to_hex(q, r)
+
+        col, sector_y = Hex.dy_reverse(raw_col)
+        row = (raw_row % 32) + 1
+
+        return row, col
+
+    @staticmethod
+    def dy_offset(row: int, sector_y: int) -> int:
+        offset = 41 - row - 1
+        return sector_y * 40 + offset
+
+    @staticmethod
+    def dy_reverse(dy_offset: int):
+        sector_y = dy_offset // 40
+        offset = dy_offset % 40
+
+        row = 40 - offset
+        return row, sector_y
 
     @property
     def x(self):
