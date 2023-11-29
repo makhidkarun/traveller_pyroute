@@ -32,6 +32,7 @@ class WikiStats(object):
         """
         Constructor
         """
+        assert uwp is not None, "Supplied UWP value must not be none"
         self.galaxy = galaxy
         self.uwp = uwp
         self.min_alg_count = min_alg_count
