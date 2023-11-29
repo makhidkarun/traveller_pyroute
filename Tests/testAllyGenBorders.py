@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import platform
 import tempfile
 import unittest
 from collections import defaultdict
@@ -13,6 +14,9 @@ from Tests.baseTest import baseTest
 
 
 class testAllyGenBorders(baseTest):
+
+    maxDiff = 9001
+
     def test_create_ally_map_masionia_collapse(self):
         sourcefile = self.unpack_filename('DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
         allymap = self.unpack_filename('DeltaFiles/create_ally_map_masionia_collapse/allymap.json')
@@ -247,7 +251,6 @@ class testAllyGenBorders(baseTest):
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
-    @pytest.mark.xfail(reason="Flaky on ubuntu")
     def test_create_ally_map_district_268_collapse(self):
         sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
         allymap = self.unpack_filename('DeltaFiles/create_ally_map_district_268_collapse/allymap.json')
@@ -275,10 +278,99 @@ class testAllyGenBorders(baseTest):
         allygen.create_ally_map('collapse')
 
         self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
-        self.assertEqual(expected_allies, allygen.allyMap)
-        self.assertEqual(expected_borders, allygen.borders)
+        self.assertDictEqual(expected_allies, allygen.allyMap)
+        self.assertDictEqual(expected_borders, allygen.borders)
 
-    @pytest.mark.xfail(reason="Flaky on ubuntu")
+    def test_create_ally_map_district_268_collapse_trim(self):
+        sourcefile = self.unpack_filename('DeltaFiles/create_ally_map_district_268_collapse_trim/Spinward Marches-District 268.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_ally_map_district_268_collapse_trim/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_ally_map_district_268_collapse_trim/borders.json')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes()
+        galaxy.trade.calculate_components()
+
+        allygen = AllyGen(galaxy)
+
+        allygen.create_ally_map('collapse')
+
+        # Check stored gubbins
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
+        self.assertDictEqual(expected_allies, allygen.allyMap)
+        self.assertDictEqual(expected_borders, allygen.borders)
+
+    def test_create_borders_district_268_collapse_trim(self):
+        sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse_trim/Spinward Marches-District 268.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse_trim/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse_trim/borders.json')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes()
+        galaxy.trade.calculate_components()
+
+        allygen = AllyGen(galaxy)
+
+        allygen.create_borders('collapse')
+
+        # Check stored gubbins
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
+        self.assertDictEqual(expected_allies, allygen.allyMap)
+        self.assertDictEqual(expected_borders, allygen.borders)
+
+    def test_create_erode_border_district_268_collapse_trim(self):
+        sourcefile = self.unpack_filename('DeltaFiles/create_erode_border_district_268_collapse_trim/Spinward Marches-District 268.sec')
+        allymap = self.unpack_filename('DeltaFiles/create_erode_border_district_268_collapse_trim/allymap.json')
+        borderfile = self.unpack_filename('DeltaFiles/create_erode_border_district_268_collapse_trim/borders.json')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.max_jump = 4
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes()
+        galaxy.trade.calculate_components()
+
+        allygen = AllyGen(galaxy)
+
+        allygen.create_erode_border('collapse')
+
+        # Check stored gubbins
+        expected_allies, expected_borders = self.load_expected_values(allymap, borderfile)
+        self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
+        self.assertDictEqual(dict(expected_allies), allygen.allyMap)
+        self.assertDictEqual(dict(expected_borders), allygen.borders)
+
     def test_create_ally_map_district_268_separate(self):
         sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
         allymap = self.unpack_filename('DeltaFiles/create_ally_map_district_268_separate/allymap.json')
@@ -309,7 +401,6 @@ class testAllyGenBorders(baseTest):
         self.assertEqual(expected_allies, allygen.allyMap)
         self.assertEqual(expected_borders, allygen.borders)
 
-    @pytest.mark.xfail(reason="Flaky on ubuntu")
     def test_create_erode_border_district_268_collapse(self):
         sourcefile = self.unpack_filename('DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
         allymap = self.unpack_filename('DeltaFiles/create_erode_border_district_268_collapse/allymap.json')
@@ -337,10 +428,9 @@ class testAllyGenBorders(baseTest):
         allygen.create_erode_border('collapse')
 
         self.assertEqual(len(expected_allies), len(allygen.allyMap), "Unexpected allyMap length")
-        self.assertEqual(expected_allies, allygen.allyMap)
-        self.assertEqual(expected_borders, allygen.borders)
+        self.assertEqual(dict(expected_allies), allygen.allyMap)
+        self.assertEqual(dict(expected_borders), allygen.borders)
 
-    @pytest.mark.xfail(reason="Flaky on ubuntu")
     def test_create_erode_border_district_268_separate(self):
         sourcefile = self.unpack_filename(
             'DeltaFiles/create_borders_district_268_collapse/Spinward Marches-District 268.sec')
