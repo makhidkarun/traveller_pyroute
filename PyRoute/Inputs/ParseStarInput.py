@@ -5,7 +5,7 @@ Created on Nov 27, 2023
 """
 import re
 
-from PyRoute.Star import Nobles
+from PyRoute.Nobles import Nobles
 from PyRoute.SystemData.UWP import UWP
 from PyRoute.SystemData.Utilities import Utilities
 from PyRoute.TradeCodes import TradeCodes

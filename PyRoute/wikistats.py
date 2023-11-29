@@ -13,7 +13,7 @@ import math
 import inflect
 import jsonpickle
 from networkx.readwrite import json_graph
-from PyRoute.Star import Nobles
+from PyRoute.Nobles import Nobles
 from PyRoute.AllyGen import AllyGen
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
