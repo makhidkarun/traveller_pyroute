@@ -152,3 +152,6 @@ class Hex(object):
             return False, msg
 
         return True, msg
+
+    def get_neighbour(self, direction, distance=1):
+        return Hex.get_neighbor(self.hex_position(), direction, distance, as_hex=True)
