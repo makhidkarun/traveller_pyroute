@@ -6,7 +6,7 @@ Created on Mar 17, 2014
 import logging
 import math
 from PyRoute.wikistats import WikiStats
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Star import UWPCodes
 from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
