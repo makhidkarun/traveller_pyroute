@@ -303,7 +303,9 @@ class StatCalculation(object):
             stats.stars += len(star_list)
             stats.star_count[len(star_list)] += 1
             primary_type = star_list[0].spectral if star_list[0].spectral is not None else star_list[0].size
+            assert primary_type is not None, "Null primary type will blow up templating"
             stats.primary_count[primary_type] += 1
+            assert None not in stats.primary_count, "Null primary type will blow up templating"
 
         for code in star.baseCode:
             if code != '-':
