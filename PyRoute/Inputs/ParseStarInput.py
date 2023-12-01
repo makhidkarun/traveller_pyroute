@@ -120,7 +120,7 @@ class ParseStarInput:
                          'Tech Level': star.tl,
                          'Pop Code': str(star.popM),
                          'Starport Size': star.starportSize,
-                         'Primary Type': star.star_list[0].spectral if star.star_list[0].spectral else 'X',
+                         'Primary Type': star.primary_type if star.primary_type else 'X',
                          'Importance': star.importance,
                          'Resources': Utilities.ehex_to_int(star.economics[1]) if star.economics else 0
                          }
