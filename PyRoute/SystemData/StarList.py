@@ -48,6 +48,7 @@ class StarList(object):
         stars_line = stars_line.replace(' IC', ' IV')
         stars_line = stars_line.replace(' C', ' V')
         old_line = None
+
         # Try to rumble missing star sizes, and iteratively fill them in
         while stars_line != old_line:
             old_line = stars_line
