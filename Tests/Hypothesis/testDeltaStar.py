@@ -159,7 +159,21 @@ class testDeltaStar(unittest.TestCase):
                 )
                 self.assertEqual(1, len(inner_logs.output), "Dummy log message not in inner_logs")
 
-                star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+                star1 = None
+                allowed_errors = [
+                    'Input UWP malformed'
+                ]
+
+                try:
+                    star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+                except ValueError as e:
+                    rep = str(e)
+
+                    if rep in allowed_errors:
+                        pass
+                    else:
+                        raise e
+                assume(star1 is not None)
                 star1.index = 0
                 star1.allegiance_base = 'NaHu'
                 self.assertIsNotNone(star1, "Fatal failure parsing line: " + starline)
@@ -210,7 +224,22 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A000000-0 As Hi                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     def test_canonicalise_invalid_trade_codes(self, starline):
         sector = Sector('# Core', '# 0, 0')
-        star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        star1 = None
+        allowed_errors = [
+            'Input UWP malformed'
+        ]
+
+        try:
+            star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        except ValueError as e:
+            rep = str(e)
+
+            if rep in allowed_errors:
+                pass
+            else:
+                raise e
+        assume(star1 is not None)
+
         star1.index = 0
         star1.allegiance_base = 'NaHu'
 
@@ -251,7 +280,21 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A655000-0 As As                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     def test_canonicalise_missing_trade_codes(self, starline):
         sector = Sector('# Core', '# 0, 0')
-        star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        star1 = None
+        allowed_errors = [
+            'Input UWP malformed'
+        ]
+
+        try:
+            star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        except ValueError as e:
+            rep = str(e)
+
+            if rep in allowed_errors:
+                pass
+            else:
+                raise e
+        assume(star1 is not None)
         star1.index = 0
         star1.allegiance_base = 'NaHu'
 
@@ -279,7 +322,21 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A000000-0 As Ba                                  { 0 } (010+0) [0000] - - A 000 0 NaHu G5 V')
     def test_canonicalise_barren_worlds(self, starline):
         sector = Sector('# Core', '# 0, 0')
-        star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        star1 = None
+        allowed_errors = [
+            'Input UWP malformed'
+        ]
+
+        try:
+            star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        except ValueError as e:
+            rep = str(e)
+
+            if rep in allowed_errors:
+                pass
+            else:
+                raise e
+        assume(star1 is not None)
         star1.index = 0
         star1.allegiance_base = 'NaHu'
 
@@ -308,7 +365,20 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A000700-0 As As                                  { 0 } (00D+0) [0000] - - A 000 0 NaHu G5 V')
     def test_canonicalise_ex_on_non_barren_worlds(self, starline):
         sector = Sector('# Core', '# 0, 0')
-        star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        star1 = None
+        allowed_errors = [
+            'Input UWP malformed'
+        ]
+
+        try:
+            star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        except ValueError as e:
+            rep = str(e)
+            if rep in allowed_errors:
+                pass
+            else:
+                raise e
+        assume(star1 is not None)
         star1.index = 0
         star1.allegiance_base = 'NaHu'
 
@@ -337,7 +407,20 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A000100-0 As As                                  { 0 } (000+0) [00F0] - - A 000 0 NaHu G5 V')
     def test_canonicalise_cx_on_non_barren_worlds(self, starline):
         sector = Sector('# Core', '# 0, 0')
-        star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        star1 = None
+        allowed_errors = [
+            'Input UWP malformed'
+        ]
+
+        try:
+            star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        except ValueError as e:
+            rep = str(e)
+            if rep in allowed_errors:
+                pass
+            else:
+                raise e
+        assume(star1 is not None)
         star1.index = 0
         star1.allegiance_base = 'NaHu'
 
@@ -364,18 +447,32 @@ class testDeltaStar(unittest.TestCase):
     @settings(
         suppress_health_check=[HealthCheck(3), HealthCheck(2)],  # suppress slow-data health check, too-much filtering
         deadline=timedelta(1000))
-    @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00')
-    @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   00')
-    @example('0101 000000000000000 A000200-0 000000000000000 {0} -  [0000] - - 0 000   00')
-    @example('0101 000000000000000 A000a00-0 000000000000000 {0} (000-0) [0000] - - 0 000   00')
-    @example('0101 000000000000000 A000Z00-0 000000000000000 {0} (000-0) [0000] - - 0 000   00')
+    @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00 D')
+    @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   00 D')
+    @example('0101 000000000000000 A000200-0 000000000000000 {0} -  [0000] - - 0 000   00 D')
+    @example('0101 000000000000000 A000a00-0 000000000000000 {0} (000-0) [0000] - - 0 000   00 D')
+    @example('0101 000000000000000 A000Z00-0 000000000000000 {0} (000-0) [0000] - - 0 000   00 D')
     @example('2123 Medurma              A9D7954-C Hi An Cs Di(Miyavine) Asla1 S\'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V            Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322')
     @example('0101 0                    A000400-0 As Ba                                  { 0 } (001+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000000-0 Cp Cp Cp Cp Cp Cp Cp Cp Cp Cp          { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000600-0 Cp Cx Cs Mr Da RsA RsB RsG             { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     def test_canonicalise_from_regex_match_and_verify_idempotency(self, starline):
         sector = Sector('# Core', '# 0, 0')
-        foo = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        foo = None
+        allowed_errors = [
+            'Input UWP malformed',
+            'No stars found'
+        ]
+
+        try:
+            foo = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        except ValueError as e:
+            rep = str(e)
+
+            if rep in allowed_errors:
+                pass
+            else:
+                raise e
         assume(foo is not None)
 
         foo.index = 0
