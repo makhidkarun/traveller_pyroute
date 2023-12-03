@@ -294,6 +294,7 @@ class testStarList(unittest.TestCase):
             ('Wrenton 1901', 'G7 M4 V', 'G7 V M4 V'),
             ('Blaskon 2824', 'M5 IC', 'M5 IV'),
             ('Ricenden 0210', 'M2 M5 M8 V', 'M2 V M5 V M8 V'),
+            ('Tail End Charlie 1803', 'G2 II G3 V M9 ', 'G2 II G3 V M9 V')
         ]
 
         for msg, starline, expected in cases:
