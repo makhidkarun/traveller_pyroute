@@ -269,6 +269,12 @@ class Star(object):
     def star_list(self):
         return self.star_list_object.stars_list
 
+    @property
+    def primary_type(self):
+        if self.star_list[0].spectral is not None:
+            return self.star_list[0].spectral
+        return self.star_list[0].size
+
     def distance(self, star):
         hex1 = self.hex.hex_position()
         hex2 = star.hex.hex_position()

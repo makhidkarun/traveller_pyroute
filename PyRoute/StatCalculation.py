@@ -6,9 +6,10 @@ Created on Mar 17, 2014
 import logging
 import math
 from PyRoute.wikistats import WikiStats
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Star import UWPCodes
+from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
 
 
 class Populations(object):
@@ -27,6 +28,7 @@ class Populations(object):
     def __lt__(self, other):
         return self.population < other.population
 
+
 class ObjectStatistics(object):
     base_mapping = {'C': 'Corsair base', 'D': 'Naval depot', 'E': 'Embassy', 'K': 'Naval base', 'M': 'Military base',
                     'N': 'Naval base', 'O': 'Naval outpost',
@@ -39,7 +41,7 @@ class ObjectStatistics(object):
 
     def __init__(self):
         self.population = 0
-        self.populations = defaultdict(Populations)
+        self.populations = NoNoneDefaultDict(Populations)
 
         self.economy = 0
         self.trade = 0
@@ -57,9 +59,9 @@ class ObjectStatistics(object):
         self.im_be = 0
         self.passengers = 0
         self.spa_people = 0
-        self.port_size = defaultdict(int)
-        self.code_counts = defaultdict(int)
-        self.bases = defaultdict(int)
+        self.port_size = NoNoneDefaultDict(int)
+        self.code_counts = NoNoneDefaultDict(int)
+        self.bases = NoNoneDefaultDict(int)
         self.eti_worlds = 0
         self.eti_cargo = 0
         self.eti_pass = 0
@@ -74,8 +76,8 @@ class ObjectStatistics(object):
         self.gg_count = 0
         self.worlds = 0
         self.stars = 0
-        self.star_count = defaultdict(int)
-        self.primary_count = defaultdict(int)
+        self.star_count = NoNoneDefaultDict(int)
+        self.primary_count = NoNoneDefaultDict(int)
 
     # For the JSONPickel work
     def __getstate__(self):
@@ -297,9 +299,13 @@ class StatCalculation(object):
         stats.worlds += star.worlds
 
         if star.star_list:
-            stats.stars += len(star.star_list)
-            stats.star_count[len(star.star_list)] += 1
-            stats.primary_count[star.star_list[0].spectral] += 1
+            star_list = star.star_list
+            stats.stars += len(star_list)
+            stats.star_count[len(star_list)] += 1
+            primary_type = star.primary_type
+            assert primary_type is not None, "Null primary type will blow up templating"
+            stats.primary_count[primary_type] += 1
+            assert None not in stats.primary_count, "Null primary type will blow up templating"
 
         for code in star.baseCode:
             if code != '-':

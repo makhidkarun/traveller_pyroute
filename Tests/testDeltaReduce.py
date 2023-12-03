@@ -347,6 +347,18 @@ class testDeltaReduce(baseTest):
         reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
         reducer.is_initial_state_uninteresting(reraise=True)
 
+    def test_zao_kfeng_jump_4_template_blowup(self):
+        args = self._make_args_no_line()
+        args.max_jump = 4
+        sourcefile = self.unpack_filename('DeltaFiles/zao_kfeng_jump_4_template_blowup/Zao Kfeng Ig Grilokh.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
+        reducer.is_initial_state_uninteresting(reraise=True)
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
