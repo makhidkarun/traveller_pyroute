@@ -292,7 +292,8 @@ class testStarList(unittest.TestCase):
     def test_handle_missing_and_wonky_star_sizes(self):
         cases = [
             ('Wrenton 1901', 'G7 M4 V', 'G7 V M4 V'),
-            ('Blaskon 2824', 'M5 IC', 'M5 IV')
+            ('Blaskon 2824', 'M5 IC', 'M5 IV'),
+            ('Ricenden 0210', 'M2 M5 M8 V', 'M2 V M5 V M8 V'),
         ]
 
         for msg, starline, expected in cases:
