@@ -46,6 +46,7 @@ class StarList(object):
     def __init__(self, stars_line, trim_stars=False):
         # Count C as a typoed V, given their adjacency on QWERTY keyboards
         stars_line = stars_line.replace(' IC', ' IV')
+        stars_line = stars_line.replace(' C', ' V')
         old_line = None
         # Try to rumble missing star sizes, and iteratively fill them in
         while stars_line != old_line:
