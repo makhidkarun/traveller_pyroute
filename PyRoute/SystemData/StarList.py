@@ -17,10 +17,14 @@ class StarList(object):
     stellar_line = '([OBAFGKM][0-9] ?(?:Ia|Ib|III|II|IV|VII|VI|V|D)|D|NS|PSR|BH|BD)'
     star_line = '^([OBAFGKM])([0-9]) ?(Ia|Ib|III|II|IV|VI|V)'
     mid_star_line = '([OBAFGKM])([0-9]) ?(Ia|Ib|III|II|IV|VI|V)'
+    two_stars_line = '([OBAFGKM][0-9]) ([OBAFGKM][0-9]) ?(Ia|Ib|III|II|IV|VI|V)'
+    end_star_line = '([OBAFGKM][0-9])[ ]{0,}$'
 
     stellar_match = re.compile(stellar_line)
     star_match = re.compile(star_line)
     mid_star_match = re.compile(mid_star_line)
+    two_stars_match = re.compile(two_stars_line)
+    end_star_match = re.compile(end_star_line)
 
     # Limits
     max_stars = 8  # T5.10 book 3 p 21, "A system may to have up to eight stars:"
@@ -40,6 +44,24 @@ class StarList(object):
     }
 
     def __init__(self, stars_line, trim_stars=False):
+        # Count C as a typoed V, given their adjacency on QWERTY keyboards
+        stars_line = stars_line.replace(' IC', ' IV')
+        stars_line = stars_line.replace(' C', ' V')
+        old_line = None
+        # Try to rumble missing star sizes, and iteratively fill them in
+        while stars_line != old_line:
+            old_line = stars_line
+            twostars = StarList.two_stars_match.findall(stars_line)
+            if twostars:
+                for item in twostars:
+                    # If there's a missing star size, play the odds and assume V
+                    original = item[0] + ' ' + item[1] + ' ' + item[2]
+                    remix = item[0] + ' V ' + item[1] + ' ' + item[2]
+                    stars_line = stars_line.replace(original, remix)
+            endstar = StarList.end_star_match.findall(stars_line)
+            if endstar:
+                stars_line = stars_line.strip() + ' V'
+
         self.stars_line = stars_line
         stars = StarList.stellar_match.findall(stars_line)
         if not stars:

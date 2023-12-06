@@ -288,3 +288,21 @@ class testStarList(unittest.TestCase):
         else:
             self.assertIsNotNone(min_flux, "if max-flux is not None, so must be min-flux.  " + hyp_line)
             self.assertTrue(max_flux >= min_flux, "Min-flux cannot exceed max-flux.  " + hyp_line)
+
+    def test_handle_missing_and_wonky_star_sizes(self):
+        cases = [
+            ('Wrenton 1901', 'G7 M4 V', 'G7 V M4 V'),
+            ('Blaskon 2824', 'M5 IC', 'M5 IV'),
+            ('Ricenden 0210', 'M2 M5 M8 V', 'M2 V M5 V M8 V'),
+            ('Tail End Charlie 1803', 'G2 II G3 V M9 ', 'G2 II G3 V M9 V'),
+            ('Woop Woop 1824', 'M5 CI', 'M5 VI'),
+            ('Woop Woop 3240', 'M5 C', 'M5 V')
+        ]
+
+        for msg, starline, expected in cases:
+            if expected is None:
+                continue
+            with self.subTest(msg):
+                starlist = StarList(starline)
+                str_rep = str(starlist)
+                self.assertEqual(expected, str_rep, "Unexpected parsing repair")
