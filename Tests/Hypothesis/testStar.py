@@ -1,13 +1,41 @@
+import re
 import unittest
 from datetime import timedelta
 
 from hypothesis import given, assume, example, HealthCheck, settings
-from hypothesis.strategies import text, from_regex
+from hypothesis.strategies import text, from_regex, composite, booleans
 
 from PyRoute.Galaxy import Sector
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Star import Star
 
+@composite
+def importance_starline(draw):
+    keep_econ = draw(booleans())
+    if not keep_econ:
+        keep_social = True
+    else:
+        keep_social = draw(booleans())
+
+    rawline = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    econ_match = r'(\([0-9A-Z]{3}[+-]\d\)|- )'
+    soc_match = r'\[[0-9A-Z]{4}\]'
+
+    if keep_econ:
+        econs = re.search(econ_match, rawline)
+        assume(econs is not None)
+
+    if keep_social:
+        socials = re.search(soc_match, rawline)
+        assume(socials is not None)
+
+    # if needed, patch up wonky hex position
+    if rawline.startswith('0000'):
+        rawline = '0101' + rawline[4:]
+    elif rawline.startswith('0000'):
+        rawline = '01' + rawline[2:]
+
+    return rawline
 
 class testStar(unittest.TestCase):
 
@@ -75,6 +103,44 @@ class testStar(unittest.TestCase):
         nu_line = nu_foo.parse_to_line()
         self.assertEqual(line, nu_line, "Reparsed line not equal to original line.  " + hyp_line)
 
+    @given(importance_starline())
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)],
+              deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
+    @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   0000D')
+    @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000]         - 0 000   0000D')
+    def test_star_line_importance_parsing(self, s):
+        econ_match = r'\([0-9A-Z]{3}[+-]\d\)'
+        soc_match = r'\[[0-9A-Z]{4}\]'
+        keep_econ = False
+        keep_social = False
+        # dig out if specific econ/cultural extensions were passed in
+        econ_m = re.search(econ_match, s)
+        soc_m = re.search(soc_match, s)
+        if econ_m:
+            if '-' != econ_m[0].strip():
+                keep_econ = True
+        if soc_m:
+            if '-' != soc_m[0].strip():
+                keep_social = True
+
+        self.assertTrue(keep_econ or keep_social, "Must keep at least one of Ex and/or Cx")
+
+        hyp_line = "Hypothesis input: " + s
+        sector = Sector('# Core', '# 0, 0')
+        pop_code = 'scaled'
+        ru_calc = 'scaled'
+        foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
+        assume(foo is not None)
+
+        if keep_econ:
+            self.assertIsNotNone(foo.economics, "Ex required, not found.  " + hyp_line)
+
+        if keep_social:
+            self.assertIsNotNone(foo.social, "Cx required, not found.  " + hyp_line)
+
+        foo.index = 0
+        foo.allegiance_base = foo.alg_base_code
+        self.assertTrue(foo.is_well_formed())
 
 if __name__ == '__main__':
     unittest.main()
