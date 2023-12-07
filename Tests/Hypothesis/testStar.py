@@ -115,7 +115,7 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000] -         - 0 000   0000D')
     @example('0101 000000000000000 ???????-? 000000000000000 { 0} -  [0000]         - 0 000   0000D')
     @example('0101 000000000000000 ???????-? 000000000000000 { 0 } -  [0000]         - 0 000   0000D')
-    def test_star_line_importance_parsing(self, s):
+    def test_star_line_extension_parsing(self, s):
         econ_match = r'\([0-9A-Z]{3}[+-]\d\)'
         soc_match = r'\[[0-9A-Z]{4}\]'
         keep_econ = False
