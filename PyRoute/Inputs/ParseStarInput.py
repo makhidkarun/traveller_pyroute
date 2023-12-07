@@ -13,7 +13,7 @@ from PyRoute.TradeCodes import TradeCodes
 
 class ParseStarInput:
     regex = """
-^(\d\d\d\d) +
+^([0-3]\d[0-4]\d) +
 (.{15,}) +
 (\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?) +
 (.{15,}) +
