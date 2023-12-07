@@ -12,12 +12,15 @@ from PyRoute.Star import Star
 @composite
 def importance_starline(draw):
     keep_econ = draw(booleans())
-    if not keep_econ:
+    keep_imp = draw(booleans())
+    if not keep_econ and not keep_imp:
         keep_social = True
     else:
         keep_social = draw(booleans())
+    assume(keep_imp or keep_econ or keep_social)
 
     rawline = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    imp_match = r'\{ *[+-]?[0-6] ?\}'
     econ_match = r'\([0-9A-Z]{3}[+-]\d\)'
     soc_match = r'\[[0-9A-Z]{4}\]'
 
@@ -28,6 +31,10 @@ def importance_starline(draw):
     if keep_social:
         socials = re.search(soc_match, rawline)
         assume(socials is not None)
+
+    if keep_imp:
+        imp = re.search(imp_match, rawline)
+        assume(imp is not None)
 
     # if needed, patch up wonky hex position
     if rawline.startswith('0000'):
@@ -118,19 +125,24 @@ class testStar(unittest.TestCase):
     def test_star_line_extension_parsing(self, s):
         econ_match = r'\([0-9A-Z]{3}[+-]\d\)'
         soc_match = r'\[[0-9A-Z]{4}\]'
+        imp_match = r'\{ *[+-]?[0-6] ?\}'
         keep_econ = False
         keep_social = False
+        keep_imp = False
         # dig out if specific econ/cultural extensions were passed in
         econ_m = re.search(econ_match, s)
         soc_m = re.search(soc_match, s)
+        imp_m = re.search(imp_match, s)
         if econ_m:
             if '-' != econ_m[0].strip():
                 keep_econ = True
         if soc_m:
             if '-' != soc_m[0].strip():
                 keep_social = True
+        if imp_m:
+            keep_imp = True
 
-        self.assertTrue(keep_econ or keep_social, "Must keep at least one of Ex and/or Cx")
+        self.assertTrue(keep_econ or keep_social or keep_imp, "Must keep at least one of Ix and/or Ex and/or Cx")
 
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
@@ -146,6 +158,9 @@ class testStar(unittest.TestCase):
 
         if keep_social:
             self.assertIsNotNone(foo.social, "Cx required, not found.  " + hyp_line)
+
+        if keep_imp:
+            self.assertIsNotNone(foo.importance, "Ix required, not found.  " + hyp_line)
 
         foo.index = 0
         foo.allegiance_base = foo.alg_base_code
