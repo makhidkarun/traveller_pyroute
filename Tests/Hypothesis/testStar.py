@@ -18,7 +18,7 @@ def importance_starline(draw):
         keep_social = draw(booleans())
 
     rawline = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
-    econ_match = r'(\([0-9A-Z]{3}[+-]\d\)|- )'
+    econ_match = r'\([0-9A-Z]{3}[+-]\d\)'
     soc_match = r'\[[0-9A-Z]{4}\]'
 
     if keep_econ:
@@ -32,7 +32,7 @@ def importance_starline(draw):
     # if needed, patch up wonky hex position
     if rawline.startswith('0000'):
         rawline = '0101' + rawline[4:]
-    elif rawline.startswith('0000'):
+    elif rawline.startswith('00'):
         rawline = '01' + rawline[2:]
 
     return rawline
@@ -108,6 +108,10 @@ class testStar(unittest.TestCase):
               deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
     @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   0000D')
     @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000]         - 0 000   0000D')
+    @example('0141 000000000000000 ???????-? 000000000000000 {0} (000-0) -  - - 0 000   0000D')
+    @example('0101 000000000000000 ???????-? 000000000000000 {0} (000-0) -  - - 0 000   0000D')
+    @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000] -         - 0 000   0000D')
+    @example('0101 000000000000000 ???????-? 000000000000000 {0 } (000-0) -         - 0 000   0000D')
     def test_star_line_importance_parsing(self, s):
         econ_match = r'\([0-9A-Z]{3}[+-]\d\)'
         soc_match = r'\[[0-9A-Z]{4}\]'
@@ -131,6 +135,8 @@ class testStar(unittest.TestCase):
         ru_calc = 'scaled'
         foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
         assume(foo is not None)
+        result, _ = foo.hex.is_well_formed()  # as we're interested in extensions, we assume hex is good
+        assume(result is True)
 
         if keep_econ:
             self.assertIsNotNone(foo.economics, "Ex required, not found.  " + hyp_line)
