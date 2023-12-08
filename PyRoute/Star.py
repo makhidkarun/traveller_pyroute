@@ -12,6 +12,7 @@ import math
 from PyRoute.Position.Hex import Hex
 
 from PyRoute.AllyGen import AllyGen
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.SystemData.Utilities import Utilities
 from collections import OrderedDict
 
@@ -472,18 +473,7 @@ class Star(object):
             "RU = {0} * {1} * {2} * {3} = {4}".format(resources, labor, infrastructure, efficiency, self.ru))
 
     def calculate_TCS(self):
-        tax_rate = {'0': 0.50, '1': 0.8, '2': 1.0, '3': 0.9, '4': 0.85,
-                    '5': 0.95, '6': 1.0, '7': 1.0, '8': 1.1, '9': 1.15,
-                    'A': 1.20, 'B': 1.1, 'C': 1.2, 'D': 0.75, 'E': 0.75,
-                    'F': 0.75,
-                    # Aslan Government codes
-                    'G': 1.0, 'H': 1.0, 'J': 1.2, 'K': 1.1, 'L': 1.0,
-                    'M': 1.1, 'N': 1.2,
-                    # Unknown Gov Codes
-                    'I': 1.0, 'P': 1.0, 'Q': 1.0, 'R': 1.0, 'S': 1.0, 'T': 1.0,
-                    '': 1.0, 'U': 1.0, 'V': 1.0, 'W': 1.0, 'X': 1.0, '?': 0.0
-                    }
-        self.ship_capacity = int(self.population * tax_rate[self.uwpCodes['Government']] * 1000)
+        self.ship_capacity = int(self.population * Utilities.tax_rate[self.uwpCodes['Government']] * 1000)
         gwp_base = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 28, 32]
         if self.tl >= 5:
             self.tcs_gwp = self.population * gwp_base[min(self.tl - 5, 13)] * 1000
@@ -503,7 +493,7 @@ class Star(object):
         if self.tradeCode.nonagricultural:
             self.tcs_gwp = self.tcs_gwp * 8 // 10
 
-        budget = int(self.tcs_gwp * 0.03 * tax_rate[self.uwpCodes['Government']])
+        budget = int(self.tcs_gwp * 0.03 * Utilities.tax_rate[self.uwpCodes['Government']])
 
         # if AllyGen.sameAligned('Im', self.alg):
         #    budget = budget * 0.3
