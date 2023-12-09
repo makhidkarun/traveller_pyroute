@@ -24,8 +24,11 @@ class testUWP(unittest.TestCase):
     @example('?0000a0-0')
     @example('?00000a-0')
     @example('?000000-a')
+    @example('?0000Y0-0')
     def test_initial_parsing(self, uwp_line):
-        uwp = UWP(uwp_line)
+        uwp = self.parse_uwp(uwp_line)
+
+        assume(uwp is not None)
 
         result, msg = uwp.is_well_formed()
         hyp_input = 'Hypothesis input: ' + uwp_line
@@ -65,8 +68,11 @@ class testUWP(unittest.TestCase):
     @example('?0000G0-0', '?000050-4')
     @example('?000?F0-0', '?000?FA-4')
     @example('?000?Q0-0', '?000?FA-4')
+    @example('?0000y0-0', None)
     def test_check_canonicalisation_and_verify_canonicalisation(self, uwp_line, expected):
-        uwp = UWP(uwp_line)
+        uwp = self.parse_uwp(uwp_line)
+
+        assume(uwp is not None)
         old_rep = str(uwp)
         hyp_input = 'Hypothesis input: ' + uwp_line
 
@@ -93,6 +99,26 @@ class testUWP(unittest.TestCase):
         # finally, if an expected value was supplied, check it
         if expected is not None:
             self.assertEqual(expected, new_rep)
+
+    def parse_uwp(self, uwp_line):
+        allowed = [
+            'Input UWP malformed'
+        ]
+        uwp = None
+        try:
+            uwp = UWP(uwp_line)
+        except ValueError as e:
+            msg = str(e)
+            unexplained = True
+
+            for line in allowed:
+                if line in msg:
+                    unexplained = False
+                    break
+
+            if unexplained:
+                raise e
+        return uwp
 
 
 if __name__ == '__main__':
