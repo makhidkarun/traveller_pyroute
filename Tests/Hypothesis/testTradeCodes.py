@@ -1,11 +1,13 @@
 import unittest
-import unittest
 from datetime import timedelta
 
 from hypothesis import given, assume, example, HealthCheck, settings
-from hypothesis.strategies import text
+from hypothesis.strategies import text, from_regex
 
+from Galaxy import Sector
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.TradeCodes import TradeCodes
+from Star import Star
 
 
 class testTradeCodes(unittest.TestCase):
@@ -58,19 +60,27 @@ class testTradeCodes(unittest.TestCase):
         msg = "Re-parsed TradeCodes string does not equal original parsed string"
         self.assertEqual(trade_string, nu_trade_string, msg)
 
-    @given(text(min_size=15, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    @given(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
+    @example('0000 000000000000000 ???????-? 000000000000000       - - 0 000   0000D')
     def test_verify_canonicalisation_is_idempotent(self, s):
         hyp_input = 'Hypothesis input: ' + s
+        sector = Sector('# Core', '# 0, 0')
+        pop_code = 'scaled'
+        ru_calc = 'scaled'
 
-        trade = TradeCodes(s)
-        result, _ = trade.is_well_formed()
+        foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
+        assume(foo is not None)
+        # filter out malformed tradeCode objects while we're at it
+        result, _ = foo.tradeCode.is_well_formed()
         assume(result)
+        trade = foo.tradeCode
 
-        result, msg = trade.check_canonical()
+        result, msg = trade.check_canonical(foo)
         assume(0 < len(msg))
 
-        trade.canonicalise()
-        result, msg = trade.check_canonical()
+        trade.canonicalise(foo)
+        result, msg = trade.check_canonical(foo)
         self.assertEqual(0, len(msg), "Canonicalisation failed.  " + hyp_input)
 
 
