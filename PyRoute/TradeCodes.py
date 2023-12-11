@@ -288,12 +288,12 @@ class TradeCodes(object):
         code_match = code in self.codeset
         if star_match == code_match:
             return True
+        msg = None
         if star_match and not code_match:
             msg = '{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset)
-            self.logger.error(msg)
         if code_match and not star_match:
             msg = '{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset)
-            self.logger.error(msg)
+        self.logger.error(msg)
         return False
 
     def _check_pop_code(self, star, code, pop):
@@ -301,13 +301,14 @@ class TradeCodes(object):
         code_match = code in self.codeset
         if star_match == code_match:
             return True
+        msg = None
         if star_match and not code_match:
             msg = '{} - Calculated "{}" not in trade codes {}'.format(star, code, self.codeset)
-            self.logger.error(msg)
+
         if code_match and not star_match:
             msg = '{} - Found invalid "{}" code on world with {} population: {}'.format(star, code, star.pop,
                                                                                        self.codeset)
-            self.logger.error(msg)
+        self.logger.error(msg)
         return False
 
     def _check_econ_code(self, star, code, atmo, hydro, pop):
@@ -318,12 +319,12 @@ class TradeCodes(object):
         code_match = code in self.codeset
         if star_match == code_match:
             return True
+        msg = None
         if star_match and not code_match:
             msg = '{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset)
-            self.logger.error(msg)
         if code_match and not star_match:
             msg = '{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset)
-            self.logger.error(msg)
+        self.logger.error(msg)
         return False
 
     def check_world_codes(self, star):
