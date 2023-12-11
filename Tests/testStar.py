@@ -452,12 +452,14 @@ class TestStar(unittest.TestCase):
         # Port-known lifted from Kruse 1001 in Travmap M1105 data as at 12 Dec 2023
         # Port + size known lifted from Kruse 0302 in Travmap M1105 data as at 12 Dec 2023
         # Port thru atmo known lifted from Kruse 0310 in Travmap M1105 data as at 12 Dec 2023
+        # Physicals known lifted from Un'k!!ng 1410 in Travmap M1105 data as at 12 Dec 2023, with star added
         sector = Sector('# Phlask', '# 3,-3')
         cases = [
             ('Unknown socials', '0709 Adams 0709           X344???-?                                       - - - 001   Na M6 V'),
             ('Port known', '1001 Barnett 0201         X??????-?                                       - - A 013   Na K4 V'),
             ('Port + size known', '0302 Adams 0302           X3?????-?                                       - - - 001   Na K6 V'),
-            ('Port thru atmo known', '0310 Adams 0310           X41????-?                                       - - - 011   Na M3 V')
+            ('Port thru atmo known', '0310 Adams 0310           X41????-?                                       - - - 011   Na M3 V'),
+            ('Physicals known', '1410                      ?200???-? Va                                  - - - ?24   Na M3 V')
         ]
 
         for msg, starline in cases:
