@@ -285,22 +285,24 @@ class TradeCodes(object):
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
         check = True
-        if star.size in size and star.atmo in atmo and star.hydro in hydro \
-                and code not in self.codeset:
+        star_match = star.size in size and star.atmo in atmo and star.hydro in hydro
+        code_match = code in self.codeset
+        if star_match and not code_match:
             self.logger.error('{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset))
             check = False
-        if code in self.codeset and \
-                not (star.size in size and star.atmo in atmo and star.hydro in hydro):
+        if code_match and not star_match:
             self.logger.error('{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset))
             check = False
         return check
 
     def _check_pop_code(self, star, code, pop):
         check = True
-        if star.pop in pop and code not in self.codeset:
+        star_match = star.pop in pop
+        code_match = code in self.codeset
+        if star_match and not code_match:
             self.logger.error('{} - Calculated "{}" not in trade codes {}'.format(star, code, self.codeset))
             check = False
-        if code in self.codeset and star.pop not in pop:
+        if code_match and not star_match:
             self.logger.error(
                 '{} - Found invalid "{}" code on world with {} population: {}'.format(star, code, star.pop,
                                                                                        self.codeset))
@@ -312,12 +314,12 @@ class TradeCodes(object):
         hydro = '0123456789A' if hydro is None else hydro
         pop = '0123456789ABCD' if pop is None else pop
         check = True
-        if star.atmo in atmo and star.hydro in hydro and star.pop in pop \
-                and code not in self.codeset:
+        star_match = star.atmo in atmo and star.hydro in hydro and star.pop in pop
+        code_match = code in self.codeset
+        if star_match and not code_match:
             self.logger.error('{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset))
             check = False
-        if code in self.codeset and \
-                not (star.atmo in atmo and star.hydro in hydro and star.pop in pop):
+        if code_match and not star_match:
             self.logger.error('{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset))
             check = False
         return check
