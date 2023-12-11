@@ -58,6 +58,21 @@ class testTradeCodes(unittest.TestCase):
         msg = "Re-parsed TradeCodes string does not equal original parsed string"
         self.assertEqual(trade_string, nu_trade_string, msg)
 
+    @given(text(min_size=15, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    def test_verify_canonicalisation_is_idempotent(self, s):
+        hyp_input = 'Hypothesis input: ' + s
+
+        trade = TradeCodes(s)
+        result, _ = trade.is_well_formed()
+        assume(result)
+
+        result, msg = trade.check_canonical()
+        assume(0 < len(msg))
+
+        trade.canonicalise()
+        result, msg = trade.check_canonical()
+        self.assertEqual(0, len(msg), "Canonicalisation failed.  " + hyp_input)
+
 
 if __name__ == '__main__':
     unittest.main()

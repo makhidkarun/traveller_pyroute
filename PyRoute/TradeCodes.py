@@ -604,3 +604,9 @@ class TradeCodes(object):
             return False, msg
 
         return True, msg
+
+    def check_canonical(self):
+        return True, []
+
+    def canonicalise(self):
+        pass
