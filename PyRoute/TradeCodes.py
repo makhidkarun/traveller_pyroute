@@ -289,9 +289,11 @@ class TradeCodes(object):
         if star_match == code_match:
             return True
         if star_match and not code_match:
-            self.logger.error('{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset))
+            msg = '{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset)
+            self.logger.error(msg)
         if code_match and not star_match:
-            self.logger.error('{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset))
+            msg = '{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset)
+            self.logger.error(msg)
         return False
 
     def _check_pop_code(self, star, code, pop):
@@ -300,11 +302,12 @@ class TradeCodes(object):
         if star_match == code_match:
             return True
         if star_match and not code_match:
-            self.logger.error('{} - Calculated "{}" not in trade codes {}'.format(star, code, self.codeset))
+            msg = '{} - Calculated "{}" not in trade codes {}'.format(star, code, self.codeset)
+            self.logger.error(msg)
         if code_match and not star_match:
-            self.logger.error(
-                '{} - Found invalid "{}" code on world with {} population: {}'.format(star, code, star.pop,
-                                                                                       self.codeset))
+            msg = '{} - Found invalid "{}" code on world with {} population: {}'.format(star, code, star.pop,
+                                                                                       self.codeset)
+            self.logger.error(msg)
         return False
 
     def _check_econ_code(self, star, code, atmo, hydro, pop):
@@ -316,9 +319,11 @@ class TradeCodes(object):
         if star_match == code_match:
             return True
         if star_match and not code_match:
-            self.logger.error('{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset))
+            msg = '{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset)
+            self.logger.error(msg)
         if code_match and not star_match:
-            self.logger.error('{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset))
+            msg = '{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset)
+            self.logger.error(msg)
         return False
 
     def check_world_codes(self, star):
