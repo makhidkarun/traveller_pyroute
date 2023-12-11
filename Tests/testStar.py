@@ -447,6 +447,24 @@ class TestStar(unittest.TestCase):
         self.assertEqual(5, stats.populations['Hak'].population)
         self.assertEqual(0, stats.populations['Huma'].population)
 
+    def testParseStarlineWithSomeUnknownUWPValues(self):
+        # Unknown-socials lLifted from Kruse 0709 in Travmap M1105 data as at 12 Dec 2023
+        # Port-known lifted from Kruse 1001 in Travmap M1105 data as at 12 Dec 2023
+        # Port + size known lifted from Kruse 0302 in Travmap M1105 data as at 12 Dec 2023
+        # Port thru atmo known lifted from Kruse 0310 in Travmap M1105 data as at 12 Dec 2023
+        sector = Sector('# Phlask', '# 3,-3')
+        cases = [
+            ('Unknown socials', '0709 Adams 0709           X344???-?                                       - - - 001   Na M6 V'),
+            ('Port known', '1001 Barnett 0201         X??????-?                                       - - A 013   Na K4 V'),
+            ('Port + size known', '0302 Adams 0302           X3?????-?                                       - - - 001   Na K6 V'),
+            ('Port thru atmo known', '0310 Adams 0310           X41????-?                                       - - - 011   Na M3 V')
+        ]
+
+        for msg, starline in cases:
+            with self.subTest(msg):
+                star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+                self.assertIsNotNone(star, "Starline should parse cleanly")
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
