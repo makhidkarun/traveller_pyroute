@@ -8,6 +8,7 @@ from Galaxy import Sector
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.TradeCodes import TradeCodes
 from Star import Star
+from SystemData.UWP import UWP
 
 
 class testTradeCodes(unittest.TestCase):
@@ -60,16 +61,24 @@ class testTradeCodes(unittest.TestCase):
         msg = "Re-parsed TradeCodes string does not equal original parsed string"
         self.assertEqual(trade_string, nu_trade_string, msg)
 
-    @given(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    @given(from_regex(regex=UWP.match, alphabet='0123456789abcdefghjklmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWYXZ -{}()[]?\'+*'),
+           text(min_size=15, max_size=36, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
-    @example('0000 000000000000000 ???????-? 000000000000000       - - 0 000   0000D')
-    def test_verify_canonicalisation_is_idempotent(self, s):
-        hyp_input = 'Hypothesis input: ' + s
+    @example('A000000-0', '000000000000000')
+    def test_verify_canonicalisation_is_idempotent(self, s, trade_line):
+        s = s[0:9]
+        hyp_input = 'Hypothesis input: ' + s + ', ' + trade_line
+        starline = '0101 000000000000000 {} {}  - - 0 000   0000D'.format(s, trade_line.ljust(38))
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
         ru_calc = 'scaled'
 
-        foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
+        foo = None
+
+        try:
+            foo = Star.parse_line_into_star(starline, sector, pop_code, ru_calc)
+        except KeyError:
+            pass
         assume(foo is not None)
         # filter out malformed tradeCode objects while we're at it
         result, _ = foo.tradeCode.is_well_formed()
@@ -81,7 +90,8 @@ class testTradeCodes(unittest.TestCase):
 
         trade.canonicalise(foo)
         result, msg = trade.check_canonical(foo)
-        self.assertEqual(0, len(msg), "Canonicalisation failed.  " + hyp_input)
+        badline = '' if result else msg[0]
+        self.assertEqual(0, len(msg), "Canonicalisation failed.  " + badline + '\n' + hyp_input)
 
 
 if __name__ == '__main__':

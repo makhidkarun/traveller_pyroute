@@ -625,5 +625,5 @@ class TradeCodes(object):
 
         return 0 == len(msg), msg
 
-    def canonicalise(self):
+    def canonicalise(self, star):
         pass
