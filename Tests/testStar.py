@@ -502,6 +502,16 @@ class TestStar(unittest.TestCase):
         star = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
         self.assertIsNone(star)
 
+    def testParseStarlineWithoutExtensions(self):
+        sector = Sector('# Phlask', '# 3,-3')
+
+        starline = '2618 Horden 2618          D54A367-D Ht Lo Wa O:2915                     - - - 401   So       D '
+        star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        self.assertIsNotNone(star, "Starline should parse cleanly")
+        expected = '2618 Horden 2618          D54A367-D Ht Lo O:2915 Wa                       { -1 } -       -      -    -  - 401 0  So   D                                                       '
+        actual = star.parse_to_line()
+        self.assertEqual(expected, actual)
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
