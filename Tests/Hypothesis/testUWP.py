@@ -24,11 +24,10 @@ class testUWP(unittest.TestCase):
     @example('?0000a0-0')
     @example('?00000a-0')
     @example('?000000-a')
+    @example('?0000O0-0')
     @example('?0000Y0-0')
     def test_initial_parsing(self, uwp_line):
         uwp = self.parse_uwp(uwp_line)
-
-        assume(uwp is not None)
 
         result, msg = uwp.is_well_formed()
         hyp_input = 'Hypothesis input: ' + uwp_line
@@ -72,7 +71,6 @@ class testUWP(unittest.TestCase):
     def test_check_canonicalisation_and_verify_canonicalisation(self, uwp_line, expected):
         uwp = self.parse_uwp(uwp_line)
 
-        assume(uwp is not None)
         old_rep = str(uwp)
         hyp_input = 'Hypothesis input: ' + uwp_line
 
@@ -118,6 +116,7 @@ class testUWP(unittest.TestCase):
 
             if unexplained:
                 raise e
+        assume(uwp is not None)
         return uwp
 
 
