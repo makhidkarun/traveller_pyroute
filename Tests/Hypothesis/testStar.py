@@ -125,9 +125,11 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 000000000000000 { 0 } -  [0000]         - 0 000   0000D')
     @example('0101 000000000000000 ???????-? 000000000000 {0 {0} -  [0000] -         - 0 000   00+D')
     @example('0101 000000000000000 ???????-? 0000000000000 { {0} -  [0000] -         - 0 000   00+D')
+    @example('0101 000000000000000 ???????-? 000000000000000 { 0 } -  [000a]         - 0 000   0000D')
+    @example('0101 000000000000000 ???????-? 000000000000000 {0 } (a00-0) -         - 0 000   0000D')
     def test_star_line_extension_parsing(self, s):
-        econ_match = r'\([0-9A-Z]{3}[+-]\d\)'
-        soc_match = r'\[[0-9A-Z]{4}\]'
+        econ_match = r'\([0-9A-Za-z]{3}[+-]\d\)'
+        soc_match = r'\[[0-9A-Za-z]{4}\]'
         imp_match = r'\{ *[+-]?[0-6] ?\}'
         keep_econ = False
         keep_social = False
@@ -158,9 +160,13 @@ class testStar(unittest.TestCase):
 
         if keep_econ:
             self.assertIsNotNone(foo.economics, "Ex required, not found.  " + hyp_line)
+            upper_econ = foo.economics.upper()
+            self.assertEqual(upper_econ, foo.economics, "Ex not capitalised.  " + hyp_line)
 
         if keep_social:
             self.assertIsNotNone(foo.social, "Cx required, not found.  " + hyp_line)
+            upper_social = foo.social.upper()
+            self.assertEqual(upper_social, foo.social, "Cx not capitalised.  " + hyp_line)
 
         if keep_imp:
             self.assertIsNotNone(foo.importance, "Ix required, not found.  " + hyp_line)
