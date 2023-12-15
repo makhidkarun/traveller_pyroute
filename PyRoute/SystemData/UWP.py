@@ -31,6 +31,8 @@ class UWP(object):
         if not matches:
             raise ValueError('Input UWP malformed')
         line = str(matches[0]).upper()
+        if line[5] not in Utilities.tax_rate:
+            raise ValueError('Input UWP malformed')
         self._port = line[0]
         self._size = line[1]
         self._atmo = line[2]
