@@ -508,6 +508,7 @@ class TestStar(unittest.TestCase):
         starline = '2618 Horden 2618          D54A367-D Ht Lo Wa O:2915                     - - - 401   So       D '
         star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
         self.assertIsNotNone(star, "Starline should parse cleanly")
+        self.assertTrue(star.oldskool, "Zero extensions present should result in oldskool")
         expected = '2618 Horden 2618          D54A367-D Ht Lo O:2915 Wa                       { -1 } -       -      -    -  - 401 0  So   D                                                       '
         actual = star.parse_to_line()
         self.assertEqual(expected, actual)

@@ -93,6 +93,7 @@ class Star(object):
         self.is_redzone = False
         self.hex = None
         self.deep_space_station = False
+        self._oldskool = False
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -279,6 +280,14 @@ class Star(object):
         if self.star_list[0].spectral is not None:
             return self.star_list[0].spectral
         return self.star_list[0].size
+
+    @property
+    def oldskool(self):
+        return self._oldskool is True
+
+    @oldskool.setter
+    def oldskool(self, value):
+        self._oldskool = value is True
 
     def distance(self, star):
         hex1 = self.hex.hex_position()
