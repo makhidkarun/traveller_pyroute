@@ -136,9 +136,14 @@ class Star(object):
         result += str(self.uwp)
         star_list = str(self.star_list_object)
         result += " " + str(self.tradeCode).ljust(38)
-        imp_chunk = "{ " + str(self.importance) + " }"
-        econ = str(self.economics) if self.economics is not None else '-'
-        social = str(self.social) if self.social is not None else '-'
+        if self.oldskool:  # If Ix, Ex and Cx were all missing on the way _in_, they should be missing on the way _out_
+            imp_chunk = ' '
+            econ = ' '
+            social = ' '
+        else:
+            imp_chunk = "{ " + str(self.importance) + " }"
+            econ = str(self.economics) if self.economics is not None else '-'
+            social = str(self.social) if self.social is not None else '-'
 
         result += imp_chunk.ljust(6) + " " + econ.ljust(7) + " " + social.ljust(6) + " "
         result += str(self.nobles).ljust(4) + " "
