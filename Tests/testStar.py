@@ -519,6 +519,14 @@ class TestStar(unittest.TestCase):
         reactual = star.parse_to_line()
         self.assertEqual(expected, reactual)
 
+    def testParseStarlineWithAllDashExtensions(self):
+        sector = Sector('# Phlask', '# 3,-3')
+
+        starline = '2618 Horden 2618          D54A367-D Ht Lo Wa O:2915       - - -         - - - 401   So       D '
+        star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        self.assertIsNotNone(star, "Starline should parse cleanly")
+        self.assertFalse(star.oldskool, "Zero extensions present should not result in oldskool")
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

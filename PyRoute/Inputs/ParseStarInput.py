@@ -106,7 +106,7 @@ class ParseStarInput:
 
         star.tradeCode.check_world_codes(star, fix_pop=fix_pop)
 
-        if data[5]:
+        if data[5] and data[5].startswith('{'):
             imp = int(data[5][1:-1].strip())
             star.calculate_importance()
             if imp != star.importance:
