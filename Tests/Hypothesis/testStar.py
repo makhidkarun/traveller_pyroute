@@ -51,11 +51,11 @@ class testStar(unittest.TestCase):
     """
     @given(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
-    @example('0000 000000000000000 00000O0-0 000000000000000       - - 0 000   00')
-    @example('0000 000000000000000 ???????-? 000000000000000 {0} (000-0)  - - - 0 000   00')
-    @example('0000 000000000000000 00000ź0-0 000000000000000 {0} -  [0000] - - 0 000   00')
-    @example('0000 000000000000000 ?000000-0 000000000000000 {0} (000-0) [0000] - - 0 000   00')
-    @example('0100 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   00')
+    @example('0101 000000000000000 00000O0-0 000000000000000       - - 0 000   00')
+    @example('0101 000000000000000 ???????-? 000000000000000 {0} (000-0)  - - - 0 000   00')
+    @example('0101 000000000000000 00000ź0-0 000000000000000 {0} -  [0000] - - 0 000   00')
+    @example('0101 000000000000000 ?000000-0 000000000000000 {0} (000-0) [0000] - - 0 000   00')
+    @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   00')
     @example('0150 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   00')
     @example('0101 000000000000000 ?000000-0 000000000000000 {0} (000-0) [0000] - - 0 000   00')
     @example('0101 000000000000000 ???????-? 0000000000000 0       - - 0 000   00')
@@ -98,6 +98,7 @@ class testStar(unittest.TestCase):
         foo.allegiance_base = foo.alg_base_code
         foo.baseCode = str(foo.baseCode).upper()
         self.assertTrue(foo.is_well_formed())
+        old_skool = foo.oldskool
 
         line = foo.parse_to_line()
 
@@ -110,6 +111,8 @@ class testStar(unittest.TestCase):
 
         nu_line = nu_foo.parse_to_line()
         self.assertEqual(line, nu_line, "Reparsed line not equal to original line.  " + hyp_line)
+        new_skool = nu_foo.oldskool
+        self.assertEqual(old_skool, new_skool, "Oldskool status should be invariant across reparsing.  " + hyp_line)
 
     @given(importance_starline())
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)],
