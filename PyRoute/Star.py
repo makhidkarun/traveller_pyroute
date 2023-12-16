@@ -271,6 +271,8 @@ class Star(object):
 
     @property
     def primary_type(self):
+        if 0 == len(self.star_list):
+            return None
         if self.star_list[0].spectral is not None:
             return self.star_list[0].spectral
         return self.star_list[0].size
