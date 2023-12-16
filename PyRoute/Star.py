@@ -134,13 +134,14 @@ class Star(object):
         result += self.name.ljust(20) + " "
 
         result += str(self.uwp)
-        imp_chunk = "{ " + str(self.importance) + " }"
         star_list = str(self.star_list_object)
-        result += " " + str(self.tradeCode).ljust(38) + imp_chunk.ljust(6) + " "
+        result += " " + str(self.tradeCode).ljust(38)
+        imp_chunk = "{ " + str(self.importance) + " }"
         econ = str(self.economics) if self.economics is not None else '-'
         social = str(self.social) if self.social is not None else '-'
 
-        result += econ.ljust(7) + " " + social.ljust(6) + " " + str(self.nobles).ljust(4) + " "
+        result += imp_chunk.ljust(6) + " " + econ.ljust(7) + " " + social.ljust(6) + " "
+        result += str(self.nobles).ljust(4) + " "
         popM = str(Utilities.int_to_ehex(self.popM))
         belts = str(Utilities.int_to_ehex(self.belts))
         ggCount = str(Utilities.int_to_ehex(self.ggCount))
