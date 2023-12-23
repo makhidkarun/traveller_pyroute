@@ -280,74 +280,93 @@ class TradeCodes(object):
     def calculate_pcode(self):
         return self.pcode
 
-    def _check_planet_code(self, star, code, size, atmo, hydro):
+    def _check_planet_code(self, star, code, size, atmo, hydro, listmsg=None):
         size = '0123456789ABC' if size is None else size
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
-        check = True
-        if star.size in size and star.atmo in atmo and star.hydro in hydro \
-                and code not in self.codeset:
-            self.logger.error('{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset))
-            check = False
-        if code in self.codeset and \
-                not (star.size in size and star.atmo in atmo and star.hydro in hydro):
-            self.logger.error('{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset))
-            check = False
-        return check
+        star_match = star.size in size and star.atmo in atmo and star.hydro in hydro
+        code_match = code in self.codeset
+        if star_match == code_match:
+            return True
+        msg = None
+        if star_match and not code_match:
+            msg = '{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset)
+        if code_match and not star_match:
+            msg = '{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset)
+        if isinstance(listmsg, list):
+            listmsg.append(msg)
+        else:
+            self.logger.error(msg)
+        return False
 
-    def _check_pop_code(self, star, code, pop):
-        check = True
-        if star.pop in pop and code not in self.codeset:
-            self.logger.error('{} - Calculated "{}" not in trade codes {}'.format(star, code, self.codeset))
-            check = False
-        if code in self.codeset and star.pop not in pop:
-            self.logger.error(
-                '{} - Found invalid "{}" code on world with {} population: {}'.format(star, code, star.pop,
-                                                                                       self.codeset))
-            check = False
-        return check
+    def _check_pop_code(self, star, code, pop, listmsg=None):
+        star_match = star.pop in pop
+        code_match = code in self.codeset
+        if star_match == code_match:
+            return True
+        msg = None
+        if star_match and not code_match:
+            msg = '{} - Calculated "{}" not in trade codes {}'.format(star, code, self.codeset)
 
-    def _check_econ_code(self, star, code, atmo, hydro, pop):
+        if code_match and not star_match:
+            msg = '{} - Found invalid "{}" code on world with {} population: {}'.format(star, code, star.pop,
+                                                                                       self.codeset)
+        if isinstance(listmsg, list):
+            listmsg.append(msg)
+        else:
+            self.logger.error(msg)
+        return False
+
+    def _check_econ_code(self, star, code, atmo, hydro, pop, listmsg=None):
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
         pop = '0123456789ABCD' if pop is None else pop
+        star_match = star.atmo in atmo and star.hydro in hydro and star.pop in pop
+        code_match = code in self.codeset
+        if star_match == code_match:
+            return True
+        msg = None
+        if star_match and not code_match:
+            msg = '{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset)
+        if code_match and not star_match:
+            msg = '{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset)
+        self.logger.error(msg)
+        if isinstance(listmsg, list):
+            listmsg.append(msg)
+        else:
+            self.logger.error(msg)
+        return False
+
+    def check_world_codes(self, star, msg=None):
+        is_list = isinstance(msg, list)
+        msg = msg if is_list else None
         check = True
-        if star.atmo in atmo and star.hydro in hydro and star.pop in pop \
-                and code not in self.codeset:
-            self.logger.error('{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset))
-            check = False
-        if code in self.codeset and \
-                not (star.atmo in atmo and star.hydro in hydro and star.pop in pop):
-            self.logger.error('{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset))
-            check = False
-        return check
+        check = self._check_planet_code(star, 'As', '0', '0', '0', msg) and check
+        check = self._check_planet_code(star, 'De', None, '23456789', '0', msg) and check
+        check = self._check_planet_code(star, 'Fl', None, 'ABC', '123456789A', msg) and check
+        check = self._check_planet_code(star, 'Ga', '678', '568', '567', msg) and check
+        check = self._check_planet_code(star, 'He', '3456789ABC', '2479ABC', '012', msg) and check
+        check = self._check_planet_code(star, 'Ic', None, '01', '123456789A', msg) and check
+        check = self._check_planet_code(star, 'Po', None, '2345', '0123', msg) and check
+        check = self._check_planet_code(star, 'Oc', 'ABCD', '3456789DEF', 'A', msg) and check
+        check = self._check_planet_code(star, 'Va', None, '0', None, msg) and check
+        check = self._check_planet_code(star, 'Wa', '3456789', '3456789DEF', 'A', msg) and check
 
-    def check_world_codes(self, star):
-        check = True
-        check = self._check_planet_code(star, 'As', '0', '0', '0') and check
-        check = self._check_planet_code(star, 'De', None, '23456789', '0') and check
-        check = self._check_planet_code(star, 'Fl', None, 'ABC', '123456789A') and check
-        check = self._check_planet_code(star, 'Ga', '678', '568', '567') and check
-        check = self._check_planet_code(star, 'He', '3456789ABC', '2479ABC', '012') and check
-        check = self._check_planet_code(star, 'Ic', None, '01', '123456789A') and check
-        check = self._check_planet_code(star, 'Po', None, '2345', '0123') and check
-        check = self._check_planet_code(star, 'Oc', 'ABCD', '3456789DEF', 'A') and check
-        check = self._check_planet_code(star, 'Va', None, '0', None) and check
-        check = self._check_planet_code(star, 'Wa', '3456789', '3456789DEF', 'A') and check
+        check = self._check_pop_code(star, 'Ba', '0', msg) and check
+        check = self._check_pop_code(star, 'Lo', '123', msg) and check
+        check = self._check_pop_code(star, 'Ni', '456', msg) and check
+        check = self._check_pop_code(star, 'Ph', '8', msg) and check
+        check = self._check_pop_code(star, 'Hi', '9ABCD', msg) and check
 
-        # self._check_pop_code('Ba', '0')
-        check = self._check_pop_code(star, 'Lo', '123') and check
-        check = self._check_pop_code(star, 'Ni', '456') and check
-        check = self._check_pop_code(star, 'Ph', '8') and check
-        check = self._check_pop_code(star, 'Hi', '9ABCD') and check
-
-        check = self._check_econ_code(star, 'Pa', '456789', '45678', '48') and check
-        check = self._check_econ_code(star, 'Ag', '456789', '45678', '567') and check
-        check = self._check_econ_code(star, 'Na', '0123', '0123', '6789ABCD') and check
-        check = self._check_econ_code(star, 'Pi', '012479', None, '78') and check
-        check = self._check_econ_code(star, 'In', '012479ABC', None, '9ABCD') and check
-        check = self._check_econ_code(star, 'Pr', '68', None, '59') and check
-        check = self._check_econ_code(star, 'Ri', '68', None, '678') and check
+        check = self._check_econ_code(star, 'Pa', '456789', '45678', '48', msg) and check
+        check = self._check_econ_code(star, 'Ag', '456789', '45678', '567', msg) and check
+        check = self._check_econ_code(star, 'Na', '0123', '0123', '6789ABCD', msg) and check
+        check = self._check_econ_code(star, 'Pi', '012479', None, '78', msg) and check
+        check = self._check_econ_code(star, 'In', '012479ABC', None, '9ABCD', msg) and check
+        check = self._check_econ_code(star, 'Pr', '68', None, '59', msg) and check
+        check = self._check_econ_code(star, 'Ri', '68', None, '678', msg) and check
+        if is_list:
+            return msg
         return check
 
     def owned_by(self, star):
@@ -599,3 +618,86 @@ class TradeCodes(object):
             return False, msg
 
         return True, msg
+
+    def check_canonical(self, star):
+        msg = []
+        self.check_world_codes(star, msg)
+
+        return 0 == len(msg), msg
+
+    def canonicalise(self, star):
+        self._fix_trade_code(star, 'As', '0', '0', '0')
+        self._fix_trade_code(star, 'Ic', None, '01', '123456789A')
+        self._fix_trade_code(star, 'De', '0123456789ABC', '23456789', '0')
+        self._fix_trade_code(star, 'Po', None, '2345', '0123')
+        self._fix_trade_code(star, 'Fl', None, 'ABC', '123456789A')
+        self._fix_trade_code(star, 'He', '3456789ABC', '2479ABC', '012')
+        self._fix_trade_code(star, 'Wa', '3456789', '3456789DEF', 'A')
+        self._fix_trade_code(star, 'Ga', '678', '568', '567')
+        self._fix_trade_code(star, 'Oc', 'ABCD', '3456789DEF', 'A')
+        self._fix_trade_code(star, 'Va', None, '0', None)
+
+        self._fix_econ_code(star, 'Na', '0123', '0123', '6789ABCD')
+        self._fix_econ_code(star, 'Pi', '012479', None, '78')
+        self._fix_econ_code(star, 'Pa', '456789', '45678', '48')
+        self._fix_econ_code(star, 'Ag', '456789', '45678', '567')
+        self._fix_econ_code(star, 'Pr', '68', None, '59')
+        self._fix_econ_code(star, 'In', '012479ABC', None, '9ABCD')
+        self._fix_econ_code(star, 'Ri', '68', None, '678')
+
+        self._fix_pop_code(star, 'Ba', '0')
+        self._fix_pop_code(star, 'Lo', '123')
+        self._fix_pop_code(star, 'Ni', '456')
+        self._fix_pop_code(star, 'Ph', '8')
+        self._fix_pop_code(star, 'Hi', '9ABCD')
+
+    def _fix_trade_code(self, star, code, size, atmo, hydro):
+        size = '0123456789ABC' if size is None else size
+        atmo = '0123456789ABCDEF' if atmo is None else atmo
+        hydro = '0123456789A' if hydro is None else hydro
+
+        code_match = code in self.codeset
+        system_match = star.size in size and star.atmo in atmo and star.hydro in hydro
+        if code_match == system_match:
+            return
+
+        if code_match and not system_match:
+            self._drop_invalid_trade_code(code)
+        elif system_match and not code_match:
+            self._add_missing_trade_code(code)
+
+    def _fix_econ_code(self, star, code, atmo, hydro, pop):
+        atmo = '0123456789ABCDEF' if atmo is None else atmo
+        hydro = '0123456789A' if hydro is None else hydro
+        pop = '0123456789ABCD' if pop is None else pop
+
+        code_match = code in self.codeset
+        phys_match = star.atmo in atmo and star.hydro in hydro and star.pop in pop
+
+        if code_match == phys_match:
+            return
+
+        if code_match and not phys_match:
+            self._drop_invalid_trade_code(code)
+        elif phys_match and not code_match:
+            self._add_missing_trade_code(code)
+
+    def _fix_pop_code(self, star, code, pop):
+        pop_match = star.pop in pop
+        code_match = code in self.codeset
+
+        if pop_match == code_match:
+            return
+
+        if code_match and not pop_match:
+            self._drop_invalid_trade_code(code)
+        elif pop_match and not code_match:
+            self._add_missing_trade_code(code)
+
+    def _drop_invalid_trade_code(self, targcode):
+        self.codes = [code for code in self.codes if code != targcode]
+        self.codeset = [code for code in self.codeset if code != targcode]
+
+    def _add_missing_trade_code(self, targcode):
+        self.codes.append(targcode)
+        self.codeset.append(targcode)
