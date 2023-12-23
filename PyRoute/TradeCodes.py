@@ -621,7 +621,7 @@ class TradeCodes(object):
 
     def check_canonical(self, star):
         msg = []
-        result = self.check_world_codes(star, msg)
+        self.check_world_codes(star, msg)
 
         return 0 == len(msg), msg
 
