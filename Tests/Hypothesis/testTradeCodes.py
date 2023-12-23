@@ -4,11 +4,11 @@ from datetime import timedelta
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, from_regex, composite, sampled_from, lists, floats
 
-from Galaxy import Sector
+from PyRoute.Galaxy import Sector
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.TradeCodes import TradeCodes
-from Star import Star
-from SystemData.UWP import UWP
+from PyRoute.Star import Star
+from PyRoute.SystemData.UWP import UWP
 
 
 tradecodes = []
