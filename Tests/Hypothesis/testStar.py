@@ -19,11 +19,11 @@ def importance_starline(draw):
         keep_social = draw(booleans())
     assume(keep_imp or keep_econ or keep_social)
 
-    rawline = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    rawline = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]\'+*?'))
+    assume('???????-?' not in rawline)
     imp_match = r'\{ *[+-]?[0-6] ?\}'
     econ_match = r'\([0-9A-Z]{3}[+-]\d\)'
     soc_match = r'\[[0-9A-Z]{4}\]'
-    uwp_match = r'\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?]'
 
     if keep_econ:
         econs = re.search(econ_match, rawline)
@@ -132,11 +132,14 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 000000000000000 { 0 } -  [000a]         - 0 000   0000D')
     @example('0101 000000000000000 ???????-? 000000000000000 {0 } (a00-0) -         - 0 000   0000D')
     @example('0101 000000000000000 ???????-? 000000000000000 {0} (000-0)       -    - 0 000   0000A0')
+    @example('0101 0000000000000-0 ???????-? 000000000000000 {0} - - - - 0 000   00')
+    @example('0101 000000000000000 E000000-0 000000000000000 {0} (000-0) [0000] 0 0 0 000 0 00+D')
+    @example('0101 000000000000000 ???????-? 0000000000000 0 {0} (000-0)       -    - 0 000   00')
     def test_star_line_extension_parsing(self, s):
         econ_match = r'\([0-9A-Za-z]{3}[+-]\d\)'
         soc_match = r'\[[0-9A-Za-z]{4}\]'
         imp_match = r'\{ *[+-]?[0-6] ?\}'
-        uwp_match = r'\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?]'
+        uwp_match = r' \w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?]'
         keep_econ = False
         keep_social = False
         keep_imp = False
@@ -144,8 +147,14 @@ class testStar(unittest.TestCase):
         econ_m = re.search(econ_match, s)
         soc_m = re.search(soc_match, s)
         imp_m = re.search(imp_match, s)
-        uwp_m = re.search(uwp_match, s)
-        uwp_rumbled = '?' in uwp_m[0].strip()
+        uwp_m = re.findall(uwp_match, s)
+        uwp_rumbled = 0 < len([match for match in uwp_m if '?' in match])
+        if not uwp_rumbled:
+            raw_uwp = uwp_m[0]
+            if raw_uwp[1].isdigit():
+                raw_uwp = ' X' + raw_uwp[2:]
+                s = s.replace(uwp_m[0], raw_uwp)
+
         if econ_m:
             if '-' != econ_m[0].strip():
                 keep_econ = True
@@ -165,7 +174,7 @@ class testStar(unittest.TestCase):
         assume(foo is not None)
         result, _ = foo.hex.is_well_formed()  # as we're interested in extensions, we assume hex is good
         assume(result is True)
-        self.assertEqual(uwp_rumbled, foo.oldskool)
+        self.assertEqual(uwp_rumbled, foo.oldskool, hyp_line)
 
         if keep_econ:
             self.assertIsNotNone(foo.economics, "Ex required, not found.  " + hyp_line)
