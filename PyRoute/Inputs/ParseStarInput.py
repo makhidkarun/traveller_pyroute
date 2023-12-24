@@ -64,8 +64,6 @@ class ParseStarInput:
 
         star.economics = data[6].strip().upper() if data[6] and data[6].strip() != '-' else None
         star.social = data[7].strip().upper() if data[7] and data[7].strip() != '-' else None
-        if data[5] is None and data[6] is None and data[7] is None:
-            star.oldskool = True
 
         star.nobles = Nobles()
         star.nobles.count(data[11])

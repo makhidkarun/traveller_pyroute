@@ -289,11 +289,7 @@ class Star(object):
 
     @property
     def oldskool(self):
-        return self._oldskool is True
-
-    @oldskool.setter
-    def oldskool(self, value):
-        self._oldskool = value is True
+        return self.uwp.oldskool is True
 
     def distance(self, star):
         hex1 = self.hex.hex_position()
