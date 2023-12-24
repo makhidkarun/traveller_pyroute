@@ -23,6 +23,7 @@ def importance_starline(draw):
     imp_match = r'\{ *[+-]?[0-6] ?\}'
     econ_match = r'\([0-9A-Z]{3}[+-]\d\)'
     soc_match = r'\[[0-9A-Z]{4}\]'
+    uwp_match = r'\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?]'
 
     if keep_econ:
         econs = re.search(econ_match, rawline)
@@ -135,6 +136,7 @@ class testStar(unittest.TestCase):
         econ_match = r'\([0-9A-Za-z]{3}[+-]\d\)'
         soc_match = r'\[[0-9A-Za-z]{4}\]'
         imp_match = r'\{ *[+-]?[0-6] ?\}'
+        uwp_match = r'\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?]'
         keep_econ = False
         keep_social = False
         keep_imp = False
@@ -142,6 +144,8 @@ class testStar(unittest.TestCase):
         econ_m = re.search(econ_match, s)
         soc_m = re.search(soc_match, s)
         imp_m = re.search(imp_match, s)
+        uwp_m = re.search(uwp_match, s)
+        uwp_rumbled = '?' in uwp_m[0].strip()
         if econ_m:
             if '-' != econ_m[0].strip():
                 keep_econ = True
@@ -161,6 +165,7 @@ class testStar(unittest.TestCase):
         assume(foo is not None)
         result, _ = foo.hex.is_well_formed()  # as we're interested in extensions, we assume hex is good
         assume(result is True)
+        self.assertEqual(uwp_rumbled, foo.oldskool)
 
         if keep_econ:
             self.assertIsNotNone(foo.economics, "Ex required, not found.  " + hyp_line)
