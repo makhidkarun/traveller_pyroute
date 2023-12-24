@@ -188,6 +188,10 @@ class UWP(object):
     def tl_code(self, value):
         self._tl = self._int_to_ehex(value)
 
+    @property
+    def oldskool(self):
+        return '?' in self.line
+
     def check_canonical(self):
         msg = []
         self._check_canonical_physicals(msg)
