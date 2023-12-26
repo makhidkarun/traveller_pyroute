@@ -260,8 +260,8 @@ class testStar(unittest.TestCase):
         )
 
     @given(from_regex(UWP.match, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'),
-           from_regex(r'\([0-9A-Za-z]{3}[+-]\d\)'),
-           from_regex(r'\[[0-9A-Za-z]{4}\]'),
+           from_regex(r'^\([0-9A-Za-z]{3}[+-]\d\)'),
+           from_regex(r'^\[[0-9A-Za-z]{4}\]'),
            none())
     @example('?000000-0', '(000-0)', '[0000]', None)
     @example('?000000-0', '(000-0)0', '[0000]', 'Star Sample economics must be None or 7-char string')
@@ -306,6 +306,7 @@ class testStar(unittest.TestCase):
         foo.calculate_importance()
         foo.check_ex()
         foo.check_cx()
+        foo.calculate_ru('fixed')
 
 
 if __name__ == '__main__':
