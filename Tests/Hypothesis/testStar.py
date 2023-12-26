@@ -4,7 +4,7 @@ import unittest
 from datetime import timedelta
 
 from hypothesis import given, assume, example, HealthCheck, settings
-from hypothesis.strategies import text, from_regex, composite, booleans
+from hypothesis.strategies import text, from_regex, composite, booleans, none
 
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
@@ -261,8 +261,15 @@ class testStar(unittest.TestCase):
 
     @given(from_regex(UWP.match, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'),
            from_regex(r'\([0-9A-Za-z]{3}[+-]\d\)'),
-           from_regex(r'\[[0-9A-Za-z]{4}\]'))
-    def test_check_economics_and_social(self, uwp, ex, cx):
+           from_regex(r'\[[0-9A-Za-z]{4}\]'),
+           none())
+    @example('?000000-0', '(000-0)', '[0000]', None)
+    @example('?000000-0', '(000-0)0', '[0000]', 'Star Sample economics must be None or 7-char string')
+    @example('?000000-0', '(000-0)', '[0000]0', 'Star Sample social must be None or 6-char string')
+    @example('?000000-0', '000-0)', '[0000]', 'Star Sample economics must be None or 7-char string')
+    @example('?000000-0', '(000-0)', '[000]', 'Star Sample social must be None or 6-char string')
+    def test_check_economics_social_and_ru(self, uwp, ex, cx, well_formed_kaboom):
+        assume('?' not in uwp)
         uwp_obj = None
 
         try:
@@ -270,8 +277,10 @@ class testStar(unittest.TestCase):
         except ValueError:
             pass
         assume(uwp_obj is not None)
-        self.assertEqual(7, len(ex), ex + " is unexpected length")
-        self.assertEqual(6, len(cx), cx + " is unexpected length")
+
+        if well_formed_kaboom is None:
+            ex = ex[0:7]
+            cx = cx[0:6]
 
         foo = Star()
         foo.name = 'Sample'
@@ -285,7 +294,14 @@ class testStar(unittest.TestCase):
         foo.star_list_object = StarList('')
         foo.economics = ex
         foo.social = cx
-        self.assertTrue(foo.is_well_formed())
+        try:
+            self.assertTrue(foo.is_well_formed())
+        except AssertionError as e:
+            if well_formed_kaboom is not None:
+                self.assertEqual(well_formed_kaboom, str(e), "Unexpected well-formed check error")
+                return
+            else:
+                raise e
 
         foo.calculate_importance()
         foo.check_ex()
