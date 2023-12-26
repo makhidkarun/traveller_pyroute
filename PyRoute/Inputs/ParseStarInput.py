@@ -17,7 +17,7 @@ class ParseStarInput:
 (.{15,}) +
 (\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?]) +
 (.{15,}) +
-((\{ *[+-]?[0-6] ?\}) +(\([0-9A-Z]{3}[+-]\d\)|- ) +(\[[0-9A-Z]{4}\]|- )|( ) ( ) ( )) +
+((\{ *[+-]?[0-6] ?\}) +(\([0-9A-Za-z]{3}[+-]\d\)|- ) +(\[[0-9A-Za-z]{4}\]|- )|( ) ( ) ( )) +
 (\w{1,5}|-| ) +
 (\w{1,3}|-|\*) +
 (\w|-| ) +
@@ -58,8 +58,8 @@ class ParseStarInput:
         star.tradeCode = TradeCodes(data[3].strip())
         star.ownedBy = star.tradeCode.owned_by(star)
 
-        star.economics = data[6].strip() if data[6] and data[6].strip() != '-' else None
-        star.social = data[7].strip() if data[7] and data[7].strip() != '-' else None
+        star.economics = data[6].strip().upper() if data[6] and data[6].strip() != '-' else None
+        star.social = data[7].strip().upper() if data[7] and data[7].strip() != '-' else None
 
         star.nobles = Nobles()
         star.nobles.count(data[11])
