@@ -8,7 +8,11 @@ from hypothesis.strategies import text, from_regex, composite, booleans
 
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
+from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
+from PyRoute.SystemData.StarList import StarList
+from PyRoute.SystemData.UWP import UWP
+from PyRoute.TradeCodes import TradeCodes
 
 @composite
 def importance_starline(draw):
@@ -254,6 +258,38 @@ class testStar(unittest.TestCase):
             cm.output,
             hyp_line
         )
+
+    @given(from_regex(UWP.match, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'),
+           from_regex(r'\([0-9A-Za-z]{3}[+-]\d\)'),
+           from_regex(r'\[[0-9A-Za-z]{4}\]'))
+    def test_check_economics_and_social(self, uwp, ex, cx):
+        uwp_obj = None
+
+        try:
+            uwp_obj = UWP(uwp)
+        except ValueError:
+            pass
+        assume(uwp_obj is not None)
+        self.assertEqual(7, len(ex), ex + " is unexpected length")
+        self.assertEqual(6, len(cx), cx + " is unexpected length")
+
+        foo = Star()
+        foo.name = 'Sample'
+        foo.sector = Sector('# Core', '# 0, 0')
+        foo.hex = Hex(foo.sector, '0101')
+        foo.alg_base_code = 'Na'
+        foo.uwp = uwp_obj
+        foo.tradeCode = TradeCodes('')
+        foo.index = 0
+        foo.allegiance_base = foo.alg_base_code
+        foo.star_list_object = StarList('')
+        foo.economics = ex
+        foo.social = cx
+        self.assertTrue(foo.is_well_formed())
+
+        foo.calculate_importance()
+        foo.check_ex()
+        foo.check_cx()
 
 
 if __name__ == '__main__':
