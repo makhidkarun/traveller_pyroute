@@ -65,7 +65,7 @@ class StarList(object):
         self.stars_line = stars_line
         stars = StarList.stellar_match.findall(stars_line)
         if not stars:
-            raise ValueError("No stars found")
+            pass  #  We used to disallow empty star lists, but real data said otherwise.
         if 8 < len(stars):
             if trim_stars:
                 stars = stars[0:8]
@@ -110,9 +110,6 @@ class StarList(object):
         num_stars = len(self.stars_list)
         if 8 < num_stars:
             msg = "Max stars exceeded"
-            return False, msg
-        if 0 == num_stars:
-            msg = "Star list must not be empty"
             return False, msg
         for item in self.stars_list:
             if not isinstance(item, SystemStar):
