@@ -82,9 +82,6 @@ class StarlineTransformer(Transformer):
                 parsed[dataval] = rawval
 
         self.square_up_overspilled_trade_codes(parsed)
-        self.fix_tail_enders(parsed)
-        self.square_up_nobles_baze_and_zone(parsed)
-        #self.square_up_worlds_alg_and_residual(parsed)
 
         for line in self.strip_list:
             parsed[line] = parsed[line].strip()
@@ -120,26 +117,6 @@ class StarlineTransformer(Transformer):
         parsed['trade'] = ' '.join(tradebitz)
         self.raw = parsed['nobles'] + ' ' + parsed['base'] + ' ' + self.raw
 
-    def square_up_worlds_alg_and_residual(self, parsed):
-        if 3 < len(parsed['pbg']):
-            return
-        if ' ' != parsed['worlds']:
-            return
-        if not parsed['allegiance'].strip().isdigit():
-            return
-        if 2 > len(parsed['residual'].strip()):
-            return
-        parsed['worlds'] = parsed['allegiance']
-        parsed['allegiance'] = parsed['residual']
-        parsed['residual'] = ''
-
-    def square_up_nobles_baze_and_zone(self, parsed):
-        basespace = parsed['base'].find(' ')
-        if 0 < basespace:
-            bitz = parsed['base'].split(' ')
-            parsed['base'] = bitz[0].strip()
-            parsed['zone'] = bitz[1].strip()
-
     def trim_raw_string(self, tree):
         assert self.raw is not None, "Raw string not supplied before trimming"
         strip_list = ['position', 'starname', 'trade', 'extensions']
@@ -164,103 +141,6 @@ class StarlineTransformer(Transformer):
                 rawval = kid.children[0].value
                 self.raw = self.raw.replace(rawval, '', 1)
         self.raw = self.raw.lstrip()
-
-    def fix_tail_enders(self, parsed):
-        parsed_list = ['nobles', 'base', 'zone', 'pbg', 'worlds', 'allegiance', 'residual']
-        clean_list = ['nobles', 'base', 'zone', 'pbg', 'worlds', 'allegiance']
-        check_raw = ''
-        for item in parsed_list:
-            check_raw += parsed[item].strip() + ' '
-        check_raw = check_raw.strip()
-        if self.raw == check_raw or self.boil_down_double_spaces(self.raw) == check_raw:
-            return  # Tail enders have been broken out properly, move on
-        pbg = ' ' + parsed['pbg'].strip() + ' '
-        rawbitz = self.raw.split(pbg)
-        if 1 == len(rawbitz):
-            rawbitz = self.raw.split(parsed['pbg'])
-        if 2 < len(rawbitz):  # if pbg also showed up as, eg, base code
-            oldbitz = []
-            oldbitz.append(pbg.join(rawbitz[0:-1]))
-            oldbitz.append(rawbitz[-1])
-            rawbitz = oldbitz
-        if rawbitz[1].startswith(' '):
-            if not rawbitz[1][1].isspace():
-                rawbitz[1] = ' ' + rawbitz[1]
-
-        self._adjust_rawbitz(rawbitz)
-        if '*' != parsed['base']:
-            if rawbitz[0].endswith('  '):
-                parsed['zone'] = ' '
-                rawbitz[0] = rawbitz[0][:-2]
-            else:
-                rawbitz[0] = rawbitz[0].rstrip()
-                parsed['zone'] = rawbitz[0][-1]
-                rawbitz[0] = rawbitz[0][:-2]
-            if rawbitz[0].endswith('  '):
-                parsed['base'] = ' '
-                rawbitz[0] = rawbitz[0][:-2]
-            else:
-                basedex = rawbitz[0].rstrip().find(' ')
-                if -1 == basedex:
-                    parsed['base'] = rawbitz[0].rstrip()
-                    rawbitz[0] = ''
-                else:
-                    parsed['base'] = rawbitz[0].rstrip()[basedex:].strip()
-                    rawbitz[0] = rawbitz[0].rstrip()[:basedex]
-            if not rawbitz[0].startswith('  '):
-                noblesdex = rawbitz[0].find(' ')
-                if -1 == noblesdex:
-                    parsed['nobles'] = rawbitz[0]
-                else:
-                    parsed['nobles'] = rawbitz[0][:noblesdex]
-
-        worldsparsed = False
-        if rawbitz[1].startswith('  '):
-            parsed['worlds'] = ' '
-            rawbitz[1] = rawbitz[1][2:].lstrip()
-            worldsparsed = True
-        else:
-            worldsdex = rawbitz[1].lstrip().find(' ')
-            if -1 != worldsdex:
-                parsed['worlds'] = rawbitz[1].lstrip()[:worldsdex]
-                rawbitz[1] = rawbitz[1].lstrip()[worldsdex:]
-                worldsparsed = True
-        if worldsparsed:
-            rawbitz[1] = rawbitz[1].lstrip()
-            algdex = rawbitz[1].find(' ')
-            if -1 == algdex:
-                algdex = len([item for item in rawbitz[1] if item.isalnum()])
-                if not rawbitz[1][algdex-1].isalnum():
-                    algdex -= 1
-
-            if -1 != algdex:
-                if 4 < algdex:  # Allegiances can be at most 4 chars long
-                    algdex = 4
-                parsed['allegiance'] = rawbitz[1][:algdex]
-            elif 4 < len(rawbitz[1]):
-                parsed['allegiance'] = rawbitz[1][:4]
-            else:
-                parsed['allegiance'] = rawbitz[1]
-
-        for item in clean_list:
-            if ' ' != parsed[item]:
-                self.raw = self.raw.replace(parsed[item], '', 1).lstrip()
-        parsed['residual'] = self.raw.strip()
-
-    def _adjust_rawbitz(self, rawbitz):
-        while rawbitz[0].endswith('   '):
-            rawbitz[0] = rawbitz[0][:-1]
-        chunkz = [item for item in rawbitz[0].split(' ') if 0 < len(item)]
-        if 3 == len(chunkz):
-            rawbitz[0] = ' '.join(chunkz)
-        if 2 == len(chunkz) and '   ' in rawbitz[0]:
-            rawbitz[0] = ' '.join(chunkz)
-        if 2 > len(rawbitz):
-            return
-        chunkz = [item for item in rawbitz[1].split(' ') if 0 < len(item)]
-        if 2 == len(chunkz) and 4 < len(chunkz[1]):  # chunkz[1] is an allegiance + residual
-            remix = [chunkz[0], chunkz[1][0:4], chunkz[1][4:]]
-            rawbitz[1] = ' '.join(remix)
 
     @staticmethod
     def boil_down_double_spaces(dubbel):
