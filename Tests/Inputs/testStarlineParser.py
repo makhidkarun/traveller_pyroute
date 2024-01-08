@@ -14,9 +14,9 @@ class testStarlineParser(unittest.TestCase):
     def test_parser(self):
         txt = '0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           '
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0103', transformed[0])
@@ -39,9 +39,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '2332 Akarrtoog            E300000-0 Ba Na Va                            - K - 013   Kk M1 V                '
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('2332', transformed[0])
@@ -64,9 +64,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0104                      X110000-6 Ba Lo Ni                            - -  - 004   Na'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0104', transformed[0])
@@ -89,9 +89,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0000 000000000000000 ???????-? 000000000000000       - 000 0 000   00'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
@@ -114,9 +114,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0000 000000000000000 ???????-? 000000000000000        - 000 0 000   00'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
@@ -139,9 +139,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0000 000000000000000 ???????-? 000000000000000       - - 0 000 00 00'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
@@ -164,9 +164,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0001 000000000000000 ???????-? 000000000000000         - 0   000   00'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0001', transformed[0], 'Unexpected hex position')
@@ -189,9 +189,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0000 000000000000000 ???????-? 0000000-0000000       - - 0 000   00'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
@@ -214,9 +214,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0000 000000000000000 0000000-0 000000000000000       - - 0 000   000000'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
@@ -239,9 +239,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0000 000000000000000 ???????-? 000000000000000         - 0 000   00'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
@@ -264,9 +264,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0000 000000000000000 ???????-? 000000000000000 {   0} -  [0000] - - 0 000   00'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
@@ -289,9 +289,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0000 000000000000000 ???????-? 000000000000000       - - 0   000   00'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
@@ -314,9 +314,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0000 000000000000000 0000000-0 000000000000000       - -      0 000   00'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
@@ -339,9 +339,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0000 000000000000000 ???????-? 000000000000000       - - 0 000   00000 '
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
@@ -364,9 +364,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0000 000000000000000 ???????-? 000000000000000       - -  0   000   00'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
@@ -389,9 +389,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0000 000000000000000 ???????-? 000000000000000       - - 0 000  0 00000'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
@@ -414,9 +414,9 @@ class testStarlineParser(unittest.TestCase):
         txt = '0000 000000000000000 ???????-? 000000000000000       - -      0 000 0010 00+'
 
         foo = StarlineParser()
-        xform = StarlineTransformer(raw=txt)
+        result, txt = foo.parse(txt)
 
-        result = foo.parse(txt)
+        xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')

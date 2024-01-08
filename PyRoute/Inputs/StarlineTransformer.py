@@ -22,69 +22,133 @@ class StarlineTransformer(Transformer):
         super().__init__(visit_tokens)
         self.raw = raw
 
-    def starname(self, starname):
+    def starline(self, args):
+        if 3 <= len(args[2]) and 1 == len(args[3]) and '' == args[3][0].value.strip():  # Square up overspilled trade codes
+            if '' == args[4][0].value and '' != args[5][0].value and '' == args[6][0].value:
+                last = args[2][-1]
+                mid = args[2][-2]
+                args[6][0].value = args[5][0].value
+                args[5][0].value = last
+                args[4][0].value = mid
+                args[2] = args[2][:-2]
+        if '*' != args[5][0].value:
+            if '' == args[4][0].value and '' != args[5][0].value:
+                args[4][0].value = args[5][0].value
+                args[5][0].value = args[6][0].value
+            elif '' == args[6][0].value and '' != args[5][0].value:
+                args[6][0].value = args[5][0].value
+                args[5][0].value = args[4][0].value
+                args[4][0].value = ''
+        if 8 == len(args):  # If there's no residual argument
+            tailend = args[7][2][0].value
+            lenlast = min(4, len(tailend))
+            counter = 0
+            while counter < lenlast and (tailend[counter].isalnum() or '-' == tailend[counter]):
+                if counter < lenlast:
+                    counter += 1
+            if counter < min(4, lenlast):  # if the allegiance overspills, move the overspill into the residual
+                overrun = tailend[counter:]
+                tailend = tailend[:counter]
+                args[7][2][0].value = tailend
+                newbie = Token('__ANON_14', overrun)
+                args.append([newbie])
+        return args
+
+    def position(self, args):
+        args[0].value = args[0].value.strip()
+        return args
+
+    def starname(self, args):
+        args[0].value = args[0].value.strip()
+        return args
+
+    def trade(self, args):
+        trimmed = []
+        for item in args:
+            trimmed.append(item.value.strip())
+        return trimmed
+
+    def extensions(self, args):
+        if 1 == len(args):
+            return args
+        return args
+
+    def nobles(self, args):
+        args[0].value = args[0].value.strip()
+        return args
+
+    def base(self, args):
+        args[0].value = args[0].value.strip()
+        return args
+
+    def zone(self, args):
+        args[0].value = args[0].value.strip()
+        return args
+
+    def pbg(self, args):
+        args[0].value = args[0].value.strip()
+        return args
+
+    def worlds(self, args):
+        raw = args[0].value
+        if 1 < len(raw):
+            raw = raw.strip()
+        args[0].value = raw
+        return args
+
+    def allegiance(self, args):
+        args[0].value = args[0].value.strip()
+        return args
+
+    def world_alg(self, args):
+        return args
+
+    def residual(self, args):
+        args[0].value = args[0].value.strip()
+        return args
+
+    def starname_transform(self, starname):
         bitz = [item for item in starname.split(' ') if 0 < len(item)]
         uwp = bitz[-1]
         bitz = bitz[:-1]
-        return [' '.join(bitz), uwp]
+        return ' '.join(bitz), uwp
 
-    def trade(self, trade):
+    def trade_transform(self, trade):
         codes = []
 
-        for kid in trade.children:
-            codes.append(kid.value)
+        for kid in trade:
+            codes.append(kid)
 
         return ' '.join(codes)
 
-    def extensions(self, extensions):
-        if 1 == len(extensions.children):  # Fallback no-extensions
+    def extensions_transform(self, extensions):
+        if 1 == len(extensions):  # Fallback no-extensions
             return None, None, None
         data = {}
-        for kid in extensions.children:
+        for kid in extensions:
             val = str(kid.data)
             data[val] = kid.children[0].value
             data[val] = self.boil_down_double_spaces(data[val])
 
         return data['ix'], data['ex'], data['cx']
 
-    def world_alg(self, world_alg):
-        data = {}
-        for kid in world_alg.children:
-            val = str(kid.data)
-            data[val] = kid.children[0].value
-        if 1 < len(data['worlds']):
-            data['worlds'] = data['worlds'].strip()
-        return data['pbg'], data['worlds'], data['allegiance']
+    def world_alg_transform(self, world_alg):
+        return world_alg[0][0].value, world_alg[1][0].value, world_alg[2][0].value
 
     def transform(self, tree):
+        tree = self._transform_tree(tree)
         parsed = {'ix': None, 'ex': None, 'cx': None, 'residual': ''}
-        self.trim_raw_string(tree)
 
-        for kid in tree.children:
-            if isinstance(kid, Token):
-                parsed['trade'].append(kid.value)
-                continue
-
-            dataval = str(kid.data)
-            if 'starname' == dataval:
-                rawval = kid.children[0].value
-                result = self.starname(rawval)
-                parsed['name'] = result[0]
-                parsed['uwp'] = result[1]
-            elif 'trade' == dataval:
-                parsed['trade'] = self.trade(kid)
-            elif 'extensions' == dataval:
-                parsed['ix'], parsed['ex'], parsed['cx'] = self.extensions(kid)
-            elif 'world_alg' == dataval:
-                parsed['pbg'], parsed['worlds'], parsed['allegiance'] = self.world_alg(kid)
-            else:
-                rawval = kid.children[0].value
-                parsed[dataval] = rawval
-
-        self.square_up_overspilled_trade_codes(parsed)
-
-        for line in self.strip_list:
-            parsed[line] = parsed[line].strip()
+        parsed['position'] = tree[0][0].value
+        parsed['name'], parsed['uwp'] = self.starname_transform(tree[1][0].value)
+        parsed['trade'] = self.trade_transform(tree[2])
+        parsed['ix'], parsed['ex'], parsed['cx'] = self.extensions_transform(tree[3])
+        parsed['nobles'] = tree[4][0].value
+        parsed['base'] = tree[5][0].value
+        parsed['zone'] = tree[6][0].value
+        parsed['pbg'], parsed['worlds'], parsed['allegiance'] = self.world_alg_transform(tree[7])
+        if 9 == len(tree):
+            parsed['residual'] = tree[8][0].value
 
         no_extensions = parsed['ix'] is None and parsed['ex'] is None and parsed['cx'] is None
         ex_ix = parsed['ix'] if parsed['ix'] is not None else ' '
@@ -101,21 +165,6 @@ class StarlineTransformer(Transformer):
         data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'], parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'], parsed['zone'], parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
 
         return data
-
-    def square_up_overspilled_trade_codes(self, parsed):
-        if parsed['ix'] is not None or parsed['ex'] is not None or parsed['cx'] is not None:
-            return
-        tradebitz = parsed['trade'].split(' ')
-        if 3 > len(tradebitz):
-            return
-        if '' != parsed['nobles'].strip():
-            return
-        parsed['zone'] = parsed['base']
-        parsed['base'] = tradebitz[-1]
-        parsed['nobles'] = tradebitz[-2]
-        tradebitz = tradebitz[:-2]
-        parsed['trade'] = ' '.join(tradebitz)
-        self.raw = parsed['nobles'] + ' ' + parsed['base'] + ' ' + self.raw
 
     def trim_raw_string(self, tree):
         assert self.raw is not None, "Raw string not supplied before trimming"
