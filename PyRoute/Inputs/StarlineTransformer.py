@@ -151,6 +151,10 @@ class StarlineTransformer(Transformer):
             parsed['residual'] = tree[8][0].value
 
         self.trim_raw_string(parsed)
+        rawbitz = self._trim_raw_bitz(parsed)
+        parsed = self._square_up_parsed_zero(rawbitz[0], parsed)
+        parsed = self._square_up_parsed_one(rawbitz[1], parsed)
+        parsed = self._square_up_allegiance_overflow(parsed)
 
         no_extensions = parsed['ix'] is None and parsed['ex'] is None and parsed['cx'] is None
         ex_ix = parsed['ix'] if parsed['ix'] is not None else ' '
@@ -178,7 +182,78 @@ class StarlineTransformer(Transformer):
             rawval = tree[dataval]
             if rawval is not None:
                 self.raw = self.raw.replace(rawval, '', 1)
-        self.raw = self.raw.lstrip()
+
+    def _square_up_parsed_zero(self, rawstring, parsed):
+        bitz = [item for item in rawstring.split(' ') if '' != item]
+        if 3 == len(bitz) and bitz[0] == parsed['nobles'] and bitz[1] == parsed['base'] and bitz[2] == parsed['zone']:
+            return parsed
+        if 3 == len(bitz):
+            parsed['nobles'] = bitz[0]
+            parsed['base'] = bitz[1]
+            parsed['zone'] = bitz[2]
+        if 2 == len(bitz) and '*' != parsed['base']:
+            if not rawstring.endswith('   '):
+                parsed['nobles'] = ''
+                parsed['base'] = bitz[0]
+                parsed['zone'] = bitz[1]
+            else:
+                parsed['nobles'] = bitz[0]
+                parsed['base'] = bitz[1]
+                parsed['zone'] = ''
+        return parsed
+
+    def _square_up_parsed_one(self, rawstring, parsed):
+        rawtrim = rawstring.lstrip()
+        rawbitz = rawtrim.split(' ')
+        if len(rawtrim) + 3 <= len(rawstring):  # Assume a blank worlds field
+            alg = rawbitz[0]
+            rawtrim = rawtrim.replace(alg, '')
+
+            parsed['worlds'] = ' '
+            parsed['allegiance'] = alg
+            parsed['residual'] = rawtrim.strip()
+        else:  # Assume worlds field is _not_ blank
+            if ' ' == parsed['worlds'] and 2 == len(rawbitz):  # if worlds field has been _parsed_ as blank, need to move allegiance and residual up one
+                parsed['worlds'] = rawbitz[0]
+                parsed['allegiance'] = rawbitz[1]
+                parsed['residual'] = ''
+
+        return parsed
+
+    def _square_up_allegiance_overflow(self, parsed):
+        alleg = parsed['allegiance']
+        if '----' == alleg or '--' == alleg:
+            return parsed
+
+        if alleg.startswith('----') and 4 <= len(alleg):
+            parsed['allegiance'] = '----'
+            parsed['residual'] = alleg[4:] + parsed['residual']
+        elif alleg.startswith('--') and 2 <= len(alleg):
+            parsed['allegiance'] = '--'
+            parsed['residual'] = alleg[2:] + parsed['residual']
+        else:
+            counter = 0
+            while counter < len(alleg) and (alleg[counter].isalnum() or '-' == alleg[counter]) and 4 > counter:
+                counter += 1
+            if counter < len(alleg):
+                spacer = ' ' if parsed['residual'] != '' else ''
+                parsed['allegiance'] = alleg[:counter]
+                parsed['residual'] = alleg[counter:] + spacer + parsed['residual']
+        return parsed
+
+    def _trim_raw_bitz(self, parsed):
+        pbg = ' ' + parsed['pbg'] + ' '
+        rawbitz = self.raw.split(pbg)
+        if 2 < len(rawbitz):
+            repack = []
+            first = pbg.join(rawbitz[:-1])
+            repack.append(first)
+            repack.append(rawbitz[-1])
+            rawbitz = repack
+        rawbitz[0] += ' '
+        rawbitz[1] = ' ' + rawbitz[1]
+
+        return rawbitz
 
     @staticmethod
     def boil_down_double_spaces(dubbel):
