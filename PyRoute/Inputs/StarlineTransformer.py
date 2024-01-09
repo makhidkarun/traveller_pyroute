@@ -150,6 +150,8 @@ class StarlineTransformer(Transformer):
         if 9 == len(tree):
             parsed['residual'] = tree[8][0].value
 
+        self.trim_raw_string(parsed)
+
         no_extensions = parsed['ix'] is None and parsed['ex'] is None and parsed['cx'] is None
         ex_ix = parsed['ix'] if parsed['ix'] is not None else ' '
         ex_ix = self.boil_down_double_spaces(ex_ix)
@@ -168,26 +170,13 @@ class StarlineTransformer(Transformer):
 
     def trim_raw_string(self, tree):
         assert self.raw is not None, "Raw string not supplied before trimming"
-        strip_list = ['position', 'starname', 'trade', 'extensions']
+        strip_list = ['position', 'name', 'uwp', 'trade', 'ix', 'ex', 'cx']
 
-        for kid in tree.children:
-            dataval = str(kid.data)
-            if dataval not in strip_list:
+        for dataval in strip_list:
+            if dataval not in tree:
                 continue
-            if 'trade' == dataval:
-                for item in kid.children:
-                    rawval = item.value
-                    self.raw = self.raw.replace(rawval, '', 1)
-            elif 'extensions' == dataval:
-                if 1 == len(kid.children):
-                    rawval = kid.children[0].value
-                    self.raw = self.raw.replace(rawval, '', 1)
-                else:
-                    for item in kid.children:
-                        rawval = item.children[0].value
-                        self.raw = self.raw.replace(rawval, '', 1)
-            else:
-                rawval = kid.children[0].value
+            rawval = tree[dataval]
+            if rawval is not None:
                 self.raw = self.raw.replace(rawval, '', 1)
         self.raw = self.raw.lstrip()
 
