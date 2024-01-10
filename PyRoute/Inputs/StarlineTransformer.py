@@ -205,17 +205,34 @@ class StarlineTransformer(Transformer):
     def _square_up_parsed_one(self, rawstring, parsed):
         rawtrim = rawstring.lstrip()
         rawbitz = rawtrim.split(' ')
-        if len(rawtrim) + 3 <= len(rawstring):  # Assume a blank worlds field
-            alg = rawbitz[0]
-            rawtrim = rawtrim.replace(alg, '')
+        trimbitz = [item for item in rawbitz if '' != item]
+        if len(rawtrim) + 3 <= len(rawstring):  # We don't have three matches, need to figure out how they drop in
+            alg = trimbitz[0]
+            rawtrim = rawtrim.replace(alg, '', 1)
 
-            parsed['worlds'] = ' '
-            parsed['allegiance'] = alg
-            parsed['residual'] = rawtrim.strip()
+            if 2 == len(trimbitz):
+                allegiance = trimbitz[1]
+                rawtrim = rawtrim.replace(allegiance, '', 1)
+                if 3 > len(alg):  # if first trimbit fits in worlds field, stick it there
+                    parsed['worlds'] = alg
+                    parsed['allegiance'] = allegiance
+                    parsed['residual'] = rawtrim.strip()
+                else:
+                    parsed['worlds'] = ' '
+                    parsed['allegiance'] = alg
+                    parsed['residual'] = allegiance
+
+            elif 1 == len(alg):  # Allegiance codes can't be single-char, so we actually have a worlds field
+                parsed['worlds'] = alg
+                parsed['allegiance'] = rawtrim.strip()
+            else:
+                parsed['worlds'] = ' '
+                parsed['allegiance'] = alg
+                parsed['residual'] = rawtrim.strip()
         else:  # Assume worlds field is _not_ blank
-            if ' ' == parsed['worlds'] and 2 == len(rawbitz):  # if worlds field has been _parsed_ as blank, need to move allegiance and residual up one
-                parsed['worlds'] = rawbitz[0]
-                parsed['allegiance'] = rawbitz[1]
+            if ' ' == parsed['worlds'] and 2 == len(trimbitz):  # if worlds field has been _parsed_ as blank, need to move allegiance and residual up one
+                parsed['worlds'] = trimbitz[0]
+                parsed['allegiance'] = trimbitz[1]
                 parsed['residual'] = ''
 
         return parsed

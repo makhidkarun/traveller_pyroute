@@ -139,6 +139,10 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 ???????-? 000000000000000         - 0 000   00', True)
     @example('0000 000000000000000 0000000-0 000000000000000       - - 0 000 00 00', True)
     @example('0000 000000011111111 ???????-? 9BD00QRV)(alo{{       1 * 0  011       1000000 000{', False)
+    @example('0000 000000000000000 0000000-0 000000000000000       - - 0 000   0 00', True)
+    @example('0000 000000000000000 ???????-? 000000000000000       - - 0 000 00   00', True)
+    @example('0000 000000000000000 0000000-0 000000000000000       - - 0 000   00 00', True)
+    @example('0000 000000000000000 ???????-? 000000000000000       - - 0 000   000 00', True)
     def test_starline_parser_against_regex(self, s, match):
         matches = ParseStarInput.starline.match(s)
         assume(matches is not None)
