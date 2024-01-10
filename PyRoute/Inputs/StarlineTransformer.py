@@ -244,6 +244,8 @@ class StarlineTransformer(Transformer):
     def _trim_raw_bitz(self, parsed):
         pbg = ' ' + parsed['pbg'] + ' '
         rawbitz = self.raw.split(pbg)
+        if 1 == len(rawbitz):
+            rawbitz.append('')
         if 2 < len(rawbitz):
             repack = []
             first = pbg.join(rawbitz[:-1])

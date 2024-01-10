@@ -46,7 +46,8 @@ def comparison_line(draw):
         '0000 000000000000000 ???????-? 000000000000  0       - - 0 000    00',
         '0001 000000000000000 ???????-? 000000000000000       -         - 0 000   00',
         '0000 000000000000000 ???????-? 000000000000000       - - 0 000   00-',
-        '0000 000000000000000 ???????-? 000000000000000       -         - 0 000   01'
+        '0000 000000000000000 ???????-? 000000000000000       -         - 0 000   01',
+        '0000 000000011111111 ???????-? 9BD00QRV)(alo{{       1 * 0  011       1000000 000{'
     ]
 
     candidate = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
@@ -137,6 +138,7 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0001 000000000000000 ???????-? 000000000000000         - 0 000   00', True)
     @example('0000 000000000000000 ???????-? 000000000000000         - 0 000   00', True)
     @example('0000 000000000000000 0000000-0 000000000000000       - - 0 000 00 00', True)
+    @example('0000 000000011111111 ???????-? 9BD00QRV)(alo{{       1 * 0  011       1000000 000{', False)
     def test_starline_parser_against_regex(self, s, match):
         matches = ParseStarInput.starline.match(s)
         assume(matches is not None)
