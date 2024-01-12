@@ -65,5 +65,6 @@ class StarlineParser:
         self.parser = Lark(self.starline_grammar, start='starline')
 
     def parse(self, text):
-        text = re.sub(r'\w  \w', dashrepl, text)
+        text = re.sub(r'[\w\-]  [\w\-]', dashrepl, text)
+
         return self.parser.parse(text), text

@@ -150,7 +150,7 @@ class StarlineTransformer(Transformer):
         if 9 == len(tree):
             parsed['residual'] = tree[8][0].value
 
-        self._square_up_parsed(parsed)
+        parsed = self._square_up_parsed(parsed)
         self.trim_raw_string(parsed)
         rawbitz = self._trim_raw_bitz(parsed)
         parsed = self._square_up_parsed_zero(rawbitz[0], parsed)
@@ -174,13 +174,27 @@ class StarlineTransformer(Transformer):
         return data
 
     def _square_up_parsed(self, parsed):
-        if ' ' != parsed['nobles'] and '' == parsed['base'] and '' == parsed['zone'] and parsed['pbg'] == parsed['allegiance']:
+        if '*' in parsed['trade'] and '' != parsed['nobles'] and '' == parsed['base'] and '' == parsed['zone']:
+            parsed['zone'] = parsed['nobles']
+            bitz = parsed['trade'].split(' ')
+            parsed['nobles'] = ''
+            parsed['base'] = '*'
+            bitz = [item for item in bitz if '*' != item]
+            parsed['trade'] = ' '.join(bitz)
+        if 15 < len(parsed['trade']) and ' ' in parsed['trade'] and '' == parsed['nobles'] and '' != parsed['base'] and '' != parsed['zone']:
+            bitz = parsed['trade'].split(' ')
+            parsed['nobles'] = bitz[-1]
+            bitz = bitz[:-1]
+            parsed['trade'] = ' '.join(bitz)
+        if ' ' != parsed['nobles'] and 0 < len(parsed['nobles']) and '' == parsed['base'] and '' == parsed['zone']:
             parsed['base'] = parsed['pbg']
             parsed['zone'] = parsed['worlds']
             parsed['pbg'] = parsed['allegiance']
             parsed['worlds'] = ' '
             parsed['allegiance'] = parsed['residual']
             parsed['residual'] = ''
+
+        return parsed
 
 
     def trim_raw_string(self, tree):
@@ -246,6 +260,10 @@ class StarlineTransformer(Transformer):
                 parsed['allegiance'] = trimbitz[1]
                 parsed['residual'] = ''
 
+        if '' == parsed['allegiance'].strip() and '' != parsed['residual']:  # Allegiance _must_ be filled, residual is optional, so switch them back if they're transposed
+            parsed['allegiance'] = parsed['residual']
+            parsed['residual'] = ''
+
         return parsed
 
     def _square_up_allegiance_overflow(self, parsed):
@@ -261,7 +279,7 @@ class StarlineTransformer(Transformer):
             parsed['residual'] = alleg[2:] + parsed['residual']
         else:
             counter = 0
-            while counter < len(alleg) and (alleg[counter].isalnum() or '-' == alleg[counter]) and 4 > counter:
+            while counter < len(alleg) and (alleg[counter].isalnum() or '-' == alleg[counter] or '?' == alleg[counter]) and 4 > counter:
                 counter += 1
             if counter < len(alleg):
                 spacer = ' ' if parsed['residual'] != '' else ''
