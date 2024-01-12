@@ -150,6 +150,7 @@ class StarlineTransformer(Transformer):
         if 9 == len(tree):
             parsed['residual'] = tree[8][0].value
 
+        self._square_up_parsed(parsed)
         self.trim_raw_string(parsed)
         rawbitz = self._trim_raw_bitz(parsed)
         parsed = self._square_up_parsed_zero(rawbitz[0], parsed)
@@ -171,6 +172,16 @@ class StarlineTransformer(Transformer):
         data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'], parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'], parsed['zone'], parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
 
         return data
+
+    def _square_up_parsed(self, parsed):
+        if ' ' != parsed['nobles'] and '' == parsed['base'] and '' == parsed['zone'] and parsed['pbg'] == parsed['allegiance']:
+            parsed['base'] = parsed['pbg']
+            parsed['zone'] = parsed['worlds']
+            parsed['pbg'] = parsed['allegiance']
+            parsed['worlds'] = ' '
+            parsed['allegiance'] = parsed['residual']
+            parsed['residual'] = ''
+
 
     def trim_raw_string(self, tree):
         assert self.raw is not None, "Raw string not supplied before trimming"
@@ -213,7 +224,7 @@ class StarlineTransformer(Transformer):
             if 2 == len(trimbitz):
                 allegiance = trimbitz[1]
                 rawtrim = rawtrim.replace(allegiance, '', 1)
-                if 3 > len(alg):  # if first trimbit fits in worlds field, stick it there
+                if alg.isdigit() and 5 > len(alg):  # if first trimbit fits in worlds field, stick it there
                     parsed['worlds'] = alg
                     parsed['allegiance'] = allegiance
                     parsed['residual'] = rawtrim.strip()
@@ -265,10 +276,12 @@ class StarlineTransformer(Transformer):
         if 1 == oldlen:
             rawbitz.append('')
         if 2 < oldlen:
+            collide = self._check_raw_collision(parsed)
+            first = pbg.join(rawbitz[:-1]) if not collide else pbg.join(rawbitz[:-2])
+            second = rawbitz[-1] if not collide else pbg.join(rawbitz[-2:])
             repack = []
-            first = pbg.join(rawbitz[:-1])
             repack.append(first)
-            repack.append(rawbitz[-1])
+            repack.append(second)
             rawbitz = repack
         rawbitz[0] += ' '
         rawbitz[1] = ' ' + rawbitz[1]
