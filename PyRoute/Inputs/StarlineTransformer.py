@@ -274,6 +274,15 @@ class StarlineTransformer(Transformer):
 
         return rawbitz
 
+    def _check_raw_collision(self, parsed):
+        if parsed['pbg'] == parsed['worlds']:
+            return True
+        if parsed['pbg'] == parsed['allegiance']:
+            return True
+        if parsed['pbg'] == parsed['residual']:
+            return True
+        return False
+
     @staticmethod
     def boil_down_double_spaces(dubbel):
         return " ".join(dubbel.split())
