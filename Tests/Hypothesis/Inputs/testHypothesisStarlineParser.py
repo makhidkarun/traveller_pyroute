@@ -56,12 +56,30 @@ def comparison_line(draw):
         '0000 000000000000000 ???????-? 0000000000000 0 {0} -  -    - 0 000   00',
         '0000 000000000000000 0000000-0 000000000000000       -       - 0   000   00',
         '0000 000000000000000 ???????-? 000000000000 00         - 0 000    00',
-        '0000 000000000000000 0000000-0 000000000000000       - -         0   000   01'
+        '0000 000000000000000 0000000-0 000000000000000       - -         0   000   01',
+        '0000 000000000000000 ???????-? 000000000000000       - -         0   001   00',
+        '0000 000000000000000 ???????-? 000000000000000       - -         0   002   00'
     ]
 
     candidate = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
     assume(67 != len(candidate))
     assume(candidate not in rejects)
+    data = ParseStarInput.starline.match(candidate).groups()
+    bitz = data[3].split(' ')
+    singleton = [item for item in bitz if 1 == len(item)]
+    if singleton:
+        assume(not singleton)
+    if 15 < len(data[3]):
+        if '' == data[11] or ' ' == data[11]:  # Skip generating noble-code spillovers
+            assume(False)
+        if '' == data[12] or ' ' == data[12]:  # Skip generating base-code spillovers
+            assume(False)
+        if '' == data[13] or ' ' == data[13]:  # Skip generating zone-code spillovers
+            assume(False)
+
+    assume(5 > len(data[15]))  # Skip generating overlong world/allegiance codes
+    assume(not data[16].isdigit())  # Skip generating numeric allegiances
+
     return candidate
 
 
@@ -164,7 +182,10 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 ???????-? 000000000000000         *       0 000   00', True)
     @example('0000 000000000000000 ???????-? 000000000000 00         - 0 000    00', True)
     @example('0000 000000000000000 0000000-0 000000000000000       - -         0   000   01', False)
-    @example('0000 000000000000000 ???????-? 000000000000000 {0} -  -       - 0   000   00', True)
+    @example('0000 000000000000000 ???????-? 000000000000000 {0} -  -       - 0   000   00', False)
+    @example('0000 000000000000000 ???????-? 000000000000000       - -         0   001   00', False)
+    @example('0000 000000000000000 ???????-? 000000000000000       - -         0   002   00', False)
+    @example('0000 000000000000000 0000000-0 000000000000000       00         - 0 000   00', False)
     def test_starline_parser_against_regex(self, s, match):
         matches = ParseStarInput.starline.match(s)
         assume(matches is not None)
