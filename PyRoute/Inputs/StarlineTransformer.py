@@ -3,6 +3,7 @@ Created on Dec 27, 2023
 
 @author: CyberiaResurrection
 """
+import re
 
 from lark import Transformer, Token
 
@@ -126,8 +127,12 @@ class StarlineTransformer(Transformer):
             return None, None, None
         data = {}
         for kid in extensions:
-            val = str(kid.data)
-            data[val] = kid.children[0].value
+            if isinstance(kid, Token):
+                val = str(kid.type)
+                data[val] = kid.value
+            else:
+                val = str(kid.data)
+                data[val] = kid.children[0].value
             data[val] = self.boil_down_double_spaces(data[val])
 
         return data['ix'], data['ex'], data['cx']
@@ -136,6 +141,7 @@ class StarlineTransformer(Transformer):
         return world_alg[0][0].value, world_alg[1][0].value, world_alg[2][0].value
 
     def transform(self, tree):
+        tree = self._preprocess_trade_and_extensions(tree)
         tree = self._transform_tree(tree)
         parsed = {'ix': None, 'ex': None, 'cx': None, 'residual': ''}
 
@@ -173,19 +179,35 @@ class StarlineTransformer(Transformer):
 
         return data
 
+    def _preprocess_trade_and_extensions(self, tree):
+        trade = tree.children[2]
+        extensions = tree.children[3]
+        ix_reg = '\{ *[+-]?[0-6] ?\}'
+
+        # If trade has importance-extension child, we need to fix it
+        counter = -1
+        ix_found = False
+        for kid in trade.children:
+            counter += 1
+            ix_match = re.match(ix_reg, kid.value)
+            if ix_match is not None:
+                ix_found = True
+                break
+
+        if not ix_found:
+            return tree
+
+        bitz = trade.children[counter:]
+        bitz[0].type = 'ix'
+        bitz[1].type = 'ex'
+        bitz[2].type = 'cx'
+        trade.children = trade.children[:counter]
+        extensions.children.extend(bitz)
+
+        return tree
+
     def _square_up_parsed(self, parsed):
-        if '*' in parsed['trade'] and '' != parsed['nobles'] and '' == parsed['base'] and '' == parsed['zone']:
-            parsed['zone'] = parsed['nobles']
-            bitz = parsed['trade'].split(' ')
-            parsed['nobles'] = ''
-            parsed['base'] = '*'
-            bitz = [item for item in bitz if '*' != item]
-            parsed['trade'] = ' '.join(bitz)
-        if 15 < len(parsed['trade']) and ' ' in parsed['trade'] and '' == parsed['nobles'] and '' != parsed['base'] and '' != parsed['zone']:
-            bitz = parsed['trade'].split(' ')
-            parsed['nobles'] = bitz[-1]
-            bitz = bitz[:-1]
-            parsed['trade'] = ' '.join(bitz)
+        parsed = self._square_up_parsed_trade_codes(parsed)
         if ' ' != parsed['nobles'] and 0 < len(parsed['nobles']) and '' == parsed['base'] and '' == parsed['zone']:
             parsed['base'] = parsed['pbg']
             parsed['zone'] = parsed['worlds']
@@ -196,6 +218,26 @@ class StarlineTransformer(Transformer):
 
         return parsed
 
+    def _square_up_parsed_trade_codes(self, parsed):
+        bitz = parsed['trade'].split(' ')
+        if 5 == len(bitz) and parsed['ix'] is None and parsed['ex'] is None and parsed['cx'] is None and '' == parsed['nobles'].strip():
+            parsed['nobles'] = bitz[-1]
+            parsed['cx'] = bitz[-2]
+            parsed['ex'] = bitz[-3]
+            parsed['ix'] = bitz[-4]
+            bitz = bitz[:-4]
+        elif '*' in parsed['trade'] and '' != parsed['nobles'] and '' == parsed['base'] and '' == parsed['zone']:
+            parsed['zone'] = parsed['nobles']
+            parsed['nobles'] = ''
+            parsed['base'] = '*'
+            bitz = [item for item in bitz if '*' != item]
+        elif 15 < len(parsed['trade']) and ' ' in parsed['trade'] and '' == parsed['nobles'] and '' != parsed[
+            'base'] and '' != parsed['zone']:
+            parsed['nobles'] = bitz[-1]
+            bitz = bitz[:-1]
+
+        parsed['trade'] = ' '.join(bitz)
+        return parsed
 
     def trim_raw_string(self, tree):
         assert self.raw is not None, "Raw string not supplied before trimming"
@@ -231,7 +273,16 @@ class StarlineTransformer(Transformer):
         rawtrim = rawstring.lstrip()
         rawbitz = rawtrim.split(' ')
         trimbitz = [item for item in rawbitz if '' != item]
-        if len(rawtrim) + 3 <= len(rawstring):  # We don't have three matches, need to figure out how they drop in
+        if 3 == len(trimbitz):
+            if trimbitz[0].isdigit():
+                parsed['worlds'] = trimbitz[0]
+                parsed['allegiance'] = trimbitz[1]
+                parsed['residual'] = trimbitz[2]
+            else:
+                parsed['worlds'] = ' '
+                parsed['allegiance'] = trimbitz[0]
+                parsed['residual'] = trimbitz[1] + ' ' + trimbitz[2]
+        elif len(rawtrim) + 3 <= len(rawstring):  # We don't have three matches, need to figure out how they drop in
             alg = trimbitz[0]
             rawtrim = rawtrim.replace(alg, '', 1)
 

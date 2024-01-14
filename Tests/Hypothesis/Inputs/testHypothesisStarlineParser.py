@@ -79,6 +79,10 @@ def comparison_line(draw):
 
     assume(5 > len(data[15]))  # Skip generating overlong world/allegiance codes
     assume(not data[16].isdigit())  # Skip generating numeric allegiances
+    badminor = r'\([^\)]{1,}\)[\d]{2,}'
+    badmatch = re.findall(badminor, data[3])  # Skip generating malformed minor-sophont pop codes
+    if 0 < len(badmatch):
+        assume(False)
 
     return candidate
 
@@ -186,12 +190,19 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 ???????-? 000000000000000       - -         0   001   00', False)
     @example('0000 000000000000000 ???????-? 000000000000000       - -         0   002   00', False)
     @example('0000 000000000000000 0000000-0 000000000000000       00         - 0 000   00', False)
+    @example('0000 000000000000000 ???????-? 000000000000000       - - 0 000   0 00? 0', True)
+    @example('0000 000000000000000 0000000-0 (000000000000)?       - - 0 000   00?', True)
+    @example('0000 000000000000000 ???????-? 000000000000000 {0} (000-0) [0000] 0      - 0 000   00?', True)
+    @example('0000 000000000000000 ???????-? 000000000000000       - - 0 000   ?0 0 0', True)
+    @example('0000 000000000000  0 ???????-? 000000000000000       - - 0 000   00?', True)
+    @example('0000 000000000000000 ???????-? 00000 (00000000 {0} (000-0) -  - - 0 000   00?', True)
+    @example('0000 000000000000000 ???????-? 000000000000000 {0} (000-0) [0000]      - 0 000   0?', True)
     def test_starline_parser_against_regex(self, s, match):
         matches = ParseStarInput.starline.match(s)
         assume(matches is not None)
         hyp_line = "Hypothesis input: " + s
         data = list(matches.groups())
-        data[1] = data[1].strip()
+        data[1] = StarlineTransformer.boil_down_double_spaces(data[1].strip())
         data[3] = StarlineTransformer.boil_down_double_spaces(data[3].strip())
         self.square_up_extension_line(data)
         if data[5] is not None:
