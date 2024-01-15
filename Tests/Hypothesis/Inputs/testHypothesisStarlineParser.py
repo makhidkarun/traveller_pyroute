@@ -58,14 +58,21 @@ def comparison_line(draw):
         '0000 000000000000000 ???????-? 000000000000 00         - 0 000    00',
         '0000 000000000000000 0000000-0 000000000000000       - -         0   000   01',
         '0000 000000000000000 ???????-? 000000000000000       - -         0   001   00',
-        '0000 000000000000000 ???????-? 000000000000000       - -         0   002   00'
+        '0000 000000000000000 ???????-? 000000000000000       - -         0   002   00',
+        '0000 000000000000000 0000000-0 000000000000000 {0} (000-0) [0000]       - - 0 000   00?',
+        '0000 000000000000000 ???????-? 000000000000000 {0} (000-0) [0000]       - - 0 000   00?'
     ]
 
     candidate = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
     assume(67 != len(candidate))
     assume(candidate not in rejects)
     data = ParseStarInput.starline.match(candidate).groups()
+    if '{' in data[3] and '}' in data[3] and '[' in data[3] and ']' in data[3] and '(' in data[3] and ')' in data[3]:
+        assume(False)  # Skip generating cases where all three extensions end up in trade codes
+    if '*' in data[3]:
+        assume(False)
     bitz = data[3].split(' ')
+    numbitz = len(bitz)
     singleton = [item for item in bitz if 1 == len(item)]
     if singleton:
         assume(not singleton)
@@ -76,7 +83,8 @@ def comparison_line(draw):
             assume(False)
         if '' == data[13] or ' ' == data[13]:  # Skip generating zone-code spillovers
             assume(False)
-    for bit in bitz:
+    for i in range(0, numbitz):
+        bit = bitz[i]
         # homeworld codes with a pop digit _and_ something following will already be parsed differently, skip them here
         if 3 > len(bit):
             continue
@@ -86,9 +94,18 @@ def comparison_line(draw):
         if bit.startswith('[') and ']' in bit:
             if ']' != bit[-1] and ']' != bit[-2]:
                 assume(False)
+        if i < numbitz - 1:
+            second = bitz[i+1]
+            if 3 > len(second):
+                continue
+            if bit.startswith('(') and ')' in second:
+                if ')' != second[-1] and ')' != second[-2]:
+                    assume(False)
+            if bit.startswith('[') and ']' in second:
+                if ']' != second[-1] and ']' != second[-2]:
+                    assume(False)
 
-
-    assume(5 > len(data[15]))  # Skip generating overlong world/allegiance codes
+    assume(3 > len(data[15]))  # Skip generating overlong world/allegiance codes
     assume(not data[16].isdigit())  # Skip generating numeric allegiances
     badminor = r'\([^\)]{1,}\)[\d]{2,}'
     badmatch = re.findall(badminor, data[3])  # Skip generating malformed minor-sophont pop codes
@@ -208,6 +225,20 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000  0 ???????-? 000000000000000       - - 0 000   00?', True)
     @example('0000 000000000000000 ???????-? 00000 (00000000 {0} (000-0) -  - - 0 000   00?', True)
     @example('0000 000000000000000 ???????-? 000000000000000 {0} (000-0) [0000]      - 0 000   0?', True)
+    @example('0000 000000000000000 ???????-? 000000000000000 {0} (000-0) [0000] 0 0       0 000   ?0', True)
+    @example('0000 000000000000000 ???????-? 000000000000000       - - 0 000   0 00? 0 0', True)
+    @example('0000 000000000000000 ???????-? 000000000000000       0 0      0 000 000 000?0', True)
+    @example('0000 000000000000000 0000000-0 (000000000000)A       - - 0 000   00?', False)
+    @example('0000 000000000000000 ???????-? 000000000000000       0 *      0 001 000 ?0000', True)
+    @example('0000 000000000000000 ???????-? 000000000000000       0 0      0 000   000 ?0000', True)
+    @example('0000 000000000000000 0000000-0 000000000000000 {0} (000-0) [0000]       - - 0 000   ?0', False)
+    @example('0000 000000000000000 ???????-? 000000000 00 00       - 000 0 000   ?0', True)
+    @example('0000 000000000000000 ???????-? 0000000000 00 00       - 000 0 000   0?', True)
+    @example('0000 000000000000000 ???????-? 00000000000 00 00       - 000 0 000   ?0', True)
+    @example('0000 000000000000000 0000000-0 000000000000000 {0} (000-0)       -    - 0 000   0?', False)
+    @example('0000 000000000000000 0000000-0 000000000000000 {0} (000-0) [0000]       - - 0 000   00?', False)
+    @example('0000 000000000000000 ???????-? 000000000000000 {0} (000-0) [0000]       - - 0 000   00?', False)
+    @example('0000 000000000000000 0000000-0 000000000000000       00 *       0 000   00?', True)
     def test_starline_parser_against_regex(self, s, match):
         matches = ParseStarInput.starline.match(s)
         assume(matches is not None)

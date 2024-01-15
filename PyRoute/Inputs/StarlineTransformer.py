@@ -24,14 +24,21 @@ class StarlineTransformer(Transformer):
         self.raw = raw
 
     def starline(self, args):
-        if 3 <= len(args[2]) and 1 == len(args[3]) and '' == args[3][0].value.strip():  # Square up overspilled trade codes
+        tradelen = sum([len(item) for item in args[2]]) + len(args[2]) - 1
+        if 16 < tradelen and 3 <= len(args[2]) and 1 == len(args[3]) and '' == args[3][0].value.strip():  # Square up overspilled trade codes
             if '' == args[4][0].value and '' != args[5][0].value and '' == args[6][0].value:
-                last = args[2][-1]
-                mid = args[2][-2]
-                args[6][0].value = args[5][0].value
-                args[5][0].value = last
-                args[4][0].value = mid
-                args[2] = args[2][:-2]
+                move_fwd = 3 == len(args[5][0].value)  # Will base code still make sense as PBG?
+                move_rev = 3 == len(args[7][2][0].value)  # Will allegiance code still make sense as PBG?
+                assert not (move_rev and move_fwd), "Move flags should be disjoint"
+                if move_fwd:
+                    last = args[2][-1]
+                    mid = args[2][-2]
+                    args[6][0].value = args[5][0].value
+                    args[5][0].value = last
+                    args[4][0].value = mid
+                    args[2] = args[2][:-2]
+                elif move_rev:
+                    pass
         if '*' != args[5][0].value:
             if '' == args[4][0].value and '' != args[5][0].value:
                 args[4][0].value = args[5][0].value
@@ -44,7 +51,7 @@ class StarlineTransformer(Transformer):
             tailend = args[7][2][0].value
             lenlast = min(4, len(tailend))
             counter = 0
-            while counter < lenlast and (tailend[counter].isalnum() or '-' == tailend[counter]):
+            while counter < lenlast and (tailend[counter].isalnum() or '-' == tailend[counter] or '?' == tailend[counter]):
                 if counter < lenlast:
                     counter += 1
             if counter < min(4, lenlast):  # if the allegiance overspills, move the overspill into the residual
@@ -142,6 +149,8 @@ class StarlineTransformer(Transformer):
 
     def transform(self, tree):
         tree = self._preprocess_trade_and_extensions(tree)
+        tree = self._preprocess_extensions_and_nbz(tree)
+        tree = self._preprocess_trade_and_nbz(tree)
         tree = self._transform_tree(tree)
         parsed = {'ix': None, 'ex': None, 'cx': None, 'residual': ''}
 
@@ -203,6 +212,65 @@ class StarlineTransformer(Transformer):
         bitz[2].type = 'cx'
         trade.children = trade.children[:counter]
         extensions.children.extend(bitz)
+
+        return tree
+
+    def _preprocess_extensions_and_nbz(self, tree):
+        extensions = tree.children[3]
+        if 5 > len(extensions.children):  # Nothing to move around, bail out
+            return tree
+
+        nobles = tree.children[4]
+        # base = tree.children[5]
+        zone = tree.children[6]
+
+        nobles.children[0].value = extensions.children[4].value
+        if 5 < len(extensions.children):
+            zone.children[0].value = extensions.children[5].value
+
+        return tree
+
+    def _preprocess_trade_and_nbz(self, tree):
+        trade = tree.children[2]
+        tradelen = sum([len(item.value) for item in trade.children]) + (len(trade.children) - 1)
+        if 17 > tradelen:
+            return tree
+
+        nobles = tree.children[4]
+        base = tree.children[5]
+        zone = tree.children[6]
+        world_alg = tree.children[7]
+        pbg = world_alg.children[0]
+        worlds = world_alg.children[1]
+
+        if 2 < len(base.children[0].value):
+            if 2 < len(trade.children):
+                if zone.children[0].value.strip() == worlds.children[0].value.strip():
+                    worlds.children[0].value = pbg.children[0].value
+                    pbg.children[0].value = base.children[0].value
+                relocate = trade.children[-2:]
+                trade.children = trade.children[:-2]
+                zone.children[0].value = nobles.children[0].value
+                base.children[0].value = relocate[1].value
+                nobles.children[0].value = relocate[0].value
+        elif 3 == len(pbg.children[0].value):
+            if 2 < len(trade.children):
+                relocate = [item for item in trade.children[-2:] if 1 == len(item)]
+                if 2 == len(relocate):
+                    trade.children = trade.children[:-2]
+                    zone.children[0].value = nobles.children[0].value
+                    base.children[0].value = relocate[1].value
+                    nobles.children[0].value = relocate[0].value
+                elif '*' == trade.children[-1]:
+                    relocate = trade.children[-2:]
+                    trade.children = trade.children[:-2]
+                    zone.children[0].value = nobles.children[0].value
+                    base.children[0].value = relocate[1].value
+                    nobles.children[0].value = relocate[0].value
+            elif 2 == len(trade.children) and '' == nobles.children[0].value:
+                relocate = trade.children[-1:]
+                trade.children = trade.children[:-1]
+                nobles.children[0].value = relocate[0].value
 
         return tree
 
@@ -273,7 +341,11 @@ class StarlineTransformer(Transformer):
         rawtrim = rawstring.lstrip()
         rawbitz = rawtrim.split(' ')
         trimbitz = [item for item in rawbitz if '' != item]
-        if 3 == len(trimbitz):
+        if 3 < len(trimbitz):
+            parsed['worlds'] = trimbitz[0]
+            parsed['allegiance'] = trimbitz[1]
+            parsed['residual'] = ' '.join(trimbitz[2:])
+        elif 3 == len(trimbitz):
             if trimbitz[0].isdigit():
                 parsed['worlds'] = trimbitz[0]
                 parsed['allegiance'] = trimbitz[1]
