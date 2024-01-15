@@ -76,6 +76,17 @@ def comparison_line(draw):
             assume(False)
         if '' == data[13] or ' ' == data[13]:  # Skip generating zone-code spillovers
             assume(False)
+    for bit in bitz:
+        # homeworld codes with a pop digit _and_ something following will already be parsed differently, skip them here
+        if 3 > len(bit):
+            continue
+        if bit.startswith('(') and ')' in bit:
+            if ')' != bit[-1] and ')' != bit[-2]:
+                assume(False)
+        if bit.startswith('[') and ']' in bit:
+            if ']' != bit[-1] and ']' != bit[-2]:
+                assume(False)
+
 
     assume(5 > len(data[15]))  # Skip generating overlong world/allegiance codes
     assume(not data[16].isdigit())  # Skip generating numeric allegiances
@@ -218,7 +229,7 @@ class testHypothesisStarlineParser(unittest.TestCase):
         if data[13] is not None:
             data[13] = data[13].strip()
         if data[17] is not None:
-            data[17] = data[17].strip()
+            data[17] = StarlineTransformer.boil_down_double_spaces(data[17].strip())
 
         foo = StarlineParser()
         result, s = foo.parse(s)
