@@ -239,6 +239,18 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 0000000-0 000000000000000 {0} (000-0) [0000]       - - 0 000   00?', False)
     @example('0000 000000000000000 ???????-? 000000000000000 {0} (000-0) [0000]       - - 0 000   00?', False)
     @example('0000 000000000000000 0000000-0 000000000000000       00 *       0 000   00?', True)
+    # Examples below this line tripped up live run
+    @example('0102                      X100000-0 Ba Lo Ni Va                         - - - 003   -- M1 V               \n', True)
+    @example('0302                      X501000-0 Ba Ic Lo Ni Va                      - - - 030   -- M2 V M1 D          \n', True)
+    @example('2309                      X476000-0 Ba Lo Ni                            - - - 006   -- F0 V M4 D M2 D     \n', True)
+    @example('0605                      C9EA764-A Wa O:????             {  1 } (A69+1) [7879] ', True)
+    @example('3015 Anix Nuno            C446953-B Hi In (Anixii)W Da          {  3 } (68A-5) [7CAC] - - A 901 11 HvFd M3 V M4 V      \n', True)
+    @example('0101 Dujj\'t\'kzo         E331000-0 Ba Po                       { -3 } (900-4) [0000] - - - 003 8 Ia   M3 IV M4 V    \n', True)
+    @example('1708                      E32579A-7 Pi X!tkW Pz                  { -2 } (761+2) [3566] - -  A 705 14 KkTw A0 V            ', True)
+    @example('0201 Yaweakhea\'e         D762445-6 Ni O:Hare3240        {-3} (A30-2) [1134] - - - 300   As F4 V            \n', True)
+    @example('3227                      E242662-7 Ni Po Cy O:Porl:0528         { -3 } (550-1) [2318] - -  - 601 7  NaXX A4 V G7 V     ', True)
+    @example('3137 Xakigraxtu           A778565-7 Ag Ni O:GhXh-0137    { 0 }  (542+3) [4564] - M - 423 11 CsTw F3 V           \n', True)
+    @example('2619 Aestera              A8A2362-C Fl He Ho Ht Lo O:1518         { 2 }  (B22+5) [416B] - KMV - 823 12 Ou   B7 V D BD A2 V M2 V       \n', True)
     def test_starline_parser_against_regex(self, s, match):
         matches = ParseStarInput.starline.match(s)
         assume(matches is not None)

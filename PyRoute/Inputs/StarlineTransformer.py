@@ -19,9 +19,11 @@ class StarlineTransformer(Transformer):
         'residual'
     ]
 
+    star_classes = ['Ia', 'Ib', 'II', 'III', 'IV', 'V', 'VI', 'D']
+
     def __init__(self, visit_tokens: bool = True, raw=None):
         super().__init__(visit_tokens)
-        self.raw = raw
+        self.raw = raw.strip('\n')
 
     def starline(self, args):
         tradelen = sum([len(item) for item in args[2]]) + len(args[2]) - 1
@@ -236,6 +238,11 @@ class StarlineTransformer(Transformer):
         if 17 > tradelen:
             return tree
 
+        trade_last = trade.children[-1].value
+        trade_final_keep = trade_last.startswith('O:') or trade_last.startswith('C:')
+        if trade_final_keep:
+            return tree
+
         nobles = tree.children[4]
         base = tree.children[5]
         zone = tree.children[6]
@@ -340,11 +347,17 @@ class StarlineTransformer(Transformer):
     def _square_up_parsed_one(self, rawstring, parsed):
         rawtrim = rawstring.lstrip()
         rawbitz = rawtrim.split(' ')
-        trimbitz = [item for item in rawbitz if '' != item]
+        #trimbitz = [item for item in rawbitz if '' != item]
+        trimbitz = self._square_up_star_codes(rawbitz)
         if 3 < len(trimbitz):
-            parsed['worlds'] = trimbitz[0]
-            parsed['allegiance'] = trimbitz[1]
-            parsed['residual'] = ' '.join(trimbitz[2:])
+            if trimbitz[0].isdigit():
+                parsed['worlds'] = trimbitz[0]
+                parsed['allegiance'] = trimbitz[1]
+                parsed['residual'] = ' '.join(trimbitz[2:])
+            else:
+                parsed['worlds'] = ' '
+                parsed['allegiance'] = trimbitz[0]
+                parsed['residual'] = ' '.join(trimbitz[1:])
         elif 3 == len(trimbitz):
             if trimbitz[0].isdigit():
                 parsed['worlds'] = trimbitz[0]
@@ -388,6 +401,23 @@ class StarlineTransformer(Transformer):
             parsed['residual'] = ''
 
         return parsed
+
+    def _square_up_star_codes(self, rawbitz):
+        foobitz = [item for item in rawbitz if '' != item]
+        trimbitz = []
+        num_bitz = len(foobitz)
+        for i in range(0, num_bitz):
+            item = foobitz[i]
+            if '' == item:
+                continue
+            if 0 < i < num_bitz - 1:
+                next_item = foobitz[i+1]
+                if next_item in self.star_classes:
+                    item += ' ' + next_item
+                    foobitz[i+1] = ''
+            trimbitz.append(item)
+
+        return trimbitz
 
     def _square_up_allegiance_overflow(self, parsed):
         alleg = parsed['allegiance']
