@@ -91,8 +91,12 @@ def comparison_line(draw):
         if bit.startswith('(') and ')' in bit:
             if ')' != bit[-1] and ')' != bit[-2]:
                 assume(False)
+            if ')' == bit[-2] and not (bit[-1].isdigit() or bit[-1] in 'WX?'):
+                assume(False)
         if bit.startswith('[') and ']' in bit:
             if ']' != bit[-1] and ']' != bit[-2]:
+                assume(False)
+            if ']' == bit[-2] and not (bit[-1].isdigit() or bit[-1] in 'WX?'):
                 assume(False)
         if i < numbitz - 1:
             second = bitz[i+1]
@@ -101,8 +105,12 @@ def comparison_line(draw):
             if bit.startswith('(') and ')' in second:
                 if ')' != second[-1] and ')' != second[-2]:
                     assume(False)
+                if ')' == second[-2] and not (second[-1].isdigit() or second[-1] in 'WX?'):
+                    assume(False)
             if bit.startswith('[') and ']' in second:
                 if ']' != second[-1] and ']' != second[-2]:
+                    assume(False)
+                if ']' == second[-2] and not (second[-1].isdigit() or second[-1] in 'WX?'):
                     assume(False)
 
     assume(3 > len(data[15]))  # Skip generating overlong world/allegiance codes
@@ -251,6 +259,11 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('3227                      E242662-7 Ni Po Cy O:Porl:0528         { -3 } (550-1) [2318] - -  - 601 7  NaXX A4 V G7 V     ', True)
     @example('3137 Xakigraxtu           A778565-7 Ag Ni O:GhXh-0137    { 0 }  (542+3) [4564] - M - 423 11 CsTw F3 V           \n', True)
     @example('2619 Aestera              A8A2362-C Fl He Ho Ht Lo O:1518         { 2 }  (B22+5) [416B] - KMV - 823 12 Ou   B7 V D BD A2 V M2 V       \n', True)
+    # More weird cases accumulated along the way
+    @example('0000 000000000000000 ???????-? 000000000000000       0 00       0 000   ?0', True)
+    @example('0000 000000000000000 ???????-? 000000000 (00)A       - - 0 000    0?', False)
+    @example('0000 000000000000000 ???????-? 00000000000 00 00       - 00G 0 000   0?', True)
+    @example('0000 000000000000000 ???????-? 000000000000000       00 0       0 000   ?0', True)
     def test_starline_parser_against_regex(self, s, match):
         matches = ParseStarInput.starline.match(s)
         assume(matches is not None)
