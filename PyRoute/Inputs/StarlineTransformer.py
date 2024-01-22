@@ -244,9 +244,13 @@ class StarlineTransformer(Transformer):
             return tree
 
         trade_ext = ''
+        overrun = 0
         for item in trade.children:
             trade_ext += item.value + ' '
-        trade_present = trade_ext in self.raw
+            if trade_ext not in self.raw:
+                overrun += 1
+        if 0 == overrun:
+            return tree
         nobles = tree.children[4]
         base = tree.children[5]
         zone = tree.children[6]
@@ -254,50 +258,37 @@ class StarlineTransformer(Transformer):
         pbg = world_alg.children[0]
         worlds = world_alg.children[1]
 
-        if 2 < len(base.children[0].value):
-            if 2 < len(trade.children):
-                if zone.children[0].value.strip() == worlds.children[0].value.strip():
-                    worlds.children[0].value = pbg.children[0].value
-                    pbg.children[0].value = base.children[0].value
-                if not trade_present:
-                    relocate = trade.children[-2:]
-                    trade.children = trade.children[:-2]
-                    zone.children[0].value = nobles.children[0].value
-                    base.children[0].value = relocate[1].value
-                    nobles.children[0].value = relocate[0].value
-        elif 3 == len(pbg.children[0].value):
-            if 2 < len(trade.children):
-                relocate = [item for item in trade.children[-2:] if 1 == len(item)]
-                two_reloc = 2 == len(relocate)
-                one_reloc = 1 == len(relocate) and relocate[0].value == trade.children[-2].value
-                if one_reloc:
-                    relocate = trade.children[-2:]
-                if two_reloc or one_reloc:
-                    trade.children = trade.children[:-2]
-                    zone.children[0].value = nobles.children[0].value
-                    base.children[0].value = relocate[1].value
-                    nobles.children[0].value = relocate[0].value
-                elif '*' == trade.children[-1]:
-                    relocate = trade.children[-2:]
-                    trade.children = trade.children[:-2]
-                    zone.children[0].value = nobles.children[0].value
-                    base.children[0].value = relocate[1].value
-                    nobles.children[0].value = relocate[0].value
-                elif not trade_present:
-                    relocate = trade.children[-2:]
-                    trade.children = trade.children[:-2]
+        if 0 < overrun:
+            relocate = trade.children[-overrun:]
+            if 1 == overrun:
+                relval = relocate[0].value
+                if '*' == relval:
+                    zone.children[0].value = base.children[0].value
+                    base.children[0].value = relval
+                    nobles.children[0].value = ''
+                else:
+                    zone.children[0].value = base.children[0].value
+                    base.children[0].value = nobles.children[0].value
+                    nobles.children[0].value = relval
+                trade.children = trade.children[:-1]
+            elif 2 == overrun:
+                if '' == nobles.children[0].value.strip() and '' == zone.children[0].value.strip():
                     zone.children[0].value = base.children[0].value
                     base.children[0].value = relocate[1].value
                     nobles.children[0].value = relocate[0].value
-            elif 2 == len(trade.children) and '' == nobles.children[0].value:
-                relocate = trade.children[-1:]
-                trade.children = trade.children[:-1]
-                nobles.children[0].value = relocate[0].value
+                    trade.children = trade.children[:-2]
+                elif '' != nobles.children[0].value.strip() and '' == zone.children[0].value.strip():
+                    worlds.children[0].value = pbg.children[0].value
+                    pbg.children[0].value = base.children[0].value
+                    zone.children[0].value = nobles.children[0].value
+                    base.children[0].value = relocate[1].value
+                    nobles.children[0].value = relocate[0].value
+                    trade.children = trade.children[:-2]
 
         return tree
 
     def _square_up_parsed(self, parsed):
-        parsed = self._square_up_parsed_trade_codes(parsed)
+        #parsed = self._square_up_parsed_trade_codes(parsed)
         if ' ' != parsed['nobles'] and 0 < len(parsed['nobles']) and '' == parsed['base'] and '' == parsed['zone']:
             parsed['base'] = parsed['pbg']
             parsed['zone'] = parsed['worlds']

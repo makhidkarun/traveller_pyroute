@@ -264,6 +264,7 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 ???????-? 000000000 (00)A       - - 0 000    0?', False)
     @example('0000 000000000000000 ???????-? 00000000000 00 00       - 00G 0 000   0?', True)
     @example('0000 000000000000000 ???????-? 000000000000000       00 0       0 000   ?0', True)
+    @example('0000 000000000000000 ???????-? 0000000000000 00       0 0       0 000   ?0', True)
     def test_starline_parser_against_regex(self, s, match):
         matches = ParseStarInput.starline.match(s)
         assume(matches is not None)
