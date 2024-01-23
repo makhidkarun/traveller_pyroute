@@ -245,11 +245,16 @@ class StarlineTransformer(Transformer):
 
         trade_ext = ''
         overrun = 0
-        for item in trade.children:
+        for item in trade.children:  # Dig out the largest left-subset of trade children that are in the raw string
             trade_ext += item.value + ' '
+            if trade_ext in self.raw:  # if it worked with one space appended, try a second space
+                trade_ext += ' '
+                if trade_ext not in self.raw:  # if it didn't, drop the second space
+                    trade_ext = trade_ext[:-1]
+            # after all that, if we've overrun (such as a nobles code getting transplanted), throw hands up and move on
             if trade_ext not in self.raw:
                 overrun += 1
-        if 0 == overrun:
+        if 0 == overrun:  # if the reconstructed trade code is fully in the raw string, nothing to do - bail out now
             return tree
         nobles = tree.children[4]
         base = tree.children[5]
@@ -288,7 +293,6 @@ class StarlineTransformer(Transformer):
         return tree
 
     def _square_up_parsed(self, parsed):
-        #parsed = self._square_up_parsed_trade_codes(parsed)
         if ' ' != parsed['nobles'] and 0 < len(parsed['nobles']) and '' == parsed['base'] and '' == parsed['zone']:
             parsed['base'] = parsed['pbg']
             parsed['zone'] = parsed['worlds']
@@ -297,27 +301,6 @@ class StarlineTransformer(Transformer):
             parsed['allegiance'] = parsed['residual']
             parsed['residual'] = ''
 
-        return parsed
-
-    def _square_up_parsed_trade_codes(self, parsed):
-        bitz = parsed['trade'].split(' ')
-        if 5 == len(bitz) and parsed['ix'] is None and parsed['ex'] is None and parsed['cx'] is None and '' == parsed['nobles'].strip():
-            parsed['nobles'] = bitz[-1]
-            parsed['cx'] = bitz[-2]
-            parsed['ex'] = bitz[-3]
-            parsed['ix'] = bitz[-4]
-            bitz = bitz[:-4]
-        elif '*' in parsed['trade'] and '' != parsed['nobles'] and '' == parsed['base'] and '' == parsed['zone']:
-            parsed['zone'] = parsed['nobles']
-            parsed['nobles'] = ''
-            parsed['base'] = '*'
-            bitz = [item for item in bitz if '*' != item]
-        elif 15 < len(parsed['trade']) and ' ' in parsed['trade'] and '' == parsed['nobles'] and '' != parsed[
-            'base'] and '' != parsed['zone']:
-            parsed['nobles'] = bitz[-1]
-            bitz = bitz[:-1]
-
-        parsed['trade'] = ' '.join(bitz)
         return parsed
 
     def trim_raw_string(self, tree):
