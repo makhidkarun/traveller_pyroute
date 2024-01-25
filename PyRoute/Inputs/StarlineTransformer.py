@@ -45,7 +45,7 @@ class StarlineTransformer(Transformer):
             if '' == args[4][0].value and '' != args[5][0].value:
                 args[4][0].value = args[5][0].value
                 args[5][0].value = args[6][0].value
-            elif '' == args[6][0].value and '' != args[5][0].value:
+            elif 1 == len(args[3]) and '' == args[6][0].value and '' != args[5][0].value:  # if only 1 extension child?
                 args[6][0].value = args[5][0].value
                 args[5][0].value = args[4][0].value
                 args[4][0].value = ''
