@@ -8,14 +8,19 @@ PyRoute/Inputs/__pycache__/
 PyRoute/Outputs/__pycache__/
 PyRoute/SystemData/__pycache__/
 Tests/__pycache__/
+Tests/Hypothesis/__pycache__/
+Tests/Hypothesis/Position/__pycache__/
+Tests/Outputs/__pycache__/
+Tests/Dummy/DeltaDebug/
 PyRoute/*.pyc
 PyRoute/DeltaDebug/*.pyc
 PyRoute/Pathfinding/*.pyc
 PyRoute/Calculation/*.pyc
 PyRoute/Position/*.pyc
 PyRoute/DeltaPasses/*.pyc
-PyRoute/DeltaPasses/__pycache__/
 Tests/*.pyc
+Tests/Hypothesis/*.pyc
+Tests/Hypothesis/Position/*.pyc
 PyRoute/*.class
 PyRoute/DeltaDebug/*.class
 PyRoute/Pathfinding/*.class
@@ -24,6 +29,8 @@ Tests/*.class
 Tests/Pathfinding/__pycache__/
 Tests/Position/__pycache__/
 Tests/.pytest_cache/
+Tests/Hypothesis/.hypothesis/
+Tests/Hypothesis/Position/.hypothesis/
 
 # ignore venvs
 venv/
@@ -41,3 +48,7 @@ sectors/
 maps/
 diffs/
 test_data/
+
+# Ignore virtualenv bits
+venv/
+venv2/

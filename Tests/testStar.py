@@ -39,6 +39,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual('Im', star1.alg_code)
         self.assertEqual(10, star1.population, "Population %s" % star1.population)
         self.assertEqual(9, star1.wtn, "wtn %s" % star1.wtn)
+        self.assertEqual('Fl', str(star1.tradeCode))
         self.assertFalse(star1.tradeCode.industrial)
         self.assertFalse(star1.tradeCode.agricultural)
         self.assertFalse(star1.tradeCode.poor)
@@ -89,6 +90,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual('Im', star1.alg_code)
         self.assertEqual(0, star1.population, "Population %s" % star1.population)
         self.assertEqual(2, star1.wtn, "wtn %s" % star1.wtn)
+        self.assertEqual('Lo Po', str(star1.tradeCode))
         self.assertFalse(star1.tradeCode.industrial)
         self.assertFalse(star1.tradeCode.agricultural)
         self.assertTrue(star1.tradeCode.poor)
@@ -111,10 +113,11 @@ class TestStar(unittest.TestCase):
             sector, 'fixed', 'fixed')
 
         self.assertEqual('Core', star1.sector.name, star1.sector.name)
-        self.assertEqual(star1.position, '2323')
-        self.assertEqual(star1.name, 'Syss')
+        self.assertEqual('2323', star1.position)
+        self.assertEqual('Syss', star1.name)
         self.assertEqual('C400746-8', str(star1.uwp))
-        self.assertEqual(star1.stars, 'M9 III D M5 V')
+        self.assertEqual('Na Pi Va', str(star1.tradeCode))
+        self.assertEqual('M9 III D M5 V', star1.stars)
         self.assertEqual('M9 III D M5 V', str(star1.star_list_object))
         self.assertEqual(22, star1.x)
         self.assertEqual(-28, star1.y)
@@ -130,6 +133,7 @@ class TestStar(unittest.TestCase):
             "2719 Zhdant               A6547C8-F Ag An Cx                            - KM - 811   Zh K0 V                        ",
             sector, 'fixed', 'fixed')
 
+        self.assertEqual('Ag An Cx', str(star1.tradeCode))
         self.assertEqual(-198, star1.x)
         self.assertEqual(-2, star1.y)
         self.assertEqual(200, star1.z)
@@ -144,6 +148,7 @@ class TestStar(unittest.TestCase):
             "2720 Vlazzhden            C210143-8 Lo Ni                               - -  - 303   Zh G1 IV                       ",
             sector, 'fixed', 'fixed')
 
+        self.assertEqual('Lo Ni', str(star1.tradeCode))
         self.assertEqual(-198, star1.x)
         self.assertEqual(-1, star1.y)
         self.assertEqual(199, star1.z)
@@ -158,6 +163,7 @@ class TestStar(unittest.TestCase):
             "2819 Tlapinsh             B569854-C Ri                                  - -  - 622   Zh F7 V                        ",
             sector, 'fixed', 'fixed')
 
+        self.assertEqual('Ri', str(star1.tradeCode))
         self.assertEqual(-197, star1.x)
         self.assertEqual(-2, star1.y)
         self.assertEqual(199, star1.z)
@@ -172,6 +178,7 @@ class TestStar(unittest.TestCase):
             "2820 Ezevrtlad            C120000-B De Ba Po                            - -  - 900   Zh K2 III                      ",
             sector, 'fixed', 'fixed')
 
+        self.assertEqual('Ba De Po', str(star1.tradeCode))
         self.assertEqual(-197, star1.x)
         self.assertEqual(-1, star1.y)
         self.assertEqual(198, star1.z)
@@ -185,6 +192,191 @@ class TestStar(unittest.TestCase):
         line = '0522 Unchin               A437743-E                            { 2 }  (B6D-1) [492B] B     N  - 620 9  ImDi K0 III                                                       '
         star1 = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
         self.assertIsInstance(star1, Star)
+        self.assertEqual('', str(star1.tradeCode))
+
+    def testParseBespin(self):
+        sector = Sector('# Core', '# 0, 0')
+        line = '0615 Bespin II            EAA19AC-4 Fl Hi He In          {+0} (98b-1) [a935] - - - 223 9  Na G1 V           '
+        star1 = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
+        self.assertIsInstance(star1, Star)
+        self.assertEqual('Fl He Hi In', str(star1.tradeCode))
+        self.assertEqual('(98B-1)', star1.economics)
+        self.assertEqual('[A935]', star1.social)
+
+    def testParseBarrelOfWeird(self):
+        # These were weird intermediate values that _kept_ turning up in round-trip testing, so it was worth breaking it
+        # out as a separate unit test to try to figure out _where_ they fire up the hyperdrive.
+        weird_line = [
+            ('0101 000000000000000      ???????-?                                       { -2 } (000-0) -      -    -  - 000 0  00  D                                                        ', ''),
+            ('0110 000000000000000      ???????-?                                       { -2 } (000-0) -      Bc   -  - 000 0  00  D                                                        ', ''),
+            ('0101 0                    A000000-0                                       { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V ', ''),
+            ('0110 000000000000000 ???????-? 00000000000000( {1} (000-0)       -   - 0 000   00 D', '')
+        ]
+        sector = Sector('# Core', '# 0, 0')
+
+        for base_line, expected_trade in weird_line:
+            with self.subTest():
+                star1 = Star.parse_line_into_star(base_line, sector, 'fixed', 'fixed')
+                self.assertIsInstance(star1, Star)
+                actual_trade = str(star1.tradeCode)
+                self.assertEqual(expected_trade, actual_trade)
+
+    def testParseLowercaseUWP(self):
+        line = '0101 000000000000000 AffaFxj-z 000000000000000 {0} (000-0) [0000] - - 0 000   00 D'
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
+        self.assertIsInstance(star1, Star)
+        self.assertEqual(33, star1.tl)
+        expected_uwp = 'AFFAFXJ-Z'
+        self.assertEqual(expected_uwp, str(star1.uwp), "Unexpected UWP value after parsing")
+
+    def testParseExplicitHomeworlds(self):
+        sector = Sector('# Core', '# 0, 0')
+
+        homeworlds = [
+            ('Terra', '1827 Terra                A867A69-F Hi Ga [Solomani] Dolp0 Mr       { 4 }  (H9C+4) [BE6G] BEf  NW - 114 10 ImDs G2 V                         ', ['Dolp0', 'SoloW'], 'Dolp0 Ga Hi Mr [Solomani]'),
+            ('Vland', '1717 Vland                A967A9A-F Hi Cs [Vilani]            { 3 }  (D9F+5) [CD7H] BEFG N  - 310 7  ImDv F8 V           ', ['VilaW'], 'Cs Hi [Vilani]'),
+            ('Kusyu', '1226 Kusyu                A876976-E Hi In Cx [Aslan]                       { 5 }  (F8H+4) [9E4D] - RT - 403 8  AsSc G4 V D             ', ['AslaW'], 'Cx Hi In [Aslan]'),
+            ('Lair', '2402 Lair                 A8859B9-E Hi Ga Cx Pr Pz [Vargr] { 3 }  (F8F+4) [AC6F] - K  A 213 12 VLPr G5 V        ', ['VargW'], 'Cx Ga Hi Pr Pz [Vargr]')
+        ]
+
+        for msg, star_line, expected_sophonts, expected_trade in homeworlds:
+            with self.subTest(msg):
+                star1 = Star.parse_line_into_star(star_line, sector, 'fixed', 'fixed')
+                star1.index = 0
+                star1.allegiance_base = star1.alg_code
+                self.assertIsInstance(star1, Star)
+                self.assertTrue(star1.is_well_formed())
+
+                self.assertEqual(expected_sophonts, star1.tradeCode.sophont_list)
+                self.assertEqual(expected_trade, str(star1.tradeCode), 'Unexpected trade code list')
+
+    def testParseStarlineWithOnlyKnownPhysicalsAndNoTradeCodes(self):
+        sector = Sector('# Core', '# 0, 0')
+
+        only_physicals = [
+            ('Nonaligned', '3135                      ?478???-?                                     - - - ?02   Na D', '?478???-?', '-'),
+            ('K\'kree', '0310                      ?776???-?                                     - - - ?03   Kk D      ', '?776???-?', '-'),
+            ('X port plus questions', '1001 Barnett 0201         X??????-?                                       - - A 013   Na K4 V                 ', 'X??????-?', 'A'),
+            ('X port plus one known physical', '0302 Adams 0302           X3?????-?                                       - - - 001   Na K6 V                 ', 'X3?????-?', '-'),
+            ('X port plus two known physicals', '0610 Adams 0610           X21????-?                                       - - - 001   Na G8 V M3 V K2 V       ', 'X21????-?', '-')
+        ]
+
+        for msg, starline, expected_uwp, expected_trade_zone in only_physicals:
+            with self.subTest(msg):
+
+                star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+                self.assertIsInstance(star1, Star)
+                star1.index = 0
+                star1.allegiance_base = star1.alg_code
+
+                self.assertTrue(star1.is_well_formed())
+
+                line = star1.parse_to_line()
+                self.assertTrue(expected_uwp in line, "UWP not regenerated")
+                self.assertEqual(0, star1.wtn)
+                self.assertEqual(expected_trade_zone, star1.zone, "Unexpected trade zone value")
+
+    def testParseStarlineWithOnlyKnownPhysicalsAndHasTradeCodes(self):
+        sector = Sector('# Core', '# 0, 0')
+
+        only_physicals = [
+            ("Nonaligned", '1732                      ?AFA???-? Fl Wa                               - - - ?13   Na D      ', '?AFA???-?'),
+            ("With stars and X starport", '1937 Osthoff 0307         X9C0???-? Pz                                    - - A 001   Na K1 V K4 V K2 V       ', 'X9C0???-?')
+        ]
+
+        for msg, starline, expected_uwp in only_physicals:
+            with self.subTest(msg):
+
+                star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+                self.assertIsInstance(star1, Star)
+                star1.index = 0
+                star1.allegiance_base = star1.alg_code
+
+                self.assertTrue(star1.is_well_formed())
+
+                line = star1.parse_to_line()
+                self.assertTrue(expected_uwp in line, "UWP not regenerated")
+                self.assertEqual(0, star1.wtn)
+
+    def testParseStarlineWithUnknownSocials(self):
+        sector = Sector('# Core', '# 0, 0')
+
+        unknown_socials = [
+            ('Unknown port, known TL, no codes', '0810                      ?124???-F                                     - - - ?03   Kk D', '?124???-F', '-', 3),
+            ('Unknown port, known TL, codes', '0401                      ?342???-B Po                                  - - - ?14   Kk D      ', '?342???-B', '-', 2),
+            ('Known port, known TL, codes', '1204 Barnett 0404         E756???-1 Ga Lt (minor)                         - - A 401   Na G9 V                 ', 'E756???-1', 'A', 1)
+        ]
+
+        for msg, starline, expected_uwp, expected_trade_zone, expected_wtn in unknown_socials:
+            with self.subTest(msg):
+
+                star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+                self.assertIsInstance(star1, Star)
+                star1.index = 0
+                star1.allegiance_base = star1.alg_code
+
+                self.assertTrue(star1.is_well_formed())
+
+                line = star1.parse_to_line()
+                self.assertTrue(expected_uwp in line, "UWP not regenerated")
+                self.assertEqual(expected_wtn, star1.wtn)
+                self.assertEqual(expected_trade_zone, star1.zone, "Unexpected trade zone value")
+
+    def testParseStarlinesWithUnknownTLs(self):
+        sector = Sector('# Core', '# 0, 0')
+
+        unknown_tls = [
+            ('No codes',
+             '0101 Raktegham            C529767-?                                      - K - 921   K3 D      ',
+             'C529767-?', '-', 6),
+            ('Codes',
+             '0403 Kirrughee            C110314-? Lo                                   - O - 223   K3 D      ',
+             'C110314-?', '-', 3),
+        ]
+
+        for msg, starline, expected_uwp, expected_trade_zone, expected_wtn in unknown_tls:
+            with self.subTest(msg):
+
+                star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+                self.assertIsInstance(star1, Star)
+                star1.index = 0
+                star1.allegiance_base = star1.alg_code
+
+                self.assertTrue(star1.is_well_formed())
+
+                line = star1.parse_to_line()
+                self.assertTrue(expected_uwp in line, "UWP not regenerated")
+                self.assertEqual(expected_wtn, star1.wtn)
+                self.assertEqual(expected_trade_zone, star1.zone, "Unexpected trade zone value")
+
+    def testParseResidualStarlines(self):
+        sector = Sector('# Core', '# 0, 0')
+
+        residual_lines = [
+            ('Wonky bracket',
+             '0631 Closser              X100755-6 Na Va Pi Tz          {-2} (665+1) [5597} - - - 810 6  Na M5 V M7 V          ',
+             'X100755-6', '-', 1),
+            ('Unknown port, unknown TL',
+             '1036                      ?6319EJ-? Lk Po Sa                            - - - 601 7 Na G8 V G0 V K1 V K4 V     ',
+             '?6319EJ-?', '-', 8)
+        ]
+
+        for msg, starline, expected_uwp, expected_trade_zone, expected_wtn in residual_lines:
+            with self.subTest(msg):
+
+                star1 = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+                self.assertIsInstance(star1, Star)
+                star1.star_list_object.move_biggest_to_primary()
+                star1.index = 0
+                star1.allegiance_base = star1.alg_code
+
+                self.assertTrue(star1.is_well_formed())
+
+                line = star1.parse_to_line()
+                self.assertTrue(expected_uwp in line, "UWP not regenerated")
+                self.assertEqual(expected_wtn, star1.wtn)
+                self.assertEqual(expected_trade_zone, star1.zone, "Unexpected trade zone value")
 
     def testAPortModifier(self):
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
@@ -414,10 +606,21 @@ class TestStar(unittest.TestCase):
             ("0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ", "K"),
             ("3030 Khaammumlar          E430761-6 De Na Po O:3032                       { -2 } (965-5) [3512] B    -  - 520 6  ImDv M0 V M5 V                                                ", "M"),
             ("1840 Mashuu               D725413-8 Ni                                    { -3 } (731-5) [1125] B    -  - 401 14 ImDv M0 V                                                     ", "M"),
-            ("0101 000000000000000      ???????-?                                       { -2 } -       -      -    -  - 000 0  0000                                                          ", None),
-            ("0101 000000000000000      ???????-?                                       { -2 } (731-5) [1125] -    -  - 000 0  0000                                                          ", None),
-            ("0101 000000000000000      ???????-?                                       { -2 } -       [1125] -    -  - 000 0  0000                                                          ", None),
-            ("0101 000000000000000      ???????-?                                       { -2 } (731-5) -      -    -  - 000 0  0000                                                          ", None)
+            ("0101 000000000000000      ???????-?                                       { -2 } -       -      -    -  - 000 0  0000 D                                                        ", "D"),
+            ("0101 000000000000000      ???????-?                                       { -2 } (731-5) [1125] -    -  - 000 0  0000 D                                                        ", "D"),
+            ("0101 000000000000000      ???????-?                                       { -2 } -       [1125] -    -  - 000 0  0000 D                                                        ", "D"),
+            ("0101 000000000000000      ???????-?                                       { -2 } (731-5) -      -    -  - 000 0  0000 D                                                        ", "D"),
+            ("2132 Iyuok                C776951-A Hi In (Iyuok) Da Cx       {  3 } (98B+2) [CC1D] - N  A 500 5  Iy   F9 V M1 V", 'F'),
+            ("2133                      C631563-6 Ni Po Cy O:2132 IyuokW Pz { -2 } (640+1) [4386] - N  A 515 14 Iy   K2 V", 'K'),
+            ("0922 Celetron             A575242-F Lo RsO                               { 1 }  (611-3) [1319] B     N  - 302 8  ImDc M1 V            Xb:0622 Xb:1123", 'M'),
+            ("1708                      E32579A-7 Pi X!tkW Pz                  { -2 } (761+2) [3566] - -  A 705 14 KkTw A0 V", 'A'),
+            ("2926                      B8B2413-C He Fl Ni HakW Pz             {  1 } (735+3) [458B] - M  A 514 16 HvFd G4 V M1 V", 'G'),
+            ("1917 Iaplebl              XAD0000-0 Ba Sa                       {-3} (900-5) [0000] - -  - 023 10 NaXX M7 VI M9 VI", 'M'),
+            ("2526 Shadowsand           C000416-B As Ni Va                      { 0 }  (733-1) [344A] - -  - 510 10 NaHu BH", 'BH'),
+            ("1901                      D335213-6 Lo                            { -3 } (811+5) [1167] - -  - 723 13 HvFd G7 M4 V        ", 'G'),
+            ("1317 Chegu                X544000-0 Ba Sa                       {-3} (800-5) [0000] - -  - 002 12 NaXX G8 V BD        ", 'G'),
+            ("0620 Shajzdenchta         C5699DB-9 Hi Pr                { 1 }  (D89-3) [CA26] - -  - 123 14 ZhMe M9 V BD BD M3 VI            ", 'M'),
+            ("0138 Plech-45             X574000-0 Ba                   { -3 } (800-3) [0000] - -  - 024 16 NaXX M1 V D BD BD              ", 'M')
         ]
         for line, expected_primary_type in line_list:
             with self.subTest():
@@ -474,6 +677,58 @@ class TestStar(unittest.TestCase):
             with self.subTest(msg):
                 star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
                 self.assertIsNotNone(star, "Starline should parse cleanly")
+
+    def test_owning_self_is_not_well_formed(self):
+        line = '3138 Andula               C542468-8 He Ni Po O:3138                       { -2 } (931-2) [4258] B    -  - 121 9  ImDv G4 V'
+        star1 = Star.parse_line_into_star(line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
+        star1.index = 0
+        star1.allegiance_base = star1.alg_code
+
+        msg = None
+
+        try:
+            star1.is_well_formed(log=False)
+        except AssertionError as e:
+            msg = str(e)
+
+        expected_msg = "Star " + str(star1.name) + " cannot own itself"
+        self.assertEqual(expected_msg, msg)
+
+    def test_colonising_self_is_not_well_formed(self):
+        line = '3138 Andula               C542468-8 He Ni Po C:3138                       { -2 } (931-2) [4258] B    -  - 121 9  ImDv G4 V'
+        star1 = Star.parse_line_into_star(line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
+        star1.index = 0
+        star1.allegiance_base = star1.alg_code
+
+        msg = None
+
+        try:
+            star1.is_well_formed(log=False)
+        except AssertionError as e:
+            msg = str(e)
+
+        expected_msg = "Star " + str(star1.name) + " cannot colonise itself"
+        self.assertEqual(expected_msg, msg)
+
+    def testParseAnjeChadr(self):
+        line = '0123 Anje Chadr           B568778-A Ag Ri Sa C:0124            {+4 } (G6C+4) [4B38] - V  - 222 11 Zh K6 V'
+        star1 = Star.parse_line_into_star(line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
+        star1.index = 0
+        star1.allegiance_base = star1.alg_code
+
+        star1.is_well_formed(log=False)
+        self.assertEqual(1, len(star1.tradeCode.colony))
+
+    def testParseGlisten(self):
+        line = '2036 Glisten              A000986-F As Hi In Na Va Cp                        { 5 }  (D8H+4) [8E4E] BEF   NS - 811 13 ImDd K9 V          '
+        star1 = Star.parse_line_into_star(line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
+        star1.index = 0
+        star1.allegiance_base = star1.alg_code
+
+        star1.is_well_formed(log=False)
+
+        parse_line = star1.parse_to_line()
+        foo = 1
 
 
 if __name__ == "__main__":

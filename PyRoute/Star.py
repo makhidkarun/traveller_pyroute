@@ -9,9 +9,10 @@ import bisect
 import random
 import math
 
-from PyRoute.Position.Hex import Hex
 
 from PyRoute.AllyGen import AllyGen
+from PyRoute.Position.Hex import Hex
+
 from PyRoute.SystemData.Utilities import Utilities
 from collections import OrderedDict
 
@@ -112,6 +113,7 @@ class Star(object):
         foo.index = self.index
         foo.calc_hash()
         foo.hex = copy.deepcopy(self.hex)
+        foo.tradeCode = copy.deepcopy(self.tradeCode)
 
         return foo
 
@@ -133,7 +135,7 @@ class Star(object):
 
         result += str(self.uwp)
         imp_chunk = "{ " + str(self.importance) + " }"
-        star_list = str(self.star_list_object)
+        star_list = str(self.star_list_object).ljust(14)
         result += " " + str(self.tradeCode).ljust(38) + imp_chunk.ljust(6) + " "
         econ = str(self.economics) if self.economics is not None else '-'
         social = str(self.social) if self.social is not None else '-'
@@ -145,7 +147,7 @@ class Star(object):
 
         result += str(self.baseCode).ljust(2) + " " + str(self.zone).ljust(1) + " " + popM + belts + ggCount + " "
         result += str(self.worlds).ljust(2) + " " + str(self.alg_code).ljust(4) + " "
-        result += str(star_list).ljust(14) + " " + " ".join(self.routes).ljust(41)
+        result += star_list + " " + " ".join(self.routes).ljust(41)
 
         return result
 
@@ -403,38 +405,38 @@ class Star(object):
             return
         pop = self.popCode
 
-        homogeneity = self._ehex_to_int(self.social[1])  # pop + flux, min 1
+        homogeneity = self._ehex_to_int(self.social[1] if self.social is not None else '1')  # pop + flux, min 1
         if pop == 0 and homogeneity != 0:
             self.logger.warning(
-                '{} - CX calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity))
+                '{} - CX Calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity))
         elif pop != 0 and not max(1, pop - 5) <= homogeneity <= pop + 5:
             self.logger.warning(
-                '{} - CX calculated homogeneity {} not in range {} - {}'.
+                '{} - CX Calculated homogeneity {} not in range {} - {}'.
                 format(self, homogeneity, max(1, pop - 5), pop + 5))
 
-        acceptance = self._ehex_to_int(self.social[2])  # pop + Ix, min 1
+        acceptance = self._ehex_to_int(self.social[2] if self.social is not None else '1')  # pop + Ix, min 1
         if pop == 0 and acceptance != 0:
             self.logger.warning(
-                '{} - CX calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
+                '{} - CX Calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
         elif pop != 0 and not max(1, pop + self.importance) == acceptance:
             self.logger.warning(
                 '{} - CX Calculated acceptance {} does not match generated acceptance {}'.
                 format(self, acceptance, max(1, pop + self.importance)))
 
-        strangeness = self._ehex_to_int(self.social[3])  # flux + 5
+        strangeness = self._ehex_to_int(self.social[3] if self.social is not None else '1')  # flux + 5
         if pop == 0 and strangeness != 0:
             self.logger.warning(
-                '{} - CX calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness))
+                '{} - CX Calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness))
         elif pop != 0 and not 1 <= strangeness <= 10:
             self.logger.warning(
-                '{} - CX calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10))
+                '{} - CX Calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10))
 
-        symbols = self._ehex_to_int(self.social[4])  # TL + flux, min 1
+        symbols = self._ehex_to_int(self.social[4] if self.social is not None else '1')  # TL + flux, min 1
         if pop == 0 and symbols != 0:
-            self.logger.warning('{} - CX calculated symbols {} should be 0 for barren worlds'.format(self, symbols))
+            self.logger.warning('{} - CX Calculated symbols {} should be 0 for barren worlds'.format(self, symbols))
         elif pop != 0 and not max(1, self.tl - 5) <= symbols <= self.tl + 5:
             self.logger.warning(
-                '{} - CX calculated symbols {} not in range {} - {}'.
+                '{} - CX Calculated symbols {} not in range {} - {}'.
                 format(self, symbols, max(1, self.tl - 5), self.tl + 5))
 
     def calculate_ru(self, ru_calc):
@@ -620,13 +622,30 @@ class Star(object):
         if len(self.routes) > 0:
             self.logger.debug("{} - routes: {}".format(self, self.routes))
 
-    def is_well_formed(self):
+    def is_well_formed(self, log=True, enforce=True):
         assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
         assert self.hex is not None, "Star " + str(self.name) + " is missing hex attribute"
+        assert self._hash is not None, "Star " + str(self.name) + " has empty _hash attribute"
+        assert self._key is not None, "Star " + str(self.name) + " has empty _key attribute"
+        assert self.tradeCode is not None, "Star " + str(self.name) + " has empty tradeCode attribute"
+        result, msg = self.tradeCode.is_well_formed()
+        if not enforce and not result:
+            return result
+        assert result, msg
         result, msg = self.hex.is_well_formed()
         assert result, msg
+        assert not (0 < len(self.tradeCode.owner) and 0 < len(self.tradeCode.colony)), "Star " + str(
+            self.name) + " cannot both be owned by another system and have colonies"
+        if log:
+            if self.hex.position == self.tradeCode.ownedBy:
+                self.logger.error("Star " + str(self.name) + " cannot own itself")
+            if ('C:' + self.hex.position) in self.tradeCode.colony:
+                self.logger.error("Star " + str(self.name) + " cannot colonise itself")
+        else:
+            assert self.hex.position != self.tradeCode.ownedBy, "Star " + str(self.name) + " cannot own itself"
+            assert ('C:' + self.hex.position) not in self.tradeCode.colony, "Star " + str(self.name) + " cannot colonise itself"
         assert hasattr(self, 'allegiance_base'), "Star " + str(self.name) + " is missing base allegiance attribute"
         assert self.allegiance_base is not None, "Star " + str(self.name) + " has empty base allegiance attribute"
         result, msg = self.uwp.is_well_formed()
@@ -648,3 +667,26 @@ class Star(object):
         capital = 2 if self.tradeCode.sector_capital or self.tradeCode.other_capital else 1 if \
             self.tradeCode.subsector_capital else 0
         self._pax_btn_mod = rich + capital
+
+    def trim_self_ownership(self):
+        posn = self.hex.position
+        if posn == self.tradeCode.ownedBy:
+            msg = "Star " + self.name + " should not own itself"
+            self.logger.warning(msg)
+            self.tradeCode.ownedBy = None
+            ownstring = 'O:' + posn
+            self.tradeCode.owner = [item for item in self.tradeCode.owner if ownstring != item]
+            self.tradeCode.owned = [item for item in self.tradeCode.owned if ownstring != item]
+            self.tradeCode.codes = [item for item in self.tradeCode.codes if ownstring != item]
+            self.tradeCode.dcode = [item for item in self.tradeCode.dcode if ownstring != item]
+
+    def trim_self_colonisation(self):
+        posn = self.hex.position
+        colstring = 'C:' + posn
+        if colstring in self.tradeCode.colony:
+            msg = "Star " + self.name + " should not colonise itself"
+            self.logger.warning(msg)
+            self.tradeCode.colony = [item for item in self.tradeCode.owner if colstring != item]
+            self.tradeCode.owned = [item for item in self.tradeCode.owned if colstring != item]
+            self.tradeCode.codes = [item for item in self.tradeCode.codes if colstring != item]
+            self.tradeCode.dcode = [item for item in self.tradeCode.dcode if colstring != item]

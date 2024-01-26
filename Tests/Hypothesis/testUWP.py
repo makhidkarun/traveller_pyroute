@@ -69,10 +69,12 @@ class testUWP(unittest.TestCase):
     @example('?000?F0-0', '?000?FA-4')
     @example('?000?Q0-0', '?000?FA-4')
     @example('?0000y0-0', None)
+    @example('?0000Y0-0', None)
+    @example('?40?6F0-0', '?40?6B6-3')
     def test_check_canonicalisation_and_verify_canonicalisation(self, uwp_line, expected):
         uwp = self.parse_uwp(uwp_line)
-
         assume(uwp is not None)
+
         old_rep = str(uwp)
         hyp_input = 'Hypothesis input: ' + uwp_line
 

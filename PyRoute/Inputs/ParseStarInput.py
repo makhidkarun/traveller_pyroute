@@ -1,13 +1,14 @@
 """
-Created on Nov 27, 2023
+Created on Nov 06, 2023
 
 @author: CyberiaResurrection
 """
 import re
 
 from PyRoute.Nobles import Nobles
-from PyRoute.SystemData.UWP import UWP
+from PyRoute.Inputs.ParseStarInputFallback import ParseStarInputFallback
 from PyRoute.SystemData.Utilities import Utilities
+from PyRoute.SystemData.UWP import UWP
 from PyRoute.TradeCodes import TradeCodes
 
 
@@ -26,36 +27,52 @@ class ParseStarInput:
 ([A-Z0-9?-][A-Za-z0-9?-]{1,3})
 (.*)
 """
+
     starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
+
+    # Permissible port codes per Travwiki, plus the unknown ? value
+    port_codes = 'ABCDEFGHXY?'
+
+    # Allowed trade zones per TravWiki, plus the blank/unknown - value
+    allowed_trade_zones = 'ARUF-'
+
+    # Oddball star classes
+    oddball_stars = ('BD', 'D', 'DF', 'DG', 'DK', 'DM')
 
     @staticmethod
     def parse_line_into_star_core(star, line, sector, pop_code, ru_calc):
+        line = line.replace('\n', '')
         star.sector = sector
         star.logger.debug(line)
-        # Cache regex lookup to avoid doing it once for check, and again to extract data
-        matches = ParseStarInput.starline.match(line)
-        if matches:
-            data = matches.groups()
-        elif '{Anomaly}' in line:
-            star.logger.info("Found anomaly, skipping processing: {}".format(line))
-            return None
-        else:
-            star.logger.error("Unmatched line: {}".format(line))
+        data = ParseStarInput._parse_line_into_star_unpack_line(star, line)
+        if data is None:
             return None
 
         star.logger.debug(data)
 
         star.position = data[0].strip()
         star.set_location()
+        result, _ = star.hex.is_well_formed()
+        if not result:
+            return None  # If hex position is bad, bail out - error is fatal
         star.name = data[1].strip()
 
-        try:
-            star.uwp = UWP(data[2].strip())
-        except ValueError as e:
-            if 'Input UWP malformed' == str(e):
-                return None
-            raise e
-        star.tradeCode = TradeCodes(data[3].strip())
+        star.uwp = UWP(data[2].strip().upper())
+
+        raw_trade = data[3].strip()
+
+        # if there's an importance block in the raw trade code, this parsing attempt is unrecoverable as later data
+        # values will be non-existent.  Bail out now.
+        # TODO: Regexise this
+        if '{-' in raw_trade or '{ -' in raw_trade:
+            return None
+        if '{0' in raw_trade or '{ 0' in raw_trade:
+            return None
+        if '- -' in raw_trade:
+            return None
+
+        star.tradeCode = TradeCodes(raw_trade)
+        star.tradeCode.trim_ill_formed_residual_codes()
         star.ownedBy = star.tradeCode.owned_by(star)
 
         star.economics = data[6].strip().upper() if data[6] and data[6].strip() != '-' else None
@@ -65,15 +82,14 @@ class ParseStarInput:
         star.nobles.count(data[11])
 
         star.baseCode = data[12].strip()
-        if '-' != star.baseCode and 1 == len(star.baseCode) and not star.baseCode.isalpha():
-            star.baseCode = '-'
-        star.zone = data[13].strip()
-        if not star.zone or star.zone not in 'arufARUF-':
-            star.zone = '-'
-        star.zone = star.zone.upper()
-        star.ggCount = int(data[14][2], 16) if data[14][2] not in 'X?' else 0
-        star.popM = int(data[14][0]) if data[14][0] not in 'X?' else 0
-        star.belts = int(data[14][1], 16) if data[14][1] not in 'X?' else 0
+        rawzone = data[13].strip().upper()
+        star.zone = rawzone if 1 == len(rawzone) and rawzone in ParseStarInput.allowed_trade_zones else '-'
+        star.popM = 0
+        star.belts = 0
+        datalen = len(data[14])
+        star.ggCount = 0 if 3 > datalen or not data[14][2].isalnum() else (int(data[14][2], 16) if data[14][2] not in 'X?' else 0)
+        star.popM = 0 if 2 > datalen or not data[14][1].isalnum() else (int(data[14][0]) if data[14][0] not in 'X?' else 0)
+        star.belts = 0 if 1 > datalen or not data[14][0].isalnum() else (int(data[14][1], 16) if data[14][1] not in 'X?' else 0)
 
         star.worlds = int(data[15]) if data[15].strip().isdigit() else 0
 
@@ -82,12 +98,7 @@ class ParseStarInput:
 
         star.stars = data[17].strip()
         star.extract_routes()
-        try:
-            star.split_stellar_data()
-        except ValueError as e:
-            if 'No stars found' == str(e):
-                return None
-            raise e
+        star.split_stellar_data()
 
         star.tradeIn = 0
         star.tradeOver = 0
@@ -117,7 +128,7 @@ class ParseStarInput:
                          'Population': star.pop,
                          'Government': star.gov,
                          'Law Level': star.law,
-                         'Tech Level': star.tl,
+                         'Tech Level': star.uwp.tl,
                          'Pop Code': str(star.popM),
                          'Starport Size': star.starportSize,
                          'Primary Type': star.primary_type if star.primary_type else 'X',
@@ -147,3 +158,26 @@ class ParseStarInput:
         star.calc_hash()
         star.calc_passenger_btn_mod()
         return star
+
+    @staticmethod
+    def _parse_line_into_star_unpack_line(star, line):
+        # Cache regex lookup to avoid doing it once for check, and again to extract data
+        matches = ParseStarInput.starline.match(line)
+        if matches:
+            rawdata = matches.groups()
+        elif '{Anomaly}' in line:
+            star.logger.info("Found anomaly, skipping processing: {}".format(line))
+            return None
+        else:
+            rawdata = ParseStarInputFallback.parse_starline_fallback(star, line)
+        if rawdata is None:
+            if '???-' in line or '-?' in line:
+                rawdata = ParseStarInputFallback.parse_starline_physicals_only(star, line)
+
+        if rawdata is None:
+            star.logger.error("Unmatched line: {}".format(line))
+            return None
+
+        data = ParseStarInputFallback.repack_starline_data(rawdata)
+
+        return data
