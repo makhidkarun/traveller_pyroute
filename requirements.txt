@@ -6,6 +6,7 @@ wikitools3==3.0.1
 hypothesis
 jinja2
 jsonpickle
+lark==1.1.8
 numpy
 pytest
 pytest-console-scripts
