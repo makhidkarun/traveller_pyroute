@@ -20,7 +20,7 @@ class StarlineParser:
 
     position: /^([0-3]\d[0-4]\d)/
 
-    starname: /(.{15,}) ([\w\?]{7,7}-[\w\?]){1,1} /
+    starname: /(.{15,}) ([\w\?]{7,7}-[\w\?]) /
 
     trade: TRADECODE*
     TRADECODE: MINOR_DIEBACK | BINARY | POPCODE | MINOR_SOPHONT | OWNED_COLONY | MAJOR_SOPHONT | RESIDUAL | SINGLETON
