@@ -75,7 +75,8 @@ class StarlineTransformer(Transformer):
     def trade(self, args):
         trimmed = []
         for item in args:
-            trimmed.append(item.value.strip())
+            rawval = StarlineTransformer.boil_down_double_spaces(item.value.strip())
+            trimmed.append(rawval)
         return trimmed
 
     def extensions(self, args):
