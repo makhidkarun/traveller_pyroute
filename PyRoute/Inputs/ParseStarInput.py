@@ -32,15 +32,8 @@ class ParseStarInput:
     def parse_line_into_star_core(star, line, sector, pop_code, ru_calc):
         star.sector = sector
         star.logger.debug(line)
-        # Cache regex lookup to avoid doing it once for check, and again to extract data
-        matches = ParseStarInput.starline.match(line)
-        if matches:
-            data = matches.groups()
-        elif '{Anomaly}' in line:
-            star.logger.info("Found anomaly, skipping processing: {}".format(line))
-            return None
-        else:
-            star.logger.error("Unmatched line: {}".format(line))
+        data = ParseStarInput._unpack_starline(star, line)
+        if data is None:
             return None
 
         star.logger.debug(data)
@@ -147,3 +140,16 @@ class ParseStarInput:
         star.calc_hash()
         star.calc_passenger_btn_mod()
         return star
+
+    @staticmethod
+    def _unpack_starline(star, line):
+        # Cache regex lookup to avoid doing it once for check, and again to extract data
+        matches = ParseStarInput.starline.match(line)
+        if matches:
+            return matches.groups()
+        elif '{Anomaly}' in line:
+            star.logger.info("Found anomaly, skipping processing: {}".format(line))
+            return None
+        else:
+            star.logger.error("Unmatched line: {}".format(line))
+            return None
