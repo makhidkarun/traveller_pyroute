@@ -49,6 +49,8 @@ class StarlineTransformer(Transformer):
                 args[6][0].value = args[5][0].value
                 args[5][0].value = args[4][0].value
                 args[4][0].value = ''
+            elif 3 == len(args[3]):
+                pass
         if 8 == len(args):  # If there's no residual argument
             tailend = args[7][2][0].value
             lenlast = min(4, len(tailend))
