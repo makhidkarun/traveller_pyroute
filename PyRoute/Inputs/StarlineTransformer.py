@@ -313,7 +313,10 @@ class StarlineTransformer(Transformer):
                 continue
             rawval = tree[dataval]
             if rawval is not None:
+                index = self.raw.find(rawval)
                 self.raw = self.raw.replace(rawval, '', 1)
+                if 0 < index:
+                    self.raw = self.raw[index:]
 
     def _square_up_parsed_zero(self, rawstring, parsed):
         bitz = [item for item in rawstring.split(' ') if '' != item]
