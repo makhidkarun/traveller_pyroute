@@ -456,7 +456,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('0', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual('', transformed[15], 'Unexpected worlds count')
+        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 

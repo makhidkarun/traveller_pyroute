@@ -246,17 +246,7 @@ class StarlineTransformer(Transformer):
         if trade_final_keep:
             return tree
 
-        trade_ext = ''
-        overrun = 0
-        for item in trade.children:  # Dig out the largest left-subset of trade children that are in the raw string
-            trade_ext += item.value + ' '
-            if trade_ext in self.raw:  # if it worked with one space appended, try a second space
-                trade_ext += ' '
-                if trade_ext not in self.raw:  # if it didn't, drop the second space
-                    trade_ext = trade_ext[:-1]
-            # after all that, if we've overrun (such as a nobles code getting transplanted), throw hands up and move on
-            if trade_ext not in self.raw:
-                overrun += 1
+        overrun = self._calc_trade_overrun(trade.children, self.raw)
         if 0 == overrun:  # if the reconstructed trade code is fully in the raw string, nothing to do - bail out now
             return tree
         nobles = tree.children[4]
@@ -294,6 +284,29 @@ class StarlineTransformer(Transformer):
                     trade.children = trade.children[:-2]
 
         return tree
+
+    @staticmethod
+    def _calc_trade_overrun(children, raw):
+        trade_ext = ''
+        overrun = 0
+        # first check whether trade codes are straight up aligned
+        for item in children:
+            trade_ext += item.value + ' '
+        if trade_ext in raw:
+            return 0
+        trade_ext = ''
+        for item in children:  # Dig out the largest left-subset of trade children that are in the raw string
+            trade_ext += item.value + ' '
+            if trade_ext in raw:  # if it worked with one space appended, try a second space
+                trade_ext += ' '
+                if trade_ext not in raw:  # if it didn't, drop the second space
+                    trade_ext = trade_ext[:-1]
+            else:  # if appending the space didn't work, try without it
+                trade_ext = trade_ext[:-1]
+            # after all that, if we've overrun (such as a nobles code getting transplanted), throw hands up and move on
+            if trade_ext not in raw:
+                overrun += 1
+        return overrun
 
     def _square_up_parsed(self, parsed):
         if ' ' != parsed['nobles'] and 0 < len(parsed['nobles']) and '' == parsed['base'] and '' == parsed['zone']:
