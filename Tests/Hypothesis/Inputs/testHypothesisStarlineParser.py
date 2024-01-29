@@ -246,6 +246,7 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 0000000-0 000000000000000 {  0} -  [0000]   - 0 000   00?', True)
     @example('0101 000000000000000      ???????-?                                       { -2 } -       -      BCDEFG -  - 000 0  00                                                           ', True)
     @example('0101 000000000000000 ???????-? 000 0000000BCDEFG       - - 0 000   00', True)
+    @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   10 +', True)
     # Cases where original regex output was wonky
     @example('0000 000000000000000 ???????-? 000000000000000       -       - 0   000   00', False)
     @example('0000 000000000000000 ???????-? 000000000000000       - -         0   000   00', False)
