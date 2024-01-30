@@ -41,16 +41,14 @@ class StarlineTransformer(Transformer):
                     args[2] = args[2][:-2]
                 elif move_rev:
                     pass
-        if '*' != args[5][0].value:
-            if '' == args[4][0].value and '' != args[5][0].value:
+        if '*' != args[5][0].value and '' != args[5][0].value and 3 != len(args[3]):
+            if '' == args[4][0].value:
                 args[4][0].value = args[5][0].value
                 args[5][0].value = args[6][0].value
-            elif 1 == len(args[3]) and '' == args[6][0].value and '' != args[5][0].value:  # if only 1 extension child?
+            elif '' == args[6][0].value:  # if only 1 extension child?
                 args[6][0].value = args[5][0].value
                 args[5][0].value = args[4][0].value
                 args[4][0].value = ''
-            elif 3 == len(args[3]):
-                pass
         if 8 == len(args):  # If there's no residual argument
             tailend = args[7][2][0].value
             lenlast = min(4, len(tailend))
@@ -310,12 +308,13 @@ class StarlineTransformer(Transformer):
 
     def _square_up_parsed(self, parsed):
         if ' ' != parsed['nobles'] and 0 < len(parsed['nobles']) and '' == parsed['base'] and '' == parsed['zone']:
-            parsed['base'] = parsed['pbg']
-            parsed['zone'] = parsed['worlds']
-            parsed['pbg'] = parsed['allegiance']
-            parsed['worlds'] = ' '
-            parsed['allegiance'] = parsed['residual']
-            parsed['residual'] = ''
+            if 3 == len(parsed['allegiance']) and parsed['allegiance'][0].isdigit():
+                parsed['base'] = parsed['pbg']
+                parsed['zone'] = parsed['worlds']
+                parsed['pbg'] = parsed['allegiance']
+                parsed['worlds'] = ' '
+                parsed['allegiance'] = parsed['residual']
+                parsed['residual'] = ''
 
         return parsed
 
