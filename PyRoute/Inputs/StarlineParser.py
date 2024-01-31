@@ -33,7 +33,7 @@ class StarlineParser:
     RESIDUAL.2: /[0-9A-Za-z?\-+*()\'\{\}\[\]]{2,}/
     SINGLETON: /[0-9A-Za-z\+\*()?\']/
 
-    extensions: ix ex cx | /( ) ( ) ( ) /
+    extensions: ix ex cx | /( ) ( ) ( )/
 
     ix: /\{ *[+-]?[0-6] ?\}/
     ex: /\([0-9A-Za-z]{3}[+-]\d\)|-/
