@@ -557,8 +557,34 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('0', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
         self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
-        self.assertEqual('000', transformed[16], 'Unexpected allegiance')
+        self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
+
+    def test_parser_screwball_synthetic_starline_20(self):
+        txt = '0101 000000000000000      ???????-?                                       { -2 } -       -      -       - 000 0  ?00                                                          '
+
+        foo = StarlineParser()
+        result, txt = foo.parse(txt)
+
+        xform = StarlineTransformer(raw=txt)
+        transformed = xform.transform(result)
+        self.assertTrue(isinstance(transformed, list), "Transformed result not list")
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
+        self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
+        self.assertEqual('???????-?', transformed[2], 'Unexpected UWP')
+        self.assertEqual('', transformed[3], 'Unexpected trade codes')
+        self.assertEqual('{ -2 } - -', transformed[4])
+        self.assertEqual('{ -2 }', transformed[5])
+        self.assertEqual('-', transformed[6])
+        self.assertEqual('-', transformed[7])
+        self.assertEqual('', transformed[11], 'Unexpected nobles code')
+        self.assertEqual('-', transformed[12], 'Unexpected base code')
+        self.assertEqual('-', transformed[13], 'Unexpected trade zone')
+        self.assertEqual('000', transformed[14], 'Unexpected PBG code')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('?00', transformed[16], 'Unexpected allegiance')
+        self.assertEqual('', transformed[17], 'Unexpected residual')
+
 
 if __name__ == '__main__':
     unittest.main()

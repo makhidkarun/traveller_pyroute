@@ -4,8 +4,6 @@ Created on Dec 27, 2023
 @author: CyberiaResurrection
 """
 
-import copy
-import logging
 import re
 import unittest
 from datetime import timedelta
@@ -60,7 +58,8 @@ def comparison_line(draw):
         '0000 000000000000000 ???????-? 000000000000000       - -         0   001   00',
         '0000 000000000000000 ???????-? 000000000000000       - -         0   002   00',
         '0000 000000000000000 0000000-0 000000000000000 {0} (000-0) [0000]       - - 0 000   00?',
-        '0000 000000000000000 ???????-? 000000000000000 {0} (000-0) [0000]       - - 0 000   00?'
+        '0000 000000000000000 ???????-? 000000000000000 {0} (000-0) [0000]       - - 0 000   00?',
+        '0000 000000000000000 ???????-?  (0 00000000)0? {0} -  -  - - 0 000   ?0'
     ]
 
     candidate = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
@@ -276,6 +275,8 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 ???????-? 000000000000000 {0} -  -         - 0 000   00', False)
     @example('0000 000000000000000 ???????-? 000000000000000 {0} -  -       - 0   000   00', False)
     @example('0000 000000000000000 0000000-0 (00000000000)0)       - - 0 000   00?', False)
+    @example('0101 000000000000000      ???????-?                                       { -2 } -       -      -       - 000 0  ?00                                                          ', False)
+    @example('0000 000000000000000 ???????-?  (0 00000000)0? {0} -  -  - - 0 000   ?0', False)
     # Weird parsing cases
     @example('0000 000000000000000 ???????-? (00000000000000       - - 0 000   00?)', 'weird')
     @example('0000 000000000000000 ???????-? [00000000000000       - - 0 000   00?]', 'weird')

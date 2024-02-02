@@ -212,7 +212,7 @@ class StarlineTransformer(Transformer):
     def _preprocess_trade_and_extensions(self, tree):
         trade = tree.children[2]
         extensions = tree.children[3]
-        ix_reg = '\{ *[+-]?[0-6] ?\}'
+        ix_reg = '\{ *[+-]?[0-6] ?\}$'
 
         # If trade has importance-extension child, we need to fix it
         counter = -1
