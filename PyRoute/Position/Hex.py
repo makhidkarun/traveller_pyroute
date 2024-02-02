@@ -104,7 +104,7 @@ class Hex(object):
     def axial_to_sector(q, r):
         (raw_row, raw_col) = Hex.axial_to_hex(q, r)
 
-        col, sector_y = Hex.dy_reverse(raw_col)
+        col, _ = Hex.dy_reverse(raw_col)
         row = (raw_row % 32) + 1
 
         return row, col

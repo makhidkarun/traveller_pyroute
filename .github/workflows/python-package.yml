@@ -27,11 +27,11 @@ jobs:
       - name: Lint with ruff - syntax errors & undefined names
         run: |
           # stop the build if there are Python syntax errors or undefined names
-          ruff --select=E9,F63,F7,F82 PyRoute
+          ruff --select=E9,F63,F7,F82 --preview PyRoute
       - name: Lint with ruff - configured options
         run: |
           # now run configured options
-          ruff check PyRoute
+          ruff check --preview PyRoute
       - name: Test with pytest
         run: |
           pytest

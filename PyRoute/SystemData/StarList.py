@@ -65,7 +65,7 @@ class StarList(object):
         self.stars_line = stars_line
         stars = StarList.stellar_match.findall(stars_line)
         if not stars:
-            pass  #  We used to disallow empty star lists, but real data said otherwise.
+            pass  # We used to disallow empty star lists, but real data said otherwise.
         if 8 < len(stars):
             if trim_stars:
                 stars = stars[0:8]

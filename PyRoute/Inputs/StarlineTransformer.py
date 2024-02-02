@@ -371,7 +371,6 @@ class StarlineTransformer(Transformer):
     def _square_up_parsed_one(self, rawstring, parsed):
         rawtrim = rawstring.lstrip()
         rawbitz = rawtrim.split(' ')
-        #trimbitz = [item for item in rawbitz if '' != item]
         trimbitz = self._square_up_star_codes(rawbitz)
         if 3 < len(trimbitz):
             if trimbitz[0].isdigit():
@@ -435,10 +434,10 @@ class StarlineTransformer(Transformer):
             if '' == item:
                 continue
             if 0 < i < num_bitz - 1:
-                next_item = foobitz[i+1]
+                next_item = foobitz[i + 1]
                 if next_item in self.star_classes:
                     item += ' ' + next_item
-                    foobitz[i+1] = ''
+                    foobitz[i + 1] = ''
             trimbitz.append(item)
 
         return trimbitz
