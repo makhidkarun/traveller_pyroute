@@ -8,7 +8,7 @@ jinja2
 jsonpickle
 lark==1.1.8
 numpy
-pytest
+pytest >= 8.0.0
 pytest-console-scripts
 pytest-randomly
 pytest-subtests
