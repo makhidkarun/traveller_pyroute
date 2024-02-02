@@ -24,6 +24,7 @@ class StarlineTransformer(Transformer):
     def __init__(self, visit_tokens: bool = True, raw=None):
         super().__init__(visit_tokens)
         self.raw = raw.strip('\n')
+        self.crankshaft = False
 
     def starline(self, args):
         tradelen = sum([len(item) for item in args[2]]) + len(args[2]) - 1
@@ -42,13 +43,14 @@ class StarlineTransformer(Transformer):
                 elif move_rev:
                     pass
         if '*' != args[5][0].value and '' != args[5][0].value and 3 != len(args[3]):
-            if '' == args[4][0].value:
-                args[4][0].value = args[5][0].value
-                args[5][0].value = args[6][0].value
-            elif '' == args[6][0].value:  # if only 1 extension child?
-                args[6][0].value = args[5][0].value
-                args[5][0].value = args[4][0].value
-                args[4][0].value = ''
+            if not self.crankshaft:
+                if '' == args[4][0].value:
+                    args[4][0].value = args[5][0].value
+                    args[5][0].value = args[6][0].value
+                elif '' == args[6][0].value:  # if only 1 extension child?
+                    args[6][0].value = args[5][0].value
+                    args[5][0].value = args[4][0].value
+                    args[4][0].value = ''
         elif '*' != args[5][0].value and 3 == len(args[3]):
             if '' == args[4][0].value and '' != args[5][0].value and '' == args[6][0].value:
                 if args[7][0][0].value == args[7][2][0].value:
@@ -164,6 +166,8 @@ class StarlineTransformer(Transformer):
         return world_alg[0][0].value, world_alg[1][0].value, world_alg[2][0].value
 
     def transform(self, tree):
+        self.crankshaft = '' == tree.children[4].children[0].value.strip() and '-' == tree.children[5].children[
+            0].value and '' == tree.children[6].children[0].value.strip() and 1 == self.raw.count(' -') and 1 == self.raw.count('-   ')
         tree = self._preprocess_trade_and_extensions(tree)
         tree = self._preprocess_extensions_and_nbz(tree)
         tree = self._preprocess_trade_and_nbz(tree)
