@@ -32,15 +32,16 @@ class StarlineTransformer(Transformer):
             if '' == args[4][0].value and '' != args[5][0].value and '' == args[6][0].value:
                 move_fwd = 3 == len(args[5][0].value)  # Will base code still make sense as PBG?
                 move_rev = 3 == len(args[7][2][0].value)  # Will allegiance code still make sense as PBG?
-                assert not (move_rev and move_fwd), "Move flags should be disjoint"
-                if move_fwd:
+                if move_fwd and not move_rev:
                     last = args[2][-1]
                     mid = args[2][-2]
                     args[6][0].value = args[5][0].value
                     args[5][0].value = last
                     args[4][0].value = mid
                     args[2] = args[2][:-2]
-                elif move_rev:
+                elif move_rev and not move_fwd:
+                    pass
+                elif move_fwd and move_rev:
                     pass
         if '*' != args[5][0].value and '' != args[5][0].value and 3 != len(args[3]):
             if not self.crankshaft:
