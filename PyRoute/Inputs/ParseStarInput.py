@@ -64,7 +64,7 @@ class ParseStarInput:
         star.nobles.count(data[11])
 
         star.baseCode = data[12].strip()
-        if '-' != star.baseCode and 1 == len(star.baseCode) and not star.baseCode.isalpha():
+        if ('' == star.baseCode) or ('-' != star.baseCode and 1 == len(star.baseCode) and not star.baseCode.isalpha()):
             star.baseCode = '-'
         star.zone = data[13].strip()
         if not star.zone or star.zone not in 'arufARUF-':
@@ -167,6 +167,7 @@ class ParseStarInput:
             ParseStarInput.transformer = StarlineTransformer(raw=line)
         else:
             ParseStarInput.transformer.raw = line
+            ParseStarInput.transformer.crankshaft = False
         transformed = ParseStarInput.transformer.transform(result)
 
         return transformed
