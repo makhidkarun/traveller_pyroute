@@ -3,13 +3,13 @@ pypdflite @ git+https://github.com/tjoneslo/pypdflite.git@python3
 inflect
 Pillow >= 10.0
 wikitools3==3.0.1
-hypothesis
+hypothesis >= 6.97.0
 jinja2
 jsonpickle
 lark==1.1.8
 numpy
-pytest
+pytest >= 8.0.0
 pytest-console-scripts
 pytest-randomly
 pytest-subtests
-ruff >= 0.1.5
+ruff >= 0.2.0

@@ -24,6 +24,7 @@ class StarlineTransformer(Transformer):
     def __init__(self, visit_tokens: bool = True, raw=None):
         super().__init__(visit_tokens)
         self.raw = raw.strip('\n')
+        self.crankshaft = False
 
     def starline(self, args):
         tradelen = sum([len(item) for item in args[2]]) + len(args[2]) - 1
@@ -31,24 +32,39 @@ class StarlineTransformer(Transformer):
             if '' == args[4][0].value and '' != args[5][0].value and '' == args[6][0].value:
                 move_fwd = 3 == len(args[5][0].value)  # Will base code still make sense as PBG?
                 move_rev = 3 == len(args[7][2][0].value)  # Will allegiance code still make sense as PBG?
-                assert not (move_rev and move_fwd), "Move flags should be disjoint"
-                if move_fwd:
+                if move_fwd and not move_rev:
                     last = args[2][-1]
                     mid = args[2][-2]
                     args[6][0].value = args[5][0].value
                     args[5][0].value = last
                     args[4][0].value = mid
                     args[2] = args[2][:-2]
-                elif move_rev:
+                elif move_rev and not move_fwd:
                     pass
-        if '*' != args[5][0].value:
-            if '' == args[4][0].value and '' != args[5][0].value:
-                args[4][0].value = args[5][0].value
-                args[5][0].value = args[6][0].value
-            elif 1 == len(args[3]) and '' == args[6][0].value and '' != args[5][0].value:  # if only 1 extension child?
-                args[6][0].value = args[5][0].value
-                args[5][0].value = args[4][0].value
-                args[4][0].value = ''
+                elif move_fwd and move_rev:
+                    pass
+        if '*' != args[5][0].value and '' != args[5][0].value and 3 != len(args[3]):
+            if not self.crankshaft:
+                if '' == args[4][0].value:
+                    args[4][0].value = args[5][0].value
+                    args[5][0].value = args[6][0].value
+                elif '' == args[6][0].value:  # if only 1 extension child?
+                    args[6][0].value = args[5][0].value
+                    args[5][0].value = args[4][0].value
+                    args[4][0].value = ''
+        elif '*' != args[5][0].value and 3 == len(args[3]):
+            if '' == args[4][0].value and '' != args[5][0].value and '' == args[6][0].value:
+                if args[7][0][0].value == args[7][2][0].value:
+                    args[4][0].value = args[5][0].value
+                    args[5][0].value = args[7][0][0].value
+                    args[6][0].value = args[7][1][0].value
+                    args[7][0][0].value = args[7][2][0].value
+                    args[7][1][0].value = ' '
+                    if 9 == len(args):
+                        args[7][2][0].value = args[8][0].value
+                        args[8][0].value = ''
+                    else:
+                        args[7][2][0].value = ''
         if 8 == len(args):  # If there's no residual argument
             tailend = args[7][2][0].value
             lenlast = min(4, len(tailend))
@@ -75,7 +91,8 @@ class StarlineTransformer(Transformer):
     def trade(self, args):
         trimmed = []
         for item in args:
-            trimmed.append(item.value.strip())
+            rawval = StarlineTransformer.boil_down_double_spaces(item.value.strip())
+            trimmed.append(rawval)
         return trimmed
 
     def extensions(self, args):
@@ -150,6 +167,8 @@ class StarlineTransformer(Transformer):
         return world_alg[0][0].value, world_alg[1][0].value, world_alg[2][0].value
 
     def transform(self, tree):
+        self.crankshaft = '' == tree.children[4].children[0].value.strip() and '-' == tree.children[5].children[
+            0].value and '' == tree.children[6].children[0].value.strip() and 1 == self.raw.count(' -') and 1 == self.raw.count('-   ')
         tree = self._preprocess_trade_and_extensions(tree)
         tree = self._preprocess_extensions_and_nbz(tree)
         tree = self._preprocess_trade_and_nbz(tree)
@@ -193,7 +212,7 @@ class StarlineTransformer(Transformer):
     def _preprocess_trade_and_extensions(self, tree):
         trade = tree.children[2]
         extensions = tree.children[3]
-        ix_reg = '\{ *[+-]?[0-6] ?\}'
+        ix_reg = '\{ *[+-]?[0-6] ?\}$'
 
         # If trade has importance-extension child, we need to fix it
         counter = -1
@@ -243,17 +262,7 @@ class StarlineTransformer(Transformer):
         if trade_final_keep:
             return tree
 
-        trade_ext = ''
-        overrun = 0
-        for item in trade.children:  # Dig out the largest left-subset of trade children that are in the raw string
-            trade_ext += item.value + ' '
-            if trade_ext in self.raw:  # if it worked with one space appended, try a second space
-                trade_ext += ' '
-                if trade_ext not in self.raw:  # if it didn't, drop the second space
-                    trade_ext = trade_ext[:-1]
-            # after all that, if we've overrun (such as a nobles code getting transplanted), throw hands up and move on
-            if trade_ext not in self.raw:
-                overrun += 1
+        overrun = self._calc_trade_overrun(trade.children, self.raw)
         if 0 == overrun:  # if the reconstructed trade code is fully in the raw string, nothing to do - bail out now
             return tree
         nobles = tree.children[4]
@@ -292,14 +301,38 @@ class StarlineTransformer(Transformer):
 
         return tree
 
+    @staticmethod
+    def _calc_trade_overrun(children, raw):
+        trade_ext = ''
+        overrun = 0
+        # first check whether trade codes are straight up aligned
+        for item in children:
+            trade_ext += item.value + ' '
+        if trade_ext in raw:
+            return 0
+        trade_ext = ''
+        for item in children:  # Dig out the largest left-subset of trade children that are in the raw string
+            trade_ext += item.value + ' '
+            if trade_ext in raw:  # if it worked with one space appended, try a second space
+                trade_ext += ' '
+                if trade_ext not in raw:  # if it didn't, drop the second space
+                    trade_ext = trade_ext[:-1]
+            else:  # if appending the space didn't work, try without it
+                trade_ext = trade_ext[:-1]
+            # after all that, if we've overrun (such as a nobles code getting transplanted), throw hands up and move on
+            if trade_ext not in raw:
+                overrun += 1
+        return overrun
+
     def _square_up_parsed(self, parsed):
         if ' ' != parsed['nobles'] and 0 < len(parsed['nobles']) and '' == parsed['base'] and '' == parsed['zone']:
-            parsed['base'] = parsed['pbg']
-            parsed['zone'] = parsed['worlds']
-            parsed['pbg'] = parsed['allegiance']
-            parsed['worlds'] = ' '
-            parsed['allegiance'] = parsed['residual']
-            parsed['residual'] = ''
+            if 3 == len(parsed['allegiance']) and parsed['allegiance'][0].isdigit():
+                parsed['base'] = parsed['pbg']
+                parsed['zone'] = parsed['worlds']
+                parsed['pbg'] = parsed['allegiance']
+                parsed['worlds'] = ' '
+                parsed['allegiance'] = parsed['residual']
+                parsed['residual'] = ''
 
         return parsed
 
@@ -312,7 +345,10 @@ class StarlineTransformer(Transformer):
                 continue
             rawval = tree[dataval]
             if rawval is not None:
+                index = self.raw.find(rawval)
                 self.raw = self.raw.replace(rawval, '', 1)
+                if 0 < index:
+                    self.raw = self.raw[index:]
 
     def _square_up_parsed_zero(self, rawstring, parsed):
         bitz = [item for item in rawstring.split(' ') if '' != item]
@@ -336,7 +372,6 @@ class StarlineTransformer(Transformer):
     def _square_up_parsed_one(self, rawstring, parsed):
         rawtrim = rawstring.lstrip()
         rawbitz = rawtrim.split(' ')
-        #trimbitz = [item for item in rawbitz if '' != item]
         trimbitz = self._square_up_star_codes(rawbitz)
         if 3 < len(trimbitz):
             if trimbitz[0].isdigit():
@@ -363,7 +398,7 @@ class StarlineTransformer(Transformer):
             if 2 == len(trimbitz):
                 allegiance = trimbitz[1]
                 rawtrim = rawtrim.replace(allegiance, '', 1)
-                if alg.isdigit() and 5 > len(alg):  # if first trimbit fits in worlds field, stick it there
+                if alg.isdigit() and 5 > len(alg) and 1 < len(allegiance):  # if first trimbit fits in worlds field, stick it there
                     parsed['worlds'] = alg
                     parsed['allegiance'] = allegiance
                     parsed['residual'] = rawtrim.strip()
@@ -400,10 +435,10 @@ class StarlineTransformer(Transformer):
             if '' == item:
                 continue
             if 0 < i < num_bitz - 1:
-                next_item = foobitz[i+1]
+                next_item = foobitz[i + 1]
                 if next_item in self.star_classes:
                     item += ' ' + next_item
-                    foobitz[i+1] = ''
+                    foobitz[i + 1] = ''
             trimbitz.append(item)
 
         return trimbitz

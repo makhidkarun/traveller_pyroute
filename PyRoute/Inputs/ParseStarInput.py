@@ -5,6 +5,10 @@ Created on Nov 27, 2023
 """
 import re
 
+from lark import UnexpectedCharacters, UnexpectedEOF
+
+from PyRoute.Inputs.StarlineTransformer import StarlineTransformer
+from PyRoute.Inputs.StarlineParser import StarlineParser
 from PyRoute.Nobles import Nobles
 from PyRoute.SystemData.UWP import UWP
 from PyRoute.SystemData.Utilities import Utilities
@@ -27,20 +31,15 @@ class ParseStarInput:
 (.*)
 """
     starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
+    parser = None
+    transformer = None
 
     @staticmethod
     def parse_line_into_star_core(star, line, sector, pop_code, ru_calc):
         star.sector = sector
         star.logger.debug(line)
-        # Cache regex lookup to avoid doing it once for check, and again to extract data
-        matches = ParseStarInput.starline.match(line)
-        if matches:
-            data = matches.groups()
-        elif '{Anomaly}' in line:
-            star.logger.info("Found anomaly, skipping processing: {}".format(line))
-            return None
-        else:
-            star.logger.error("Unmatched line: {}".format(line))
+        data = ParseStarInput._unpack_starline(star, line)
+        if data is None:
             return None
 
         star.logger.debug(data)
@@ -65,7 +64,7 @@ class ParseStarInput:
         star.nobles.count(data[11])
 
         star.baseCode = data[12].strip()
-        if '-' != star.baseCode and 1 == len(star.baseCode) and not star.baseCode.isalpha():
+        if ('' == star.baseCode) or ('-' != star.baseCode and 1 == len(star.baseCode) and not star.baseCode.isalpha()):
             star.baseCode = '-'
         star.zone = data[13].strip()
         if not star.zone or star.zone not in 'arufARUF-':
@@ -147,3 +146,28 @@ class ParseStarInput:
         star.calc_hash()
         star.calc_passenger_btn_mod()
         return star
+
+    @staticmethod
+    def _unpack_starline(star, line):
+        if '{Anomaly}' in line:
+            star.logger.info("Found anomaly, skipping processing: {}".format(line))
+            return None
+
+        if ParseStarInput.parser is None:
+            ParseStarInput.parser = StarlineParser()
+        try:
+            result, line = ParseStarInput.parser.parse(line)
+        except UnexpectedCharacters:
+            star.logger.error("Unmatched line: {}".format(line))
+            return None
+        except UnexpectedEOF:
+            star.logger.error("Unmatched line: {}".format(line))
+            return None
+        if ParseStarInput.transformer is None:
+            ParseStarInput.transformer = StarlineTransformer(raw=line)
+        else:
+            ParseStarInput.transformer.raw = line
+            ParseStarInput.transformer.crankshaft = False
+        transformed = ParseStarInput.transformer.transform(result)
+
+        return transformed

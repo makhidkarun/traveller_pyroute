@@ -30,6 +30,16 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 000000000000000       - - 0 00A   0000D')
     @example('0101 000000000000000 ???????-? 000000000000000       - - 0 0A0   0000D')
     @example('0101 000000000000000 ???????-? 000000000000000       - -         0   000   0000D')
+    @example('0101 000000000000000 ???????-? 000 0000000BCDEFG       - - 0 000   00')
+    @example('0000 000000000000000 ???????-? (000000000000)00         - 0 000   00')
+    @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   10 +')
+    @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00 0')
+    @example('0101 000000000000000 ???????-? 000000000000000         -   001   000')
+    @example('0000 000000000000000 ???????-? 000000000000000         -   000   A00')
+    @example('0000 000000000000000 ???????-? 000000000000000         -   000   00')
+    @example('0101 000000000000000 ???????-? 000000000000000       - 000 0 ?00   00')
+    @example('0000 000000000000000 0000000-0 000000000000000       0 0 0      000 000 000+')
+    @example('0000 000000000000000 ???????-? {0}000000000000       - - 0 000   00')
     def test_parse_line_to_star(self, s):
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
@@ -51,6 +61,9 @@ class testStar(unittest.TestCase):
         nu_foo = Star.parse_line_into_star(line, sector, pop_code, ru_calc)
         self.assertIsNotNone(nu_foo, "Output line did not reparse.  " + hyp_line)
         self.assertEqual(foo, nu_foo, "Reparsed star not _eq_ to original parsed star.  " + hyp_line)
+        self.assertEqual(str(foo.nobles), str(nu_foo.nobles), "Reparsed nobles not equal.  " + hyp_line)
+        self.assertEqual(str(foo.baseCode), str(nu_foo.baseCode), "Reparsed base not equal.  " + hyp_line)
+        self.assertEqual(str(foo.zone), str(nu_foo.zone), "Reparsed zone not equal.  " + hyp_line)
 
         nu_line = nu_foo.parse_to_line()
         self.assertEqual(line, nu_line, "Reparsed line not equal to original line.  " + hyp_line)
