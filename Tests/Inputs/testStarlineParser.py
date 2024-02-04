@@ -161,7 +161,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_4(self):
-        txt = '0001 000000000000000 ???????-? 000000000000000         - 0   000   00'
+        txt = '0001 000000000000000 ???????-? 000000000000000         - C   000   00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -178,7 +178,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual(None, transformed[6])
         self.assertEqual(None, transformed[7])
         self.assertEqual('-', transformed[11], 'Unexpected nobles code')
-        self.assertEqual('0', transformed[12], 'Unexpected base code')
+        self.assertEqual('C', transformed[12], 'Unexpected base code')
         self.assertEqual('', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
         self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
@@ -236,7 +236,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_7(self):
-        txt = '0000 000000000000000 ???????-? 000000000000000         - 0 000   00'
+        txt = '0000 000000000000000 ???????-? 000000000000000         - F 000   00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -254,7 +254,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual(None, transformed[7])
         self.assertEqual('', transformed[11], 'Unexpected nobles code')
         self.assertEqual('-', transformed[12], 'Unexpected base code')
-        self.assertEqual('0', transformed[13], 'Unexpected trade zone')
+        self.assertEqual('F', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
         self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')

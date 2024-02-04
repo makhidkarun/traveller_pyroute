@@ -359,7 +359,7 @@ class StarlineTransformer(Transformer):
             parsed['base'] = bitz[1]
             parsed['zone'] = bitz[2]
         if 2 == len(bitz) and '*' != parsed['base']:
-            if not rawstring.endswith('   '):
+            if not rawstring.endswith('   ') or rawstring.startswith('   '):
                 parsed['nobles'] = ''
                 parsed['base'] = bitz[0]
                 parsed['zone'] = bitz[1]
