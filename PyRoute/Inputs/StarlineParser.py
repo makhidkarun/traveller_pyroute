@@ -41,7 +41,7 @@ class StarlineParser:
 
     nobles: /(\w{1,5}|-| )/
 
-    base: /(\w{1,3}|-|\*)/
+    base: /([A-Z]{1,3}|-|\*)/
 
     zone: /([ARUFGarufg]|-| )[ ]{0,}/
 
