@@ -20,6 +20,7 @@ class StarlineTransformer(Transformer):
     ]
 
     star_classes = ['Ia', 'Ib', 'II', 'III', 'IV', 'V', 'VI', 'D']
+    zone_codes = 'ARUFGB- '
 
     def __init__(self, visit_tokens: bool = True, raw=None):
         super().__init__(visit_tokens)
@@ -359,7 +360,15 @@ class StarlineTransformer(Transformer):
             parsed['base'] = bitz[1]
             parsed['zone'] = bitz[2]
         if 2 == len(bitz) and '*' != parsed['base']:
-            if not rawstring.endswith('   ') or rawstring.startswith('   '):
+            if 1 < len(bitz[1]) or bitz[1].upper() not in self.zone_codes:  # if second bit won't fit as a trade zone, then we have nobles and base
+                parsed['nobles'] = bitz[0]
+                parsed['base'] = bitz[1]
+                parsed['zone'] = ''
+            elif not rawstring.endswith('   '):
+                parsed['nobles'] = ''
+                parsed['base'] = bitz[0]
+                parsed['zone'] = bitz[1]
+            elif rawstring.startswith('   '):
                 parsed['nobles'] = ''
                 parsed['base'] = bitz[0]
                 parsed['zone'] = bitz[1]

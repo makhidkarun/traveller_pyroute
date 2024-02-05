@@ -43,7 +43,7 @@ class StarlineParser:
 
     base: /([A-Z]{1,3}|-|\*)/
 
-    zone: /([ARUFGarufg]|-| )[ ]{0,}/
+    zone: /([ARUFGBarufgb]|-| )[ ]{0,}/
 
     pbg: /[0-9X?][0-9A-FX?][0-9A-FX?]/
 
