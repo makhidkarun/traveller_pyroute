@@ -39,7 +39,7 @@ class StarlineParser:
     ex: /\([0-9A-Za-z]{3}[+-]\d\)|-/
     cx: /(\[[0-9A-Za-z]{4}[\]\}]|-)/
 
-    nobles: /(\w{1,5}|-| )/
+    nobles: /([BcCDeEfFGH]{1,5}|-| )/
 
     base: /([A-Z]{1,3}|-|\*)/
 
