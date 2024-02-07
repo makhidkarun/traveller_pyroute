@@ -21,6 +21,7 @@ class StarlineTransformer(Transformer):
 
     star_classes = ['Ia', 'Ib', 'II', 'III', 'IV', 'V', 'VI', 'D']
     zone_codes = 'ARUFGB- '
+    zone_active = 'ARUFGB'
 
     def __init__(self, visit_tokens: bool = True, raw=None):
         super().__init__(visit_tokens)
@@ -45,7 +46,7 @@ class StarlineTransformer(Transformer):
                 elif move_fwd and move_rev:
                     pass
         if '*' != args[5][0].value and '' != args[5][0].value and 3 != len(args[3]):
-            if not self.crankshaft:
+            if not self.crankshaft and args[6][0].value.upper() not in self.zone_active:
                 if '' == args[4][0].value:
                     args[4][0].value = args[5][0].value
                     args[5][0].value = args[6][0].value
