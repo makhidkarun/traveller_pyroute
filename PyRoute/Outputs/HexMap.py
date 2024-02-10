@@ -376,14 +376,13 @@ class HexMap(object):
         color = pdf.get_color()
         color.set_color_by_number(tradeColor[0], tradeColor[1], tradeColor[2])
 
+        endCircle = end.sector == start.sector
         starty = self.y_start + (self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
         startx = (self.xm * 3 * (start.col)) + self.ym
 
         endRow = end.row
         endCol = end.col
-        endCircle = True
         if (end.sector != start.sector):
-            endCircle = False
             if end.sector.x < start.sector.x:
                 endCol -= 32
             if end.sector.x > start.sector.x:
