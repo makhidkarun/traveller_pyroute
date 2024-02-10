@@ -480,6 +480,25 @@ class Galaxy(AreaItem):
         self.set_positions()
         self.logger.debug("Allegiances: {}".format(self.alg))
 
+    def add_star_to_galaxy(self, star: Star, star_counter: int, sec: Sector):
+        assert star not in sec.worlds, "Star " + str(star) + " duplicated in sector " + str(sec)
+        star.index = star_counter
+        self.star_mapping[star.index] = star
+
+        sec.worlds.append(star)
+        sec.subsectors[star.subsector()].worlds.append(star)
+        star.alg_base_code = AllyGen.same_align(star.alg_code)
+
+        self.set_area_alg(star, self, self.alg)
+        self.set_area_alg(star, sec, self.alg)
+        self.set_area_alg(star, sec.subsectors[star.subsector()], self.alg)
+
+        star.tradeCode.sophont_list.append("{}A".format(self.alg[star.alg_code].population))
+        star.is_redzone = self.trade.unilateral_filter(star)
+        star.allegiance_base = self.alg[star.alg_base_code]
+        star.is_well_formed()
+        return star_counter + 1
+
     def set_area_alg(self, star, area, algs):
         full_alg = algs.get(star.alg_code, Allegiance(star.alg_code, 'Unknown Allegiance', base=False))
         base_alg = algs.get(star.alg_base_code, Allegiance(star.alg_base_code, 'Unknown Allegiance', base=True))
