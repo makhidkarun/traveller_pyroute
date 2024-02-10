@@ -419,10 +419,10 @@ class HexMap(object):
                 endCol -= 32
             if end.sector.x > start.sector.x:
                 endCol += 32
-            if end.sector.y < start.sector.y:
+            if end.sector.y > start.sector.y:
                 endRow -= 40
                 up = True
-            if end.sector.y > start.sector.y:
+            if end.sector.y < start.sector.y:
                 endRow += 40
                 down = True
             endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
@@ -430,9 +430,9 @@ class HexMap(object):
 
             (startx, starty), (endx, endy) = self.clipping(startx, starty, endx, endy)
             if up:
-                assert starty <= endy, "Misaligned to-coreward trade segment between " + str(start) + " and " + str(end)
+                assert starty >= endy, "Misaligned to-coreward trade segment between " + str(start) + " and " + str(end)
             if down:
-                assert starty >= endy, "Misaligned to-rimward trade segment between " + str(start) + " and " + str(end)
+                assert starty <= endy, "Misaligned to-rimward trade segment between " + str(start) + " and " + str(end)
 
         else:
             endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
