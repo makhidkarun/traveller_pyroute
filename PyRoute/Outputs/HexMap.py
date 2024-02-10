@@ -10,7 +10,9 @@ from pypdflite import PDFCursor
 from pypdflite.pdfobjects.pdfline import PDFLine
 from pypdflite.pdfobjects.pdfellipse import PDFEllipse
 from pypdflite.pdfobjects.pdftext import PDFText
+
 from PyRoute.Galaxy import Sector, Galaxy
+from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
 from PyRoute.StatCalculation import StatCalculation
 
@@ -268,7 +270,8 @@ class HexMap(object):
             rline._draw()
 
     def _draw_borders(self, x, y, hline, lline, rline):
-        q, r = self.convert_hex_to_axial(x + self.sector.dx, y + self.sector.dy - 1)
+        offset = Hex.dy_offset(y, (self.sector.dy // 40))
+        q, r = Hex.hex_to_axial(x + (self.sector.dx), offset - 1)
 
         if self.galaxy.borders.borders.get((q, r), False):
             if self.galaxy.borders.borders[(q, r)] & 1:
@@ -286,9 +289,7 @@ class HexMap(object):
 
     @staticmethod
     def convert_hex_to_axial(row, col):
-        x = row
-        z = col - (row - (row & 1)) / 2
-        return (x, z)
+        return Hex.hex_to_axial(row, col)
 
     def system(self, pdf, star):
         def_font = pdf.get_font()
