@@ -377,28 +377,7 @@ class HexMap(object):
         color.set_color_by_number(tradeColor[0], tradeColor[1], tradeColor[2])
 
         endCircle = end.sector == start.sector
-        starty = self.y_start + (self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
-        startx = (self.xm * 3 * (start.col)) + self.ym
-
-        endRow = end.row
-        endCol = end.col
-        if (end.sector != start.sector):
-            if end.sector.x < start.sector.x:
-                endCol -= 32
-            if end.sector.x > start.sector.x:
-                endCol += 32
-            if end.sector.y < start.sector.y:
-                endRow -= 40
-            if end.sector.y > start.sector.y:
-                endRow += 40
-            endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
-            endx = (self.xm * 3 * endCol) + self.ym
-
-            (startx, starty), (endx, endy) = self.clipping(startx, starty, endx, endy)
-
-        else:
-            endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
-            endx = (self.xm * 3 * endCol) + self.ym
+        endx, endy, startx, starty = self._get_line_endpoints(end, start)
 
         lineStart = PDFCursor(startx, starty)
         lineEnd = PDFCursor(endx, endy)
@@ -420,9 +399,17 @@ class HexMap(object):
         color = pdf.get_color()
         color.set_color_by_number(102, 178, 102)
 
+        endx, endy, startx, starty = self._get_line_endpoints(end, start)
+
+        lineStart = PDFCursor(startx, starty)
+        lineEnd = PDFCursor(endx, endy)
+
+        line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, stroke='solid', color=color, size=3)
+        line._draw()
+
+    def _get_line_endpoints(self, end, start):
         starty = self.y_start + (self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
         startx = (self.xm * 3 * (start.col)) + self.ym
-
         endRow = end.row
         endCol = end.col
         if (end.sector != start.sector):
@@ -442,12 +429,7 @@ class HexMap(object):
         else:
             endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
             endx = (self.xm * 3 * endCol) + self.ym
-
-        lineStart = PDFCursor(startx, starty)
-        lineEnd = PDFCursor(endx, endy)
-
-        line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, stroke='solid', color=color, size=3)
-        line._draw()
+        return endx, endy, startx, starty
 
     def zone(self, pdf, star, point):
         point.x_plus(self.ym)
