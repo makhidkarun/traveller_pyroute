@@ -177,13 +177,22 @@ class testHex(unittest.TestCase):
     def testNeighbors(self):
         pos1 = Hex(self.coreSector, "0505")
 
-        self.assertEqual((4, 33), pos1.hex_position())
-        self.assertEqual((5, 33), Hex.get_neighbor(pos1.hex_position(), 0))
-        self.assertEqual((5, 32), Hex.get_neighbor(pos1.hex_position(), 1))
-        self.assertEqual((4, 32), Hex.get_neighbor(pos1.hex_position(), 2))
-        self.assertEqual((3, 33), Hex.get_neighbor(pos1.hex_position(), 3))
-        self.assertEqual((3, 34), Hex.get_neighbor(pos1.hex_position(), 4))
-        self.assertEqual((4, 34), Hex.get_neighbor(pos1.hex_position(), 5))
+        base_pos = pos1.hex_position()
+        self.assertEqual((4, 33), base_pos)
+        self.assertEqual((5, 5), Hex.axial_to_sector(4, 33))
+
+        expected = [
+            (0, (5, 33), (), "Down/right neighbour unexpected"),
+            (1, (5, 32), (), "Up/right neighbour unexpected"),
+            (2, (4, 32), (), "Up neighbour unexpected"),
+            (3, (3, 33), (), "Up/left neighbour unexpected"),
+            (4, (3, 34), (), "Down/left neighbour unexpected"),
+            (5, (4, 34), (), "Down neighbour unexpected"),
+        ]
+
+        for direction, expected_hex, expected_sector, msg in expected:
+            with self.subTest(msg):
+                self.assertEqual(expected_hex, Hex.get_neighbor(base_pos, direction), msg)
 
     def test_auxiliary_distances(self):
         star1 = Star.parse_line_into_star(
