@@ -77,8 +77,8 @@ class Hex(object):
         5 => Down
         """
         neighbors = [
-            [+1, 0], [+1, -1], [0, -1],
-            [-1, 0], [-1, +1], [0, +1]
+            [+1, -1], [+1, 0], [0, +1],
+            [-1, +1], [-1, 0], [0, -1]
         ]
         d = neighbors[direction]
         qn = hex_pos[0] + (d[0] * distance)
