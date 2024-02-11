@@ -40,8 +40,8 @@ class TestAllyGenBase(baseTest):
                 sec, 'fixed', 'negative')
             self.galaxy.add_star_to_galaxy(star, sector, sec)
 
-    def setupOneWorldCoreSector(self, loc:str, counter:int):
+    def setupOneWorldCoreSector(self, loc:str, counter:int, allegiance:str = "Im"):
         star = Star.parse_line_into_star(
-            f"{loc} Shana Ma             E551112-7 Lo Po                {{ -3 }} (300-3) [1113] B     - A 913 9  Im K2 IV M7 V     ",
+            f"{loc} Shana Ma             E551112-7 Lo Po                {{ -3 }} (300-3) [1113] B     - A 913 9  {allegiance} K2 IV M7 V     ",
             self.galaxy.sectors[0], 'fixed', 'negative')
         self.galaxy.add_star_to_galaxy(star, counter, self.galaxy.sectors[0])
