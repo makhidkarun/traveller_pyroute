@@ -1,5 +1,6 @@
 import sys
 
+from PyRoute.AllyGen import AllyGen
 from PyRoute.Position.Hex import Hex
 from Tests.Mapping.testAllyGenBase import TestAllyGenBase
 
@@ -24,7 +25,21 @@ class TestAllyGenErode(TestAllyGenBase):
         border_map = self.borders.allyMap
         borders = self.borders.borders
 
-        expected_borders = {(4, 34): 4, (4, 35): 3, (4, 36): 1, (5, 34): 2, (5, 35): 4}
+        cand_hex = (4, 35)
+        top_hex = (4, 36)
+        bottom_hex = (4, 34)
+        top_left_hex = Hex.get_neighbor(cand_hex, 3)
+        top_right_hex = Hex.get_neighbor(cand_hex, 1)
+        bottom_left_hex = Hex.get_neighbor(cand_hex, 4)
+        bottom_right_hex = Hex.get_neighbor(cand_hex, 0)
+
+        expected_borders = {cand_hex: 7, top_hex: 1, top_left_hex: 2, top_right_hex: 4}
 
         self.assertEqual({(4, 35): 'ImDs'}, border_map, "Unexpected border map value")
+        self.assertNotIn(bottom_hex, borders, "Hex below candidate hex should not be in border dict")
+        self.assertNotIn(bottom_left_hex, borders, "Hex bottom-left of candidate hex should not be in border dict")
+        self.assertNotIn(bottom_right_hex, borders, "Hex bottom-right of candidate hex should not be in border dict")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
+        # check individual border settings
+        self.assertTrue(expected_borders[cand_hex] & AllyGen.TOPBOTTOM, "Cand_hex should have bottom border")
+        self.assertTrue(expected_borders[top_hex] & AllyGen.TOPBOTTOM, "Top_hex should have bottom border")
