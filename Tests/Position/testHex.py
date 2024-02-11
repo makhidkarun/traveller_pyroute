@@ -182,12 +182,12 @@ class testHex(unittest.TestCase):
         self.assertEqual((5, 5), Hex.axial_to_sector(4, 33))
 
         expected = [
-            (0, (5, 33), (6, 5), "Down/right neighbour unexpected"),
-            (1, (5, 32), (6, 4), "Up/right neighbour unexpected"),
-            (2, (4, 32), (5, 4), "Up neighbour unexpected"),
-            (3, (3, 33), (4, 4), "Up/left neighbour unexpected"),
-            (4, (3, 34), (4, 5), "Down/left neighbour unexpected"),
-            (5, (4, 34), (5, 6), "Down neighbour unexpected"),
+            (0, (5, 32), (6, 5), "Down/right neighbour unexpected"),
+            (1, (5, 33), (6, 4), "Up/right neighbour unexpected"),
+            (2, (4, 34), (5, 4), "Up neighbour unexpected"),
+            (3, (3, 34), (4, 4), "Up/left neighbour unexpected"),
+            (4, (3, 33), (4, 5), "Down/left neighbour unexpected"),
+            (5, (4, 32), (5, 6), "Down neighbour unexpected"),
         ]
 
         for direction, expected_hex, expected_sector, msg in expected:
