@@ -271,7 +271,7 @@ class HexMap(object):
 
     def _draw_borders(self, x, y, hline, lline, rline):
         offset = Hex.dy_offset(y, (self.sector.dy // 40))
-        q, r = Hex.hex_to_axial(x + (self.sector.dx), offset - 1)
+        q, r = Hex.hex_to_axial(x + (self.sector.dx), offset)
         #q, r = self.convert_hex_to_axial(x + self.sector.dx, y + self.sector.dy - 1)
 
         border_val = self.galaxy.borders.borders.get((q, r), False)
