@@ -236,7 +236,7 @@ class AllyGen(object):
         algs.sort(key=lambda alg: alg.stats.number, reverse=True)
         return algs
 
-    def create_borders(self, match):
+    def create_borders(self, match, enforce=True):
         """
             Create borders around various allegiances, Algorithm one.
             From the nroute.c generation system. Every world controls a
@@ -265,9 +265,9 @@ class AllyGen(object):
         self.allyMap = self.step_map(self.allyMap)
         # self._output_map(allyMap, 2)
 
-        self._generate_borders(self.allyMap)
+        self._generate_borders(self.allyMap, enforce)
 
-    def _generate_borders(self, allyMap):
+    def _generate_borders(self, allyMap, enforce=True):
         """
         This is deep, dark magic.  Futzing with this will break the border drawing process.
 
@@ -319,8 +319,9 @@ class AllyGen(object):
                 #else:
                 #    self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.BOTTOMRIGHT
 
-            result, msg = self.is_well_formed()
-            assert result, msg
+            if enforce:
+                result, msg = self.is_well_formed()
+                assert result, msg
 
     @staticmethod
     def _set_border(allyMap, cand_hex, direction):
@@ -400,7 +401,7 @@ class AllyGen(object):
                 return True
         return False
 
-    def create_ally_map(self, match):
+    def create_ally_map(self, match, enforce=True):
         """
             Create borders around various allegiances, Algorithm Two.
             From the AllyGen http://dotclue.org/t20/ code created by J. Greely.
@@ -412,7 +413,7 @@ class AllyGen(object):
 
         self.allyMap = self._ally_map(match)
         # self._output_map(allyMap, 3)
-        self._generate_borders(self.allyMap)
+        self._generate_borders(self.allyMap, enforce)
 
     def _ally_map(self, match):
         # Create list of stars
@@ -497,7 +498,7 @@ class AllyGen(object):
 
         return allyMap
 
-    def create_erode_border(self, match):
+    def create_erode_border(self, match, enforce=True):
         """
         Create borders around various allegiances, Algorithm Three.
         From TravellerMap http://travellermap.com/borders/doc.htm
@@ -519,7 +520,7 @@ class AllyGen(object):
         self._build_bridges(allyMap, starMap)
 
         self.allyMap = allyMap
-        self._generate_borders(allyMap)
+        self._generate_borders(allyMap, enforce)
 
     def _erode(self, allyMap, starMap):
         """
