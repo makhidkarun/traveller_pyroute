@@ -106,11 +106,14 @@ class Hex(object):
         return row, col
 
     @staticmethod
-    def axial_to_sector(q, r):
+    def axial_to_sector(q, r, flip=False):
         (raw_row, raw_col) = Hex.axial_to_hex(q, r)
 
         col, _ = Hex.dy_reverse(raw_col)
         row = (raw_row % 32) + 1
+
+        if flip:
+            col = 41 - col
 
         return row, col
 
