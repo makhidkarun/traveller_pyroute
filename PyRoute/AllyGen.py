@@ -319,9 +319,9 @@ class AllyGen(object):
                 #else:
                 #    self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.BOTTOMRIGHT
 
-            if enforce:
-                result, msg = self.is_well_formed()
-                assert result, msg
+        if enforce:
+            result, msg = self.is_well_formed()
+            assert result, msg
 
     @staticmethod
     def _set_border(allyMap, cand_hex, direction):
@@ -335,8 +335,9 @@ class AllyGen(object):
         # and the neighbor has no setting ,
         # or the neighbor is aligned 
         # Then no border .
-        if (AllyGen.is_nonaligned(allyMap[cand_hex], True) or allyMap[cand_hex] is None) and \
-                (allyMap.get(neighbor, True) or allyMap.get(neighbor, None) not in AllyGen.nonAligned):
+        cand_hex_not_aligned = (AllyGen.is_nonaligned(allyMap[cand_hex], True) or allyMap[cand_hex] is None)
+        neighbour_is_aligned = (allyMap.get(neighbor, True) or allyMap.get(neighbor, None) not in AllyGen.nonAligned)
+        if cand_hex_not_aligned and neighbour_is_aligned:
             return False
         # If not matched allegiance, need a border.
         elif allyMap[cand_hex] != allyMap.get(neighbor, None):
