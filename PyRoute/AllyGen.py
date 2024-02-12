@@ -137,10 +137,6 @@ class AllyGen(object):
         "NONE": "white",  # Default color
     }
 
-    TOPBOTTOM = 1
-    UPPERRIGHTORLEFT = 2
-    LOWERRIGHTORLEFT = 4
-
 
     def __init__(self, galaxy):
         """
@@ -289,34 +285,34 @@ class AllyGen(object):
             odd_q = cand_hex[0] & 1
             if self._set_border(allyMap, cand_hex, 2):  # up
                 neighbor = Hex.get_neighbor(cand_hex, 2)
-                self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | self.TOPBOTTOM
+                self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | Hex.TOPBOTTOM
             if self._set_border(allyMap, cand_hex, 5):  # down
-                self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | self.TOPBOTTOM
+                self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.TOPBOTTOM
             if self._set_border(allyMap, cand_hex, 1):  # upper right
                 neighbor = Hex.get_neighbor(cand_hex, 1)
                 if odd_q:
-                    self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | self.UPPERRIGHTORLEFT
+                    self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | Hex.UPPERRIGHTORLEFT
                 else:
-                    self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | self.LOWERRIGHTORLEFT
+                    self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | Hex.LOWERRIGHTORLEFT
             if self._set_border(allyMap, cand_hex, 3):  # upper left
                 border_hex = cand_hex if odd_q else (cand_hex[0], cand_hex[1] - 1)
 
                 if odd_q:
-                    self.borders[border_hex] = self.borders.setdefault(border_hex, 0) | self.UPPERRIGHTORLEFT
+                    self.borders[border_hex] = self.borders.setdefault(border_hex, 0) | Hex.UPPERRIGHTORLEFT
                 else:
-                    self.borders[border_hex] = self.borders.setdefault(border_hex, 0) | self.LOWERRIGHTORLEFT
+                    self.borders[border_hex] = self.borders.setdefault(border_hex, 0) | Hex.LOWERRIGHTORLEFT
             if self._set_border(allyMap, cand_hex, 0):  # down right
                 neighbor = Hex.get_neighbor(cand_hex, 0)
                 border_hex = (cand_hex[0] + 1, cand_hex[1] - 1) if odd_q else neighbor
                 if odd_q:
-                    self.borders[border_hex] = self.borders.setdefault(border_hex, 0) | self.LOWERRIGHTORLEFT
+                    self.borders[border_hex] = self.borders.setdefault(border_hex, 0) | Hex.LOWERRIGHTORLEFT
                 else:
-                    self.borders[border_hex] = self.borders.setdefault(border_hex, 0) | self.UPPERRIGHTORLEFT
+                    self.borders[border_hex] = self.borders.setdefault(border_hex, 0) | Hex.UPPERRIGHTORLEFT
             if self._set_border(allyMap, cand_hex, 4):  # down left
                 if odd_q:
-                    self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | self.LOWERRIGHTORLEFT
+                    self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.LOWERRIGHTORLEFT
                 else:
-                    self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | self.UPPERRIGHTORLEFT
+                    self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.UPPERRIGHTORLEFT
 
     @staticmethod
     def _set_border(allyMap, cand_hex, direction):

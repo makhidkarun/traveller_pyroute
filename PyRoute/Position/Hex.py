@@ -16,6 +16,11 @@ class Hex(object):
     q = 0   # location in the whole of space, axial coordinates
     r = 0
 
+    # Hex-side alias constants
+    TOPBOTTOM = 1
+    UPPERRIGHTORLEFT = 2
+    LOWERRIGHTORLEFT = 4
+
     def __init__(self, sector, position):
         """
         # The zero point of the co-ordinate system used is Reference (Core 0140).
