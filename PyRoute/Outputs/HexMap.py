@@ -274,14 +274,16 @@ class HexMap(object):
         q, r = Hex.hex_to_axial(x + (self.sector.dx), offset - 1)
         #q, r = self.convert_hex_to_axial(x + self.sector.dx, y + self.sector.dy - 1)
 
-        if self.galaxy.borders.borders.get((q, r), False):
-            if self.galaxy.borders.borders[(q, r)] & Hex.TOPBOTTOM:
+        border_val = self.galaxy.borders.borders.get((q, r), False)
+
+        if border_val is not False:
+            if border_val & Hex.TOPBOTTOM:
                 hline._draw()
 
-            if self.galaxy.borders.borders[(q, r)] & Hex.UPPERRIGHTORLEFT and y > 0:
+            if border_val & Hex.UPPERRIGHTORLEFT and y > 0:
                 rline._draw()
 
-            if self.galaxy.borders.borders[(q, r)] & Hex.LOWERRIGHTORLEFT:
+            if border_val & Hex.LOWERRIGHTORLEFT:
                 lline._draw()
 
     def draw_borders(self, pdf, sector):
