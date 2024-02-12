@@ -314,6 +314,9 @@ class AllyGen(object):
                 else:
                     self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.BOTTOMRIGHT
 
+            result, msg = self.is_well_formed()
+            assert result, msg
+
     @staticmethod
     def _set_border(allyMap, cand_hex, direction):
         """
@@ -709,3 +712,6 @@ class AllyGen(object):
         elif 'separate' == match:
             pass
         return alg
+
+    def is_well_formed(self):
+        return True, ''
