@@ -724,14 +724,34 @@ class AllyGen(object):
         for cand_hex in self.borders:
             border_val = self.borders[cand_hex]
             if border_val & Hex.BOTTOM:  # this hex has a bottom-edge border
-                # check left end of bottom edge is connected
-                if border_val & Hex.BOTTOMLEFT:
-                    continue  # bottom edge is left-connected, move on
-                neighbour = Hex.get_neighbor(cand_hex, 4)
-                neighbour_val = self.borders.get(neighbour, False)
-                if neighbour_val is not False:
-                    if neighbour_val & Hex.BOTTOMRIGHT:
-                        continue  # bottom edge is left-connected, move on
-                msg = "Bottom edge of " + str(cand_hex) + " is not left-connected"
-                return False, msg
+                result, msg = self._bottom_left_edge(cand_hex, border_val)
+                if not result:
+                    return False, msg
+                result, msg = self._bottom_right_edge(cand_hex, border_val)
+                if not result:
+                    return False, msg
         return True, ''
+
+    def _bottom_left_edge(self, cand_hex, border_val):
+        msg = ''
+        if border_val and Hex.BOTTOMLEFT:
+            return True, msg  # bottom edge is left-connected, move on
+        neighbour = Hex.get_neighbor(cand_hex, 4)
+        neighbour_val = self.borders.get(neighbour, False)
+        if neighbour_val is not False:
+            if neighbour_val & Hex.BOTTOMRIGHT:
+                return True, msg  # bottom edge is left-connected, move on
+        msg = "Bottom edge of " + str(cand_hex) + " is not left-connected"
+        return False, msg
+
+    def _bottom_right_edge(self, cand_hex, border_val):
+        msg = ''
+        if border_val and Hex.BOTTOMRIGHT:
+            return True, msg  # bottom edge is right-connected, move on
+        neighbour = Hex.get_neighbor(cand_hex, 0)
+        neighbour_val = self.borders.get(neighbour, False)
+        if neighbour_val is not False:
+            if neighbour_val & Hex.BOTTOMLEFT:
+                return True, msg  # bottom edge is right-connected, move on
+        msg = "Bottom edge of " + str(cand_hex) + " is not right-connected"
+        return False, msg
