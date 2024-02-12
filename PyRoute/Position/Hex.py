@@ -17,9 +17,9 @@ class Hex(object):
     r = 0
 
     # Hex-side alias constants
-    TOPBOTTOM = 1
-    UPPERRIGHTORLEFT = 2
-    LOWERRIGHTORLEFT = 4
+    BOTTOM = 1
+    BOTTOMRIGHT = 2
+    BOTTOMLEFT = 4
 
     def __init__(self, sector, position):
         """

@@ -277,13 +277,13 @@ class HexMap(object):
         border_val = self.galaxy.borders.borders.get((q, r), False)
 
         if border_val is not False:
-            if border_val & Hex.TOPBOTTOM:
+            if border_val & Hex.BOTTOM:
                 hline._draw()
 
-            if border_val & Hex.UPPERRIGHTORLEFT and y > 0:
+            if border_val & Hex.BOTTOMRIGHT and y > 0:
                 rline._draw()
 
-            if border_val & Hex.LOWERRIGHTORLEFT:
+            if border_val & Hex.BOTTOMLEFT:
                 lline._draw()
 
     def draw_borders(self, pdf, sector):
