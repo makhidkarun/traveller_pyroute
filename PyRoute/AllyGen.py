@@ -737,6 +737,13 @@ class AllyGen(object):
                 result, msg = self._left_right_edge(cand_hex, border_val)
                 if not result:
                     return False, msg
+            if border_val & Hex.BOTTOMRIGHT:  # this hex has a bottom-right border
+                result, msg = self._right_left_edge(cand_hex, border_val)
+                if not result:
+                    return False, msg
+                result, msg = self._right_right_edge(cand_hex, border_val)
+                if not result:
+                    return False, msg
         return True, ''
 
     def _bottom_left_edge(self, cand_hex, border_val):
@@ -787,4 +794,31 @@ class AllyGen(object):
                 return True, msg  # left edge is right-connected, move on
 
         msg = "Bottom-left edge of " + str(cand_hex) + " is not right-connected"
+        return False, msg
+
+    def _right_left_edge(self, cand_hex, border_val):
+        msg = ''
+        if border_val and Hex.BOTTOM:
+            return True, msg  # right edge is left-connected, move on
+
+        neighbour = Hex.get_neighbor(cand_hex, 3)
+        neighbour_val = self.borders.get(neighbour, False)
+        if neighbour_val is not False:
+            if neighbour_val & Hex.BOTTOMLEFT:
+                return True, msg  # right edge is left-connected, move on
+
+        msg = "Bottom-right edge of " + str(cand_hex) + " is not left-connected"
+        return False, msg
+
+    def _right_right_edge(self, cand_hex, border_val):
+        msg = ''
+        neighbour = Hex.get_neighbor(cand_hex, 1)
+        neighbour_val = self.borders.get(neighbour, False)
+        if neighbour_val is not False:
+            if neighbour_val & Hex.BOTTOM:
+                return True, msg  # right edge is right-connected, move on
+            if neighbour_val & Hex.BOTTOMLEFT:
+                return True, msg  # right edge is right-connected, move on
+
+        msg = "Bottom-right edge of " + str(cand_hex) + " is not right-connected"
         return False, msg

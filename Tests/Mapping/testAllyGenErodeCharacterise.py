@@ -20,7 +20,7 @@ class TestAllyGenErode(TestAllyGenBase):
 
     def testErodeBorderOddImperialWorld(self):
         self.setupOneWorldCoreSector("0503", 0, "ImDs")
-        self.borders.create_erode_border('separate')
+        self.borders.create_erode_border('separate', False)
 
         border_map = self.borders.allyMap
         borders = self.borders.borders
