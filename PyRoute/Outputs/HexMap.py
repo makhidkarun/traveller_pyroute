@@ -423,10 +423,10 @@ class HexMap(object):
                 endCol -= 32
             if end.sector.x > start.sector.x:
                 endCol += 32
-            if end.sector.y < start.sector.y:
+            if end.sector.y > start.sector.y:
                 endRow -= 40
                 up = True
-            if end.sector.y > start.sector.y:
+            if end.sector.y < start.sector.y:
                 endRow += 40
                 down = True
             endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
