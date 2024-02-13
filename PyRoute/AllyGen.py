@@ -144,6 +144,7 @@ class AllyGen(object):
         """
         self.galaxy = galaxy
         self.borders = {}  # 2D array using (q,r) as key, with flags for data
+        self.borders_map = {}  # 2D array using (q,r) as key, with flags for data, linking borders and hex-map
         self.allyMap = {}  # 2D array using (q,r) as key, with allegiance code as data
         self.logger = logging.getLogger('PyRoute.AllyGen')
 
@@ -282,42 +283,50 @@ class AllyGen(object):
         So the complexity is here to make the draw portion quick.
         """
         for cand_hex in list(allyMap.keys()):
-            # odd_q = cand_hex[0] & 1
+            odd_q = cand_hex[0] & 1
             if self._set_border(allyMap, cand_hex, 2):  # up
                 neighbor = Hex.get_neighbor(cand_hex, 2)
                 self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | Hex.BOTTOM
+                self.borders_map[neighbor] = self.borders_map.setdefault(neighbor, 0) | Hex.BOTTOM
             if self._set_border(allyMap, cand_hex, 5):  # down
                 self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.BOTTOM
+                self.borders_map[cand_hex] = self.borders_map.setdefault(cand_hex, 0) | Hex.BOTTOM
             if self._set_border(allyMap, cand_hex, 1):  # upper right
                 neighbour = Hex.get_neighbor(cand_hex, 1)
                 self.borders[neighbour] = self.borders.setdefault(neighbour, 0) | Hex.BOTTOMLEFT
-                #if odd_q:
+                if odd_q:
+                    pass
                 #    self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | Hex.BOTTOMRIGHT
-                #else:
-                #    self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | Hex.BOTTOMLEFT
+                else:
+                    neighbor = Hex.get_neighbor(cand_hex, 1)
+                    self.borders_map[neighbor] = self.borders_map.setdefault(neighbor, 0) | Hex.BOTTOMLEFT
             if self._set_border(allyMap, cand_hex, 3):  # upper left
                 neighbour = Hex.get_neighbor(cand_hex, 3)
                 self.borders[neighbour] = self.borders.setdefault(neighbour, 0) | Hex.BOTTOMRIGHT
                 #border_hex = cand_hex if odd_q else (cand_hex[0], cand_hex[1] - 1)
 
-                #if odd_q:
+                if odd_q:
+                    pass
                 #    self.borders[border_hex] = self.borders.setdefault(border_hex, 0) | Hex.BOTTOMRIGHT
-                #else:
-                #    self.borders[border_hex] = self.borders.setdefault(border_hex, 0) | Hex.BOTTOMLEFT
+                else:
+                    neighbor = Hex.get_neighbor(cand_hex, 2)
+                    self.borders_map[neighbor] = self.borders_map.setdefault(neighbor, 0) | Hex.BOTTOMLEFT
             if self._set_border(allyMap, cand_hex, 0):  # down right
                 self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.BOTTOMRIGHT
-                #neighbor = Hex.get_neighbor(cand_hex, 0)
+                neighbour = Hex.get_neighbor(cand_hex, 0)
                 #border_hex = (cand_hex[0] + 1, cand_hex[1] - 1) if odd_q else neighbor
-                #if odd_q:
+                if odd_q:
+                    pass
                 #    self.borders[border_hex] = self.borders.setdefault(border_hex, 0) | Hex.BOTTOMLEFT
-                #else:
-                #    self.borders[border_hex] = self.borders.setdefault(border_hex, 0) | Hex.BOTTOMRIGHT
+                else:
+                    self.borders_map[neighbour] = self.borders_map.setdefault(neighbour, 0) | Hex.BOTTOMRIGHT
             if self._set_border(allyMap, cand_hex, 4):  # down left
                 self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.BOTTOMLEFT
-                #if odd_q:
+                if odd_q:
+                    pass
                 #    self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.BOTTOMLEFT
-                #else:
-                #    self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.BOTTOMRIGHT
+                else:
+                    self.borders_map[cand_hex] = self.borders_map.setdefault(cand_hex, 0) | Hex.BOTTOMRIGHT
 
         if enforce:
             result, msg = self.is_well_formed()

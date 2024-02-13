@@ -274,7 +274,7 @@ class HexMap(object):
         q, r = Hex.hex_to_axial(x + (self.sector.dx), offset)
         #q, r = self.convert_hex_to_axial(x + self.sector.dx, y + self.sector.dy - 1)
 
-        border_val = self.galaxy.borders.borders.get((q, r), False)
+        border_val = self.galaxy.borders.borders_map.get((q, r), False)
 
         if border_val is not False:
             if border_val & Hex.BOTTOM:
