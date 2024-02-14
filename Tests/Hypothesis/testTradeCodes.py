@@ -113,7 +113,7 @@ class testTradeCodes(unittest.TestCase):
         if isinstance(trade_line, list):
             trade_line = ' '.join(trade_line)
         hyp_input = 'Hypothesis input: \'' + s + '\', \'' + trade_line + '\''
-        starline = '0101 000000000000000 {} {}  - - 0 000   0000D'.format(s, trade_line.ljust(38))
+        starline = '0101 000000000000000 {} {}  - - A 000   0000D'.format(s, trade_line.ljust(38))
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
         ru_calc = 'scaled'

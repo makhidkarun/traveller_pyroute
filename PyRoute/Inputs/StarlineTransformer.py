@@ -20,6 +20,8 @@ class StarlineTransformer(Transformer):
     ]
 
     star_classes = ['Ia', 'Ib', 'II', 'III', 'IV', 'V', 'VI', 'D']
+    zone_codes = 'ARUFGB- '
+    zone_active = 'ARUFGB'
 
     def __init__(self, visit_tokens: bool = True, raw=None):
         super().__init__(visit_tokens)
@@ -44,7 +46,7 @@ class StarlineTransformer(Transformer):
                 elif move_fwd and move_rev:
                     pass
         if '*' != args[5][0].value and '' != args[5][0].value and 3 != len(args[3]):
-            if not self.crankshaft:
+            if not self.crankshaft and args[6][0].value.upper() not in self.zone_active:
                 if '' == args[4][0].value:
                     args[4][0].value = args[5][0].value
                     args[5][0].value = args[6][0].value
@@ -205,7 +207,7 @@ class StarlineTransformer(Transformer):
             extensions = ''
 
         # Currently aiming to drop-in replace the starline regex output
-        data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'], parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'], parsed['zone'], parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
+        data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'], parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'], parsed['zone'].upper(), parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
 
         return data
 
@@ -359,7 +361,15 @@ class StarlineTransformer(Transformer):
             parsed['base'] = bitz[1]
             parsed['zone'] = bitz[2]
         if 2 == len(bitz) and '*' != parsed['base']:
-            if not rawstring.endswith('   '):
+            if 1 < len(bitz[1]) or bitz[1].upper() not in self.zone_codes:  # if second bit won't fit as a trade zone, then we have nobles and base
+                parsed['nobles'] = bitz[0]
+                parsed['base'] = bitz[1]
+                parsed['zone'] = ''
+            elif not rawstring.endswith('   '):
+                parsed['nobles'] = ''
+                parsed['base'] = bitz[0]
+                parsed['zone'] = bitz[1]
+            elif rawstring.startswith('   '):
                 parsed['nobles'] = ''
                 parsed['base'] = bitz[0]
                 parsed['zone'] = bitz[1]
