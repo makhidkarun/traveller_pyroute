@@ -1,11 +1,8 @@
-import sys
-
-from PyRoute.AllyGen import AllyGen
 from PyRoute.Position.Hex import Hex
 from Tests.Mapping.testAllyGenBase import TestAllyGenBase
 
 
-class TestAllyGenErode(TestAllyGenBase):
+class TestAllyGenErodeCharacterise(TestAllyGenBase):
 
     def testErodeBorderOddClientState(self):
         self.setupOneWorldCoreSector("0503", 0, "CsIm")
