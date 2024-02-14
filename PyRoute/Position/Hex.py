@@ -16,6 +16,11 @@ class Hex(object):
     q = 0   # location in the whole of space, axial coordinates
     r = 0
 
+    # Hex-side alias constants
+    BOTTOM = 1
+    BOTTOMRIGHT = 2
+    BOTTOMLEFT = 4
+
     def __init__(self, sector, position):
         """
         # The zero point of the co-ordinate system used is Reference (Core 0140).
@@ -77,8 +82,8 @@ class Hex(object):
         5 => Down
         """
         neighbors = [
-            [+1, 0], [+1, -1], [0, -1],
-            [-1, 0], [-1, +1], [0, +1]
+            [+1, -1], [+1, 0], [0, +1],
+            [-1, +1], [-1, 0], [0, -1]
         ]
         d = neighbors[direction]
         qn = hex_pos[0] + (d[0] * distance)
@@ -101,11 +106,14 @@ class Hex(object):
         return row, col
 
     @staticmethod
-    def axial_to_sector(q, r):
+    def axial_to_sector(q, r, flip=False):
         (raw_row, raw_col) = Hex.axial_to_hex(q, r)
 
         col, _ = Hex.dy_reverse(raw_col)
         row = (raw_row % 32) + 1
+
+        if flip:
+            col = 41 - col
 
         return row, col
 

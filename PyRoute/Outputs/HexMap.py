@@ -10,7 +10,9 @@ from pypdflite import PDFCursor
 from pypdflite.pdfobjects.pdfline import PDFLine
 from pypdflite.pdfobjects.pdfellipse import PDFEllipse
 from pypdflite.pdfobjects.pdftext import PDFText
+
 from PyRoute.Galaxy import Sector, Galaxy
+from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
 from PyRoute.StatCalculation import StatCalculation
 
@@ -268,16 +270,19 @@ class HexMap(object):
             rline._draw()
 
     def _draw_borders(self, x, y, hline, lline, rline):
-        q, r = self.convert_hex_to_axial(x + self.sector.dx, y + self.sector.dy - 1)
+        offset = Hex.dy_offset(y, (self.sector.dy // 40))
+        q, r = Hex.hex_to_axial(x + (self.sector.dx), offset)
 
-        if self.galaxy.borders.borders.get((q, r), False):
-            if self.galaxy.borders.borders[(q, r)] & 1:
+        border_val = self.galaxy.borders.borders_map.get((q, r), False)
+
+        if border_val is not False:
+            if border_val & Hex.BOTTOM:
                 hline._draw()
 
-            if self.galaxy.borders.borders[(q, r)] & 2 and y > 0:
+            if border_val & Hex.BOTTOMRIGHT and y > 0:
                 rline._draw()
 
-            if self.galaxy.borders.borders[(q, r)] & 4:
+            if border_val & Hex.BOTTOMLEFT:
                 lline._draw()
 
     def draw_borders(self, pdf, sector):
@@ -286,9 +291,7 @@ class HexMap(object):
 
     @staticmethod
     def convert_hex_to_axial(row, col):
-        x = row
-        z = col - (row - (row & 1)) / 2
-        return (x, z)
+        return Hex.hex_to_axial(row, col)
 
     def system(self, pdf, star):
         def_font = pdf.get_font()
@@ -376,30 +379,8 @@ class HexMap(object):
         color = pdf.get_color()
         color.set_color_by_number(tradeColor[0], tradeColor[1], tradeColor[2])
 
-        starty = self.y_start + (self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
-        startx = (self.xm * 3 * (start.col)) + self.ym
-
-        endRow = end.row
-        endCol = end.col
-        endCircle = True
-        if (end.sector != start.sector):
-            endCircle = False
-            if end.sector.x < start.sector.x:
-                endCol -= 32
-            if end.sector.x > start.sector.x:
-                endCol += 32
-            if end.sector.y < start.sector.y:
-                endRow -= 40
-            if end.sector.y > start.sector.y:
-                endRow += 40
-            endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
-            endx = (self.xm * 3 * endCol) + self.ym
-
-            (startx, starty), (endx, endy) = self.clipping(startx, starty, endx, endy)
-
-        else:
-            endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
-            endx = (self.xm * 3 * endCol) + self.ym
+        endCircle = end.sector == start.sector
+        endx, endy, startx, starty = self._get_line_endpoints(end, start)
 
         lineStart = PDFCursor(startx, starty)
         lineEnd = PDFCursor(endx, endy)
@@ -421,34 +402,45 @@ class HexMap(object):
         color = pdf.get_color()
         color.set_color_by_number(102, 178, 102)
 
-        starty = self.y_start + (self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
-        startx = (self.xm * 3 * (start.col)) + self.ym
-
-        endRow = end.row
-        endCol = end.col
-        if (end.sector != start.sector):
-            if end.sector.x < start.sector.x:
-                endCol -= 32
-            if end.sector.x > start.sector.x:
-                endCol += 32
-            if end.sector.y < start.sector.y:
-                endRow -= 40
-            if end.sector.y > start.sector.y:
-                endRow += 40
-            endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
-            endx = (self.xm * 3 * endCol) + self.ym
-
-            (startx, starty), (endx, endy) = self.clipping(startx, starty, endx, endy)
-
-        else:
-            endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
-            endx = (self.xm * 3 * endCol) + self.ym
+        endx, endy, startx, starty = self._get_line_endpoints(end, start)
 
         lineStart = PDFCursor(startx, starty)
         lineEnd = PDFCursor(endx, endy)
 
         line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, stroke='solid', color=color, size=3)
         line._draw()
+
+    def _get_line_endpoints(self, end, start):
+        starty = self.y_start + (self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
+        startx = (self.xm * 3 * (start.col)) + self.ym
+        endRow = end.row
+        endCol = end.col
+        if (end.sector != start.sector):
+            up = False
+            down = False
+            if end.sector.x < start.sector.x:
+                endCol -= 32
+            if end.sector.x > start.sector.x:
+                endCol += 32
+            if end.sector.y > start.sector.y:
+                endRow -= 40
+                up = True
+            if end.sector.y < start.sector.y:
+                endRow += 40
+                down = True
+            endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
+            endx = (self.xm * 3 * endCol) + self.ym
+
+            (startx, starty), (endx, endy) = self.clipping(startx, starty, endx, endy)
+            if up:
+                assert starty >= endy, "Misaligned to-coreward trade segment between " + str(start) + " and " + str(end)
+            if down:
+                assert starty <= endy, "Misaligned to-rimward trade segment between " + str(start) + " and " + str(end)
+
+        else:
+            endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
+            endx = (self.xm * 3 * endCol) + self.ym
+        return endx, endy, startx, starty
 
     def zone(self, pdf, star, point):
         point.x_plus(self.ym)

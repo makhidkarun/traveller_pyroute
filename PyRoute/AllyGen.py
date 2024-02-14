@@ -144,6 +144,7 @@ class AllyGen(object):
         """
         self.galaxy = galaxy
         self.borders = {}  # 2D array using (q,r) as key, with flags for data
+        self.borders_map = {}  # 2D array using (q,r) as key, with flags for data, linking borders and hex-map
         self.allyMap = {}  # 2D array using (q,r) as key, with allegiance code as data
         self.logger = logging.getLogger('PyRoute.AllyGen')
 
@@ -236,7 +237,7 @@ class AllyGen(object):
         algs.sort(key=lambda alg: alg.stats.number, reverse=True)
         return algs
 
-    def create_borders(self, match):
+    def create_borders(self, match, enforce=True):
         """
             Create borders around various allegiances, Algorithm one.
             From the nroute.c generation system. Every world controls a
@@ -265,9 +266,9 @@ class AllyGen(object):
         self.allyMap = self.step_map(self.allyMap)
         # self._output_map(allyMap, 2)
 
-        self._generate_borders(self.allyMap)
+        self._generate_borders(self.allyMap, enforce)
 
-    def _generate_borders(self, allyMap):
+    def _generate_borders(self, allyMap, enforce=True):
         """
         This is deep, dark magic.  Futzing with this will break the border drawing process.
 
@@ -282,33 +283,50 @@ class AllyGen(object):
         So the complexity is here to make the draw portion quick.
         """
         for cand_hex in list(allyMap.keys()):
+            odd_q = cand_hex[0] & 1
             if self._set_border(allyMap, cand_hex, 2):  # up
                 neighbor = Hex.get_neighbor(cand_hex, 2)
-                self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | 1
+                self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | Hex.BOTTOM
+                self.borders_map[neighbor] = self.borders_map.setdefault(neighbor, 0) | Hex.BOTTOM
             if self._set_border(allyMap, cand_hex, 5):  # down
-                self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | 1
+                self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.BOTTOM
+                self.borders_map[cand_hex] = self.borders_map.setdefault(cand_hex, 0) | Hex.BOTTOM
             if self._set_border(allyMap, cand_hex, 1):  # upper right
-                neighbor = Hex.get_neighbor(cand_hex, 1)
-                if cand_hex[0] & 1:
-                    self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | 2
+                neighbour = Hex.get_neighbor(cand_hex, 1)
+                self.borders[neighbour] = self.borders.setdefault(neighbour, 0) | Hex.BOTTOMLEFT
+
+                if odd_q:
+                    self.borders_map[neighbour] = self.borders_map.setdefault(neighbour, 0) | Hex.BOTTOMRIGHT
                 else:
-                    self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | 4
+                    self.borders_map[neighbour] = self.borders_map.setdefault(neighbour, 0) | Hex.BOTTOMLEFT
             if self._set_border(allyMap, cand_hex, 3):  # upper left
-                if cand_hex[0] & 1:
-                    self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | 2
+                neighbour = Hex.get_neighbor(cand_hex, 3)
+                self.borders[neighbour] = self.borders.setdefault(neighbour, 0) | Hex.BOTTOMRIGHT
+                neighbour = cand_hex if odd_q else Hex.get_neighbor(cand_hex, 2)
+
+                if odd_q:
+                    self.borders_map[neighbour] = self.borders_map.setdefault(neighbour, 0) | Hex.BOTTOMRIGHT
                 else:
-                    self.borders[(cand_hex[0], cand_hex[1] - 1)] = self.borders.setdefault((cand_hex[0], cand_hex[1] - 1), 0) | 4
+                    self.borders_map[neighbour] = self.borders_map.setdefault(neighbour, 0) | Hex.BOTTOMLEFT
             if self._set_border(allyMap, cand_hex, 0):  # down right
-                neighbor = Hex.get_neighbor(cand_hex, 0)
-                if cand_hex[0] & 1:
-                    self.borders[(cand_hex[0] + 1, cand_hex[1] - 1)] = self.borders.setdefault((cand_hex[0] + 1, cand_hex[1] - 1), 0) | 4
+                self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.BOTTOMRIGHT
+                neighbour = Hex.get_neighbor(cand_hex, 1) if odd_q else Hex.get_neighbor(cand_hex, 0)
+
+                if odd_q:
+                    self.borders_map[neighbour] = self.borders_map.setdefault(neighbour, 0) | Hex.BOTTOMLEFT
                 else:
-                    self.borders[neighbor] = self.borders.setdefault(neighbor, 0) | 2
+                    self.borders_map[neighbour] = self.borders_map.setdefault(neighbour, 0) | Hex.BOTTOMRIGHT
             if self._set_border(allyMap, cand_hex, 4):  # down left
-                if cand_hex[0] & 1:
-                    self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | 4
+                self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | Hex.BOTTOMLEFT
+
+                if odd_q:
+                    self.borders_map[cand_hex] = self.borders_map.setdefault(cand_hex, 0) | Hex.BOTTOMLEFT
                 else:
-                    self.borders[cand_hex] = self.borders.setdefault(cand_hex, 0) | 2
+                    self.borders_map[cand_hex] = self.borders_map.setdefault(cand_hex, 0) | Hex.BOTTOMRIGHT
+
+        if enforce:
+            result, msg = self.is_well_formed()
+            assert result, msg
 
     @staticmethod
     def _set_border(allyMap, cand_hex, direction):
@@ -322,8 +340,9 @@ class AllyGen(object):
         # and the neighbor has no setting ,
         # or the neighbor is aligned 
         # Then no border .
-        if (AllyGen.is_nonaligned(allyMap[cand_hex], True) or allyMap[cand_hex] is None) and \
-                (allyMap.get(neighbor, True) or allyMap.get(neighbor, None) not in AllyGen.nonAligned):
+        cand_hex_not_aligned = (AllyGen.is_nonaligned(allyMap[cand_hex], True) or allyMap[cand_hex] is None)
+        neighbour_is_aligned = (allyMap.get(neighbor, True) or allyMap.get(neighbor, None) not in AllyGen.nonAligned)
+        if cand_hex_not_aligned and neighbour_is_aligned:
             return False
         # If not matched allegiance, need a border.
         elif allyMap[cand_hex] != allyMap.get(neighbor, None):
@@ -388,7 +407,7 @@ class AllyGen(object):
                 return True
         return False
 
-    def create_ally_map(self, match):
+    def create_ally_map(self, match, enforce=True):
         """
             Create borders around various allegiances, Algorithm Two.
             From the AllyGen http://dotclue.org/t20/ code created by J. Greely.
@@ -400,7 +419,7 @@ class AllyGen(object):
 
         self.allyMap = self._ally_map(match)
         # self._output_map(allyMap, 3)
-        self._generate_borders(self.allyMap)
+        self._generate_borders(self.allyMap, enforce)
 
     def _ally_map(self, match):
         # Create list of stars
@@ -485,7 +504,7 @@ class AllyGen(object):
 
         return allyMap
 
-    def create_erode_border(self, match):
+    def create_erode_border(self, match, enforce=True):
         """
         Create borders around various allegiances, Algorithm Three.
         From TravellerMap http://travellermap.com/borders/doc.htm
@@ -507,7 +526,7 @@ class AllyGen(object):
         self._build_bridges(allyMap, starMap)
 
         self.allyMap = allyMap
-        self._generate_borders(allyMap)
+        self._generate_borders(allyMap, enforce)
 
     def _erode(self, allyMap, starMap):
         """
@@ -705,3 +724,106 @@ class AllyGen(object):
         elif 'separate' == match:
             pass
         return alg
+
+    def is_well_formed(self):
+        for cand_hex in self.borders:
+            border_val = self.borders[cand_hex]
+            if border_val & Hex.BOTTOM:  # this hex has a bottom-edge border
+                result, msg = self._bottom_left_edge(cand_hex, border_val)
+                if not result:
+                    return False, msg
+                result, msg = self._bottom_right_edge(cand_hex, border_val)
+                if not result:
+                    return False, msg
+            if border_val & Hex.BOTTOMLEFT:  # this hex has a bottom-left border
+                result, msg = self._left_left_edge(cand_hex, border_val)
+                if not result:
+                    return False, msg
+                result, msg = self._left_right_edge(cand_hex, border_val)
+                if not result:
+                    return False, msg
+            if border_val & Hex.BOTTOMRIGHT:  # this hex has a bottom-right border
+                result, msg = self._right_left_edge(cand_hex, border_val)
+                if not result:
+                    return False, msg
+                result, msg = self._right_right_edge(cand_hex, border_val)
+                if not result:
+                    return False, msg
+        return True, ''
+
+    def _bottom_left_edge(self, cand_hex, border_val):
+        msg = ''
+        if border_val and Hex.BOTTOMLEFT:
+            return True, msg  # bottom edge is left-connected, move on
+        neighbour = Hex.get_neighbor(cand_hex, 4)
+        neighbour_val = self.borders.get(neighbour, False)
+        if neighbour_val is not False:
+            if neighbour_val & Hex.BOTTOMRIGHT:
+                return True, msg  # bottom edge is left-connected, move on
+        msg = "Bottom edge of " + str(cand_hex) + " is not left-connected"
+        return False, msg
+
+    def _bottom_right_edge(self, cand_hex, border_val):
+        msg = ''
+        if border_val and Hex.BOTTOMRIGHT:
+            return True, msg  # bottom edge is right-connected, move on
+        neighbour = Hex.get_neighbor(cand_hex, 0)
+        neighbour_val = self.borders.get(neighbour, False)
+        if neighbour_val is not False:
+            if neighbour_val & Hex.BOTTOMLEFT:
+                return True, msg  # bottom edge is right-connected, move on
+        msg = "Bottom edge of " + str(cand_hex) + " is not right-connected"
+        return False, msg
+
+    def _left_left_edge(self, cand_hex, border_val):
+        msg = ''
+        neighbour = Hex.get_neighbor(cand_hex, 3)
+        neighbour_val = self.borders.get(neighbour, False)
+        if neighbour_val is not False:
+            if neighbour_val & Hex.BOTTOM:
+                return True, msg  # left edge is left-connected, move on
+            if neighbour_val & Hex.BOTTOMRIGHT:
+                return True, msg  # left edge is left-connected, move on
+
+        msg = "Bottom-left edge of " + str(cand_hex) + " is not left-connected"
+        return False, msg
+
+    def _left_right_edge(self, cand_hex, border_val):
+        msg = ''
+        if border_val and Hex.BOTTOM:
+            return True, msg  # left edge is right-connected, move on
+        neighbour = Hex.get_neighbor(cand_hex, 4)
+        neighbour_val = self.borders.get(neighbour, False)
+        if neighbour_val is not False:
+            if neighbour_val & Hex.BOTTOMRIGHT:
+                return True, msg  # left edge is right-connected, move on
+
+        msg = "Bottom-left edge of " + str(cand_hex) + " is not right-connected"
+        return False, msg
+
+    def _right_left_edge(self, cand_hex, border_val):
+        msg = ''
+        if border_val and Hex.BOTTOM:
+            return True, msg  # right edge is left-connected, move on
+
+        neighbour = Hex.get_neighbor(cand_hex, 3)
+        neighbour_val = self.borders.get(neighbour, False)
+        if neighbour_val is not False:
+            if neighbour_val & Hex.BOTTOMLEFT:
+                return True, msg  # right edge is left-connected, move on
+
+        msg = "Bottom-right edge of " + str(cand_hex) + " is not left-connected"
+        return False, msg
+
+    def _right_right_edge(self, cand_hex, border_val):
+        msg = ''
+        neighbour = Hex.get_neighbor(cand_hex, 1)
+        neighbour_val = self.borders.get(neighbour, False)
+        if neighbour_val is not False:
+            if neighbour_val & Hex.BOTTOM:
+                return True, msg  # right edge is right-connected, move on
+            if neighbour_val & Hex.BOTTOMLEFT:
+                return True, msg  # right edge is right-connected, move on
+
+        msg = "Bottom-right edge of " + str(cand_hex) + " is not right-connected"
+        return False, msg
