@@ -325,11 +325,6 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
         _, curnode, dist, parent = pop(queue)
         node_counter += 1
 
-        if 0 == node_counter % 49 and 0 < len(queue):
-            # Trim queue items that can not result in a shorter path
-            queue = [item for item in queue if not (item[1] in enqueued and item[2] > enqueued[item[1]][0])]
-            heapify(queue)
-
         if curnode == target:
             diagnostics['nodes_expanded'] = node_counter
             path = [curnode]
@@ -339,6 +334,11 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
                 node = explored[node]
             path.reverse()
             return path, diagnostics
+
+        if 0 == node_counter % 49 and 0 < len(queue):
+            # Trim queue items that can not result in a shorter path
+            queue = [item for item in queue if not (item[1] in enqueued and item[2] > enqueued[item[1]][0])]
+            heapify(queue)
 
         if curnode in explored:
             # Do not override the parent of starting node
