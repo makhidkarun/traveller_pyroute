@@ -86,7 +86,7 @@ class ApproximateShortestPathTree:
 
             # If that bound no longer holds, it's due to the edge (u, v) having its weight decreased during pathfinding.
             # Tag each incident node as needing updates.
-            if delta >= (1 + self._epsilon) * weight:
+            if delta * self._divisor >= weight:
                 dropnodes.add(left)
                 dropnodes.add(right)
 
