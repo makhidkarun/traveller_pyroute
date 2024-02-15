@@ -53,13 +53,17 @@ class ApproximateShortestPathTree:
     def lower_bound(self, source, target):
         left = self._distances[source]
         right = self._distances[target]
-        big = max(left, right)
-        little = min(left, right)
+        if left > right:
+            big = left * self._divisor
+            little = right
+        else:
+            big = right * self._divisor
+            little = left
 
         # Since we're trying to _lower_ bound the cost between source and target, we have to assume the little value
         # is accurate, while the big value is overstated by (1 + epsilon).  Thus, we divide big by (1 + epsilon) before
         # subtracting, and lower-bounding the result to zero (since costs can't be negative).
-        return max(0, big * self._divisor - little)
+        return max(0, big - little)
 
     def update_edges(self, edges):
         dropnodes = set()
