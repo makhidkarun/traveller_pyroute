@@ -313,7 +313,8 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
     # Maps explored nodes to parent closest to the source.
     explored = {}
     # Tracks shortest _complete_ path found so far
-    upbound = float('inf')
+    floatinf = float('inf')
+    upbound = floatinf
     # Diagnostic dictionary
     diagnostics = {'nodes_expanded': 0, 'nodes_queued': 0, 'neighbours_checked': 0, 'heuristic_calls': 0}
 
@@ -361,7 +362,7 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
         # Explicitly _exclude_ source node (if present) because re-considering it is pointless
         neighbours = [(k, dist + v['weight']) for (k, v) in G_succ[curnode].items()
                       if not (k in enqueued and dist + v['weight'] >= enqueued[k][0] and not (k == target)) and not (k == source)]
-        if upbound != float('inf') and 0 < len(neighbours):
+        if upbound != floatinf and 0 < len(neighbours):
             # Remove neighbour nodes who will bust the upper bound as it currently stands
             neighbours = [(k, v) for (k, v) in neighbours if v <= upbound]
             # remove enqueued neighbour nodes whose cost plus stored heuristic value will bust upper bound
