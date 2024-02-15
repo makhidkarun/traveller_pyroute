@@ -55,7 +55,7 @@ def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None,
     return distance_labels
 
 
-def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None):
+def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1):
     # assumes that distance_labels is already setup
     if seeds is None:
         seeds = {source}
@@ -87,7 +87,7 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
 
         if 0 == num_nodes:
             continue
-        active_weights = active_weights[keep]
+        active_weights = dist_tail + divisor * neighbours[1][keep]
         distance_labels[active_nodes] = active_weights
 
         heapq.heappush(heap, (active_weights[0], active_nodes[0]))
