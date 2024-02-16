@@ -81,8 +81,7 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
         neighbours = arcs[tail]
         active_nodes = neighbours[0]
         active_costs = neighbours[1]
-        active_weights = dist_tail + active_costs
-        keep = active_weights < distance_labels[active_nodes]
+        keep = dist_tail + active_costs < distance_labels[active_nodes]
         active_nodes = active_nodes[keep]
         num_nodes = len(active_nodes)
 
