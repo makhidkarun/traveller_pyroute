@@ -80,14 +80,15 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
         # when the sum of dist_tail and that edge's weight equals or exceeds the corresponding node's distance label.
         neighbours = arcs[tail]
         active_nodes = neighbours[0]
-        active_weights = dist_tail + neighbours[1]
+        active_costs = neighbours[1]
+        active_weights = dist_tail + active_costs
         keep = active_weights < distance_labels[active_nodes]
         active_nodes = active_nodes[keep]
         num_nodes = len(active_nodes)
 
         if 0 == num_nodes:
             continue
-        active_weights = dist_tail + divisor * neighbours[1][keep]
+        active_weights = dist_tail + divisor * active_costs[keep]
         distance_labels[active_nodes] = active_weights
 
         heapq.heappush(heap, (active_weights[0], active_nodes[0]))
