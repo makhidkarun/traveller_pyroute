@@ -329,17 +329,19 @@ class TradeCalculation(RouteCalculation):
                 end.tradeCount += 1
                 end.passOver += tradePass
             data = self.galaxy.stars[start.index][end.index]
+            exhausted = data['count'] > data['exhaust']
             data['trade'] += tradeCr
             data['count'] += 1
-            if reweight:
+            if reweight and not exhausted:
                 data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
                 self.shortest_path_tree.lighten_edge(start.index, end.index, data['weight'])
-            edges.append((start.index, end.index))
+            if not exhausted:  # If edge is exhausted - can't trip an update - don't queue it for update
+                edges.append((start.index, end.index))
             start = end
 
         # Feed the list of touched edges into the approximate-shortest-path machinery, so it can update whatever
         # distance labels it needs to stay within its approximation bound.
-        if reweight:
+        if reweight and 0 < len(edges):
             self.shortest_path_tree.update_edges(edges)
 
         return (tradeCr, tradePass)
