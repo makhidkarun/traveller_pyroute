@@ -301,10 +301,10 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
 
     G_succ = G._adj  # For speed-up (and works for both directed and undirected graphs)
 
-    # The queue stores priority, node, cost to reach, and parent.
+    # The queue stores priority, cost to reach, node,  and parent.
     # Uses Python heapq to keep in priority order.
     # The nodes themselves, being integers, are directly comparable.
-    queue = [(0, source, 0, None)]
+    queue = [(0, 0, source, None)]
 
     # Maps enqueued nodes to distance of discovered paths and the
     # computed heuristics to target. We avoid computing the heuristics
@@ -322,7 +322,7 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
 
     while queue:
         # Pop the smallest item from queue.
-        _, curnode, dist, parent = pop(queue)
+        _, dist, curnode, parent = pop(queue)
         node_counter += 1
 
         if curnode == target:
@@ -337,7 +337,7 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
 
         if 0 == node_counter % 49 and 0 < len(queue):
             # Trim queue items that can not result in a shorter path
-            queue = [item for item in queue if not (item[1] in enqueued and item[2] > enqueued[item[1]][0])]
+            queue = [item for item in queue if not (item[2] in enqueued and item[1] > enqueued[item[2]][0])]
             heapify(queue)
 
         if curnode in explored:
@@ -348,7 +348,7 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
             # Skip bad paths that were enqueued before finding a better one
             qcost, h = enqueued[curnode]
             if qcost < dist:
-                queue = [item for item in queue if not (item[1] in enqueued and item[2] > enqueued[item[1]][0])]
+                queue = [item for item in queue if not (item[2] in enqueued and item[1] > enqueued[item[2]][0])]
                 heapify(queue)
                 continue
             # If we've found a better path, update
@@ -417,10 +417,10 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
                 if 0 < len(queue):
                     queue = [item for item in queue if item[0] <= upbound]
                     # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
-                    queue = [item for item in queue if not (item[1] in enqueued and item[2] > enqueued[item[1]][0])]
+                    queue = [item for item in queue if not (item[2] in enqueued and item[1] > enqueued[item[2]][0])]
                     heapify(queue)
 
             enqueued[neighbor] = ncost, h
-            push(queue, (ncost + h, neighbor, ncost, curnode))
+            push(queue, (ncost + h, ncost, neighbor, curnode))
 
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
