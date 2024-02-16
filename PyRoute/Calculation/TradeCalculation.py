@@ -169,7 +169,7 @@ class TradeCalculation(RouteCalculation):
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(source.index, self.galaxy.stars, 0.2, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
 
         base_btn = 0
         counter = 0

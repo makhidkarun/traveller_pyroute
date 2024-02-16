@@ -33,6 +33,7 @@ class RouteCalculation(object):
     def __init__(self, galaxy):
         self.logger = logging.getLogger('PyRoute.TradeCalculation')
         self.galaxy = galaxy
+        self.epsilon = 0.2
 
         # component level tracking
         self.components = dict()
