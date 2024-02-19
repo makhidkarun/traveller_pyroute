@@ -12,6 +12,7 @@ import unittest
 
 import networkx as nx
 
+from LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Pathfinding.ApproximateShortestPathForest import ApproximateShortestPathForest
@@ -98,6 +99,39 @@ class testApproximateShortestPathForest(baseTest):
         targ = stars[80]
 
         expected = 223
+        actual = approx.lower_bound(src, targ)
+        self.assertEqual(expected, actual, "Unexpected lower bound value")
+
+    def test_triaxial_bounds_should_wrap_three_trees(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes()
+        galaxy.trade.calculate_components()
+
+        foo = LandmarksTriaxialExtremes(galaxy)
+        landmarks = foo.get_landmarks(index=True)
+        graph = galaxy.stars
+        stars = list(graph.nodes)
+        source = stars[0]
+
+        approx = ApproximateShortestPathForest(source, graph, 0.2, sources=landmarks)
+        self.assertEqual(3, len(approx._trees), "Unexpected number of approx-SP trees")
+
+        src = stars[2]
+        targ = stars[80]
+
+        expected = 367
         actual = approx.lower_bound(src, targ)
         self.assertEqual(expected, actual, "Unexpected lower bound value")
 
