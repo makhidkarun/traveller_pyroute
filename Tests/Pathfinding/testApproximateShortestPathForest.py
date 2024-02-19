@@ -60,5 +60,46 @@ class testApproximateShortestPathForest(baseTest):
         actual = approx.lower_bound(src, targ)
         self.assertEqual(expected, actual, "Unexpected lower bound value")
 
+    def test_dict_of_sources_should_wrap_single_tree(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes()
+        galaxy.trade.calculate_components()
+
+        landmarks = galaxy.trade.get_landmarks(index=True)
+        graph = galaxy.stars
+        stars = list(graph.nodes)
+        source = stars[0]
+
+        approx = ApproximateShortestPathTree(source, graph, 0.2, sources=landmarks)
+        self.assertEqual(496, len(approx._distances), "Distances dictionary has unexpected length")
+
+        src = stars[2]
+        targ = stars[80]
+
+        expected = 223
+        actual = approx.lower_bound(src, targ)
+        self.assertEqual(expected, actual, "Unexpected lower bound value")
+
+        approx = ApproximateShortestPathForest(source, graph, 0.2, sources=landmarks)
+
+        src = stars[2]
+        targ = stars[80]
+
+        expected = 223
+        actual = approx.lower_bound(src, targ)
+        self.assertEqual(expected, actual, "Unexpected lower bound value")
+
 if __name__ == '__main__':
     unittest.main()

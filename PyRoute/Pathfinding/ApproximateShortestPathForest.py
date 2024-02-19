@@ -14,6 +14,11 @@ class ApproximateShortestPathForest:
         if sources is None:
             nu_tree = ApproximateShortestPathTree(source, graph, epsilon)
             self._trees.append(nu_tree)
+        elif isinstance(sources, dict):
+            nu_tree = ApproximateShortestPathTree(source, graph, epsilon, sources=sources)
+            self._trees.append(nu_tree)
+
+        assert 0 < len(self._trees), "No approx-SP trees generated"
 
     def lower_bound(self, source, target):
         bound = 0
