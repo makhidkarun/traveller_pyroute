@@ -137,7 +137,6 @@ class AllyGen(object):
         "NONE": "white",  # Default color
     }
 
-
     def __init__(self, galaxy):
         """
         Constructor
@@ -212,7 +211,6 @@ class AllyGen(object):
                 code = "Huma"
         return code
 
-         
     @staticmethod
     def sort_allegiances(alg_list, base_match_only):
         # The logic: 

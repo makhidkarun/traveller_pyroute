@@ -223,7 +223,6 @@ class StatCalculation(object):
         self.galaxy.trade.is_sector_trade_balanced()
         self.galaxy.trade.is_sector_pass_balanced()
 
-
     def add_alg_stats(self, area, star, alg):
         algStats = area.alg[alg].stats
         self.add_stats(algStats, star)
@@ -329,7 +328,6 @@ class StatCalculation(object):
                     stats.bases[ObjectStatistics.base_mapping['M']] += 1
                 else:
                     stats.bases[ObjectStatistics.base_mapping[code]] += 1
-
 
         if star.eti_cargo_volume > 0 or star.eti_pass_volume > 0:
             stats.eti_worlds += 1

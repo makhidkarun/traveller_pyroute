@@ -109,7 +109,6 @@ class TradeMPCalculation(TradeCalculation):
         self.btn = []
         self.mp_threads = mp_threads
 
-
     def calculate_routes(self):
         """
         The base calculate routes. Read through all the stars in WTN order.

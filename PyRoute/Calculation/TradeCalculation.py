@@ -480,7 +480,6 @@ class TradeCalculation(RouteCalculation):
             target) + " must be positive"
         return weight
 
-
     def unilateral_filter(self, star):
         if star.zone in ['R', 'F']:
             return True

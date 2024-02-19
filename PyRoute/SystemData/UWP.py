@@ -235,7 +235,6 @@ class UWP(object):
                 line = 'UWP Calculated law "{}" not in expected range {}-{}'.format(self.law, min_law, max_law)
                 msg.append(line)
 
-
     def _check_canonical_tl(self, msg):
         if '?' != self.tl:
             max_tl, min_tl = self._get_tl_bounds()
