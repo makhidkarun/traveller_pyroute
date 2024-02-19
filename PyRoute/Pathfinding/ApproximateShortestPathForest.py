@@ -24,7 +24,9 @@ class ApproximateShortestPathForest:
 
         assert 0 < len(self._trees), "No approx-SP trees generated"
 
-    def lower_bound(self, source, target):
+    def lower_bound(self, source, target, tree=None):
+        if isinstance(tree, int):
+            return self._trees[tree].lower_bound(source, target)
         bound = 0
         for tree in self._trees:
             nu_bound = tree.lower_bound(source, target)
@@ -46,3 +48,17 @@ class ApproximateShortestPathForest:
             if not result:
                 return False
         return True
+
+    def find_max_tree(self, source, target):
+        bound = -1
+        choice = None
+        counter = -1
+
+        for tree in self._trees:
+            counter += 1
+            nu_bound = tree.lower_bound(source, target)
+            if nu_bound > bound:
+                bound = nu_bound
+                choice = counter
+
+        return choice

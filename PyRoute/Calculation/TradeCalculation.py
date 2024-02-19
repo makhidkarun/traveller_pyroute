@@ -199,6 +199,8 @@ class TradeCalculation(RouteCalculation):
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
+            # disable static landmark choice for this route
+            self.tree_choice = None
             rawroute, _ = astar_path_indexes(self.galaxy.stars, star.index, target.index, self.galaxy.heuristic_distance_indexes)
         except nx.NetworkXNoPath:
             return
