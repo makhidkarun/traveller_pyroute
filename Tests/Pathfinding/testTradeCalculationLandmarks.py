@@ -28,7 +28,7 @@ class testTradeCalculationLandmarks(baseTest):
 
         self.assertEqual(1, len(galaxy.trade.components), "Unexpected number of components at J-4")
 
-        landmarks = galaxy.trade.get_landmarks()
+        landmarks = galaxy.trade.get_landmarks()[0]
         self.assertTrue(isinstance(landmarks, dict), 'Landmarks result should be a dict')
         self.assertEqual(len(galaxy.trade.components), len(landmarks), 'Should have one landmark per component')
         self.assertEqual("Strela (Zarushagar 0407)", str(landmarks[0]), "Unexpected landmark choice")
@@ -53,7 +53,7 @@ class testTradeCalculationLandmarks(baseTest):
 
         self.assertEqual(6, len(galaxy.trade.components), "Unexpected number of components at J-1")
 
-        landmarks = galaxy.trade.get_landmarks()
+        landmarks = galaxy.trade.get_landmarks()[0]
         self.assertTrue(isinstance(landmarks, dict), 'Landmarks result should be a dict')
         self.assertEqual(len(galaxy.trade.components), len(landmarks), 'Should have one landmark per component')
         self.assertEqual("Strela (Zarushagar 0407)", str(landmarks[0]), "Unexpected landmark choice")

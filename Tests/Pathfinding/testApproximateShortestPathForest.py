@@ -61,7 +61,7 @@ class testApproximateShortestPathForest(baseTest):
     def test_dict_of_sources_should_wrap_single_tree(self):
         galaxy = self.set_up_zarushagar_sector()
 
-        landmarks = galaxy.trade.get_landmarks(index=True)
+        landmarks = galaxy.trade.get_landmarks(index=True)[0]
         graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]

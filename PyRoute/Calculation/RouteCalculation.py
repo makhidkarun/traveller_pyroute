@@ -11,6 +11,7 @@ import math
 
 import networkx as nx
 
+from PyRoute.Pathfinding.LandmarkSchemes.LandmarksWTNExtremes import LandmarksWTNExtremes
 from PyRoute.AllyGen import AllyGen
 
 
@@ -189,23 +190,8 @@ class RouteCalculation(object):
         return
 
     def get_landmarks(self, index=False):
-        result = dict()
-
-        # Dig out landmarks for each connected component
-        # First landmark is the star with the biggest WTN in the component.
-        # Later landmark(s), if any, will probably be the star in the component furthest away from the closest existing
-        # landmark in that component.  If all the stars in a component are _already_ landmarks, return the previous
-        # landmark choice.
-        for component_id in self.components:
-            stars = [item for item in self.galaxy.star_mapping.values() if component_id == item.component]
-            source = max(stars, key=lambda item: item.wtn)
-            source.is_landmark = True
-            if index:
-                result[component_id] = source.index
-            else:
-                result[component_id] = source
-
-        return result
+        schema = LandmarksWTNExtremes(self.galaxy)
+        return schema.get_landmarks(index)
 
     def unilateral_filter(self, star):
         """

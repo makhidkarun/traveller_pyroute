@@ -9,7 +9,7 @@ from multiprocessing import Queue, Pool
 from queue import Empty
 
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
-from PyRoute.Pathfinding.ApproximateShortestPathTreeDistanceGraph import ApproximateShortestPathTreeDistanceGraph
+from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
 from PyRoute.Pathfinding.astar import astar_path_indexes
 
 # Convert the TradeMPCalculation to a global variable to allow the child processes to access it, and all the data.
@@ -137,7 +137,7 @@ class TradeMPCalculation(TradeCalculation):
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathForestDistanceGraph(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
 
         large_btn_index = next(i for i, v in enumerate(self.btn) if v[2]['btn'] == 18)
 
@@ -196,7 +196,7 @@ class TradeMPCalculation(TradeCalculation):
 
     def process_long_routes(self, btn):
 
-        self.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(self.shortest_path_tree._source, self.galaxy.stars,
+        self.shortest_path_tree = ApproximateShortestPathForestDistanceGraph(self.shortest_path_tree._source, self.galaxy.stars,
                                                                   0, sources=self.shortest_path_tree._sources)
 
         # Create the Queues for sending data between processes.
