@@ -46,9 +46,9 @@ class testApproximateShortestPathTree(baseTest):
         src = stars[2]
         targ = stars[80]
 
-        expected = 540 - 239
+        expected = 254.167
         actual = approx.lower_bound(src, targ)
-        self.assertEqual(expected, actual, "Unexpected lower bound value")
+        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
     def test_lower_bound_does_overlap(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
@@ -76,9 +76,9 @@ class testApproximateShortestPathTree(baseTest):
         src = stars[20]
         targ = stars[19]
 
-        expected = 1
+        expected = 0.833
         actual = approx.lower_bound(src, targ)
-        self.assertEqual(expected, actual, "Unexpected lower bound value")
+        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
     def test_lower_bound_self_to_self(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')

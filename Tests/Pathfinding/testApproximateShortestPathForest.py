@@ -17,6 +17,7 @@ from PyRoute.Pathfinding.LandmarkSchemes.LandmarksWTNExtremes import LandmarksWT
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Pathfinding.ApproximateShortestPathForest import ApproximateShortestPathForest
+from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
 from Tests.baseTest import baseTest
 
@@ -35,18 +36,27 @@ class testApproximateShortestPathForest(baseTest):
         src = stars[2]
         targ = stars[80]
 
-        expected = 540 - 239
+        expected = 254.167
         actual = approx.lower_bound(src, targ)
-        self.assertEqual(expected, actual, "Unexpected lower bound value")
+        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
         approx = ApproximateShortestPathForest(source, graph, 0.2)
 
         src = stars[2]
         targ = stars[80]
 
-        expected = 540 - 239
+        expected = 254.167
         actual = approx.lower_bound(src, targ)
-        self.assertEqual(expected, actual, "Unexpected lower bound value")
+        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
+
+        approx = ApproximateShortestPathForestDistanceGraph(source, graph, 0.2)
+
+        src = stars[2]
+        targ = stars[80]
+
+        expected = 254.167
+        actual = approx.lower_bound(src, targ)
+        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
     def test_dict_of_sources_should_wrap_single_tree(self):
         galaxy = self.set_up_zarushagar_sector()
@@ -62,18 +72,27 @@ class testApproximateShortestPathForest(baseTest):
         src = stars[2]
         targ = stars[80]
 
-        expected = 223
+        expected = 185.833
         actual = approx.lower_bound(src, targ)
-        self.assertEqual(expected, actual, "Unexpected lower bound value")
+        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
         approx = ApproximateShortestPathForest(source, graph, 0.2, sources=landmarks)
 
         src = stars[2]
         targ = stars[80]
 
-        expected = 223
+        expected = 185.833
         actual = approx.lower_bound(src, targ)
-        self.assertEqual(expected, actual, "Unexpected lower bound value")
+        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
+
+        approx = ApproximateShortestPathForestDistanceGraph(source, graph, 0.2, sources=landmarks)
+
+        src = stars[2]
+        targ = stars[80]
+
+        expected = 185.833
+        actual = approx.lower_bound(src, targ)
+        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
     def test_triaxial_bounds_should_wrap_three_trees(self):
         galaxy = self.set_up_zarushagar_sector()
@@ -90,9 +109,19 @@ class testApproximateShortestPathForest(baseTest):
         src = stars[2]
         targ = stars[80]
 
-        expected = 367
+        expected = 310.833
         actual = approx.lower_bound(src, targ)
-        self.assertEqual(expected, actual, "Unexpected lower bound value")
+        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
+
+        approx = ApproximateShortestPathForestDistanceGraph(source, graph, 0.2, sources=landmarks)
+        self.assertEqual(3, len(approx._trees), "Unexpected number of approx-SP trees")
+
+        src = stars[2]
+        targ = stars[80]
+
+        expected = 310.833
+        actual = approx.lower_bound(src, targ)
+        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
     def test_wtn_bounds_should_wrap_one_trees(self):
         galaxy = self.set_up_zarushagar_sector()
@@ -109,9 +138,19 @@ class testApproximateShortestPathForest(baseTest):
         src = stars[2]
         targ = stars[80]
 
-        expected = 223
+        expected = 185.833
         actual = approx.lower_bound(src, targ)
-        self.assertEqual(expected, actual, "Unexpected lower bound value")
+        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
+
+        approx = ApproximateShortestPathForestDistanceGraph(source, graph, 0.2, sources=landmarks)
+        self.assertEqual(1, len(approx._trees), "Unexpected number of approx-SP trees")
+
+        src = stars[2]
+        targ = stars[80]
+
+        expected = 185.833
+        actual = approx.lower_bound(src, targ)
+        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
     def set_up_zarushagar_sector(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
