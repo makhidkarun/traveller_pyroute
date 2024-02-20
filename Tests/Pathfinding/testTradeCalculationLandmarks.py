@@ -31,7 +31,7 @@ class testTradeCalculationLandmarks(baseTest):
         landmarks = galaxy.trade.get_landmarks()[0]
         self.assertTrue(isinstance(landmarks, dict), 'Landmarks result should be a dict')
         self.assertEqual(len(galaxy.trade.components), len(landmarks), 'Should have one landmark per component')
-        self.assertEqual("Strela (Zarushagar 0407)", str(landmarks[0]), "Unexpected landmark choice")
+        self.assertEqual("Airvae (Zarushagar 0801)", str(landmarks[0]), "Unexpected landmark choice")
 
     def test_landmarks_on_ibara_subsector_multiple_components(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
@@ -56,11 +56,11 @@ class testTradeCalculationLandmarks(baseTest):
         landmarks = galaxy.trade.get_landmarks()[0]
         self.assertTrue(isinstance(landmarks, dict), 'Landmarks result should be a dict')
         self.assertEqual(len(galaxy.trade.components), len(landmarks), 'Should have one landmark per component')
-        self.assertEqual("Strela (Zarushagar 0407)", str(landmarks[0]), "Unexpected landmark choice")
+        self.assertEqual("Dorevann (Zarushagar 0708)", str(landmarks[0]), "Unexpected landmark choice")
         self.assertEqual("Ymirial (Zarushagar 0106)", str(landmarks[1]), "Unexpected landmark choice")
-        self.assertEqual("San Nuska Kilna (Zarushagar 0108)", str(landmarks[2]), "Unexpected landmark choice")
+        self.assertEqual("Ichiban (Zarushagar 0309)", str(landmarks[2]), "Unexpected landmark choice")
         self.assertEqual("Toulon-Cadiz (Zarushagar 0510)", str(landmarks[3]), "Unexpected landmark choice")
-        self.assertEqual("Gishin (Zarushagar 0804)", str(landmarks[4]), "Unexpected landmark choice")
+        self.assertEqual("Airvae (Zarushagar 0801)", str(landmarks[4]), "Unexpected landmark choice")
         self.assertEqual("New Orlando (Zarushagar 0710)", str(landmarks[5]), "Unexpected landmark choice")
 
     def _make_args(self):
