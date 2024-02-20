@@ -27,7 +27,6 @@ from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
 from PyRoute.Galaxy import Galaxy
 
 
-
 logger = logging.getLogger('PyRoute')
 
 

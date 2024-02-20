@@ -17,6 +17,7 @@ from PyRoute.Nobles import Nobles
 from PyRoute.AllyGen import AllyGen
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+
 class WikiStats(object):
     """
     classdocs

@@ -169,7 +169,7 @@ class TradeCalculation(RouteCalculation):
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(source.index, self.galaxy.stars, 0.2, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
 
         base_btn = 0
         counter = 0
@@ -329,17 +329,19 @@ class TradeCalculation(RouteCalculation):
                 end.tradeCount += 1
                 end.passOver += tradePass
             data = self.galaxy.stars[start.index][end.index]
+            exhausted = data['count'] > data['exhaust']
             data['trade'] += tradeCr
             data['count'] += 1
-            if reweight:
+            if reweight and not exhausted:
                 data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
                 self.shortest_path_tree.lighten_edge(start.index, end.index, data['weight'])
-            edges.append((start.index, end.index))
+            if not exhausted:  # If edge is exhausted - can't trip an update - don't queue it for update
+                edges.append((start.index, end.index))
             start = end
 
         # Feed the list of touched edges into the approximate-shortest-path machinery, so it can update whatever
         # distance labels it needs to stay within its approximation bound.
-        if reweight:
+        if reweight and 0 < len(edges):
             self.shortest_path_tree.update_edges(edges)
 
         return (tradeCr, tradePass)
@@ -477,7 +479,6 @@ class TradeCalculation(RouteCalculation):
         assert 0 < weight, "Weight of edge between " + str(star) + " and " + str(
             target) + " must be positive"
         return weight
-
 
     def unilateral_filter(self, star):
         if star.zone in ['R', 'F']:

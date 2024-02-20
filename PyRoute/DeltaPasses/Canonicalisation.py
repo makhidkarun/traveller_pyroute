@@ -44,7 +44,6 @@ class Canonicalisation(object):
                     elif raw_line.startswith('---- --'):
                         temp_sectors[sec_name].headers[i] = new_dash
 
-
             self.reducer.sectors = temp_sectors
             msg = "Reduction found with full canonicalisation"
             self.reducer.logger.error(msg)

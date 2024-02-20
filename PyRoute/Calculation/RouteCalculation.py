@@ -7,6 +7,7 @@ import bisect
 import functools
 import itertools
 import logging
+import math
 
 import networkx as nx
 
@@ -33,6 +34,7 @@ class RouteCalculation(object):
     def __init__(self, galaxy):
         self.logger = logging.getLogger('PyRoute.TradeCalculation')
         self.galaxy = galaxy
+        self.epsilon = 0.2
 
         # component level tracking
         self.components = dict()
@@ -70,6 +72,8 @@ class RouteCalculation(object):
         self.logger.info('generating jumps...')
         self.galaxy.is_well_formed()
         raw_ranges = self._raw_ranges()
+        ratio = 1 - 1 / self.route_reuse
+        multiplier = -1 / math.log(ratio)
         for star, neighbor in raw_ranges:
             if self.base_route_filter(star, neighbor):
                 continue
@@ -81,8 +85,10 @@ class RouteCalculation(object):
             if dist <= self.galaxy.max_jump_range:
                 weight = self.route_weight(star, neighbor)
                 btn = self.get_btn(star, neighbor)
+                excess = (weight / dist - 1)
+                exhaust = 1 + math.ceil(math.log(excess) * multiplier)
                 self.galaxy.stars.add_edge(star.index, neighbor.index, distance=dist,
-                                           weight=weight, trade=0, btn=btn, count=0)
+                                           weight=weight, trade=0, btn=btn, count=0, exhaust=exhaust)
                 self.check_existing_routes(star, neighbor)
 
         self.logger.info("base routes: %s  -  ranges: %s" %

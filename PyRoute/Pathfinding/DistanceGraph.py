@@ -18,7 +18,6 @@ class DistanceGraph:
             for u in self._nodes
         ]
 
-
     def lighten_edge(self, u, v, weight):
         self._lighten_arc(u, v, weight)
         self._lighten_arc(v, u, weight)

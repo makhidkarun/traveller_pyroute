@@ -176,6 +176,7 @@ class Allegiance(AreaItem):
 
         return True, msg
 
+
 class Subsector(AreaItem):
     def __init__(self, name, position, sector):
         super(Subsector, self).__init__(name)
@@ -189,6 +190,7 @@ class Subsector(AreaItem):
         self.dx = sector.dx
         self.dy = sector.dy
         self._wiki_name = Subsector.set_wiki_name(name, sector.name, position)
+
     # For the JSONPickel work
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -740,15 +742,15 @@ class Galaxy(AreaItem):
         # The general approach used for the heuristic estimate between star and target is the maximum of whatever
         # choices are available.
         item = (star, target)
-        # Previous-route-distances are only stored if they exceed the straight-line bound
+        # Previous-route-distances are stored unconditionally.
         if item in self.landmarks:
             base = self.landmarks[item]
         else:
             base = Hex.heuristicDistance(self.star_mapping[star], self.star_mapping[target])
         # Now we've got the maximum of the fixed bounds, compare that maximum with the dynamic-between-runs
         # approximate-shortest-path bound.
-        sp_bound = self.trade.shortest_path_tree.lower_bound(item[0], item[1])
-        return max(base, sp_bound)
+        sp_bound = self.trade.shortest_path_tree.lower_bound(star, target)
+        return 1.005 * max(base, sp_bound)
 
     def route_cost(self, route):
         """

@@ -25,7 +25,7 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
         for seed in seeds:
             distances[seed] = 0
 
-        self._distances = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source, distances, seeds=seeds)
+        self._distances = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source, distances, seeds=seeds, divisor=self._divisor)
 
     def update_edges(self, edges):
         dropnodes = set()
@@ -39,7 +39,7 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
             weight = shelf[1][keep][0]
             delta = abs(leftdist - rightdist)
 
-            if delta >= (1 + self._epsilon) * weight:
+            if delta >= weight:
                 dropnodes.add(left)
                 dropnodes.add(right)
 
@@ -49,7 +49,7 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
 
         self._distances = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
                                                                          distance_labels=self._distances,
-                                                                         seeds=dropnodes)
+                                                                         seeds=dropnodes, divisor=self._divisor)
 
     def lighten_edge(self, u, v, weight):
         self._graph.lighten_edge(u, v, weight)

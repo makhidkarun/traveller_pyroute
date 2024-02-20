@@ -55,7 +55,7 @@ def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None,
     return distance_labels
 
 
-def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None):
+def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1):
     # assumes that distance_labels is already setup
     if seeds is None:
         seeds = {source}
@@ -68,8 +68,8 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
     while heap:
         dist_tail, tail = heapq.heappop(heap)
         if dist_tail > distance_labels[tail]:
-            # Since we've just dequeued a bad node, remove other bad nodes from the list to avoid tripping
-            # over them later
+            # Since we've just dequeued a bad node (distance exceeding its current label), remove other bad nodes
+            # from the list to avoid tripping over them later
             heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]
             heapq.heapify(heap)
             continue
@@ -80,19 +80,20 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
         # when the sum of dist_tail and that edge's weight equals or exceeds the corresponding node's distance label.
         neighbours = arcs[tail]
         active_nodes = neighbours[0]
-        active_weights = dist_tail + neighbours[1]
-        keep = active_weights < distance_labels[active_nodes]
+        active_costs = neighbours[1]
+        keep = dist_tail + active_costs < distance_labels[active_nodes]
         active_nodes = active_nodes[keep]
         num_nodes = len(active_nodes)
 
         if 0 == num_nodes:
             continue
-        active_weights = active_weights[keep]
+        active_weights = dist_tail + divisor * active_costs[keep]
         distance_labels[active_nodes] = active_weights
 
-        heapq.heappush(heap, (active_weights[0], active_nodes[0]))
-        if 1 < num_nodes:  # Only cop the iterator overhead if there's at least 2 neighbours to queue
-            for index in range(1, num_nodes):
+        if 1 == num_nodes:
+            heapq.heappush(heap, (active_weights[0], active_nodes[0]))
+        else:  # Only cop the iterator overhead if there's at least 2 neighbours to queue
+            for index in range(0, num_nodes):
                 heapq.heappush(heap, (active_weights[index], active_nodes[index]))
 
     return distance_labels
