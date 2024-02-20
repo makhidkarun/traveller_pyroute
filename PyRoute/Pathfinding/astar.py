@@ -360,13 +360,13 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
         # Remove neighbour nodes that are already enqueued and won't result in shorter paths to them
         # Explicitly retain target node (if present) to give a chance of finding a better upper bound
         # Explicitly _exclude_ source node (if present) because re-considering it is pointless
-        neighbours = [(k, dist + v['weight']) for (k, v) in G_succ[curnode].items()
+        neighbours = [(k, dist + v['weight'], k in enqueued) for (k, v) in G_succ[curnode].items()
                       if not (k in enqueued and dist + v['weight'] >= enqueued[k][0] and not (k == target)) and not (k == source)]
         if upbound != floatinf and 0 < len(neighbours):
             # Remove neighbour nodes who will bust the upper bound as it currently stands
-            neighbours = [(k, v) for (k, v) in neighbours if v <= upbound]
+            neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= upbound]
             # remove enqueued neighbour nodes whose cost plus stored heuristic value will bust upper bound
-            neighbours = [(k, v) for (k, v) in neighbours if not (k in enqueued and v + enqueued[k][1] > upbound)]
+            neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if not (is_queue and v + enqueued[k][1] > upbound)]
 
         # if neighbours list is empty, go around
         num_neighbours = len(neighbours)
@@ -376,17 +376,17 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
         # if neighbours list has at least 2 elements, sort it, putting the target node first, then by ascending weight
         if 1 < num_neighbours:
             neighbours.sort(key=lambda item: item[1])
-            neighbours.sort(key=lambda item: 2 if item[0] == target else 0 + 1 if item[0] in enqueued else 0, reverse=True)
+            neighbours.sort(key=lambda item: 2 if item[0] == target else 0 + 1 if item[2] else 0, reverse=True)
             if neighbours[0][0] == target:  # If first item is the target node, drop all neighbours with higher weights
                 targ_weight = neighbours[0][1]
-                neighbours = [(k, v) for (k, v) in neighbours if v <= targ_weight]
+                neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= targ_weight]
                 num_neighbours = len(neighbours)
 
         diagnostics['neighbours_checked'] += num_neighbours
         diagnostics['heuristic_calls'] += num_neighbours
         diagnostics['nodes_queued'] += num_neighbours
-        for neighbor, ncost in neighbours:
-            if neighbor in enqueued:
+        for neighbor, ncost, is_queue in neighbours:
+            if is_queue:
                 diagnostics['heuristic_calls'] -= 1
                 qcost, h = enqueued[neighbor]
                 # if qcost <= ncost, a less costly path from the
