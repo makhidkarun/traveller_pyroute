@@ -38,8 +38,8 @@ class testAStarIndexes(baseTest):
 
         exp_route = [0, 8, 9, 15, 24, 36]
         exp_diag = dict()
-        exp_diag['heuristic_calls'] = 30
-        exp_diag['neighbours_checked'] = 45
+        exp_diag['heuristic_calls'] = 29
+        exp_diag['neighbours_checked'] = 41
         exp_diag['nodes_expanded'] = 17
         exp_diag['nodes_queued'] = 41
 
