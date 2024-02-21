@@ -21,7 +21,7 @@ class ParseStarInput:
 (.{15,}) +
 (\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?]) +
 (.{15,}) +
-((\{ *[+-]?[0-6] ?\}) +(\([0-9A-Za-z]{3}[+-]\d\)|- ) +(\[[0-9A-Za-z]{4}\]|- )|( ) ( ) ( )) +
+((\{ *[+-]?[0-6] ?\}|-) +(\([0-9A-Za-z]{3}[+-]\d\)|- ) +(\[[0-9A-Za-z]{4}\]|- )|( ) ( ) ( )) +
 ([BcCDeEfFGH]{1,5}|-| ) +
 ([A-Z]{1,3}|-|\*) +
 ([ARUFGBarufgb]|-| ) +
@@ -99,7 +99,7 @@ class ParseStarInput:
 
         star.tradeCode.check_world_codes(star)
 
-        if data[5]:
+        if data[5] and data[5].startswith('{'):
             imp = int(data[5][1:-1].strip())
             star.calculate_importance()
             if imp != star.importance:
