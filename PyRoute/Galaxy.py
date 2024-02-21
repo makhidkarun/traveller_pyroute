@@ -749,7 +749,7 @@ class Galaxy(AreaItem):
             base = Hex.heuristicDistance(self.star_mapping[star], self.star_mapping[target])
         # Now we've got the maximum of the fixed bounds, compare that maximum with the dynamic-between-runs
         # approximate-shortest-path bound.
-        sp_bound = self.trade.shortest_path_tree.lower_bound(star, target, self.trade.tree_choice)
+        sp_bound = self.trade.shortest_path_tree.lower_bound(star, target)
         return 1.005 * max(base, sp_bound)
 
     def route_cost(self, route):

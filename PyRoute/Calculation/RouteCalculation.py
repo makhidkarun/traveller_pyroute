@@ -11,7 +11,6 @@ import math
 
 import networkx as nx
 
-from PyRoute.Pathfinding.LandmarkSchemes.LandmarksWTNExtremes import LandmarksWTNExtremes
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
 from PyRoute.AllyGen import AllyGen
 
@@ -191,7 +190,6 @@ class RouteCalculation(object):
         return
 
     def get_landmarks(self, index=False):
-        #schema = LandmarksWTNExtremes(self.galaxy)
         schema = LandmarksTriaxialExtremes(self.galaxy)
         return schema.get_landmarks(index)
 
