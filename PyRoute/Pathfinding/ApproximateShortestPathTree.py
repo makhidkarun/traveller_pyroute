@@ -55,9 +55,7 @@ class ApproximateShortestPathTree:
         return seeds, source
 
     def lower_bound(self, source, target):
-        left = self._distances[source]
-        right = self._distances[target]
-        return abs(left - right)
+        return abs(self._distances[source] - self._distances[target])
 
     def update_edges(self, edges):
         dropnodes = set()
