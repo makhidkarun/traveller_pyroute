@@ -427,7 +427,11 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
             # let alone queueing it
             # If neighbour is the target, h should be zero
             if ncost + h > upbound:
-                diagnostics['nodes_queued'] -= 1
+                if not is_queue:
+                    # Queue the bound-busting neighbour so it can be pre-emptively removed in later iterations
+                    enqueued[neighbor] = ncost, h
+                else:
+                    diagnostics['nodes_queued'] -= 1
                 continue
 
             enqueued[neighbor] = ncost, h
