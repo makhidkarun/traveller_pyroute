@@ -375,7 +375,6 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
 
         # if neighbours list has at least 2 elements, sort it, putting the target node first, then by ascending weight
         if 1 < num_neighbours:
-            neighbours.sort(key=lambda item: item[1])
             neighbours.sort(key=lambda item: 2 if item[0] == target else 0 + 1 if item[2] else 0, reverse=True)
             if neighbours[0][0] == target:  # If first item is the target node, drop all neighbours with higher weights
                 targ_weight = neighbours[0][1]
