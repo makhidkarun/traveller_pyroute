@@ -378,7 +378,8 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
             neighbours.sort(key=lambda item: 2 if item[0] == target else 0 + 1 if item[2] else 0, reverse=True)
             if neighbours[0][0] == target:  # If first item is the target node, drop all neighbours with higher weights
                 targ_weight = neighbours[0][1]
-                neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= targ_weight]
+                neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= targ_weight
+                              and not (is_queue and v + enqueued[k][1] > targ_weight)]
                 num_neighbours = len(neighbours)
 
         diagnostics['neighbours_checked'] += num_neighbours
