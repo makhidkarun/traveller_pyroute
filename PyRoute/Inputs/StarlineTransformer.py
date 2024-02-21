@@ -369,6 +369,10 @@ class StarlineTransformer(Transformer):
                 parsed['nobles'] = ''
                 parsed['base'] = bitz[0]
                 parsed['zone'] = bitz[1]
+            elif bitz[0].isalpha() and not bitz[0].isupper():  # if bitz[0] doesn't fit as a base code
+                parsed['nobles'] = bitz[0]
+                parsed['base'] = bitz[1]
+                parsed['zone'] = ''
             elif rawstring.startswith('   '):
                 parsed['nobles'] = ''
                 parsed['base'] = bitz[0]
