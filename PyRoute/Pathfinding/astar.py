@@ -411,6 +411,10 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
                 enqueued[target] = ncost, h
                 push(queue, (ncost + h, ncost, target, curnode))
 
+            # if there _was_ one neighbour to process, that was the target, so neighbour list is now empty.
+            if 1 == num_neighbours:
+                continue
+
         for neighbor, ncost, is_queue in neighbours:
             if is_queue:
                 diagnostics['heuristic_calls'] -= 1
