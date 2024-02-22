@@ -27,6 +27,9 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
     enqueued = {}
     # Maps explored nodes to parent closest to the source.
     explored = {}
+    # Traces lowest distance from source node found for each node
+    distances = np.ones(len(G)) * float('+inf')
+    distances[source] = 0
     # Tracks shortest _complete_ path found so far
     floatinf = float('inf')
     upbound = floatinf
@@ -71,6 +74,10 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
         # Shims to support numpy conversion
         raw_nodes = list(G_succ[curnode].keys())
         active_nodes = np.array(raw_nodes)
+        # filter out nodes whose distance labels are strictly less than current node dist
+        # - the current node can _not_ result in a shorter path
+        keep = distances[active_nodes] >= dist
+        active_nodes = active_nodes[keep]
         active_heuristics = bulk_heuristic(active_nodes, target)
         active_dict = dict(zip(active_nodes, range(len(raw_nodes))))
         # Pre-filter neighbours
@@ -121,6 +128,7 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
 
             if queue_targ and better_bound:
                 h = 0
+                distances[target] = ncost
                 enqueued[target] = ncost, h
                 push(queue, (ncost + h, ncost, target, curnode))
 
@@ -140,6 +148,7 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
                     enqueued[neighbor] = ncost, h
                 continue
 
+            distances[neighbor] = ncost
             enqueued[neighbor] = ncost, h
             push(queue, (ncost + h, ncost, neighbor, curnode))
 
