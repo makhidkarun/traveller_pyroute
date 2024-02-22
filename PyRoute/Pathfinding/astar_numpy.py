@@ -9,9 +9,6 @@ import networkx as nx
 
 
 def astar_path_numpy(G, source, target, heuristic=None):
-    if source not in G or target not in G:
-        msg = f"Either source {source} or target {target} is not in G"
-        raise nx.NodeNotFound(msg)
 
     push = heappush
     pop = heappop
