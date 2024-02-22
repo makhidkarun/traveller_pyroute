@@ -21,10 +21,6 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
     # The nodes themselves, being integers, are directly comparable.
     queue = [(0, 0, source, None)]
 
-    # Maps enqueued nodes to distance of discovered paths and the
-    # computed heuristics to target. We avoid computing the heuristics
-    # more than once and inserting the node into the queue too many times.
-    enqueued = {}
     # Maps explored nodes to parent closest to the source.
     explored = {}
     # Traces lowest distance from source node found for each node
@@ -52,7 +48,7 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
 
         if 0 == node_counter % 49 and 0 < len(queue):
             # Trim queue items that can not result in a shorter path
-            queue = [item for item in queue if not (item[2] in enqueued and item[1] > enqueued[item[2]][0])]
+            queue = [item for item in queue if not (item[1] > distances[item[2]])]
             heapify(queue)
 
         if curnode in explored:
@@ -61,13 +57,13 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
                 continue
 
             # Skip bad paths that were enqueued before finding a better one
-            qcost, h = enqueued[curnode]
+            qcost = distances[curnode]
             if qcost < dist:
-                queue = [item for item in queue if not (item[2] in enqueued and item[1] > enqueued[item[2]][0])]
+                queue = [item for item in queue if not (item[1] > distances[item[2]])]
                 heapify(queue)
                 continue
             # If we've found a better path, update
-            enqueued[curnode] = dist, h
+            distances[curnode] = qcost
 
         explored[curnode] = parent
 
@@ -84,13 +80,11 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
         # Remove neighbour nodes that are already enqueued and won't result in shorter paths to them
         # Explicitly retain target node (if present) to give a chance of finding a better upper bound
         # Explicitly _exclude_ source node (if present) because re-considering it is pointless
-        neighbours = [(k, dist + v['weight'], k in enqueued) for (k, v) in G_succ[curnode].items()
-                      if not (k in enqueued and dist + v['weight'] >= enqueued[k][0] and not (k == target)) and not (k == source)]
+        neighbours = [(k, dist + v['weight'], distances[k] != floatinf) for (k, v) in G_succ[curnode].items()
+                      if not (dist + v['weight'] >= distances[k] and not (k == target)) and not (k == source)]
         if upbound != floatinf and 0 < len(neighbours):
             # Remove neighbour nodes who will bust the upper bound as it currently stands
             neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= upbound]
-            # remove enqueued neighbour nodes whose cost plus stored heuristic value will bust upper bound
-            neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if not (is_queue and v + enqueued[k][1] > upbound)]
 
         # if neighbours list is empty, go around
         num_neighbours = len(neighbours)
@@ -102,8 +96,7 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
             neighbours.sort(key=lambda item: 2 if item[0] == target else 0 + 1 if item[2] else 0, reverse=True)
             if neighbours[0][0] == target:  # If first item is the target node, drop all neighbours with higher weights
                 targ_weight = neighbours[0][1]
-                neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= targ_weight
-                              and not (is_queue and v + enqueued[k][1] > targ_weight)]
+                neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= targ_weight]
                 num_neighbours = len(neighbours)
 
         if target == neighbours[0][0]:
@@ -112,7 +105,7 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
             is_queue = neighbours[0][2]
             queue_targ = True
             if is_queue:
-                qcost, h = enqueued[target]
+                qcost = distances[target]
                 if qcost <= ncost:
                     queue_targ = False
 
@@ -121,7 +114,7 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
                 if 0 < len(queue):
                     queue = [item for item in queue if item[0] <= upbound]
                     # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
-                    queue = [item for item in queue if not (item[2] in enqueued and item[1] > enqueued[item[2]][0])]
+                    queue = [item for item in queue if not (item[1] > distances[item[2]])]
                     heapify(queue)
             # either way, target node has been processed, drop it from neighbours
             neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= upbound and k != target]
@@ -129,7 +122,6 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
             if queue_targ and better_bound:
                 h = 0
                 distances[target] = ncost
-                enqueued[target] = ncost, h
                 push(queue, (ncost + h, ncost, target, curnode))
 
             # if there _was_ one neighbour to process, that was the target, so neighbour list is now empty.
@@ -145,11 +137,10 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
             if ncost + h > upbound:
                 if not is_queue:
                     # Queue the bound-busting neighbour so it can be pre-emptively removed in later iterations
-                    enqueued[neighbor] = ncost, h
+                    distances[neighbor] = ncost
                 continue
 
             distances[neighbor] = ncost
-            enqueued[neighbor] = ncost, h
             push(queue, (ncost + h, ncost, neighbor, curnode))
 
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
