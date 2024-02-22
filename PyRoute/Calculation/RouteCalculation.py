@@ -41,6 +41,7 @@ class RouteCalculation(object):
         self.components = dict()
 
         self.shortest_path_tree = None
+        self.star_graph = None
 
     def generate_routes(self):
         raise NotImplementedError("Base Class")
@@ -91,6 +92,7 @@ class RouteCalculation(object):
                 self.galaxy.stars.add_edge(star.index, neighbor.index, distance=dist,
                                            weight=weight, trade=0, btn=btn, count=0, exhaust=exhaust)
                 self.check_existing_routes(star, neighbor)
+                self.star_graph.lighten_edge(star.index, neighbor.index, weight)
 
         self.logger.info("base routes: %s  -  ranges: %s" %
                          (self.galaxy.stars.number_of_edges(),
