@@ -6,9 +6,10 @@ Created on Feb 22, 2024
 from heapq import heappop, heappush, heapify
 
 import networkx as nx
+import numpy as np
 
 
-def astar_path_numpy(G, source, target, heuristic=None):
+def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
 
     push = heappush
     pop = heappop
@@ -67,6 +68,11 @@ def astar_path_numpy(G, source, target, heuristic=None):
 
         explored[curnode] = parent
 
+        # Shims to support numpy conversion
+        raw_nodes = list(G_succ[curnode].keys())
+        active_nodes = np.array(raw_nodes)
+        active_heuristics = bulk_heuristic(active_nodes, target)
+        active_dict = dict(zip(active_nodes, range(len(raw_nodes))))
         # Pre-filter neighbours
         # Remove neighbour nodes that are already enqueued and won't result in shorter paths to them
         # Explicitly retain target node (if present) to give a chance of finding a better upper bound
@@ -123,15 +129,7 @@ def astar_path_numpy(G, source, target, heuristic=None):
                 continue
 
         for neighbor, ncost, is_queue in neighbours:
-            if is_queue:
-                qcost, h = enqueued[neighbor]
-                # if qcost <= ncost, a less costly path from the
-                # neighbor to the source was already determined.
-                # All such cases were stripped out during neighbour selection/filtering, above
-                # Thus, we've found a less-costly path from neighbour to the source, so we'll update it
-                # when we re-queue the neighbour
-            else:
-                h = heuristic(neighbor, target)
+            h = active_heuristics[active_dict[neighbor]]
 
             # if ncost + h would bust the current _upper_ bound, there's no point continuing with the neighbour,
             # let alone queueing it
