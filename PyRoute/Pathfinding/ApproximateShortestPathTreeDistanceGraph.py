@@ -51,5 +51,9 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
                                                                          distance_labels=self._distances,
                                                                          seeds=dropnodes, divisor=self._divisor)
 
+    def lower_bound_bulk(self, active_nodes, target):
+        result = np.abs(self._distances[active_nodes] - self._distances[target])
+        return result
+
     def lighten_edge(self, u, v, weight):
         self._graph.lighten_edge(u, v, weight)

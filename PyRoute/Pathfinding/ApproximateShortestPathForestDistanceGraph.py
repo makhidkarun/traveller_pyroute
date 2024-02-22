@@ -3,6 +3,9 @@ Created on Feb 19, 2024
 
 @author: CyberiaResurrection
 """
+import numpy as np
+
+
 from PyRoute.Pathfinding.ApproximateShortestPathForest import ApproximateShortestPathForest
 from PyRoute.Pathfinding.ApproximateShortestPathTreeDistanceGraph import ApproximateShortestPathTreeDistanceGraph
 
@@ -24,3 +27,11 @@ class ApproximateShortestPathForestDistanceGraph(ApproximateShortestPathForest):
                 self._trees.append(nu_tree)
 
         assert 0 < len(self._trees), "No approx-SP trees generated"
+
+    def lower_bound_bulk(self, active_nodes, target):
+        result = np.zeros(len(active_nodes))
+        for tree in self._trees:
+            interim = tree.lower_bound_bulk(active_nodes, target)
+            result = np.maximum(result, interim)
+
+        return result

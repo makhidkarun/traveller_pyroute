@@ -11,7 +11,9 @@ import tempfile
 import unittest
 
 import networkx as nx
+import numpy as np
 
+from PyRoute.Pathfinding.ApproximateShortestPathTreeDistanceGraph import ApproximateShortestPathTreeDistanceGraph
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
@@ -108,6 +110,36 @@ class testApproximateShortestPathTree(baseTest):
         expected = 0
         actual = approx.lower_bound(src, src)
         self.assertEqual(expected, actual, "Unexpected lower bound value")
+
+    def test_bulk_lower_bound_on_distance_graph(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debugflag)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes()
+        galaxy.trade.calculate_components()
+
+        graph = galaxy.stars
+        stars = list(graph.nodes)
+        source = stars[0]
+        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0.2)
+
+        active_nodes = [20, 19, 1]
+        target = 1
+
+        result = approx.lower_bound_bulk(active_nodes, target)
+        self.assertIsNotNone(result)
+        expected = np.array([57.5, 56.666667, 0])
+        np.testing.assert_array_almost_equal(expected, result, 0.000001, "Unexpected bounds array")
 
     def test_drop_first_level_intermediate_nodes_in_same_component(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
