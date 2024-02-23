@@ -11,6 +11,7 @@ import math
 
 import networkx as nx
 
+from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
 from PyRoute.AllyGen import AllyGen
 
@@ -92,7 +93,8 @@ class RouteCalculation(object):
                 self.galaxy.stars.add_edge(star.index, neighbor.index, distance=dist,
                                            weight=weight, trade=0, btn=btn, count=0, exhaust=exhaust)
                 self.check_existing_routes(star, neighbor)
-                self.star_graph.lighten_edge(star.index, neighbor.index, weight)
+
+        self.star_graph = DistanceGraph(self.galaxy.stars)
 
         self.logger.info("base routes: %s  -  ranges: %s" %
                          (self.galaxy.stars.number_of_edges(),

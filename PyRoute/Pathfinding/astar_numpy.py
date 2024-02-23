@@ -9,7 +9,7 @@ import networkx as nx
 import numpy as np
 
 
-def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
+def astar_path_numpy(G, source, target, bulk_heuristic):
 
     push = heappush
     pop = heappop

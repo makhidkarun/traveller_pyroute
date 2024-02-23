@@ -203,9 +203,7 @@ class TradeCalculation(RouteCalculation):
 
         try:
             # disable static landmark choice for this route
-            self.tree_choice = None
-            #rawroute, _ = astar_path_indexes(self.galaxy.stars, star.index, target.index, self.galaxy.heuristic_distance_indexes)
-            rawroute, _ = astar_path_numpy(self.galaxy.stars, star.index, target.index, self.galaxy.heuristic_distance_indexes, self.shortest_path_tree.lower_bound_bulk)
+            rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index, self.shortest_path_tree.lower_bound_bulk)
         except nx.NetworkXNoPath:
             return
 
