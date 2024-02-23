@@ -89,9 +89,6 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
             drop = active_nodes == target
             ncost = active_weights[drop][0]
             better_bound = upbound > ncost
-            queue_targ = True
-            if ncost > distances[target]:
-                queue_targ = False
 
             if better_bound:
                 upbound = ncost
@@ -106,13 +103,13 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
             keep = np.logical_and(keep, below_bound)
             active_nodes = active_nodes[keep]
             active_weights = active_weights[keep]
-            active_heuristics = active_heuristics[keep]
+            # active_heuristics = active_heuristics[keep]
             augmented_weights = augmented_weights[keep]
 
-            if queue_targ and better_bound:
-                h = 0
+            if better_bound:
                 distances[target] = ncost
-                push(queue, (ncost + h, ncost, target, curnode))
+                #push(queue, (ncost + 0, ncost, target, curnode))
+                push(queue, (ncost, ncost, target, curnode))
 
             # if there _was_ one neighbour to process, that was the target, so neighbour list is now empty.
             if 1 == num_neighbours:
