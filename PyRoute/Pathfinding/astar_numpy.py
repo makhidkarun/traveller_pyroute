@@ -78,6 +78,12 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
         below_bound = active_weights <= upbound
         keep = np.logical_and(keep, below_bound)
         active_nodes = active_nodes[keep]
+
+        # if neighbours list is empty, go around
+        num_neighbours = len(active_nodes)
+        if 0 == num_neighbours:
+            continue
+
         active_weights = active_weights[keep]
         active_heuristics = bulk_heuristic(active_nodes, target)
         # Pre-filter neighbours
@@ -85,11 +91,6 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
         # Explicitly retain target node (if present) to give a chance of finding a better upper bound
         # Explicitly _exclude_ source node (if present) because re-considering it is pointless
         # TODO: fill in
-
-        # if neighbours list is empty, go around
-        num_neighbours = len(active_nodes)
-        if 0 == num_neighbours:
-            continue
 
         if target in active_nodes:
             drop = active_nodes == target
