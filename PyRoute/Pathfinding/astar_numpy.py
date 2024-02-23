@@ -86,6 +86,7 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
 
         active_weights = active_weights[keep]
         active_heuristics = bulk_heuristic(active_nodes, target)
+        augmented_weights = active_weights + active_heuristics
         # Pre-filter neighbours
         # Remove neighbour nodes that are already enqueued and won't result in shorter paths to them
         # Explicitly retain target node (if present) to give a chance of finding a better upper bound
@@ -114,6 +115,7 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
             active_nodes = active_nodes[keep]
             active_weights = active_weights[keep]
             active_heuristics = active_heuristics[keep]
+            augmented_weights = augmented_weights[keep]
 
             if queue_targ and better_bound:
                 h = 0
@@ -127,18 +129,19 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
         for i in range(0, len(active_nodes)):
             neighbour = active_nodes[i]
             ncost = active_weights[i]
-            h = active_heuristics[i]
+            # h = active_heuristics[i]
+            augment = augmented_weights[i]
 
             # if ncost + h would bust the current _upper_ bound, there's no point continuing with the neighbour,
             # let alone queueing it
             # If neighbour is the target, h should be zero
-            if ncost + h > upbound:
+            if augment > upbound:
                 if ncost < distances[neighbour]:
                     # Queue the bound-busting neighbour so it can be pre-emptively removed in later iterations
                     distances[neighbour] = ncost
                 continue
 
             distances[neighbour] = ncost
-            push(queue, (ncost + h, ncost, neighbour, curnode))
+            push(queue, (augment, ncost, neighbour, curnode))
 
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
