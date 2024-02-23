@@ -72,9 +72,9 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
         raw_nodes = G_succ[curnode]
         active_nodes = raw_nodes[0]
         active_weights = dist + raw_nodes[1]
-        # filter out nodes whose distance labels are strictly less than current node dist
+        # filter out nodes whose distance labels are strictly less than their active weights
         # - the current node can _not_ result in a shorter path
-        keep = distances[active_nodes] >= dist
+        keep = distances[active_nodes] >= active_weights
         below_bound = active_weights <= upbound
         keep = np.logical_and(keep, below_bound)
         active_nodes = active_nodes[keep]
@@ -127,10 +127,6 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
             neighbour = active_nodes[i]
             ncost = active_weights[i]
             h = active_heuristics[i]
-
-            # if we've already _found_ a shorter path to neighbour node, skip this one
-            if ncost > distances[neighbour]:
-                continue
 
             # if ncost + h would bust the current _upper_ bound, there's no point continuing with the neighbour,
             # let alone queueing it
