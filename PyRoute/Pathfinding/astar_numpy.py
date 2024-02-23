@@ -68,7 +68,6 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
 
         explored[curnode] = parent
 
-        # Shims to support numpy conversion
         raw_nodes = G_succ[curnode]
         active_nodes = raw_nodes[0]
         active_weights = dist + raw_nodes[1]
@@ -87,11 +86,6 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
         active_weights = active_weights[keep]
         active_heuristics = bulk_heuristic(active_nodes, target)
         augmented_weights = active_weights + active_heuristics
-        # Pre-filter neighbours
-        # Remove neighbour nodes that are already enqueued and won't result in shorter paths to them
-        # Explicitly retain target node (if present) to give a chance of finding a better upper bound
-        # Explicitly _exclude_ source node (if present) because re-considering it is pointless
-        # TODO: fill in
 
         if target in active_nodes:
             drop = active_nodes == target
