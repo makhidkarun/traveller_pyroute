@@ -29,3 +29,6 @@ class DistanceGraph:
             arcs[1][flip] = weight
         else:
             assert False
+
+    def __len__(self):
+        return len(self._nodes)

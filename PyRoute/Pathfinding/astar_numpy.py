@@ -14,7 +14,7 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
     push = heappush
     pop = heappop
 
-    G_succ = G._adj  # For speed-up (and works for both directed and undirected graphs)
+    G_succ = G._arcs  # For speed-up
 
     # The queue stores priority, cost to reach, node,  and parent.
     # Uses Python heapq to keep in priority order.
@@ -41,6 +41,7 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
             path = [curnode]
             node = parent
             while node is not None:
+                assert node not in path, "Node " + str(node) + " duplicated in discovered path"
                 path.append(node)
                 node = explored[node]
             path.reverse()
@@ -68,46 +69,35 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
         explored[curnode] = parent
 
         # Shims to support numpy conversion
-        raw_nodes = list(G_succ[curnode].keys())
-        active_nodes = np.array(raw_nodes)
+        raw_nodes = G_succ[curnode]
+        active_nodes = raw_nodes[0]
+        active_weights = dist + raw_nodes[1]
         # filter out nodes whose distance labels are strictly less than current node dist
         # - the current node can _not_ result in a shorter path
         keep = distances[active_nodes] >= dist
+        below_bound = active_weights <= upbound
+        keep = np.logical_and(keep, below_bound)
         active_nodes = active_nodes[keep]
+        active_weights = active_weights[keep]
         active_heuristics = bulk_heuristic(active_nodes, target)
-        active_dict = dict(zip(active_nodes, range(len(raw_nodes))))
         # Pre-filter neighbours
         # Remove neighbour nodes that are already enqueued and won't result in shorter paths to them
         # Explicitly retain target node (if present) to give a chance of finding a better upper bound
         # Explicitly _exclude_ source node (if present) because re-considering it is pointless
-        neighbours = [(k, dist + v['weight'], distances[k] != floatinf) for (k, v) in G_succ[curnode].items()
-                      if not (dist + v['weight'] >= distances[k] and not (k == target)) and not (k == source)]
-        if upbound != floatinf and 0 < len(neighbours):
-            # Remove neighbour nodes who will bust the upper bound as it currently stands
-            neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= upbound]
+        # TODO: fill in
 
         # if neighbours list is empty, go around
-        num_neighbours = len(neighbours)
+        num_neighbours = len(active_nodes)
         if 0 == num_neighbours:
             continue
 
-        # if neighbours list has at least 2 elements, sort it, putting the target node first, then by ascending weight
-        if 1 < num_neighbours:
-            neighbours.sort(key=lambda item: 2 if item[0] == target else 0 + 1 if item[2] else 0, reverse=True)
-            if neighbours[0][0] == target:  # If first item is the target node, drop all neighbours with higher weights
-                targ_weight = neighbours[0][1]
-                neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= targ_weight]
-                num_neighbours = len(neighbours)
-
-        if target == neighbours[0][0]:
-            ncost = neighbours[0][1]
+        if target in active_nodes:
+            drop = active_nodes == target
+            ncost = active_weights[drop][0]
             better_bound = upbound > ncost
-            is_queue = neighbours[0][2]
             queue_targ = True
-            if is_queue:
-                qcost = distances[target]
-                if qcost <= ncost:
-                    queue_targ = False
+            if ncost > distances[target]:
+                queue_targ = False
 
             if better_bound:
                 upbound = ncost
@@ -117,7 +107,12 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
                     queue = [item for item in queue if not (item[1] > distances[item[2]])]
                     heapify(queue)
             # either way, target node has been processed, drop it from neighbours
-            neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= upbound and k != target]
+            keep = active_nodes != target
+            below_bound = active_weights <= upbound  # As we have a tighter upper bound, apply it to the neighbours as well
+            keep = np.logical_and(keep, below_bound)
+            active_nodes = active_nodes[keep]
+            active_weights = active_weights[keep]
+            active_heuristics = active_heuristics[keep]
 
             if queue_targ and better_bound:
                 h = 0
@@ -128,19 +123,25 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
             if 1 == num_neighbours:
                 continue
 
-        for neighbor, ncost, is_queue in neighbours:
-            h = active_heuristics[active_dict[neighbor]]
+        for i in range(0, len(active_nodes)):
+            neighbour = active_nodes[i]
+            ncost = active_weights[i]
+            h = active_heuristics[i]
+
+            # if we've already _found_ a shorter path to neighbour node, skip this one
+            if ncost > distances[neighbour]:
+                continue
 
             # if ncost + h would bust the current _upper_ bound, there's no point continuing with the neighbour,
             # let alone queueing it
             # If neighbour is the target, h should be zero
             if ncost + h > upbound:
-                if not is_queue:
+                if ncost < distances[neighbour]:
                     # Queue the bound-busting neighbour so it can be pre-emptively removed in later iterations
-                    distances[neighbor] = ncost
+                    distances[neighbour] = ncost
                 continue
 
-            distances[neighbor] = ncost
-            push(queue, (ncost + h, ncost, neighbor, curnode))
+            distances[neighbour] = ncost
+            push(queue, (ncost + h, ncost, neighbour, curnode))
 
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
