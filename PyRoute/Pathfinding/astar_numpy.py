@@ -137,8 +137,9 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
         keep = augmented_weights <= upbound
         active_nodes = active_nodes[keep]
         active_weights = active_weights[keep]
-        active_heuristics = active_heuristics[keep]
+        # active_heuristics = active_heuristics[keep]
         augmented_weights = augmented_weights[keep]
+        distances[active_nodes] = active_weights
 
         for i in range(0, len(active_nodes)):
             neighbour = active_nodes[i]
@@ -146,7 +147,6 @@ def astar_path_numpy(G, source, target, heuristic, bulk_heuristic):
             # h = active_heuristics[i]
             augment = augmented_weights[i]
 
-            distances[neighbour] = ncost
             push(queue, (augment, ncost, neighbour, curnode))
 
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
