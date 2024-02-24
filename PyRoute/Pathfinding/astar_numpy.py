@@ -132,3 +132,56 @@ def astar_path_numpy(G, source, target, bulk_heuristic):
             push(queue, (augmented_weights[i], active_weights[i], active_nodes[i], curnode))
 
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
+
+
+def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
+
+    G_succ = G._arcs  # For speed-up
+
+    # Traces lowest distance from source node found for each node
+    distances = np.ones(len(G)) * float('+inf')
+    distances[source] = 0
+    # Tracks shortest _complete_ path found so far
+    floatinf = float('inf')
+    upbound = floatinf
+    # Tracks node parents
+    parents = [None] * len(G)
+
+    # the buckets array does a couple of things:
+    # 1 - the kth bucket stores all nodes with f values between k, inclusive, and k+1, exclusive
+    # 2 - nodes in a bucket are not sorted, to dodge the overhead that regular A* would incur
+    buckets = [[(0, source)]]
+    i = 0
+
+    while i < len(buckets):
+        if distances[target] < i:
+            break
+        for dist_u, u in buckets[i]:
+            if dist_u != distances[u]:
+                continue
+            neighbours = G_succ[u]
+            active_nodes = neighbours[0]
+            active_weights = neighbours[1]
+            active_heuristics = bulk_heuristic(active_nodes, target)
+            for k in range(len(active_nodes)):
+                v = active_nodes[k]
+                dist_v = dist_u + active_weights[k] + active_heuristics[k]
+                if distances[v] <= dist_v:
+                    continue
+                distances[v] = dist_v
+                parents[v] = u
+                j = int(dist_v)
+                while len(buckets) <= j:
+                    buckets.append([])
+                buckets[j].append((dist_v, v))
+        i += 1
+    if distances[target] == floatinf:
+        return None
+    path = [target]
+    node = parents[target]
+    while node is not None:
+        assert node not in path, "Node " + str(node) + " duplicated in discovered path"
+        path.append(node)
+        node = parents[node]
+    path.reverse()
+    return path, {}
