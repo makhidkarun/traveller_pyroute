@@ -146,6 +146,8 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
     upbound = floatinf
     # Tracks node parents
     parents = [None] * len(G)
+    # pre-calc heuristics for all nodes to the target node
+    potentials = bulk_heuristic(G._nodes, target)
 
     # the buckets array does a couple of things:
     # 1 - the kth bucket stores all nodes with f values between k, inclusive, and k+1, exclusive
@@ -161,20 +163,14 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
                 continue
             neighbours = G_succ[u]
             active_nodes = neighbours[0]
-            augmented_weights = dist_u + neighbours[1]
-            keep = augmented_weights < np.minimum(distances[active_nodes], distances[target])
-            active_nodes = active_nodes[keep]
-            if 0 == len(active_nodes):  # if active_nodes is empty, bail out now to dodge the bulk_heuristic call
-                continue
-            active_heuristics = bulk_heuristic(active_nodes, target)
-            augmented_weights = augmented_weights[keep] + active_heuristics
+            augmented_weights = dist_u + neighbours[1] + potentials[active_nodes]
             keep = augmented_weights < np.minimum(distances[active_nodes], distances[target])
             active_nodes = active_nodes[keep]
             num_nodes = len(active_nodes)
             if 0 == num_nodes:  # if active_nodes is empty, bail out now to avoid the pointless iterator setup
                 continue
             augmented_weights = augmented_weights[keep]
-            for k in range(num_nodes):
+            for k in range(0, num_nodes):
                 v = active_nodes[k]
                 dist_v = augmented_weights[k]
                 if distances[target] <= dist_v:  # target distance is the upper bound on the shortest-path length
