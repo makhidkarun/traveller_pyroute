@@ -170,10 +170,10 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
             if 0 == num_nodes:  # if active_nodes is empty, bail out now to avoid the pointless iterator setup
                 continue
             augmented_weights = augmented_weights[keep]
+            distances[active_nodes] = augmented_weights
             for k in range(0, num_nodes):
                 v = active_nodes[k]
                 dist_v = augmented_weights[k]
-                distances[v] = dist_v
                 parents[v] = u
                 j = int(dist_v)
                 while len(buckets) <= j:
