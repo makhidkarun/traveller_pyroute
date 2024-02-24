@@ -143,7 +143,6 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
     distances[source] = 0
     # Tracks shortest _complete_ path found so far
     floatinf = float('inf')
-    upbound = floatinf
     # Tracks node parents
     parents = np.ones(len(G)) * -1
     # pre-calc heuristics for all nodes to the target node
@@ -172,10 +171,11 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
             augmented_weights = dist_u + neighbours[1] + potentials[active_nodes]
             keep = augmented_weights < np.minimum(distances[active_nodes], distances[target])
             active_nodes = active_nodes[keep]
-            num_nodes = len(active_nodes)
-            if 0 == num_nodes:  # if active_nodes is empty, bail out now to avoid the pointless iterator setup
+            if 0 == len(active_nodes):  # if active_nodes is empty, bail out now - is pointless to continue
                 continue
             augmented_weights = augmented_weights[keep]
+
+            # Update distance labels and parents for active_nodes, in bulk
             distances[active_nodes] = augmented_weights
             parents[active_nodes] = u
             delta = (int(max(augmented_weights)) + 1) - len(buckets)
@@ -183,6 +183,7 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
             if 0 < delta:
                 for k in range(0, delta):
                     buckets.append([])
+
             remain = zip(active_nodes, augmented_weights)
 
             # Now everything else is done, queue up the remaining neighbours
