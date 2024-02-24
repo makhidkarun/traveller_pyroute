@@ -161,9 +161,12 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
                 continue
             neighbours = G_succ[u]
             active_nodes = neighbours[0]
-            active_weights = neighbours[1]
+            augmented_weights = dist_u + neighbours[1]
+            keep = augmented_weights <= distances[active_nodes]
+            active_nodes = active_nodes[keep]
+            augmented_weights = augmented_weights[keep]
             active_heuristics = bulk_heuristic(active_nodes, target)
-            augmented_weights = dist_u + active_weights + active_heuristics
+            augmented_weights = augmented_weights + active_heuristics
             for k in range(len(active_nodes)):
                 v = active_nodes[k]
                 dist_v = augmented_weights[k]
