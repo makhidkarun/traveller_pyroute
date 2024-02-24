@@ -183,13 +183,14 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
             if 0 < delta:
                 for k in range(0, delta):
                     buckets.append([])
+            remain = zip(active_nodes, augmented_weights)
 
-            for k in range(0, num_nodes):
-                v = active_nodes[k]
-                dist_v = augmented_weights[k]
+            # Now everything else is done, queue up the remaining neighbours
+            for v, dist_v in remain:
                 j = int(dist_v)
                 buckets[j].append((dist_v, v))
         i += 1
+
     if distances[target] == floatinf:
         return None
     path = [target]
