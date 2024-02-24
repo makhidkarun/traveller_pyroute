@@ -31,6 +31,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic):
     upbound = floatinf
     # pre-calc heuristics for all nodes to the target node
     potentials = bulk_heuristic(G._nodes, target)
+    # pre-calc the minimum-cost edge on each node
+    min_cost = np.zeros(len(G))
 
     node_counter = 0
 
@@ -75,7 +77,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic):
         active_weights = dist + raw_nodes[1]
         # filter out nodes whose active weights exceed _either_ the node's distance label _or_ the current upper bound
         # - the current node can _not_ result in a shorter path
-        keep = active_weights <= np.minimum(distances[active_nodes], upbound)
+        keep = active_weights + min_cost[active_nodes] <= np.minimum(distances[active_nodes], upbound)
         active_nodes = active_nodes[keep]
 
         # if neighbours list is empty, go around
