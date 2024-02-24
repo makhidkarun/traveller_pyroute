@@ -145,7 +145,7 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
     floatinf = float('inf')
     upbound = floatinf
     # Tracks node parents
-    parents = [None] * len(G)
+    parents = np.ones(len(G)) * -1
     # pre-calc heuristics for all nodes to the target node
     potentials = bulk_heuristic(G._nodes, target)
 
@@ -171,10 +171,10 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
                 continue
             augmented_weights = augmented_weights[keep]
             distances[active_nodes] = augmented_weights
+            parents[active_nodes] = u
             for k in range(0, num_nodes):
                 v = active_nodes[k]
                 dist_v = augmented_weights[k]
-                parents[v] = u
                 j = int(dist_v)
                 while len(buckets) <= j:
                     buckets.append([])
@@ -183,10 +183,10 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
     if distances[target] == floatinf:
         return None
     path = [target]
-    node = parents[target]
-    while node is not None:
+    node = int(parents[target])
+    while node != -1:
         assert node not in path, "Node " + str(node) + " duplicated in discovered path"
         path.append(node)
-        node = parents[node]
+        node = int(parents[node])
     path.reverse()
     return path, {}
