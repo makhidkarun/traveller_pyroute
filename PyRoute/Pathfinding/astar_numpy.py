@@ -162,16 +162,16 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
             neighbours = G_succ[u]
             active_nodes = neighbours[0]
             augmented_weights = dist_u + neighbours[1]
-            keep = augmented_weights <= distances[active_nodes]
+            keep = augmented_weights < np.minimum(distances[active_nodes], distances[target])
+            active_nodes = active_nodes[keep]
+            active_heuristics = bulk_heuristic(active_nodes, target)
+            augmented_weights = augmented_weights[keep] + active_heuristics
+            keep = augmented_weights < np.minimum(distances[active_nodes], distances[target])
             active_nodes = active_nodes[keep]
             augmented_weights = augmented_weights[keep]
-            active_heuristics = bulk_heuristic(active_nodes, target)
-            augmented_weights = augmented_weights + active_heuristics
             for k in range(len(active_nodes)):
                 v = active_nodes[k]
                 dist_v = augmented_weights[k]
-                if distances[v] <= dist_v:
-                    continue
                 if distances[target] <= dist_v:  # target distance is the upper bound on the shortest-path length
                     continue
                 distances[v] = dist_v
