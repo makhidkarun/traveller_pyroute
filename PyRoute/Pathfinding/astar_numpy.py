@@ -168,6 +168,8 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
                 dist_v = dist_u + active_weights[k] + active_heuristics[k]
                 if distances[v] <= dist_v:
                     continue
+                if distances[target] <= dist_v:  # target distance is the upper bound on the shortest-path length
+                    continue
                 distances[v] = dist_v
                 parents[v] = u
                 j = int(dist_v)
