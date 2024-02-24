@@ -3,6 +3,7 @@ Created on Mar 15, 2014
 
 @author: tjoneslo
 """
+import copy
 import functools
 
 import networkx as nx
@@ -13,7 +14,7 @@ from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
 from PyRoute.Pathfinding.astar import astar_path_indexes
 from PyRoute.TradeBalance import TradeBalance
-from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
+from PyRoute.Pathfinding.astar_numpy import astar_path_numpy, astar_path_numpy_bucket
 
 
 class TradeCalculation(RouteCalculation):
@@ -203,7 +204,11 @@ class TradeCalculation(RouteCalculation):
 
         try:
             # disable static landmark choice for this route
-            rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index, self.shortest_path_tree.lower_bound_bulk)
+            mincost = copy.deepcopy(self.star_graph._min_cost)
+            rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
+                                           self.shortest_path_tree.lower_bound_bulk, min_cost=mincost)
+            #rawroute, _ = astar_path_numpy_bucket(self.star_graph, star.index, target.index,
+            #                               self.shortest_path_tree.lower_bound_bulk, min_cost=mincost)
         except nx.NetworkXNoPath:
             return
 

@@ -114,7 +114,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
                     heapify(queue)
             # either way, target node has been processed, drop it from neighbours
             keep = active_nodes != target
-            below_bound = active_weights <= upbound  # As we have a tighter upper bound, apply it to the neighbours as well
+            # As we have a tighter upper bound, apply it to the neighbours as well
+            below_bound = active_weights + min_cost[active_nodes] < upbound
             keep = np.logical_and(keep, below_bound)
             active_nodes = active_nodes[keep]
             active_weights = active_weights[keep]
