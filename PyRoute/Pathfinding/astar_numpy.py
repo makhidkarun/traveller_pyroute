@@ -86,6 +86,15 @@ def astar_path_numpy(G, source, target, bulk_heuristic):
         active_weights = active_weights[keep]
         augmented_weights = active_weights + potentials[active_nodes]
 
+        if upbound != floatinf:
+            keep = augmented_weights <= upbound
+            active_nodes = active_nodes[keep]
+            active_weights = active_weights[keep]
+            augmented_weights = augmented_weights[keep]
+            num_neighbours = len(active_nodes)
+            if 0 == num_neighbours:
+                continue
+
         if target in active_nodes:
             drop = active_nodes == target
             ncost = active_weights[drop][0]
@@ -125,6 +134,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic):
 
         keep = augmented_weights <= upbound
         active_nodes = active_nodes[keep]
+        if 0 == len(active_nodes):
+            continue
         active_weights = active_weights[keep]
         augmented_weights = augmented_weights[keep]
 
