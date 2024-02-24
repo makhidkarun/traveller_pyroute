@@ -9,7 +9,7 @@ import networkx as nx
 import numpy as np
 
 
-def astar_path_numpy(G, source, target, bulk_heuristic):
+def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
 
     push = heappush
     pop = heappop
@@ -32,7 +32,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic):
     # pre-calc heuristics for all nodes to the target node
     potentials = bulk_heuristic(G._nodes, target)
     # pre-calc the minimum-cost edge on each node
-    min_cost = np.zeros(len(G))
+    min_cost = np.zeros(len(G)) if min_cost is None else min_cost
+    min_cost[target] = 0
 
     node_counter = 0
 
@@ -77,7 +78,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic):
         active_weights = dist + raw_nodes[1]
         # filter out nodes whose active weights exceed _either_ the node's distance label _or_ the current upper bound
         # - the current node can _not_ result in a shorter path
-        keep = active_weights + min_cost[active_nodes] <= np.minimum(distances[active_nodes], upbound)
+        keep = active_weights <= np.minimum(distances[active_nodes], upbound - min_cost[active_nodes])
         active_nodes = active_nodes[keep]
 
         # if neighbours list is empty, go around
@@ -149,7 +150,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic):
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
 
 
-def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
+def astar_path_numpy_bucket(G, source, target, bulk_heuristic, min_cost=None):
 
     G_succ = G._arcs  # For speed-up
 
