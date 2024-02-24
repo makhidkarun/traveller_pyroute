@@ -101,10 +101,12 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
         if target in active_nodes:
             drop = active_nodes == target
             ncost = active_weights[drop][0]
-            better_bound = upbound > ncost
 
-            if better_bound:
+            if upbound > ncost:
                 upbound = ncost
+                distances[target] = ncost
+                # push(queue, (ncost + 0, ncost, target, curnode))
+                push(queue, (ncost, ncost, target, curnode))
                 if 0 < len(queue):
                     queue = [item for item in queue if item[0] <= upbound]
                     # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
@@ -117,11 +119,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
             active_nodes = active_nodes[keep]
             active_weights = active_weights[keep]
             augmented_weights = augmented_weights[keep]
-
-            if better_bound:
-                distances[target] = ncost
-                #push(queue, (ncost + 0, ncost, target, curnode))
-                push(queue, (ncost, ncost, target, curnode))
 
             # if there _was_ one neighbour to process, that was the target, so neighbour list is now empty.
             # Likewise, if the new upper bound has emptied the neighbour list, go around.
