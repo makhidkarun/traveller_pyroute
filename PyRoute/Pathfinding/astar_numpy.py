@@ -112,7 +112,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic):
                 push(queue, (ncost, ncost, target, curnode))
 
             # if there _was_ one neighbour to process, that was the target, so neighbour list is now empty.
-            if 1 == num_neighbours:
+            # Likewise, if the new upper bound has emptied the neighbour list, go around.
+            if 1 == num_neighbours or 0 == len(active_nodes):
                 continue
 
         # Now we have the latest upper bound, use it to filter out nodes whose augmented weights will bust the upper
