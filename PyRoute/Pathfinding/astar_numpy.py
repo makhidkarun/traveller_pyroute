@@ -29,6 +29,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic):
     # Tracks shortest _complete_ path found so far
     floatinf = float('inf')
     upbound = floatinf
+    # pre-calc heuristics for all nodes to the target node
+    potentials = bulk_heuristic(G._nodes, target)
 
     node_counter = 0
 
@@ -82,8 +84,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic):
             continue
 
         active_weights = active_weights[keep]
-        active_heuristics = bulk_heuristic(active_nodes, target)
-        augmented_weights = active_weights + active_heuristics
+        augmented_weights = active_weights + potentials[active_nodes]
 
         if target in active_nodes:
             drop = active_nodes == target
@@ -103,7 +104,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic):
             keep = np.logical_and(keep, below_bound)
             active_nodes = active_nodes[keep]
             active_weights = active_weights[keep]
-            # active_heuristics = active_heuristics[keep]
             augmented_weights = augmented_weights[keep]
 
             if better_bound:
@@ -125,7 +125,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic):
         keep = augmented_weights <= upbound
         active_nodes = active_nodes[keep]
         active_weights = active_weights[keep]
-        # active_heuristics = active_heuristics[keep]
         augmented_weights = augmented_weights[keep]
 
         remain = zip(augmented_weights, active_weights, active_nodes)
