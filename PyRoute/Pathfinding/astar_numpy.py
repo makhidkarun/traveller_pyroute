@@ -155,6 +155,12 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
     buckets = [[(0, source)]]
     i = 0
 
+    # pre-heat buckets list - we have the source-to-target heuristic value, which (by assumption) must not be greater
+    # than the actual route cost, so add that many buckets
+    source_potential = int(potentials[source]) + 1
+    for k in range(0, source_potential):
+        buckets.append([])
+
     while i < len(buckets):
         if distances[target] < i:
             break
@@ -172,12 +178,16 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic):
             augmented_weights = augmented_weights[keep]
             distances[active_nodes] = augmented_weights
             parents[active_nodes] = u
+            delta = (int(max(augmented_weights)) + 1) - len(buckets)
+            # now we know the overall number of new buckets needed for this neighbour set, spin them up
+            if 0 < delta:
+                for k in range(0, delta):
+                    buckets.append([])
+
             for k in range(0, num_nodes):
                 v = active_nodes[k]
                 dist_v = augmented_weights[k]
                 j = int(dist_v)
-                while len(buckets) <= j:
-                    buckets.append([])
                 buckets[j].append((dist_v, v))
         i += 1
     if distances[target] == floatinf:
