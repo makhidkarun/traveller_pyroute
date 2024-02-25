@@ -33,13 +33,9 @@ class RouteLandmarkGraph(DistanceBase):
         if v not in u_first:
             u_first = np.append(u_first, [v])
             u_last = np.append(u_last, [weight])
+            self._arcs[u] = (u_first, u_last)
         else:
-            flip = u_first == v
-            if flip.any():
-                u_last[flip] = weight
-            else:
-                assert False
-        self._arcs[u] = (u_first, u_last)
+            self._lighten_arc(u, v, weight)
 
     def _check_index(self, item):
         if not isinstance(item, int):
@@ -49,3 +45,6 @@ class RouteLandmarkGraph(DistanceBase):
         if len(self) <= item:
             raise IndexError("Index must be integer between 0 and " + str(len(self) - 1))
 
+    def lighten_edge(self, u, v, weight):
+        self._lighten_arc(u, v, weight)
+        self._lighten_arc(v, u, weight)

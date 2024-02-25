@@ -17,3 +17,11 @@ class DistanceBase:
 
     def lighten_edge(self, u, v, weight):
         raise NotImplementedError("Base Class")
+
+    def _lighten_arc(self, u, v, weight):
+        arcs = self._arcs[u]
+        flip = arcs[0] == v
+        if flip.any():
+            arcs[1][flip] = weight
+        else:
+            assert False
