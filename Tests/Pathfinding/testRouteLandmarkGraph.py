@@ -75,6 +75,29 @@ class testRouteLandmarkGraph(baseTest):
         self.assertEqual([1], actual[0], "v - index nodelist not updated")
         self.assertEqual([11], actual[1], "v - value list not updated")
 
+    def test_add_single_edge_twice_should_update_in_place(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
+        graph, source, stars = self._setup_graph(sourcefile)
+        num_stars = len(stars)
+
+        rlg = RouteLandmarkGraph(graph)
+        self.assertEqual(num_stars, len(rlg))
+
+        rlg.add_edge(1, 4, 11)
+        rlg.add_edge(1, 4, 7.5)
+
+        actual = rlg[1]
+        self.assertEqual(1, len(actual[0]), "u - First tuple element should have one element")
+        self.assertEqual(1, len(actual[1]), "u - Second tuple element should have one element")
+        self.assertEqual([4], actual[0], "u - index nodelist not updated")
+        self.assertEqual([7.5], actual[1], "u - value list not updated")
+
+        actual = rlg[4]
+        self.assertEqual(1, len(actual[0]), "v - First tuple element should have one element")
+        self.assertEqual(1, len(actual[1]), "v - Second tuple element should have one element")
+        self.assertEqual([1], actual[0], "v - index nodelist not updated")
+        self.assertEqual([7.5], actual[1], "v - value list not updated")
+
     def _setup_graph(self, sourcefile):
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()

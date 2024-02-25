@@ -29,9 +29,16 @@ class RouteLandmarkGraph(DistanceBase):
 
     def _extend_arc(self, u, v, weight):
         u_first = self._arcs[u][0]
-        u_last = self._arcs[u][0]
-        u_first = np.append(u_first, [v])
-        u_last = np.append(u_last, [weight])
+        u_last = self._arcs[u][1]
+        if v not in u_first:
+            u_first = np.append(u_first, [v])
+            u_last = np.append(u_last, [weight])
+        else:
+            flip = u_first == v
+            if flip.any():
+                u_last[flip] = weight
+            else:
+                assert False
         self._arcs[u] = (u_first, u_last)
 
     def _check_index(self, item):
