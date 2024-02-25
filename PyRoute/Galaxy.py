@@ -12,6 +12,7 @@ import ast
 import itertools
 import math
 import networkx as nx
+import numpy as np
 
 from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
@@ -754,6 +755,13 @@ class Galaxy(AreaItem):
         # approximate-shortest-path bound.
         sp_bound = self.trade.shortest_path_tree.lower_bound(star, target)
         return 1.005 * max(base, sp_bound)
+
+    def heuristic_distance_bulk(self, active_nodes, target):
+        raw = self.trade.shortest_path_tree.lower_bound_bulk(active_nodes, target)
+        lands = self.landmarks_bulk[target]
+        raw[lands[0]] = np.maximum(raw[lands[0]], lands[1])
+
+        return 1.005 * raw
 
     def route_cost(self, route):
         """
