@@ -21,7 +21,7 @@ class ApproximateShortestPathTree:
         self._sources = sources
 
         # now we're all set up, seed the approximate-SP tree/forest (tree with seeds in 1 component, forest otherwise)
-        self._distances = implicit_shortest_path_dijkstra_indexes(self._graph, self._source, seeds=seeds)
+        self._distances = implicit_shortest_path_dijkstra_indexes(self._graph, self._source, seeds=seeds, divisor=self._divisor)
 
     def _get_sources(self, graph, source, sources):
         seeds = None
@@ -35,6 +35,7 @@ class ApproximateShortestPathTree:
                 raise ValueError(
                     "Source node " + str(graph.nodes[source][
                                              'star']) + " has undefined component.  Has calculate_components() been run?")
+            seeds = [source]
         if sources is not None:
             for source in sources:
                 if isinstance(source, Star) and sources[source].component is None:
@@ -47,13 +48,14 @@ class ApproximateShortestPathTree:
                         raise ValueError(
                             "Source node " + str(graph.nodes[source][
                                                      'star']) + " has undefined component.  Has calculate_components() been run?")
-            seeds = sources.values()
+            if isinstance(sources, dict):
+                seeds = sources.values()
+            else:
+                seeds = sources
         return seeds, source
 
     def lower_bound(self, source, target):
-        left = self._distances[source]
-        right = self._distances[target]
-        return abs(left - right)
+        return abs(self._distances[source] - self._distances[target])
 
     def update_edges(self, edges):
         dropnodes = set()

@@ -8,7 +8,7 @@ import networkx as nx
 from PyRoute.Position.Hex import Hex
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
-from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
+from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
 
 
 class XRouteCalculation(RouteCalculation):
@@ -167,8 +167,7 @@ class XRouteCalculation(RouteCalculation):
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathTree(source.index, self.galaxy.stars, 0.2,
-                                                              sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathForestDistanceGraph(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
         self.logger.info('XRoute pass 1')
         self.routes_pass_1()
 

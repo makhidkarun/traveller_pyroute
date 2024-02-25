@@ -11,7 +11,7 @@ where less than the entire shortest path tree needs to be regenerated due to a l
 import heapq
 
 
-def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None, seeds=None):
+def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None, seeds=None, divisor=1):
     if distance_labels is None:
         # dig up nodes in same graph component as source - that's the ones we care about finding distance labels _for_
         if seeds is None:
@@ -46,12 +46,12 @@ def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None,
         # the corresponding node's distance label at the other end of the candidate edge, trim that edge.  Such edges
         # cannot _possibly_ result in smaller distance labels.  By a similar argument, filter the remaining edges
         # when the sum of dist_tail and that edge's weight equals or exceeds the corresponding node's distance label.
-        neighbours = ((head, dist_tail + data['weight']) for (head, data) in graph[tail].items()
+        neighbours = ((head, dist_tail + data['weight'], dist_tail + divisor * data['weight']) for (head, data) in graph[tail].items()
                       if dist_tail <= distance_labels[head] and dist_tail + data['weight'] < distance_labels[head]
                       )
-        for head, dist_head in neighbours:
-            distance_labels[head] = dist_head
-            heapq.heappush(heap, (dist_head, head))
+        for head, dist_head, adj_head in neighbours:
+            distance_labels[head] = adj_head
+            heapq.heappush(heap, (adj_head, head))
     return distance_labels
 
 

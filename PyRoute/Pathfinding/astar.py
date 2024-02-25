@@ -360,13 +360,13 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
         # Remove neighbour nodes that are already enqueued and won't result in shorter paths to them
         # Explicitly retain target node (if present) to give a chance of finding a better upper bound
         # Explicitly _exclude_ source node (if present) because re-considering it is pointless
-        neighbours = [(k, dist + v['weight']) for (k, v) in G_succ[curnode].items()
+        neighbours = [(k, dist + v['weight'], k in enqueued) for (k, v) in G_succ[curnode].items()
                       if not (k in enqueued and dist + v['weight'] >= enqueued[k][0] and not (k == target)) and not (k == source)]
         if upbound != floatinf and 0 < len(neighbours):
             # Remove neighbour nodes who will bust the upper bound as it currently stands
-            neighbours = [(k, v) for (k, v) in neighbours if v <= upbound]
+            neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= upbound]
             # remove enqueued neighbour nodes whose cost plus stored heuristic value will bust upper bound
-            neighbours = [(k, v) for (k, v) in neighbours if not (k in enqueued and v + enqueued[k][1] > upbound)]
+            neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if not (is_queue and v + enqueued[k][1] > upbound)]
 
         # if neighbours list is empty, go around
         num_neighbours = len(neighbours)
@@ -375,29 +375,55 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
 
         # if neighbours list has at least 2 elements, sort it, putting the target node first, then by ascending weight
         if 1 < num_neighbours:
-            neighbours.sort(key=lambda item: item[1])
-            neighbours.sort(key=lambda item: 2 if item[0] == target else 0 + 1 if item[0] in enqueued else 0, reverse=True)
+            neighbours.sort(key=lambda item: 2 if item[0] == target else 0 + 1 if item[2] else 0, reverse=True)
             if neighbours[0][0] == target:  # If first item is the target node, drop all neighbours with higher weights
                 targ_weight = neighbours[0][1]
-                neighbours = [(k, v) for (k, v) in neighbours if v <= targ_weight]
+                neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= targ_weight
+                              and not (is_queue and v + enqueued[k][1] > targ_weight)]
                 num_neighbours = len(neighbours)
 
         diagnostics['neighbours_checked'] += num_neighbours
         diagnostics['heuristic_calls'] += num_neighbours
         diagnostics['nodes_queued'] += num_neighbours
-        for neighbor, ncost in neighbours:
-            if neighbor in enqueued:
+        if target == neighbours[0][0]:
+            diagnostics['heuristic_calls'] -= 1
+            ncost = neighbours[0][1]
+            better_bound = upbound > ncost
+            is_queue = neighbours[0][2]
+            queue_targ = True
+            if is_queue:
+                qcost, h = enqueued[target]
+                if qcost <= ncost:
+                    queue_targ = False
+
+            if better_bound:
+                upbound = ncost
+                if 0 < len(queue):
+                    queue = [item for item in queue if item[0] <= upbound]
+                    # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
+                    queue = [item for item in queue if not (item[2] in enqueued and item[1] > enqueued[item[2]][0])]
+                    heapify(queue)
+            # either way, target node has been processed, drop it from neighbours
+            neighbours = [(k, v, is_queue) for (k, v, is_queue) in neighbours if v <= upbound and k != target]
+
+            if queue_targ and better_bound:
+                h = 0
+                enqueued[target] = ncost, h
+                push(queue, (ncost + h, ncost, target, curnode))
+
+            # if there _was_ one neighbour to process, that was the target, so neighbour list is now empty.
+            if 1 == num_neighbours:
+                continue
+
+        for neighbor, ncost, is_queue in neighbours:
+            if is_queue:
                 diagnostics['heuristic_calls'] -= 1
                 qcost, h = enqueued[neighbor]
                 # if qcost <= ncost, a less costly path from the
                 # neighbor to the source was already determined.
-                # Therefore, we won't attempt to push this neighbor
-                # to the queue
-                if qcost <= ncost:
-                    diagnostics['nodes_queued'] -= 1
-                    continue
-                # if qcost > ncost, we've found a less-costly
-                # path from neighbour to the source, so we'll update it when we re-queue the neighbour
+                # All such cases were stripped out during neighbour selection/filtering, above
+                # Thus, we've found a less-costly path from neighbour to the source, so we'll update it
+                # when we re-queue the neighbour
             else:
                 h = heuristic(neighbor, target)
 
@@ -405,20 +431,12 @@ def astar_path_indexes(G, source, target, heuristic=None, weight="weight"):
             # let alone queueing it
             # If neighbour is the target, h should be zero
             if ncost + h > upbound:
-                diagnostics['nodes_queued'] -= 1
+                if not is_queue:
+                    # Queue the bound-busting neighbour so it can be pre-emptively removed in later iterations
+                    enqueued[neighbor] = ncost, h
+                else:
+                    diagnostics['nodes_queued'] -= 1
                 continue
-
-            # if this completes a path (no matter how _bad_), update the upper bound.
-            # We hold the is_target checks until _after_ we've checked we're enqueueing
-            # a cheaper path
-            if neighbor == target and upbound > ncost:
-                upbound = ncost
-                # only trim the queue if it's not empty
-                if 0 < len(queue):
-                    queue = [item for item in queue if item[0] <= upbound]
-                    # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
-                    queue = [item for item in queue if not (item[2] in enqueued and item[1] > enqueued[item[2]][0])]
-                    heapify(queue)
 
             enqueued[neighbor] = ncost, h
             push(queue, (ncost + h, ncost, neighbor, curnode))
