@@ -21,6 +21,7 @@ from PyRoute.Calculation.CommCalculation import CommCalculation
 from PyRoute.Calculation.OwnedWorldCalculation import OwnedWorldCalculation
 from PyRoute.Calculation.NoneCalculation import NoneCalculation
 from PyRoute.Calculation.XRouteCalculation import XRouteCalculation
+from PyRoute.Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
 from PyRoute.StatCalculation import ObjectStatistics
 from PyRoute.AllyGen import AllyGen
 
@@ -393,6 +394,7 @@ class Galaxy(AreaItem):
         self.max_jump_range = max_jump
         self.min_btn = min_btn
         self.landmarks = dict()
+        self.landmarks_bulk = None
         self.big_component = None
         self.star_mapping = dict()
         self.trade = None
@@ -522,6 +524,7 @@ class Galaxy(AreaItem):
         assert map_len == shadow_len, "Mismatch between shadow stars and stars mapping, " + str(shadow_len) + " and " + str(map_len)
         for item in self.stars.nodes:
             assert 'star' in self.stars.nodes[item], "Star attribute not set for item " + str(item)
+        self.landmarks_bulk = RouteLandmarkGraph(self.stars)
 
     def set_bounding_sectors(self):
         for sector, neighbor in itertools.combinations(self.sectors.values(), 2):
