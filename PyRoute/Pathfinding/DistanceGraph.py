@@ -7,12 +7,13 @@ Thanks to @GamesByDavidE for original prototype and design discussions
 """
 import numpy as np
 
+from PyRoute.Pathfinding.DistanceBase import DistanceBase
 
-class DistanceGraph:
+
+class DistanceGraph(DistanceBase):
 
     def __init__(self, graph):
-        self._nodes = list(graph.nodes())
-        self._indexes = {node: i for (i, node) in enumerate(self._nodes)}
+        super().__init__(graph)
         self._arcs = [
             (np.array(graph.adj[u]), np.array([data['weight'] for data in list(graph.adj[u].values())], dtype=float))
             for u in self._nodes
@@ -36,6 +37,3 @@ class DistanceGraph:
             arcs[1][flip] = weight
         else:
             assert False
-
-    def __len__(self):
-        return len(self._nodes)
