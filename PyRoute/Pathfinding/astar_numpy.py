@@ -115,8 +115,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
             # either way, target node has been processed, drop it from neighbours
             keep = active_nodes != target
             # As we have a tighter upper bound, apply it to the neighbours as well
-            below_bound = active_weights + min_cost[active_nodes] < upbound
-            keep = np.logical_and(keep, below_bound)
+            keep = np.logical_and(keep, augmented_weights < upbound)
             active_nodes = active_nodes[keep]
             active_weights = active_weights[keep]
             augmented_weights = augmented_weights[keep]
@@ -132,15 +131,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
         # As a result, unconditionally queue _all_ nodes that are still active, and filter out the bound-busting
         # neighbours.
         distances[active_nodes] = active_weights
-
-        if upbound != floatinf:
-            keep = augmented_weights <= upbound
-            if not keep.all():
-                active_nodes = active_nodes[keep]
-                if 0 == len(active_nodes):
-                    continue
-                active_weights = active_weights[keep]
-                augmented_weights = augmented_weights[keep]
 
         remain = zip(augmented_weights, active_weights, active_nodes)
 
@@ -163,6 +153,9 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic, min_cost=None):
     parents = np.ones(len(G)) * -1
     # pre-calc heuristics for all nodes to the target node
     potentials = bulk_heuristic(G._nodes, target)
+    # pre-calc the minimum-cost edge on each node
+    min_cost = np.zeros(len(G)) if min_cost is None else min_cost
+    min_cost[target] = 0
 
     # the buckets array does a couple of things:
     # 1 - the kth bucket stores all nodes with f values between k, inclusive, and k+1, exclusive
@@ -179,6 +172,9 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic, min_cost=None):
     while i < len(buckets):
         if distances[target] < i:
             break
+        if not buckets[i]:
+            i += 1
+            continue
         for dist_u, u in buckets[i]:
             if dist_u != distances[u]:
                 continue
