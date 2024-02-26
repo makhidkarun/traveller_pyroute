@@ -79,20 +79,18 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
         # filter out nodes whose active weights exceed _either_ the node's distance label _or_ the current upper bound
         # - the current node can _not_ result in a shorter path
         keep = active_weights <= np.minimum(distances[active_nodes], upbound - min_cost[active_nodes])
+        # if we're not keeping anything, go around
+        if not keep.any():
+            continue
         active_nodes = active_nodes[keep]
 
-        # if neighbours list is empty, go around
         num_neighbours = len(active_nodes)
-        if 0 == num_neighbours:
-            continue
-
         active_weights = active_weights[keep]
         augmented_weights = active_weights + potentials[active_nodes]
 
         if upbound != floatinf:
-            drop = augmented_weights > upbound
-            if drop.any():
-                keep = augmented_weights <= upbound
+            keep = augmented_weights <= upbound
+            if not keep.all():
                 active_nodes = active_nodes[keep]
                 active_weights = active_weights[keep]
                 augmented_weights = augmented_weights[keep]
@@ -136,9 +134,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
         distances[active_nodes] = active_weights
 
         if upbound != floatinf:
-            drop = augmented_weights > upbound
-            if drop.any():
-                keep = augmented_weights <= upbound
+            keep = augmented_weights <= upbound
+            if not keep.all():
                 active_nodes = active_nodes[keep]
                 if 0 == len(active_nodes):
                     continue
