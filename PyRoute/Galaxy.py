@@ -761,6 +761,21 @@ class Galaxy(AreaItem):
         lands = self.landmarks_bulk[target]
         raw[lands[0]] = np.maximum(raw[lands[0]], lands[1])
 
+        # The minimum edge cost on each node is itself an admissible heuristic:
+        # If u is the target, min-edge-cost is special-cased to 0, which equals the cost to target.
+        # If the target is connected to node u via the least-cost edge, u's min-edge-cost equals the cost to target.
+        # If the target is connected to node u via some other edge, u's min-edge-cost underestimates cost to target.
+        # If the target is not directly connected to node u, the target is at least the sum of two nodes' min-edge costs
+        # away, so u's min-edge-cost again underestimates cost to target.
+
+        min_cost = copy.deepcopy(self.trade.star_graph._min_cost)
+        min_cost[target] = 0  # Target is special case, so zero its min cost
+        min_cost = min_cost[active_nodes]
+
+        # Case-wise maximum of 2 or more admissible heuristics (approx-SP bound, existing route distances and min-cost
+        # edges) is itself admissible
+        raw = np.maximum(raw, min_cost)
+
         return 1.005 * raw
 
     def route_cost(self, route):
