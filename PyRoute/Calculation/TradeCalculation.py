@@ -203,12 +203,9 @@ class TradeCalculation(RouteCalculation):
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
-            # disable static landmark choice for this route
             mincost = copy.deepcopy(self.star_graph._min_cost)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
-                                           self.shortest_path_tree.lower_bound_bulk, min_cost=mincost)
-            #rawroute, _ = astar_path_numpy_bucket(self.star_graph, star.index, target.index,
-            #                               self.shortest_path_tree.lower_bound_bulk, min_cost=mincost)
+                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost)
         except nx.NetworkXNoPath:
             return
 
