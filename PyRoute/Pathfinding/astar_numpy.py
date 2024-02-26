@@ -107,13 +107,13 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
             if upbound > ncost:
                 upbound = ncost
                 distances[target] = ncost
-                # push(queue, (ncost + 0, ncost, target, curnode))
-                push(queue, (ncost, ncost, target, curnode))
                 if 0 < len(queue):
                     queue = [item for item in queue if item[0] <= upbound]
                     # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
                     queue = [item for item in queue if not (item[1] > distances[item[2]])]
                     heapify(queue)
+                # push(queue, (ncost + 0, ncost, target, curnode))
+                push(queue, (ncost, ncost, target, curnode))
             # either way, target node has been processed, drop it from neighbours
             keep = active_nodes != target
             # As we have a tighter upper bound, apply it to the neighbours as well
