@@ -254,24 +254,38 @@ def astar_path_numpy_bucket_hybrid(G, source, target, bulk_heuristic, min_cost=N
         if not buckets[i]:
             i += 1
             continue
-        buckets[i] = [(dist_u, u) for (dist_u, u) in buckets[i] if dist_u == distances[u] and dist_u + min_cost[u] <= distances[target]]
+        buckets[i] = [(dist_u, u) for (dist_u, u) in buckets[i] if dist_u == distances[u] and dist_u + potentials[u] <= distances[target]]
         if not buckets[i]:
             i += 1
             continue
+        if 1 < len(buckets[i]):
+            buckets[i].sort(key=lambda item: item[0])
         for dist_u, u in buckets[i]:
             if dist_u != distances[u]:
                 continue
             neighbours = G_succ[u]
             active_nodes = neighbours[0]
-            augmented_weights = dist_u + neighbours[1] + potentials[active_nodes]
-            keep = augmented_weights < np.minimum(distances[active_nodes], distances[target])
+            active_weights = dist_u + neighbours[1]
+            has_bound = distances[target] != floatinf
+            if has_bound:
+                keep = active_weights < np.minimum(distances[active_nodes], distances[target] - min_cost[active_nodes])
+            else:
+                keep = active_weights < distances[active_nodes]
             active_nodes = active_nodes[keep]
             if 0 == len(active_nodes):  # if active_nodes is empty, bail out now - is pointless to continue
                 continue
-            augmented_weights = augmented_weights[keep]
+            active_weights = active_weights[keep]
+            augmented_weights = active_weights + potentials[active_nodes]
+            if has_bound:
+                keep = augmented_weights < distances[target]
+                active_nodes = active_nodes[keep]
+                if 0 == len(active_nodes):  # if active_nodes is empty, bail out now - is pointless to continue
+                    continue
+                active_weights = active_weights[keep]
+                augmented_weights = augmented_weights[keep]
 
             # Update distance labels and parents for active_nodes, in bulk
-            distances[active_nodes] = augmented_weights
+            distances[active_nodes] = active_weights
             parents[active_nodes] = u
             delta = (int(max(augmented_weights) / bucket_width) + 1) - len(buckets)
             # now we know the overall number of new buckets needed for this neighbour set, spin them up
@@ -279,7 +293,7 @@ def astar_path_numpy_bucket_hybrid(G, source, target, bulk_heuristic, min_cost=N
                 for k in range(0, delta):
                     buckets.append([])
 
-            remain = zip(active_nodes, augmented_weights)
+            remain = zip(active_nodes, active_weights)
 
             # Now everything else is done, queue up the remaining neighbours
             for v, dist_v in remain:
