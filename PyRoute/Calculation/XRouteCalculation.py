@@ -206,12 +206,11 @@ class XRouteCalculation(RouteCalculation):
     def get_route_between(self, star, target, trade, heuristic):
         try:
             mincost = copy.deepcopy(self.star_graph._min_cost)
-            rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
+            route, _ = astar_path_numpy(self.star_graph, star.index, target.index,
                                            self.galaxy.heuristic_distance_bulk, min_cost=mincost)
         except nx.NetworkXNoPath:
             return
 
-        route = [self.galaxy.star_mapping[item] for item in rawroute]
         self.galaxy.ranges.add_edge(star, target, distance=star.distance(target))
 
         distance = 0
