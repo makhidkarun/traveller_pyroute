@@ -216,3 +216,79 @@ def astar_path_numpy_bucket(G, source, target, bulk_heuristic, min_cost=None):
         node = int(parents[node])
     path.reverse()
     return path, {}
+
+
+def astar_path_numpy_bucket_hybrid(G, source, target, bulk_heuristic, min_cost=None):
+
+    G_succ = G._arcs  # For speed-up
+
+    # Traces lowest distance from source node found for each node
+    distances = np.ones(len(G)) * float('+inf')
+    distances[source] = 0
+    # Tracks shortest _complete_ path found so far
+    floatinf = float('inf')
+    # Tracks node parents
+    parents = np.ones(len(G)) * -1
+    # pre-calc heuristics for all nodes to the target node
+    potentials = bulk_heuristic(G._nodes, target)
+    # pre-calc the minimum-cost edge on each node
+    min_cost = np.zeros(len(G)) if min_cost is None else min_cost
+    min_cost[target] = 0
+
+    # the buckets array does a couple of things:
+    # 1 - the kth bucket stores all nodes with f values between k, inclusive, and k+1, exclusive
+    # 2 - nodes in a bucket are not sorted, to dodge the overhead that regular A* would incur
+    buckets = [[(0, source)]]
+    i = 0
+
+    # pre-heat buckets list - we have the source-to-target heuristic value, which (by assumption) must not be greater
+    # than the actual route cost, so add that many buckets
+    source_potential = int(potentials[source]) + 1
+    for k in range(0, source_potential):
+        buckets.append([])
+
+    while i < len(buckets):
+        if distances[target] < i:
+            break
+        if not buckets[i]:
+            i += 1
+            continue
+        for dist_u, u in buckets[i]:
+            if dist_u != distances[u]:
+                continue
+            neighbours = G_succ[u]
+            active_nodes = neighbours[0]
+            augmented_weights = dist_u + neighbours[1] + potentials[active_nodes]
+            keep = augmented_weights < np.minimum(distances[active_nodes], distances[target])
+            active_nodes = active_nodes[keep]
+            if 0 == len(active_nodes):  # if active_nodes is empty, bail out now - is pointless to continue
+                continue
+            augmented_weights = augmented_weights[keep]
+
+            # Update distance labels and parents for active_nodes, in bulk
+            distances[active_nodes] = augmented_weights
+            parents[active_nodes] = u
+            delta = (int(max(augmented_weights)) + 1) - len(buckets)
+            # now we know the overall number of new buckets needed for this neighbour set, spin them up
+            if 0 < delta:
+                for k in range(0, delta):
+                    buckets.append([])
+
+            remain = zip(active_nodes, augmented_weights)
+
+            # Now everything else is done, queue up the remaining neighbours
+            for v, dist_v in remain:
+                j = int(dist_v)
+                buckets[j].append((dist_v, v))
+        i += 1
+
+    if distances[target] == floatinf:
+        return None
+    path = [target]
+    node = int(parents[target])
+    while node != -1:
+        assert node not in path, "Node " + str(node) + " duplicated in discovered path"
+        path.append(node)
+        node = int(parents[node])
+    path.reverse()
+    return path, {}
