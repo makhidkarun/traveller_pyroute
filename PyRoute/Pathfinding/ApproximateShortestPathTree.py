@@ -58,41 +58,13 @@ class ApproximateShortestPathTree:
         return abs(self._distances[source] - self._distances[target])
 
     def update_edges(self, edges):
-        dropnodes = set()
-        for item in edges:
-            left = item[0]
-            right = item[1]
-            leftdist = self._distances[left]
-            rightdist = self._distances[right]
-            weight = self._graph[left][right]['weight']
-            delta = abs(leftdist - rightdist)
-            # Given distance labels, L, on nodes u and v, assuming u's label being smaller,
-            # and edge cost between u and v of d(u, v):
-            # L(u) + d(u, v) <= L(v)
-            # Or, after rearranging,
-            # d(u, v) <= L(v) - L(u)
-            # u and v do _NOT_ have to be shortest-path parent/child for this bound to hold
-
-            # Allowing an approximation tolerance of epsilon (say 0.1), that bound becomes
-            # d(u, v) * (1 + epsilon) <= L(v) - L(u)
-
-            # If that bound no longer holds, it's due to the edge (u, v) having its weight decreased during pathfinding.
-            # Tag each incident node as needing updates.
-            if delta >= weight:
-                dropnodes.add(left)
-                dropnodes.add(right)
-
-        # if no nodes are to be dropped, nothing to do - bail out
-        if 0 == len(dropnodes):
-            return
-
-        # Now we have the nodes incident to edges that bust the (1+eps) approximation bound, feed them into restarted
-        # dijkstra to update the approx-SP tree/forest.  Some nodes in dropnodes may well be SP descendants of others,
-        # but it wasn't worth the time or complexity cost to filter them out here.
-        self._distances = implicit_shortest_path_dijkstra_indexes(self._graph, self._source, distance_labels=self._distances, seeds=dropnodes)
+        raise NotImplementedError("Base Class")
 
     def lighten_edge(self, u, v, weight):
-        pass
+        raise NotImplementedError("Base Class")
+
+    def lower_bound_bulk(self, active_nodes, target):
+        raise NotImplementedError("Base Class")
 
     def is_well_formed(self):
         return True
