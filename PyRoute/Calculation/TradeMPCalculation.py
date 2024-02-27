@@ -11,7 +11,6 @@ from queue import Empty
 
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
-from PyRoute.Pathfinding.astar import astar_path_indexes
 from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 
 # Convert the TradeMPCalculation to a global variable to allow the child processes to access it, and all the data.
