@@ -254,7 +254,10 @@ def astar_path_numpy_bucket_hybrid(G, source, target, bulk_heuristic, min_cost=N
         if not buckets[i]:
             i += 1
             continue
-        #buckets[i] = [(dist_u, u) for (dist_u, u) in buckets[i] if dist_u == distances[u]]
+        buckets[i] = [(dist_u, u) for (dist_u, u) in buckets[i] if dist_u == distances[u]]
+        if not buckets[i]:
+            i += 1
+            continue
         for dist_u, u in buckets[i]:
             if dist_u != distances[u]:
                 continue
