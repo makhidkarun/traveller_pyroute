@@ -240,19 +240,21 @@ def astar_path_numpy_bucket_hybrid(G, source, target, bulk_heuristic, min_cost=N
     # 2 - nodes in a bucket are not sorted, to dodge the overhead that regular A* would incur
     buckets = [[(0, source)]]
     i = 0
+    bucket_width = 5
 
     # pre-heat buckets list - we have the source-to-target heuristic value, which (by assumption) must not be greater
     # than the actual route cost, so add that many buckets
-    source_potential = int(potentials[source]) + 1
+    source_potential = int(potentials[source] / bucket_width) + 1
     for k in range(0, source_potential):
         buckets.append([])
 
     while i < len(buckets):
-        if distances[target] < i:
+        if distances[target] < (i * bucket_width):
             break
         if not buckets[i]:
             i += 1
             continue
+        #buckets[i] = [(dist_u, u) for (dist_u, u) in buckets[i] if dist_u == distances[u]]
         for dist_u, u in buckets[i]:
             if dist_u != distances[u]:
                 continue
@@ -268,7 +270,7 @@ def astar_path_numpy_bucket_hybrid(G, source, target, bulk_heuristic, min_cost=N
             # Update distance labels and parents for active_nodes, in bulk
             distances[active_nodes] = augmented_weights
             parents[active_nodes] = u
-            delta = (int(max(augmented_weights)) + 1) - len(buckets)
+            delta = (int(max(augmented_weights) / bucket_width) + 1) - len(buckets)
             # now we know the overall number of new buckets needed for this neighbour set, spin them up
             if 0 < delta:
                 for k in range(0, delta):
@@ -278,7 +280,7 @@ def astar_path_numpy_bucket_hybrid(G, source, target, bulk_heuristic, min_cost=N
 
             # Now everything else is done, queue up the remaining neighbours
             for v, dist_v in remain:
-                j = int(dist_v)
+                j = int(dist_v / bucket_width)
                 buckets[j].append((dist_v, v))
         i += 1
 
