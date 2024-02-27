@@ -14,7 +14,7 @@ from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
 from PyRoute.Pathfinding.astar import astar_path_indexes
 from PyRoute.TradeBalance import TradeBalance
-from PyRoute.Pathfinding.astar_numpy import astar_path_numpy, astar_path_numpy_bucket
+from PyRoute.Pathfinding.astar_numpy import astar_path_numpy, astar_path_numpy_bucket, astar_path_numpy_bucket_hybrid
 
 
 class TradeCalculation(RouteCalculation):
