@@ -17,9 +17,7 @@ from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import Landma
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarksWTNExtremes import LandmarksWTNExtremes
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Pathfinding.ApproximateShortestPathForest import ApproximateShortestPathForest
 from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
-from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
 from Tests.baseTest import baseTest
 
 
@@ -33,7 +31,7 @@ class testApproximateShortestPathForest(baseTest):
         stars = list(graph.nodes)
         source = stars[0]
 
-        approx = ApproximateShortestPathForest(source, graph, 0.2, sources=landmarks)
+        approx = ApproximateShortestPathForestDistanceGraph(source, graph, 0.2, sources=landmarks)
         self.assertEqual(3, len(approx._trees), "Unexpected number of approx-SP trees")
 
         src = stars[2]

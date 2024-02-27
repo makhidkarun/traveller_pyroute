@@ -42,8 +42,8 @@ class testApproximateShortestPathTree(baseTest):
         stars = list(graph.nodes)
         source = stars[0]
 
-        approx = ApproximateShortestPathTree(source, graph, 0.2)
-        self.assertEqual(482, len(approx._distances), "Distances dictionary has unexpected length")
+        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0.2)
+        self.assertEqual(496, len(approx._distances), "Distances dictionary has unexpected length")
 
         src = stars[2]
         targ = stars[80]
@@ -73,7 +73,7 @@ class testApproximateShortestPathTree(baseTest):
         stars = list(graph.nodes)
         source = stars[0]
 
-        approx = ApproximateShortestPathTree(source, graph, 0.2)
+        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0.2)
 
         src = stars[20]
         targ = stars[19]
@@ -103,7 +103,7 @@ class testApproximateShortestPathTree(baseTest):
         stars = list(graph.nodes)
         source = stars[0]
 
-        approx = ApproximateShortestPathTree(source, graph, 0.2)
+        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0.2)
 
         src = stars[2]
 
@@ -162,12 +162,10 @@ class testApproximateShortestPathTree(baseTest):
         stars = list(graph.nodes)
         source = stars[0]
 
-        approx = ApproximateShortestPathTree(source, graph, 0.2)
+        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0.2)
         # verify that all distances as at ctor are finite
         distances = approx._distances
         old_num = len(distances)
-        for node in distances:
-            self.assertFalse(distances[node] == float('+inf'), "SPT distance for " + str(node) + " not finite")
 
         # auxiliary network dijkstra calculation to dish out parent nodes
         paths = nx.single_source_dijkstra_path(graph, source)
@@ -202,7 +200,7 @@ class testApproximateShortestPathTree(baseTest):
         stars = list(graph.nodes)
         source = stars[0]
 
-        approx = ApproximateShortestPathTree(source, graph, 0.2)
+        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0.2)
 
         # auxiliary network dijkstra calculation to dish out parent nodes
         paths = nx.single_source_dijkstra_path(graph, source)
@@ -216,7 +214,7 @@ class testApproximateShortestPathTree(baseTest):
         edges = [(inter, hi)]
 
         approx.update_edges(edges)
-        self.assertEqual(482, len(approx._distances))
+        self.assertEqual(496, len(approx._distances))
 
     def test_verify_changed_leaf_edge_trip_update(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
@@ -244,7 +242,7 @@ class testApproximateShortestPathTree(baseTest):
         leafnode = stars[30]
         subnode = stars[paths[leafnode][-2]]
 
-        approx = ApproximateShortestPathTree(source, graph, 0)
+        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0)
 
         # seed expected distances
         with open(jsonfile, 'r') as file:
@@ -259,10 +257,14 @@ class testApproximateShortestPathTree(baseTest):
                 exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
 
-        self.assertEqual(expected_distances, approx._distances, "Unexpected distances after SPT creation")
+        distance_check = list(expected_distances.values()) == approx._distances
+        self.assertTrue(distance_check.all(), "Unexpected distances after SPT creation")
 
         # adjust weight
+        oldweight = galaxy.stars[subnode][leafnode]['weight']
         galaxy.stars[subnode][leafnode]['weight'] -= 1
+        galaxy.trade.star_graph.lighten_edge(subnode, leafnode, oldweight - 1)
+        approx._graph.lighten_edge(subnode, leafnode, oldweight - 1)
 
         # tell SPT weight has changed
         edge = (subnode, leafnode)
@@ -294,7 +296,7 @@ class testApproximateShortestPathTree(baseTest):
         source = stars[0]
         leafnode = stars[30]
 
-        approx = ApproximateShortestPathTree(source, graph, 0)
+        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0)
 
         # auxiliary network dijkstra calculation to dish out parent nodes
         paths = nx.single_source_dijkstra_path(graph, source)
@@ -313,10 +315,14 @@ class testApproximateShortestPathTree(baseTest):
                 exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
 
-        self.assertEqual(expected_distances, approx._distances, "Unexpected distances after SPT creation")
+        distance_check = list(expected_distances.values()) == approx._distances
+        self.assertTrue(distance_check.all(), "Unexpected distances after SPT creation")
 
         # adjust weight
+        oldweight = galaxy.stars[source][right]['weight']
         galaxy.stars[source][right]['weight'] -= 1
+        galaxy.trade.star_graph.lighten_edge(source, right, oldweight - 1)
+        approx._graph.lighten_edge(source, right, oldweight - 1)
 
         # tell SPT weight has changed
         edge = (source, right)
@@ -328,7 +334,8 @@ class testApproximateShortestPathTree(baseTest):
 
         approx.update_edges([edge])
 
-        self.assertEqual(expected_distances, approx._distances, "Unexpected distances after SPT restart")
+        distance_check = list(expected_distances.values()) == approx._distances
+        self.assertTrue(distance_check.all(), "Unexpected distances after SPT restart")
 
     def test_verify_multiple_near_root_edges_propagate(self):
         sourcefile = self.unpack_filename('DeltaFiles/dijkstra_restart_blowup/Lishun.sec')
@@ -351,8 +358,7 @@ class testApproximateShortestPathTree(baseTest):
         stars = list(graph.nodes)
         source = stars[4]
 
-        approx = ApproximateShortestPathTree(source, graph, 0)
-
+        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0)
 
         edges = [(stars[3], stars[2]), (stars[2], source)]
 

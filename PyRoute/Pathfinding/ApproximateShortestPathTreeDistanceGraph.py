@@ -12,20 +12,13 @@ from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_di
 class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
 
     def __init__(self, source, graph, epsilon, sources=None):
-        seeds, source = self._get_sources(graph, source, sources)
-
-        self._source = source
+        super().__init__(source, graph, epsilon, sources)
         self._graph = DistanceGraph(graph)
-        self._epsilon = epsilon
-        # memoising this because its value gets used _heavily_ in lower bound calcs, called during heuristic generation
-        self._divisor = 1 / (1 + epsilon)
-        self._sources = sources
-
         distances = np.ones(len(graph)) * float('+inf')
-        for seed in seeds:
+        for seed in self._seeds:
             distances[seed] = 0
 
-        self._distances = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source, distances, seeds=seeds, divisor=self._divisor)
+        self._distances = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source, distances, seeds=self._seeds, divisor=self._divisor)
 
     def update_edges(self, edges):
         dropnodes = set()
@@ -65,6 +58,9 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
         self._distances = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
                                                                          distance_labels=self._distances,
                                                                          seeds=dropnodes, divisor=self._divisor)
+
+    def lower_bound(self, source, target):
+        return abs(self._distances[source] - self._distances[target])
 
     def lower_bound_bulk(self, active_nodes, target):
         result = np.abs(self._distances[active_nodes] - self._distances[target])

@@ -8,20 +8,17 @@ from PyRoute.Star import Star
 
 
 class ApproximateShortestPathTree:
-    __slots__ = '_source', '_graph', '_epsilon', '_divisor', '_distances', '_sources'
+    __slots__ = '_source', '_graph', '_epsilon', '_divisor', '_distances', '_sources', '_seeds'
 
     def __init__(self, source, graph, epsilon, sources=None):
         seeds, source = self._get_sources(graph, source, sources)
 
         self._source = source
-        self._graph = graph
         self._epsilon = epsilon
         # memoising this because its value gets used _heavily_ in lower bound calcs, called during heuristic generation
         self._divisor = 1 / (1 + epsilon)
         self._sources = sources
-
-        # now we're all set up, seed the approximate-SP tree/forest (tree with seeds in 1 component, forest otherwise)
-        self._distances = implicit_shortest_path_dijkstra_indexes(self._graph, self._source, seeds=seeds, divisor=self._divisor)
+        self._seeds = seeds
 
     def _get_sources(self, graph, source, sources):
         seeds = None
@@ -55,7 +52,7 @@ class ApproximateShortestPathTree:
         return seeds, source
 
     def lower_bound(self, source, target):
-        return abs(self._distances[source] - self._distances[target])
+        raise NotImplementedError("Base Class")
 
     def update_edges(self, edges):
         raise NotImplementedError("Base Class")
