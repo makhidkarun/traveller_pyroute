@@ -1,6 +1,7 @@
 """
 @author: tjoneslo
 """
+import copy
 import os
 
 import networkx as nx
@@ -50,8 +51,9 @@ def intrasector_process(working_queue, processed_queue):
                     continue
 
                 try:
-                    rawroute, _ = astar_path_indexes(tradeCalculation.galaxy.stars, star.index, neighbor.index,
-                                                        tradeCalculation.galaxy.heuristic_distance_indexes)
+                    mincost = copy.deepcopy(tradeCalculation.star_graph._min_cost)
+                    rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star.index, neighbor.index,
+                                               tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost)
                 except nx.NetworkXNoPath:
                     continue
 
@@ -83,13 +85,14 @@ def long_route_process(working_queue, processed_queue):
             break
 
         try:
-            route, _ = astar_path_indexes(tradeCalculation.galaxy.stars, star, neighbor,
-                                             tradeCalculation.galaxy.heuristic_distance_indexes)
+            mincost = copy.deepcopy(tradeCalculation.star_graph._min_cost)
+            rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star.index, neighbor.index,
+                                       tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost)
         except nx.NetworkXNoPath:
             continue
 
         # Route is a list of star indexes, which is what the parent process is assuming.
-        processed_queue.put(route)
+        processed_queue.put(rawroute)
         processed += 1
         if total > 100 and processed % (total // 20) == 0:
             tradeCalculation.logger.info(f'Child {os.getpid()} processed {processed} routes, at {processed // (total // 100)}%')
@@ -281,7 +284,9 @@ class TradeMPCalculation(TradeCalculation):
             f"This route from {star} to {target} has already been processed in reverse"
 
         try:
-            rawroute, _ = astar_path_indexes(self.galaxy.stars, star.index, target.index, self.galaxy.heuristic_distance_indexes)
+            mincost = copy.deepcopy(self.star_graph._min_cost)
+            rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
+                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost)
         except nx.NetworkXNoPath:
             return
 
