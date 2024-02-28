@@ -351,6 +351,14 @@ class StarlineTransformer(Transformer):
                 self.raw = self.raw.replace(rawval, '', 1)
                 if 0 < index:
                     self.raw = self.raw[index:]
+                # special-case trade-code removal
+                if 'trade' == dataval and -1 == index:
+                    bitz = rawval.split()
+                    for valbit in bitz:
+                        index = self.raw.find(valbit)
+                        self.raw = self.raw.replace(valbit, '', 1)
+                        if 0 < index:
+                            self.raw = self.raw[index:]
 
     def _square_up_parsed_zero(self, rawstring, parsed):
         bitz = [item for item in rawstring.split(' ') if '' != item]
