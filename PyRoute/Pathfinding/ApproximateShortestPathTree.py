@@ -3,7 +3,6 @@ Created on Aug 08, 2023
 
 @author: CyberiaResurrection
 """
-from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_indexes
 from PyRoute.Star import Star
 
 
