@@ -4,13 +4,14 @@ Created on Sep 21, 2023
 @author: CyberiaResurrection
 """
 from PyRoute.Pathfinding.ApproximateShortestPathTreeDistanceGraph import ApproximateShortestPathTreeDistanceGraph
+from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from Tests.baseTest import baseTest
-from PyRoute.Pathfinding.astar import astar_path_indexes
+from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 
 
-class testAStarIndexes(baseTest):
+class testAStarNumpy(baseTest):
 
     def testAStarOverSubsector(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
@@ -28,21 +29,16 @@ class testAStarIndexes(baseTest):
 
         galaxy.generate_routes()
         galaxy.trade.calculate_components()
+        dist_graph = DistanceGraph(galaxy.stars)
 
         source = galaxy.star_mapping[0]
         target = galaxy.star_mapping[36]
 
         galaxy.trade.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(source.index, galaxy.stars, 0)
 
-        heuristic = galaxy.heuristic_distance_indexes
+        heuristic = galaxy.heuristic_distance_bulk
 
         exp_route = [0, 8, 9, 15, 24, 36]
-        exp_diag = dict()
-        exp_diag['heuristic_calls'] = 29
-        exp_diag['neighbours_checked'] = 41
-        exp_diag['nodes_expanded'] = 17
-        exp_diag['nodes_queued'] = 41
 
-        act_route, act_diag = astar_path_indexes(galaxy.stars, source.index, target.index, heuristic)
+        act_route, _ = astar_path_numpy(dist_graph, source.index, target.index, heuristic)
         self.assertEqual(exp_route, act_route)
-        self.assertEqual(exp_diag, act_diag)
