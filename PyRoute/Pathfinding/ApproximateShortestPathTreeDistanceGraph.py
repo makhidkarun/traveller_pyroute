@@ -11,6 +11,8 @@ from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_di
 
 class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
 
+    floatinf = float('+inf')
+
     def __init__(self, source, graph, epsilon, sources=None):
         super().__init__(source, graph, epsilon, sources)
         self._graph = DistanceGraph(graph)
@@ -63,6 +65,8 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
         return abs(self._distances[source] - self._distances[target])
 
     def lower_bound_bulk(self, active_nodes, target):
+        if self.floatinf == self._distances[target]:
+            return np.zeros(len(active_nodes))
         result = np.abs(self._distances[active_nodes] - self._distances[target])
         return result
 
