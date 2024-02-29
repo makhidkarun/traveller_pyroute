@@ -11,6 +11,7 @@ import tempfile
 import unittest
 
 import networkx as nx
+import numpy as np
 
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarksWTNExtremes import LandmarksWTNExtremes
@@ -51,6 +52,25 @@ class testApproximateShortestPathForest(baseTest):
         expected = 310.833
         actual = approx.lower_bound(src, targ)
         self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
+
+    def test_trixial_bounds_in_bulk(self):
+        galaxy = self.set_up_zarushagar_sector()
+
+        foo = LandmarksTriaxialExtremes(galaxy)
+        landmarks = foo.get_landmarks(index=True)
+        graph = galaxy.stars
+        stars = list(graph.nodes)
+        source = stars[0]
+
+        approx = ApproximateShortestPathForestDistanceGraph(source, graph, 0.2, sources=landmarks)
+
+        active_nodes = [2, 80]
+        target = 80
+        expected = np.array([310.833, 0])
+        actual = approx.lower_bound_bulk(active_nodes, target)
+        self.assertIsNotNone(actual)
+
+        np.testing.assert_array_almost_equal(expected, actual, 0.000001, "Unexpected bounds array")
 
     def set_up_zarushagar_sector(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')

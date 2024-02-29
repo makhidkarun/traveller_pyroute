@@ -3,11 +3,14 @@ Created on Aug 09, 2023
 
 @author: CyberiaResurrection
 """
+import copy
+
 import networkx as nx
 
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
+from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 
 
 class CommCalculation(RouteCalculation):
@@ -195,7 +198,9 @@ class CommCalculation(RouteCalculation):
 
     def get_route_between(self, star, target):
         try:
-            route = nx.astar_path(self.galaxy.stars, star.index, target.index, self.galaxy.heuristic_distance_indexes)
+            mincost = copy.deepcopy(self.star_graph._min_cost)
+            route, _ = astar_path_numpy(self.star_graph, star.index, target.index,
+                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost)
         except nx.NetworkXNoPath:
             return
 

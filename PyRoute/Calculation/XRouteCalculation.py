@@ -3,12 +3,15 @@ Created on Aug 09, 2023
 
 @author: CyberiaResurrection
 """
+import copy
+
 import networkx as nx
 
 from PyRoute.Position.Hex import Hex
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
+from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 
 
 class XRouteCalculation(RouteCalculation):
@@ -202,9 +205,12 @@ class XRouteCalculation(RouteCalculation):
 
     def get_route_between(self, star, target, trade, heuristic):
         try:
-            route = nx.astar_path(self.galaxy.stars, star.index, target.index, heuristic)
+            mincost = copy.deepcopy(self.star_graph._min_cost)
+            route, _ = astar_path_numpy(self.star_graph, star.index, target.index,
+                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost)
         except nx.NetworkXNoPath:
             return
+
         self.galaxy.ranges.add_edge(star, target, distance=star.distance(target))
 
         distance = 0

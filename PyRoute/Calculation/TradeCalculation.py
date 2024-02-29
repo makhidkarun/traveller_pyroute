@@ -3,15 +3,17 @@ Created on Mar 15, 2014
 
 @author: tjoneslo
 """
+import copy
 import functools
 
 import networkx as nx
 
+from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
-from PyRoute.Pathfinding.astar import astar_path_indexes
 from PyRoute.TradeBalance import TradeBalance
+from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 
 
 class TradeCalculation(RouteCalculation):
@@ -164,6 +166,7 @@ class TradeCalculation(RouteCalculation):
 
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
+        self.star_graph = DistanceGraph(self.galaxy.stars)
         landmarks = self.get_landmarks(index=True)
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
         source.is_landmark = True
@@ -199,9 +202,9 @@ class TradeCalculation(RouteCalculation):
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
-            # disable static landmark choice for this route
-            self.tree_choice = None
-            rawroute, _ = astar_path_indexes(self.galaxy.stars, star.index, target.index, self.galaxy.heuristic_distance_indexes)
+            mincost = copy.deepcopy(self.star_graph._min_cost)
+            rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
+                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost)
         except nx.NetworkXNoPath:
             return
 
@@ -311,6 +314,7 @@ class TradeCalculation(RouteCalculation):
 
         self.galaxy.landmarks[(source.index, target.index)] = distance
         self.galaxy.landmarks[(target.index, source.index)] = distance
+        self.galaxy.landmarks_bulk.add_edge(source.index, target.index, distance)
 
         # Gather basic statistics.
         tradeBTN = self.get_btn(source, target, distance)
@@ -336,6 +340,7 @@ class TradeCalculation(RouteCalculation):
             data['count'] += 1
             if reweight and not exhausted:
                 data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
+                self.star_graph.lighten_edge(start.index, end.index, data['weight'])
                 self.shortest_path_tree.lighten_edge(start.index, end.index, data['weight'])
             if not exhausted:  # If edge is exhausted - can't trip an update - don't queue it for update
                 edges.append((start.index, end.index))

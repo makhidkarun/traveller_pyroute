@@ -5,7 +5,7 @@ import unittest
 
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
+from PyRoute.Pathfinding.ApproximateShortestPathTreeDistanceGraph import ApproximateShortestPathTreeDistanceGraph
 from Tests.baseTest import baseTest
 
 
@@ -35,7 +35,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -65,7 +65,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -95,7 +95,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
         stars.sort(key=lambda item: item.wtn, reverse=True)
         stars[0].is_landmark = True
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -124,7 +124,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
         stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -266,7 +266,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
         stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
@@ -298,7 +298,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
         stars = [galaxy.stars.nodes[item]['star'] for item in galaxy.stars]
         stars.sort(key=lambda item: item.wtn, reverse=True)
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTree(stars[0].index, galaxy.stars, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(stars[0].index, galaxy.stars, 0)
         for (star, neighbour, data) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 

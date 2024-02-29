@@ -12,6 +12,7 @@ import ast
 import itertools
 import math
 import networkx as nx
+import numpy as np
 
 from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
@@ -21,6 +22,7 @@ from PyRoute.Calculation.CommCalculation import CommCalculation
 from PyRoute.Calculation.OwnedWorldCalculation import OwnedWorldCalculation
 from PyRoute.Calculation.NoneCalculation import NoneCalculation
 from PyRoute.Calculation.XRouteCalculation import XRouteCalculation
+from PyRoute.Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
 from PyRoute.StatCalculation import ObjectStatistics
 from PyRoute.AllyGen import AllyGen
 
@@ -393,6 +395,7 @@ class Galaxy(AreaItem):
         self.max_jump_range = max_jump
         self.min_btn = min_btn
         self.landmarks = dict()
+        self.landmarks_bulk = None
         self.big_component = None
         self.star_mapping = dict()
         self.trade = None
@@ -522,6 +525,7 @@ class Galaxy(AreaItem):
         assert map_len == shadow_len, "Mismatch between shadow stars and stars mapping, " + str(shadow_len) + " and " + str(map_len)
         for item in self.stars.nodes:
             assert 'star' in self.stars.nodes[item], "Star attribute not set for item " + str(item)
+        self.landmarks_bulk = RouteLandmarkGraph(self.stars)
 
     def set_bounding_sectors(self):
         for sector, neighbor in itertools.combinations(self.sectors.values(), 2):
@@ -751,6 +755,28 @@ class Galaxy(AreaItem):
         # approximate-shortest-path bound.
         sp_bound = self.trade.shortest_path_tree.lower_bound(star, target)
         return 1.005 * max(base, sp_bound)
+
+    def heuristic_distance_bulk(self, active_nodes, target):
+        raw = self.trade.shortest_path_tree.lower_bound_bulk(active_nodes, target)
+        lands = self.landmarks_bulk[target]
+        raw[lands[0]] = np.maximum(raw[lands[0]], lands[1])
+
+        # The minimum edge cost on each node is itself an admissible heuristic:
+        # If u is the target, min-edge-cost is special-cased to 0, which equals the cost to target.
+        # If the target is connected to node u via the least-cost edge, u's min-edge-cost equals the cost to target.
+        # If the target is connected to node u via some other edge, u's min-edge-cost underestimates cost to target.
+        # If the target is not directly connected to node u, the target is at least the sum of two nodes' min-edge costs
+        # away, so u's min-edge-cost again underestimates cost to target.
+
+        min_cost = copy.deepcopy(self.trade.star_graph._min_cost)
+        min_cost[target] = 0  # Target is special case, so zero its min cost
+        min_cost = min_cost[active_nodes]
+
+        # Case-wise maximum of 2 or more admissible heuristics (approx-SP bound, existing route distances and min-cost
+        # edges) is itself admissible
+        raw = np.maximum(raw, min_cost)
+
+        return 1.005 * raw
 
     def route_cost(self, route):
         """
