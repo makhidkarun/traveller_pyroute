@@ -8,6 +8,7 @@ import copy
 import logging
 import os
 
+from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Galaxy import Sector, Allegiance
 from PyRoute.Star import Star
@@ -168,6 +169,18 @@ class SectorDictionary(dict):
             allegiance = foo.allegiances[label]
             if not hasattr(allegiance.stats, 'high_pop_worlds'):
                 allegiance.stats.high_pop_worlds = []
+            DeltaLogicError.delta_assert(
+                0 == allegiance.stats.passengers,
+                "Passenger stats not reset on SectorDictionary deepcopy"
+            )
+            DeltaLogicError.delta_assert(
+                0 == allegiance.stats.trade,
+                "Trade stats not reset on SectorDictionary deepcopy"
+            )
+            DeltaLogicError.delta_assert(
+                0 == allegiance.stats.tradeExt,
+                "TradeExt stats not reset on SectorDictionary deepcopy"
+            )
 
         return foo
 
