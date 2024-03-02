@@ -2,6 +2,18 @@
 Created on Feb 22, 2024
 
 @author: CyberiaResurrection
+
+Compared to the ancestral networkx version of astar_path, this code:
+    Does _not_ use a count() object reference to break ties, as nodes are directly-comparable integers
+    Leans on numpy to handle neighbour nodes, edges to same and heuristic values in bulk
+    Tracks upper-bounds on shortest-path length as they are found
+    Prunes neighbour candidates early - if this exhausts a node by leaving it no viable neighbour candidates, so be it
+    Grooms the node queue in the following cases:
+        When a new upper bound is found, discards queue entries whose f-values bust the new upper bound
+        When a _longer_ path is found to a previously-queued node, discards queue entries whose g-values bust
+            the corresponding node's distance label
+        Every 49 nodes, discards queue entries who bust their corresponding node's distance label
+
 """
 from heapq import heappop, heappush, heapify
 

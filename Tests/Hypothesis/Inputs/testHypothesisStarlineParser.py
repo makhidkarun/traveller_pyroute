@@ -266,6 +266,7 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 ???????-? 000000000000000       - - A 000   000 000-0 ', True)
     @example('0101 000000000000000 ???????-? 00000000000+  0         - a 000   00', True)
     @example('0101 000000000000000 ???????-? 000000000000000       c -   000   00', True)
+    @example('0101 000000000000000 ???????-? 00000000+  0000         -   000   00', True)
     # Cases where original regex output was wonky
     @example('0000 000000000000000 ???????-? 000000000000000       -         - 0 000   00', False)
     @example('0000 000000000000000 0000000-0 000000000000000       -         - 0 000 0 00', False)
@@ -304,6 +305,7 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 ???????-? 000000000000 (0       - - 0 000   ?0)', 'weird')
     @example('0000 000000000000000 0000000-0 000000000000 (0       - - 0 000   ?0)', 'weird')
     @example('0000 000000000000000 ???????-? 000000000000000       - - A 000   000?000-0 ', 'weird')
+    @example('0000 000000000000000 0000000-0 000000000000000       - - A 000   00?0000-0 ', 'weird')
     def test_starline_parser_against_regex(self, s, match):
         # if it's a known weird-parse case, assume it out now
         assume(match != 'weird')

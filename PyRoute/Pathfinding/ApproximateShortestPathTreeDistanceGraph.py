@@ -11,21 +11,16 @@ from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_di
 
 class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
 
+    floatinf = float('+inf')
+
     def __init__(self, source, graph, epsilon, sources=None):
-        seeds, source = self._get_sources(graph, source, sources)
-
-        self._source = source
+        super().__init__(source, graph, epsilon, sources)
         self._graph = DistanceGraph(graph)
-        self._epsilon = epsilon
-        # memoising this because its value gets used _heavily_ in lower bound calcs, called during heuristic generation
-        self._divisor = 1 / (1 + epsilon)
-        self._sources = sources
-
         distances = np.ones(len(graph)) * float('+inf')
-        for seed in seeds:
+        for seed in self._seeds:
             distances[seed] = 0
 
-        self._distances = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source, distances, seeds=seeds, divisor=self._divisor)
+        self._distances = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source, distances, seeds=self._seeds, divisor=self._divisor)
 
     def update_edges(self, edges):
         dropnodes = set()
@@ -38,6 +33,18 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
             keep = shelf[0] == right
             weight = shelf[1][keep][0]
             delta = abs(leftdist - rightdist)
+            # Given distance labels, L, on nodes u and v, assuming u's label being smaller,
+            # and edge cost between u and v of d(u, v):
+            # L(u) + d(u, v) <= L(v)
+            # Or, after rearranging,
+            # d(u, v) <= L(v) - L(u)
+            # u and v do _NOT_ have to be shortest-path parent/child for this bound to hold
+
+            # Allowing an approximation tolerance of epsilon (say 0.1), that bound becomes
+            # d(u, v) * (1 + epsilon) <= L(v) - L(u)
+
+            # If that bound no longer holds, it's due to the edge (u, v) having its weight decreased during pathfinding.
+            # Tag each incident node as needing updates.
 
             if delta >= weight:
                 dropnodes.add(left)
@@ -47,11 +54,19 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
         if 0 == len(dropnodes):
             return
 
+        # Now we have the nodes incident to edges that bust the (1+eps) approximation bound, feed them into restarted
+        # dijkstra to update the approx-SP tree/forest.  Some nodes in dropnodes may well be SP descendants of others,
+        # but it wasn't worth the time or complexity cost to filter them out here.
         self._distances = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
                                                                          distance_labels=self._distances,
                                                                          seeds=dropnodes, divisor=self._divisor)
 
+    def lower_bound(self, source, target):
+        return abs(self._distances[source] - self._distances[target])
+
     def lower_bound_bulk(self, active_nodes, target):
+        if self.floatinf == self._distances[target]:
+            return np.zeros(len(active_nodes))
         result = np.abs(self._distances[active_nodes] - self._distances[target])
         return result
 

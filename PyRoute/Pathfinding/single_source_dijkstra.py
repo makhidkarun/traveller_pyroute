@@ -4,8 +4,9 @@ Restarted single-source all-target Dijkstra shortest paths.
 Lifted from networkx repo (https://github.com/networkx/networkx/blob/main/networkx/algorithms/shortest_paths/weighted.py)
 as at Add note about using latex formatting in docstring in the contributor…  (commit a63c8bd).
 
-Major modifications here are ripping out gubbins unrelated to the single-source all-targets case, and handling cases
-where less than the entire shortest path tree needs to be regenerated due to a link weight change.
+Major modifications here are ripping out gubbins unrelated to the single-source all-targets case, handling cases
+where less than the entire shortest path tree needs to be regenerated due to a link weight change, and specialising to
+the specific input format used in PyRoute.
 
 """
 import heapq
