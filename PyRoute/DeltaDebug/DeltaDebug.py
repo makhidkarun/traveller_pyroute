@@ -28,6 +28,7 @@ from PyRoute.Galaxy import Galaxy
 
 
 logger = logging.getLogger('PyRoute')
+tradelogger = logging.getLogger('PyRoute.TradeCodes')
 
 
 def process():
@@ -107,6 +108,7 @@ def process():
     delta.add_argument('--assume-interesting', dest="run_init", default=True, action='store_false',
                        help="Assume initial input is interesting.")
 
+    tradelogger.setLevel(logging.CRITICAL + 1)
     args = parser.parse_args()
 
     # sanity check run arguments
