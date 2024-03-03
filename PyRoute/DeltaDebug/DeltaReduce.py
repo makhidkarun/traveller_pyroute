@@ -6,9 +6,11 @@ Modify this class to add different reduction passes.
 
 @author: CyberiaResurrection
 """
+import copy
 import logging
 import math
 
+from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.HexMap import HexMap
@@ -51,7 +53,7 @@ class DeltaReduce:
         self.breacher = WidenHoleReducer(self)
 
     def is_initial_state_interesting(self):
-        sectors = self.sectors
+        sectors = copy.deepcopy(self.sectors)
         args = self.args
 
         interesting, _, _ = self._check_interesting(args, sectors)
@@ -60,7 +62,7 @@ class DeltaReduce:
             raise AssertionError("Original input not interesting - aborting")
 
     def is_initial_state_uninteresting(self, reraise=False):
-        sectors = self.sectors
+        sectors = copy.deepcopy(self.sectors)
         args = self.args
 
         interesting, msg, e = self._check_interesting(args, sectors)
@@ -144,6 +146,15 @@ class DeltaReduce:
 
             galaxy.set_borders(args.borders, args.ally_match)
 
+            # Now all the set up is done, check we ended up with a well-formed galaxy
+            galaxy.is_well_formed()
+            # Check, before _any_ routes are run, that passenger and trade totals balance
+            try:
+                galaxy.trade.cross_check_totals()
+            except AssertionError as e:
+                q = DeltaLogicError(e.args)
+                raise q
+
             if args.owned:
                 galaxy.process_owned_worlds()
 
@@ -168,6 +179,9 @@ class DeltaReduce:
                     graphMap = GraphicSubsectorMap(galaxy, args.routes, args.speculative_version)
                     graphMap.write_maps()
         except Exception as e:
+            # special-case DeltaLogicError - that means something's gone sideways in the delta debugger itself
+            if isinstance(e, DeltaLogicError):
+                raise e
             q = e
             # check e's message and/or stack trace for interestingness line
             msg = str(e)

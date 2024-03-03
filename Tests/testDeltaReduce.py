@@ -59,13 +59,34 @@ class testDeltaReduce(baseTest):
         delta[sector.name] = sector
 
         reducer = DeltaReduce(delta, args)
-
-        # reducer.is_initial_state_interesting()
-        # reducer.reduce_subsector_pass()
         reducer.reduce_line_pass()
-        reducer.is_initial_state_interesting()
+        reducer.is_initial_state_uninteresting()
 
-        foo = 1
+    def test_line_reduction_throws_delta_logic_error(self):
+        sourcefile = self.unpack_filename('DeltaFiles/dagudashaag-allegiance-pax-balance/Dagudashaag-delta-error.sec')
+
+        args = self._make_args_no_line()
+        args.interestingline = ": Allegiance total"
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+
+        reducer.reduce_line_pass()
+        # input should be un-interesting, so the is-interesting check should blow up with an assertion error
+        expected_msg = 'Original input not interesting - aborting'
+        msg = None
+        try:
+            reducer.is_initial_state_interesting()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual(expected_msg, msg)
+
+        # as input should be un-interesting, the is-not-interesting check should not blow up
+        reducer.is_initial_state_uninteresting()
 
     def test_line_reduction(self):
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
