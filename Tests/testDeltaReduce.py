@@ -67,6 +67,22 @@ class testDeltaReduce(baseTest):
 
         foo = 1
 
+    def test_line_reduction_throws_delta_logic_error(self):
+        sourcefile = self.unpack_filename('DeltaFiles/dagudashaag-allegiance-pax-balance/Dagudashaag-delta-error.sec')
+
+        args = self._make_args_no_line()
+        args.interestingline = ": Allegiance total"
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+
+        reducer.reduce_line_pass()
+        reducer.is_initial_state_interesting()
+
     def test_line_reduction(self):
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
 
