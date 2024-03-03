@@ -6,6 +6,7 @@ Modify this class to add different reduction passes.
 
 @author: CyberiaResurrection
 """
+import copy
 import logging
 import math
 
@@ -52,7 +53,7 @@ class DeltaReduce:
         self.breacher = WidenHoleReducer(self)
 
     def is_initial_state_interesting(self):
-        sectors = self.sectors
+        sectors = copy.deepcopy(self.sectors)
         args = self.args
 
         interesting, _, _ = self._check_interesting(args, sectors)
@@ -61,7 +62,7 @@ class DeltaReduce:
             raise AssertionError("Original input not interesting - aborting")
 
     def is_initial_state_uninteresting(self, reraise=False):
-        sectors = self.sectors
+        sectors = copy.deepcopy(self.sectors)
         args = self.args
 
         interesting, msg, e = self._check_interesting(args, sectors)
