@@ -758,8 +758,6 @@ class Galaxy(AreaItem):
 
     def heuristic_distance_bulk(self, active_nodes, target):
         raw = self.trade.shortest_path_tree.lower_bound_bulk(active_nodes, target)
-        lands = self.landmarks_bulk[target]
-        raw[lands[0]] = np.maximum(raw[lands[0]], lands[1])
 
         # The minimum edge cost on each node is itself an admissible heuristic:
         # If u is the target, min-edge-cost is special-cased to 0, which equals the cost to target.
