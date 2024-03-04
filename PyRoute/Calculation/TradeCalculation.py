@@ -260,6 +260,14 @@ class TradeCalculation(RouteCalculation):
                 nubound = min(midleft + midright)
                 upbound = min(upbound, nubound)
 
+        if 0 < len(hist_src[0]) and 0 < len(hist_targ[0]):
+            common, src, trg = np.intersect1d(hist_src[0], hist_targ[0], assume_unique=True, return_indices=True)
+            if 0 < len(common):
+                midleft = hist_src[1][src]
+                midright = hist_targ[1][trg]
+                nubound = min(midleft + midright)
+                upbound = min(upbound, nubound)
+
         return upbound
 
     def update_statistics(self, star, target, tradeCr, tradePass):
