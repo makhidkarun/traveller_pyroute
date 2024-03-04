@@ -6,8 +6,11 @@ Created on Feb 22, 2024
 Compared to the ancestral networkx version of astar_path, this code:
     Does _not_ use a count() object reference to break ties, as nodes are directly-comparable integers
     Leans on numpy to handle neighbour nodes, edges to same and heuristic values in bulk
-    Tracks upper-bounds on shortest-path length as they are found
+    Tracks upper-bounds on shortest-path cost as they are found
     Prunes neighbour candidates early - if this exhausts a node by leaving it no viable neighbour candidates, so be it
+    Takes an optional externally-supplied upper bound
+        - Sanity and correctness of this upper bound are the _caller_'s responsibility
+        - If the supplied upper bound produces a pathfinding failure, so be it
     Grooms the node queue in the following cases:
         When a new upper bound is found, discards queue entries whose f-values bust the new upper bound
         When a _longer_ path is found to a previously-queued node, discards queue entries whose g-values bust
@@ -21,7 +24,7 @@ import networkx as nx
 import numpy as np
 
 
-def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
+def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=None):
 
     push = heappush
     pop = heappop
@@ -40,7 +43,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
     distances[source] = 0
     # Tracks shortest _complete_ path found so far
     floatinf = float('inf')
-    upbound = floatinf
+    upbound = floatinf if upbound is None else upbound
     # pre-calc heuristics for all nodes to the target node
     potentials = bulk_heuristic(G._nodes, target)
     # pre-calc the minimum-cost edge on each node

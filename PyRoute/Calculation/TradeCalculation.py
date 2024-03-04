@@ -202,6 +202,7 @@ class TradeCalculation(RouteCalculation):
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
+            upbound = self._preheat_upper_bound(star, target)
             mincost = copy.deepcopy(self.star_graph._min_cost)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
                                            self.galaxy.heuristic_distance_bulk, min_cost=mincost)
@@ -230,6 +231,12 @@ class TradeCalculation(RouteCalculation):
         # Update the trade route (edges)
         tradeCr, tradePass = self.route_update_simple(route, True)
         self.update_statistics(star, target, tradeCr, tradePass)
+
+    def _preheat_upper_bound(self, star, target):
+        stardex = star.index
+        targdex = target.index
+
+        return float('+inf')
 
     def update_statistics(self, star, target, tradeCr, tradePass):
         if star.sector != target.sector:
