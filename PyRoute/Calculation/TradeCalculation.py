@@ -242,6 +242,15 @@ class TradeCalculation(RouteCalculation):
         src_adj = self.star_graph._arcs[stardex]
         trg_adj = self.star_graph._arcs[targdex]
 
+        hist_targ = self.galaxy.historic_costs._arcs[targdex]
+        if 0 < len(hist_targ[0]):
+            common, src, trg = np.intersect1d(src_adj[0], hist_targ[0], assume_unique=True, return_indices=True)
+            if 0 < len(common):
+                midleft = src_adj[1][src]
+                midright = hist_targ[1][trg]
+                nubound = min(midleft + midright)
+                upbound = min(upbound, nubound)
+
         return upbound
 
     def update_statistics(self, star, target, tradeCr, tradePass):
