@@ -6,6 +6,7 @@ Created on Mar 15, 2014
 import copy
 import functools
 
+import numpy as np
 import networkx as nx
 
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
@@ -205,7 +206,7 @@ class TradeCalculation(RouteCalculation):
             upbound = self._preheat_upper_bound(star, target)
             mincost = copy.deepcopy(self.star_graph._min_cost)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
-                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost)
+                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
         except nx.NetworkXNoPath:
             return
 
@@ -236,7 +237,12 @@ class TradeCalculation(RouteCalculation):
         stardex = star.index
         targdex = target.index
 
-        return float('+inf')
+        upbound = float('+inf')
+
+        src_adj = self.star_graph._arcs[stardex]
+        trg_adj = self.star_graph._arcs[targdex]
+
+        return upbound
 
     def update_statistics(self, star, target, tradeCr, tradePass):
         if star.sector != target.sector:
@@ -352,6 +358,12 @@ class TradeCalculation(RouteCalculation):
             if not exhausted:  # If edge is exhausted - can't trip an update - don't queue it for update
                 edges.append((start.index, end.index))
             start = end
+
+        if not self.galaxy.stars.has_edge(source.index, target.index):
+            historic_cost = self.route_cost(route) * 1.005
+            self.galaxy.historic_costs.add_edge(source.index, target.index, historic_cost)
+            self.galaxy.stars.add_edge(source.index, target.index, distance=distance, weight=historic_cost, trade=0,
+                                       btn=0, count=0, exhaust=0, route=route)
 
         # Feed the list of touched edges into the approximate-shortest-path machinery, so it can update whatever
         # distance labels it needs to stay within its approximation bound.

@@ -396,6 +396,7 @@ class Galaxy(AreaItem):
         self.min_btn = min_btn
         self.landmarks = dict()
         self.landmarks_bulk = None
+        self.historic_costs = None
         self.big_component = None
         self.star_mapping = dict()
         self.trade = None
@@ -526,6 +527,7 @@ class Galaxy(AreaItem):
         for item in self.stars.nodes:
             assert 'star' in self.stars.nodes[item], "Star attribute not set for item " + str(item)
         self.landmarks_bulk = RouteLandmarkGraph(self.stars)
+        self.historic_costs = RouteLandmarkGraph(self.stars)
 
     def set_bounding_sectors(self):
         for sector, neighbor in itertools.combinations(self.sectors.values(), 2):
