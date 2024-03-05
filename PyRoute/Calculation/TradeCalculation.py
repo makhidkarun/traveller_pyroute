@@ -5,6 +5,7 @@ Created on Mar 15, 2014
 """
 import copy
 import functools
+import math
 
 import numpy as np
 import networkx as nx
@@ -236,8 +237,10 @@ class TradeCalculation(RouteCalculation):
     def _preheat_upper_bound(self, star, target):
         stardex = star.index
         targdex = target.index
+        reheat = (stardex + targdex) % (math.floor(math.sqrt(len(self.star_graph)))) == 0
 
         upbound = float('+inf')
+        reheat_list = set()
 
         src_adj = self.star_graph._arcs[stardex]
         trg_adj = self.star_graph._arcs[targdex]
@@ -248,8 +251,11 @@ class TradeCalculation(RouteCalculation):
             if 0 < len(common):
                 midleft = src_adj[1][src]
                 midright = hist_targ[1][trg]
-                nubound = min(midleft + midright)
+                midbound = midleft + midright
+                mindex = np.argmin(midbound)
+                nubound = midbound[mindex]
                 upbound = min(upbound, nubound)
+                reheat_list.add((stardex, common[mindex]))
 
         hist_src = self.galaxy.historic_costs._arcs[stardex]
         if 0 < len(hist_src[0]):
@@ -257,16 +263,36 @@ class TradeCalculation(RouteCalculation):
             if 0 < len(common):
                 midleft = hist_src[1][src]
                 midright = trg_adj[1][trg]
-                nubound = min(midleft + midright)
+                midbound = midleft + midright
+                mindex = np.argmin(midbound)
+                nubound = midbound[mindex]
                 upbound = min(upbound, nubound)
+                reheat_list.add((targdex, common[mindex]))
 
         if 0 < len(hist_src[0]) and 0 < len(hist_targ[0]):
             common, src, trg = np.intersect1d(hist_src[0], hist_targ[0], assume_unique=True, return_indices=True)
             if 0 < len(common):
                 midleft = hist_src[1][src]
                 midright = hist_targ[1][trg]
-                nubound = min(midleft + midright)
+                midbound = midleft + midright
+                mindex = np.argmin(midbound)
+                nubound = midbound[mindex]
                 upbound = min(upbound, nubound)
+                reheat_list.add((stardex, common[mindex]))
+                reheat_list.add((targdex, common[mindex]))
+
+        if reheat and 0 < len(reheat_list):
+            for pair in reheat_list:
+                start = pair[0]
+                end = pair[1]
+                edge = self.galaxy.stars[start][end]
+                route = edge.get('route', False)
+                if route is not False:
+                    rawroute = [item.index for item in route]
+                    newcost = self.galaxy.route_cost(rawroute) * 1.005
+                    if edge['weight'] > newcost:
+                        self.galaxy.stars[start][end]['weight'] = newcost
+                        self.galaxy.historic_costs.lighten_edge(start, end, newcost)
 
         return upbound
 
