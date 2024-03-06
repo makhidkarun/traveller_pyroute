@@ -388,7 +388,6 @@ class TradeCalculation(RouteCalculation):
 
         self.galaxy.landmarks[(source.index, target.index)] = distance
         self.galaxy.landmarks[(target.index, source.index)] = distance
-        self.galaxy.landmarks_bulk.add_edge(source.index, target.index, distance)
 
         # Gather basic statistics.
         tradeBTN = self.get_btn(source, target, distance)

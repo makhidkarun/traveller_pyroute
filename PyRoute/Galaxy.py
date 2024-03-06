@@ -395,7 +395,6 @@ class Galaxy(AreaItem):
         self.max_jump_range = max_jump
         self.min_btn = min_btn
         self.landmarks = dict()
-        self.landmarks_bulk = None
         self.historic_costs = None
         self.big_component = None
         self.star_mapping = dict()
@@ -526,7 +525,6 @@ class Galaxy(AreaItem):
         assert map_len == shadow_len, "Mismatch between shadow stars and stars mapping, " + str(shadow_len) + " and " + str(map_len)
         for item in self.stars.nodes:
             assert 'star' in self.stars.nodes[item], "Star attribute not set for item " + str(item)
-        self.landmarks_bulk = RouteLandmarkGraph(self.stars)
         self.historic_costs = RouteLandmarkGraph(self.stars)
 
     def set_bounding_sectors(self):
