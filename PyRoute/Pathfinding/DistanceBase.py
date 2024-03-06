@@ -26,9 +26,9 @@ class DistanceBase:
     def lighten_edge(self, u, v, weight):
         raise NotImplementedError("Base Class")
 
-    def distances_from_target(self, target):
-        dq = self._positions[:, 0] - self._positions[target, 0]
-        dr = self._positions[:, 1] - self._positions[target, 1]
+    def distances_from_target(self, active_nodes, target):
+        dq = self._positions[active_nodes, 0] - self._positions[target, 0]
+        dr = self._positions[active_nodes, 1] - self._positions[target, 1]
 
         return (abs(dq) + abs(dr) + abs(dq + dr)) // 2
 

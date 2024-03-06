@@ -111,7 +111,7 @@ class testRouteLandmarkGraph(baseTest):
         raw_nodes = graph.nodes()
         targstar = raw_nodes[11]['star']
 
-        targ_distances = rlg.distances_from_target(11)
+        targ_distances = rlg.distances_from_target(raw_nodes, 11)
         self.assertEqual(len(rlg), len(targ_distances), "Should be one distance-to-target per node")
 
         for i in range(len(rlg)):
