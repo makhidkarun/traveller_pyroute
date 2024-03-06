@@ -10,6 +10,7 @@ the specific input format used in PyRoute.
 
 """
 import heapq
+import numpy as np
 
 
 def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None, seeds=None, divisor=1):
@@ -57,6 +58,12 @@ def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None,
 
 
 def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1):
+    # return only distance_labels from the explicit version
+    distance_labels, _ = explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds, divisor)
+    return distance_labels
+
+
+def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1):
     # assumes that distance_labels is already setup
     if seeds is None:
         seeds = {source}
@@ -65,6 +72,9 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
 
     heap = [(distance_labels[seed], seed) for seed in seeds if 0 < len(arcs[seed][0])]
     heapq.heapify(heap)
+
+    parents = np.ones(len(graph), dtype=int) * -100  # Using -100 to track "not considered during processing"
+    parents[list(seeds)] = -1  # Using -1 to flag "root node of tree"
 
     while heap:
         dist_tail, tail = heapq.heappop(heap)
@@ -90,6 +100,7 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
             continue
         active_weights = dist_tail + divisor * active_costs[keep]
         distance_labels[active_nodes] = active_weights
+        parents[active_nodes] = tail
 
         if 1 == num_nodes:
             heapq.heappush(heap, (active_weights[0], active_nodes[0]))
@@ -97,4 +108,4 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
             for index in range(0, num_nodes):
                 heapq.heappush(heap, (active_weights[index], active_nodes[index]))
 
-    return distance_labels
+    return distance_labels, parents

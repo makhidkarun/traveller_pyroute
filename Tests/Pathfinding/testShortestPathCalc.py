@@ -5,7 +5,8 @@ from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from Tests.baseTest import baseTest
-from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph
+from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph,\
+    explicit_shortest_path_dijkstra_distance_graph
 import numpy as np
 
 
@@ -36,6 +37,70 @@ class testShortestPathCalc(baseTest):
         actual_distances = implicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
 
         self.assertEqual(list(expected_distances.values()), list(actual_distances), "Unexpected distances after SPT creation")
+
+    def test_shortest_explicit_path_by_distance_graph(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
+        jsonfile = self.unpack_filename('PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
+
+        graph, source, stars = self._setup_graph(sourcefile)
+        distgraph = DistanceGraph(graph)
+
+        # seed expected distances
+        with open(jsonfile, 'r') as file:
+            expected_string = json.load(file)
+
+        expected_distances = dict()
+        component = [item for item in stars if graph.nodes[item]['star'].component == graph.nodes[source]['star'].component]
+        for item in component:
+            exp_dist = 0
+            rawstar = graph.nodes[item]['star']
+            if str(rawstar) in expected_string:
+                exp_dist = expected_string[str(rawstar)]
+            expected_distances[item] = exp_dist
+
+        distance_labels = np.ones(len(graph)) * float('+inf')
+        distance_labels[source] = 0
+        expected_parents = np.ones(len(graph), dtype=int) * -1
+        expected_parents[1] = 6
+        expected_parents[2] = 1
+        expected_parents[3] = 2
+        expected_parents[4] = 2
+        expected_parents[5] = 0
+        expected_parents[6] = 9
+        expected_parents[7] = 12
+        expected_parents[8] = 0
+        expected_parents[9] = 8
+        expected_parents[10] = 9
+        expected_parents[11] = 9
+        expected_parents[12] = 18
+        expected_parents[13] = 12
+        expected_parents[14] = 5
+        expected_parents[15] = 9
+        expected_parents[16] = 9
+        expected_parents[17] = 15
+        expected_parents[18] = 11
+        expected_parents[19] = 8
+        expected_parents[20] = 8
+        expected_parents[21] = 14
+        expected_parents[22] = 11
+        expected_parents[23] = 12
+        expected_parents[24] = 15
+        expected_parents[25] = 24
+        expected_parents[26] = 17
+        expected_parents[27] = 19
+        expected_parents[28] = 20
+        expected_parents[29] = 26
+        expected_parents[30] = 23
+        expected_parents[31] = 27
+        expected_parents[32] = 28
+        expected_parents[33] = 28
+        expected_parents[34] = 24
+        expected_parents[35] = 24
+        expected_parents[36] = 24
+        actual_distances, actual_parents = explicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
+
+        self.assertEqual(list(expected_distances.values()), list(actual_distances), "Unexpected distances after SPT creation")
+        self.assertEqual(list(expected_parents), list(actual_parents), "Unexpected parent relations")
 
     def _setup_graph(self, sourcefile):
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
