@@ -237,6 +237,8 @@ class TradeCalculation(RouteCalculation):
     def _preheat_upper_bound(self, star, target):
         stardex = star.index
         targdex = target.index
+        # Don't reheat on _every_ route, but reheat frequently enough to keep historic costs sort-of firm.
+        # Keeping this deterministic helps keep input reduction straight, as there's less state to track.
         reheat = (stardex + targdex) % (math.floor(math.sqrt(len(self.star_graph)))) == 0
 
         upbound = float('+inf')
@@ -245,8 +247,10 @@ class TradeCalculation(RouteCalculation):
         src_adj = self.star_graph._arcs[stardex]
         trg_adj = self.star_graph._arcs[targdex]
 
+        # Case 1 - Direct source neighbour to historic-route target neighbour
         hist_targ = self.galaxy.historic_costs._arcs[targdex]
         if 0 < len(hist_targ[0]):
+            # Dig out the common neighbours, _and_ their indexes in the respective adjacency lists
             common, src, trg = np.intersect1d(src_adj[0], hist_targ[0], assume_unique=True, return_indices=True)
             if 0 < len(common):
                 midleft = src_adj[1][src]
@@ -257,8 +261,10 @@ class TradeCalculation(RouteCalculation):
                 upbound = min(upbound, nubound)
                 reheat_list.add((stardex, common[mindex]))
 
+        # Case 2 - Historic-route source neighbour to direct target neighbour
         hist_src = self.galaxy.historic_costs._arcs[stardex]
         if 0 < len(hist_src[0]):
+            # Dig out the common neighbours, _and_ their indexes in the respective adjacency lists
             common, src, trg = np.intersect1d(hist_src[0], trg_adj[0], assume_unique=True, return_indices=True)
             if 0 < len(common):
                 midleft = hist_src[1][src]
@@ -269,7 +275,9 @@ class TradeCalculation(RouteCalculation):
                 upbound = min(upbound, nubound)
                 reheat_list.add((targdex, common[mindex]))
 
+        # Case 3 - Historic-route source neighbour to historic-route target neighbour
         if 0 < len(hist_src[0]) and 0 < len(hist_targ[0]):
+            # Dig out the common neighbours, _and_ their indexes in the respective adjacency lists
             common, src, trg = np.intersect1d(hist_src[0], hist_targ[0], assume_unique=True, return_indices=True)
             if 0 < len(common):
                 midleft = hist_src[1][src]
@@ -289,6 +297,7 @@ class TradeCalculation(RouteCalculation):
                 route = edge.get('route', False)
                 if route is not False:
                     rawroute = [item.index for item in route]
+                    # The 0.5% bump is to _ensure_ the newcost remains an _upper_ bound on the historic-route cost
                     newcost = self.galaxy.route_cost(rawroute) * 1.005
                     if edge['weight'] > newcost:
                         self.galaxy.stars[start][end]['weight'] = newcost
