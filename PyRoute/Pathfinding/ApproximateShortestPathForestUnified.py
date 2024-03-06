@@ -102,6 +102,19 @@ class ApproximateShortestPathForestUnified:
                                                                             distance_labels=self._distances[:, i],
                                                                             seeds=dropnodes, divisor=self._divisor)
 
+    def expand_forest(self, nu_seeds):
+        raw_seeds = nu_seeds if isinstance(nu_seeds, list) else list(nu_seeds.values())
+        nu_distances = np.ones((self._graph_len)) * float('+inf')
+        nu_distances[raw_seeds] = 0
+        nu_distances = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
+                                                                nu_distances,
+                                                                seeds=raw_seeds,
+                                                                divisor=self._divisor)
+        result = np.zeros((self._graph_len, 1), dtype=float)
+        result[:, 0] = list(nu_distances)
+        self._distances = np.append(self._distances, result, 1)
+        self._num_trees += 1
+
     def _get_sources(self, graph, source, sources):
         seeds = None
         num_trees = 1
@@ -137,3 +150,7 @@ class ApproximateShortestPathForestUnified:
 
     def lighten_edge(self, u, v, weight):
         self._graph.lighten_edge(u, v, weight)
+
+    @property
+    def num_trees(self):
+        return self._num_trees

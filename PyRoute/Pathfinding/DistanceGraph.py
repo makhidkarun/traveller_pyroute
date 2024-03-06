@@ -5,6 +5,8 @@ Created on Sep 23, 2023
 
 Thanks to @GamesByDavidE for original prototype and design discussions
 """
+import copy
+
 import numpy as np
 
 from PyRoute.Pathfinding.DistanceBase import DistanceBase
@@ -23,6 +25,12 @@ class DistanceGraph(DistanceBase):
             node_edges = self._arcs[i][1]
             if 0 < len(node_edges):
                 self._min_cost[i] = min(node_edges)
+
+    def min_cost(self, active_nodes, target):
+        min_cost = copy.deepcopy(self._min_cost)
+        min_cost[target] = 0
+
+        return min_cost[active_nodes]
 
     def lighten_edge(self, u, v, weight):
         self._lighten_arc(u, v, weight)

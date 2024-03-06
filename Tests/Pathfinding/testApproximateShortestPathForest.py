@@ -196,6 +196,43 @@ class testApproximateShortestPathForest(baseTest):
         distance_check = list(expected_distances.values()) == approx._distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT restart")
 
+    def test_add_tree_to_unified_forest(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, 1, False)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes()
+        galaxy.trade.calculate_components()
+
+        graph = galaxy.stars
+        stars = list(graph.nodes)
+        source = stars[0]
+
+        seeds = [{0: 1}, {0: 2}, {0: 3}]
+        active_nodes = list(range(37))
+
+        approx = ApproximateShortestPathForestUnified(source, graph, epsilon=0.1, sources=seeds)
+        self.assertEqual(3, approx.num_trees)
+        oldbound = approx.lower_bound_bulk(active_nodes, source)
+
+        nu_seed = {0: 4}
+        approx.expand_forest(nu_seed)
+
+        self.assertEqual(4, approx.num_trees)
+        nubound = approx.lower_bound_bulk(active_nodes, source)
+
+        delta = nubound - oldbound
+        self.assertGreater(max(delta), 0, "At least one heuristic value should be improved by extra tree")
+
     def set_up_zarushagar_sector(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
