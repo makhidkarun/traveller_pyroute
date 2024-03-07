@@ -22,11 +22,14 @@ class TestTradeCode(unittest.TestCase):
         self.logger = logging.getLogger("PyRoute")
 
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        logging.disable(logging.NOTSET)
         # create console handler and set level to debug
         ch = logging.StreamHandler()
         ch.setLevel("INFO")
         ch.setFormatter(formatter)
         self.logger.addHandler(ch)
+        logger = logging.getLogger('PyRoute.TradeCodes')
+        logger.setLevel(logging.WARNING)
 
     def testLo(self):
         code = TradeCodes("Lo")
