@@ -110,11 +110,11 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             keep = augmented_weights < upbound
             if not keep.all():
                 active_nodes = active_nodes[keep]
-                active_weights = active_weights[keep]
-                augmented_weights = augmented_weights[keep]
                 num_neighbours = len(active_nodes)
                 if 0 == num_neighbours:
                     continue
+                active_weights = active_weights[keep]
+                augmented_weights = augmented_weights[keep]
 
         if target in active_nodes:
             drop = active_nodes == target
