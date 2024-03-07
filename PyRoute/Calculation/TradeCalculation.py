@@ -234,12 +234,12 @@ class TradeCalculation(RouteCalculation):
         tradeCr, tradePass = self.route_update_simple(route, True)
         self.update_statistics(star, target, tradeCr, tradePass)
 
-    def _preheat_upper_bound(self, star, target):
+    def _preheat_upper_bound(self, star, target, allow_reheat=True):
         stardex = star.index
         targdex = target.index
         # Don't reheat on _every_ route, but reheat frequently enough to keep historic costs sort-of firm.
         # Keeping this deterministic helps keep input reduction straight, as there's less state to track.
-        reheat = (stardex + targdex) % (math.floor(math.sqrt(len(self.star_graph)))) == 0
+        reheat = allow_reheat and ((stardex + targdex) % (math.floor(math.sqrt(len(self.star_graph)))) == 0)
 
         upbound = float('+inf')
         reheat_list = set()
@@ -302,6 +302,8 @@ class TradeCalculation(RouteCalculation):
                     if edge['weight'] > newcost:
                         self.galaxy.stars[start][end]['weight'] = newcost
                         self.galaxy.historic_costs.lighten_edge(start, end, newcost)
+            reheated_upbound = self._preheat_upper_bound(star, target, allow_reheat=False)
+            upbound = min(reheated_upbound, upbound)
 
         return upbound
 
