@@ -76,12 +76,12 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
 
             # Skip bad paths that were enqueued before finding a better one
             qcost = distances[curnode]
-            if qcost < dist:
+            if qcost <= dist:
                 queue = [item for item in queue if not (item[1] > distances[item[2]])]
                 heapify(queue)
                 continue
             # If we've found a better path, update
-            distances[curnode] = qcost
+            distances[curnode] = dist
 
         explored[curnode] = parent
         has_bound = upbound != floatinf
