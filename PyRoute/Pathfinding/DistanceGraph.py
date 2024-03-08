@@ -15,7 +15,7 @@ class DistanceGraph(DistanceBase):
     def __init__(self, graph):
         super().__init__(graph)
         self._arcs = [
-            (np.array(graph.adj[u]), np.array([data['weight'] for data in list(graph.adj[u].values())], dtype=float))
+            (np.array(graph.adj[u], dtype=int), np.array([data['weight'] for data in list(graph.adj[u].values())], dtype=float))
             for u in self._nodes
         ]
         self._min_cost = np.zeros(len(self._nodes))
