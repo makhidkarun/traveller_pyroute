@@ -35,7 +35,13 @@ class ApproximateShortestPathForestUnified:
             self._distances[:, i] = result
 
     def lower_bound_bulk(self, active_nodes, target):
-        raw = np.abs(self._distances[active_nodes, :] - self._distances[target, :])
+        actives = self._distances[active_nodes, :]
+        target = self._distances[target, :]
+        overdrive = target == float('+inf')
+        if overdrive.any():
+            target[overdrive] = 0
+            actives[:, overdrive] = 0
+        raw = np.abs(actives - target)
 
         return np.max(raw, axis=1)
 

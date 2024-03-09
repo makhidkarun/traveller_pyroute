@@ -103,6 +103,36 @@ class testApproximateShortestPathForest(baseTest):
         approx = ApproximateShortestPathForestUnified(source, graph, 0.2, sources=landmarks)
         self.assertEqual(1, approx._num_trees)
 
+    def test_unified_can_handle_bulk_lobound_from_singleton_component(self):
+        galaxy = self.set_up_zarushagar_sector()
+
+        foo = LandmarksTriaxialExtremes(galaxy)
+        landmarks = foo.get_landmarks(index=True)
+        graph = galaxy.stars
+        stars = list(graph.nodes)
+        source = stars[0]
+        targ = [item for item in graph if graph.nodes()[item]['star'].component == 1][0]
+
+        approx = ApproximateShortestPathForestUnified(source, graph, 0.2, sources=landmarks)
+
+        bulk_lo = approx.lower_bound_bulk(stars, targ)
+        self.assertEqual(1129.1666666666667, max(bulk_lo), "Unexpected lobound")
+
+    def test_unified_can_handle_bulk_lobound_to_singleton_component(self):
+        galaxy = self.set_up_zarushagar_sector()
+
+        foo = LandmarksTriaxialExtremes(galaxy)
+        landmarks = foo.get_landmarks(index=True)
+        graph = galaxy.stars
+        stars = list(graph.nodes)
+        source = stars[0]
+        targ = [item for item in graph if graph.nodes()[item]['star'].component == 1][0]
+
+        approx = ApproximateShortestPathForestUnified(source, graph, 0.2, sources=landmarks)
+
+        bulk_lo = approx.lower_bound_bulk(stars, source)
+        self.assertEqual(float('+inf'), bulk_lo[targ])
+
     def test_verify_near_root_edge_propagates(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         jsonfile = self.unpack_filename('PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
