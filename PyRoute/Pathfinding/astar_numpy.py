@@ -6,8 +6,11 @@ Created on Feb 22, 2024
 Compared to the ancestral networkx version of astar_path, this code:
     Does _not_ use a count() object reference to break ties, as nodes are directly-comparable integers
     Leans on numpy to handle neighbour nodes, edges to same and heuristic values in bulk
-    Tracks upper-bounds on shortest-path length as they are found
+    Tracks upper-bounds on shortest-path cost as they are found
     Prunes neighbour candidates early - if this exhausts a node by leaving it no viable neighbour candidates, so be it
+    Takes an optional externally-supplied upper bound
+        - Sanity and correctness of this upper bound are the _caller_'s responsibility
+        - If the supplied upper bound produces a pathfinding failure, so be it
     Grooms the node queue in the following cases:
         When a new upper bound is found, discards queue entries whose f-values bust the new upper bound
         When a _longer_ path is found to a previously-queued node, discards queue entries whose g-values bust
@@ -21,7 +24,7 @@ import networkx as nx
 import numpy as np
 
 
-def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
+def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=None):
 
     push = heappush
     pop = heappop
@@ -40,7 +43,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
     distances[source] = 0
     # Tracks shortest _complete_ path found so far
     floatinf = float('inf')
-    upbound = floatinf
+    upbound = floatinf if upbound is None else upbound
     # pre-calc heuristics for all nodes to the target node
     potentials = bulk_heuristic(G._nodes, target)
     # pre-calc the minimum-cost edge on each node
@@ -48,6 +51,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
     min_cost[target] = 0
 
     node_counter = 0
+    has_bound = upbound != floatinf
 
     while queue:
         # Pop the smallest item from queue.
@@ -76,15 +80,14 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
 
             # Skip bad paths that were enqueued before finding a better one
             qcost = distances[curnode]
-            if qcost < dist:
+            if qcost <= dist:
                 queue = [item for item in queue if not (item[1] > distances[item[2]])]
                 heapify(queue)
                 continue
             # If we've found a better path, update
-            distances[curnode] = qcost
+            distances[curnode] = dist
 
         explored[curnode] = parent
-        has_bound = upbound != floatinf
 
         raw_nodes = G_succ[curnode]
         active_nodes = raw_nodes[0]
@@ -107,11 +110,11 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
             keep = augmented_weights < upbound
             if not keep.all():
                 active_nodes = active_nodes[keep]
-                active_weights = active_weights[keep]
-                augmented_weights = augmented_weights[keep]
                 num_neighbours = len(active_nodes)
                 if 0 == num_neighbours:
                     continue
+                active_weights = active_weights[keep]
+                augmented_weights = augmented_weights[keep]
 
         if target in active_nodes:
             drop = active_nodes == target
@@ -119,11 +122,16 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None):
 
             upbound = ncost
             distances[target] = ncost
+            has_bound = True
             if 0 < len(queue):
                 queue = [item for item in queue if item[0] < upbound]
                 # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
                 queue = [item for item in queue if not (item[1] > distances[item[2]])]
-                heapify(queue)
+                # Finally, dedupe the queue after cleaning all bound-busts out and 2 or more elements are left.
+                # Empty or single-element sets cannot require deduplication, and are already heaps themselves.
+                if 1 < len(queue):
+                    queue = list(set(queue))
+                    heapify(queue)
             # push(queue, (ncost + 0, ncost, target, curnode))
             push(queue, (ncost, ncost, target, curnode))
             # target node has been processed, drop it from neighbours

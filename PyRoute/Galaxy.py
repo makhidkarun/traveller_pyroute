@@ -395,7 +395,7 @@ class Galaxy(AreaItem):
         self.max_jump_range = max_jump
         self.min_btn = min_btn
         self.landmarks = dict()
-        self.landmarks_bulk = None
+        self.historic_costs = None
         self.big_component = None
         self.star_mapping = dict()
         self.trade = None
@@ -525,7 +525,7 @@ class Galaxy(AreaItem):
         assert map_len == shadow_len, "Mismatch between shadow stars and stars mapping, " + str(shadow_len) + " and " + str(map_len)
         for item in self.stars.nodes:
             assert 'star' in self.stars.nodes[item], "Star attribute not set for item " + str(item)
-        self.landmarks_bulk = RouteLandmarkGraph(self.stars)
+        self.historic_costs = RouteLandmarkGraph(self.stars)
 
     def set_bounding_sectors(self):
         for sector, neighbor in itertools.combinations(self.sectors.values(), 2):
@@ -758,8 +758,8 @@ class Galaxy(AreaItem):
 
     def heuristic_distance_bulk(self, active_nodes, target):
         raw = self.trade.shortest_path_tree.lower_bound_bulk(active_nodes, target)
-        lands = self.landmarks_bulk[target]
-        raw[lands[0]] = np.maximum(raw[lands[0]], lands[1])
+        distances = self.trade.star_graph.distances_from_target(active_nodes, target)
+        raw = np.maximum(raw, distances)
 
         # The minimum edge cost on each node is itself an admissible heuristic:
         # If u is the target, min-edge-cost is special-cased to 0, which equals the cost to target.

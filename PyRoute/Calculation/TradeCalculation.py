@@ -5,7 +5,9 @@ Created on Mar 15, 2014
 """
 import copy
 import functools
+import math
 
+import numpy as np
 import networkx as nx
 
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
@@ -202,9 +204,10 @@ class TradeCalculation(RouteCalculation):
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
+            upbound = self._preheat_upper_bound(star, target)
             mincost = copy.deepcopy(self.star_graph._min_cost)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
-                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost)
+                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
         except nx.NetworkXNoPath:
             return
 
@@ -230,6 +233,79 @@ class TradeCalculation(RouteCalculation):
         # Update the trade route (edges)
         tradeCr, tradePass = self.route_update_simple(route, True)
         self.update_statistics(star, target, tradeCr, tradePass)
+
+    def _preheat_upper_bound(self, star, target, allow_reheat=True):
+        stardex = star.index
+        targdex = target.index
+        # Don't reheat on _every_ route, but reheat frequently enough to keep historic costs sort-of firm.
+        # Keeping this deterministic helps keep input reduction straight, as there's less state to track.
+        reheat = allow_reheat and ((stardex + targdex) % (math.floor(math.sqrt(len(self.star_graph)))) == 0)
+
+        upbound = float('+inf')
+        reheat_list = set()
+
+        src_adj = self.star_graph._arcs[stardex]
+        trg_adj = self.star_graph._arcs[targdex]
+
+        # Case 1 - Direct source neighbour to historic-route target neighbour
+        hist_targ = self.galaxy.historic_costs._arcs[targdex]
+        if 0 < len(hist_targ[0]):
+            # Dig out the common neighbours, _and_ their indexes in the respective adjacency lists
+            common, src, trg = np.intersect1d(src_adj[0], hist_targ[0], assume_unique=True, return_indices=True)
+            if 0 < len(common):
+                midleft = src_adj[1][src]
+                midright = hist_targ[1][trg]
+                midbound = midleft + midright
+                mindex = np.argmin(midbound)
+                nubound = midbound[mindex]
+                upbound = min(upbound, nubound)
+                reheat_list.add((stardex, common[mindex]))
+
+        # Case 2 - Historic-route source neighbour to direct target neighbour
+        hist_src = self.galaxy.historic_costs._arcs[stardex]
+        if 0 < len(hist_src[0]):
+            # Dig out the common neighbours, _and_ their indexes in the respective adjacency lists
+            common, src, trg = np.intersect1d(hist_src[0], trg_adj[0], assume_unique=True, return_indices=True)
+            if 0 < len(common):
+                midleft = hist_src[1][src]
+                midright = trg_adj[1][trg]
+                midbound = midleft + midright
+                mindex = np.argmin(midbound)
+                nubound = midbound[mindex]
+                upbound = min(upbound, nubound)
+                reheat_list.add((targdex, common[mindex]))
+
+        # Case 3 - Historic-route source neighbour to historic-route target neighbour
+        if 0 < len(hist_src[0]) and 0 < len(hist_targ[0]):
+            # Dig out the common neighbours, _and_ their indexes in the respective adjacency lists
+            common, src, trg = np.intersect1d(hist_src[0], hist_targ[0], assume_unique=True, return_indices=True)
+            if 0 < len(common):
+                midleft = hist_src[1][src]
+                midright = hist_targ[1][trg]
+                midbound = midleft + midright
+                mindex = np.argmin(midbound)
+                nubound = midbound[mindex]
+                upbound = min(upbound, nubound)
+                reheat_list.add((stardex, common[mindex]))
+                reheat_list.add((targdex, common[mindex]))
+
+        if reheat and 0 < len(reheat_list):
+            for pair in reheat_list:
+                start = pair[0]
+                end = pair[1]
+                edge = self.galaxy.stars[start][end]
+                route = edge.get('route', False)
+                if route is not False:
+                    rawroute = [item.index for item in route]
+                    # The 0.5% bump is to _ensure_ the newcost remains an _upper_ bound on the historic-route cost
+                    newcost = self.galaxy.route_cost(rawroute) * 1.005
+                    if edge['weight'] > newcost:
+                        self.galaxy.stars[start][end]['weight'] = newcost
+                        self.galaxy.historic_costs.lighten_edge(start, end, newcost)
+            reheated_upbound = self._preheat_upper_bound(star, target, allow_reheat=False)
+            upbound = min(reheated_upbound, upbound)
+
+        return upbound
 
     def update_statistics(self, star, target, tradeCr, tradePass):
         if star.sector != target.sector:
@@ -314,7 +390,6 @@ class TradeCalculation(RouteCalculation):
 
         self.galaxy.landmarks[(source.index, target.index)] = distance
         self.galaxy.landmarks[(target.index, source.index)] = distance
-        self.galaxy.landmarks_bulk.add_edge(source.index, target.index, distance)
 
         # Gather basic statistics.
         tradeBTN = self.get_btn(source, target, distance)
@@ -345,6 +420,12 @@ class TradeCalculation(RouteCalculation):
             if not exhausted:  # If edge is exhausted - can't trip an update - don't queue it for update
                 edges.append((start.index, end.index))
             start = end
+
+        if not self.galaxy.stars.has_edge(source.index, target.index):
+            historic_cost = self.route_cost(route) * 1.005
+            self.galaxy.historic_costs.add_edge(source.index, target.index, historic_cost)
+            self.galaxy.stars.add_edge(source.index, target.index, distance=distance, weight=historic_cost, trade=0,
+                                       btn=0, count=0, exhaust=0, route=route)
 
         # Feed the list of touched edges into the approximate-shortest-path machinery, so it can update whatever
         # distance labels it needs to stay within its approximation bound.
