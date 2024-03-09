@@ -51,6 +51,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     min_cost[target] = 0
 
     node_counter = 0
+    has_bound = upbound != floatinf
 
     while queue:
         # Pop the smallest item from queue.
@@ -87,7 +88,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             distances[curnode] = dist
 
         explored[curnode] = parent
-        has_bound = upbound != floatinf
 
         raw_nodes = G_succ[curnode]
         active_nodes = raw_nodes[0]
@@ -122,6 +122,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
 
             upbound = ncost
             distances[target] = ncost
+            has_bound = True
             if 0 < len(queue):
                 queue = [item for item in queue if item[0] < upbound]
                 # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
