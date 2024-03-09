@@ -9,12 +9,10 @@ import math
 
 import numpy as np
 import networkx as nx
-import numpy as np
 
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
-from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
 from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from PyRoute.TradeBalance import TradeBalance
 from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
@@ -382,7 +380,6 @@ class TradeCalculation(RouteCalculation):
         - reduce the weight of routes used to allow more trade to flow
         """
         distance = self.route_distance(route)
-        route_cost = self.route_cost(route)
 
         source = route[0]
         target = route[-1]

@@ -33,8 +33,6 @@ class ApproximateShortestPathForestUnified:
                                                                                    seeds=raw_seeds,
                                                                                    divisor=self._divisor)
             self._distances[:, i] = result
-        foo = 1
-        pass
 
     def lower_bound_bulk(self, active_nodes, target):
         raw = np.abs(self._distances[active_nodes, :] - self._distances[target, :])
