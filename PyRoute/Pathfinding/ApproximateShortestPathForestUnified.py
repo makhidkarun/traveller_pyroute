@@ -3,6 +3,9 @@ Created on Feb 29, 2024
 
 @author: CyberiaResurrection
 """
+import copy
+import functools
+
 import numpy as np
 from PyRoute.Star import Star
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
@@ -34,16 +37,30 @@ class ApproximateShortestPathForestUnified:
                                                                                    divisor=self._divisor)
             self._distances[:, i] = result
 
-    def lower_bound_bulk(self, active_nodes, target):
-        actives = self._distances[active_nodes, :]
-        target = self._distances[target, :]
-        overdrive = target == float('+inf')
-        if overdrive.any():
-            target[overdrive] = 0
-            actives[:, overdrive] = 0
-        raw = np.abs(actives - target)
+    def lower_bound_bulk(self, active_nodes, target_node):
+        overdrive, fastpath = self._mona_lisa_overdrive(target_node)
+
+        if fastpath:  # Fastpath - all overdrive elements are _finite_, so all rows are retrieved
+            # If all nodes are active, we're on the speedypath - no need to slice self._distances
+            # and incur 9x relative overhead
+            if len(active_nodes) == self._graph_len:
+                raw = np.abs(self._distances - self._distances[target_node, :])
+            else:
+                raw = np.abs(self._distances[active_nodes, :] - self._distances[target_node, :])
+        else:
+            actives = self._distances[:, overdrive]
+            actives = actives[active_nodes, :]
+            target = self._distances[target_node, overdrive]
+
+            raw = np.abs(actives - target)
 
         return np.max(raw, axis=1)
+
+    #  Gratuitous William Gibson reference is gratuitous.
+    @functools.cache
+    def _mona_lisa_overdrive(self, target_node):
+        result = copy.deepcopy(self._distances[target_node, :] != float('+inf'))
+        return result, result.all()
 
     def update_edges(self, edges):
         dropnodes = set()
