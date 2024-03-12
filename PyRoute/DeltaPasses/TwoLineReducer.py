@@ -25,7 +25,7 @@ class TwoLineReducer(object):
         best_sectors = self.reducer.sectors
         gap = 1
         while gap < len(segment):
-            msg = "# of lines: " + str(len(best_sectors.lines))
+            msg = "# of lines: " + str(len(best_sectors.lines)) + f", gap {gap}"
             self.reducer.logger.error(msg)
 
             i = 0
