@@ -134,6 +134,10 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
                     heapify(queue)
             # push(queue, (ncost + 0, ncost, target, curnode))
             push(queue, (ncost, ncost, target, curnode))
+            #  If target node is only active node, and is neighbour node of only active queue element, bail out now
+            #  and dodge the now-known-to-be-pointless neighbourhood bookkeeping.
+            if 1 == len(queue) and 1 == len(active_nodes):
+                continue
             # target node has been processed, drop it from neighbours
             keep = active_nodes != target
             # As we have a tighter upper bound, apply it to the neighbours as well

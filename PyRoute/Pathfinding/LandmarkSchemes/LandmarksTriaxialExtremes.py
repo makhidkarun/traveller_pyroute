@@ -17,6 +17,8 @@ class LandmarksTriaxialExtremes:
         result.append(dict())
         result.append(dict())
         for component_id in self.galaxy.trade.components:
+            comp_size = self.galaxy.trade.components[component_id]
+
             stars = [item for item in self.galaxy.star_mapping.values() if component_id == item.component]
             # maximum q in component
             source = max(stars, key=lambda item: item.hex.q)
@@ -24,6 +26,9 @@ class LandmarksTriaxialExtremes:
                 result[0][component_id] = source.index
             else:
                 result[0][component_id] = source
+
+            if 2 > comp_size:
+                continue
 
             # minimum r in component
             source = min(stars, key=lambda item: item.hex.r)
