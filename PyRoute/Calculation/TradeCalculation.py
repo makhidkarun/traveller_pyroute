@@ -210,6 +210,9 @@ class TradeCalculation(RouteCalculation):
 
         try:
             upbound = self._preheat_upper_bound(star, target)
+            # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
+            if float('+inf') != upbound:
+                upbound = round(upbound * 1.005 + 0.0005, 3)
             mincost = copy.deepcopy(self.star_graph._min_cost)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
                                            self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
