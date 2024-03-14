@@ -11,9 +11,9 @@ class LandmarksTriaxialExtremes:
 
     def __init__(self, galaxy):
         self.galaxy = galaxy
-        self.max_slots = 6
+        self.max_slots = 7
 
-    def get_landmarks(self, index=False):
+    def get_landmarks(self, index=False, btn=None):
         max_size = max(self.galaxy.trade.components.values())
         num_slots = min(self.max_slots, 3 * math.ceil(math.log10(max_size)))
         result = []
@@ -96,5 +96,23 @@ class LandmarksTriaxialExtremes:
 
             if 6 == slots:
                 continue
+
+            btn_split = [(s, n, d) for (s, n, d) in btn if s.component == component_id]
+            counters = defaultdict(int)
+            for item in btn_split:
+                firstdex = item[0].index
+                seconddex = item[1].index
+                if seconddex in component_landmarks[item[0].component]:
+                    continue
+                counters[firstdex] += 1
+            max_counter = max(counters.values())
+            max_candidates = {k:v for (k, v) in counters.items() if v == max_counter}
+            source = list(max_candidates.keys())[0]
+            if index:
+                result[6][component_id] = source
+                component_landmarks[component_id].add(source)
+            else:
+                nusource = [item for item in stars if stars.index == source]
+                result[6][component_id] = nusource[0]
 
         return result, component_landmarks

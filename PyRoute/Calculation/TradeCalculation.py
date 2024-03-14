@@ -173,7 +173,7 @@ class TradeCalculation(RouteCalculation):
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
         self.star_graph = DistanceGraph(self.galaxy.stars)
-        landmarks, self.component_landmarks = self.get_landmarks(index=True)
+        landmarks, self.component_landmarks = self.get_landmarks(index=True, btn=btn)
 
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
         source.is_landmark = True
@@ -213,10 +213,16 @@ class TradeCalculation(RouteCalculation):
             upbound = self._preheat_upper_bound(star, target)
             # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
             if float('+inf') != upbound:
+                comp_id = star.component
                 upbound = round(upbound * 1.005 + 0.0005, 3)
+                if star.index in self.component_landmarks[comp_id]:
+                    if target.index not in self.component_landmarks[comp_id]:
+                        target, star = star, target
+
             mincost = copy.deepcopy(self.star_graph._min_cost)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
                                            self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
+
         except nx.NetworkXNoPath:
             return
 

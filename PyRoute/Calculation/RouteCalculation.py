@@ -194,9 +194,9 @@ class RouteCalculation(object):
                 self.galaxy.star_mapping[star].component = counter
         return
 
-    def get_landmarks(self, index=False):
+    def get_landmarks(self, index=False, btn=None):
         schema = LandmarksTriaxialExtremes(self.galaxy)
-        return schema.get_landmarks(index)
+        return schema.get_landmarks(index, btn=btn)
 
     def unilateral_filter(self, star):
         """
