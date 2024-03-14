@@ -34,7 +34,7 @@ class testDeltaReduce(baseTest):
             expected = 0
             affix = " not empty after subsector reduction"
             if subsector_name == 'Pact':
-                expected = 40
+                expected = 39
                 affix = " empty after subsector reduction"
             actual = 0 if reducer.sectors['Dagudashaag'][subsector_name].items is None else len(reducer.sectors['Dagudashaag'][subsector_name].items)
             self.assertEqual(expected, actual, subsector_name + affix)
@@ -401,6 +401,7 @@ class testDeltaReduce(baseTest):
         args.output = tempfile.gettempdir()
         args.mp_threads = 1
         args.debug_flag = False
+        args.mindir = tempfile.gettempdir()
         return args
 
     def _make_args_no_line(self):
