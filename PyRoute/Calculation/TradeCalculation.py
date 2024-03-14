@@ -68,6 +68,10 @@ class TradeCalculation(RouteCalculation):
         # Override the default setting for route-reuse from the base class
         # based upon program arguments. 
         self.route_reuse = route_reuse
+        # Testing indicated that allowing a little more than 1 edge hit before tripping an update seemed to
+        # strike the best space/time tradeoff, so default epsilon to 1/route_reuse.  The 0.1 cap is to speed up
+        # the default case.
+        self.epsilon = min(0.1, 1.0 / route_reuse)
 
         # Are debugging gubbins turned on?
         self.debug_flag = debug_flag
@@ -206,6 +210,9 @@ class TradeCalculation(RouteCalculation):
 
         try:
             upbound = self._preheat_upper_bound(star, target)
+            # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
+            if float('+inf') != upbound:
+                upbound = round(upbound * 1.005 + 0.0005, 3)
             mincost = copy.deepcopy(self.star_graph._min_cost)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
                                            self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
