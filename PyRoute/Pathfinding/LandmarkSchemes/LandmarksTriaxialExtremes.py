@@ -4,6 +4,7 @@ Created on Feb 19, 2024
 @author: CyberiaResurrection
 """
 import math
+from collections import defaultdict
 
 
 class LandmarksTriaxialExtremes:
@@ -16,6 +17,7 @@ class LandmarksTriaxialExtremes:
         max_size = max(self.galaxy.trade.components.values())
         num_slots = min(self.max_slots, 3 * math.ceil(math.log10(max_size)))
         result = []
+        component_landmarks = defaultdict(set)
 
         for i in range(num_slots):
             result.append(dict())
@@ -33,6 +35,7 @@ class LandmarksTriaxialExtremes:
             source = max(stars, key=lambda item: item.hex.q)
             if index:
                 result[0][component_id] = source.index
+                component_landmarks[component_id].add(source.index)
             else:
                 result[0][component_id] = source
 
@@ -43,6 +46,7 @@ class LandmarksTriaxialExtremes:
             source = min(stars, key=lambda item: item.hex.r)
             if index:
                 result[1][component_id] = source.index
+                component_landmarks[component_id].add(source.index)
             else:
                 result[1][component_id] = source
 
@@ -53,6 +57,7 @@ class LandmarksTriaxialExtremes:
             source = min(stars, key=lambda item: -item.hex.q - item.hex.r)
             if index:
                 result[2][component_id] = source.index
+                component_landmarks[component_id].add(source.index)
             else:
                 result[2][component_id] = source
 
@@ -63,6 +68,7 @@ class LandmarksTriaxialExtremes:
             source = min(stars, key=lambda item: item.hex.q)
             if index:
                 result[3][component_id] = source.index
+                component_landmarks[component_id].add(source.index)
             else:
                 result[3][component_id] = source
 
@@ -73,6 +79,7 @@ class LandmarksTriaxialExtremes:
             source = max(stars, key=lambda item: item.hex.r)
             if index:
                 result[4][component_id] = source.index
+                component_landmarks[component_id].add(source.index)
             else:
                 result[4][component_id] = source
 
@@ -83,10 +90,11 @@ class LandmarksTriaxialExtremes:
             source = max(stars, key=lambda item: -item.hex.q - item.hex.r)
             if index:
                 result[5][component_id] = source.index
+                component_landmarks[component_id].add(source.index)
             else:
                 result[5][component_id] = source
 
             if 6 == slots:
                 continue
 
-        return result
+        return result, component_landmarks

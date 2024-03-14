@@ -40,6 +40,7 @@ class RouteCalculation(object):
 
         # component level tracking
         self.components = dict()
+        self.component_landmarks = None
 
         self.shortest_path_tree = None
         self.star_graph = None
