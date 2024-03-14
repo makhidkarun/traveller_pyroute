@@ -28,6 +28,7 @@ class LandmarksTriaxialExtremes:
             # slots = min(self.max_slots, 3 * math.ceil(math.log10(comp_size)))
 
             stars = [item for item in self.galaxy.star_mapping.values() if component_id == item.component]
+            stars.sort(key=lambda item: item.wtn, reverse=True)
             # maximum q in component
             source = max(stars, key=lambda item: item.hex.q)
             if index:
