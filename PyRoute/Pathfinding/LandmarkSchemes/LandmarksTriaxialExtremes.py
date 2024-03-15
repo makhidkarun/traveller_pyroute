@@ -23,7 +23,7 @@ class LandmarksTriaxialExtremes:
 
     def get_landmarks(self, index=False, btn=None):
         max_size = max(self.galaxy.trade.components.values())
-        num_slots = min(self.max_slots, math.ceil(3 * math.log10(max_size)))
+        num_slots = min(self.max_slots, self._size_to_landmarks(max_size))
         result = []
         component_landmarks = defaultdict(set)
         all_nodes = list(range(len(self.galaxy.star_mapping)))
@@ -36,7 +36,7 @@ class LandmarksTriaxialExtremes:
             # No point generating landmarks for a singleton component, as it will never be used in pathfinding
             if 2 > comp_size:
                 continue
-            slots = min(self.max_slots, math.ceil(3 * math.log10(comp_size)))
+            slots = min(self.max_slots, self._size_to_landmarks(comp_size))
 
             stars = [item for item in self.galaxy.star_mapping.values() if component_id == item.component]
             stars.sort(key=lambda item: item.wtn, reverse=True)
@@ -163,3 +163,7 @@ class LandmarksTriaxialExtremes:
                 slotcount += 1
 
         return result, component_landmarks
+
+    @staticmethod
+    def _size_to_landmarks(size):
+        return math.ceil(3 * math.log10(size))
