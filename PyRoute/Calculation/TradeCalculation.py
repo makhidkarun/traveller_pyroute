@@ -3,7 +3,6 @@ Created on Mar 15, 2014
 
 @author: tjoneslo
 """
-import copy
 import functools
 import math
 
@@ -210,6 +209,7 @@ class TradeCalculation(RouteCalculation):
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
+            active_nodes = list(range(len(self.star_graph)))
             upbound = self._preheat_upper_bound(star, target)
             # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
             if float('+inf') != upbound:
@@ -219,7 +219,7 @@ class TradeCalculation(RouteCalculation):
                     if target.index not in self.component_landmarks[comp_id]:
                         target, star = star, target
 
-            mincost = copy.deepcopy(self.star_graph._min_cost)
+            mincost = self.star_graph.min_cost(active_nodes, target.index)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
                                            self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
 

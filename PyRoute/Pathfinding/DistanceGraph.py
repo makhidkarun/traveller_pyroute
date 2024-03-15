@@ -30,6 +30,9 @@ class DistanceGraph(DistanceBase):
         min_cost = copy.deepcopy(self._min_cost)
         min_cost[target] = 0
 
+        if len(active_nodes) == len(self):
+            return min_cost
+
         return min_cost[active_nodes]
 
     def lighten_edge(self, u, v, weight):
