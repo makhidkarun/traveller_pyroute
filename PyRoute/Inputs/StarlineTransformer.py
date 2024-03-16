@@ -368,23 +368,31 @@ class StarlineTransformer(Transformer):
             parsed['nobles'] = bitz[0]
             parsed['base'] = bitz[1]
             parsed['zone'] = bitz[2]
+            return parsed
         if 2 == len(bitz) and '*' != parsed['base']:
-            if 1 < len(bitz[1]) or bitz[1].upper() not in self.zone_codes:  # if second bit won't fit as a trade zone, then we have nobles and base
+            bit_one_zone_code = bitz[1].upper() in self.zone_codes
+            # bit_zero_empty = '-' == bitz[0] or '' == bitz[0]
+            bit_zero_forced_noble = bitz[0].isalpha() and not bitz[0].isupper()
+            if 1 < len(bitz[1]) or not bit_one_zone_code:  # if second bit won't fit as a trade zone, then we have nobles and base
                 parsed['nobles'] = bitz[0]
                 parsed['base'] = bitz[1]
                 parsed['zone'] = ''
-            elif not rawstring.endswith('   '):
-                parsed['nobles'] = ''
-                parsed['base'] = bitz[0]
-                parsed['zone'] = bitz[1]
-            elif bitz[0].isalpha() and not bitz[0].isupper():  # if bitz[0] doesn't fit as a base code
+                return parsed
+            if bit_zero_forced_noble:  # if bitz[0] doesn't fit as a base code, have nobles and base
                 parsed['nobles'] = bitz[0]
                 parsed['base'] = bitz[1]
                 parsed['zone'] = ''
-            elif rawstring.startswith('   '):
+                return parsed
+            if not rawstring.endswith('   '):
                 parsed['nobles'] = ''
                 parsed['base'] = bitz[0]
                 parsed['zone'] = bitz[1]
+                return parsed
+            if rawstring.startswith('   '):
+                parsed['nobles'] = ''
+                parsed['base'] = bitz[0]
+                parsed['zone'] = bitz[1]
+                return parsed
             else:
                 parsed['nobles'] = bitz[0]
                 parsed['base'] = bitz[1]
