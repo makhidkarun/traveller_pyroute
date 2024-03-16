@@ -19,13 +19,15 @@ class LandmarkAvoidHelper:
     def calc_sizes(weights, tree, landmarks):
         active_nodes = np.array(range(len(weights)))
         sizes = np.zeros(len(weights))
+        # filter out nodes who aren't part of a tree
+        keep = tree[active_nodes] != LandmarkAvoidHelper.TREE_NONE
+        active_nodes = active_nodes[keep]
+
         # spin through each node, propagating weights upwards
         for rawnode in active_nodes:
             node = rawnode
             # Add node's weight to its own size
             parent = tree[node]
-            if LandmarkAvoidHelper.TREE_NONE == parent:
-                continue
             ballast = weights[node]
             sizes[node] += ballast
             while LandmarkAvoidHelper.TREE_ROOT != parent:  # If node is not tree root, propagate its weights upwards
