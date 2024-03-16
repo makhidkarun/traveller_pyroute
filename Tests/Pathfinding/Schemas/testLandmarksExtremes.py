@@ -116,5 +116,5 @@ class testLandmarksExtremes(baseTest):
             {0: 486, 1: 165, 2: 293, 3: 368, 4: 408, 5: 409, 6: 420, 7: 415},
             {0: 126, 1: 165, 2: 293, 3: 368, 4: 408, 5: 411, 6: 416, 7: 415}
         ]
-        actual = foo.get_landmarks(index=True)
+        actual, _ = foo.get_landmarks(index=True)
         self.assertEqual(expected, actual)

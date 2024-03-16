@@ -72,6 +72,8 @@ class LandmarksTriaxialExtremes:
                 result[2][component_id] = source
             component_landmarks[component_id].add(source.index)
 
+            assert 3 == len(component_landmarks[component_id]),\
+                f"Duplicate landmarks detected on component {component_id} early segment"
             if 3 == slots:
                 continue
 
@@ -105,6 +107,8 @@ class LandmarksTriaxialExtremes:
                 result[5][component_id] = source
             component_landmarks[component_id].add(source.index)
 
+            assert 6 == len(component_landmarks[component_id]),\
+                f"Duplicate landmarks detected on component {component_id} late segment"
             if 6 == slots:
                 continue
 
