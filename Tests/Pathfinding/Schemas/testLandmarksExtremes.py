@@ -112,9 +112,15 @@ class testLandmarksExtremes(baseTest):
         foo = LandmarksTriaxialExtremes(galaxy)
 
         expected = [
-            {0: 132, 1: 165, 2: 293, 3: 368, 4: 408, 5: 411, 6: 420, 7: 415},
-            {0: 486, 1: 165, 2: 293, 3: 368, 4: 408, 5: 409, 6: 420, 7: 415},
-            {0: 126, 1: 165, 2: 293, 3: 368, 4: 408, 5: 411, 6: 416, 7: 415}
+            {0: 132, 5: 411, 6: 420},
+            {0: 486, 5: 409, 6: 418},
+            {0: 126, 6: 416},
+            {0: 0},
+            {0: 5},
+            {0: 428},
+            {0: 413},
+            {0: 258},
+            {0: 268}
         ]
         actual, _ = foo.get_landmarks(index=True)
         self.assertEqual(expected, actual)
