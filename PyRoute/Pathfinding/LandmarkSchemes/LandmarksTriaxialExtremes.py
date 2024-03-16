@@ -46,9 +46,9 @@ class LandmarksTriaxialExtremes:
             source = max(stars, key=lambda item: item.hex.q)
             if index:
                 result[0][component_id] = source.index
-                component_landmarks[component_id].add(source.index)
             else:
                 result[0][component_id] = source
+            component_landmarks[component_id].add(source.index)
 
             if 1 == slots:
                 continue
@@ -57,9 +57,9 @@ class LandmarksTriaxialExtremes:
             source = min(stars, key=lambda item: item.hex.r)
             if index:
                 result[1][component_id] = source.index
-                component_landmarks[component_id].add(source.index)
             else:
                 result[1][component_id] = source
+            component_landmarks[component_id].add(source.index)
 
             if 2 == slots:
                 continue
@@ -68,9 +68,9 @@ class LandmarksTriaxialExtremes:
             source = min(stars, key=lambda item: -item.hex.q - item.hex.r)
             if index:
                 result[2][component_id] = source.index
-                component_landmarks[component_id].add(source.index)
             else:
                 result[2][component_id] = source
+            component_landmarks[component_id].add(source.index)
 
             if 3 == slots:
                 continue
@@ -79,9 +79,9 @@ class LandmarksTriaxialExtremes:
             source = min(stars, key=lambda item: item.hex.q)
             if index:
                 result[3][component_id] = source.index
-                component_landmarks[component_id].add(source.index)
             else:
                 result[3][component_id] = source
+            component_landmarks[component_id].add(source.index)
 
             if 4 == slots:
                 continue
@@ -90,9 +90,9 @@ class LandmarksTriaxialExtremes:
             source = max(stars, key=lambda item: item.hex.r)
             if index:
                 result[4][component_id] = source.index
-                component_landmarks[component_id].add(source.index)
             else:
                 result[4][component_id] = source
+            component_landmarks[component_id].add(source.index)
 
             if 5 == slots:
                 continue
@@ -101,9 +101,9 @@ class LandmarksTriaxialExtremes:
             source = max(stars, key=lambda item: -item.hex.q - item.hex.r)
             if index:
                 result[5][component_id] = source.index
-                component_landmarks[component_id].add(source.index)
             else:
                 result[5][component_id] = source
+            component_landmarks[component_id].add(source.index)
 
             if 6 == slots:
                 continue
@@ -154,10 +154,10 @@ class LandmarksTriaxialExtremes:
                 nu_landmark = LandmarkAvoidHelper.traverse_sizes(sizes, first_star.index, sp_parents)
                 if index:
                     result[slotcount][component_id] = nu_landmark
-                    component_landmarks[component_id].add(nu_landmark)
                 else:
                     nusource = [item for item in stars if stars.index == nu_landmark]
                     result[slotcount][component_id] = nusource[0]
+                component_landmarks[component_id].add(nu_landmark)
 
                 reseed = {component_id: nu_landmark}
                 approx.expand_forest(reseed)
