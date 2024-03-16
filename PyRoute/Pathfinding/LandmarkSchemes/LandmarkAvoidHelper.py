@@ -34,7 +34,7 @@ class LandmarkAvoidHelper:
             active_weights = active_weights[keep]
             active_nodes = tree[active_nodes]  # Move up to immediate parents
 
-        active_nodes = np.array(landmarks)
+        active_nodes = np.array(list(landmarks))
         while 0 < len(active_nodes):
             sizes[active_nodes] = 0
             keep = tree[active_nodes] != LandmarkAvoidHelper.TREE_ROOT

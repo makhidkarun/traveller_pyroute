@@ -8,6 +8,7 @@ import functools
 import itertools
 import logging
 import math
+from collections import defaultdict
 
 import networkx as nx
 
@@ -40,7 +41,7 @@ class RouteCalculation(object):
 
         # component level tracking
         self.components = dict()
-        self.component_landmarks = None
+        self.component_landmarks = defaultdict(set)
 
         self.shortest_path_tree = None
         self.star_graph = None

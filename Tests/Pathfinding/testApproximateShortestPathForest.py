@@ -27,13 +27,13 @@ class testApproximateShortestPathForest(baseTest):
         galaxy = self.set_up_zarushagar_sector()
 
         foo = LandmarksTriaxialExtremes(galaxy)
-        landmarks = foo.get_landmarks(index=True)
+        landmarks, _ = foo.get_landmarks(index=True)
         graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
 
         approx = ApproximateShortestPathForestDistanceGraph(source, graph, 0.2, sources=landmarks)
-        self.assertEqual(3, len(approx._trees), "Unexpected number of approx-SP trees")
+        self.assertEqual(9, len(approx._trees), "Unexpected number of approx-SP trees")
 
         src = stars[2]
         targ = stars[80]
@@ -43,7 +43,7 @@ class testApproximateShortestPathForest(baseTest):
         self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
         approx = ApproximateShortestPathForestDistanceGraph(source, graph, 0.2, sources=landmarks)
-        self.assertEqual(3, len(approx._trees), "Unexpected number of approx-SP trees")
+        self.assertEqual(9, len(approx._trees), "Unexpected number of approx-SP trees")
 
         src = stars[2]
         targ = stars[80]
@@ -56,7 +56,7 @@ class testApproximateShortestPathForest(baseTest):
         galaxy = self.set_up_zarushagar_sector()
 
         foo = LandmarksTriaxialExtremes(galaxy)
-        landmarks = foo.get_landmarks(index=True)
+        landmarks, _ = foo.get_landmarks(index=True)
         graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
@@ -65,7 +65,7 @@ class testApproximateShortestPathForest(baseTest):
 
         active_nodes = [2, 80]
         target = 80
-        expected = np.array([310.833, 0])
+        expected = np.array([399.167, 0])
         actual = approx.lower_bound_bulk(active_nodes, target)
         self.assertIsNotNone(actual)
 
@@ -75,17 +75,17 @@ class testApproximateShortestPathForest(baseTest):
         galaxy = self.set_up_zarushagar_sector()
 
         foo = LandmarksTriaxialExtremes(galaxy)
-        landmarks = foo.get_landmarks(index=True)
+        landmarks, _ = foo.get_landmarks(index=True)
         graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
 
         approx = ApproximateShortestPathForestUnified(source, graph, 0.2, sources=landmarks)
-        self.assertEqual(3, approx._num_trees)
+        self.assertEqual(9, approx._num_trees)
 
         active_nodes = [2, 80]
         target = 80
-        expected = np.array([310.833, 0])
+        expected = np.array([399.833, 0])
         actual = approx.lower_bound_bulk(active_nodes, target)
         self.assertIsNotNone(actual)
 
@@ -95,34 +95,35 @@ class testApproximateShortestPathForest(baseTest):
         galaxy = self.set_up_zarushagar_sector()
 
         foo = LandmarksTriaxialExtremes(galaxy)
-        landmarks = foo.get_landmarks(index=True)[0]
+        landmarks, _ = foo.get_landmarks(index=True)
         graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
 
         approx = ApproximateShortestPathForestUnified(source, graph, 0.2, sources=landmarks)
-        self.assertEqual(1, approx._num_trees)
+        self.assertEqual(9, approx._num_trees)
 
     def test_unified_can_handle_bulk_lobound_from_singleton_component(self):
         galaxy = self.set_up_zarushagar_sector()
 
         foo = LandmarksTriaxialExtremes(galaxy)
-        landmarks = foo.get_landmarks(index=True)
+        landmarks, _ = foo.get_landmarks(index=True)
         graph = galaxy.stars
         stars = list(graph.nodes)
-        source = stars[0]
+        source = [item for item in graph if graph.nodes()[item]['star'].component == 0][0]
         targ = [item for item in graph if graph.nodes()[item]['star'].component == 1][0]
 
         approx = ApproximateShortestPathForestUnified(source, graph, 0.2, sources=landmarks)
 
         bulk_lo = approx.lower_bound_bulk(stars, targ)
-        self.assertEqual(1129.1666666666667, max(bulk_lo), "Unexpected lobound")
+        # Approx-sp lower bounds to a singleton component should be zero, as they are irrelevant in actual pathfinding
+        self.assertEqual(0, max(bulk_lo), "Unexpected lobound")
 
     def test_unified_can_handle_bulk_lobound_to_singleton_component(self):
         galaxy = self.set_up_zarushagar_sector()
 
         foo = LandmarksTriaxialExtremes(galaxy)
-        landmarks = foo.get_landmarks(index=True)
+        landmarks, _ = foo.get_landmarks(index=True)
         graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]

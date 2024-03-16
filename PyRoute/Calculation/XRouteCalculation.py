@@ -10,7 +10,7 @@ import networkx as nx
 from PyRoute.Position.Hex import Hex
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
-from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
+from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 
 
@@ -165,12 +165,13 @@ class XRouteCalculation(RouteCalculation):
         self.calculate_components()
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
-        landmarks = self.get_landmarks(index=True)
+        landmarks, _ = self.get_landmarks(index=True)
+        landmarks = None if 0 == len(landmarks) else landmarks
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathForestDistanceGraph(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
         self.logger.info('XRoute pass 1')
         self.routes_pass_1()
 

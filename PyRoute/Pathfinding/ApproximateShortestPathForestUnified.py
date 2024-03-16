@@ -51,6 +51,9 @@ class ApproximateShortestPathForestUnified:
             actives = self._distances[:, overdrive]
             actives = actives[active_nodes, :]
             target = self._distances[target_node, overdrive]
+            # if we haven't got _any_ active lines, throw hands up and spit back zeros
+            if not overdrive.any():
+                return np.zeros(len(active_nodes), dtype=float)
 
             raw = np.abs(actives - target)
 

@@ -9,7 +9,7 @@ from collections import defaultdict
 
 from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarkAvoidHelper import LandmarkAvoidHelper
-from single_source_dijkstra import explicit_shortest_path_dijkstra_distance_graph
+from PyRoute.Pathfinding.single_source_dijkstra import explicit_shortest_path_dijkstra_distance_graph
 
 
 class LandmarksTriaxialExtremes:
@@ -108,23 +108,24 @@ class LandmarksTriaxialExtremes:
             if 6 == slots:
                 continue
 
-            btn_split = [(s, n, d) for (s, n, d) in btn if s.component == component_id]
-            counters = defaultdict(int)
-            for item in btn_split:
-                firstdex = item[0].index
-                seconddex = item[1].index
-                if seconddex in component_landmarks[item[0].component]:
-                    continue
-                counters[firstdex] += 1
-            max_counter = max(counters.values())
-            max_candidates = {k: v for (k, v) in counters.items() if v == max_counter}
-            source = list(max_candidates.keys())[0]
-            if index:
-                result[6][component_id] = source
-                component_landmarks[component_id].add(source)
-            else:
-                nusource = [item for item in stars if stars.index == source]
-                result[6][component_id] = nusource[0]
+            if btn is not None:
+                btn_split = [(s, n, d) for (s, n, d) in btn if s.component == component_id]
+                counters = defaultdict(int)
+                for item in btn_split:
+                    firstdex = item[0].index
+                    seconddex = item[1].index
+                    if seconddex in component_landmarks[item[0].component]:
+                        continue
+                    counters[firstdex] += 1
+                max_counter = max(counters.values())
+                max_candidates = {k: v for (k, v) in counters.items() if v == max_counter}
+                source = list(max_candidates.keys())[0]
+                if index:
+                    result[6][component_id] = source
+                    component_landmarks[component_id].add(source)
+                else:
+                    nusource = [item for item in stars if stars.index == source]
+                    result[6][component_id] = nusource[0]
 
             if 7 == slots:
                 continue
