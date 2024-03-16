@@ -23,27 +23,23 @@ class LandmarkAvoidHelper:
         keep = tree[active_nodes] != LandmarkAvoidHelper.TREE_NONE
         active_nodes = active_nodes[keep]
 
-        # spin through each node, propagating weights upwards
-        for rawnode in active_nodes:
-            node = rawnode
-            # Add node's weight to its own size
-            parent = tree[node]
-            ballast = weights[node]
-            sizes[node] += ballast
-            while LandmarkAvoidHelper.TREE_ROOT != parent:  # If node is not tree root, propagate its weights upwards
-                node = parent
-                parent = tree[node]
-                sizes[node] += ballast
+        # spin through nodes in bulk, propagating weights upwards
+        active_weights = weights[active_nodes]
+        while 0 < len(active_nodes):
+            #  Directly iterating in python worked out faster than using nditer
+            for index in range(len(active_nodes)):
+                sizes[active_nodes[index]] += active_weights[index]
+            keep = tree[active_nodes] != LandmarkAvoidHelper.TREE_ROOT
+            active_nodes = active_nodes[keep]
+            active_weights = active_weights[keep]
+            active_nodes = tree[active_nodes]  # Move up to immediate parents
 
-        # spin thru landmarks, propagating their zero weights upwards
-        for rawnode in landmarks:
-            node = rawnode
-            sizes[node] = 0
-            parent = tree[node]
-            while LandmarkAvoidHelper.TREE_ROOT != parent:  # If node is not tree root, propagate its weights upwards
-                node = parent
-                parent = tree[node]
-                sizes[node] = 0
+        active_nodes = np.array(landmarks)
+        while 0 < len(active_nodes):
+            sizes[active_nodes] = 0
+            keep = tree[active_nodes] != LandmarkAvoidHelper.TREE_ROOT
+            active_nodes = active_nodes[keep]
+            active_nodes = tree[active_nodes]
 
         return sizes
 

@@ -46,8 +46,11 @@ class testLandmarkAvoidHelper(baseTest):
         for item in contains_landmark:
             expected_sizes[item] = 0
 
-        actual_sizes = LandmarkAvoidHelper.calc_sizes(actual_weights, actual_parents, [actual_landmark])
+        landmarks = [actual_landmark]
+        old_mark = [actual_landmark]
+        actual_sizes = LandmarkAvoidHelper.calc_sizes(actual_weights, actual_parents, landmarks)
         self.assertEqual(list(expected_sizes), list(actual_sizes), "Unexpected second-pass node sizes")
+        self.assertEqual(old_mark, landmarks, "Landmark set unexpectedly altered")
 
     def _setup_graph(self, sourcefile):
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
