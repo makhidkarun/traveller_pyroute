@@ -39,6 +39,10 @@ class LandmarksTriaxialExtremes:
             slots = min(self.max_slots, self._size_to_landmarks(comp_size))
 
             stars = [item for item in self.galaxy.star_mapping.values() if component_id == item.component]
+            max_q = (max(stars, key=lambda item: item.hex.q)).hex.q
+            max_r = (max(stars, key=lambda item: item.hex.r)).hex.r
+            min_q = (min(stars, key=lambda item: item.hex.q)).hex.q
+            min_r = (min(stars, key=lambda item: item.hex.r)).hex.r
             stars.sort(key=lambda item: item.wtn, reverse=True)
             first_star = stars[0]
             # active_nodes = [item.index for item in stars]
@@ -54,7 +58,7 @@ class LandmarksTriaxialExtremes:
                 continue
 
             # minimum r in component
-            source = min(stars, key=lambda item: item.hex.r)
+            source = min(stars, key=lambda item: item.hex.r if item.index not in component_landmarks[component_id] else max_r)
             if index:
                 result[1][component_id] = source.index
             else:
@@ -65,7 +69,7 @@ class LandmarksTriaxialExtremes:
                 continue
 
             # minimum s in component
-            source = min(stars, key=lambda item: -item.hex.q - item.hex.r)
+            source = min(stars, key=lambda item: -item.hex.q - item.hex.r if item.index not in component_landmarks[component_id] else -(min_q + min_r))
             if index:
                 result[2][component_id] = source.index
             else:
@@ -78,7 +82,7 @@ class LandmarksTriaxialExtremes:
                 continue
 
             # minimum q in component
-            source = min(stars, key=lambda item: item.hex.q)
+            source = min(stars, key=lambda item: item.hex.q if item.index not in component_landmarks[component_id] else max_q)
             if index:
                 result[3][component_id] = source.index
             else:
@@ -89,7 +93,7 @@ class LandmarksTriaxialExtremes:
                 continue
 
             # maximum r in component
-            source = max(stars, key=lambda item: item.hex.r)
+            source = max(stars, key=lambda item: item.hex.r if item.index not in component_landmarks[component_id] else min_r)
             if index:
                 result[4][component_id] = source.index
             else:
@@ -100,7 +104,7 @@ class LandmarksTriaxialExtremes:
                 continue
 
             # maximum s in component
-            source = max(stars, key=lambda item: -item.hex.q - item.hex.r)
+            source = max(stars, key=lambda item: -item.hex.q - item.hex.r if item.index not in component_landmarks[component_id] else -(max_q + max_r))
             if index:
                 result[5][component_id] = source.index
             else:
