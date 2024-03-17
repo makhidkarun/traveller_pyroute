@@ -67,6 +67,10 @@ class ApproximateShortestPathForestUnified:
 
     def update_edges(self, edges):
         dropnodes = set()
+        dropspecific = []
+        tree_dex = np.array(list(range(self._num_trees)), dtype=int)
+        for _ in tree_dex:
+            dropspecific.append(set())
         for item in edges:
             left = item[0]
             right = item[1]
@@ -92,6 +96,10 @@ class ApproximateShortestPathForestUnified:
             if np.max(delta) >= weight:
                 dropnodes.add(left)
                 dropnodes.add(right)
+                overdrive = tree_dex[delta >= weight]
+                for k in overdrive:
+                    dropspecific[k].add(left)
+                    dropspecific[k].add(right)
 
         # if no nodes are to be dropped, nothing to do - bail out
         if 0 == len(dropnodes):
@@ -101,9 +109,11 @@ class ApproximateShortestPathForestUnified:
         # dijkstra to update the approx-SP tree/forest.  Some nodes in dropnodes may well be SP descendants of others,
         # but it wasn't worth the time or complexity cost to filter them out here.
         for i in range(self._num_trees):
+            if 0 == len(dropspecific[i]):
+                continue
             self._distances[:, i] = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
                                                                             distance_labels=self._distances[:, i],
-                                                                            seeds=dropnodes, divisor=self._divisor)
+                                                                            seeds=dropspecific[i], divisor=self._divisor)
 
     def expand_forest(self, nu_seeds):
         raw_seeds = nu_seeds if isinstance(nu_seeds, list) else list(nu_seeds.values())
