@@ -105,15 +105,21 @@ class ApproximateShortestPathForestUnified:
         if 0 == len(dropnodes):
             return
 
+        # Now we're updating at least one tree, grab the current min-cost vector to feed into implicit-dijkstra
+        min_cost = self._graph.min_cost(list(range(self._graph_len)), 0)
+
         # Now we have the nodes incident to edges that bust the (1+eps) approximation bound, feed them into restarted
         # dijkstra to update the approx-SP tree/forest.  Some nodes in dropnodes may well be SP descendants of others,
         # but it wasn't worth the time or complexity cost to filter them out here.
         for i in range(self._num_trees):
             if 0 == len(dropspecific[i]):
                 continue
-            self._distances[:, i] = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
-                                                                            distance_labels=self._distances[:, i],
-                                                                            seeds=dropspecific[i], divisor=self._divisor)
+            self._distances[:, i] = implicit_shortest_path_dijkstra_distance_graph(self._graph,
+                                                                                   self._source,
+                                                                                   distance_labels=self._distances[:, i],
+                                                                                   seeds=dropspecific[i],
+                                                                                   divisor=self._divisor,
+                                                                                   min_cost=min_cost)
 
     def expand_forest(self, nu_seeds):
         raw_seeds = nu_seeds if isinstance(nu_seeds, list) else list(nu_seeds.values())

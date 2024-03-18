@@ -57,16 +57,19 @@ def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None,
     return distance_labels
 
 
-def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1):
+def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1, min_cost=None):
     # return only distance_labels from the explicit version
-    distance_labels, _ = explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds, divisor)
+    distance_labels, _ = explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds, divisor,
+                                                                        min_cost=min_cost)
     return distance_labels
 
 
-def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1):
+def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1, min_cost=None):
     # assumes that distance_labels is already setup
     if seeds is None:
         seeds = {source}
+
+    min_cost = np.zeros(len(graph)) if min_cost is None else min_cost
 
     arcs = graph._arcs
 
@@ -93,8 +96,14 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
         # when the sum of dist_tail and that edge's weight equals or exceeds the corresponding node's distance label.
         neighbours = arcs[tail]
         active_nodes = neighbours[0]
+        active_labels = distance_labels[active_nodes]
+        # if the current dist_tail value _plus_ this node's min-cost vector busts the maximum distance label among
+        # this node's neighbours (or an upper bound thereon), go around - we're on a hiding to nowhere, and _can't_
+        # improve any distance labels
+        if dist_tail + min_cost[tail] > max(active_labels):
+            continue
         active_costs = neighbours[1]
-        keep = dist_tail + active_costs < distance_labels[active_nodes]
+        keep = dist_tail + active_costs < active_labels
         active_nodes = active_nodes[keep]
         num_nodes = len(active_nodes)
 
