@@ -120,7 +120,8 @@ class ApproximateShortestPathForestUnified:
                                                                                    distance_labels=self._distances[:, i],
                                                                                    seeds=dropspecific[i],
                                                                                    divisor=self._divisor,
-                                                                                   min_cost=min_cost)
+                                                                                   min_cost=min_cost,
+                                                                                    max_labels=self._max_labels[:, i])
 
     def expand_forest(self, nu_seeds):
         raw_seeds = nu_seeds if isinstance(nu_seeds, list) else list(nu_seeds.values())

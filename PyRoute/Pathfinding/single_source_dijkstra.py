@@ -57,23 +57,24 @@ def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None,
     return distance_labels
 
 
-def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1, min_cost=None):
+def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1, min_cost=None, max_labels=None):
     # return only distance_labels from the explicit version
     distance_labels, _, max_neighbour_labels = explicit_shortest_path_dijkstra_distance_graph(graph, source,
                                                                                               distance_labels, seeds,
                                                                                               divisor,
-                                                                                              min_cost=min_cost)
+                                                                                              min_cost=min_cost,
+                                                                                              max_labels=max_labels)
     return distance_labels, max_neighbour_labels
 
 
-def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1, min_cost=None):
+def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1, min_cost=None, max_labels=None):
     # assumes that distance_labels is already setup
     if seeds is None:
         seeds = {source}
 
     floatinf = float('+inf')
     min_cost = np.zeros(len(graph)) if min_cost is None else min_cost
-    max_neighbour_labels = np.ones(len(graph), dtype=float) * floatinf
+    max_neighbour_labels = max_labels if max_labels is not None else np.ones(len(graph), dtype=float) * floatinf
 
     arcs = graph._arcs
 
@@ -87,9 +88,10 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
     while heap:
         dist_tail, tail = heapq.heappop(heap)
         node_counter += 1
-        if dist_tail > distance_labels[tail]:
-            # Since we've just dequeued a bad node (distance exceeding its current label), remove other bad nodes
-            # from the list to avoid tripping over them later
+        max_label = max_neighbour_labels[tail]
+        if dist_tail > distance_labels[tail] or dist_tail + min_cost[tail] > max_label:
+            # Since we've just dequeued a bad node (distance exceeding its current label, or too close to max-label),
+            # remove other bad nodes from the list to avoid tripping over them later
             heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]
             # While we're grooming the queue already, chuck out nodes who cannot give better distance labels
             heap = [(distance, tail) for (distance, tail) in heap if distance + min_cost[tail] <= max_neighbour_labels[tail]]
@@ -107,18 +109,14 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
         neighbours = arcs[tail]
         active_nodes = neighbours[0]
         active_labels = distance_labels[active_nodes]
-        # if the current dist_tail value _plus_ this node's min-cost vector busts the maximum distance label among
-        # this node's neighbours (or an upper bound thereon), go around - we're on a hiding to nowhere, and _can't_
-        # improve any distance labels
-        max_label = max_neighbour_labels[tail]
-        if dist_tail + min_cost[tail] > max_label:
-            continue
         active_costs = neighbours[1]
         keep = dist_tail + active_costs < active_labels
         active_nodes = active_nodes[keep]
         num_nodes = len(active_nodes)
 
         if 0 == num_nodes:
+            if floatinf == max_label:
+                max_neighbour_labels[tail] = max(distance_labels[neighbours[0]])
             continue
         active_weights = dist_tail + divisor * active_costs[keep]
         distance_labels[active_nodes] = active_weights
