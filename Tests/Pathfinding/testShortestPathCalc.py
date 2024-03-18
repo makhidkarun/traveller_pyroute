@@ -102,6 +102,30 @@ class testShortestPathCalc(baseTest):
         self.assertEqual(list(expected_distances.values()), list(actual_distances), "Unexpected distances after SPT creation")
         self.assertEqual(list(expected_parents), list(actual_parents), "Unexpected parent relations")
 
+    def test_masked_gubbins(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
+        graph, _, _ = self._setup_graph(sourcefile)
+
+        expected_parents = np.ones(len(graph), dtype=int) * -1
+        expected_parents[1] = 6
+        expected_parents[2] = 1
+        expected_parents[3] = 2
+        expected_parents[4] = 2
+        expected_parents[5] = 0
+        expected_parents[6] = 9
+        expected_parents[7] = 12
+        expected_parents[8] = 0
+        expected_parents[9] = 8
+
+        items = np.array(range(37), dtype=int)
+        mask = items > 6
+
+        hiver = np.ma.array(expected_parents, mask=mask)
+
+        self.assertEqual(9, max(hiver), "Unexpected max value in masked array")
+        expected_parents[6] = 0
+        self.assertEqual(6, max(hiver), "Unexpected max value in masked array after original max clobbered")
+
     def _setup_graph(self, sourcefile):
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
