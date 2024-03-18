@@ -34,7 +34,7 @@ class testShortestPathCalc(baseTest):
 
         distance_labels = np.ones(len(graph)) * float('+inf')
         distance_labels[source] = 0
-        actual_distances = implicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
+        actual_distances, _ = implicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
 
         self.assertEqual(list(expected_distances.values()), list(actual_distances), "Unexpected distances after SPT creation")
 
@@ -97,7 +97,7 @@ class testShortestPathCalc(baseTest):
         expected_parents[34] = 24
         expected_parents[35] = 24
         expected_parents[36] = 24
-        actual_distances, actual_parents = explicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
+        actual_distances, actual_parents, _ = explicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
 
         self.assertEqual(list(expected_distances.values()), list(actual_distances), "Unexpected distances after SPT creation")
         self.assertEqual(list(expected_parents), list(actual_parents), "Unexpected parent relations")

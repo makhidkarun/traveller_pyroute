@@ -59,9 +59,11 @@ def implicit_shortest_path_dijkstra_indexes(graph, source, distance_labels=None,
 
 def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1, min_cost=None):
     # return only distance_labels from the explicit version
-    distance_labels, _ = explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds, divisor,
-                                                                        min_cost=min_cost)
-    return distance_labels
+    distance_labels, _, max_neighbour_labels = explicit_shortest_path_dijkstra_distance_graph(graph, source,
+                                                                                              distance_labels, seeds,
+                                                                                              divisor,
+                                                                                              min_cost=min_cost)
+    return distance_labels, max_neighbour_labels
 
 
 def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1, min_cost=None):
@@ -130,4 +132,4 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
             for index in range(0, num_nodes):
                 heapq.heappush(heap, (active_weights[index], active_nodes[index]))
 
-    return distance_labels, parents
+    return distance_labels, parents, max_neighbour_labels

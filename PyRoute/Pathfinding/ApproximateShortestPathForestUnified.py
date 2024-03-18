@@ -26,6 +26,7 @@ class ApproximateShortestPathForestUnified:
         self._num_trees = num_trees
         self._graph_len = len(self._graph)
         self._distances = np.ones((self._graph_len, self._num_trees)) * float('+inf')
+        self._max_labels = np.ones((self._graph_len, self._num_trees)) * float('+inf')
 
         # spin up initial distances
         for i in range(self._num_trees):
@@ -35,7 +36,7 @@ class ApproximateShortestPathForestUnified:
                                                                                    self._distances[:, i],
                                                                                    seeds=raw_seeds,
                                                                                    divisor=self._divisor)
-            self._distances[:, i] = result
+            self._distances[:, i], self._max_labels[:, i] = result
 
     def lower_bound_bulk(self, active_nodes, target_node):
         overdrive, fastpath = self._mona_lisa_overdrive(target_node)
@@ -114,7 +115,7 @@ class ApproximateShortestPathForestUnified:
         for i in range(self._num_trees):
             if 0 == len(dropspecific[i]):
                 continue
-            self._distances[:, i] = implicit_shortest_path_dijkstra_distance_graph(self._graph,
+            self._distances[:, i], self._max_labels[:, i] = implicit_shortest_path_dijkstra_distance_graph(self._graph,
                                                                                    self._source,
                                                                                    distance_labels=self._distances[:, i],
                                                                                    seeds=dropspecific[i],
@@ -125,13 +126,16 @@ class ApproximateShortestPathForestUnified:
         raw_seeds = nu_seeds if isinstance(nu_seeds, list) else list(nu_seeds.values())
         nu_distances = np.ones((self._graph_len)) * float('+inf')
         nu_distances[raw_seeds] = 0
-        nu_distances = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
+        nu_distances, nu_max_labels = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
                                                                 nu_distances,
                                                                 seeds=raw_seeds,
                                                                 divisor=self._divisor)
         result = np.zeros((self._graph_len, 1), dtype=float)
         result[:, 0] = list(nu_distances)
+        maxresult = np.zeros((self._graph_len, 1), dtype=float)
+        maxresult[:, 0] = list(nu_max_labels)
         self._distances = np.append(self._distances, result, 1)
+        self._max_labels = np.append(self._distances, maxresult, 1)
         self._num_trees += 1
 
     def _get_sources(self, graph, source, sources):

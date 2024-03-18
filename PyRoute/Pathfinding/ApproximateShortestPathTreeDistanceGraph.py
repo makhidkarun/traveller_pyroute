@@ -20,7 +20,7 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
         for seed in self._seeds:
             distances[seed] = 0
 
-        self._distances = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source, distances, seeds=self._seeds, divisor=self._divisor)
+        self._distances, _ = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source, distances, seeds=self._seeds, divisor=self._divisor)
 
     def update_edges(self, edges):
         dropnodes = set()
@@ -57,7 +57,7 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
         # Now we have the nodes incident to edges that bust the (1+eps) approximation bound, feed them into restarted
         # dijkstra to update the approx-SP tree/forest.  Some nodes in dropnodes may well be SP descendants of others,
         # but it wasn't worth the time or complexity cost to filter them out here.
-        self._distances = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
+        self._distances, _ = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
                                                                          distance_labels=self._distances,
                                                                          seeds=dropnodes, divisor=self._divisor)
 

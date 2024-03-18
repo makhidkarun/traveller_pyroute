@@ -153,7 +153,7 @@ class LandmarksTriaxialExtremes:
                 distance_labels = np.ones(self.graph_len) * float('+inf')
                 distance_labels[first_star.index] = 0
 
-                sp_distances, sp_parents = explicit_shortest_path_dijkstra_distance_graph(self.distgraph, first_star.index,
+                sp_distances, sp_parents, _ = explicit_shortest_path_dijkstra_distance_graph(self.distgraph, first_star.index,
                                                                                           distance_labels)
                 inf_set = self.floatinf == sp_distances
                 sp_distances[inf_set] = 0
