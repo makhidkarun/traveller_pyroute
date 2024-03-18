@@ -69,7 +69,9 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
     if seeds is None:
         seeds = {source}
 
+    floatinf = float('+inf')
     min_cost = np.zeros(len(graph)) if min_cost is None else min_cost
+    max_neighbour_labels = np.ones(len(graph), dtype=float) * floatinf
 
     arcs = graph._arcs
 
@@ -87,8 +89,14 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
             # Since we've just dequeued a bad node (distance exceeding its current label), remove other bad nodes
             # from the list to avoid tripping over them later
             heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]
+            # While we're grooming the queue already, chuck out nodes who cannot give better distance labels
+            heap = [(distance, tail) for (distance, tail) in heap if distance + min_cost[tail] <= max_neighbour_labels[tail]]
             heapq.heapify(heap)
             continue
+        if 0 == (node_counter % 49):
+            heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]
+            heap = [(distance, tail) for (distance, tail) in heap if distance + min_cost[tail] <= max_neighbour_labels[tail]]
+            heapq.heapify(heap)
 
         # Link weights are strictly positive, thus lower bounded by zero. Thus, when the current dist_tail value exceeds
         # the corresponding node's distance label at the other end of the candidate edge, trim that edge.  Such edges
@@ -100,7 +108,8 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
         # if the current dist_tail value _plus_ this node's min-cost vector busts the maximum distance label among
         # this node's neighbours (or an upper bound thereon), go around - we're on a hiding to nowhere, and _can't_
         # improve any distance labels
-        if dist_tail + min_cost[tail] > max(active_labels):
+        max_label = max_neighbour_labels[tail]
+        if dist_tail + min_cost[tail] > max_label:
             continue
         active_costs = neighbours[1]
         keep = dist_tail + active_costs < active_labels
@@ -111,6 +120,8 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
             continue
         active_weights = dist_tail + divisor * active_costs[keep]
         distance_labels[active_nodes] = active_weights
+        # update max label
+        max_neighbour_labels[tail] = max(distance_labels[neighbours[0]])
         parents[active_nodes] = tail
 
         if 1 == num_nodes:
