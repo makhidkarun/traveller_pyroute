@@ -108,9 +108,9 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
         # when the sum of dist_tail and that edge's weight equals or exceeds the corresponding node's distance label.
         neighbours = arcs[tail]
         active_nodes = neighbours[0]
-        active_labels = distance_labels[active_nodes]
         active_costs = neighbours[1]
-        keep = dist_tail + active_costs < active_labels
+        # It's not worth (time wise) being cute and trying to break this up, forcing jumps in and out of numpy
+        keep = active_costs < (distance_labels[active_nodes] - dist_tail)
         active_nodes = active_nodes[keep]
         num_nodes = len(active_nodes)
 
