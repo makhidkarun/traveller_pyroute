@@ -28,6 +28,7 @@ class ApproximateShortestPathForestUnified:
         self._distances = np.ones((self._graph_len, self._num_trees)) * float('+inf')
         self._max_labels = np.ones((self._graph_len, self._num_trees)) * float('+inf')
 
+        min_cost = self._graph.min_cost(list(range(self._graph_len)), 0)
         # spin up initial distances
         for i in range(self._num_trees):
             raw_seeds = self._seeds[i] if isinstance(self._seeds[i], list) else list(self._seeds[i].values())
@@ -35,6 +36,7 @@ class ApproximateShortestPathForestUnified:
             result = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
                                                                                    self._distances[:, i],
                                                                                    seeds=raw_seeds,
+                                                                                   min_cost=min_cost,
                                                                                    divisor=self._divisor)
             self._distances[:, i], self._max_labels[:, i] = result
 
