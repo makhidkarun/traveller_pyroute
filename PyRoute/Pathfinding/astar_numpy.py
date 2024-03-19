@@ -106,6 +106,9 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         active_weights = active_weights[keep]
         augmented_weights = active_weights + potentials[active_nodes]
 
+        # Even if we have the target node as a candidate neighbour, of itself, that's _no_ guarantee that the target
+        # as neighbour will give a better upper bound.  The has_bound check also works out faster than the
+        # target in active_nodes check.
         if has_bound:
             keep = augmented_weights < upbound
             if not keep.all():
