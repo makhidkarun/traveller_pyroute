@@ -16,10 +16,21 @@ class LandmarksTriaxialExtremes:
 
     def __init__(self, galaxy):
         self.galaxy = galaxy
-        self.max_slots = 15
+        self.route_reuse = galaxy.trade.route_reuse
+        self._set_max_slots()
         self.graph_len = len(self.galaxy.stars)
         self.distgraph = self.galaxy.trade.star_graph
         self.floatinf = float('+inf')
+
+    def _set_max_slots(self):
+        if 500 < self.route_reuse:
+            self.max_slots = 3
+        elif 250 < self.route_reuse:
+            self.max_slots = 4
+        elif 125 < self.route_reuse:
+            self.max_slots = 5
+        else:
+            self.max_slots = 15
 
     def get_landmarks(self, index=False, btn=None):
         max_size = max(self.galaxy.trade.components.values())
