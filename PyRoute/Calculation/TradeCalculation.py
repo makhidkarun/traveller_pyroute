@@ -219,7 +219,7 @@ class TradeCalculation(RouteCalculation):
                     if target.index not in self.component_landmarks[comp_id]:
                         target, star = star, target
 
-            mincost = self.star_graph.min_cost(active_nodes, target.index)
+            mincost = self.star_graph.min_cost(active_nodes, target.index, indirect=True)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
                                            self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
 

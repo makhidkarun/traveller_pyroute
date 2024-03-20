@@ -767,7 +767,7 @@ class Galaxy(AreaItem):
         # If the target is connected to node u via some other edge, u's min-edge-cost underestimates cost to target.
         # If the target is not directly connected to node u, the target is at least the sum of two nodes' min-edge costs
         # away, so u's min-edge-cost again underestimates cost to target.
-        min_cost = self.trade.star_graph.min_cost(active_nodes, target)
+        min_cost = self.trade.star_graph.min_cost(active_nodes, target, indirect=True)
 
         # Case-wise maximum of 2 or more admissible heuristics (approx-SP bound, existing route distances and min-cost
         # edges) is itself admissible
