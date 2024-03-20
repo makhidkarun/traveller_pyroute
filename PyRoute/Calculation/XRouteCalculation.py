@@ -36,12 +36,9 @@ class XRouteCalculation(RouteCalculation):
     def generate_routes(self):
         self.distance_weight = self.capSec_weight
         self.generate_base_routes()
-        self.capital = [star for star in self.galaxy.ranges if \
-                        AllyGen.imperial_align(star.alg_code) and star.tradeCode.other_capital]
-        self.secCapitals = [star for star in self.galaxy.ranges if \
-                            AllyGen.imperial_align(star.alg_code) and star.tradeCode.sector_capital]
-        self.subCapitals = [star for star in self.galaxy.ranges if \
-                            AllyGen.imperial_align(star.alg_code) and star.tradeCode.subsector_capital]
+        self.capital = [star for star in self.galaxy.ranges if AllyGen.imperial_align(star.alg_code) and star.tradeCode.other_capital]
+        self.secCapitals = [star for star in self.galaxy.ranges if AllyGen.imperial_align(star.alg_code) and star.tradeCode.sector_capital]
+        self.subCapitals = [star for star in self.galaxy.ranges if AllyGen.imperial_align(star.alg_code) and star.tradeCode.subsector_capital]
 
     def routes_pass_1(self):
         # Pass 1: Get routes at J6  Capital and sector capitals
@@ -117,15 +114,13 @@ class XRouteCalculation(RouteCalculation):
                     self.get_route_between(secCap[0], star, self.calc_trade(23), self.galaxy.heuristic_distance_indexes)
 
         for star in self.subCapitals:
-            routes = [neighbor for neighbor in self.subCapitals if \
-                      neighbor != star and neighbor.distance(star) <= 40]
+            routes = [neighbor for neighbor in self.subCapitals if neighbor != star and neighbor.distance(star) <= 40]
             for neighbor in routes:
                 self.get_route_between(star, neighbor, self.calc_trade(23), self.galaxy.heuristic_distance_indexes)
 
     def routes_pass_3(self):
         self.reweight_routes(self.impt_weight)
-        important = [star for star in self.galaxy.ranges if \
-                     AllyGen.imperial_align(star.alg_code) and star.tradeCount == 0
+        important = [star for star in self.galaxy.ranges if AllyGen.imperial_align(star.alg_code) and star.tradeCount == 0
                      and (star.importance >= 4 or 'D' in star.baseCode or 'W' in star.baseCode)]
 
         jumpStations = [star for star in self.galaxy.ranges if star.tradeCount > 0]

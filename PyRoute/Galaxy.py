@@ -652,10 +652,8 @@ class Galaxy(AreaItem):
                 if worldstar.ownedBy == worldstar:
                     continue
                 neighbours = [self.star_mapping[item] for item in self.stars.neighbors(world)]
-                ownedBy = [star for star in neighbours \
-                           if star.tl >= 9 and star.popCode >= 6 and \
-                           star.port in 'ABC' and star.ownedBy == star and \
-                           AllyGen.are_owned_allies(star.alg_code, worldstar.alg_code)]
+                ownedBy = [star for star in neighbours if star.tl >= 9 and star.popCode >= 6 and star.port in 'ABC'
+                           and star.ownedBy == star and AllyGen.are_owned_allies(star.alg_code, worldstar.alg_code)]
 
                 ownedBy.sort(reverse=True,
                              key=lambda star: star.popCode)
