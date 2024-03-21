@@ -71,7 +71,7 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
         return result
 
     def triangle_upbound(self, source, target):
-        return self._distances[source] + self._distances[target]
+        return self._distances[source.index] + self._distances[target.index]
 
     def lighten_edge(self, u, v, weight):
         self._graph.lighten_edge(u, v, weight)
