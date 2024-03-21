@@ -66,7 +66,7 @@ class ApproximateShortestPathForestUnified:
         raw = self._distances[source.index, :] + self._distances[target.index, :]
         raw = raw[raw != float('+inf')]
 
-        return np.min(raw)
+        return np.min(raw) * (1 + self._epsilon)
 
     #  Gratuitous William Gibson reference is gratuitous.
     @functools.cache

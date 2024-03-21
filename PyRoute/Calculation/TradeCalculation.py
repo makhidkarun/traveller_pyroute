@@ -211,7 +211,6 @@ class TradeCalculation(RouteCalculation):
         try:
             active_nodes = list(range(len(self.star_graph)))
             upbound = self._preheat_upper_bound(star, target)
-            triangle_bound = self.shortest_path_tree.triangle_upbound(star, target)
             # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
             if float('+inf') != upbound:
                 comp_id = star.component
@@ -259,7 +258,8 @@ class TradeCalculation(RouteCalculation):
         # Keeping this deterministic helps keep input reduction straight, as there's less state to track.
         reheat = allow_reheat and ((stardex + targdex) % (math.floor(math.sqrt(len(self.star_graph)))) == 0)
 
-        upbound = float('+inf')
+        #upbound = float('+inf')
+        upbound = self.shortest_path_tree.triangle_upbound(star, target)
         reheat_list = set()
 
         src_adj = self.star_graph._arcs[stardex]
