@@ -259,7 +259,7 @@ class TradeCalculation(RouteCalculation):
         reheat = allow_reheat and ((stardex + targdex) % (math.floor(math.sqrt(len(self.star_graph)))) == 0)
 
         #upbound = float('+inf')
-        upbound = self.shortest_path_tree.triangle_upbound(stardex, targdex)
+        upbound = self.shortest_path_tree.triangle_upbound(star, target)
         reheat_list = set()
 
         src_adj = self.star_graph._arcs[stardex]

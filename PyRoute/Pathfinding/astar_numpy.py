@@ -89,6 +89,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     g_exhausted = 0
     f_exhausted = 0
     new_upbounds = 0
+    targ_exhausted = 0
     un_exhausted = 0
 
     while queue:
@@ -108,7 +109,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             diagnostics = {'nodes_expanded': node_counter, 'nodes_queued': queue_counter, 'branch_factor': branch,
                            'num_jumps': len(path) - 1, 'nodes_revisited': revisited, 'neighbour_bound': neighbour_bound,
                            'new_upbounds': new_upbounds, 'g_exhausted': g_exhausted, 'f_exhausted': f_exhausted,
-                           'un_exhausted': un_exhausted}
+                           'un_exhausted': un_exhausted, 'targ_exhausted': targ_exhausted}
             return path, diagnostics
 
         if 0 == node_counter % 49 and 0 < len(queue):
@@ -185,6 +186,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             #  If target node is only active node, and is neighbour node of only active queue element, bail out now
             #  and dodge the now-known-to-be-pointless neighbourhood bookkeeping.
             if 1 == len(queue) and 1 == len(active_nodes):
+                targ_exhausted += 1
                 continue
             # target node has been processed, drop it from neighbours
             keep = active_nodes != target
@@ -197,6 +199,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             # if there _was_ one neighbour to process, that was the target, so neighbour list is now empty.
             # Likewise, if the new upper bound has emptied the neighbour list, go around.
             if 1 == num_neighbours or 0 == len(active_nodes):
+                targ_exhausted += 1
                 continue
 
         # Now we have the latest upper bound, use it to filter out nodes whose augmented weights will bust the upper
