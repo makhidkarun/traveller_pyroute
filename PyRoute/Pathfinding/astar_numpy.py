@@ -23,15 +23,17 @@ from heapq import heappop, heappush, heapify
 import networkx as nx
 import numpy as np
 
+
 def _sum_branch(branch_fac, path_len):
     crosscheck = branch_fac * (branch_fac ** path_len - 1) / (branch_fac - 1)
     return crosscheck
+
 
 def _calc_branching_factor(nodes_queued, path_len):
     if path_len == nodes_queued:
         return 1.0
 
-    hibound = nodes_queued ** (1/path_len)
+    hibound = nodes_queued ** (1 / path_len)
     hires = _sum_branch(hibound, path_len) - nodes_queued
     lobound = 1
     lores = path_len - nodes_queued
@@ -93,7 +95,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     new_upbounds = 0
     targ_exhausted = 0
     un_exhausted = 0
-    exhaust_count = 0
     revis_continue = 0
 
     while queue:

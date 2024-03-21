@@ -314,7 +314,6 @@ class TradeCalculation(RouteCalculation):
         # Keeping this deterministic helps keep input reduction straight, as there's less state to track.
         reheat = allow_reheat and ((stardex + targdex) % (math.floor(math.sqrt(len(self.star_graph)))) == 0)
 
-        #upbound = float('+inf')
         upbound = self.shortest_path_tree.triangle_upbound(star, target)
         reheat_list = set()
 
