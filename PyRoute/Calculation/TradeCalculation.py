@@ -211,6 +211,7 @@ class TradeCalculation(RouteCalculation):
         try:
             active_nodes = list(range(len(self.star_graph)))
             upbound = self._preheat_upper_bound(star, target)
+            triangle_bound = self.shortest_path_tree.triangle_upbound(star, target)
             # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
             if float('+inf') != upbound:
                 comp_id = star.component
@@ -224,6 +225,8 @@ class TradeCalculation(RouteCalculation):
                                            self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
 
         except nx.NetworkXNoPath:
+            assert upbound != float('+inf'),\
+                f"Pathfinding failure between {star} and {target} contradicts path implied by finite upbound"
             return
 
         route = [self.galaxy.star_mapping[item] for item in rawroute]
@@ -261,6 +264,12 @@ class TradeCalculation(RouteCalculation):
 
         src_adj = self.star_graph._arcs[stardex]
         trg_adj = self.star_graph._arcs[targdex]
+
+        # Case 0a - Source and target are directly connected
+        keep = src_adj[0] == targdex
+        if keep.any():
+            flip = src_adj[1][keep]
+            upbound = min(upbound, flip[0])
 
         # Case 1 - Direct source neighbour to historic-route target neighbour
         hist_targ = self.galaxy.historic_costs._arcs[targdex]
