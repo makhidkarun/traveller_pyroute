@@ -24,6 +24,37 @@ import networkx as nx
 import numpy as np
 
 
+def _sum_branch(branch_fac, path_len):
+    total = 0
+    for i in range(1, path_len + 1):
+        total += branch_fac ** i
+    return total
+
+
+def _calc_branching_factor(nodes_queued, path_len):
+    if path_len == nodes_queued:
+        return 1.0
+
+    hibound = nodes_queued ** (1/path_len)
+    hires = _sum_branch(hibound, path_len) - nodes_queued
+    lobound = 1
+    lores = path_len - nodes_queued
+
+    while 0.001 <= abs(hibound - lobound):
+        mid = round(0.5 * (hibound + lobound), 3)
+        if mid == hibound or mid == lobound:
+            break
+        midres = _sum_branch(mid, path_len) - nodes_queued
+        if 0 < midres:
+            hibound = mid
+            hires = midres
+        else:
+            lobound = mid
+            lores = midres
+
+    return mid
+
+
 def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=None):
 
     push = heappush
@@ -52,6 +83,12 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
 
     node_counter = 0
     queue_counter = 0
+    revisited = 0
+    neighbour_bound = 0
+    g_exhausted = 0
+    f_exhausted = 0
+    new_upbounds = 0
+    un_exhausted = 0
     has_bound = upbound != floatinf
 
     while queue:
@@ -66,8 +103,13 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
                 assert node not in path, "Node " + str(node) + " duplicated in discovered path"
                 path.append(node)
                 node = explored[node]
+            branch = _calc_branching_factor(queue_counter, len(path) - 1)
+            diagnostics = {'nodes_expanded': node_counter, 'nodes_queued': queue_counter, 'branch_factor': branch,
+                           'num_jumps': len(path) - 1, 'nodes_revisited': revisited, 'neighbour_bound': neighbour_bound,
+                           'new_upbounds': new_upbounds, 'g_exhausted': g_exhausted, 'f_exhausted': f_exhausted,
+                           'un_exhausted': un_exhausted}
             path.reverse()
-            return path, {}
+            return path, diagnostics
 
         if 0 == node_counter % 49 and 0 < len(queue):
             # Trim queue items that can not result in a shorter path
@@ -75,6 +117,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             heapify(queue)
 
         if curnode in explored:
+            revisited += 1
             # Do not override the parent of starting node
             if explored[curnode] is None:
                 continue
@@ -89,6 +132,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             distances[curnode] = dist
 
         explored[curnode] = parent
+        neighbour_bound += 1
 
         raw_nodes = G_succ[curnode]
         active_nodes = raw_nodes[0]
@@ -103,6 +147,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         active_nodes = active_nodes[keep]
         num_neighbours = len(active_nodes)
         if 0 == num_neighbours:
+            g_exhausted += 1
             continue
         active_weights = active_weights[keep]
         augmented_weights = active_weights + potentials[active_nodes]
@@ -116,6 +161,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
                 active_nodes = active_nodes[keep]
                 num_neighbours = len(active_nodes)
                 if 0 == num_neighbours:
+                    f_exhausted += 1
                     continue
                 active_weights = active_weights[keep]
                 augmented_weights = augmented_weights[keep]
@@ -125,6 +171,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             ncost = active_weights[drop][0]
 
             upbound = ncost
+            new_upbounds += 1
             distances[target] = ncost
             has_bound = True
             if 0 < len(queue):
@@ -164,6 +211,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         # As a result, unconditionally queue _all_ nodes that are still active, and filter out the bound-busting
         # neighbours.
         distances[active_nodes] = active_weights
+        un_exhausted += 1
 
         remain = zip(augmented_weights, active_weights, active_nodes)
         queue_counter += len(active_nodes)
