@@ -74,6 +74,7 @@ class TradeCalculation(RouteCalculation):
 
         # Are debugging gubbins turned on?
         self.debug_flag = debug_flag
+        self.pathfinding_data = None
 
         self.shortest_path_tree = None
         # Track inter-sector passenger imbalances
@@ -168,6 +169,18 @@ class TradeCalculation(RouteCalculation):
 
         btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+        if self.debug_flag:
+            self.pathfinding_data = {'nodes_expanded': np.ones(len(btn), dtype=float) * -1,
+                                     'nodes_queued': np.ones(len(btn), dtype=float) * -1,
+                                     'branch_factor': np.ones(len(btn), dtype=float) * -1,
+                                     'nodes_revisited': np.ones(len(btn), dtype=float) * -1,
+                                     'neighbour_bound': np.ones(len(btn), dtype=float) * -1,
+                                     'new_upbounds': np.ones(len(btn), dtype=float) * -1,
+                                     'g_exhausted': np.ones(len(btn), dtype=float) * -1,
+                                     'f_exhausted': np.ones(len(btn), dtype=float) * -1,
+                                     'targ_exhausted': np.ones(len(btn), dtype=float) * -1,
+                                     'un_exhausted': np.ones(len(btn), dtype=float) * -1,
+                                     'neighbourhood_size': np.ones(len(btn), dtype=float) * -1}
 
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
@@ -198,6 +211,33 @@ class TradeCalculation(RouteCalculation):
             processed += 1
         self.multilateral_balance_pass()
         self.logger.info('processed {} routes at BTN {}'.format(counter, base_btn))
+        if self.debug_flag:
+            num_stars = len(self.galaxy.stars)
+            self.logger.info('Pathfinding diagnostic data for route reuse {}, {} stars, {} routes'.
+                             format(self.route_reuse, num_stars, processed))
+            keep = self.pathfinding_data['nodes_expanded'] != -1
+            branch = np.percentile(self.pathfinding_data['branch_factor'], 98)
+            neighbourhood_size = round(np.percentile(self.pathfinding_data['neighbourhood_size'], 98), 3)
+            total_expanded = int(np.sum(self.pathfinding_data['nodes_expanded'][keep]))
+            total_queued = int(np.sum(self.pathfinding_data['nodes_queued'][keep]))
+            total_revisited = int(np.sum(self.pathfinding_data['nodes_revisited'][keep]))
+            total_neighbour_bound = int(np.sum(self.pathfinding_data['neighbour_bound'][keep]))
+            total_upbounds = int(np.sum(self.pathfinding_data['new_upbounds'][keep]))
+            total_g_exhausted = int(np.sum(self.pathfinding_data['g_exhausted'][keep]))
+            total_f_exhausted = int(np.sum(self.pathfinding_data['f_exhausted'][keep]))
+            total_targ_exhausted = int(np.sum(self.pathfinding_data['targ_exhausted'][keep]))
+            total_un_exhausted = int(np.sum(self.pathfinding_data['un_exhausted'][keep]))
+            self.logger.info('98th percentile effective branch factor {}'.format(branch))
+            self.logger.info('98th percentile neighbourhood size {}'.format(neighbourhood_size))
+            self.logger.info('Total nodes popped {}'.format(total_expanded))
+            self.logger.info('Total nodes queued {}'.format(total_queued))
+            self.logger.info('Total nodes revisited {}'.format(total_revisited))
+            self.logger.info('Total neighbour bound checks {}'.format(total_neighbour_bound))
+            self.logger.info('Total new upper bounds {}'.format(total_upbounds))
+            self.logger.info('Total g-exhausted nodes {}'.format(total_g_exhausted))
+            self.logger.info('Total f-exhausted nodes {}'.format(total_f_exhausted))
+            self.logger.info('Total target-exhausted nodes {}'.format(total_targ_exhausted))
+            self.logger.info('Total un-exhausted nodes {}'.format(total_un_exhausted))
 
     def get_trade_between(self, star, target):
         """
@@ -220,8 +260,24 @@ class TradeCalculation(RouteCalculation):
                         target, star = star, target
 
             mincost = self.star_graph.min_cost(active_nodes, target.index, indirect=True)
-            rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
+            rawroute, diag = astar_path_numpy(self.star_graph, star.index, target.index,
                                            self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
+
+            if self.debug_flag:
+                moshdex = np.where(self.pathfinding_data['branch_factor'] == -1.0)[0][0]
+                # Now load up this route's summary data
+                self.pathfinding_data['nodes_expanded'][moshdex] = diag['nodes_expanded']
+                self.pathfinding_data['nodes_queued'][moshdex] = diag['nodes_queued']
+                self.pathfinding_data['branch_factor'][moshdex] = diag['branch_factor']
+                self.pathfinding_data['nodes_revisited'][moshdex] = diag['nodes_revisited']
+                self.pathfinding_data['neighbour_bound'][moshdex] = diag['neighbour_bound']
+                self.pathfinding_data['new_upbounds'][moshdex] = diag['new_upbounds']
+                self.pathfinding_data['g_exhausted'][moshdex] = diag['g_exhausted']
+                self.pathfinding_data['f_exhausted'][moshdex] = diag['f_exhausted']
+                self.pathfinding_data['targ_exhausted'][moshdex] = diag['targ_exhausted']
+                self.pathfinding_data['un_exhausted'][moshdex] = diag['un_exhausted']
+                neighbourhood_size = 1 if diag['un_exhausted'] == 0 else diag['nodes_queued'] / diag['un_exhausted']
+                self.pathfinding_data['neighbourhood_size'][moshdex] = neighbourhood_size
 
         except nx.NetworkXNoPath:
             assert upbound != float('+inf'),\
