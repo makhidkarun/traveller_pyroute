@@ -62,6 +62,12 @@ class ApproximateShortestPathForestUnified:
 
         return np.max(raw, axis=1)
 
+    def triangle_upbound(self, source, target):
+        raw = self._distances[source.index, :] + self._distances[target.index, :]
+        raw = raw[raw != float('+inf')]
+
+        return np.min(raw)
+
     #  Gratuitous William Gibson reference is gratuitous.
     @functools.cache
     def _mona_lisa_overdrive(self, target_node):
