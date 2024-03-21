@@ -75,6 +75,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     # Tracks shortest _complete_ path found so far
     floatinf = float('inf')
     upbound = floatinf if upbound is None else upbound
+    assert upbound != floatinf, "Supplied upbound must not be infinite"
     # pre-calc heuristics for all nodes to the target node
     potentials = bulk_heuristic(G._nodes, target)
     # pre-calc the minimum-cost edge on each node
@@ -89,7 +90,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     f_exhausted = 0
     new_upbounds = 0
     un_exhausted = 0
-    has_bound = upbound != floatinf
 
     while queue:
         # Pop the smallest item from queue.
@@ -103,12 +103,12 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
                 assert node not in path, "Node " + str(node) + " duplicated in discovered path"
                 path.append(node)
                 node = explored[node]
+            path.reverse()
             branch = _calc_branching_factor(queue_counter, len(path) - 1)
             diagnostics = {'nodes_expanded': node_counter, 'nodes_queued': queue_counter, 'branch_factor': branch,
                            'num_jumps': len(path) - 1, 'nodes_revisited': revisited, 'neighbour_bound': neighbour_bound,
                            'new_upbounds': new_upbounds, 'g_exhausted': g_exhausted, 'f_exhausted': f_exhausted,
                            'un_exhausted': un_exhausted}
-            path.reverse()
             return path, diagnostics
 
         if 0 == node_counter % 49 and 0 < len(queue):
@@ -139,10 +139,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         active_weights = dist + raw_nodes[1]
         # filter out nodes whose active weights exceed _either_ the node's distance label _or_ the current upper bound
         # - the current node can _not_ result in a shorter path
-        if has_bound:
-            keep = active_weights <= np.minimum(distances[active_nodes], upbound - min_cost[active_nodes])
-        else:
-            keep = active_weights <= distances[active_nodes]
+        keep = active_weights <= np.minimum(distances[active_nodes], upbound - min_cost[active_nodes])
         # if we're not keeping anything, go around
         active_nodes = active_nodes[keep]
         num_neighbours = len(active_nodes)
@@ -153,18 +150,16 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         augmented_weights = active_weights + potentials[active_nodes]
 
         # Even if we have the target node as a candidate neighbour, of itself, that's _no_ guarantee that the target
-        # as neighbour will give a better upper bound.  The has_bound check also works out faster than the
-        # target in active_nodes check.
-        if has_bound:
-            keep = augmented_weights < upbound
-            if not keep.all():
-                active_nodes = active_nodes[keep]
-                num_neighbours = len(active_nodes)
-                if 0 == num_neighbours:
-                    f_exhausted += 1
-                    continue
-                active_weights = active_weights[keep]
-                augmented_weights = augmented_weights[keep]
+        # as neighbour will give a better upper bound.
+        keep = augmented_weights < upbound
+        if not keep.all():
+            active_nodes = active_nodes[keep]
+            num_neighbours = len(active_nodes)
+            if 0 == num_neighbours:
+                f_exhausted += 1
+                continue
+            active_weights = active_weights[keep]
+            augmented_weights = augmented_weights[keep]
 
         if target in active_nodes:
             drop = active_nodes == target
@@ -173,7 +168,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             upbound = ncost
             new_upbounds += 1
             distances[target] = ncost
-            has_bound = True
             if 0 < len(queue):
                 queue = [item for item in queue if item[0] < upbound]
                 # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value

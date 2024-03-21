@@ -40,5 +40,6 @@ class testAStarNumpy(baseTest):
 
         exp_route = [0, 8, 9, 15, 24, 36]
 
-        act_route, _ = astar_path_numpy(dist_graph, source.index, target.index, heuristic)
+        upbound = galaxy.trade.shortest_path_tree.triangle_upbound(source.index, target.index) * 1.005
+        act_route, _ = astar_path_numpy(dist_graph, source.index, target.index, heuristic, upbound=upbound)
         self.assertEqual(exp_route, act_route)

@@ -70,5 +70,8 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
         result = np.abs(self._distances[active_nodes] - self._distances[target])
         return result
 
+    def triangle_upbound(self, source, target):
+        return self._distances[source] + self._distances[target]
+
     def lighten_edge(self, u, v, weight):
         self._graph.lighten_edge(u, v, weight)
