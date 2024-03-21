@@ -23,13 +23,9 @@ from heapq import heappop, heappush, heapify
 import networkx as nx
 import numpy as np
 
-
 def _sum_branch(branch_fac, path_len):
-    total = 0
-    for i in range(1, path_len + 1):
-        total += branch_fac ** i
-    return total
-
+    crosscheck = branch_fac * (branch_fac ** path_len - 1) / (branch_fac - 1)
+    return crosscheck
 
 def _calc_branching_factor(nodes_queued, path_len):
     if path_len == nodes_queued:
@@ -39,9 +35,14 @@ def _calc_branching_factor(nodes_queued, path_len):
     hires = _sum_branch(hibound, path_len) - nodes_queued
     lobound = 1
     lores = path_len - nodes_queued
+    slope = (hires - lores) / (hibound - lobound)
+    use_slope = True
 
     while 0.001 <= abs(hibound - lobound):
-        mid = round(0.5 * (hibound + lobound), 3)
+        if use_slope:
+            mid = round(hibound - hires / slope, 3)
+        else:
+            mid = round(0.5 * (hibound + lobound), 3)
         if mid == hibound or mid == lobound:
             break
         midres = _sum_branch(mid, path_len) - nodes_queued
@@ -51,6 +52,8 @@ def _calc_branching_factor(nodes_queued, path_len):
         else:
             lobound = mid
             lores = midres
+        use_slope = not use_slope
+        slope = (hires - lores) / (hibound - lobound)
 
     return mid
 
@@ -85,12 +88,13 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     node_counter = 0
     queue_counter = 0
     revisited = 0
-    neighbour_bound = 0
     g_exhausted = 0
     f_exhausted = 0
     new_upbounds = 0
     targ_exhausted = 0
     un_exhausted = 0
+    exhaust_count = 0
+    revis_continue = 0
 
     while queue:
         # Pop the smallest item from queue.
@@ -106,6 +110,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
                 node = explored[node]
             path.reverse()
             branch = _calc_branching_factor(queue_counter, len(path) - 1)
+            neighbour_bound = node_counter - 1 + revis_continue - revisited
+            un_exhausted = neighbour_bound - f_exhausted - g_exhausted - targ_exhausted
             diagnostics = {'nodes_expanded': node_counter, 'nodes_queued': queue_counter, 'branch_factor': branch,
                            'num_jumps': len(path) - 1, 'nodes_revisited': revisited, 'neighbour_bound': neighbour_bound,
                            'new_upbounds': new_upbounds, 'g_exhausted': g_exhausted, 'f_exhausted': f_exhausted,
@@ -130,10 +136,10 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
                 heapify(queue)
                 continue
             # If we've found a better path, update
+            revis_continue += 1
             distances[curnode] = dist
 
         explored[curnode] = parent
-        neighbour_bound += 1
 
         raw_nodes = G_succ[curnode]
         active_nodes = raw_nodes[0]
@@ -208,7 +214,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         # As a result, unconditionally queue _all_ nodes that are still active, and filter out the bound-busting
         # neighbours.
         distances[active_nodes] = active_weights
-        un_exhausted += 1
 
         remain = zip(augmented_weights, active_weights, active_nodes)
         queue_counter += len(active_nodes)
