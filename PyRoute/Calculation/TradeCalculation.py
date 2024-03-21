@@ -271,6 +271,19 @@ class TradeCalculation(RouteCalculation):
             flip = src_adj[1][keep]
             upbound = min(upbound, flip[0])
 
+        # Case 0b - Source and target have at least one mutual neighbour
+        # Although this may seem redundant after Case 0a returns a finite bound, it's not, especially towards the
+        # bitter end of pathfinding with lower route-reuse values.  In such case, it's not uncommon to have an indirect
+        # bound through a mutual neighbour be lower (and thus better) than the direct link.
+        common, src, trg = np.intersect1d(src_adj[0], trg_adj[0], assume_unique=True, return_indices=True)
+        if 0 < len(common):
+            midleft = src_adj[1][src]
+            midright = trg_adj[1][trg]
+            midbound = midleft + midright
+            mindex = np.argmin(midbound)
+            nubound = midbound[mindex]
+            upbound = min(upbound, nubound)
+
         # Case 1 - Direct source neighbour to historic-route target neighbour
         hist_targ = self.galaxy.historic_costs._arcs[targdex]
         if 0 < len(hist_targ[0]):
