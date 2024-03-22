@@ -68,9 +68,9 @@ class TradeCalculation(RouteCalculation):
         # based upon program arguments. 
         self.route_reuse = route_reuse
         # Testing indicated that allowing a little more than 1 edge hit before tripping an update seemed to
-        # strike the best space/time tradeoff, so default epsilon to 1/route_reuse.  The 0.1 cap is to speed up
+        # strike the best space/time tradeoff, so default epsilon to sqrt(10/route_reuse).  The 0.1 cap is to speed up
         # the default case.
-        self.epsilon = min(0.1, 1.0 / route_reuse)
+        self.epsilon = 0.1 * min(1, (10 / route_reuse) ** 0.5)
 
         # Are debugging gubbins turned on?
         self.debug_flag = debug_flag
