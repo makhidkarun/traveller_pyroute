@@ -216,8 +216,12 @@ class TradeCalculation(RouteCalculation):
             self.logger.info('Pathfinding diagnostic data for route reuse {}, {} stars, {} routes'.
                              format(self.route_reuse, num_stars, processed))
             keep = self.pathfinding_data['nodes_expanded'] != -1
-            branch = np.percentile(self.pathfinding_data['branch_factor'], 98)
-            neighbourhood_size = round(np.percentile(self.pathfinding_data['neighbourhood_size'], 98), 3)
+            branchdata = self.pathfinding_data['branch_factor']
+            branchdata = branchdata[1 <= branchdata]
+            branchdata = branchdata[branchdata < float('+inf')]
+            branch = np.percentile(branchdata, [50, 80, 98])
+            branch_geomean = round(10 ** np.mean(np.log10(branchdata)), 3)
+            neighbourhood_size = np.round(np.percentile(self.pathfinding_data['neighbourhood_size'], [50, 80, 98]), 3)
             total_expanded = int(np.sum(self.pathfinding_data['nodes_expanded'][keep]))
             total_queued = int(np.sum(self.pathfinding_data['nodes_queued'][keep]))
             total_revisited = int(np.sum(self.pathfinding_data['nodes_revisited'][keep]))
@@ -227,8 +231,9 @@ class TradeCalculation(RouteCalculation):
             total_f_exhausted = int(np.sum(self.pathfinding_data['f_exhausted'][keep]))
             total_targ_exhausted = int(np.sum(self.pathfinding_data['targ_exhausted'][keep]))
             total_un_exhausted = int(np.sum(self.pathfinding_data['un_exhausted'][keep]))
-            self.logger.info('98th percentile effective branch factor {}'.format(branch))
-            self.logger.info('98th percentile neighbourhood size {}'.format(neighbourhood_size))
+            self.logger.info('50th/80th/98th percentile effective branch factor {}/{}/{}'.format(branch[0], branch[1], branch[2]))
+            self.logger.info('Geometric mean effective branch factor {}'.format(branch_geomean))
+            self.logger.info('50th/80th/98th percentile neighbourhood size {}/{}/{}'.format(neighbourhood_size[0], neighbourhood_size[1], neighbourhood_size[2]))
             self.logger.info('Total nodes popped {}'.format(total_expanded))
             self.logger.info('Total nodes queued {}'.format(total_queued))
             self.logger.info('Total nodes revisited {}'.format(total_revisited))
