@@ -9,7 +9,7 @@ import networkx as nx
 
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
-from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
+from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 
 
@@ -124,12 +124,13 @@ class CommCalculation(RouteCalculation):
         self.calculate_components()
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
-        landmarks = self.get_landmarks(index=True)
+        landmarks, _ = self.get_landmarks(index=True)
+        landmarks = None if 0 == len(landmarks) else landmarks
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathForestDistanceGraph(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
 
         self.logger.info('sorting routes...')
         routes = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
@@ -199,8 +200,9 @@ class CommCalculation(RouteCalculation):
     def get_route_between(self, star, target):
         try:
             mincost = copy.deepcopy(self.star_graph._min_cost)
+            upbound = self.shortest_path_tree.triangle_upbound(star, target) * 1.005
             route, _ = astar_path_numpy(self.star_graph, star.index, target.index,
-                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost)
+                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
         except nx.NetworkXNoPath:
             return
 

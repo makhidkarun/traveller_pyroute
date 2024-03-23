@@ -8,6 +8,7 @@ import functools
 import itertools
 import logging
 import math
+from collections import defaultdict
 
 import networkx as nx
 
@@ -40,6 +41,7 @@ class RouteCalculation(object):
 
         # component level tracking
         self.components = dict()
+        self.component_landmarks = defaultdict(set)
 
         self.shortest_path_tree = None
         self.star_graph = None
@@ -193,9 +195,9 @@ class RouteCalculation(object):
                 self.galaxy.star_mapping[star].component = counter
         return
 
-    def get_landmarks(self, index=False):
+    def get_landmarks(self, index=False, btn=None):
         schema = LandmarksTriaxialExtremes(self.galaxy)
-        return schema.get_landmarks(index)
+        return schema.get_landmarks(index, btn=btn)
 
     def unilateral_filter(self, star):
         """

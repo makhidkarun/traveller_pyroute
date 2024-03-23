@@ -652,10 +652,8 @@ class Galaxy(AreaItem):
                 if worldstar.ownedBy == worldstar:
                     continue
                 neighbours = [self.star_mapping[item] for item in self.stars.neighbors(world)]
-                ownedBy = [star for star in neighbours \
-                           if star.tl >= 9 and star.popCode >= 6 and \
-                           star.port in 'ABC' and star.ownedBy == star and \
-                           AllyGen.are_owned_allies(star.alg_code, worldstar.alg_code)]
+                ownedBy = [star for star in neighbours if star.tl >= 9 and star.popCode >= 6 and star.port in 'ABC'
+                           and star.ownedBy == star and AllyGen.are_owned_allies(star.alg_code, worldstar.alg_code)]
 
                 ownedBy.sort(reverse=True,
                              key=lambda star: star.popCode)
@@ -767,10 +765,7 @@ class Galaxy(AreaItem):
         # If the target is connected to node u via some other edge, u's min-edge-cost underestimates cost to target.
         # If the target is not directly connected to node u, the target is at least the sum of two nodes' min-edge costs
         # away, so u's min-edge-cost again underestimates cost to target.
-
-        min_cost = copy.deepcopy(self.trade.star_graph._min_cost)
-        min_cost[target] = 0  # Target is special case, so zero its min cost
-        min_cost = min_cost[active_nodes]
+        min_cost = self.trade.star_graph.min_cost(active_nodes, target, indirect=True)
 
         # Case-wise maximum of 2 or more admissible heuristics (approx-SP bound, existing route distances and min-cost
         # edges) is itself admissible

@@ -10,7 +10,7 @@ import networkx as nx
 from PyRoute.Position.Hex import Hex
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
-from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
+from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 
 
@@ -36,12 +36,9 @@ class XRouteCalculation(RouteCalculation):
     def generate_routes(self):
         self.distance_weight = self.capSec_weight
         self.generate_base_routes()
-        self.capital = [star for star in self.galaxy.ranges if \
-                        AllyGen.imperial_align(star.alg_code) and star.tradeCode.other_capital]
-        self.secCapitals = [star for star in self.galaxy.ranges if \
-                            AllyGen.imperial_align(star.alg_code) and star.tradeCode.sector_capital]
-        self.subCapitals = [star for star in self.galaxy.ranges if \
-                            AllyGen.imperial_align(star.alg_code) and star.tradeCode.subsector_capital]
+        self.capital = [star for star in self.galaxy.ranges if AllyGen.imperial_align(star.alg_code) and star.tradeCode.other_capital]
+        self.secCapitals = [star for star in self.galaxy.ranges if AllyGen.imperial_align(star.alg_code) and star.tradeCode.sector_capital]
+        self.subCapitals = [star for star in self.galaxy.ranges if AllyGen.imperial_align(star.alg_code) and star.tradeCode.subsector_capital]
 
     def routes_pass_1(self):
         # Pass 1: Get routes at J6  Capital and sector capitals
@@ -117,15 +114,13 @@ class XRouteCalculation(RouteCalculation):
                     self.get_route_between(secCap[0], star, self.calc_trade(23), self.galaxy.heuristic_distance_indexes)
 
         for star in self.subCapitals:
-            routes = [neighbor for neighbor in self.subCapitals if \
-                      neighbor != star and neighbor.distance(star) <= 40]
+            routes = [neighbor for neighbor in self.subCapitals if neighbor != star and neighbor.distance(star) <= 40]
             for neighbor in routes:
                 self.get_route_between(star, neighbor, self.calc_trade(23), self.galaxy.heuristic_distance_indexes)
 
     def routes_pass_3(self):
         self.reweight_routes(self.impt_weight)
-        important = [star for star in self.galaxy.ranges if \
-                     AllyGen.imperial_align(star.alg_code) and star.tradeCount == 0
+        important = [star for star in self.galaxy.ranges if AllyGen.imperial_align(star.alg_code) and star.tradeCount == 0
                      and (star.importance >= 4 or 'D' in star.baseCode or 'W' in star.baseCode)]
 
         jumpStations = [star for star in self.galaxy.ranges if star.tradeCount > 0]
@@ -165,12 +160,13 @@ class XRouteCalculation(RouteCalculation):
         self.calculate_components()
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
-        landmarks = self.get_landmarks(index=True)
+        landmarks, _ = self.get_landmarks(index=True)
+        landmarks = None if 0 == len(landmarks) else landmarks
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathForestDistanceGraph(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
         self.logger.info('XRoute pass 1')
         self.routes_pass_1()
 
@@ -206,8 +202,9 @@ class XRouteCalculation(RouteCalculation):
     def get_route_between(self, star, target, trade, heuristic):
         try:
             mincost = copy.deepcopy(self.star_graph._min_cost)
+            upbound = self.shortest_path_tree.triangle_upbound(star, target) * 1.005
             route, _ = astar_path_numpy(self.star_graph, star.index, target.index,
-                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost)
+                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
         except nx.NetworkXNoPath:
             return
 

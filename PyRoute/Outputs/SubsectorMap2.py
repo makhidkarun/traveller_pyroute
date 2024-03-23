@@ -403,9 +403,8 @@ class GraphicSubsectorMap(GraphicMap):
         img = Image.new("RGBA", self.image_size, 0)
         draw = ImageDraw.Draw(img)
 
-        trade = [pair for pair in self.galaxy.stars.edges(subsector.worlds, True) \
-                 if pair[2]['distance'] < 3 and \
-                 (pair[2]['SourceMarketPrice'] > 0 or pair[2]['TargetMarketPrice'] > 0)]
+        trade = [pair for pair in self.galaxy.stars.edges(subsector.worlds, True)
+                 if pair[2]['distance'] < 3 and (pair[2]['SourceMarketPrice'] > 0 or pair[2]['TargetMarketPrice'] > 0)]
 
         self.logger.info("Generating routes in {} for {} worlds".format(subsector.name, len(trade)))
         for (star, neighbor, data) in trade:

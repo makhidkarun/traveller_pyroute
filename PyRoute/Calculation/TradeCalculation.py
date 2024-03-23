@@ -3,7 +3,6 @@ Created on Mar 15, 2014
 
 @author: tjoneslo
 """
-import copy
 import functools
 import math
 
@@ -69,12 +68,13 @@ class TradeCalculation(RouteCalculation):
         # based upon program arguments. 
         self.route_reuse = route_reuse
         # Testing indicated that allowing a little more than 1 edge hit before tripping an update seemed to
-        # strike the best space/time tradeoff, so default epsilon to 1/route_reuse.  The 0.1 cap is to speed up
+        # strike the best space/time tradeoff, so default epsilon to sqrt(10/route_reuse).  The 0.1 cap is to speed up
         # the default case.
-        self.epsilon = min(0.1, 1.0 / route_reuse)
+        self.epsilon = 0.1 * min(1, (10 / route_reuse) ** 0.5)
 
         # Are debugging gubbins turned on?
         self.debug_flag = debug_flag
+        self.pathfinding_data = None
 
         self.shortest_path_tree = None
         # Track inter-sector passenger imbalances
@@ -169,11 +169,24 @@ class TradeCalculation(RouteCalculation):
 
         btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+        if self.debug_flag:
+            self.pathfinding_data = {'nodes_expanded': np.ones(len(btn), dtype=float) * -1,
+                                     'nodes_queued': np.ones(len(btn), dtype=float) * -1,
+                                     'branch_factor': np.ones(len(btn), dtype=float) * -1,
+                                     'nodes_revisited': np.ones(len(btn), dtype=float) * -1,
+                                     'neighbour_bound': np.ones(len(btn), dtype=float) * -1,
+                                     'new_upbounds': np.ones(len(btn), dtype=float) * -1,
+                                     'g_exhausted': np.ones(len(btn), dtype=float) * -1,
+                                     'f_exhausted': np.ones(len(btn), dtype=float) * -1,
+                                     'targ_exhausted': np.ones(len(btn), dtype=float) * -1,
+                                     'un_exhausted': np.ones(len(btn), dtype=float) * -1,
+                                     'neighbourhood_size': np.ones(len(btn), dtype=float) * -1}
 
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
         self.star_graph = DistanceGraph(self.galaxy.stars)
-        landmarks = self.get_landmarks(index=True)
+        landmarks, self.component_landmarks = self.get_landmarks(index=True, btn=btn)
+
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
@@ -198,6 +211,38 @@ class TradeCalculation(RouteCalculation):
             processed += 1
         self.multilateral_balance_pass()
         self.logger.info('processed {} routes at BTN {}'.format(counter, base_btn))
+        if self.debug_flag:
+            num_stars = len(self.galaxy.stars)
+            self.logger.info('Pathfinding diagnostic data for route reuse {}, {} stars, {} routes'.
+                             format(self.route_reuse, num_stars, processed))
+            keep = self.pathfinding_data['nodes_expanded'] != -1
+            branchdata = self.pathfinding_data['branch_factor']
+            branchdata = branchdata[1 <= branchdata]
+            branchdata = branchdata[branchdata < float('+inf')]
+            branch = np.percentile(branchdata, [50, 80, 98])
+            branch_geomean = round(10 ** np.mean(np.log10(branchdata)), 3)
+            neighbourhood_size = np.round(np.percentile(self.pathfinding_data['neighbourhood_size'], [50, 80, 98]), 3)
+            total_expanded = int(np.sum(self.pathfinding_data['nodes_expanded'][keep]))
+            total_queued = int(np.sum(self.pathfinding_data['nodes_queued'][keep]))
+            total_revisited = int(np.sum(self.pathfinding_data['nodes_revisited'][keep]))
+            total_neighbour_bound = int(np.sum(self.pathfinding_data['neighbour_bound'][keep]))
+            total_upbounds = int(np.sum(self.pathfinding_data['new_upbounds'][keep]))
+            total_g_exhausted = int(np.sum(self.pathfinding_data['g_exhausted'][keep]))
+            total_f_exhausted = int(np.sum(self.pathfinding_data['f_exhausted'][keep]))
+            total_targ_exhausted = int(np.sum(self.pathfinding_data['targ_exhausted'][keep]))
+            total_un_exhausted = int(np.sum(self.pathfinding_data['un_exhausted'][keep]))
+            self.logger.info('50th/80th/98th percentile effective branch factor {}/{}/{}'.format(branch[0], branch[1], branch[2]))
+            self.logger.info('Geometric mean effective branch factor {}'.format(branch_geomean))
+            self.logger.info('50th/80th/98th percentile neighbourhood size {}/{}/{}'.format(neighbourhood_size[0], neighbourhood_size[1], neighbourhood_size[2]))
+            self.logger.info('Total nodes popped {}'.format(total_expanded))
+            self.logger.info('Total nodes queued {}'.format(total_queued))
+            self.logger.info('Total nodes revisited {}'.format(total_revisited))
+            self.logger.info('Total neighbour bound checks {}'.format(total_neighbour_bound))
+            self.logger.info('Total new upper bounds {}'.format(total_upbounds))
+            self.logger.info('Total g-exhausted nodes {}'.format(total_g_exhausted))
+            self.logger.info('Total f-exhausted nodes {}'.format(total_f_exhausted))
+            self.logger.info('Total target-exhausted nodes {}'.format(total_targ_exhausted))
+            self.logger.info('Total un-exhausted nodes {}'.format(total_un_exhausted))
 
     def get_trade_between(self, star, target):
         """
@@ -209,14 +254,39 @@ class TradeCalculation(RouteCalculation):
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
+            active_nodes = list(range(len(self.star_graph)))
             upbound = self._preheat_upper_bound(star, target)
             # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
             if float('+inf') != upbound:
+                comp_id = star.component
                 upbound = round(upbound * 1.005 + 0.0005, 3)
-            mincost = copy.deepcopy(self.star_graph._min_cost)
-            rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
+                if star.index in self.component_landmarks[comp_id]:
+                    if target.index not in self.component_landmarks[comp_id]:
+                        target, star = star, target
+
+            mincost = self.star_graph.min_cost(active_nodes, target.index, indirect=True)
+            rawroute, diag = astar_path_numpy(self.star_graph, star.index, target.index,
                                            self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
+
+            if self.debug_flag:
+                moshdex = np.where(self.pathfinding_data['branch_factor'] == -1.0)[0][0]
+                # Now load up this route's summary data
+                self.pathfinding_data['nodes_expanded'][moshdex] = diag['nodes_expanded']
+                self.pathfinding_data['nodes_queued'][moshdex] = diag['nodes_queued']
+                self.pathfinding_data['branch_factor'][moshdex] = diag['branch_factor']
+                self.pathfinding_data['nodes_revisited'][moshdex] = diag['nodes_revisited']
+                self.pathfinding_data['neighbour_bound'][moshdex] = diag['neighbour_bound']
+                self.pathfinding_data['new_upbounds'][moshdex] = diag['new_upbounds']
+                self.pathfinding_data['g_exhausted'][moshdex] = diag['g_exhausted']
+                self.pathfinding_data['f_exhausted'][moshdex] = diag['f_exhausted']
+                self.pathfinding_data['targ_exhausted'][moshdex] = diag['targ_exhausted']
+                self.pathfinding_data['un_exhausted'][moshdex] = diag['un_exhausted']
+                neighbourhood_size = 1 if diag['un_exhausted'] == 0 else diag['nodes_queued'] / diag['un_exhausted']
+                self.pathfinding_data['neighbourhood_size'][moshdex] = neighbourhood_size
+
         except nx.NetworkXNoPath:
+            assert upbound != float('+inf'),\
+                f"Pathfinding failure between {star} and {target} contradicts path implied by finite upbound"
             return
 
         route = [self.galaxy.star_mapping[item] for item in rawroute]
@@ -249,11 +319,30 @@ class TradeCalculation(RouteCalculation):
         # Keeping this deterministic helps keep input reduction straight, as there's less state to track.
         reheat = allow_reheat and ((stardex + targdex) % (math.floor(math.sqrt(len(self.star_graph)))) == 0)
 
-        upbound = float('+inf')
+        upbound = self.shortest_path_tree.triangle_upbound(star, target)
         reheat_list = set()
 
         src_adj = self.star_graph._arcs[stardex]
         trg_adj = self.star_graph._arcs[targdex]
+
+        # Case 0a - Source and target are directly connected
+        keep = src_adj[0] == targdex
+        if keep.any():
+            flip = src_adj[1][keep]
+            upbound = min(upbound, flip[0])
+
+        # Case 0b - Source and target have at least one mutual neighbour
+        # Although this may seem redundant after Case 0a returns a finite bound, it's not, especially towards the
+        # bitter end of pathfinding with lower route-reuse values.  In such case, it's not uncommon to have an indirect
+        # bound through a mutual neighbour be lower (and thus better) than the direct link.
+        common, src, trg = np.intersect1d(src_adj[0], trg_adj[0], assume_unique=True, return_indices=True)
+        if 0 < len(common):
+            midleft = src_adj[1][src]
+            midright = trg_adj[1][trg]
+            midbound = midleft + midright
+            mindex = np.argmin(midbound)
+            nubound = midbound[mindex]
+            upbound = min(upbound, nubound)
 
         # Case 1 - Direct source neighbour to historic-route target neighbour
         hist_targ = self.galaxy.historic_costs._arcs[targdex]

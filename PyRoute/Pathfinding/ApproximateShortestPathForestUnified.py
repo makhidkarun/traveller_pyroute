@@ -26,7 +26,9 @@ class ApproximateShortestPathForestUnified:
         self._num_trees = num_trees
         self._graph_len = len(self._graph)
         self._distances = np.ones((self._graph_len, self._num_trees)) * float('+inf')
+        self._max_labels = np.ones((self._graph_len, self._num_trees)) * float('+inf')
 
+        min_cost = self._graph.min_cost(list(range(self._graph_len)), 0)
         # spin up initial distances
         for i in range(self._num_trees):
             raw_seeds = self._seeds[i] if isinstance(self._seeds[i], list) else list(self._seeds[i].values())
@@ -34,8 +36,9 @@ class ApproximateShortestPathForestUnified:
             result = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
                                                                                    self._distances[:, i],
                                                                                    seeds=raw_seeds,
+                                                                                   min_cost=min_cost,
                                                                                    divisor=self._divisor)
-            self._distances[:, i] = result
+            self._distances[:, i], self._max_labels[:, i] = result
 
     def lower_bound_bulk(self, active_nodes, target_node):
         overdrive, fastpath = self._mona_lisa_overdrive(target_node)
@@ -51,10 +54,19 @@ class ApproximateShortestPathForestUnified:
             actives = self._distances[:, overdrive]
             actives = actives[active_nodes, :]
             target = self._distances[target_node, overdrive]
+            # if we haven't got _any_ active lines, throw hands up and spit back zeros
+            if not overdrive.any():
+                return np.zeros(len(active_nodes), dtype=float)
 
             raw = np.abs(actives - target)
 
         return np.max(raw, axis=1)
+
+    def triangle_upbound(self, source, target):
+        raw = self._distances[source.index, :] + self._distances[target.index, :]
+        raw = raw[raw != float('+inf')]
+
+        return np.min(raw) * (1 + self._epsilon)
 
     #  Gratuitous William Gibson reference is gratuitous.
     @functools.cache
@@ -64,6 +76,10 @@ class ApproximateShortestPathForestUnified:
 
     def update_edges(self, edges):
         dropnodes = set()
+        dropspecific = []
+        tree_dex = np.array(list(range(self._num_trees)), dtype=int)
+        for _ in tree_dex:
+            dropspecific.append(set())
         for item in edges:
             left = item[0]
             right = item[1]
@@ -89,18 +105,47 @@ class ApproximateShortestPathForestUnified:
             if np.max(delta) >= weight:
                 dropnodes.add(left)
                 dropnodes.add(right)
+                overdrive = tree_dex[delta >= weight]
+                for k in overdrive:
+                    dropspecific[k].add(left)
+                    dropspecific[k].add(right)
 
         # if no nodes are to be dropped, nothing to do - bail out
         if 0 == len(dropnodes):
             return
 
+        # Now we're updating at least one tree, grab the current min-cost vector to feed into implicit-dijkstra
+        min_cost = self._graph.min_cost(list(range(self._graph_len)), 0)
+
         # Now we have the nodes incident to edges that bust the (1+eps) approximation bound, feed them into restarted
         # dijkstra to update the approx-SP tree/forest.  Some nodes in dropnodes may well be SP descendants of others,
         # but it wasn't worth the time or complexity cost to filter them out here.
         for i in range(self._num_trees):
-            self._distances[:, i] = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
-                                                                            distance_labels=self._distances[:, i],
-                                                                            seeds=dropnodes, divisor=self._divisor)
+            if 0 == len(dropspecific[i]):
+                continue
+            self._distances[:, i], self._max_labels[:, i] = implicit_shortest_path_dijkstra_distance_graph(self._graph,
+                                                                                   self._source,
+                                                                                   distance_labels=self._distances[:, i],
+                                                                                   seeds=dropspecific[i],
+                                                                                   divisor=self._divisor,
+                                                                                   min_cost=min_cost,
+                                                                                    max_labels=self._max_labels[:, i])
+
+    def expand_forest(self, nu_seeds):
+        raw_seeds = nu_seeds if isinstance(nu_seeds, list) else list(nu_seeds.values())
+        nu_distances = np.ones((self._graph_len)) * float('+inf')
+        nu_distances[raw_seeds] = 0
+        nu_distances, nu_max_labels = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
+                                                                nu_distances,
+                                                                seeds=raw_seeds,
+                                                                divisor=self._divisor)
+        result = np.zeros((self._graph_len, 1), dtype=float)
+        result[:, 0] = list(nu_distances)
+        maxresult = np.zeros((self._graph_len, 1), dtype=float)
+        maxresult[:, 0] = list(nu_max_labels)
+        self._distances = np.append(self._distances, result, 1)
+        self._max_labels = np.append(self._distances, maxresult, 1)
+        self._num_trees += 1
 
     def _get_sources(self, graph, source, sources):
         seeds = None
@@ -137,3 +182,7 @@ class ApproximateShortestPathForestUnified:
 
     def lighten_edge(self, u, v, weight):
         self._graph.lighten_edge(u, v, weight)
+
+    @property
+    def num_trees(self):
+        return self._num_trees

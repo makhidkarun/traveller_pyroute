@@ -28,10 +28,11 @@ class testTradeCalculationLandmarks(baseTest):
 
         self.assertEqual(1, len(galaxy.trade.components), "Unexpected number of components at J-4")
 
-        landmarks = galaxy.trade.get_landmarks()[0]
+        landmarks, _ = galaxy.trade.get_landmarks()
+        landmarks = landmarks[0]
         self.assertTrue(isinstance(landmarks, dict), 'Landmarks result should be a dict')
         self.assertEqual(len(galaxy.trade.components), len(landmarks), 'Should have one landmark per component')
-        self.assertEqual("Airvae (Zarushagar 0801)", str(landmarks[0]), "Unexpected landmark choice")
+        self.assertEqual("Gishin (Zarushagar 0804)", str(landmarks[0]), "Unexpected landmark choice")
 
     def test_landmarks_on_ibara_subsector_multiple_components(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
@@ -53,15 +54,18 @@ class testTradeCalculationLandmarks(baseTest):
 
         self.assertEqual(6, len(galaxy.trade.components), "Unexpected number of components at J-1")
 
-        landmarks = galaxy.trade.get_landmarks()[0]
-        self.assertTrue(isinstance(landmarks, dict), 'Landmarks result should be a dict')
-        self.assertEqual(len(galaxy.trade.components), len(landmarks), 'Should have one landmark per component')
-        self.assertEqual("Dorevann (Zarushagar 0708)", str(landmarks[0]), "Unexpected landmark choice")
-        self.assertEqual("Ymirial (Zarushagar 0106)", str(landmarks[1]), "Unexpected landmark choice")
-        self.assertEqual("Ichiban (Zarushagar 0309)", str(landmarks[2]), "Unexpected landmark choice")
-        self.assertEqual("Toulon-Cadiz (Zarushagar 0510)", str(landmarks[3]), "Unexpected landmark choice")
-        self.assertEqual("Airvae (Zarushagar 0801)", str(landmarks[4]), "Unexpected landmark choice")
-        self.assertEqual("New Orlando (Zarushagar 0710)", str(landmarks[5]), "Unexpected landmark choice")
+        landmarks, components = galaxy.trade.get_landmarks()
+        self.assertEqual(4, len(landmarks), 'Should have one landmark per component')
+        self.assertEqual("Dorevann (Zarushagar 0708)", str(landmarks[0][0]), "Unexpected landmark choice")
+        self.assertEqual("Shadishi (Zarushagar 0310)", str(landmarks[0][2]), "Unexpected landmark choice")
+        self.assertEqual("Gishin (Zarushagar 0804)", str(landmarks[0][4]), "Unexpected landmark choice")
+        self.assertEqual("Miller's World (Zarushagar 0607)", str(landmarks[1][0]), "Unexpected landmark choice")
+        self.assertEqual("Norsec (Zarushagar 0110)", str(landmarks[1][2]), "Unexpected landmark choice")
+        self.assertEqual("Madagast (Zarushagar 0806)", str(landmarks[1][4]), "Unexpected landmark choice")
+        self.assertEqual("Engaki (Zarushagar 0502)", str(landmarks[2][0]), "Unexpected landmark choice")
+        self.assertEqual("San Nuska Kilna (Zarushagar 0108)", str(landmarks[2][2]), "Unexpected landmark choice")
+        self.assertEqual("Nedadzia (Zarushagar 0701)", str(landmarks[2][4]), "Unexpected landmark choice")
+        self.assertEqual("Didraga (Zarushagar 0101)", str(landmarks[3][0]), "Unexpected landmark choice")
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')

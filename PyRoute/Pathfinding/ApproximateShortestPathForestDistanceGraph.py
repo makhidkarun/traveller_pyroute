@@ -35,3 +35,11 @@ class ApproximateShortestPathForestDistanceGraph(ApproximateShortestPathForest):
             result = np.maximum(result, interim)
 
         return result
+
+    def triangle_upbound(self, source, target):
+        result = 0
+        for tree in self._trees:
+            interim = tree.triangle_upbound(source, target)
+            result = np.maximum(result, interim)
+
+        return result
