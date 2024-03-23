@@ -24,11 +24,11 @@ class LandmarksTriaxialExtremes:
 
     def _set_max_slots(self):
         if 500 < self.route_reuse:
-            self.max_slots = 3
+            self.max_slots = 10
         elif 250 < self.route_reuse:
-            self.max_slots = 4
+            self.max_slots = 12
         elif 125 < self.route_reuse:
-            self.max_slots = 5
+            self.max_slots = 14
         else:
             self.max_slots = 15
 
