@@ -24,40 +24,31 @@ import networkx as nx
 import numpy as np
 
 
-def _sum_branch(branch_fac, path_len):
-    crosscheck = branch_fac * (branch_fac ** path_len - 1) / (branch_fac - 1)
-    return crosscheck
-
-
 def _calc_branching_factor(nodes_queued, path_len):
     if path_len == nodes_queued:
         return 1.0
 
-    hibound = nodes_queued ** (1 / path_len)
-    hires = _sum_branch(hibound, path_len) - nodes_queued
-    lobound = 1
-    lores = path_len - nodes_queued
-    slope = (hires - lores) / (hibound - lobound)
-    use_slope = True
+    # Letting nodes_queued be S, and path_len be d, we're trying to solve for the value of r in the following:
+    # S = r * ( r ^ (d-1) - 1 ) / ( r - 1 )
+    # Applying some sixth-grade algebra:
+    # Sr - S = r * ( r ^ (d-1) - 1 )
+    # Sr - S = r ^ d - r
+    # Sr - S + r = r ^ d
+    # r ^ d = Sr - S + r
+    #
+    # That final line is an ideal form to apply fixed-point iteration to, starting with an initial guess for r
+    # and feeding it into:
+    # r* = (Sr - S + r) ^ (1/d)
+    # iterating until r* and r sufficiently converge.
 
-    while 0.001 <= abs(hibound - lobound):
-        if use_slope:
-            mid = round(hibound - hires / slope, 3)
-        else:
-            mid = round(0.5 * (hibound + lobound), 3)
-        if mid == hibound or mid == lobound:
-            break
-        midres = _sum_branch(mid, path_len) - nodes_queued
-        if 0 < midres:
-            hibound = mid
-            hires = midres
-        else:
-            lobound = mid
-            lores = midres
-        use_slope = not use_slope
-        slope = (hires - lores) / (hibound - lobound)
+    old = 0
+    new = 0.5 * (1 + nodes_queued ** (1 / path_len))
+    while 0.001 <= abs(new - old):
+        old = new
+        rhs = nodes_queued * new - nodes_queued + new
+        new = rhs ** (1 / path_len)
 
-    return mid
+    return round(new, 3)
 
 
 def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=None):
