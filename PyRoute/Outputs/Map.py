@@ -88,6 +88,9 @@ class Map(object):
         """
         raise NotImplementedError("Base Class")
 
+    def write_sector_pdf_map(self, gal_sector, is_live=True):
+        raise NotImplementedError("Base Class")
+
     def write_maps(self):
         """
         Starting point for writing PDF files.
@@ -219,6 +222,7 @@ class Map(object):
                 lline._draw()
 
     def draw_borders(self, pdf, sector):
+        self.sector = sector
         self.hex_grid(pdf, self._draw_borders, 1.5, 'salmon')
 
     @staticmethod
