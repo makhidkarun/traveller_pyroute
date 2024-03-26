@@ -42,19 +42,7 @@ class PDFHexMap(Map):
             srcstar = self.galaxy.star_mapping[star]
             trgstar = self.galaxy.star_mapping[neighbor]
             self.trade_line(pdf_doc, [srcstar, trgstar], data)
-        # Get all the worlds in this sector
-        # for (star, neighbor, data) in self.galaxy.stars.edges(sector.worlds, True):
-        #    if star.sector != sector:
-        #        continue#
-        #    if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:
-        #        self.galaxy.stars[star][neighbor]['trade btn'] = self.trade_to_btn(data['trade'])
-        #        self.trade_line(pdf, [star, neighbor], data)
-        #    elif star.sector != neighbor.sector:
-        #        data = self.galaxy.stars.get_edge_data(neighbor, star)
-        #        if data is not None and \
-        #            data['trade'] > 0 and \
-        #            self.trade_to_btn(data['trade']) >= self.min_btn:
-        #            self.trade_line(pdf, [star, neighbor], data)
+
         for star in gal_sector.worlds:
             self.system(pdf_doc, star)
         if gal_sector.coreward:
@@ -83,7 +71,6 @@ class PDFHexMap(Map):
         cursor.x = 306 - (width / 2)
         doc.add_text(name, cursor)
         doc.set_font(font=def_font)
-
 
     def coreward_sector(self, pdf, name):
         cursor = PDFCursor(5, self.y_start - 15, True)
@@ -278,7 +265,6 @@ class PDFHexMap(Map):
         pdf.add_text(added, point)
 
         pdf.set_font(def_font)
-
 
     def trade_line(self, pdf, edge, data):
 
