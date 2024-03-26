@@ -15,10 +15,11 @@ from PyRoute.StatCalculation import StatCalculation
 
 
 class PDFHexMap(Map):
-    def __init__(self, galaxy, routes):
+    def __init__(self, galaxy, routes, min_btn=8):
         super(PDFHexMap, self).__init__(galaxy, routes)
         self.lineStart = PDFCursor(0, 0)
         self.lineEnd = PDFCursor(0, 0)
+        self.min_btn = min_btn
 
     def document(self, sector):
         """

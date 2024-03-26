@@ -75,6 +75,13 @@ class Map(object):
         # color.set_color_by_name(colorname)
         # hline = PDFLine(pdf.session, pdf.page, hlineStart, hlineEnd, stroke='solid', color=color, size=width)
 
+    def trade_line(self, pdf, edge, data):
+        raise NotImplementedError("Base Class")
+
+    @staticmethod
+    def string_width(font, string):
+        raise NotImplementedError("Base Class")
+
     def place_system(self, doc, star):
         """
         Write a single world information into the map
