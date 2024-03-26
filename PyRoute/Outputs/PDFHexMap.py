@@ -67,6 +67,11 @@ class PDFHexMap(Map):
             self.trailing_sector(pdf_doc, gal_sector.trailing.name)
         return self.writer.close()
 
+    def write_base_map(self, pdf, sector):
+        self.sector_name(pdf, sector.name)
+        self.subsector_grid(pdf)
+        self.hex_grid(pdf, self._draw_all, 0.5)
+
     def sector_name(self, doc, name):
         """
         Write name at the top of the document
@@ -117,6 +122,101 @@ class PDFHexMap(Map):
         text._text(name)
         pdf.set_font(font=def_font)
 
+    def subsector_grid(self, pdf):
+        color = pdf.get_color()
+        color.set_color_by_name('lightgray')
+        pdf.set_draw_color(color)
+        vlineStart = PDFCursor(0, self.y_start + self.xm)
+        vlineEnd = PDFCursor(0, self.y_start + self.xm + (180 * 4))
+        for x in range(self.x_start, 595, 144):
+            vlineStart.x = x
+            vlineEnd.x = x
+            pdf.add_line(cursor1=vlineStart, cursor2=vlineEnd)
+
+        hlineStart = PDFCursor(self.x_start, 0)
+        hlineEnd = PDFCursor(591, 0)
+        for y in range(self.y_start + self.xm, 780, 180):
+            hlineStart.y = y
+            hlineEnd.y = y
+            pdf.add_line(cursor1=hlineStart, cursor2=hlineEnd)
+
+    def _hline(self, pdf, width, colorname):
+        hlineStart = PDFCursor(0, 0)
+        hlineStart.x = 3
+        hlineStart.y = self.y_start - self.ym
+        hlineStart.dx = self.xm * 3
+        hlineStart.dy = self.ym * 2
+
+        hlineEnd = PDFCursor(0, 0)
+        hlineEnd.x = self.xm * 2.5
+        hlineEnd.y = self.y_start - self.ym
+        hlineEnd.dx = self.xm * 3
+        hlineEnd.dy = self.ym * 2
+
+        color = pdf.get_color()
+        color.set_color_by_name(colorname)
+
+        hline = PDFLine(pdf.session, pdf.page, hlineStart, hlineEnd, stroke='solid', color=color, size=width)
+
+        return (hlineStart, hlineEnd, hline)
+
+    def _hline_restart_y(self, x, hlineStart, hlineEnd):
+        if (x & 1):
+            hlineStart.y = self.y_start - self.ym
+            hlineEnd.y = self.y_start - self.ym
+        else:
+            hlineStart.y = self.y_start - 2 * self.ym
+            hlineEnd.y = self.y_start - 2 * self.ym
+
+    def _lline(self, pdf, width, colorname):
+        llineStart = PDFCursor(-10, 0)
+        llineStart.x = self.x_start
+        llineStart.dx = self.xm * 3
+        llineStart.dy = self.ym * 2
+
+        llineEnd = PDFCursor(-10, 0)
+        llineEnd.x = self.x_start + self.xm
+        llineEnd.dx = self.xm * 3
+        llineEnd.dy = self.ym * 2
+
+        color = pdf.get_color()
+        color.set_color_by_name(colorname)
+
+        lline = PDFLine(pdf.session, pdf.page, llineStart, llineEnd, stroke='solid', color=color, size=width)
+
+        return (llineStart, llineEnd, lline)
+
+    def _lline_restart_y(self, x, llineStart, llineEnd):
+        if (x & 1):
+            llineStart.y = self.y_start - 2 * self.ym
+            llineEnd.y = self.y_start - self.ym
+        else:
+            llineStart.y = self.y_start - self.ym
+            llineEnd.y = self.y_start - 2 * self.ym
+
+    def _rline(self, pdf, width, colorname):
+        rlineStart = PDFCursor(0, 0)
+        rlineStart.x = self.x_start + self.xm
+        rlineStart.dx = self.xm * 3
+        rlineStart.dy = self.ym * 2
+        rlineEnd = PDFCursor(0, 0)
+        rlineEnd.x = self.x_start
+        rlineEnd.dx = self.xm * 3
+        rlineEnd.dy = self.ym * 2
+
+        color = pdf.get_color()
+        color.set_color_by_name(colorname)
+        rline = PDFLine(pdf.session, pdf.page, rlineStart, rlineEnd, stroke='solid', color=color, size=width)
+
+        return (rlineStart, rlineEnd, rline)
+
+    def _rline_restart_y(self, x, rlineStart, rlineEnd):
+        if (x & 1):
+            rlineStart.y = self.y_start - 3 * self.ym
+            rlineEnd.y = self.y_start - 2 * self.ym
+        else:
+            rlineStart.y = self.y_start - 2 * self.ym
+            rlineEnd.y = self.y_start - 3 * self.ym
 
     def system(self, pdf, star):
         def_font = pdf.get_font()
