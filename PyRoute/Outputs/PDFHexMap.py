@@ -145,10 +145,10 @@ class PDFHexMap(Map):
 
         hline = PDFLine(pdf.session, pdf.page, hlineStart, hlineEnd, stroke='solid', color=color, size=width)
 
-        return (hlineStart, hlineEnd, hline)
+        return hlineStart, hlineEnd, hline
 
     def _hline_restart_y(self, x, hlineStart, hlineEnd):
-        if (x & 1):
+        if x & 1:
             hlineStart.y = self.y_start - self.ym
             hlineEnd.y = self.y_start - self.ym
         else:
@@ -171,10 +171,10 @@ class PDFHexMap(Map):
 
         lline = PDFLine(pdf.session, pdf.page, llineStart, llineEnd, stroke='solid', color=color, size=width)
 
-        return (llineStart, llineEnd, lline)
+        return llineStart, llineEnd, lline
 
     def _lline_restart_y(self, x, llineStart, llineEnd):
-        if (x & 1):
+        if x & 1:
             llineStart.y = self.y_start - 2 * self.ym
             llineEnd.y = self.y_start - self.ym
         else:
@@ -195,10 +195,10 @@ class PDFHexMap(Map):
         color.set_color_by_name(colorname)
         rline = PDFLine(pdf.session, pdf.page, rlineStart, rlineEnd, stroke='solid', color=color, size=width)
 
-        return (rlineStart, rlineEnd, rline)
+        return rlineStart, rlineEnd, rline
 
     def _rline_restart_y(self, x, rlineStart, rlineEnd):
-        if (x & 1):
+        if x & 1:
             rlineStart.y = self.y_start - 3 * self.ym
             rlineEnd.y = self.y_start - 2 * self.ym
         else:
@@ -209,8 +209,8 @@ class PDFHexMap(Map):
         def_font = pdf.get_font()
         pdf.set_font('times', size=4)
 
-        col = (self.xm * 3 * (star.col))
-        if (star.col & 1):
+        col = (self.xm * 3 * star.col)
+        if star.col & 1:
             row = (self.y_start - self.ym * 2) + (star.row * self.ym * 2)
         else:
             row = (self.y_start - self.ym) + (star.row * self.ym * 2)
@@ -323,11 +323,11 @@ class PDFHexMap(Map):
         line._draw()
 
     def _get_line_endpoints(self, end, start):
-        starty = self.y_start + (self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
-        startx = (self.xm * 3 * (start.col)) + self.ym
+        starty = self.y_start + (self.ym * 2 * start.row) - (self.ym * (1 if start.col & 1 else 0))
+        startx = (self.xm * 3 * start.col) + self.ym
         endRow = end.row
         endCol = end.col
-        if (end.sector != start.sector):
+        if end.sector != start.sector:
             up = False
             down = False
             if end.sector.x < start.sector.x:
@@ -340,7 +340,7 @@ class PDFHexMap(Map):
             if end.sector.y < start.sector.y:
                 endRow += 40
                 down = True
-            endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
+            endy = self.y_start + (self.ym * 2 * endRow) - (self.ym * (1 if endCol & 1 else 0))
             endx = (self.xm * 3 * endCol) + self.ym
 
             (startx, starty), (endx, endy) = self.clipping(startx, starty, endx, endy)
@@ -350,7 +350,7 @@ class PDFHexMap(Map):
                 assert starty <= endy, "Misaligned to-rimward trade segment between " + str(start) + " and " + str(end)
 
         else:
-            endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
+            endy = self.y_start + (self.ym * 2 * endRow) - (self.ym * (1 if endCol & 1 else 0))
             endx = (self.xm * 3 * endCol) + self.ym
         return endx, endy, startx, starty
 
@@ -408,8 +408,8 @@ class PDFHexMap(Map):
         def_font = pdf.get_font()
         pdf.set_font('times', size=4)
 
-        col = (self.xm * 3 * (star.col))
-        if (star.col & 1):
+        col = (self.xm * 3 * star.col)
+        if star.col & 1:
             row = (self.y_start - self.ym * 2) + (star.row * self.ym * 2)
         else:
             row = (self.y_start - self.ym) + (star.row * self.ym * 2)
