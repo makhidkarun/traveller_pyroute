@@ -91,6 +91,9 @@ class Map(object):
     def write_sector_pdf_map(self, gal_sector, is_live=True):
         raise NotImplementedError("Base Class")
 
+    def system(self, pdf, star):
+        raise NotImplementedError("Base Class")
+
     def write_maps(self):
         """
         Starting point for writing PDF files.
