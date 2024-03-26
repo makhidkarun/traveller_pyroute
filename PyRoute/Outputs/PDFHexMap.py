@@ -471,3 +471,7 @@ class PDFHexMap(Map):
         for i in string:
             w += font.character_widths[i] if i in font.character_widths else 600
         return w * font.font_size / 1000.0
+
+    @property
+    def compression(self):
+        return self.writer.session.compression

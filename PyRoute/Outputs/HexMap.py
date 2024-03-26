@@ -514,6 +514,9 @@ class HexMap(object):
         logging.getLogger("PyRoute.HexMap").debug(result)
         return (result[0], result[1]), (result[2], result[3])
 
+    @property
+    def compression(self):
+        return self.writer.session.compression
 
 if __name__ == '__main__':
     sector = Sector('# Core', '# 0,0')
