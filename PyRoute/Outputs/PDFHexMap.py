@@ -14,9 +14,9 @@ from PyRoute.Outputs.Map import Map
 from PyRoute.StatCalculation import StatCalculation
 
 
-class PDFSectorMap(Map):
+class PDFHexMap(Map):
     def __init__(self, galaxy, routes):
-        super(PDFSectorMap, self).__init__(galaxy, routes)
+        super(PDFHexMap, self).__init__(galaxy, routes)
         self.lineStart = PDFCursor(0, 0)
         self.lineEnd = PDFCursor(0, 0)
 
