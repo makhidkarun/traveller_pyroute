@@ -21,6 +21,7 @@ class PDFHexMap(Map):
         self.lineStart = PDFCursor(0, 0)
         self.lineEnd = PDFCursor(0, 0)
         self.min_btn = min_btn
+        self.writer = None
 
     def write_sector_pdf_map(self, gal_sector, is_live=True):
         pdf_doc = self.document(gal_sector, is_live)

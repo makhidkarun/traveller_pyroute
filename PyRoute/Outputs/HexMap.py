@@ -32,6 +32,8 @@ class HexMap(object):
         self.min_btn = min_btn
         self.y_start = 43
         self.x_start = 15
+        self.sector = None
+        self.writer = None
 
     def write_maps(self):
         """
