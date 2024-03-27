@@ -313,8 +313,14 @@ class PDFHexMap(Map):
             rlineEnd[1] = self.y_start - 3 * self.ym
 
     def system(self, pdf, star):
-        def_font = pdf.get_font()
-        pdf.set_font('times', size=4)
+        #def_font = pdf.get_font()
+        font_name = pdf._fontname
+        font_size = pdf._fontsize
+        font_leading = pdf._leading
+
+        new_font = 'Times-Roman'
+        new_size = 4
+        pdf.setFont(new_font, size=new_size)
 
         col = (self.xm * 3 * star.col)
         if star.col & 1:
@@ -324,21 +330,32 @@ class PDFHexMap(Map):
 
         point = PDFCursor(col, row)
         self.zone(pdf, star, point.copy())
+        rawpoint = [col, row]
 
-        width = self.string_width(pdf.get_font(), str(star.uwp))
-        point.y_plus(7)
-        point.x_plus(self.ym - (width // 2))
-        pdf.add_text(str(star.uwp), point)
+        #width = self.string_width(pdf.get_font(), str(star.uwp))
+        width = pdf.stringWidth(str(star.uwp), new_font, new_size)
+        ##point.y_plus(7)
+        #point.x_plus(self.ym - (width // 2))
+        rawpoint[0] += self.ym - (width // 2)
+        rawpoint[1] += 7
+        textobject = pdf.beginText(rawpoint[0], rawpoint[1])
+        textobject.textOut(str(star.uwp))
+        #pdf.add_text(str(star.uwp), point)
 
         if len(star.name) > 0:
             for chars in range(len(star.name), 0, -1):
-                width = self.string_width(pdf.get_font(), star.name[:chars])
+                #width = self.string_width(pdf.get_font(), star.name[:chars])
+                width = pdf.stringWidth(star.name[:chars], new_font, new_size)
                 if width <= self.xm * 3.5:
                     break
-            point.y_plus(3.5)
-            point.x = col
-            point.x_plus(self.ym - (width // 2))
-            pdf.add_text(star.name[:chars], point)
+            #point.y_plus(3.5)
+            #point.x = col
+            #point.x_plus(self.ym - (width // 2))
+            rawpoint[0] = col + self.ym - (width // 2)
+            rawpoint[1] += 3.5
+            textobject = pdf.beginText(rawpoint[0], rawpoint[1])
+            textobject.textOut(star.name[:chars])
+            #pdf.add_text(star.name[:chars], point)
 
         added = star.alg_code
         if star.tradeCode.subsector_capital:
@@ -349,11 +366,17 @@ class PDFHexMap(Map):
             added += ' '
 
         added += '{:d}'.format(star.ggCount)
-        point.y_plus(3.5)
-        point.x = col
-        width = pdf.get_font()._string_width(added)
-        point.x_plus(self.ym - (width // 2))
-        pdf.add_text(added, point)
+        #point.y_plus(3.5)
+        #point.x = col
+        rawpoint[0] = col
+        rawpoint[1] += 3.5
+        #width = pdf.get_font()._string_width(added)
+        width = pdf.stringWidth(added)
+        # point.x_plus(self.ym - (width // 2))
+        rawpoint[0] += self.ym - (width // 2)
+        #pdf.add_text(added, point)
+        textobject = pdf.beginText(rawpoint[0], rawpoint[1])
+        textobject.textOut(added)
 
         added = ''
         tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
@@ -365,13 +388,20 @@ class PDFHexMap(Map):
             added += "{}{} {}".format(star.baseCode, star.ggCount, star.importance)
         elif self.routes == 'xroute':
             added += " {}".format(star.importance)
-        width = pdf.get_font()._string_width(added)
-        point.y_plus(3.5)
-        point.x = col
-        point.x_plus(self.ym - (width // 2))
-        pdf.add_text(added, point)
+        #width = pdf.get_font()._string_width(added)
+        width = pdf.stringWidth(added)
+        #point.y_plus(3.5)
+        #point.x = col
+        #point.x_plus(self.ym - (width // 2))
+        rawpoint[0] = col + self.ym - (width // 2)
+        rawpoint[1] += 3.5
+        #pdf.add_text(added, point)
+        textobject = pdf.beginText(rawpoint[0], rawpoint[1])
+        textobject.textOut(added)
 
-        pdf.set_font(def_font)
+        #pdf.set_font(def_font)
+        # Restore saved font
+        pdf.setFont(font_name, font_size, font_leading)
 
     def trade_line(self, pdf, edge, data):
 
@@ -395,8 +425,9 @@ class PDFHexMap(Map):
             trade = 6
 
         tradeColor = tradeColors[trade]
-        color = pdf.get_color()
-        color.set_color_by_number(tradeColor[0], tradeColor[1], tradeColor[2])
+        #color = pdf.get_color()
+        #color.set_color_by_number(tradeColor[0], tradeColor[1], tradeColor[2])
+        pdf.setStrokeColorRGB(tradeColor[0], tradeColor[1], tradeColor[2])
 
         endCircle = end.sector == start.sector
         endx, endy, startx, starty = self._get_line_endpoints(end, start)
@@ -404,16 +435,20 @@ class PDFHexMap(Map):
         lineStart = PDFCursor(startx, starty)
         lineEnd = PDFCursor(endx, endy)
 
-        line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, stroke='solid', color=color, size=1)
-        line._draw()
+        pdf.line(startx, starty, endx, endy)
 
-        radius = PDFCursor(2, 2)
-        circle = PDFEllipse(pdf.session, pdf.page, lineStart, radius, color, size=3)
-        circle._draw()
+        #line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, stroke='solid', color=color, size=1)
+        #line._draw()
+
+        #radius = PDFCursor(2, 2)
+        #circle = PDFEllipse(pdf.session, pdf.page, lineStart, radius, color, size=3)
+        #circle._draw()
+        pdf.ellipse(startx - 2, starty - 2, startx + 2, starty + 2)
 
         if endCircle:
-            circle = PDFEllipse(pdf.session, pdf.page, lineEnd, radius, color, size=3)
-            circle._draw()
+            #circle = PDFEllipse(pdf.session, pdf.page, lineEnd, radius, color, size=3)
+            #circle._draw()
+            pdf.ellipse(endx - 2, endy - 2, endx + 2, endy + 2)
 
     def comm_line(self, pdf, edge):
         start = edge[0]
