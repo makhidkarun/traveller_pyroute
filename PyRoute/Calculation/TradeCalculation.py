@@ -105,7 +105,7 @@ class TradeCalculation(RouteCalculation):
 
     def base_range_routes(self, star, neighbor):
         dist = star.distance(neighbor)
-        max_dist = self.btn_range[min(max(0, max(star.wtn, neighbor.wtn) - self.min_wtn), 5)]
+        max_dist = self._max_dist(star.wtn, neighbor.wtn)
         # add all the stars in the BTN range, but skip this pair
         # if there there isn't enough trade to warrant a trade check
         if dist > max(self.galaxy.max_jump_range, max_dist):
@@ -121,11 +121,18 @@ class TradeCalculation(RouteCalculation):
                                             passenger_btn=passBTN)
         return dist
 
+    @functools.cache
+    def _max_dist(self, star_wtn, neighbour_wtn):
+        if neighbour_wtn < star_wtn:
+            return self._max_dist(neighbour_wtn, star_wtn)
+        return self.btn_range[min(max(0, max(star_wtn, neighbour_wtn) - self.min_wtn), 5)]
+
     def _raw_ranges(self):
         ranges = super()._raw_ranges()
         max_route_dist = max(self.btn_range)
 
-        ranges = ((star, neighbour) for (star, neighbour) in ranges if star.distance(neighbour) <= max_route_dist)
+        ranges = ((star, neighbour) for (star, neighbour) in ranges
+                  if star.distance(neighbour) <= max_route_dist)
         self.logger.info("Routes with endpoints more than " + str(max_route_dist) + " pc apart, trimmed")
 
         return ranges

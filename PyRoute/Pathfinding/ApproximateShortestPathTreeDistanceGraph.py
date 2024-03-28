@@ -62,12 +62,17 @@ class ApproximateShortestPathTreeDistanceGraph(ApproximateShortestPathTree):
                                                                          seeds=dropnodes, divisor=self._divisor)
 
     def lower_bound(self, source, target):
-        return abs(self._distances[source] - self._distances[target])
+        result = abs(self._distances[source] - self._distances[target])
+        if np.isinf(result):
+            return 0
+        return result
 
     def lower_bound_bulk(self, active_nodes, target):
         if self.floatinf == self._distances[target]:
             return np.zeros(len(active_nodes))
         result = np.abs(self._distances[active_nodes] - self._distances[target])
+        # Zero out infinite results, to keep the bulk heuristic consistent
+        result[np.isinf(result)] = 0
         return result
 
     def triangle_upbound(self, source, target):

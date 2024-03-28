@@ -138,7 +138,7 @@ class testApproximateShortestPathTree(baseTest):
 
         result = approx.lower_bound_bulk(active_nodes, target)
         self.assertIsNotNone(result)
-        expected = np.array([57.5, 56.666667, 0])
+        expected = np.array([57.5, 56.667, 0])
         np.testing.assert_array_almost_equal(expected, result, 0.000001, "Unexpected bounds array")
 
     def test_drop_first_level_intermediate_nodes_in_same_component(self):
@@ -293,6 +293,7 @@ class testApproximateShortestPathTree(baseTest):
 
         graph = galaxy.stars
         stars = list(graph.nodes)
+        self.assertEqual(37, len(stars))
         source = stars[0]
         leafnode = stars[30]
 
