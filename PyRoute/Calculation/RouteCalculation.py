@@ -145,10 +145,7 @@ class RouteCalculation(object):
         if not distance:
             distance = star1.distance(star2)
 
-        jump_index = bisect.bisect_left(RouteCalculation.btn_jump_range, distance)
-        # if distance <= 3:
-        #    logging.getLogger('PyRoute.TradeCalculation').info("{} -> index {}".format(distance, jump_index))
-        btn += RouteCalculation.btn_jump_mod[jump_index]
+        btn += RouteCalculation.get_btn_offset(distance)
 
         max_btn = (min(star1.wtn, star2.wtn) * 2) + 1
         btn = min(btn, max_btn)
@@ -158,6 +155,12 @@ class RouteCalculation(object):
     def get_passenger_btn(btn, star, neighbor):
         passBTN = btn + star.passenger_btn_mod + neighbor.passenger_btn_mod
         return passBTN
+
+    @staticmethod
+    @functools.cache
+    def get_btn_offset(distance):
+        jump_index = bisect.bisect_left(RouteCalculation.btn_jump_range, distance)
+        return RouteCalculation.btn_jump_mod[jump_index]
 
     @staticmethod
     @functools.cache
