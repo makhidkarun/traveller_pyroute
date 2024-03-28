@@ -417,11 +417,11 @@ class TradeCodes(object):
     def rich(self):
         return 'Ri' in self.codeset
 
-    @property
+    @functools.cached_property
     def industrial(self):
         return 'In' in self.codeset
 
-    @property
+    @functools.cached_property
     def agricultural(self):
         return 'Ag' in self.codeset
 
