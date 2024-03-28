@@ -3,6 +3,7 @@ Created on Oct 3, 2017
 
 @author: tjoneslo
 """
+import functools
 import itertools
 import re
 import logging
@@ -423,6 +424,10 @@ class TradeCodes(object):
     @property
     def agricultural(self):
         return 'Ag' in self.codeset
+
+    @functools.cached_property
+    def needs_agricultural(self):
+        return self.nonagricultural or self.extreme
 
     @property
     def poor(self):
