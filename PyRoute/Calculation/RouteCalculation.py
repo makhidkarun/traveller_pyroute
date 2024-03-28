@@ -147,9 +147,7 @@ class RouteCalculation(object):
 
         btn += RouteCalculation.get_btn_offset(distance)
 
-        max_btn = (min(star1.wtn, star2.wtn) * 2) + 1
-        btn = min(btn, max_btn)
-        return btn
+        return min(btn, RouteCalculation.get_max_btn(star1.wtn, star2.wtn))
 
     @staticmethod
     def get_passenger_btn(btn, star, neighbor):
@@ -161,6 +159,13 @@ class RouteCalculation(object):
     def get_btn_offset(distance):
         jump_index = bisect.bisect_left(RouteCalculation.btn_jump_range, distance)
         return RouteCalculation.btn_jump_mod[jump_index]
+
+    @staticmethod
+    @functools.cache
+    def get_max_btn(star_wtn, neighbour_wtn):
+        if neighbour_wtn > star_wtn:
+            return RouteCalculation.get_max_btn(neighbour_wtn, star_wtn)
+        return (min(star_wtn, neighbour_wtn) * 2) + 1
 
     @staticmethod
     @functools.cache
