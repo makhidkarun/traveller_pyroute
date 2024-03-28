@@ -122,17 +122,20 @@ class TradeCalculation(RouteCalculation):
         return dist
 
     @functools.cache
-    def _max_dist(self, star_wtn, neighbour_wtn):
+    def _max_dist(self, star_wtn, neighbour_wtn, maxjump=False):
         if neighbour_wtn < star_wtn:
-            return self._max_dist(neighbour_wtn, star_wtn)
-        return self.btn_range[min(max(0, max(star_wtn, neighbour_wtn) - self.min_wtn), 5)]
+            return self._max_dist(neighbour_wtn, star_wtn, maxjump)
+        max_dist = self.btn_range[min(max(0, max(star_wtn, neighbour_wtn) - self.min_wtn), 5)]
+        if maxjump:
+            return max(max_dist, self.galaxy.max_jump_range)
+        return max_dist
 
     def _raw_ranges(self):
         ranges = super()._raw_ranges()
         max_route_dist = max(self.btn_range)
 
         ranges = ((star, neighbour) for (star, neighbour) in ranges
-                  if star.distance(neighbour) <= max_route_dist)
+                  if star.distance(neighbour) <= self._max_dist(star.wtn, neighbour.wtn, True))
         self.logger.info("Routes with endpoints more than " + str(max_route_dist) + " pc apart, trimmed")
 
         return ranges
