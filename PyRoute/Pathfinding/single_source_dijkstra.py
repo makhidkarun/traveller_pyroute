@@ -114,14 +114,13 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
         active_nodes = active_nodes[keep]
         num_nodes = len(active_nodes)
 
+        # update max label
+        max_neighbour_labels[tail] = max(distance_labels[neighbours[0]])
         if 0 == num_nodes:
-            if floatinf == max_label:
-                max_neighbour_labels[tail] = max(distance_labels[neighbours[0]])
             continue
         active_weights = dist_tail + divisor * active_costs[keep]
         distance_labels[active_nodes] = active_weights
-        # update max label
-        max_neighbour_labels[tail] = max(distance_labels[neighbours[0]])
+
         parents[active_nodes] = tail
 
         if 1 == num_nodes:
