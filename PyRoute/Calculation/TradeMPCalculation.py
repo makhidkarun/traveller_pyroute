@@ -1,7 +1,6 @@
 """
 @author: tjoneslo
 """
-import copy
 import os
 
 import networkx as nx
@@ -9,9 +8,8 @@ from networkx import is_path
 from multiprocessing import Queue, Pool
 from queue import Empty
 
-from ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
-from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
+from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 
 # Convert the TradeMPCalculation to a global variable to allow the child processes to access it, and all the data.
@@ -55,7 +53,6 @@ def intrasector_process(working_queue, processed_queue):
                     upbound = tradeCalculation._preheat_upper_bound(star, neighbor)
                     # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
                     if float('+inf') != upbound:
-                        comp_id = star.component
                         upbound = round(upbound * 1.005 + 0.0005, 3)
 
                     mincost = tradeCalculation.star_graph.min_cost(active_nodes, neighbor.index, indirect=True)
