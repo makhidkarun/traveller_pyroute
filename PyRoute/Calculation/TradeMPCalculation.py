@@ -135,7 +135,7 @@ class TradeMPCalculation(TradeCalculation):
 
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
-        landmarks = self.get_landmarks(index=True)
+        landmarks, self.component_landmarks = self.get_landmarks(index=True)
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
