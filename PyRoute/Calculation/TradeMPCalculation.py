@@ -50,9 +50,16 @@ def intrasector_process(working_queue, processed_queue):
                     continue
 
                 try:
-                    mincost = copy.deepcopy(tradeCalculation.star_graph._min_cost)
+                    active_nodes = list(range(len(tradeCalculation.star_graph)))
+                    upbound = tradeCalculation._preheat_upper_bound(star, neighbor)
+                    # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
+                    if float('+inf') != upbound:
+                        comp_id = star.component
+                        upbound = round(upbound * 1.005 + 0.0005, 3)
+
+                    mincost = tradeCalculation.star_graph.min_cost(active_nodes, neighbor.index, indirect=True)
                     rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star.index, neighbor.index,
-                                               tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost)
+                                               tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
                 except nx.NetworkXNoPath:
                     continue
 
@@ -283,9 +290,19 @@ class TradeMPCalculation(TradeCalculation):
             f"This route from {star} to {target} has already been processed in reverse"
 
         try:
-            mincost = copy.deepcopy(self.star_graph._min_cost)
+            active_nodes = list(range(len(self.star_graph)))
+            upbound = self._preheat_upper_bound(star, target)
+            # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
+            if float('+inf') != upbound:
+                comp_id = star.component
+                upbound = round(upbound * 1.005 + 0.0005, 3)
+                if star.index in self.component_landmarks[comp_id]:
+                    if target.index not in self.component_landmarks[comp_id]:
+                        target, star = star, target
+
+            mincost = self.star_graph.min_cost(active_nodes, target.index, indirect=True)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
-                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost)
+                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
         except nx.NetworkXNoPath:
             return
 
