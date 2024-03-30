@@ -9,6 +9,7 @@ from networkx import is_path
 from multiprocessing import Queue, Pool
 from queue import Empty
 
+from ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
 from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
@@ -91,9 +92,12 @@ def long_route_process(working_queue, processed_queue):
             break
 
         try:
-            mincost = copy.deepcopy(tradeCalculation.star_graph._min_cost)
-            rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star.index, neighbor.index,
-                                       tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost)
+            active_nodes = list(range(len(tradeCalculation.star_graph)))
+            upbound = tradeCalculation._preheat_upper_bound(star, neighbor)
+
+            mincost = tradeCalculation.star_graph.min_cost(active_nodes, neighbor, indirect=True)
+            rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star, neighbor,
+                                       tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
         except nx.NetworkXNoPath:
             continue
 
@@ -147,7 +151,7 @@ class TradeMPCalculation(TradeCalculation):
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathForestDistanceGraph(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
 
         large_btn_index = next(i for i, v in enumerate(self.btn) if v[2]['btn'] == 18)
 
@@ -206,8 +210,8 @@ class TradeMPCalculation(TradeCalculation):
 
     def process_long_routes(self, btn):
 
-        self.shortest_path_tree = ApproximateShortestPathForestDistanceGraph(self.shortest_path_tree._source, self.galaxy.stars,
-                                                                  0, sources=self.shortest_path_tree._sources)
+        self.shortest_path_tree = ApproximateShortestPathForestUnified(0, self.galaxy.stars,
+                                             0, sources=self.shortest_path_tree._sources)
 
         # Create the Queues for sending data between processes.
         find_queue = Queue()

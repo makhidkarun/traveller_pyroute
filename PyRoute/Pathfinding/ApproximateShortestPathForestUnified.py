@@ -63,7 +63,9 @@ class ApproximateShortestPathForestUnified:
         return np.max(raw, axis=1)
 
     def triangle_upbound(self, source, target):
-        raw = self._distances[source.index, :] + self._distances[target.index, :]
+        stardex = source.index if not isinstance(source, int) else source
+        targdex = target.index if not isinstance(target, int) else target
+        raw = self._distances[stardex, :] + self._distances[targdex, :]
         raw = raw[raw != float('+inf')]
 
         return np.min(raw) * (1 + self._epsilon)
