@@ -48,7 +48,7 @@ class TradeCalculation(RouteCalculation):
     # and the system checks every other world in that range for trade 
     # opportunity. See the btn_jump_mod and min btn to see how  
     # worlds are excluded from this list. 
-    btn_range = [2, 9, 29, 59, 99, 299]
+    btn_range = [2, 9, 29, 59, 99, 299, 599]
 
     # Maximum WTN to process routes for
     max_wtn = 15
@@ -125,7 +125,7 @@ class TradeCalculation(RouteCalculation):
     def _max_dist(self, star_wtn, neighbour_wtn, maxjump=False):
         if neighbour_wtn < star_wtn:
             return self._max_dist(neighbour_wtn, star_wtn, maxjump)
-        max_dist = self.btn_range[min(max(0, max(star_wtn, neighbour_wtn) - self.min_wtn), 5)]
+        max_dist = self.btn_range[min(max(0, max(star_wtn, neighbour_wtn) - self.min_wtn), 6)]
         if maxjump:
             return max(max_dist, self.galaxy.max_jump_range)
         return max_dist

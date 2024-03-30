@@ -157,8 +157,8 @@ class testTradeCalculation(unittest.TestCase):
             (11, 59),
             (12, 99),
             (13, 299),
-            (14, 299),
-            (15, 299),
+            (14, 599),
+            (15, 599),
         ]
 
         for wtn, exp_dist in cand_wtn:
