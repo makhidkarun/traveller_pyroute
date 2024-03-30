@@ -109,10 +109,11 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
         neighbours = arcs[tail]
         active_nodes = neighbours[0]
         active_costs = neighbours[1]
+        active_labels = distance_labels[active_nodes]
         # update max label
-        max_neighbour_labels[tail] = max(distance_labels[active_nodes])
+        max_neighbour_labels[tail] = max(active_labels)
         # It's not worth (time wise) being cute and trying to break this up, forcing jumps in and out of numpy
-        keep = active_costs < (distance_labels[active_nodes] - dist_tail)
+        keep = active_costs < (active_labels - dist_tail)
         active_nodes = active_nodes[keep]
         num_nodes = len(active_nodes)
 
