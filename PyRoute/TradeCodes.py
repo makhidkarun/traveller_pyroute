@@ -514,6 +514,12 @@ class TradeCodes(object):
     def low_per_capita_gwp(self):
         return self.extreme or self.poor or self.nonindustrial or self.low
 
+    def match_ag_codes(self, code):
+        return (self.agricultural and code.needs_agricultural) or (self.needs_agricultural and code.agricultural)
+
+    def match_in_codes(self, code):
+        return (self.industrial and code.nonindustrial) or (self.nonindustrial and code.industrial)
+
     def is_well_formed(self):
         msg = ""
         for code in self.codeset:

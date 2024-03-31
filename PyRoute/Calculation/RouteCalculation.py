@@ -129,12 +129,9 @@ class RouteCalculation(object):
         code1 = star1.tradeCode
         code2 = star2.tradeCode
         if code1.agricultural or code2.agricultural:
-            if (code1.agricultural and code2.needs_agricultural) or \
-               (code1.needs_agricultural and code2.agricultural):
-                btn += 1
+            btn += 1 if code1.match_ag_codes(code2) else 0
         if code1.industrial or code2.industrial:
-            if (code1.nonindustrial and code2.industrial) or (code2.nonindustrial and code1.industrial):
-                btn += 1
+            btn += 1 if code1.match_in_codes(code2) else 0
 
         if not AllyGen.are_allies(star1.alg_code, star2.alg_code):
             btn -= 1
