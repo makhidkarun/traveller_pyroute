@@ -145,6 +145,27 @@ class testTradeCalculation(unittest.TestCase):
         tradecalc.multilateral_balance_trade()
         tradecalc.is_sector_trade_balanced()
 
+    def test_max_dist(self):
+        galaxy = Galaxy(min_btn=13)
+        tradecalc = TradeCalculation(galaxy)
+        self.assertEqual(8, tradecalc.min_wtn)
+
+        cand_wtn = [
+            (8, 2),
+            (9, 9),
+            (10, 29),
+            (11, 59),
+            (12, 99),
+            (13, 299),
+            (14, 599),
+            (15, 599),
+        ]
+
+        for wtn, exp_dist in cand_wtn:
+            with self.subTest(msg="WTN " + str(wtn)):
+                act_dist = tradecalc._max_dist(wtn, wtn)
+                self.assertEqual(exp_dist, act_dist)
+
 
 if __name__ == '__main__':
     unittest.main()

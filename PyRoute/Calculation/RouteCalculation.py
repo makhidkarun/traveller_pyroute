@@ -129,12 +129,9 @@ class RouteCalculation(object):
         code1 = star1.tradeCode
         code2 = star2.tradeCode
         if code1.agricultural or code2.agricultural:
-            if (code1.agricultural and (code2.nonagricultural or code2.extreme)) or \
-               ((code1.nonagricultural or code1.extreme) and code2.agricultural):
-                btn += 1
+            btn += 1 if code1.match_ag_codes(code2) else 0
         if code1.industrial or code2.industrial:
-            if (code1.nonindustrial and code2.industrial) or (code2.nonindustrial and code1.industrial):
-                btn += 1
+            btn += 1 if code1.match_in_codes(code2) else 0
 
         if not AllyGen.are_allies(star1.alg_code, star2.alg_code):
             btn -= 1
@@ -145,19 +142,27 @@ class RouteCalculation(object):
         if not distance:
             distance = star1.distance(star2)
 
-        jump_index = bisect.bisect_left(RouteCalculation.btn_jump_range, distance)
-        # if distance <= 3:
-        #    logging.getLogger('PyRoute.TradeCalculation').info("{} -> index {}".format(distance, jump_index))
-        btn += RouteCalculation.btn_jump_mod[jump_index]
+        btn += RouteCalculation.get_btn_offset(distance)
 
-        max_btn = (min(star1.wtn, star2.wtn) * 2) + 1
-        btn = min(btn, max_btn)
-        return btn
+        return min(btn, RouteCalculation.get_max_btn(star1.wtn, star2.wtn))
 
     @staticmethod
     def get_passenger_btn(btn, star, neighbor):
         passBTN = btn + star.passenger_btn_mod + neighbor.passenger_btn_mod
         return passBTN
+
+    @staticmethod
+    @functools.cache
+    def get_btn_offset(distance):
+        jump_index = bisect.bisect_left(RouteCalculation.btn_jump_range, distance)
+        return RouteCalculation.btn_jump_mod[jump_index]
+
+    @staticmethod
+    @functools.cache
+    def get_max_btn(star_wtn, neighbour_wtn):
+        if neighbour_wtn > star_wtn:
+            return RouteCalculation.get_max_btn(neighbour_wtn, star_wtn)
+        return (min(star_wtn, neighbour_wtn) * 2) + 1
 
     @staticmethod
     @functools.cache

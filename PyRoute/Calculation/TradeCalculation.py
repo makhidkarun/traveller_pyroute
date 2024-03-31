@@ -48,7 +48,7 @@ class TradeCalculation(RouteCalculation):
     # and the system checks every other world in that range for trade 
     # opportunity. See the btn_jump_mod and min btn to see how  
     # worlds are excluded from this list. 
-    btn_range = [2, 9, 29, 59, 99, 299]
+    btn_range = [2, 9, 29, 59, 99, 299, 599]
 
     # Maximum WTN to process routes for
     max_wtn = 15
@@ -60,6 +60,7 @@ class TradeCalculation(RouteCalculation):
         # this value are ignored. Set lower to have more routes calculated, but
         # may not have have an impact on the overall trade flows.
         self.min_btn = min_btn
+        self.min_route_wtn = (min_btn - 1) // 2  # In light of minimum btn, what is smallest WTN that _can_ meet it?
 
         # Minimum WTN to process routes for
         self.min_wtn = route_btn
@@ -92,13 +93,24 @@ class TradeCalculation(RouteCalculation):
         # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
         # - in this case, red/forbidden zones and barren systems - so only bilateral filtering remains.
         # TODO: Bilateral filtering
+        # This would ordinarily be a unilateral filter, but, for hysterical raisins, route and edge filtering are
+        # convolved.  Rather than untangle that, filter out routes with at least one endpoint too small to support the
+        # minimum WTN route here.
+        if self.min_route_wtn > star.wtn or self.min_route_wtn > neighbor.wtn:
+            # Don't filter if, despite the route being too small, it's within the max jump range.  Such stars can still
+            # have trade routes flowing _through_ them, just not _from_ or _to_ them.
+            if self.galaxy.max_jump_range < star.distance(neighbor):
+                return True
         return False
 
     def base_range_routes(self, star, neighbor):
         dist = star.distance(neighbor)
-        max_dist = self.btn_range[min(max(0, max(star.wtn, neighbor.wtn) - self.min_wtn), 5)]
+        max_dist = self._max_dist(star.wtn, neighbor.wtn)
         # add all the stars in the BTN range, but skip this pair
         # if there there isn't enough trade to warrant a trade check
+        if dist > max_dist and dist > self.galaxy.max_jump_range:
+            return None
+
         if dist <= max_dist:
             # Only bother getting btn if the route is inside max length
             btn = self.get_btn(star, neighbor, dist)
@@ -108,6 +120,25 @@ class TradeCalculation(RouteCalculation):
                                             btn=btn,
                                             passenger_btn=passBTN)
         return dist
+
+    @functools.cache
+    def _max_dist(self, star_wtn, neighbour_wtn, maxjump=False):
+        if neighbour_wtn < star_wtn:
+            return self._max_dist(neighbour_wtn, star_wtn, maxjump)
+        max_dist = self.btn_range[min(max(0, max(star_wtn, neighbour_wtn) - self.min_wtn), 6)]
+        if maxjump:
+            return max(max_dist, self.galaxy.max_jump_range)
+        return max_dist
+
+    def _raw_ranges(self):
+        ranges = super()._raw_ranges()
+        max_route_dist = max(self.btn_range)
+
+        ranges = ((star, neighbour) for (star, neighbour) in ranges
+                  if star.distance(neighbour) <= self._max_dist(star.wtn, neighbour.wtn, True))
+        self.logger.info("Routes with endpoints more than " + str(max_route_dist) + " pc apart, trimmed")
+
+        return ranges
 
     def generate_routes(self):
         """

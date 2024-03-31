@@ -3,6 +3,7 @@ Created on Oct 3, 2017
 
 @author: tjoneslo
 """
+import functools
 import itertools
 import re
 import logging
@@ -404,95 +405,99 @@ class TradeCodes(object):
             return [code if len(code) > 6 else 'C:' + sector_name[0:4] + '-' + code[2:]
                     for code in self.owned if code.startswith('C:')]
 
-    @property
+    @functools.cached_property
     def homeworld(self):
         return sorted(self.homeworld_list)
 
-    @property
+    @functools.cached_property
     def sophonts(self):
         return sorted(self.sophont_list)
 
-    @property
+    @functools.cached_property
     def rich(self):
         return 'Ri' in self.codeset
 
-    @property
+    @functools.cached_property
     def industrial(self):
         return 'In' in self.codeset
 
-    @property
+    @functools.cached_property
     def agricultural(self):
         return 'Ag' in self.codeset
 
-    @property
+    @functools.cached_property
+    def needs_agricultural(self):
+        return self.nonagricultural or self.extreme
+
+    @functools.cached_property
     def poor(self):
         return 'Po' in self.codeset
 
-    @property
+    @functools.cached_property
     def nonagricultural(self):
         return 'Na' in self.codeset
 
-    @property
+    @functools.cached_property
     def barren(self):
         return 'Ba' in self.codeset or 'Di' in self.codeset
 
-    @property
+    @functools.cached_property
     def low(self):
         return 'Lo' in self.codeset
 
-    @property
+    @functools.cached_property
     def nonindustrial(self):
         return 'Ni' in self.codeset
 
-    @property
+    @functools.cached_property
     def high(self):
         return 'Hi' in self.codeset
 
-    @property
+    @functools.cached_property
     def asteroid(self):
         return 'As' in self.codeset
 
-    @property
+    @functools.cached_property
     def desert(self):
         return 'De' in self.codeset
 
-    @property
+    @functools.cached_property
     def fluid(self):
         return 'Fl' in self.codeset
 
-    @property
+    @functools.cached_property
     def vacuum(self):
         return 'Va' in self.codeset and 'As' not in self.codeset
 
-    @property
+    @functools.cached_property
     def waterworld(self):
         return 'Wa' in self.codeset or 'Oc' in self.codeset
 
-    @property
+    @functools.cached_property
     def extreme(self):
         return len(self.ex_codes & set(self.codeset)) > 0
 
-    @property
+    @functools.cached_property
     def capital(self):
         return 'Cp' in self.dcode or 'Cx' in self.dcode or 'Cs' in self.dcode
 
-    @property
+    @functools.cached_property
     def subsector_capital(self):
         return 'Cp' in self.dcode
 
-    @property
+    @functools.cached_property
     def sector_capital(self):
         return 'Cs' in self.dcode
 
-    @property
+    @functools.cached_property
     def other_capital(self):
         return 'Cx' in self.dcode
 
-    @property
+    @functools.cached_property
     def research_station(self):
         return set(self.research.keys()).intersection(self.dcode)
 
-    @property
+    @functools.cached_property
     def research_station_char(self):
         stations = self.research_station
         if len(stations) == 1:
@@ -501,13 +506,19 @@ class TradeCodes(object):
         else:
             return None
 
-    @property
+    @functools.cached_property
     def pcode_color(self):
         return self.pcolor.get(self.pcode, '#44ff44')
 
-    @property
+    @functools.cached_property
     def low_per_capita_gwp(self):
         return self.extreme or self.poor or self.nonindustrial or self.low
+
+    def match_ag_codes(self, code):
+        return (self.agricultural and code.needs_agricultural) or (self.needs_agricultural and code.agricultural)
+
+    def match_in_codes(self, code):
+        return (self.industrial and code.nonindustrial) or (self.nonindustrial and code.industrial)
 
     def is_well_formed(self):
         msg = ""
