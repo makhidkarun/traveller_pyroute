@@ -39,5 +39,4 @@ jobs:
         run: |
           echo "$PWD"
           mkdir ./Tests/maps
-          cp ./Tests/TradeMPFiles/run_trademp_parameters ./run_trademp_parameters
-          PYTHONPATH="." python ./PyRoute/route.py @run_trademp_parameters
+          PYTHONPATH="." python ./PyRoute/route.py @Tests/TradeMPFiles/run_trademp_parameters
