@@ -344,8 +344,8 @@ class TradeCalculation(RouteCalculation):
         self.update_statistics(star, target, tradeCr, tradePass)
 
     def _preheat_upper_bound(self, star, target, allow_reheat=True):
-        stardex = star.index
-        targdex = target.index
+        stardex = star.index if not isinstance(star, int) else star
+        targdex = target.index if not isinstance(target, int) else target
         # Don't reheat on _every_ route, but reheat frequently enough to keep historic costs sort-of firm.
         # Keeping this deterministic helps keep input reduction straight, as there's less state to track.
         reheat = allow_reheat and ((stardex + targdex) % (math.floor(math.sqrt(len(self.star_graph)))) == 0)

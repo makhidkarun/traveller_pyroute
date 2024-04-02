@@ -35,3 +35,8 @@ jobs:
       - name: Test with pytest
         run: |
           pytest
+      - name: TradeMP smoke test
+        run: |
+          echo "$PWD"
+          mkdir ./Tests/maps
+          PYTHONPATH="." python ./PyRoute/route.py @Tests/TradeMPFiles/run_trademp_parameters

@@ -1,7 +1,6 @@
 """
 @author: tjoneslo
 """
-import copy
 import os
 
 import networkx as nx
@@ -10,7 +9,7 @@ from multiprocessing import Queue, Pool
 from queue import Empty
 
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
-from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
+from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 
 # Convert the TradeMPCalculation to a global variable to allow the child processes to access it, and all the data.
@@ -50,9 +49,15 @@ def intrasector_process(working_queue, processed_queue):
                     continue
 
                 try:
-                    mincost = copy.deepcopy(tradeCalculation.star_graph._min_cost)
+                    active_nodes = list(range(len(tradeCalculation.star_graph)))
+                    upbound = tradeCalculation._preheat_upper_bound(star, neighbor)
+                    # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
+                    if float('+inf') != upbound:
+                        upbound = round(upbound * 1.005 + 0.0005, 3)
+
+                    mincost = tradeCalculation.star_graph.min_cost(active_nodes, neighbor.index, indirect=True)
                     rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star.index, neighbor.index,
-                                               tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost)
+                                               tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
                 except nx.NetworkXNoPath:
                     continue
 
@@ -84,9 +89,12 @@ def long_route_process(working_queue, processed_queue):
             break
 
         try:
-            mincost = copy.deepcopy(tradeCalculation.star_graph._min_cost)
-            rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star.index, neighbor.index,
-                                       tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost)
+            active_nodes = list(range(len(tradeCalculation.star_graph)))
+            upbound = tradeCalculation._preheat_upper_bound(star, neighbor)
+
+            mincost = tradeCalculation.star_graph.min_cost(active_nodes, neighbor, indirect=True)
+            rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star, neighbor,
+                                       tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
         except nx.NetworkXNoPath:
             continue
 
@@ -135,12 +143,12 @@ class TradeMPCalculation(TradeCalculation):
 
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
-        landmarks = self.get_landmarks(index=True)
+        landmarks, self.component_landmarks = self.get_landmarks(index=True)
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathForestDistanceGraph(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
 
         large_btn_index = next(i for i, v in enumerate(self.btn) if v[2]['btn'] == 18)
 
@@ -199,8 +207,8 @@ class TradeMPCalculation(TradeCalculation):
 
     def process_long_routes(self, btn):
 
-        self.shortest_path_tree = ApproximateShortestPathForestDistanceGraph(self.shortest_path_tree._source, self.galaxy.stars,
-                                                                  0, sources=self.shortest_path_tree._sources)
+        self.shortest_path_tree = ApproximateShortestPathForestUnified(0, self.galaxy.stars,
+                                             0, sources=self.shortest_path_tree._sources)
 
         # Create the Queues for sending data between processes.
         find_queue = Queue()
@@ -283,9 +291,19 @@ class TradeMPCalculation(TradeCalculation):
             f"This route from {star} to {target} has already been processed in reverse"
 
         try:
-            mincost = copy.deepcopy(self.star_graph._min_cost)
+            active_nodes = list(range(len(self.star_graph)))
+            upbound = self._preheat_upper_bound(star, target)
+            # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
+            if float('+inf') != upbound:
+                comp_id = star.component
+                upbound = round(upbound * 1.005 + 0.0005, 3)
+                if star.index in self.component_landmarks[comp_id]:
+                    if target.index not in self.component_landmarks[comp_id]:
+                        target, star = star, target
+
+            mincost = self.star_graph.min_cost(active_nodes, target.index, indirect=True)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
-                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost)
+                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
         except nx.NetworkXNoPath:
             return
 
