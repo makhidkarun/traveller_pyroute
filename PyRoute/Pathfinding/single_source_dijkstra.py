@@ -88,7 +88,7 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
     while heap:
         dist_tail, tail = heapq.heappop(heap)
         node_counter += 1
-        #max_label = max_neighbour_labels[tail]
+        # max_label = max_neighbour_labels[tail]
         if dist_tail > distance_labels[tail] or dist_tail + min_cost[tail] > max_neighbour_labels[tail]:
             # Since we've just dequeued a bad node (distance exceeding its current label, or too close to max-label),
             # remove other bad nodes from the list to avoid tripping over them later
@@ -97,10 +97,6 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
             heap = [(distance, tail) for (distance, tail) in heap if distance + min_cost[tail] <= max_neighbour_labels[tail]]
             heapq.heapify(heap)
             continue
-        if 0 == (node_counter % 49):
-            heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]
-            heap = [(distance, tail) for (distance, tail) in heap if distance + min_cost[tail] <= max_neighbour_labels[tail]]
-            heapq.heapify(heap)
 
         # Link weights are strictly positive, thus lower bounded by zero. Thus, when the current dist_tail value exceeds
         # the corresponding node's distance label at the other end of the candidate edge, trim that edge.  Such edges
