@@ -88,8 +88,8 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
     while heap:
         dist_tail, tail = heapq.heappop(heap)
         node_counter += 1
-        max_label = max_neighbour_labels[tail]
-        if dist_tail > distance_labels[tail] or dist_tail + min_cost[tail] > max_label:
+        #max_label = max_neighbour_labels[tail]
+        if dist_tail > distance_labels[tail] or dist_tail + min_cost[tail] > max_neighbour_labels[tail]:
             # Since we've just dequeued a bad node (distance exceeding its current label, or too close to max-label),
             # remove other bad nodes from the list to avoid tripping over them later
             heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]
