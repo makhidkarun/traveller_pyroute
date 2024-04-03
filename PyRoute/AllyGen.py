@@ -540,8 +540,10 @@ class AllyGen(object):
             if cand_hex in starMap:
                 newMap[cand_hex] = starMap[cand_hex]
                 continue
-            if AllyGen.is_nonaligned(allyMap[cand_hex]):
-                newMap[cand_hex] = allyMap[cand_hex]
+
+            ally_map_candidate = allyMap[cand_hex]
+            if AllyGen.is_nonaligned(ally_map_candidate):
+                newMap[cand_hex] = ally_map_candidate
                 continue
 
             # Check for three continuous empty hexes around this cand_hex
@@ -550,7 +552,7 @@ class AllyGen(object):
                 for check in range(3):
                     checkHex = Hex.get_neighbor(cand_hex, (direction + check) % 6)
                     neighborAlg = allyMap.get(checkHex, None)
-                    if not AllyGen.are_allies(allyMap[cand_hex], neighborAlg):
+                    if not AllyGen.are_allies(ally_map_candidate, neighborAlg):
                         notCount += 1
                 if notCount >= 3:
                     break
@@ -558,7 +560,7 @@ class AllyGen(object):
             if notCount >= 3:
                 changed = True
             else:  # No empty hex in range found, keep allegiance.
-                newMap[cand_hex] = allyMap[cand_hex]
+                newMap[cand_hex] = ally_map_candidate
         return changed, newMap
 
     def _break_spans(self, allyMap, starMap):
