@@ -35,7 +35,7 @@ class ParseStarInput:
     transformer = None
 
     @staticmethod
-    def parse_line_into_star_core(star, line, sector, pop_code, ru_calc):
+    def parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=False):
         star.sector = sector
         star.logger.debug(line)
         data = ParseStarInput._unpack_starline(star, line)
@@ -97,7 +97,7 @@ class ParseStarInput:
         star.starportBudget = 0
         star.starportPop = 0
 
-        star.tradeCode.check_world_codes(star)
+        star.tradeCode.check_world_codes(star, fix_pop=fix_pop)
 
         if data[5]:
             imp = int(data[5][1:-1].strip())

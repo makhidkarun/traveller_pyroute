@@ -72,6 +72,8 @@ def process():
     debugging = parser.add_argument_group('Debug', "Debugging flags")
     debugging.add_argument('--debug', dest="debug_flag", default=False, action=argparse.BooleanOptionalAction,
                            help="Turn on trade-route debugging")
+    debugging.add_argument('--fix-pop', dest="fix_pop", default=False, action=argparse.BooleanOptionalAction,
+                           help="Fix incorrect pop codes when loading stars")
 
     parser.add_argument('--version', action='version', version='%(prog)s 0.4')
     parser.add_argument('--log-level', default='INFO')
@@ -98,7 +100,8 @@ def process():
             logger.warning(sector + " is duplicated")
 
     galaxy.read_sectors(sectors_list, args.pop_code, args.ru_calc,
-                        args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+                        args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag,
+                        fix_pop=args.fix_pop)
 
     logger.info("%s sectors read" % len(galaxy.sectors))
 

@@ -122,10 +122,10 @@ class Star(object):
         setattr(self, key, value)
 
     @staticmethod
-    def parse_line_into_star(line, sector, pop_code, ru_calc):
+    def parse_line_into_star(line, sector, pop_code, ru_calc, fix_pop=False):
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
         star = Star()
-        return ParseStarInput.parse_line_into_star_core(star, line, sector, pop_code, ru_calc)
+        return ParseStarInput.parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=fix_pop)
 
     def parse_to_line(self):
         result = str(self.position) + " "
