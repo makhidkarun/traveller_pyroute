@@ -341,7 +341,11 @@ class TradeCodes(object):
     def check_world_codes(self, star, msg=None, fix_pop=False):
         is_list = isinstance(msg, list)
         msg = msg if is_list else None
+
         check = True
+        if fix_pop is True:
+            self._fix_all_pop_codes(star)
+
         check = self._check_planet_code(star, 'As', '0', '0', '0', msg) and check
         check = self._check_planet_code(star, 'De', None, '23456789', '0', msg) and check
         check = self._check_planet_code(star, 'Fl', None, 'ABC', '123456789A', msg) and check
@@ -353,9 +357,7 @@ class TradeCodes(object):
         check = self._check_planet_code(star, 'Va', None, '0', None, msg) and check
         check = self._check_planet_code(star, 'Wa', '3456789', '3456789DEF', 'A', msg) and check
 
-        if fix_pop is True:
-            self._fix_all_pop_codes(star)
-        else:
+        if fix_pop is not True:
             check = self._check_all_pop_codes(check, msg, star)
 
         check = self._check_econ_code(star, 'Pa', '456789', '45678', '48', msg) and check
