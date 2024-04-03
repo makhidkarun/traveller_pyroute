@@ -81,14 +81,20 @@ class Hex(object):
         4 => Down / left
         5 => Down
         """
+        d = Hex._get_neighbour_core(direction, distance)
+        return int(hex_pos[0] + d[0]), int(hex_pos[1] + d[1])
+
+    @staticmethod
+    @functools.cache
+    def _get_neighbour_core(direction, distance):
         neighbors = [
             [+1, -1], [+1, 0], [0, +1],
             [-1, +1], [-1, 0], [0, -1]
         ]
         d = neighbors[direction]
-        qn = hex_pos[0] + (d[0] * distance)
-        rn = hex_pos[1] + (d[1] * distance)
-        return (int(qn), int(rn))
+        d[0] *= distance
+        d[1] *= distance
+        return d
 
     @staticmethod
     def hex_to_axial(row, col):
