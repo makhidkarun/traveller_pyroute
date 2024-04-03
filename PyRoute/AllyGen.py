@@ -535,6 +535,7 @@ class AllyGen(object):
 
         # Erode, remove empty hex from polity
         # if three contiguous hexes are not aligned
+
         for cand_hex in allyMap.keys():
             # Worlds keep their allegiances.
             if cand_hex in starMap:
@@ -551,8 +552,8 @@ class AllyGen(object):
                 notCount = 0
                 for check in range(3):
                     checkHex = Hex.get_neighbor(cand_hex, (direction + check) % 6)
-                    neighborAlg = allyMap.get(checkHex, None)
-                    if not AllyGen.are_allies(ally_map_candidate, neighborAlg):
+                    # neighborAlg = allyMap.get(checkHex, None)
+                    if not AllyGen.are_allies(ally_map_candidate, allyMap.get(checkHex, None)):
                         notCount += 1
                 if notCount >= 3:
                     break
