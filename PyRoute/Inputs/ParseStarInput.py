@@ -124,7 +124,10 @@ class ParseStarInput:
                          'Resources': Utilities.ehex_to_int(star.economics[1]) if star.economics else 0
                          }
 
-        star.check_ex()
+        if fix_pop is True:
+            star.fix_ex()
+        else:
+            star.check_ex()
         star.check_cx()
 
         star.calculate_wtn()
