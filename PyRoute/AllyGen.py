@@ -547,13 +547,21 @@ class AllyGen(object):
                 newMap[cand_hex] = ally_map_candidate
                 continue
 
+            # The direction/check combo hits all 6 surrounding hexen up 3 times apiece, and, per profiling, is
+            # the heaviest chunk of runtime in the whole method (previously 80%+ of runtime), so it's worth
+            # memoising.
+            ally_neighbours = dict()
+
             # Check for three continuous empty hexes around this cand_hex
             for direction in range(6):
                 notCount = 0
                 for check in range(3):
-                    checkHex = Hex.get_neighbor(cand_hex, (direction + check) % 6)
-                    # neighborAlg = allyMap.get(checkHex, None)
-                    if not AllyGen.are_allies(ally_map_candidate, allyMap.get(checkHex, None)):
+                    checkdir = (direction + check) % 6
+                    if checkdir not in ally_neighbours:
+                        checkHex = Hex.get_neighbor(cand_hex, (direction + check) % 6)
+                        ally_neighbours[checkdir] = not AllyGen.are_allies(ally_map_candidate, allyMap.get(checkHex, None))
+
+                    if ally_neighbours[checkdir]:
                         notCount += 1
                 if notCount >= 3:
                     break
