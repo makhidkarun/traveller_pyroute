@@ -9,6 +9,8 @@ import argparse
 import logging
 import codecs
 import os
+
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.Galaxy import Galaxy
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.Outputs.HexMap import HexMap
@@ -72,6 +74,8 @@ def process():
     debugging = parser.add_argument_group('Debug', "Debugging flags")
     debugging.add_argument('--debug', dest="debug_flag", default=False, action=argparse.BooleanOptionalAction,
                            help="Turn on trade-route debugging")
+    debugging.add_argument('--fix-pop', dest="fix_pop", default=False, action=argparse.BooleanOptionalAction,
+                           help="Fix incorrect pop codes when loading stars")
 
     parser.add_argument('--version', action='version', version='%(prog)s 0.4')
     parser.add_argument('--log-level', default='INFO')
@@ -97,8 +101,14 @@ def process():
         else:
             logger.warning(sector + " is duplicated")
 
-    galaxy.read_sectors(sectors_list, args.pop_code, args.ru_calc,
-                        args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+    readparms = ReadSectorOptions(sectors=sectors_list, pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                  route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
+                                  mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=args.fix_pop)
+    galaxy.read_sectors(readparms)
+
+    # galaxy.read_sectors(sectors_list, args.pop_code, args.ru_calc,
+    #                    args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag,
+    #                    fix_pop=args.fix_pop)
 
     logger.info("%s sectors read" % len(galaxy.sectors))
 

@@ -22,6 +22,7 @@ from PyRoute.Calculation.CommCalculation import CommCalculation
 from PyRoute.Calculation.OwnedWorldCalculation import OwnedWorldCalculation
 from PyRoute.Calculation.NoneCalculation import NoneCalculation
 from PyRoute.Calculation.XRouteCalculation import XRouteCalculation
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
 from PyRoute.StatCalculation import ObjectStatistics
 from PyRoute.AllyGen import AllyGen
@@ -412,8 +413,19 @@ class Galaxy(AreaItem):
         del state['alg_sorted']
         return state
 
-    def read_sectors(self, sectors, pop_code, ru_calc,
-                     route_reuse, trade_choice, route_btn, mp_threads, debug_flag):
+    # def read_sectors(self, sectors, pop_code, ru_calc,
+    #                 route_reuse, trade_choice, route_btn, mp_threads, debug_flag, fix_pop=False):
+    def read_sectors(self, options):
+        assert isinstance(options, ReadSectorOptions)
+        route_reuse = options.route_reuse
+        trade_choice = options.trade_choice
+        route_btn = options.route_btn
+        mp_threads = options.mp_threads
+        debug_flag = options.debug_flag
+        sectors = options.sectors
+        pop_code = options.pop_code
+        ru_calc = options.ru_calc
+        fix_pop = options.fix_pop
         self._set_trade_object(route_reuse, trade_choice, route_btn, mp_threads, debug_flag)
         star_counter = 0
         loaded_sectors = set()
@@ -457,7 +469,7 @@ class Galaxy(AreaItem):
             for line in lines[lineno + 2:]:
                 if line.startswith('#') or len(line) < 20:
                     continue
-                star = Star.parse_line_into_star(line, sec, pop_code, ru_calc)
+                star = Star.parse_line_into_star(line, sec, pop_code, ru_calc, fix_pop=fix_pop)
                 if star:
                     assert star not in sec.worlds, "Star " + str(star) + " duplicated in sector " + str(sec)
                     star.index = star_counter

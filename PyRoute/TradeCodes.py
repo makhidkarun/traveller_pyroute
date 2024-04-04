@@ -338,10 +338,14 @@ class TradeCodes(object):
             self.logger.error(msg)
         return False
 
-    def check_world_codes(self, star, msg=None):
+    def check_world_codes(self, star, msg=None, fix_pop=False):
         is_list = isinstance(msg, list)
         msg = msg if is_list else None
+
         check = True
+        if fix_pop is True:
+            self._fix_all_pop_codes(star)
+
         check = self._check_planet_code(star, 'As', '0', '0', '0', msg) and check
         check = self._check_planet_code(star, 'De', None, '23456789', '0', msg) and check
         check = self._check_planet_code(star, 'Fl', None, 'ABC', '123456789A', msg) and check
@@ -353,11 +357,8 @@ class TradeCodes(object):
         check = self._check_planet_code(star, 'Va', None, '0', None, msg) and check
         check = self._check_planet_code(star, 'Wa', '3456789', '3456789DEF', 'A', msg) and check
 
-        check = self._check_pop_code(star, 'Ba', '0', msg) and check
-        check = self._check_pop_code(star, 'Lo', '123', msg) and check
-        check = self._check_pop_code(star, 'Ni', '456', msg) and check
-        check = self._check_pop_code(star, 'Ph', '8', msg) and check
-        check = self._check_pop_code(star, 'Hi', '9ABCD', msg) and check
+        if fix_pop is not True:
+            check = self._check_all_pop_codes(check, msg, star)
 
         check = self._check_econ_code(star, 'Pa', '456789', '45678', '48', msg) and check
         check = self._check_econ_code(star, 'Ag', '456789', '45678', '567', msg) and check
@@ -368,6 +369,14 @@ class TradeCodes(object):
         check = self._check_econ_code(star, 'Ri', '68', None, '678', msg) and check
         if is_list:
             return msg
+        return check
+
+    def _check_all_pop_codes(self, check, msg, star):
+        check = self._check_pop_code(star, 'Ba', '0', msg) and check
+        check = self._check_pop_code(star, 'Lo', '123', msg) and check
+        check = self._check_pop_code(star, 'Ni', '456', msg) and check
+        check = self._check_pop_code(star, 'Ph', '8', msg) and check
+        check = self._check_pop_code(star, 'Hi', '9ABCD', msg) and check
         return check
 
     def owned_by(self, star):
@@ -656,11 +665,7 @@ class TradeCodes(object):
         self._fix_econ_code(star, 'In', '012479ABC', None, '9ABCD')
         self._fix_econ_code(star, 'Ri', '68', None, '678')
 
-        self._fix_pop_code(star, 'Ba', '0')
-        self._fix_pop_code(star, 'Lo', '123')
-        self._fix_pop_code(star, 'Ni', '456')
-        self._fix_pop_code(star, 'Ph', '8')
-        self._fix_pop_code(star, 'Hi', '9ABCD')
+        self._fix_all_pop_codes(star)
 
     def _fix_trade_code(self, star, code, size, atmo, hydro):
         size = '0123456789ABC' if size is None else size
@@ -704,6 +709,13 @@ class TradeCodes(object):
             self._drop_invalid_trade_code(code)
         elif pop_match and not code_match:
             self._add_missing_trade_code(code)
+
+    def _fix_all_pop_codes(self, star):
+        self._fix_pop_code(star, 'Ba', '0')
+        self._fix_pop_code(star, 'Lo', '123')
+        self._fix_pop_code(star, 'Ni', '456')
+        self._fix_pop_code(star, 'Ph', '8')
+        self._fix_pop_code(star, 'Hi', '9ABCD')
 
     def _drop_invalid_trade_code(self, targcode):
         self.codes = [code for code in self.codes if code != targcode]

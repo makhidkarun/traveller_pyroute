@@ -122,10 +122,10 @@ class Star(object):
         setattr(self, key, value)
 
     @staticmethod
-    def parse_line_into_star(line, sector, pop_code, ru_calc):
+    def parse_line_into_star(line, sector, pop_code, ru_calc, fix_pop=False):
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
         star = Star()
-        return ParseStarInput.parse_line_into_star_core(star, line, sector, pop_code, ru_calc)
+        return ParseStarInput.parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=fix_pop)
 
     def parse_to_line(self):
         result = str(self.position) + " "
@@ -396,6 +396,36 @@ class Star(object):
         elif not 0 <= infrastructure <= 12 + self.importance:
             self.logger.warning('{} - EX Calculated infrastructure {} not in range 0 - {}'.
                                 format(self, infrastructure, 12 + self.importance))
+
+    def fix_ex(self):
+        if not self.economics:
+            return
+
+        labor = self._ehex_to_int(self.economics[2])
+        infrastructure = self._ehex_to_int(self.economics[3])
+
+        if labor != max(self.popCode - 1, 0):
+            nu_labour = self._int_to_ehex(max(self.popCode - 1, 0))
+            self.economics = self.economics[0:2] + nu_labour + self.economics[3:]
+
+        nu_infrastructure = None
+        if self.tradeCode.barren and infrastructure != 0:
+            nu_infrastructure = '0'
+        elif self.tradeCode.low and infrastructure != max(self.importance, 0):
+            nu_infrastructure = self._int_to_ehex(max(self.importance, 0))
+        elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= 6 + self.importance:
+            if 0 > infrastructure:
+                nu_infrastructure = '0'
+            else:
+                nu_infrastructure = self._int_to_ehex(6 + self.importance)
+        elif not 0 <= infrastructure <= 12 + self.importance:
+            if 0 > infrastructure:
+                nu_infrastructure = '0'
+            else:
+                nu_infrastructure = self._int_to_ehex(12 + self.importance)
+
+        if nu_infrastructure is not None:
+            self.economics = self.economics[0:3] + nu_infrastructure + self.economics[4:]
 
     def check_cx(self):
         if not self.economics:

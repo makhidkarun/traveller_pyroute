@@ -7,6 +7,8 @@ Created on Dec 27, 2017
 import logging
 import argparse
 import os
+
+from DataClasses.ReadSectorOptions import ReadSectorOptions
 from .Galaxy import Galaxy
 from .WikiReview import WikiReview
 from wikitools.page import Page
@@ -240,7 +242,9 @@ No information yet available.
 
     def read_sector(self, sectors):
         galaxy = Galaxy(12)
-        galaxy.read_sectors(sectors, 'fixed', 'scaled')
+        options = ReadSectorOptions(sectors=sectors, pop_code='fixed', ru_calc='collapse')
+        # galaxy.read_sectors(sectors, 'fixed', 'scaled')
+        galaxy.read_sectors(options)
         return galaxy
 
 

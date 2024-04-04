@@ -7,6 +7,7 @@ import os
 import logging
 import math
 
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.Position.Hex import Hex
 from PyRoute.Outputs.GraphicMap import GraphicMap
 from PyRoute.Galaxy import Galaxy
@@ -541,7 +542,9 @@ if __name__ == '__main__':
     # route.set_logging('DEBUG')
     galaxy = Galaxy(15, 4, 8)
     galaxy.output_path = '.'
-    galaxy.read_sectors(['../sectors_tne/SpinwardMarches.sec'], 'fixed', 'collapse')
+    options = ReadSectorOptions(sectors=['../sectors_tne/SpinwardMarches.sec'], pop_code='fixed', ru_calc='collapse')
+    # galaxy.read_sectors(['../sectors_tne/SpinwardMarches.sec'], 'fixed', 'collapse')
+    galaxy.read_sectors(options)
     galaxy.set_borders('erode', 'collapse')
 
     graphMap = GraphicSubsectorMap(galaxy, None)

@@ -2,6 +2,8 @@ import os
 import logging
 import math
 import itertools
+
+from DataClasses.ReadSectorOptions import ReadSectorOptions
 from .SubsectorMap2 import GraphicSubsectorMap
 from .Galaxy import Galaxy
 from PIL import Image, ImageDraw, ImageFont
@@ -171,9 +173,11 @@ def set_logging(level):
 
 if __name__ == '__main__':
     set_logging('INFO')
+    options = ReadSectorOptions(sectors=['./sectors/TNE/SpinwardMarches.sec'], pop_code='fixed', ru_calc='collapse')
     galaxy = Galaxy(15, 4, 8)
     galaxy.output_path = '.'
-    galaxy.read_sectors(['./sectors/TNE/SpinwardMarches.sec'], 'fixed', 'collapse')
+    # galaxy.read_sectors(['./sectors/TNE/SpinwardMarches.sec'], 'fixed', 'collapse')
+    galaxy.read_sectors(options)
     galaxy.set_borders('erode', 'collapse')
 
     graphMap = DrawArcsTest(galaxy, None)
