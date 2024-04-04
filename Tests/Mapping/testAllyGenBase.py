@@ -1,3 +1,5 @@
+import json
+
 from PyRoute.Calculation.NoneCalculation import NoneCalculation
 from PyRoute.Galaxy import Galaxy, Sector, Subsector
 from PyRoute.Star import Star
@@ -45,3 +47,26 @@ class TestAllyGenBase(baseTest):
             f"{loc} Shana Ma             E551112-7 Lo Po                {{ -3 }} (300-3) [1113] B     - A 913 9  {allegiance} K2 IV M7 V     ",
             self.galaxy.sectors[0], 'fixed', 'negative')
         self.galaxy.add_star_to_galaxy(star, counter, self.galaxy.sectors[0])
+
+    @staticmethod
+    def dump_dict_to_json(targ_dict, rawfile):
+        raw = {str(k): v for (k, v) in targ_dict.items()}
+        raw = json.dumps(raw)
+        with open(rawfile, 'w+') as outfile:
+            outfile.write(raw)
+
+    @staticmethod
+    def load_dict_from_json(rawfile):
+        raw = None
+        with open(rawfile, 'r') as infile:
+            raw = json.load(infile)
+        assert isinstance(raw, dict), "Loaded file could not be restored to python dict"
+        mid = dict()
+        rawkey: str
+        for rawkey in raw:
+            value = raw[rawkey]
+            rawstrip = rawkey.strip('()')
+            bitz = rawstrip.split(',')
+            nu_key = (int(bitz[0]), int(bitz[1]))
+            mid[nu_key] = value
+        return mid

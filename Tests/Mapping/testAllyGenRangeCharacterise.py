@@ -196,3 +196,63 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+
+    def testRangeBorderOnFarFrontiersSector(self):
+        sourcefile = self.unpack_filename('BorderGeneration/Far Frontiers.sec')
+        mapfile = self.unpack_filename('BorderGeneration/Far Frontiers-range-allymap.json')
+        borderfile = self.unpack_filename('BorderGeneration/Far Frontiers-range-border.json')
+        bordermapfile = self.unpack_filename('BorderGeneration/Far Frontiers-range-bordermap.json')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+
+        self.galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        self.galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        self.borders = self.galaxy.borders
+        self.borders.create_borders('separate', True)
+
+        expected_ally_map = self.load_dict_from_json(mapfile)
+        expected_borders = self.load_dict_from_json(borderfile)
+        expected_borders_map = self.load_dict_from_json(bordermapfile)
+
+        ally_map = dict(self.borders.allyMap)
+        borders = dict(self.borders.borders)
+        borders_map = dict(self.borders.borders_map)
+
+        self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
+        self.assertEqual(expected_borders, borders, "Unexpected borders value")
+        self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+
+    def testRangeBorderOnVanguardReachesSector(self):
+        sourcefile = self.unpack_filename('BorderGeneration/Vanguard Reaches.sec')
+        mapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-range-allymap.json')
+        borderfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-range-border.json')
+        bordermapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-range-bordermap.json')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+
+        self.galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        self.galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        self.borders = self.galaxy.borders
+        self.borders.create_borders('separate', True)
+
+        expected_ally_map = self.load_dict_from_json(mapfile)
+        expected_borders = self.load_dict_from_json(borderfile)
+        expected_borders_map = self.load_dict_from_json(bordermapfile)
+
+        ally_map = dict(self.borders.allyMap)
+        borders = dict(self.borders.borders)
+        borders_map = dict(self.borders.borders_map)
+
+        self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
+        self.assertEqual(expected_borders, borders, "Unexpected borders value")
+        self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
