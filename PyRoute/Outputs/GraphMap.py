@@ -1,6 +1,8 @@
 from itertools import product
 import logging
 from PIL import Image, ImageDraw
+
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.Galaxy import Galaxy
 from PyRoute.Outputs.HexMap import HexMap
 from PyRoute.route import route
@@ -137,8 +139,8 @@ if __name__ == '__main__':
     route.set_logging('INFO')
     galaxy = Galaxy(8)
     galaxy.output_path = '../DeltaDebug'
-    galaxy.read_sectors(['../sectors_review/Spica.sec'],
-                        'fixed', 'collapse')
+    options = ReadSectorOptions(sectors=['../sectors_review/Spica.sec'], pop_code='fixed', ru_calc='collapse')
+    # galaxy.read_sectors(['../sectors_review/Spica.sec'], 'fixed', 'collapse')
     galaxy.set_borders('range', 'collapse')
     hexMap = GraphMap(galaxy, None)
     hexMap.write_dot_map()

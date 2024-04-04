@@ -9,6 +9,8 @@ import argparse
 import logging
 import codecs
 import os
+
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.Galaxy import Galaxy
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.Outputs.HexMap import HexMap
@@ -99,9 +101,14 @@ def process():
         else:
             logger.warning(sector + " is duplicated")
 
-    galaxy.read_sectors(sectors_list, args.pop_code, args.ru_calc,
-                        args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag,
-                        fix_pop=args.fix_pop)
+    readparms = ReadSectorOptions(sectors=sectors_list, pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                  route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
+                                  mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=args.fix_pop)
+    galaxy.read_sectors(readparms)
+
+    # galaxy.read_sectors(sectors_list, args.pop_code, args.ru_calc,
+    #                    args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag,
+    #                    fix_pop=args.fix_pop)
 
     logger.info("%s sectors read" % len(galaxy.sectors))
 
