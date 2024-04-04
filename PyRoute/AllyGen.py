@@ -558,13 +558,17 @@ class AllyGen(object):
                 checkHex = Hex.get_neighbor(cand_hex, direction)
                 not_ally_neighbours[direction] = not AllyGen.are_allies(ally_map_candidate, allyMap.get(checkHex, None))
 
-            for direction in range(6):
-                notCount = 0
-                for check in range(3):
-                    if not_ally_neighbours[(direction + check) % 6]:
-                        notCount += 1
-                if notCount >= 3:
-                    break
+            # Only spin through neighbours if there's 3 or more empty hexen - doing this with 2 or fewer empty
+            # hexen is a hiding to nowhere, as 3 continuous empty hexen _can't_ exist
+            notCount = 0
+            if 2 < sum(not_ally_neighbours.values()):
+                for direction in range(6):
+                    notCount = 0
+                    for check in range(3):
+                        if not_ally_neighbours[(direction + check) % 6]:
+                            notCount += 1
+                    if notCount >= 3:
+                        break
 
             if notCount >= 3:
                 changed = True
