@@ -665,13 +665,13 @@ class AllyGen(object):
             cand_hex = (star.q, star.r)
             alg = starMap[cand_hex]
 
-            if star.port in ['E', 'X', '?']:
+            if AllyGen.is_nonaligned(alg, True):
+                maxRange = 0
+            elif star.port in ['E', 'X', '?']:
                 maxRange = 1
             else:
                 maxRange = ['D', 'C', 'B', 'A'].index(star.port) + 2
 
-            if AllyGen.is_nonaligned(alg, True):
-                maxRange = 0
             # Walk the ring filling in the hexes around star with this neighbor
             for dist in range(1, maxRange):
                 # Start in direction 0, at distance n
