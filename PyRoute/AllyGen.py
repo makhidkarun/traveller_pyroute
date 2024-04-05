@@ -543,9 +543,6 @@ class AllyGen(object):
                 continue
 
             ally_map_candidate = allyMap[cand_hex]
-            if AllyGen.is_nonaligned(ally_map_candidate):
-                newMap[cand_hex] = ally_map_candidate
-                continue
 
             # The direction/check combo hits all 6 surrounding hexen up 3 times apiece, and, per profiling, is
             # the heaviest chunk of runtime in the whole method (previously 80%+ of runtime), so it's worth
