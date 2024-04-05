@@ -33,3 +33,6 @@ class NoneCalculation(RouteCalculation):
         dist = star.distance(target)
         weight = self.distance_weight[dist]
         return weight
+
+    def cross_check_totals(self):
+        pass
