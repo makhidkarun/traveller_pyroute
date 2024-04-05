@@ -582,11 +582,11 @@ class AllyGen(object):
         changed = False
         # Create the edge map, of hexes on the border
         for cand_hex in allyMap.keys():
+            cand_ally = allyMap[cand_hex]
             for direction in range(6):
                 checkHex = Hex.get_neighbor(cand_hex, direction)
-                neighborAlg = allyMap.get(checkHex, None)
-                if not AllyGen.are_allies(allyMap[cand_hex], neighborAlg):
-                    edgeMap[cand_hex] = allyMap[cand_hex]
+                if not AllyGen.are_allies(cand_ally, allyMap.get(checkHex, None)):
+                    edgeMap[cand_hex] = cand_ally
 
         for cand_hex in edgeMap.keys():
             if cand_hex in starMap:
