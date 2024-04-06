@@ -585,12 +585,10 @@ class AllyGen(object):
             cand_ally = allyMap[cand_hex]
             for direction in range(6):
                 checkHex = Hex.get_neighbor(cand_hex, direction)
-                if not AllyGen.are_allies(cand_ally, allyMap.get(checkHex, None)):
+                if not AllyGen.are_allies(cand_ally, allyMap.get(checkHex, None)) and cand_hex not in starMap:
                     edgeMap[cand_hex] = cand_ally
 
         for cand_hex in edgeMap.keys():
-            if cand_hex in starMap:
-                continue
             for direction in range(6):
                 if self._check_aligned(starMap, edgeMap, cand_hex, direction, 1) and \
                         self._check_aligned(starMap, edgeMap, cand_hex, direction, 2) and \
