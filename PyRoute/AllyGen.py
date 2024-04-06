@@ -623,13 +623,18 @@ class AllyGen(object):
     def _search_range(self, cand_hex, allyMap, starMap):
         newBridge = None
         checked = []
+        star_candidate = starMap[cand_hex]
+        neighbours = {}
         for direction in range(6):
-            checkHex = Hex.get_neighbor(cand_hex, direction)
+            neighbours[direction] = Hex.get_neighbor(cand_hex, direction)
+
+        for direction in range(6):
+            checkHex = neighbours[direction]
             if checkHex in starMap:
-                if self.are_allies(starMap[cand_hex], starMap[checkHex]):
+                if self.are_allies(star_candidate, starMap[checkHex]):
                     checked.append(checkHex)
                 continue
-            if self.are_allies(starMap[cand_hex], allyMap.get(checkHex, None)):
+            if self.are_allies(star_candidate, allyMap.get(checkHex, None)):
                 checked.append(checkHex)
                 continue
             for second in range(6):
@@ -640,11 +645,11 @@ class AllyGen(object):
                 if searchHex == cand_hex or Hex.axial_distance(searchHex, cand_hex) == 1:
                     continue
                 if searchHex in starMap and \
-                        self.are_allies(starMap[cand_hex], starMap[searchHex]):
+                        self.are_allies(star_candidate, starMap[searchHex]):
                     newBridge = checkHex
                     checked.append(checkHex)
         if newBridge:
-            allyMap[newBridge] = starMap[cand_hex]
+            allyMap[newBridge] = star_candidate
 
     def _erode_map(self, match):
         """
