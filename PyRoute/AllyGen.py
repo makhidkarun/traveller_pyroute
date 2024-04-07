@@ -535,30 +535,42 @@ class AllyGen(object):
 
         # Erode, remove empty hex from polity
         # if three contiguous hexes are not aligned
+
         for cand_hex in allyMap.keys():
             # Worlds keep their allegiances.
             if cand_hex in starMap:
                 newMap[cand_hex] = starMap[cand_hex]
                 continue
-            if AllyGen.is_nonaligned(allyMap[cand_hex]):
-                newMap[cand_hex] = allyMap[cand_hex]
-                continue
+
+            ally_map_candidate = allyMap[cand_hex]
+
+            # The direction/check combo hits all 6 surrounding hexen up 3 times apiece, and, per profiling, is
+            # the heaviest chunk of runtime in the whole method (previously 80%+ of runtime), so it's worth
+            # memoising.
+            not_ally_neighbours = dict()
 
             # Check for three continuous empty hexes around this cand_hex
             for direction in range(6):
-                notCount = 0
-                for check in range(3):
-                    checkHex = Hex.get_neighbor(cand_hex, (direction + check) % 6)
-                    neighborAlg = allyMap.get(checkHex, None)
-                    if not AllyGen.are_allies(allyMap[cand_hex], neighborAlg):
-                        notCount += 1
-                if notCount >= 3:
-                    break
+                # pre-heat not_ally_neighbours
+                checkHex = Hex.get_neighbor(cand_hex, direction)
+                not_ally_neighbours[direction] = not AllyGen.are_allies(ally_map_candidate, allyMap.get(checkHex, None))
+
+            # Only spin through neighbours if there's 3 or more empty hexen - doing this with 2 or fewer empty
+            # hexen is a hiding to nowhere, as 3 continuous empty hexen _can't_ exist
+            notCount = 0
+            if 2 < sum(not_ally_neighbours.values()):
+                for direction in range(6):
+                    notCount = 0
+                    for check in range(3):
+                        if not_ally_neighbours[(direction + check) % 6]:
+                            notCount += 1
+                    if notCount >= 3:
+                        break
 
             if notCount >= 3:
                 changed = True
             else:  # No empty hex in range found, keep allegiance.
-                newMap[cand_hex] = allyMap[cand_hex]
+                newMap[cand_hex] = ally_map_candidate
         return changed, newMap
 
     def _break_spans(self, allyMap, starMap):
@@ -570,15 +582,13 @@ class AllyGen(object):
         changed = False
         # Create the edge map, of hexes on the border
         for cand_hex in allyMap.keys():
+            cand_ally = allyMap[cand_hex]
             for direction in range(6):
                 checkHex = Hex.get_neighbor(cand_hex, direction)
-                neighborAlg = allyMap.get(checkHex, None)
-                if not AllyGen.are_allies(allyMap[cand_hex], neighborAlg):
-                    edgeMap[cand_hex] = allyMap[cand_hex]
+                if not AllyGen.are_allies(cand_ally, allyMap.get(checkHex, None)) and cand_hex not in starMap:
+                    edgeMap[cand_hex] = cand_ally
 
         for cand_hex in edgeMap.keys():
-            if cand_hex in starMap:
-                continue
             for direction in range(6):
                 if self._check_aligned(starMap, edgeMap, cand_hex, direction, 1) and \
                         self._check_aligned(starMap, edgeMap, cand_hex, direction, 2) and \
@@ -611,13 +621,18 @@ class AllyGen(object):
     def _search_range(self, cand_hex, allyMap, starMap):
         newBridge = None
         checked = []
+        star_candidate = starMap[cand_hex]
+        neighbours = {}
         for direction in range(6):
-            checkHex = Hex.get_neighbor(cand_hex, direction)
+            neighbours[direction] = Hex.get_neighbor(cand_hex, direction)
+
+        for direction in range(6):
+            checkHex = neighbours[direction]
             if checkHex in starMap:
-                if self.are_allies(starMap[cand_hex], starMap[checkHex]):
+                if self.are_allies(star_candidate, starMap[checkHex]):
                     checked.append(checkHex)
                 continue
-            if self.are_allies(starMap[cand_hex], allyMap.get(checkHex, None)):
+            if self.are_allies(star_candidate, allyMap.get(checkHex, None)):
                 checked.append(checkHex)
                 continue
             for second in range(6):
@@ -628,11 +643,11 @@ class AllyGen(object):
                 if searchHex == cand_hex or Hex.axial_distance(searchHex, cand_hex) == 1:
                     continue
                 if searchHex in starMap and \
-                        self.are_allies(starMap[cand_hex], starMap[searchHex]):
+                        self.are_allies(star_candidate, starMap[searchHex]):
                     newBridge = checkHex
                     checked.append(checkHex)
         if newBridge:
-            allyMap[newBridge] = starMap[cand_hex]
+            allyMap[newBridge] = star_candidate
 
     def _erode_map(self, match):
         """
@@ -650,13 +665,13 @@ class AllyGen(object):
             cand_hex = (star.q, star.r)
             alg = starMap[cand_hex]
 
-            if star.port in ['E', 'X', '?']:
+            if AllyGen.is_nonaligned(alg, True):
+                maxRange = 0
+            elif star.port in ['E', 'X', '?']:
                 maxRange = 1
             else:
                 maxRange = ['D', 'C', 'B', 'A'].index(star.port) + 2
 
-            if AllyGen.is_nonaligned(alg, True):
-                maxRange = 0
             # Walk the ring filling in the hexes around star with this neighbor
             for dist in range(1, maxRange):
                 # Start in direction 0, at distance n

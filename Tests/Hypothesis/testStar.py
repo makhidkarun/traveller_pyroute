@@ -45,6 +45,7 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 00000000000+  0         - a 000   00')
     @example('0101 000000000000000 ???????-? 000000000000000       c -   000   00')
     @example('0101 000000000000000 ???????-? 00000000+  0000         -   000   00')
+    @example('0101 000000000000000 ???????-? 000000000000000 {  -0} -  -  c -   000   00')
     def test_parse_line_to_star(self, s):
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
@@ -59,6 +60,7 @@ class testStar(unittest.TestCase):
         self.assertIsInstance(foo, Star)
         foo.index = 0
         foo.allegiance_base = foo.alg_base_code
+        foo.baseCode = str(foo.baseCode).upper()
         self.assertTrue(foo.is_well_formed())
 
         line = foo.parse_to_line()
