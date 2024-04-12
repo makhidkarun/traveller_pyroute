@@ -87,6 +87,7 @@ class ApproximateShortestPathForestUnified:
             right = item[1]
             leftdist = self._distances[left, :]
             rightdist = self._distances[right, :]
+            rightdist[np.isinf(rightdist)] = 0
             shelf = self._graph._arcs[left]
             keep = shelf[0] == right
             weight = shelf[1][keep][0]
