@@ -231,7 +231,8 @@ class StarlineTransformer(Transformer):
 
         bitz = trade.children[counter:]
         bitz[0].type = 'ix'
-        bitz[1].type = 'ex'
+        if 1 < len(bitz):
+            bitz[1].type = 'ex'
         if 2 < len(bitz):
             bitz[2].type = 'cx'
         trade.children = trade.children[:counter]

@@ -272,6 +272,7 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 ???????-? 000000000000000 - -  -  - - A 000   00?', True)
     @example('0000 000000000000000 ???????-? 00000000000000        B     - A 000   0?', True)
     @example('0000 000000000000000 ???????-? 000000000000000 {0} (000-0) -  - - A 000   0?', True)
+    @example('0706 11111MPQY-*]nrw ???????-? 00000111156677D {1} -  -  - - G 136   00-', True)
     # Cases where original regex output was wonky
     @example('0000 000000000000000 ???????-? 000000000000000       -         - 0 000   00', False)
     @example('0000 000000000000000 0000000-0 000000000000000       -         - 0 000 0 00', False)
@@ -300,6 +301,7 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 0000000-0 (00000000000)0)       - - A 000    0?', False)
     @example('0000 000000000000000 ???????-? 000000000000000       - - A 000    --0', False)
     @example('0000 000000000000000 ???????-? 000000000000000 {0} -  [0000]   - A   000   ?0', False)
+    @example('0001 000000000000000 ???????-? 000000000000000       - - A 000   --0', False)
     # Weird parsing cases
     @example('0000 000000000000000 ???????-? (00000000000000       - - 0 000   00?)', 'weird')
     @example('0000 000000000000000 ???????-? [00000000000000       - - 0 000   00?]', 'weird')
@@ -313,6 +315,8 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 0000000-0 000000000000 (0       - - 0 000   ?0)', 'weird')
     @example('0000 000000000000000 ???????-? 000000000000000       - - A 000   000?000-0 ', 'weird')
     @example('0000 000000000000000 0000000-0 000000000000000       - - A 000   00?0000-0 ', 'weird')
+    @example('2234 00001111111111[ 1234446-N (111114GK\'ehilp - (005-1) -  B - U  112       WW', 'weird')
+    @example('0000 000000000000000 ???????-? (0 000000000)0?       - - A 000   00?', 'weird')
     def test_starline_parser_against_regex(self, s, match):
         # if it's a known weird-parse case, assume it out now
         assume(match != 'weird')
