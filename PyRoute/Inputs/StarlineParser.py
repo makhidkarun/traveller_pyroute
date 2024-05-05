@@ -35,7 +35,7 @@ class StarlineParser:
 
     extensions: ix ex cx | /( ) ( ) ( )/
 
-    ix: /\{ *[+-]?[0-6] ?\}/
+    ix: /\{ *[+-]?[0-6] ?\}|-/
     ex: /\([0-9A-Za-z]{3}[+-]\d\)|-/
     cx: /(\[[0-9A-Za-z]{4}[\]\}]|-)/
 
