@@ -21,6 +21,7 @@ def importance_starline(draw):
 
     rawline = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]\'+*?'))
     assume('???????-?' not in rawline)
+    assume(160 > len(rawline))
     imp_match = r'\{ *[+-]?[0-6] ?\}'
     econ_match = r'\([0-9A-Z]{3}[+-]\d\)'
     soc_match = r'\[[0-9A-Z]{4}\]'
@@ -51,7 +52,8 @@ class testStar(unittest.TestCase):
     Given a regex-matching string, parse_line_to_star should return either a valid Star object or None
     """
     @given(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)],
+        deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
     @example('0101 000000000000000 00000O0-0 000000000000000       - - 0 000   00')
     @example('0101 000000000000000 ???????-? 000000000000000 {0} (000-0)  - - - 0 000   00')
     @example('0101 000000000000000 00000ź0-0 000000000000000 {0} -  [0000] - - 0 000   00')
