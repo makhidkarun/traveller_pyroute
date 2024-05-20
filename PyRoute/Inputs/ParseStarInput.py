@@ -7,6 +7,8 @@ import re
 
 from lark import UnexpectedCharacters, UnexpectedEOF
 
+from PyRoute.Inputs.StarlineStationParser import StarlineStationParser
+from PyRoute.Inputs.StarlineStationTransformer import StarlineStationTransformer
 from PyRoute.Inputs.StarlineTransformer import StarlineTransformer
 from PyRoute.Inputs.StarlineParser import StarlineParser
 from PyRoute.Nobles import Nobles
@@ -33,6 +35,8 @@ class ParseStarInput:
     starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
     parser = None
     transformer = None
+    station_parser = None
+    station_transformer = None
 
     @staticmethod
     def parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=False):
@@ -152,12 +156,15 @@ class ParseStarInput:
 
     @staticmethod
     def _unpack_starline(star, line):
+        is_station = False
         if '{Anomaly}' in line:
             star.logger.info("Found anomaly, skipping processing: {}".format(line))
             return None
 
         if ParseStarInput.parser is None:
             ParseStarInput.parser = StarlineParser()
+        if ParseStarInput.station_parser is None:
+            ParseStarInput.station_parser = StarlineStationParser()
         try:
             result, line = ParseStarInput.parser.parse(line)
         except UnexpectedCharacters:
@@ -171,6 +178,15 @@ class ParseStarInput:
         else:
             ParseStarInput.transformer.raw = line
             ParseStarInput.transformer.crankshaft = False
-        transformed = ParseStarInput.transformer.transform(result)
+        if ParseStarInput.station_transformer is None:
+            ParseStarInput.station_transformer = StarlineStationTransformer(raw=line)
+        else:
+            ParseStarInput.station_transformer.raw = line
+            ParseStarInput.station_transformer.crankshaft = False
+
+        if is_station:
+            transformed = ParseStarInput.station_transformer.transform(result)
+        else:
+            transformed = ParseStarInput.transformer.transform(result)
 
         return transformed
