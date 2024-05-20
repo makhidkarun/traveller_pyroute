@@ -70,9 +70,9 @@ class ParseStarInput:
         if not star.zone or star.zone not in 'arufARUF-':
             star.zone = '-'
         star.zone = star.zone.upper()
-        star.ggCount = int(data[14][2], 16) if data[14][2] not in 'X?' else 0
-        star.popM = int(data[14][0]) if data[14][0] not in 'X?' else 0
-        star.belts = int(data[14][1], 16) if data[14][1] not in 'X?' else 0
+        star.ggCount = 0 if (len(data[14]) < 3 or not data[14][2] or data[14][2] in 'X?') else int(data[14][2], 16)
+        star.popM = 0 if data[14][0] in 'X?' else int(data[14][0])
+        star.belts = 0 if (len(data[14]) < 2 or data[14][1] in 'X?') else int(data[14][1], 16)
 
         star.worlds = int(data[15]) if data[15].strip().isdigit() else 0
 
