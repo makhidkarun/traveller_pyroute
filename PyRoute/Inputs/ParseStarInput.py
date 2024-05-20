@@ -43,7 +43,7 @@ class ParseStarInput:
     def parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=False):
         star.sector = sector
         star.logger.debug(line)
-        data = ParseStarInput._unpack_starline(star, line)
+        data, is_station = ParseStarInput._unpack_starline(star, line, sector)
         if data is None:
             return None
 
@@ -153,27 +153,39 @@ class ParseStarInput:
         star.trade_id = None  # Used by the Speculative Trade
         star.calc_hash()
         star.calc_passenger_btn_mod()
+        if is_station:
+            star.deep_space_station = True
         return star
 
     @staticmethod
-    def _unpack_starline(star, line):
+    def _unpack_starline(star, line, sector):
         is_station = False
-        if '{Anomaly}' in line:
+        if '{Anomaly}' in line and sector.name not in ParseStarInput.deep_space:
             star.logger.info("Found anomaly, skipping processing: {}".format(line))
-            return None
+            return None, None
+        elif sector.name in ParseStarInput.deep_space:
+            if line[0:4] not in ParseStarInput.deep_space[sector.name]:
+                if '{Anomaly}' in line:
+                    star.logger.info("Found anomaly, skipping processing: {}".format(line))
+                    return None, None
+            else:
+                is_station = True
 
         if ParseStarInput.parser is None:
             ParseStarInput.parser = StarlineParser()
         if ParseStarInput.station_parser is None:
             ParseStarInput.station_parser = StarlineStationParser()
         try:
-            result, line = ParseStarInput.parser.parse(line)
+            if is_station:
+                result, line = ParseStarInput.station_parser.parse(line)
+            else:
+                result, line = ParseStarInput.parser.parse(line)
         except UnexpectedCharacters:
             star.logger.error("Unmatched line: {}".format(line))
-            return None
+            return None, None
         except UnexpectedEOF:
             star.logger.error("Unmatched line: {}".format(line))
-            return None
+            return None, None
         if ParseStarInput.transformer is None:
             ParseStarInput.transformer = StarlineTransformer(raw=line)
         else:
@@ -190,4 +202,4 @@ class ParseStarInput:
         else:
             transformed = ParseStarInput.transformer.transform(result)
 
-        return transformed
+        return transformed, is_station

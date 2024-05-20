@@ -10,6 +10,7 @@ import unittest
 import re
 import sys
 
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Position.Hex import Hex
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Galaxy import Allegiance
@@ -23,6 +24,7 @@ from PyRoute.Galaxy import Sector, Galaxy
 class TestStar(unittest.TestCase):
 
     def setUp(self):
+        ParseStarInput.deep_space = {}
         pass
 
     def testParseIrkigkhan(self):
@@ -474,6 +476,31 @@ class TestStar(unittest.TestCase):
             with self.subTest(msg):
                 star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
                 self.assertIsNotNone(star, "Starline should parse cleanly")
+                self.assertFalse(star.deep_space_station)
+
+    def testParseAnomalyWithNoDSS(self):
+        line = '0618 Chandler Station          ???????-? {Anomaly}                                        -   -  - ???                       '
+        sector = Sector('# Reft', '# -3,0')
+
+        star = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
+        self.assertIsNone(star)
+
+    def testParseAnomalyWithDSS(self):
+        ParseStarInput.deep_space = {'Reft': ['0618']}
+        line = '0618 Chandler Station          ???????-? {Anomaly}                                        -   -  - ???                       '
+        sector = Sector('# Reft', '# -3,0')
+
+        star = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
+        self.assertIsNotNone(star)
+        self.assertTrue(star.deep_space_station)
+
+    def testParseAnomalySansDSS(self):
+        ParseStarInput.deep_space = {'Reft': ['0618']}
+        line = '3103 Ishlagu Calibration Point ???????-? {Anomaly}                                        -   -  - ???                       '
+        sector = Sector('# Reft', '# -3,0')
+
+        star = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
+        self.assertIsNone(star)
 
 
 if __name__ == "__main__":
