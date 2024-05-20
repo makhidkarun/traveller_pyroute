@@ -117,7 +117,7 @@ def process():
             continue
         if bitz[0] not in deep_space:
             deep_space[bitz[0]] = []
-        deep_space[bitz[0]].append(bitz[1])
+        deep_space[bitz[0]].append(bitz[1].strip('\n'))
 
     readparms = ReadSectorOptions(sectors=sectors_list, pop_code=args.pop_code, ru_calc=args.ru_calc,
                                   route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
