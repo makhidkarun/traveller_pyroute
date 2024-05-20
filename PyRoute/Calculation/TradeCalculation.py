@@ -689,6 +689,8 @@ class TradeCalculation(RouteCalculation):
             weight += 25
         if star.port in 'DEX':
             weight += 25
+        if star.deep_space_station or target.deep_space_station:
+            weight += 100
         weight -= star.importance + target.importance
         # Per https://www.baeldung.com/cs/dijkstra-vs-a-pathfinding , to ensure termination in finite time:
         # "the edges have strictly positive costs"

@@ -165,6 +165,8 @@ class CommCalculation(RouteCalculation):
             weight += 50
         if star.popCode == 0 or target.popCode == 0:
             weight += 25
+        if star.deep_space_station or target.deep_space_station:
+            weight += 100
         weight -= 2 * (star.importance + target.importance)
         weight -= 6 if self.comm_bases(star) or self.comm_bases(target) else 0
         weight -= 6 if self.capitals(star) or self.capitals(target) else 0
