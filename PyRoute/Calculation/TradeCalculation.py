@@ -324,6 +324,12 @@ class TradeCalculation(RouteCalculation):
 
         assert self.galaxy.route_no_revisit(route), "Route between " + str(star) + " and " + str(target) + " revisits at least one star"
 
+        distance = self.route_distance(route)
+        btn = self.get_btn(star, target, distance)
+
+        if self.min_btn > btn:
+            return
+
         if self.debug_flag:
             fwd_weight = self.route_cost(route)
             route.reverse()
