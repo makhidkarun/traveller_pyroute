@@ -37,6 +37,7 @@ class ParseStarInput:
     transformer = None
     station_parser = None
     station_transformer = None
+    deep_space = {}
 
     @staticmethod
     def parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=False):
