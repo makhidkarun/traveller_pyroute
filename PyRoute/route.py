@@ -129,7 +129,6 @@ def process():
     #                    args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag,
     #                    fix_pop=args.fix_pop)
 
-
     logger.info("%s sectors read" % len(galaxy.sectors))
 
     galaxy.generate_routes()
