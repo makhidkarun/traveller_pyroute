@@ -155,6 +155,10 @@ class ParseStarInput:
         star.calc_passenger_btn_mod()
         if is_station:
             star.deep_space_station = True
+            if star.allegiance_base is None or '?' == star.alg_code:
+                star.allegiance_base = 'Na'
+                star.alg_code = 'Na'
+                star.alg_base_code = 'Na'
         return star
 
     @staticmethod
