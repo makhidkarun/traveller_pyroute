@@ -691,9 +691,9 @@ class TradeCalculation(RouteCalculation):
         weight = self.distance_weight[dist]
         if target.alg_code != star.alg_code:
             weight += 25
-        if star.port in 'CDEX?':
+        if star.port in 'CDEX?' or target.port in 'CDEX?':
             weight += 25
-        if star.port in 'DEX?':
+        if star.port in 'DEX?' or target.port in 'DEX?':
             weight += 25
         if star.deep_space_station or target.deep_space_station:
             weight += 100
