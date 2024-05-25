@@ -324,6 +324,12 @@ class TradeCalculation(RouteCalculation):
 
         assert self.galaxy.route_no_revisit(route), "Route between " + str(star) + " and " + str(target) + " revisits at least one star"
 
+        distance = self.route_distance(route)
+        btn = self.get_btn(star, target, distance)
+
+        if self.min_btn > btn:
+            return
+
         if self.debug_flag:
             fwd_weight = self.route_cost(route)
             route.reverse()
@@ -685,10 +691,12 @@ class TradeCalculation(RouteCalculation):
         weight = self.distance_weight[dist]
         if target.alg_code != star.alg_code:
             weight += 25
-        if star.port in 'CDEX':
+        if star.port in 'CDEX?' or target.port in 'CDEX?':
             weight += 25
-        if star.port in 'DEX':
+        if star.port in 'DEX?' or target.port in 'DEX?':
             weight += 25
+        if star.deep_space_station or target.deep_space_station:
+            weight += 100
         weight -= star.importance + target.importance
         # Per https://www.baeldung.com/cs/dijkstra-vs-a-pathfinding , to ensure termination in finite time:
         # "the edges have strictly positive costs"

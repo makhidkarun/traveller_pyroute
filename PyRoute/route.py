@@ -69,6 +69,7 @@ def process():
     source = parser.add_argument_group('Input', 'Source of data options')
     source.add_argument('--input', default='sectors', help='input directory for sectors')
     source.add_argument('--sectors', default=None, help='file with list of sector names to process')
+    source.add_argument('--deep-space', dest='deep_space', default=None, help='file with list of deep space stations to process')
     source.add_argument('sector', nargs='*', help='T5SS sector file(s) to process')
 
     debugging = parser.add_argument_group('Debug', "Debugging flags")
@@ -101,9 +102,27 @@ def process():
         else:
             logger.warning(sector + " is duplicated")
 
+    raw_dss_list = args.deep_space
+    deep_space_lines = []
+    if raw_dss_list is not None:
+        try:
+            deep_space_lines = [line for line in codecs.open(raw_dss_list, 'r', 'utf-8')]
+        except (OSError, IOError):
+            pass
+
+    deep_space = {}
+    for line in deep_space_lines:
+        bitz = line.split(',')
+        if 2 != len(bitz):
+            continue
+        if bitz[0] not in deep_space:
+            deep_space[bitz[0]] = []
+        deep_space[bitz[0]].append(bitz[1].strip('\n'))
+
     readparms = ReadSectorOptions(sectors=sectors_list, pop_code=args.pop_code, ru_calc=args.ru_calc,
                                   route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
-                                  mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=args.fix_pop)
+                                  mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=args.fix_pop,
+                                  deep_space=deep_space)
     galaxy.read_sectors(readparms)
 
     # galaxy.read_sectors(sectors_list, args.pop_code, args.ru_calc,

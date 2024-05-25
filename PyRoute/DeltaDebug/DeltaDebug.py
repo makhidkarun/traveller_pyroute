@@ -84,6 +84,8 @@ def process():
     delta = parser.add_argument_group('Debugging', 'Parameters for the delta-debugging procedure itself')
     delta.add_argument('--input', default='sectors', help='input directory for sectors')
     delta.add_argument('--sectors', default=None, help='file with list of sector names to process')
+    delta.add_argument('--deep-space', dest='deep_space', default=None,
+                        help='file with list of deep space stations to process')
     delta.add_argument('sector', nargs='*', help='T5SS sector file(s) to process')
     delta.add_argument('--output-dir', dest="outputdir",
                        help='Output folder to place any maps generated during minimisation.')
@@ -121,6 +123,26 @@ def process():
     sectors_list = args.sector
     if args.sectors is not None:
         sectors_list.extend(get_sectors(args.sectors, args.input))
+
+    raw_dss_list = args.deep_space
+    deep_space_lines = []
+    if raw_dss_list is not None:
+        try:
+            deep_space_lines = [line for line in codecs.open(raw_dss_list, 'r', 'utf-8')]
+        except (OSError, IOError):
+            pass
+
+    deep_space = {}
+    for line in deep_space_lines:
+        bitz = line.split(',')
+        if 2 != len(bitz):
+            continue
+        if bitz[0] not in deep_space:
+            deep_space[bitz[0]] = []
+        deep_space[bitz[0]].append(bitz[1].strip('\n'))
+
+    from PyRoute.Inputs.ParseStarInput import ParseStarInput
+    ParseStarInput.deep_space = {} if (deep_space is None or not isinstance(deep_space, dict)) else deep_space
 
     delta = DeltaDictionary()
     for sector_file in sectors_list:

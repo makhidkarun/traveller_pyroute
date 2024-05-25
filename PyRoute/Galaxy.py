@@ -429,6 +429,8 @@ class Galaxy(AreaItem):
         self._set_trade_object(route_reuse, trade_choice, route_btn, mp_threads, debug_flag)
         star_counter = 0
         loaded_sectors = set()
+        from PyRoute.Inputs.ParseStarInput import ParseStarInput
+        ParseStarInput.deep_space = {} if (options.deep_space is None or not isinstance(options.deep_space, dict)) else options.deep_space
         for sector in sectors:
             try:
                 lines = [line for line in codecs.open(sector, 'r', 'utf-8')]

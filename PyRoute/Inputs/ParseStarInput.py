@@ -7,6 +7,8 @@ import re
 
 from lark import UnexpectedCharacters, UnexpectedEOF
 
+from PyRoute.Inputs.StarlineStationParser import StarlineStationParser
+from PyRoute.Inputs.StarlineStationTransformer import StarlineStationTransformer
 from PyRoute.Inputs.StarlineTransformer import StarlineTransformer
 from PyRoute.Inputs.StarlineParser import StarlineParser
 from PyRoute.Nobles import Nobles
@@ -33,12 +35,15 @@ class ParseStarInput:
     starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
     parser = None
     transformer = None
+    station_parser = None
+    station_transformer = None
+    deep_space = {}
 
     @staticmethod
     def parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=False):
         star.sector = sector
         star.logger.debug(line)
-        data = ParseStarInput._unpack_starline(star, line)
+        data, is_station = ParseStarInput._unpack_starline(star, line, sector)
         if data is None:
             return None
 
@@ -67,12 +72,12 @@ class ParseStarInput:
         if ('' == star.baseCode) or ('-' != star.baseCode and 1 == len(star.baseCode) and not star.baseCode.isalpha()):
             star.baseCode = '-'
         star.zone = data[13].strip()
-        if not star.zone or star.zone not in 'arufARUF-':
+        if not star.zone or star.zone not in 'arufgbARUFGB-':
             star.zone = '-'
         star.zone = star.zone.upper()
-        star.ggCount = int(data[14][2], 16) if data[14][2] not in 'X?' else 0
-        star.popM = int(data[14][0]) if data[14][0] not in 'X?' else 0
-        star.belts = int(data[14][1], 16) if data[14][1] not in 'X?' else 0
+        star.ggCount = 0 if (len(data[14]) < 3 or not data[14][2] or data[14][2] in 'X?') else int(data[14][2], 16)
+        star.popM = 0 if data[14][0] in 'X?' else int(data[14][0])
+        star.belts = 0 if (len(data[14]) < 2 or data[14][1] in 'X?') else int(data[14][1], 16)
 
         star.worlds = int(data[15]) if data[15].strip().isdigit() else 0
 
@@ -148,29 +153,57 @@ class ParseStarInput:
         star.trade_id = None  # Used by the Speculative Trade
         star.calc_hash()
         star.calc_passenger_btn_mod()
+        if is_station:
+            star.deep_space_station = True
+            if star.allegiance_base is None or '?' == star.alg_code:
+                star.allegiance_base = 'Na'
+                star.alg_code = 'Na'
+                star.alg_base_code = 'Na'
         return star
 
     @staticmethod
-    def _unpack_starline(star, line):
-        if '{Anomaly}' in line:
+    def _unpack_starline(star, line, sector):
+        is_station = False
+        if '{Anomaly}' in line and sector.name not in ParseStarInput.deep_space:
             star.logger.info("Found anomaly, skipping processing: {}".format(line))
-            return None
+            return None, None
+        elif sector.name in ParseStarInput.deep_space:
+            if line[0:4] not in ParseStarInput.deep_space[sector.name]:
+                if '{Anomaly}' in line:
+                    star.logger.info("Found anomaly, skipping processing: {}".format(line))
+                    return None, None
+            else:
+                is_station = True
 
         if ParseStarInput.parser is None:
             ParseStarInput.parser = StarlineParser()
+        if ParseStarInput.station_parser is None:
+            ParseStarInput.station_parser = StarlineStationParser()
         try:
-            result, line = ParseStarInput.parser.parse(line)
+            if is_station:
+                result, line = ParseStarInput.station_parser.parse(line)
+            else:
+                result, line = ParseStarInput.parser.parse(line)
         except UnexpectedCharacters:
             star.logger.error("Unmatched line: {}".format(line))
-            return None
+            return None, None
         except UnexpectedEOF:
             star.logger.error("Unmatched line: {}".format(line))
-            return None
+            return None, None
         if ParseStarInput.transformer is None:
             ParseStarInput.transformer = StarlineTransformer(raw=line)
         else:
             ParseStarInput.transformer.raw = line
             ParseStarInput.transformer.crankshaft = False
-        transformed = ParseStarInput.transformer.transform(result)
+        if ParseStarInput.station_transformer is None:
+            ParseStarInput.station_transformer = StarlineStationTransformer(raw=line)
+        else:
+            ParseStarInput.station_transformer.raw = line
+            ParseStarInput.station_transformer.crankshaft = False
 
-        return transformed
+        if is_station:
+            transformed = ParseStarInput.station_transformer.transform(result)
+        else:
+            transformed = ParseStarInput.transformer.transform(result)
+
+        return transformed, is_station

@@ -20,29 +20,29 @@ class testDistanceGraph(baseTest):
         self.assertEqual(1, len(components))
 
         distgraph = DistanceGraph(graph)
-        expected = [0.0, 46.0, 24.0, 24.0, 26.0, 26.0, 26.0, 26.0, 26.0, 25.0, 26.0, 27.0, 28.0, 28.0, 27.0, 25.0, 28.0,
-                    24.0, 24.0, 32.0, 31.0, 29.0, 25.0, 47.0, 32.0, 32.0, 25.0, 28.0, 25.0, 29.0, 51.0, 28.0, 28.0,
-                    25.0, 24.0, 24.0, 45.0]
+        expected = [0.0, 46.0, 24.0, 24.0, 26.0, 26.0, 26.0, 26.0, 26.0, 25.0, 26.0, 27.0, 28.0, 28.0, 27.0, 25.0, 53.0,
+                    24.0, 24.0, 82.0, 81.0, 54.0, 25.0, 47.0, 45.0, 79.0, 25.0, 28.0, 25.0, 79.0, 101.0, 28.0, 28.0,
+                    25.0, 25.0, 49.0, 45.0]
         actual = distgraph.min_cost(range(37), 0)
         self.assertEqual(expected, list(actual), 'Unexpected min-cost vector')
 
         expected_extended = [0.0, 70.0, 48.0, 48.0, 50.0, 26.0, 51.0, 50.0, 26.0, 50.0, 50.0, 51.0, 52.0, 52.0, 52.0,
-                             49.0, 52.0, 48.0, 48.0, 58.0, 56.0, 54.0, 49.0, 75.0, 56.0, 56.0, 49.0, 56.0, 49.0, 54.0,
-                             80.0, 53.0, 52.0, 49.0, 48.0, 48.0, 69.0]
+                             49.0, 77.0, 48.0, 48.0, 108.0, 106.0, 79.0, 49.0, 75.0, 69.0, 103.0, 49.0, 56.0, 50.0, 104.0,
+                             148.0, 53.0, 53.0, 50.0, 50.0, 74.0, 70.0]
         extended = distgraph.min_cost(range(37), 0, indirect=True)
         self.assertEqual(expected_extended, list(extended), 'Unexpected indirect min-cost vector')
 
         distgraph.lighten_edge(1, 11, 40)
         expected_extended = [0.0, 64.0, 48.0, 48.0, 50.0, 26.0, 51.0, 50.0, 26.0, 50.0, 50.0, 51.0, 52.0, 52.0, 52.0,
-                             49.0, 52.0, 48.0, 48.0, 58.0, 56.0, 54.0, 49.0, 75.0, 56.0, 56.0, 49.0, 56.0, 49.0, 54.0,
-                             80.0, 53.0, 52.0, 49.0, 48.0, 48.0, 69.0]
+                             49.0, 77.0, 48.0, 48.0, 108.0, 106.0, 79.0, 49.0, 75.0, 69.0, 103.0, 49.0, 56.0, 50.0, 104.0,
+                             148.0, 53.0, 53.0, 50.0, 50.0, 74.0, 70.0]
         extended = distgraph.min_cost(range(37), 0, indirect=True)
         self.assertEqual(expected_extended, list(extended), 'Unexpected indirect min-cost vector after update')
 
         distgraph.lighten_edge(1, 11, 10)
         expected_extended = [0.0, 20.0, 34.0, 48.0, 50.0, 26.0, 36.0, 50.0, 26.0, 35.0, 36.0, 20.0, 52.0, 52.0, 52.0,
-                             35.0, 38.0, 34.0, 34.0, 58.0, 56.0, 54.0, 35.0, 75.0, 56.0, 56.0, 49.0, 56.0, 49.0, 54.0,
-                             80.0, 53.0, 52.0, 49.0, 48.0, 48.0, 69.0]
+                             35.0, 63.0, 34.0, 34.0, 108.0, 106.0, 79.0, 35.0, 75.0, 69.0, 103.0, 49.0, 56.0, 50.0, 104.0,
+                             148.0, 53.0, 53.0, 50.0, 50.0, 74.0, 70.0]
         extended = distgraph.min_cost(range(37), 0, indirect=True)
         self.assertEqual(expected_extended, list(extended), 'Unexpected indirect min-cost vector after update')
 

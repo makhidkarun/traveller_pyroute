@@ -155,9 +155,9 @@ class CommCalculation(RouteCalculation):
     def route_weight(self, star, target):
         dist = star.distance(target)
         weight = self.distance_weight[dist]
-        if star.port in 'CDEX':
+        if star.port in 'CDEX?' or target.port in 'CDEX?':
             weight += 25
-        if star.port in 'DEX':
+        if star.port in 'DEX?' or target.port in 'DEX?':
             weight += 25
         # if star.zone in 'A' or target.zone in 'A':
         #    weight += 25
@@ -165,6 +165,8 @@ class CommCalculation(RouteCalculation):
             weight += 50
         if star.popCode == 0 or target.popCode == 0:
             weight += 25
+        if star.deep_space_station or target.deep_space_station:
+            weight += 100
         weight -= 2 * (star.importance + target.importance)
         weight -= 6 if self.comm_bases(star) or self.comm_bases(target) else 0
         weight -= 6 if self.capitals(star) or self.capitals(target) else 0

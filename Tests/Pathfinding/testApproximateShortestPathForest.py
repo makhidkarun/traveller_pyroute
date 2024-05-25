@@ -38,7 +38,7 @@ class testApproximateShortestPathForest(baseTest):
         src = stars[2]
         targ = stars[80]
 
-        expected = 310.833
+        expected = 325.833
         actual = approx.lower_bound(src, targ)
         self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
@@ -48,7 +48,7 @@ class testApproximateShortestPathForest(baseTest):
         src = stars[2]
         targ = stars[80]
 
-        expected = 310.833
+        expected = 325.833
         actual = approx.lower_bound(src, targ)
         self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
@@ -65,7 +65,7 @@ class testApproximateShortestPathForest(baseTest):
 
         active_nodes = [2, 80]
         target = 80
-        expected = np.array([399.167, 0])
+        expected = np.array([420.833, 0])
         actual = approx.lower_bound_bulk(active_nodes, target)
         self.assertIsNotNone(actual)
 
@@ -85,7 +85,7 @@ class testApproximateShortestPathForest(baseTest):
 
         active_nodes = [2, 80]
         target = 80
-        expected = np.array([399.833, 0])
+        expected = np.array([420.833, 0])
         actual = approx.lower_bound_bulk(active_nodes, target)
         self.assertIsNotNone(actual)
 

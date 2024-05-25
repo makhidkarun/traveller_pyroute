@@ -88,12 +88,12 @@ class testShortestPathCalc(baseTest):
         expected_parents[25] = 24
         expected_parents[26] = 17
         expected_parents[27] = 19
-        expected_parents[28] = 20
+        expected_parents[28] = 24
         expected_parents[29] = 26
         expected_parents[30] = 23
         expected_parents[31] = 27
-        expected_parents[32] = 28
-        expected_parents[33] = 28
+        expected_parents[32] = 34
+        expected_parents[33] = 34
         expected_parents[34] = 24
         expected_parents[35] = 24
         expected_parents[36] = 24
