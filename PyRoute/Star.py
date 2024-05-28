@@ -692,3 +692,10 @@ class Star(object):
         capital = 2 if self.tradeCode.sector_capital or self.tradeCode.other_capital else 1 if \
             self.tradeCode.subsector_capital else 0
         self._pax_btn_mod = rich + capital
+
+    def canonicalise(self):
+        self.uwp.canonicalise()
+        self.tradeCode.canonicalise(self)
+        self.fix_ex()
+        self.star_list_object.canonicalise()
+        self.calculate_importance()
