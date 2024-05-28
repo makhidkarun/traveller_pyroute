@@ -1,3 +1,4 @@
+import logging
 import re
 import unittest
 from datetime import timedelta
@@ -194,6 +195,40 @@ class testStar(unittest.TestCase):
         foo.index = 0
         foo.allegiance_base = foo.alg_base_code
         self.assertTrue(foo.is_well_formed())
+
+    @given(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)],
+              deadline=timedelta(1000))
+    @example('0000 000000000000000 ????1??-? 000000000000000 - (000-0) [0000]  - - A 000    00')
+    def test_star_canonicalise(self, s):
+        hyp_line = "Hypothesis input: " + s
+        sector = Sector('# Core', '# 0, 0')
+        pop_code = 'scaled'
+        ru_calc = 'scaled'
+        tradelogger = logging.getLogger('PyRoute.TradeCodes')
+        logger = logging.getLogger('PyRoute.Star')
+        logger.setLevel(logging.CRITICAL)
+        tradelogger.setLevel(logging.CRITICAL)
+        foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
+        logger.setLevel(logging.INFO)
+        tradelogger.setLevel(logging.INFO)
+        assume(foo is not None)
+        assume(foo.economics is not None)
+        assume(foo.social is not None)
+
+        foo.fix_ex()
+        with self.assertLogs(logger) as cm:
+            logger.info('Dummy log')
+            foo.check_ex()
+            foo.check_cx()
+
+        self.assertEqual(
+            ["INFO:PyRoute.Star:Dummy log"],
+            cm.output,
+            hyp_line
+        )
+
+
 
 if __name__ == '__main__':
     unittest.main()
