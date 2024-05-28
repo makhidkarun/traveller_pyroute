@@ -198,7 +198,7 @@ class testStar(unittest.TestCase):
 
     @given(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)],
-              deadline=timedelta(1000))
+              deadline=timedelta(200))
     @example('0000 000000000000000 ????1??-? 000000000000000 - (000-0) [0000]  - - A 000    00')
     def test_star_canonicalise(self, s):
         hyp_line = "Hypothesis input: " + s
@@ -216,7 +216,7 @@ class testStar(unittest.TestCase):
         assume(foo.economics is not None)
         assume(foo.social is not None)
 
-        foo.fix_ex()
+        foo.canonicalise()
         with self.assertLogs(logger) as cm:
             logger.info('Dummy log')
             foo.check_ex()
