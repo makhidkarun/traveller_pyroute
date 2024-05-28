@@ -93,6 +93,7 @@ class Star(object):
         self.is_redzone = False
         self.hex = None
         self.deep_space_station = False
+        self._oldskool = False
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -133,13 +134,19 @@ class Star(object):
         result += self.name.ljust(20) + " "
 
         result += str(self.uwp)
-        imp_chunk = "{ " + str(self.importance) + " }"
         star_list = str(self.star_list_object)
-        result += " " + str(self.tradeCode).ljust(38) + imp_chunk.ljust(6) + " "
-        econ = str(self.economics) if self.economics is not None else '-'
-        social = str(self.social) if self.social is not None else '-'
+        result += " " + str(self.tradeCode).ljust(38)
+        if self.oldskool:  # If Ix, Ex and Cx were all missing on the way _in_, they should be missing on the way _out_
+            imp_chunk = ' '
+            econ = ' '
+            social = ' '
+        else:
+            imp_chunk = "{ " + str(self.importance) + " }"
+            econ = str(self.economics) if self.economics is not None else '-'
+            social = str(self.social) if self.social is not None else '-'
 
-        result += econ.ljust(7) + " " + social.ljust(6) + " " + str(self.nobles).ljust(4) + " "
+        result += imp_chunk.ljust(6) + " " + econ.ljust(7) + " " + social.ljust(6) + " "
+        result += str(self.nobles).ljust(4) + " "
         popM = str(Utilities.int_to_ehex(self.popM))
         belts = str(Utilities.int_to_ehex(self.belts))
         ggCount = str(Utilities.int_to_ehex(self.ggCount))
@@ -279,6 +286,10 @@ class Star(object):
         if self.star_list[0].spectral is not None:
             return self.star_list[0].spectral
         return self.star_list[0].size
+
+    @property
+    def oldskool(self):
+        return self.uwp.oldskool is True
 
     def distance(self, star):
         hex1 = self.hex.hex_position()

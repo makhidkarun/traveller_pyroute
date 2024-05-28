@@ -23,7 +23,7 @@ class ParseStarInput:
 (.{15,}) +
 (\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?]) +
 (.{15,}) +
-((\{ *[+-]?[0-6] ?\}) +(\([0-9A-Za-z]{3}[+-]\d\)|- ) +(\[[0-9A-Za-z]{4}\]|- )|( ) ( ) ( )) +
+((\{ *[+-]?[0-6] ?\}|-) +(\([0-9A-Za-z]{3}[+-]\d\)|- ) +(\[[0-9A-Za-z]{4}\]|- )|( ) ( ) ( )) +
 ([BcCDeEfFGH]{1,5}|-| ) +
 ([A-Z]{1,3}|-|\*) +
 ([ARUFGBarufgb]|-| ) +
@@ -32,6 +32,18 @@ class ParseStarInput:
 ([A-Z0-9?-][A-Za-z0-9?-]{1,3})
 (.*)
 """
+    # Hex position in the sector
+    # Name of the system
+    # UWP
+    # Trade Codes
+    # Ix, Ex, Cx The T5 Extensions
+    # Nobility codes
+    # Base codes
+    # Travel Zone Code
+    # PBG code (Population, Belts, Gas Giants
+    # World Count
+    # Allegiance
+    # Stars and star data (parsed separately)
     starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
     parser = None
     transformer = None
@@ -104,7 +116,7 @@ class ParseStarInput:
 
         star.tradeCode.check_world_codes(star, fix_pop=fix_pop)
 
-        if data[5]:
+        if data[5] and data[5].startswith('{'):
             imp = int(data[5][1:-1].strip())
             star.calculate_importance()
             if imp != star.importance:

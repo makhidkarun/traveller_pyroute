@@ -31,11 +31,11 @@ class StarlineParser:
     MAJOR_SOPHONT.3: /\[[^\]\{]{1,}\][W\d\?]{0,1}/
     OWNED_COLONY.3: /[OC]:[X\d\?]{0,4}/ | /[OC]:[A-Z][A-Za-z]{3,3}[-\:]{0,1}\d{4,4}/
     RESIDUAL.2: /[0-9A-Za-z?\-+*()\'\{\}\[\]]{2,}/
-    SINGLETON: /[0-9A-Za-z\+\*()?\']/
+    SINGLETON: /[0-9AC-Za-z\+\*()?\']/
 
     extensions: ix ex cx | /( ) ( ) ( )/
 
-    ix: /\{ *[+-]?[0-6] ?\}/
+    ix: /\{ *[+-]?[0-6] ?\}|-/
     ex: /\([0-9A-Za-z]{3}[+-]\d\)|-/
     cx: /(\[[0-9A-Za-z]{4}[\]\}]|-)/
 
