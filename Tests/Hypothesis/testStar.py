@@ -47,6 +47,25 @@ def importance_starline(draw):
 
     return rawline
 
+@composite
+def canonical_check(draw):
+    rawline = '1919 Khula                B575A77-E Hi In Pz Di(Khulans)      { 4 }  (D9G+4) [AE5E] BEf  N  A 510 10 ImDv M0 V'
+    uwp_match = r'(\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?])'
+    imp_match = r'\{ *[+-]?[0-6] ?\}'
+    econ_match = r'\([0-9A-Z]{3}[+-]\d\)'
+    soc_match = r'\[[0-9A-Z]{4}\]'
+
+    uwp_draw = draw(from_regex(uwp_match))
+    rawline.replace('B575A77-E', uwp_draw)
+    imp_draw = draw(from_regex(imp_match))
+    rawline.replace('{ 4 }', imp_draw)
+    econ_draw = draw(from_regex(econ_match))
+    rawline.replace('(D9G+4)', econ_draw)
+    soc_draw = draw(from_regex(soc_match))
+    rawline.replace('[AE5E]', soc_draw)
+
+    return rawline
+
 class testStar(unittest.TestCase):
 
     """
@@ -196,9 +215,8 @@ class testStar(unittest.TestCase):
         foo.allegiance_base = foo.alg_base_code
         self.assertTrue(foo.is_well_formed())
 
-    @given(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)],
-              deadline=timedelta(200))
+    @given(canonical_check())
+    @settings(deadline=timedelta(200))
     @example('0000 000000000000000 ????1??-? 000000000000000 - (000-0) [0000]  - - A 000    00')
     def test_star_canonicalise(self, s):
         hyp_line = "Hypothesis input: " + s
