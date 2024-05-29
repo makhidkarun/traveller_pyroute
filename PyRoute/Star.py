@@ -526,9 +526,9 @@ class Star(object):
         nu_symbols = None
         if 0 == pop and symbols != 0:
             nu_symbols = '0'
-        elif 0 != pop and symbols > max(1, self.tl - 5):
+        elif 0 != pop and symbols < max(1, self.tl - 5):
             nu_symbols = self._int_to_ehex(max(1, self.tl - 5))
-        elif 0 != pop and symbols < self.tl + 5:
+        elif 0 != pop and symbols > self.tl + 5:
             nu_symbols = self._int_to_ehex(self.tl + 5)
 
         if nu_symbols is not None:
