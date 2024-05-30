@@ -22,6 +22,7 @@ class Canonicalisation(object):
         for line in self.reducer.sectors.lines:
             canon = DeltaStar.reduce(line, canonicalise=True)
             assert isinstance(canon, str), "Candidate line " + line + " was not reduced to a string.  Got " + canon + " instead."
+            canon = DeltaStar.reduce(canon, canonicalise=True)
             subs_list.append((line, canon))
 
         if 0 == len(subs_list):
