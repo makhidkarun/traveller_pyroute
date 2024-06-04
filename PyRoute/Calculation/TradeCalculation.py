@@ -596,55 +596,6 @@ class TradeCalculation(RouteCalculation):
             start = end
         return total_weight
 
-    def get_trade_to(self, star, trade):
-        """
-        Unused:
-        Calculate the trade route between starting star and all potential target.
-        This was the direct copy algorithm from nroute for doing route calculation
-        It was replaced by the process above which works better with the
-        pythonic data structures. It remains for historical purposes.
-        """
-
-        # Loop through all the stars in the ranges list, i.e. all potential stars
-        # within the range of the BTN route. 
-        for (newstar, target) in self.galaxy.ranges.edges(star, False):
-            if newstar != star:
-                self.logger.error("edges found newstar %s != star %s" % (newstar, star))
-                continue
-
-            # Skip this pair if we've already done the trade
-            # usually from the other star first. 
-            if target in star.tradeMatched:
-                continue
-
-            # Calculate the route between the stars
-            # If we can't find a route (no jump 4 path) skip this pair
-            try:
-                route = nx.astar_path(self.galaxy.stars, star, target)
-            except nx.NetworkXNoPath:
-                continue
-
-            # Gather basic statistics. 
-            tradeBTN = self.get_btn(star, target)
-            tradeCr = self.calc_trade(tradeBTN)
-            star.tradeIn += tradeCr
-            target.tradeIn += tradeCr
-            target.tradeMatched.append(star)
-
-            # Update the trade route (edges)
-            start = star
-            for end in route:
-                if end == start:
-                    continue
-                data = self.galaxy.stars[start][end]
-                data['trade'] += tradeCr
-                # Reduce the weight of this route. 
-                # As the higher trade routes create established routes 
-                # which are more likely to be followed by lower trade routes
-                data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
-                end.tradeOver += tradeCr if end != target else 0
-                start = end
-
     def route_weight(self, star, target):
         dist = star.distance(target)
         weight = self.distance_weight[dist]
