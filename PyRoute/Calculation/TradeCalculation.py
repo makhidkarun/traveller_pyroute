@@ -596,47 +596,6 @@ class TradeCalculation(RouteCalculation):
             start = end
         return total_weight
 
-    def route_update_skip(self, route, tradeCr):
-        """
-        Unused: This was an experiment in adding skip-routes,
-        i.e. longer, already calculated routes, to allow the
-        A* route finder to work faster. This needs better system
-        for selecting these routes as too many got added and it
-        would slow the system down.
-        """
-        dist = 0
-        weight = 0
-        start = route[0]
-        usesJumpRoute = False
-        for end in route[1:]:
-            end.tradeOver += tradeCr if end != route[-1] else 0
-            if self.galaxy.routes.has_edge(start, end) and self.galaxy.routes[start][end].get('route', False):
-                routeDist, routeWeight = self.route_update(self.galaxy.routes[start][end]['route'], tradeCr)
-                dist += routeDist
-                weight += routeWeight
-                usesJumpRoute = True
-                # Reduce the weight of this route. 
-                # As the higher trade routes create established routes
-                # which are more likely to be followed by lower trade routes
-            elif self.galaxy.stars.has_edge(start, end):
-                self.galaxy.stars[start][end]['trade'] += tradeCr
-                dist += self.galaxy.stars[start][end]['distance']
-                weight += self.galaxy.stars[start][end]['weight']
-            else:
-                print((start, end, self.galaxy.routes.has_edge(start, end)))
-            start = end
-
-        if len(route) > 6 and not usesJumpRoute:
-            weight -= weight // self.route_reuse
-            self.galaxy.routes.add_edge(route[0], route[-1], distance=dist,
-                                        weight=weight, trade=0, route=route,
-                                        btn=0)
-            start = route[0]
-            for end in route[1:]:
-                # self.galaxy.routes.remove_edge(start, end)
-                start = end
-        return dist, weight
-
     def get_trade_to(self, star, trade):
         """
         Unused:
