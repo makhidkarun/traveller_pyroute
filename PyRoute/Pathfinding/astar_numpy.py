@@ -83,7 +83,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     f_exhausted = 0
     new_upbounds = 0
     targ_exhausted = 0
-    un_exhausted = 0
     revis_continue = 0
 
     while queue:
