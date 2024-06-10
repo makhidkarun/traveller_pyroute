@@ -193,14 +193,15 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             # As we have a tighter upper bound, apply it to the neighbours as well
             keep = np.logical_and(keep, augmented_weights < upbound)
             active_nodes = active_nodes[keep]
-            active_weights = active_weights[keep]
-            augmented_weights = augmented_weights[keep]
 
             # if there _was_ one neighbour to process, that was the target, so neighbour list is now empty.
             # Likewise, if the new upper bound has emptied the neighbour list, go around.
             if 1 == num_neighbours or 0 == len(active_nodes):
                 targ_exhausted += 1
                 continue
+
+            active_weights = active_weights[keep]
+            augmented_weights = augmented_weights[keep]
 
         # Now we have the latest upper bound, use it to filter out nodes whose augmented weights will bust the upper
         # bound. We still need to _queue_ the bound-busting nodes' active costs, as that allows us to dodge about a
