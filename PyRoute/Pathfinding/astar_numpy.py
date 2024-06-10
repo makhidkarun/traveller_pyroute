@@ -201,11 +201,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             active_weights = active_weights[keep]
             augmented_weights = augmented_weights[keep]
 
-        # Now we have the latest upper bound, use it to filter out nodes whose augmented weights will bust the upper
-        # bound. We still need to _queue_ the bound-busting nodes' active costs, as that allows us to dodge about a
-        # quarter of the nodes we would otherwise have to spin through - if it's stupid, but it works, it isn't stupid.
-        # As a result, unconditionally queue _all_ nodes that are still active, and filter out the bound-busting
-        # neighbours.
+        # Now unconditionally queue _all_ nodes that are still active, worrying about filtering out the bound-busting
+        # neighbours later.
         distances[active_nodes] = active_weights
         num_nodes = len(active_nodes)
 
