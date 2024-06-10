@@ -186,10 +186,9 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             if 1 == len(queue) and 1 == len(active_nodes):
                 targ_exhausted += 1
                 continue
-            # target node has been processed, drop it from neighbours
-            keep = active_nodes != target
-            # As we have a tighter upper bound, apply it to the neighbours as well
-            keep = np.logical_and(keep, augmented_weights < upbound)
+            # As we have a tighter upper bound, apply it to the neighbours as well - target will be excluded because
+            # its augmented weight is _equal_ to upbound
+            keep = augmented_weights < upbound
             active_nodes = active_nodes[keep]
 
             # if there _was_ one neighbour to process, that was the target, so neighbour list is now empty.
