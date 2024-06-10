@@ -53,9 +53,6 @@ def _calc_branching_factor(nodes_queued, path_len):
 
 def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=None):
 
-    push = heappush
-    pop = heappop
-
     G_succ = G._arcs  # For speed-up
 
     # The queue stores priority, cost to reach, node,  and parent.
@@ -91,7 +88,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
 
     while queue:
         # Pop the smallest item from queue.
-        _, dist, curnode, parent = pop(queue)
+        _, dist, curnode, parent = heappop(queue)
         node_counter += 1
 
         if curnode == target:
@@ -180,8 +177,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
                 if 1 < len(queue):
                     queue = list(set(queue))
                     heapify(queue)
-            # push(queue, (ncost + 0, ncost, target, curnode))
-            push(queue, (ncost, ncost, target, curnode))
+            # heappush(queue, (ncost + 0, ncost, target, curnode))
+            heappush(queue, (ncost, ncost, target, curnode))
             queue_counter += 1
             #  If target node is only active node, and is neighbour node of only active queue element, bail out now
             #  and dodge the now-known-to-be-pointless neighbourhood bookkeeping.
@@ -214,6 +211,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         queue_counter += num_nodes
 
         for i in range(num_nodes):
-            push(queue, (augmented_weights[i], active_weights[i], active_nodes[i], curnode))
+            heappush(queue, (augmented_weights[i], active_weights[i], active_nodes[i], curnode))
 
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
