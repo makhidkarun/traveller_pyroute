@@ -208,11 +208,11 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         # As a result, unconditionally queue _all_ nodes that are still active, and filter out the bound-busting
         # neighbours.
         distances[active_nodes] = active_weights
+        num_nodes = len(active_nodes)
 
-        remain = zip(augmented_weights, active_weights, active_nodes)
-        queue_counter += len(active_nodes)
+        queue_counter += num_nodes
 
-        for augmented_weight, active_weight, active_node in remain:
-            push(queue, (augmented_weight, active_weight, active_node, curnode))
+        for i in range(num_nodes):
+            push(queue, (augmented_weights[i], active_weights[i], active_nodes[i], curnode))
 
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
