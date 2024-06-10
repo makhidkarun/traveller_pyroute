@@ -77,6 +77,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     # pre-calc the minimum-cost edge on each node
     min_cost = np.zeros(len(G)) if min_cost is None else min_cost
     min_cost[target] = 0
+    up_threshold = upbound - min_cost
 
     node_counter = 0
     queue_counter = 0
@@ -138,7 +139,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         active_weights = dist + raw_nodes[1]
         # filter out nodes whose active weights exceed _either_ the node's distance label _or_ the current upper bound
         # - the current node can _not_ result in a shorter path
-        keep = active_weights <= np.minimum(distances[active_nodes], upbound - min_cost[active_nodes])
+        keep = active_weights <= np.minimum(distances[active_nodes], up_threshold[active_nodes])
         # if we're not keeping anything, go around
         active_nodes = active_nodes[keep]
         num_neighbours = len(active_nodes)
@@ -167,6 +168,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             upbound = ncost
             new_upbounds += 1
             distances[target] = ncost
+            up_threshold = upbound - min_cost
             if 0 < len(queue):
                 queue = [item for item in queue if item[0] < upbound]
                 # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
