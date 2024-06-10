@@ -51,7 +51,7 @@ def _calc_branching_factor(nodes_queued, path_len):
     return round(new, 3)
 
 
-def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=None):
+def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=None, diagnostics=False):
 
     G_succ = G._arcs  # For speed-up
 
@@ -98,6 +98,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
                 path.append(node)
                 node = explored[node]
             path.reverse()
+            if diagnostics is not True:
+                return path, {}
             branch = _calc_branching_factor(queue_counter, len(path) - 1)
             neighbour_bound = node_counter - 1 + revis_continue - revisited
             un_exhausted = neighbour_bound - f_exhausted - g_exhausted - targ_exhausted
