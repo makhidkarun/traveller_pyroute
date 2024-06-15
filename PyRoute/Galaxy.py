@@ -771,19 +771,9 @@ class Galaxy(AreaItem):
     def heuristic_distance_bulk(self, active_nodes, target):
         raw = self.trade.shortest_path_tree.lower_bound_bulk(active_nodes, target)
         distances = self.trade.star_graph.distances_from_target(active_nodes, target)
+        # Case-wise maximum of 2 or more admissible heuristics (approx-SP bound, existing route distances) is itself
+        # admissible
         raw = np.maximum(raw, distances)
-
-        # The minimum edge cost on each node is itself an admissible heuristic:
-        # If u is the target, min-edge-cost is special-cased to 0, which equals the cost to target.
-        # If the target is connected to node u via the least-cost edge, u's min-edge-cost equals the cost to target.
-        # If the target is connected to node u via some other edge, u's min-edge-cost underestimates cost to target.
-        # If the target is not directly connected to node u, the target is at least the sum of two nodes' min-edge costs
-        # away, so u's min-edge-cost again underestimates cost to target.
-        min_cost = self.trade.star_graph.min_cost(active_nodes, target, indirect=True)
-
-        # Case-wise maximum of 2 or more admissible heuristics (approx-SP bound, existing route distances and min-cost
-        # edges) is itself admissible
-        raw = np.maximum(raw, min_cost)
 
         return 1.005 * raw
 
