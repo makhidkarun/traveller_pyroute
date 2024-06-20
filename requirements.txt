@@ -7,7 +7,7 @@ hypothesis >= 6.97.0
 jinja2
 jsonpickle
 lark==1.1.8
-numpy
+numpy >= 2.0
 pytest >= 8.0.0
 pytest-console-scripts
 pytest-randomly
