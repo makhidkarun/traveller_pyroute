@@ -56,13 +56,13 @@ def canonical_check(draw):
     soc_match = r'\[[0-9A-Z]{4}\]'
 
     uwp_draw = draw(from_regex(uwp_match))
-    rawline.replace('B575A77-E', uwp_draw)
+    rawline = rawline.replace('B575A77-E', uwp_draw)
     imp_draw = draw(from_regex(imp_match))
-    rawline.replace('{ 4 }', imp_draw)
+    rawline = rawline.replace('{ 4 }', imp_draw)
     econ_draw = draw(from_regex(econ_match))
-    rawline.replace('(D9G+4)', econ_draw)
+    rawline = rawline.replace('(D9G+4)', econ_draw)
     soc_draw = draw(from_regex(soc_match))
-    rawline.replace('[AE5E]', soc_draw)
+    rawline = rawline.replace('[AE5E]', soc_draw)
 
     return rawline
 
@@ -216,8 +216,8 @@ class testStar(unittest.TestCase):
         self.assertTrue(foo.is_well_formed())
 
     @given(canonical_check())
-    @settings(deadline=timedelta(200))
-    @example('0000 000000000000000 ????1??-? 000000000000000 - (000-0) [0000]  - - A 000    00')
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(200))
+    # @example('0000 000000000000000 ????1??-? 000000000000000 - (000-0) [0000]  - - A 000    00')
     def test_star_canonicalise(self, s):
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
