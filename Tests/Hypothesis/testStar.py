@@ -66,7 +66,12 @@ def canonical_check(draw):
 
     return rawline
 
+
 class testStar(unittest.TestCase):
+
+    def setUp(self) -> None:
+        logger = logging.getLogger('PyRoute.Star')
+        logger.setLevel(logging.INFO)
 
     """
     Given a regex-matching string, parse_line_to_star should return either a valid Star object or None
@@ -217,7 +222,7 @@ class testStar(unittest.TestCase):
 
     @given(canonical_check())
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(200))
-    # @example('0000 000000000000000 ????1??-? 000000000000000 - (000-0) [0000]  - - A 000    00')
+    @example('1919 Khula                ???????-? Hi In Pz Di(Khulans)      {0}  (000-0) [0000] BEf  N  A 510 10 ImDv M0 V')
     def test_star_canonicalise(self, s):
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
@@ -230,6 +235,8 @@ class testStar(unittest.TestCase):
         foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
         logger.setLevel(logging.INFO)
         tradelogger.setLevel(logging.INFO)
+        logger.manager.disable = 10
+        self.assertTrue(logger.isEnabledFor(logging.INFO))
         assume(foo is not None)
         assume(foo.economics is not None)
         assume(foo.social is not None)
@@ -245,7 +252,6 @@ class testStar(unittest.TestCase):
             cm.output,
             hyp_line
         )
-
 
 
 if __name__ == '__main__':
