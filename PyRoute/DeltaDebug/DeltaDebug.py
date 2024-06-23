@@ -102,7 +102,7 @@ def process():
     delta.add_argument('--no-line', dest="run_line", default=True, action='store_false',
                        help="Skip line-level reduction.")
     delta.add_argument('--two-reduce', dest="two_min", default=False, action='store_true',
-                       help="Try all pairs of star lines to see if any can be removed.  At least one of sector, subsector, line and two-line reduction must be selected")
+                       help="Try all pairs of star lines to see if any can be removed.")
     delta.add_argument('--within-line', dest="run_within", default=False, action='store_true',
                        help="Try to remove irrelevant components (eg base codes) from _within_ individual lines")
     delta.add_argument('--allegiance', dest="run_allegiance", default=False, action='store_true',
@@ -114,7 +114,7 @@ def process():
     args = parser.parse_args()
 
     # sanity check run arguments
-    if not (args.two_min or args.run_sector or args.run_subsector or args.run_line):
+    if not (args.two_min or args.run_sector or args.run_subsector or args.run_line or args.run_within or args.run_allegiance):
         raise ValueError("Must select at least one reduction pass to run")
 
     galaxy = Galaxy(args.btn, args.max_jump)

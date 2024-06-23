@@ -1,4 +1,5 @@
 import argparse
+import tempfile
 import unittest.main
 
 from PyRoute.DeltaPasses.AllegianceReducer import AllegianceReducer
@@ -378,6 +379,7 @@ class testDeltaPasses(baseTest):
         args.output = ''
         args.mp_threads = 1
         args.debug_flag = False
+        args.mindir = tempfile.gettempdir()
         return args
 
     def _make_args_no_line(self):

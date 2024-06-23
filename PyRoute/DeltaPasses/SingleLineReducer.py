@@ -82,8 +82,19 @@ class SingleLineReducer(object):
                                 reverse=True,
                                 best_sectors=best_sectors
                             )
-                            msg = "Widening breach complete"
+
+                        if i < num_chunks - 1:  # now try expanding hole forwards
+                            msg = "Widening breach forwards"
                             self.reducer.logger.error(msg)
+                            startloc = bounds[i - 1][1]
+                            best_sectors = self.breacher.run(
+                                start_pos=startloc,
+                                reverse=False,
+                                best_sectors=best_sectors
+                            )
+
+                        msg = "Widening breach complete"
+                        self.reducer.logger.error(msg)
 
             if 0 < len(remove):
                 num_chunks -= len(remove)
