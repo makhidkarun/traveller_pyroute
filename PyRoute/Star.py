@@ -481,6 +481,59 @@ class Star(object):
                 '{} - CX calculated symbols {} not in range {} - {}'.
                 format(self, symbols, max(1, self.tl - 5), self.tl + 5))
 
+    def fix_cx(self):
+        if not self.economics:
+            return
+        if not self.social:
+            return
+        pop = self.popCode
+
+        homogeneity = self._ehex_to_int(self.social[1])
+        nu_homogeneity = None
+        if 0 == pop and 0 != homogeneity:
+            nu_homogeneity = '0'
+        elif 0 != pop and homogeneity < max(1, pop - 5):
+            nu_homogeneity = self._int_to_ehex(max(1, pop - 5))
+        elif 0 != pop and homogeneity > pop + 5:
+            nu_homogeneity = self._int_to_ehex(pop + 5)
+
+        if nu_homogeneity is not None:
+            self.social = self.social[0] + nu_homogeneity + self.social[2:]
+
+        acceptance = self._ehex_to_int(self.social[2])
+        nu_acceptance = None
+        if 0 == pop and 0 != acceptance:
+            nu_acceptance = '0'
+        elif 0 != pop and max(1, pop + self.importance) != acceptance:
+            nu_acceptance = self._int_to_ehex(max(1, pop + self.importance))
+
+        if nu_acceptance is not None:
+            self.social = self.social[0:2] + nu_acceptance + self.social[3:]
+
+        strangeness = self._ehex_to_int(self.social[3])
+        nu_strangeness = None
+        if 0 == pop and 0 != strangeness:
+            nu_strangeness = '0'
+        elif 0 != pop and 1 > strangeness:
+            nu_strangeness = self._int_to_ehex(1)
+        elif 0 != pop and 10 < strangeness:
+            nu_strangeness = self._int_to_ehex(10)
+
+        if nu_strangeness is not None:
+            self.social = self.social[0:3] + nu_strangeness + self.social[4:]
+
+        symbols = self._ehex_to_int(self.social[4])
+        nu_symbols = None
+        if 0 == pop and symbols != 0:
+            nu_symbols = '0'
+        elif 0 != pop and symbols < max(1, self.tl - 5):
+            nu_symbols = self._int_to_ehex(max(1, self.tl - 5))
+        elif 0 != pop and symbols > self.tl + 5:
+            nu_symbols = self._int_to_ehex(self.tl + 5)
+
+        if nu_symbols is not None:
+            self.social = self.social[0:4] + nu_symbols + self.social[5:]
+
     def calculate_ru(self, ru_calc):
         if not self.economics:
             self.ru = 0
@@ -692,3 +745,11 @@ class Star(object):
         capital = 2 if self.tradeCode.sector_capital or self.tradeCode.other_capital else 1 if \
             self.tradeCode.subsector_capital else 0
         self._pax_btn_mod = rich + capital
+
+    def canonicalise(self):
+        self.uwp.canonicalise()
+        self.tradeCode.canonicalise(self)
+        self.fix_ex()
+        self.fix_cx()
+        self.star_list_object.canonicalise()
+        self.calculate_importance()

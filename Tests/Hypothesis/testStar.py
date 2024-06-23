@@ -1,3 +1,4 @@
+import logging
 import re
 import unittest
 from datetime import timedelta
@@ -46,7 +47,31 @@ def importance_starline(draw):
 
     return rawline
 
+@composite
+def canonical_check(draw):
+    rawline = '1919 Khula                B575A77-E Hi In Pz Di(Khulans)      { 4 }  (D9G+4) [AE5E] BEf  N  A 510 10 ImDv M0 V'
+    uwp_match = r'(\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?])'
+    imp_match = r'\{ *[+-]?[0-6] ?\}'
+    econ_match = r'\([0-9A-Z]{3}[+-]\d\)'
+    soc_match = r'\[[0-9A-Z]{4}\]'
+
+    uwp_draw = draw(from_regex(uwp_match))
+    rawline = rawline.replace('B575A77-E', uwp_draw)
+    imp_draw = draw(from_regex(imp_match))
+    rawline = rawline.replace('{ 4 }', imp_draw)
+    econ_draw = draw(from_regex(econ_match))
+    rawline = rawline.replace('(D9G+4)', econ_draw)
+    soc_draw = draw(from_regex(soc_match))
+    rawline = rawline.replace('[AE5E]', soc_draw)
+
+    return rawline
+
+
 class testStar(unittest.TestCase):
+
+    def setUp(self) -> None:
+        logger = logging.getLogger('PyRoute.Star')
+        logger.setLevel(logging.INFO)
 
     """
     Given a regex-matching string, parse_line_to_star should return either a valid Star object or None
@@ -194,6 +219,40 @@ class testStar(unittest.TestCase):
         foo.index = 0
         foo.allegiance_base = foo.alg_base_code
         self.assertTrue(foo.is_well_formed())
+
+    @given(canonical_check())
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(200))
+    @example('1919 Khula                ???????-? Hi In Pz Di(Khulans)      {0}  (000-0) [0000] BEf  N  A 510 10 ImDv M0 V')
+    def test_star_canonicalise(self, s):
+        hyp_line = "Hypothesis input: " + s
+        sector = Sector('# Core', '# 0, 0')
+        pop_code = 'scaled'
+        ru_calc = 'scaled'
+        tradelogger = logging.getLogger('PyRoute.TradeCodes')
+        logger = logging.getLogger('PyRoute.Star')
+        logger.setLevel(logging.CRITICAL)
+        tradelogger.setLevel(logging.CRITICAL)
+        foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
+        logger.setLevel(logging.INFO)
+        tradelogger.setLevel(logging.INFO)
+        logger.manager.disable = 10
+        self.assertTrue(logger.isEnabledFor(logging.INFO))
+        assume(foo is not None)
+        assume(foo.economics is not None)
+        assume(foo.social is not None)
+
+        foo.canonicalise()
+        with self.assertLogs(logger) as cm:
+            logger.info('Dummy log')
+            foo.check_ex()
+            foo.check_cx()
+
+        self.assertEqual(
+            ["INFO:PyRoute.Star:Dummy log"],
+            cm.output,
+            hyp_line
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
