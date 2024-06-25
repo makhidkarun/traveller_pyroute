@@ -338,6 +338,8 @@ class UWP(object):
         if 'X' == self.gov:
             if 0 < self.pop_code:
                 self.gov_code = 0
+                max_gov, min_gov = self._get_gov_bounds()
+                self.gov_code = max(min_gov, min(max_gov, self.gov_code))
         elif '?' != self.gov:
             max_gov, min_gov = self._get_gov_bounds()
             self.gov_code = max(min_gov, min(max_gov, self.gov_code))

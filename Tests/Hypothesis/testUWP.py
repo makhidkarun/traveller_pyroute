@@ -62,10 +62,10 @@ class testUWP(unittest.TestCase):
     @example('?B00000-0', '?B61000-2')
     @example('?170000-0', '?160000-4')
     @example('?000060-0', '?000050-4')
-    @example('?0005X0-0', '?0005X0-6')
+    @example('?0005X0-0', '?000500-6')
     @example('?000F00-0', '?000FA5-8')
     @example('?000?x0-0', '?000?X0-5')
-    @example('?0006X0-0', '?0006X0-5')  # Not sure exactly what to do with this one - Lintsec likes treating gov X as gov 0
+    @example('?0006X0-0', '?000610-5')  # Not sure exactly what to do with this one - Lintsec likes treating gov X as gov 0
     @example('?000F00-0', '?000FA5-8')
     @example('?0000G0-0', '?000050-4')
     @example('?000?F0-0', '?000?FA-4')
