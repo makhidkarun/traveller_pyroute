@@ -137,7 +137,14 @@ class TradeCodes(object):
             if ')' == raw:
                 continue
             if raw.startswith('Di('):
-                codes.append(raw)
+                if not raw.endswith(')') and i < num_codes - 1:
+                    next = raw_codes[i + 1]
+                    if next.endswith(')'):
+                        combo = raw + ' ' + next
+                        codes.append(combo)
+                        raw_codes[i + 1] = ''
+                else:
+                    codes.append(raw)
                 continue
             if 7 < len(raw) and '(' == raw[0] and ')' == raw[-2]:  # Let older-style sophont codes through
                 codes.append(raw)

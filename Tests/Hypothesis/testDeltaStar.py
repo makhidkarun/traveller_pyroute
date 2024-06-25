@@ -31,7 +31,7 @@ class testDeltaStar(unittest.TestCase):
              '0924 Ognar                X867000-0 Ba Di(Ogna) Ga                        { -3 } (300+1) [0000] -     -  R 004 10 Og   K1 V                                                     '),
             # Dieback of two-word sophont name tripped things up
             ('2117 Sabmiqys             A560056-H De Fo Di(Gya Ks)          { 2 }  (600-4) [0000] -    -  R 004 9  ImDa G3 V          ',
-             '2117 Sabmiqys             A560056-D De Di(Gya Ks) Fo                      { 1 }  (600-4) [0000] -     -  R 004 9  ImDa G3 V                                                     '),
+             '2117 Sabmiqys             A561056-6 Ba Di(Gya Ks) Fo                      { -1 } (600-4) [0000] -    -  R 004 9  ImDa G3 V                                                    '),
             # Treat Gov code X with population as Gov 0
             ('1702 Eslalyat             B493AXB-A Hi In                               - M  R 211   Dr        ',
              '1702 Eslalyat             B494A05-A Hi In                                 { 4 }  -       -      -    M  R 211 0  Dr                                                           '),
