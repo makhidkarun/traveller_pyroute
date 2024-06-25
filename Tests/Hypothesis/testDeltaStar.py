@@ -32,12 +32,12 @@ class testDeltaStar(unittest.TestCase):
             # Dieback of two-word sophont name tripped things up
             ('2117 Sabmiqys             A560056-H De Fo Di(Gya Ks)          { 2 }  (600-4) [0000] -    -  R 004 9  ImDa G3 V          ',
              '2117 Sabmiqys             A560056-D De Di(Gya Ks) Fo                      { 1 }  (600-4) [0000] -     -  R 004 9  ImDa G3 V                                                     '),
-            # Treat Gov code X as Gov 0
+            # Treat Gov code X with population as Gov 0
             ('1702 Eslalyat             B493AXB-A Hi In                               - M  R 211   Dr        ',
-             '1702 Eslalyat             B493A0B-B Hi In                                 { 4 }  -       -      -     M  R 211 0  Dr                                                            '),
+             '1702 Eslalyat             B494A05-A Hi In                                 { 4 }  -       -      -    M  R 211 0  Dr                                                           '),
             # <TL8 worlds should have max resources 12
-            ('1620 Daydyor Yashas       X683973-D Hi Pr                { 1 }  (E8D+2) [9AAD] - -  - 323 14 NaXX F7 V',
-             '1620 Daydyor Yashas       X683973-4 Hi Pr                                 { -1 } (C8B+2) [98A9] -     -  - 323 14 NaXX F7 V                                                     '),
+            ('1620 Daydyor Yashas       X683973-4 Hi Pr                { 1 }  (E8D+2) [9AAD] - -  - 323 14 NaXX F7 V',
+             '1620 Daydyor Yashas       X683973-4 Hi Pr                                 { -1 } (C8B+2) [98A9] -    -  - 323 14 NaXX F7 V                                                    '),
             # Atmo should be capped to F, hydro capped to A
             ('1920 Rainbow Sun          AAVV997-D Hi In Sp                            - KM - 223   Na',
              '1920 Rainbow Sun          AAFA997-B Hi Oc Sp                              { 5 }  -       -      -    KM - 223 0  Na                                                           ')
