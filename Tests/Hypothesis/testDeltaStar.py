@@ -15,7 +15,7 @@ class testDeltaStar(unittest.TestCase):
             ('0101                      X73A000-0 Ba Lo Ni Wa                         - -  - 012   --',
              '0101                      X738000-3 Ba                                    { -3 } -       -      -    -  - 012 0  --                                                           '),
             ('0527 Wellington Base      AEFA422-E Ht Ni Oc                            - M  R 711   He',
-             '0527 Wellington Base      AEFA422-E Ht Ni Oc                              { 1 }  -       -      -     M  R 711 0  He                                                            '),
+             '0527 Wellington Base      AEFA422-A Ht Ni Oc                              { 1 }  -       -      -    M  R 711 0  He                                                           '),
             ('0239 Etromen              CFB8558-B Fl Ni                               - -  A 523   Na',
              '0239 Etromen              CFB8558-8 Fl Ni                                 { -2 } -       -      -    -  A 523 0  Na                                                           '),
             ('1220 Gateway              A002688-B As Ic Na Ni Va Cx      { 1 }  (C55+1) [675B] - -  - 822 16 GaFd A2 V F0 V',

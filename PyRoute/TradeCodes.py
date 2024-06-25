@@ -360,7 +360,7 @@ class TradeCodes(object):
         check = self._check_planet_code(star, 'He', '3456789ABC', '2479ABC', '012', msg) and check
         check = self._check_planet_code(star, 'Ic', None, '01', '123456789A', msg) and check
         check = self._check_planet_code(star, 'Po', None, '2345', '0123', msg) and check
-        check = self._check_planet_code(star, 'Oc', 'ABCD', '3456789DEF', 'A', msg) and check
+        check = self._check_planet_code(star, 'Oc', 'ABCDEF', '3456789DEF', 'A', msg) and check
         check = self._check_planet_code(star, 'Va', None, '0', None, msg) and check
         check = self._check_planet_code(star, 'Wa', '3456789', '3456789DEF', 'A', msg) and check
 
@@ -661,7 +661,7 @@ class TradeCodes(object):
         self._fix_trade_code(star, 'He', '3456789ABC', '2479ABC', '012')
         self._fix_trade_code(star, 'Wa', '3456789', '3456789DEF', 'A')
         self._fix_trade_code(star, 'Ga', '678', '568', '567')
-        self._fix_trade_code(star, 'Oc', 'ABCD', '3456789DEF', 'A')
+        self._fix_trade_code(star, 'Oc', 'ABCDEF', '3456789DEF', 'A')
         self._fix_trade_code(star, 'Va', None, '0', None)
 
         self._fix_econ_code(star, 'Na', '0123', '0123', '6789ABCD')
