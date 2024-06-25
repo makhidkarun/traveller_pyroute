@@ -336,7 +336,8 @@ class UWP(object):
 
     def _canonicalise_socials(self):
         if 'X' == self.gov:
-            pass
+            if 0 < self.pop_code:
+                self.gov_code = 0
         elif '?' != self.gov:
             max_gov, min_gov = self._get_gov_bounds()
             self.gov_code = max(min_gov, min(max_gov, self.gov_code))
