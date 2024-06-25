@@ -13,7 +13,7 @@ from PyRoute.SystemData.Utilities import Utilities
 
 class UWP(object):
     # Port code, size, atmo, hydro, pop, gov, law, the all-important hyphen, then TL
-    match_string = '^([A-HXYa-hxy\?])([0-9A-Fa-f\?])([0-9A-Fa-f\?])([0-9Aa\?])([0-9A-Fa-f\?])([0-9A-Za-z\?])([0-9A-Ja-j\?])-([0-9A-Za-z\?])'
+    match_string = '^([A-HXYa-hxy\?])([0-9A-Fa-f\?])([0-9A-Za-z\?])([0-9A-Za-z\?])([0-9A-Fa-f\?])([0-9A-Za-z\?])([0-9A-Ja-j\?])-([0-9A-Za-z\?])'
 
     match = re.compile(match_string)
 
