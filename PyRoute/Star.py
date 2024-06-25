@@ -421,6 +421,10 @@ class Star(object):
         if 8 > self.uwp.tl_code:
             nu_resources = self._int_to_ehex(max(0, min(12, resources)))
             self.economics = self.economics[0:1] + nu_resources + self.economics[2:]
+        else:
+            max_resources = 12 + self.ggCount + self.belts
+            nu_resources = self._int_to_ehex(max(0, min(max_resources, resources)))
+            self.economics = self.economics[0:1] + nu_resources + self.economics[2:]
 
         if labor != max(self.popCode - 1, 0):
             nu_labour = self._int_to_ehex(max(self.popCode - 1, 0))

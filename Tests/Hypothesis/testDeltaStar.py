@@ -40,7 +40,10 @@ class testDeltaStar(unittest.TestCase):
              '1620 Daydyor Yashas       X683973-4 Hi Pr                                 { -1 } (C8B+2) [98A9] -    -  - 323 14 NaXX F7 V                                                    '),
             # Atmo should be capped to F, hydro capped to A
             ('1920 Rainbow Sun          AAVV997-D Hi In Sp                            - KM - 223   Na',
-             '1920 Rainbow Sun          AAFA997-B Hi Oc Sp                              { 5 }  -       -      -    KM - 223 0  Na                                                           ')
+             '1920 Rainbow Sun          AAFA997-B Hi Oc Sp                              { 5 }  -       -      -    KM - 223 0  Na                                                           '),
+            # TL8+ worlds should have max resources 12 + belts + GGs
+            ('1620 Daydyor Yashas       X683973-D Hi Pr                { 1 }  (F8D+2) [9AAD] - -  - 311 14 NaXX F7 V',
+             '1620 Daydyor Yashas       X683973-8 Hi Pr                                 { -1 } (E8D+2) [9AAD] -    -  - 311 14 NaXX F7 V                                                    '),
         ]
 
         sector = Sector('# Core', '# 0, 0')
