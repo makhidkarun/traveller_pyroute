@@ -289,7 +289,7 @@ class TradeCodes(object):
         return self.pcode
 
     def _check_planet_code(self, star, code, size, atmo, hydro, listmsg=None):
-        size = '0123456789ABC' if size is None else size
+        size = '0123456789ABCDEF' if size is None else size
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
         star_match = star.size in size and star.atmo in atmo and star.hydro in hydro
@@ -675,7 +675,7 @@ class TradeCodes(object):
         self._fix_all_pop_codes(star)
 
     def _fix_trade_code(self, star, code, size, atmo, hydro):
-        size = '0123456789ABC' if size is None else size
+        size = '0123456789ABCDEF' if size is None else size
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
 
