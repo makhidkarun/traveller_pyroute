@@ -383,7 +383,7 @@ class TradeCodes(object):
         check = self._check_pop_code(star, 'Lo', '123', msg) and check
         check = self._check_pop_code(star, 'Ni', '456', msg) and check
         check = self._check_pop_code(star, 'Ph', '8', msg) and check
-        check = self._check_pop_code(star, 'Hi', '9ABCD', msg) and check
+        check = self._check_pop_code(star, 'Hi', '9ABCDEF', msg) and check
         return check
 
     def owned_by(self, star):
@@ -722,7 +722,7 @@ class TradeCodes(object):
         self._fix_pop_code(star, 'Lo', '123')
         self._fix_pop_code(star, 'Ni', '456')
         self._fix_pop_code(star, 'Ph', '8')
-        self._fix_pop_code(star, 'Hi', '9ABCD')
+        self._fix_pop_code(star, 'Hi', '9ABCDEF')
 
     def _drop_invalid_trade_code(self, targcode):
         self.codes = [code for code in self.codes if code != targcode]
