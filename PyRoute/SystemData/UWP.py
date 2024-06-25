@@ -319,8 +319,8 @@ class UWP(object):
     def _canonicalise_physicals(self):
         size_is_zero = self.size_is_zero
         if '0' == self.size:
-            self.atmo = '0'
-            self.hydro = '0'
+            self.atmo_code = 0
+            self.hydro_code = 0
 
         if not size_is_zero and '?' != self.atmo:
             max_atmo, min_atmo = self._get_atmo_bounds()
@@ -328,7 +328,7 @@ class UWP(object):
 
         # Handle short-circuit values first, then (if needed) drop to the general case
         if '1' == str(self.size):
-            self.hydro = '0'
+            self.hydro_code = 0
 
         elif not size_is_zero and '?' != self.atmo and '?' != self.hydro:
             max_hydro, min_hydro = self._get_hydro_bounds()
