@@ -2,7 +2,7 @@ import unittest
 from datetime import timedelta
 
 from hypothesis import given, assume, example, HealthCheck, settings
-from hypothesis.strategies import text, from_regex, composite, sampled_from, lists, floats
+from hypothesis.strategies import text, from_regex, composite, sampled_from, lists, floats, booleans
 
 from PyRoute.Galaxy import Sector
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
@@ -15,7 +15,7 @@ tradecodes = []
 
 
 @composite
-def trade_code(draw):
+def trade_code(draw, unique=False, min_size=2, max_size=12):
     if 0 == len(tradecodes):
         tradecodes.extend(TradeCodes.pcodes)
         tradecodes.extend(TradeCodes.dcodes)
@@ -24,7 +24,7 @@ def trade_code(draw):
 
     strat = sampled_from(tradecodes)
 
-    return draw(lists(strat, min_size=2, max_size=12))
+    return draw(lists(strat, min_size=min_size, max_size=max_size, unique=unique))
 
 
 @composite
@@ -138,6 +138,64 @@ class testTradeCodes(unittest.TestCase):
         badline = '' if result else msg[0]
         self.assertEqual(0, len(msg), "Canonicalisation failed.  " + badline + '\n' + hyp_input)
 
+    @given(trade_code(unique=True))
+    def test_verify_trade_codes_from_direct_selection(self, trade_line):
+        if isinstance(trade_line, list):
+            trade_line = ' '.join(trade_line)
+
+        trade = TradeCodes(trade_line)
+
+        result, _ = trade.is_well_formed()
+        assume(result)
+
+        trade_string = str(trade)
+
+        nu_trade = TradeCodes(trade_string)
+        result, msg = nu_trade.is_well_formed()
+        self.assertTrue(result, msg)
+
+        nu_trade_string = str(nu_trade)
+        msg = "Re-parsed TradeCodes string does not equal original parsed string"
+        self.assertEqual(trade_string, nu_trade_string, msg)
+
+    @given(from_regex(regex=UWP.match, alphabet='0123456789abcdefghjklmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWYXZ -{}()[]?\'+*'),
+           trade_code(max_size=1, min_size=1),
+           booleans())
+    def test_has_code_but_not_uwp(self, s, trade_line, forward):
+        s = s[0:9]
+        if isinstance(trade_line, list):
+            trade_line = ' '.join(trade_line)
+        hyp_input = 'Hypothesis input: \'' + s + '\', \'' + trade_line + '\''
+        starline = '0101 000000000000000 {} {}  - - A 000   0000D'.format(s, trade_line.ljust(38))
+        sector = Sector('# Core', '# 0, 0')
+        pop_code = 'scaled'
+        ru_calc = 'scaled'
+
+        foo = None
+
+        try:
+            foo = Star.parse_line_into_star(starline, sector, pop_code, ru_calc)
+        except KeyError:
+            pass
+        assume(foo is not None)
+
+        # filter out malformed tradeCode objects while we're at it
+        result, _ = foo.tradeCode.is_well_formed()
+        assume(result)
+        trade = foo.tradeCode
+
+        result, msg = trade.check_canonical(foo)
+        assume(0 < len(msg))
+        if forward:
+            submsg = [item for item in msg if "Found invalid" in item]
+        else:
+            submsg = [item for item in msg if "not in trade codes" in item]
+        assume(0 < len(submsg))
+
+        trade.canonicalise(foo)
+        result, msg = trade.check_canonical(foo)
+        badline = '' if result else msg[0]
+        self.assertEqual(0, len(msg), "Canonicalisation failed.  " + badline + '\n' + hyp_input)
 
 if __name__ == '__main__':
     unittest.main()
