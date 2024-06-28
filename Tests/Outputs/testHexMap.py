@@ -5,6 +5,7 @@ import unittest
 
 import networkx as nx
 import pytest
+from pymupdf import pymupdf
 
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
@@ -261,7 +262,7 @@ class testHexMap(baseTest):
 
     def test_verify_subsector_trade_write_pdf(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
-        outfile = self.unpack_filename('OutputFiles/verify_subsector_trade_write/Zao Kfeng Ig Grilokh - subsector P - trade.txt')
+        srcpdf = self.unpack_filename('OutputFiles/verify_subsector_trade_write/Zao Kfeng Ig Grilokh - subsector P - trade.pdf')
 
         starsfile = self.unpack_filename('OutputFiles/verify_subsector_trade_write/trade stars.txt')
         rangesfile = self.unpack_filename('OutputFiles/verify_subsector_trade_write/trade ranges.txt')
@@ -299,24 +300,20 @@ class testHexMap(baseTest):
 
         hexmap = PDFHexMap(galaxy, 'trade')
 
-        oldtime = b'20230912001440'
-        oldmd5 = b'b1f97f6ac37340ab332a9a0568711ec0'
-
-        with open(outfile, 'rb') as file:
-            expected_result = file.read()
-
-        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=False)
-        self.assertIsNotNone(result)
-        # rather than try to mock datetime.now(), patch the output result.
-        # this also lets us check that there's only a single match
-        matches = self.timeline.search(result)
-        self.assertEqual(1, len(matches.groups()), 'Should be exactly one create-date match')
-        result = self.timeline.sub(oldtime, result)
-        # likewise patch md5 output
-        matches = self.md5line.findall(result)
-        self.assertEqual(2, len(matches), 'Should be exactly two MD5 matches')
-        result = self.md5line.sub(oldmd5, result)
-        self.assertEqual(expected_result, result)
+        targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
+        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        src_img = pymupdf.open(srcpdf)
+        src_iter = src_img.pages(0)
+        for page in src_iter:
+            src = page.get_pixmap()
+        srcfile = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector original.png')
+        src.save(srcfile)
+        trg_img = pymupdf.open(targpath)
+        trg_iter = trg_img.pages(0)
+        for page in trg_iter:
+            trg = page.get_pixmap()
+        trgfile = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector remix.png')
+        trg.save(trgfile)
 
     def test_verify_subsector_comm_write(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')

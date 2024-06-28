@@ -8,6 +8,7 @@ jinja2
 jsonpickle
 lark==1.1.8
 numpy >= 2.0
+pymupdf
 pytest >= 8.0.0
 pytest-console-scripts
 pytest-randomly
