@@ -48,6 +48,7 @@ class PDFHexMap(Map):
             trgstar = self.galaxy.star_mapping[neighbor]
             self.trade_line(pdf_doc, [srcstar, trgstar], data)
 
+        pdf_doc.setStrokeColorRGB(0, 0, 0)
         for star in gal_sector.worlds:
             self.system(pdf_doc, star)
         if gal_sector.coreward:
@@ -343,6 +344,7 @@ class PDFHexMap(Map):
         rawpoint[1] += 7
         textobject = pdf.beginText(rawpoint[0], rawpoint[1])
         textobject.textOut(str(star.uwp))
+        pdf.drawText(textobject)
         #pdf.add_text(str(star.uwp), point)
 
         if len(star.name) > 0:
@@ -358,6 +360,7 @@ class PDFHexMap(Map):
             rawpoint[1] += 3.5
             textobject = pdf.beginText(rawpoint[0], rawpoint[1])
             textobject.textOut(star.name[:chars])
+            pdf.drawText(textobject)
             #pdf.add_text(star.name[:chars], point)
 
         added = star.alg_code
@@ -380,6 +383,7 @@ class PDFHexMap(Map):
         #pdf.add_text(added, point)
         textobject = pdf.beginText(rawpoint[0], rawpoint[1])
         textobject.textOut(added)
+        pdf.drawText(textobject)
 
         added = ''
         tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
@@ -401,6 +405,7 @@ class PDFHexMap(Map):
         #pdf.add_text(added, point)
         textobject = pdf.beginText(rawpoint[0], rawpoint[1])
         textobject.textOut(added)
+        pdf.drawText(textobject)
 
         #pdf.set_font(def_font)
         # Restore saved font
