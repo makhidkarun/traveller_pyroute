@@ -153,7 +153,8 @@ class PDFHexMap(Map):
         hlineStart, hlineEnd, hlineStartStep, hlineEndStep, colour = self._hline(doc, width, colorname)
         llineStart, llineEnd, llineStartStep, llineEndStep, colour = self._lline(doc, width, colorname)
         rlineStart, rlineEnd, rlineStartStep, rlineEndStep, colour = self._rline(doc, width, colorname)
-        doc.setStrokeColorRGB(colour[0]/255.0, colour[1]/255.0, colour[2]/255.0)
+        doc.setStrokeColorRGB(colour[0]/256.0, colour[1]/256.0, colour[2]/256.0)
+        doc.setLineWidth(width)
 
         for x in range(self.x_count):
             #hlineStart.x_plus()
