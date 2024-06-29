@@ -126,7 +126,7 @@ class PDFHexMap(Map):
         pdf.set_font(font=def_font)
 
     def subsector_grid(self, pdf: Canvas):
-        pdf.setStrokeColorRGB(211, 211, 211)
+        pdf.setStrokeColorRGB(211/255.0, 211/255.0, 211/255.0)
         #vlineStart = PDFCursor(0, self.y_start + self.xm)
         #vlineEnd = PDFCursor(0, self.y_start + self.xm + (180 * 4))
         vlineStart = [0, self.y_start + self.xm]
@@ -152,6 +152,7 @@ class PDFHexMap(Map):
         hlineStart, hlineEnd, hlineStartStep, hlineEndStep, colour = self._hline(doc, width, colorname)
         llineStart, llineEnd, llineStartStep, llineEndStep, colour = self._lline(doc, width, colorname)
         rlineStart, rlineEnd, rlineStartStep, rlineEndStep, colour = self._rline(doc, width, colorname)
+        doc.setStrokeColorRGB(colour[0]/255.0, colour[1]/255.0, colour[2]/255.0)
 
         for x in range(self.x_count):
             #hlineStart.x_plus()
@@ -429,7 +430,7 @@ class PDFHexMap(Map):
         tradeColor = tradeColors[trade]
         #color = pdf.get_color()
         #color.set_color_by_number(tradeColor[0], tradeColor[1], tradeColor[2])
-        pdf.setStrokeColorRGB(tradeColor[0], tradeColor[1], tradeColor[2])
+        pdf.setStrokeColorRGB(tradeColor[0]/255.0, tradeColor[1]/255.0, tradeColor[2]/255.0)
 
         endCircle = end.sector == start.sector
         endx, endy, startx, starty = self._get_line_endpoints(end, start)
