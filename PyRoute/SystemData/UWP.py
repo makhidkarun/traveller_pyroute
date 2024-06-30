@@ -13,7 +13,7 @@ from PyRoute.SystemData.Utilities import Utilities
 
 class UWP(object):
     # Port code, size, atmo, hydro, pop, gov, law, the all-important hyphen, then TL
-    match_string = '^([A-HXYa-hxy\?])([0-9A-Fa-f\?])([0-9A-Fa-f\?])([0-9Aa\?])([0-9A-Fa-f\?])([0-9A-Za-z\?])([0-9A-Ja-j\?])-([0-9A-Za-z\?])'
+    match_string = '^([A-HXYa-hxy\?])([0-9A-Fa-f\?])([0-9A-Za-z\?])([0-9A-Za-z\?])([0-9A-Fa-f\?])([0-9A-Za-z\?])([0-9A-Ja-j\?])-([0-9A-Za-z\?])'
 
     match = re.compile(match_string)
 
@@ -319,8 +319,8 @@ class UWP(object):
     def _canonicalise_physicals(self):
         size_is_zero = self.size_is_zero
         if '0' == self.size:
-            self.atmo = '0'
-            self.hydro = '0'
+            self.atmo_code = 0
+            self.hydro_code = 0
 
         if not size_is_zero and '?' != self.atmo:
             max_atmo, min_atmo = self._get_atmo_bounds()
@@ -328,7 +328,7 @@ class UWP(object):
 
         # Handle short-circuit values first, then (if needed) drop to the general case
         if '1' == str(self.size):
-            self.hydro = '0'
+            self.hydro_code = 0
 
         elif not size_is_zero and '?' != self.atmo and '?' != self.hydro:
             max_hydro, min_hydro = self._get_hydro_bounds()
@@ -336,7 +336,10 @@ class UWP(object):
 
     def _canonicalise_socials(self):
         if 'X' == self.gov:
-            pass
+            if 0 < self.pop_code:
+                self.gov_code = 0
+                max_gov, min_gov = self._get_gov_bounds()
+                self.gov_code = max(min_gov, min(max_gov, self.gov_code))
         elif '?' != self.gov:
             max_gov, min_gov = self._get_gov_bounds()
             self.gov_code = max(min_gov, min(max_gov, self.gov_code))

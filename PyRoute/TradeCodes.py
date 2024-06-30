@@ -137,7 +137,14 @@ class TradeCodes(object):
             if ')' == raw:
                 continue
             if raw.startswith('Di('):
-                codes.append(raw)
+                if not raw.endswith(')') and i < num_codes - 1:
+                    next = raw_codes[i + 1]
+                    if next.endswith(')'):
+                        combo = raw + ' ' + next
+                        codes.append(combo)
+                        raw_codes[i + 1] = ''
+                else:
+                    codes.append(raw)
                 continue
             if 7 < len(raw) and '(' == raw[0] and ')' == raw[-2]:  # Let older-style sophont codes through
                 codes.append(raw)
@@ -282,7 +289,7 @@ class TradeCodes(object):
         return self.pcode
 
     def _check_planet_code(self, star, code, size, atmo, hydro, listmsg=None):
-        size = '0123456789ABC' if size is None else size
+        size = '0123456789ABCDEF' if size is None else size
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
         star_match = star.size in size and star.atmo in atmo and star.hydro in hydro
@@ -353,7 +360,7 @@ class TradeCodes(object):
         check = self._check_planet_code(star, 'He', '3456789ABC', '2479ABC', '012', msg) and check
         check = self._check_planet_code(star, 'Ic', None, '01', '123456789A', msg) and check
         check = self._check_planet_code(star, 'Po', None, '2345', '0123', msg) and check
-        check = self._check_planet_code(star, 'Oc', 'ABCD', '3456789DEF', 'A', msg) and check
+        check = self._check_planet_code(star, 'Oc', 'ABCDEF', '3456789DEF', 'A', msg) and check
         check = self._check_planet_code(star, 'Va', None, '0', None, msg) and check
         check = self._check_planet_code(star, 'Wa', '3456789', '3456789DEF', 'A', msg) and check
 
@@ -376,7 +383,7 @@ class TradeCodes(object):
         check = self._check_pop_code(star, 'Lo', '123', msg) and check
         check = self._check_pop_code(star, 'Ni', '456', msg) and check
         check = self._check_pop_code(star, 'Ph', '8', msg) and check
-        check = self._check_pop_code(star, 'Hi', '9ABCD', msg) and check
+        check = self._check_pop_code(star, 'Hi', '9ABCDEF', msg) and check
         return check
 
     def owned_by(self, star):
@@ -654,7 +661,7 @@ class TradeCodes(object):
         self._fix_trade_code(star, 'He', '3456789ABC', '2479ABC', '012')
         self._fix_trade_code(star, 'Wa', '3456789', '3456789DEF', 'A')
         self._fix_trade_code(star, 'Ga', '678', '568', '567')
-        self._fix_trade_code(star, 'Oc', 'ABCD', '3456789DEF', 'A')
+        self._fix_trade_code(star, 'Oc', 'ABCDEF', '3456789DEF', 'A')
         self._fix_trade_code(star, 'Va', None, '0', None)
 
         self._fix_econ_code(star, 'Na', '0123', '0123', '6789ABCD')
@@ -668,7 +675,7 @@ class TradeCodes(object):
         self._fix_all_pop_codes(star)
 
     def _fix_trade_code(self, star, code, size, atmo, hydro):
-        size = '0123456789ABC' if size is None else size
+        size = '0123456789ABCDEF' if size is None else size
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
 
@@ -715,7 +722,7 @@ class TradeCodes(object):
         self._fix_pop_code(star, 'Lo', '123')
         self._fix_pop_code(star, 'Ni', '456')
         self._fix_pop_code(star, 'Ph', '8')
-        self._fix_pop_code(star, 'Hi', '9ABCD')
+        self._fix_pop_code(star, 'Hi', '9ABCDEF')
 
     def _drop_invalid_trade_code(self, targcode):
         self.codes = [code for code in self.codes if code != targcode]
