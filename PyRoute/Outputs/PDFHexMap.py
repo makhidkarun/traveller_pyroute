@@ -34,6 +34,7 @@ class PDFHexMap(Map):
         worlds = [item.index for item in gal_sector.worlds]
         comm_routes = [star for star in self.galaxy.stars.edges(worlds, True)
                        if star[2].get('xboat', False) or star[2].get('comm', False)]
+        pdf_doc.setLineWidth(1)
         for (star, neighbor, data) in comm_routes:
             srcstar = self.galaxy.star_mapping[star]
             trgstar = self.galaxy.star_mapping[neighbor]
