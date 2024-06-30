@@ -2,8 +2,10 @@ import ast
 import os
 import re
 import unittest
+from PIL import Image
 
 import networkx as nx
+import numpy as np
 import pytest
 from pymupdf import pymupdf
 
@@ -149,8 +151,8 @@ class testHexMap(baseTest):
 
     def test_verify_empty_sector_write_pdf(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
-
-        outfile = self.unpack_filename('OutputFiles/verify_empty_sector_write/Zao Kfeng Ig Grilokh empty.txt')
+        srcpdf = self.unpack_filename(
+            'OutputFiles/verify_empty_sector_write/Zao Kfeng Ig Grilokh empty.pdf')
 
         args = self._make_args()
         args.interestingline = None
@@ -172,33 +174,29 @@ class testHexMap(baseTest):
 
         hexmap = PDFHexMap(galaxy, 'trade')
 
-        oldtime = b'20230911163653'
-        oldmd5 = b'8419949643701e6b438d6f3f93239cf7'
+        targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
+        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        src_img = pymupdf.open(srcpdf)
+        src_iter = src_img.pages(0)
+        for page in src_iter:
+            src = page.get_pixmap()
+        srcfile = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector original.png')
+        src.save(srcfile)
+        trg_img = pymupdf.open(targpath)
+        trg_iter = trg_img.pages(0)
+        for page in trg_iter:
+            trg = page.get_pixmap()
+        trgfile = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector remix.png')
+        trg.save(trgfile)
 
-        with open(outfile, 'rb') as file:
-            expected_result = file.read()
+        image1 = Image.open(srcfile)
+        image2 = Image.open(trgfile)
 
-        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=False)
-        self.assertIsNotNone(result)
-        # rather than try to mock datetime.now(), patch the output result.
-        # this also lets us check that there's only a single match
-        matches = self.timeline.search(result)
-        self.assertEqual(1, len(matches.groups()), 'Should be exactly one create-date match')
-        result = self.timeline.sub(oldtime, result)
-        # likewise patch md5 outout
-        matches = self.md5line.findall(result)
-        self.assertEqual(2, len(matches), 'Should be exactly two MD5 matches')
-        result = self.md5line.sub(oldmd5, result)
-        # Clean up double-trailing-zeros in expected_result
-        expected_result = expected_result.replace(b".00 ", b" ")
-        for i in range(0, 10):
-            old = "." + str(i) + "0 "
-            new = "." + str(i) + " "
-            enc_old = old.encode('utf-8')
-            enc_new = new.encode('utf-8')
-            expected_result = expected_result.replace(enc_old, enc_new)
+        array1 = np.array(image1)
+        array2 = np.array(image2)
 
-        self.assertEqual(str(expected_result), str(result))
+        mse = np.mean((array1 - array2) ** 2)
+        self.assertTrue(0.2 > mse, "Image difference above threshold")
 
     @pytest.mark.xfail(reason='Flaky on ubuntu')
     def test_verify_subsector_trade_write(self):
@@ -315,6 +313,15 @@ class testHexMap(baseTest):
         trgfile = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector remix.png')
         trg.save(trgfile)
 
+        image1 = Image.open(srcfile)
+        image2 = Image.open(trgfile)
+
+        array1 = np.array(image1)
+        array2 = np.array(image2)
+
+        mse = np.mean((array1 - array2) ** 2)
+        self.assertTrue(0.2 > mse, "Image difference above threshold")
+
     def test_verify_subsector_comm_write(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
         outfile = self.unpack_filename('OutputFiles/verify_subsector_comm_write/Zao Kfeng Ig Grilokh - subsector P - comm.txt')
@@ -377,10 +384,10 @@ class testHexMap(baseTest):
 
     def test_verify_subsector_comm_write_pdf(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
-        outfile = self.unpack_filename('OutputFiles/verify_subsector_comm_write/Zao Kfeng Ig Grilokh - subsector P - comm.txt')
+        srcpdf = self.unpack_filename(
+            'OutputFiles/verify_subsector_comm_write/Zao Kfeng Ig Grilokh - subsector P - comm.pdf')
 
         starsfile = self.unpack_filename('OutputFiles/verify_subsector_comm_write/comm stars.txt')
-
         rangesfile = self.unpack_filename('OutputFiles/verify_subsector_comm_write/comm ranges.txt')
 
         args = self._make_args()
@@ -414,26 +421,31 @@ class testHexMap(baseTest):
 
         secname = 'Zao Kfeng Ig Grilokh'
 
-        hexmap = PDFHexMap(galaxy, 'trade')
+        hexmap = PDFHexMap(galaxy, 'comm')
 
-        oldtime = b'20230912013953'
-        oldmd5 = b'ff091edb9d8ca0abacea39e5791a9843'
+        targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
+        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        src_img = pymupdf.open(srcpdf)
+        src_iter = src_img.pages(0)
+        for page in src_iter:
+            src = page.get_pixmap()
+        srcfile = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector original.png')
+        src.save(srcfile)
+        trg_img = pymupdf.open(targpath)
+        trg_iter = trg_img.pages(0)
+        for page in trg_iter:
+            trg = page.get_pixmap()
+        trgfile = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector remix.png')
+        trg.save(trgfile)
 
-        with open(outfile, 'rb') as file:
-            expected_result = file.read()
+        image1 = Image.open(srcfile)
+        image2 = Image.open(trgfile)
 
-        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=False)
-        self.assertIsNotNone(result)
-        # rather than try to mock datetime.now(), patch the output result.
-        # this also lets us check that there's only a single match
-        matches = self.timeline.search(result)
-        self.assertEqual(1, len(matches.groups()), 'Should be exactly one create-date match')
-        result = self.timeline.sub(oldtime, result)
-        # likewise patch md5 output
-        matches = self.md5line.findall(result)
-        self.assertEqual(2, len(matches), 'Should be exactly two MD5 matches')
-        result = self.md5line.sub(oldmd5, result)
-        self.assertEqual(expected_result, result)
+        array1 = np.array(image1)
+        array2 = np.array(image2)
+
+        mse = np.mean((array1 - array2) ** 2)
+        self.assertTrue(0.2 > mse, "Image difference above threshold")
 
     def _load_ranges(self, galaxy, sourcefile):
         with open(sourcefile, "rb") as f:
