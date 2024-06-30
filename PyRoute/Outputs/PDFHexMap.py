@@ -437,27 +437,18 @@ class PDFHexMap(Map):
         #color = pdf.get_color()
         #color.set_color_by_number(tradeColor[0], tradeColor[1], tradeColor[2])
         pdf.setStrokeColorRGB(tradeColor[0]/255.0, tradeColor[1]/255.0, tradeColor[2]/255.0)
+        pdf.setFillColorRGB(tradeColor[0] / 255.0, tradeColor[1] / 255.0, tradeColor[2] / 255.0)
 
         endCircle = end.sector == start.sector
         endx, endy, startx, starty = self._get_line_endpoints(end, start)
 
-        lineStart = PDFCursor(startx, starty)
-        lineEnd = PDFCursor(endx, endy)
-
         pdf.line(startx, starty, endx, endy)
 
-        #line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, stroke='solid', color=color, size=1)
-        #line._draw()
-
-        #radius = PDFCursor(2, 2)
-        #circle = PDFEllipse(pdf.session, pdf.page, lineStart, radius, color, size=3)
-        #circle._draw()
-        pdf.ellipse(startx - 2, starty - 2, startx + 2, starty + 2)
+        pdf.ellipse(startx - 3, starty - 3, startx + 3, starty + 3, fill=1)
 
         if endCircle:
-            #circle = PDFEllipse(pdf.session, pdf.page, lineEnd, radius, color, size=3)
-            #circle._draw()
-            pdf.ellipse(endx - 2, endy - 2, endx + 2, endy + 2)
+            pdf.ellipse(endx - 3, endy - 3, endx + 3, endy + 3, fill=1)
+        pdf.setFillColorRGB(0, 0, 0)
 
     def comm_line(self, pdf, edge):
         start = edge[0]
