@@ -82,7 +82,7 @@ class PDFHexMap(Map):
         doc.setFont(new_font, size=new_size)
         width = doc.stringWidth(name, new_font, new_size)
         x = 306 - (width / 2)
-        textobject = doc.beginText(x, -5)
+        textobject = doc.beginText(x, 31)
         textobject.textOut(name)
         textobject.setStrokeColor('black')
         doc.drawText(textobject)
