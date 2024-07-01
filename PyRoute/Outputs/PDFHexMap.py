@@ -128,24 +128,48 @@ class PDFHexMap(Map):
         pdf.setFont(font_name, font_size, font_leading)
 
     def spinward_sector(self, pdf, name):
-        cursor = PDFCursor(self.x_start - 5, 396, True)
-        def_font = pdf.get_font()
-        pdf.set_font('times', size=10)
-        cursor.y_plus(pdf.get_font()._string_width(name) / 2)
-        text = PDFText(pdf.session, pdf.page, None, cursor=cursor)
-        text.text_rotate(90)
-        text._text(name)
-        pdf.set_font(font=def_font)
+        # Save out whatever font is currently set
+        font_name = pdf._fontname
+        font_size = pdf._fontsize
+        font_leading = pdf._leading
+
+        new_font = 'Times-Roman'
+        new_size = 10
+        pdf.setFont(new_font, size=new_size)
+        width = pdf.stringWidth(name, new_font, new_size)
+        y = 390 + (width / 2)
+        x = self.x_start - 5
+
+        textobject = pdf.beginText(x, y)
+        textobject.setTextTransform(0, -1, 1, 0, x, y)
+        textobject.textOut(name)
+        textobject.setStrokeColor('black')
+        pdf.drawText(textobject)
+
+        # Restore saved font
+        pdf.setFont(font_name, font_size, font_leading)
 
     def trailing_sector(self, pdf, name):
-        cursor = PDFCursor(598, 396 - self.y_start, True)
-        def_font = pdf.get_font()
-        pdf.set_font('times', size=10)
-        cursor.y_plus(-(pdf.get_font()._string_width(name) / 2))
-        text = PDFText(pdf.session, pdf.page, None, cursor=cursor)
-        text.text_rotate(-90)
-        text._text(name)
-        pdf.set_font(font=def_font)
+        # Save out whatever font is currently set
+        font_name = pdf._fontname
+        font_size = pdf._fontsize
+        font_leading = pdf._leading
+
+        new_font = 'Times-Roman'
+        new_size = 10
+        pdf.setFont(new_font, size=new_size)
+        width = pdf.stringWidth(name, new_font, new_size)
+        y = 421 - (width / 2)
+        x = 598
+
+        textobject = pdf.beginText(x, y)
+        textobject.setTextTransform(0, 1, -1, 0, x, y)
+        textobject.textOut(name)
+        textobject.setStrokeColor('black')
+        pdf.drawText(textobject)
+
+        # Restore saved font
+        pdf.setFont(font_name, font_size, font_leading)
 
     def subsector_grid(self, pdf: Canvas):
         pdf.setStrokeColorRGB(211/255.0, 211/255.0, 211/255.0)
