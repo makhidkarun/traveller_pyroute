@@ -91,21 +91,41 @@ class PDFHexMap(Map):
         doc.setFont(font_name, font_size, font_leading)
 
     def coreward_sector(self, pdf, name):
-        cursor = PDFCursor(5, self.y_start - 15, True)
-        def_font = pdf.get_font()
-        pdf.set_font('times', size=10)
-        width = pdf.get_font()._string_width(name) / 2
-        cursor.x = 306 - width
-        pdf.add_text(name, cursor)
-        pdf.set_font(font=def_font)
+        # Save out whatever font is currently set
+        font_name = pdf._fontname
+        font_size = pdf._fontsize
+        font_leading = pdf._leading
+
+        new_font = 'Times-Roman'
+        new_size = 10
+        pdf.setFont(new_font, size=new_size)
+        width = pdf.stringWidth(name, new_font, new_size)
+
+        x = 306 - (width/2)
+        textobject = pdf.beginText(x, self.y_start - 3)
+        textobject.textOut(name)
+        textobject.setStrokeColor('black')
+        pdf.drawText(textobject)
+        # Restore saved font
+        pdf.setFont(font_name, font_size, font_leading)
 
     def rimward_sector(self, pdf, name):
-        cursor = PDFCursor(306, 767, True)
-        def_font = pdf.get_font()
-        pdf.set_font('times', size=10)
-        cursor.x_plus(-pdf.get_font()._string_width(name) / 2)
-        pdf.add_text(name, cursor)
-        pdf.set_font(font=def_font)
+        # Save out whatever font is currently set
+        font_name = pdf._fontname
+        font_size = pdf._fontsize
+        font_leading = pdf._leading
+
+        new_font = 'Times-Roman'
+        new_size = 10
+        pdf.setFont(new_font, size=new_size)
+        width = pdf.stringWidth(name, new_font, new_size)
+        x = 328 - (width/2)
+        textobject = pdf.beginText(x, 779)
+        textobject.textOut(name)
+        textobject.setStrokeColor('black')
+        pdf.drawText(textobject)
+        # Restore saved font
+        pdf.setFont(font_name, font_size, font_leading)
 
     def spinward_sector(self, pdf, name):
         cursor = PDFCursor(self.x_start - 5, 396, True)

@@ -447,6 +447,89 @@ class testHexMap(baseTest):
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.2 > mse, "Image difference above threshold")
 
+    def test_verify_coreward_rimward_sector(self):
+        source1file = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
+        source2file = self.unpack_filename('DeltaFiles/no_subsectors_named/Ngathksirz empty.sec')
+
+        source1pdf = self.unpack_filename('OutputFiles/verify_coreward_rimward/Zao Kfeng Ig Grilokh Sector.pdf')
+        source2pdf = self.unpack_filename('OutputFiles/verify_coreward_rimward/Ngathksirz Sector.pdf')
+
+        args = self._make_args()
+        args.interestingline = None
+        args.interestingtype = None
+        args.maps = True
+        args.routes = 'trade'
+        args.subsectors = False
+
+        delta = DeltaDictionary()
+        sector = SectorDictionary.load_traveller_map_file(source1file)
+        delta[sector.name] = sector
+        sector = SectorDictionary.load_traveller_map_file(source2file)
+        delta[sector.name] = sector
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes()
+
+        zaokpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
+        ngatpath = os.path.abspath(args.output + '/Ngathksirz Sector.pdf')
+
+        hexmap = PDFHexMap(galaxy, 'trade')
+
+        secname = 'Zao Kfeng Ig Grilokh'
+        hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        secname = 'Ngathksirz'
+        hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+
+        srczaok = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector original.png')
+        srcngat = os.path.abspath(args.output + '/Ngathksirz Sector original.png')
+        trgzaok = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector remix.png')
+        trgngat = os.path.abspath(args.output + '/Ngathksirz Sector remix.png')
+
+        src_img = pymupdf.open(source1pdf)
+        src_iter = src_img.pages(0)
+        for page in src_iter:
+            src = page.get_pixmap()
+        src.save(srczaok)
+
+        src_img = pymupdf.open(source2pdf)
+        src_iter = src_img.pages(0)
+        for page in src_iter:
+            src = page.get_pixmap()
+        src.save(srcngat)
+
+        trg_img = pymupdf.open(zaokpath)
+        trg_iter = trg_img.pages(0)
+        for page in trg_iter:
+            trg = page.get_pixmap()
+        trg.save(trgzaok)
+
+        trg_img = pymupdf.open(ngatpath)
+        trg_iter = trg_img.pages(0)
+        for page in trg_iter:
+            trg = page.get_pixmap()
+        trg.save(trgngat)
+
+        image1 = Image.open(srczaok)
+        image2 = Image.open(trgzaok)
+
+        array1 = np.array(image1)
+        array2 = np.array(image2)
+
+        mse = np.mean((array1 - array2) ** 2)
+        self.assertTrue(0.2 > mse, "Image difference above threshold")
+
+        image1 = Image.open(srcngat)
+        image2 = Image.open(trgngat)
+        array1 = np.array(image1)
+        array2 = np.array(image2)
+
+        mse = np.mean((array1 - array2) ** 2)
+        self.assertTrue(0.2 > mse, "Image difference above threshold")
+
     def _load_ranges(self, galaxy, sourcefile):
         with open(sourcefile, "rb") as f:
             lines = f.readlines()
