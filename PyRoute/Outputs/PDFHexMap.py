@@ -18,7 +18,8 @@ from PyRoute.StatCalculation import StatCalculation
 
 class PDFHexMap(Map):
 
-    colourmap = {'gray': (128, 128, 128), 'salmon': (255, 140, 105)}
+    colourmap = {'gray': (128, 128, 128), 'salmon': (255, 140, 105), 'goldenrod': (218, 165, 32),
+                 'crimson': (220, 20, 60)}
 
     def __init__(self, galaxy, routes, min_btn=8):
         super(PDFHexMap, self).__init__(galaxy, routes)
@@ -170,6 +171,20 @@ class PDFHexMap(Map):
 
         # Restore saved font
         pdf.setFont(font_name, font_size, font_leading)
+
+    def zone(self, doc, star, point):
+        offset = 3
+        point[0] += self.xm + offset
+        point[1] += self.xm + offset
+        #point.x_plus(self.xm)
+        #point.y_plus(self.ym)
+
+        if star.zone in ['R', 'F']:
+            self.add_circle(doc, point, self.xm, 'crimson')
+        elif star.zone in ['A', 'U']:
+            self.add_circle(doc, point, self.xm, 'goldenrod')
+        else:  # no zone -> do nothing
+            return
 
     def subsector_grid(self, pdf: Canvas):
         pdf.setStrokeColorRGB(211/255.0, 211/255.0, 211/255.0)
@@ -378,8 +393,9 @@ class PDFHexMap(Map):
         else:
             row = (self.y_start - self.ym) + (star.row * self.ym * 2)
 
-        point = PDFCursor(col, row)
-        self.zone(pdf, star, point.copy())
+        #point = PDFCursor(col, row)
+        point = [col, row]
+        self.zone(pdf, star, point)
         rawpoint = [col, row]
 
         #width = self.string_width(pdf.get_font(), str(star.uwp))
@@ -498,16 +514,13 @@ class PDFHexMap(Map):
     def comm_line(self, pdf, edge):
         start = edge[0]
         end = edge[1]
-        color = pdf.get_color()
-        color.set_color_by_number(102, 178, 102)
+
+        pdf.setStrokeColorRGB(102 / 255.0, 178 / 255.0, 102 / 255.0)
+        pdf.setLineWidth(3)
 
         endx, endy, startx, starty = self._get_line_endpoints(end, start)
 
-        lineStart = PDFCursor(startx, starty)
-        lineEnd = PDFCursor(endx, endy)
-
-        line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, stroke='solid', color=color, size=3)
-        line._draw()
+        pdf.line(startx, starty, endx, endy)
 
     def _get_line_endpoints(self, end, start):
         starty = self.y_start + (self.ym * 2 * start.row) - (self.ym * (1 if start.col & 1 else 0))
@@ -581,11 +594,13 @@ class PDFHexMap(Map):
         pdf.add_line(cursor1=start, cursor2=end)
 
     def add_circle(self, pdf, center, radius, colorname):
-        color = pdf.get_color()
-        color.set_color_by_name(colorname)
-        radius = PDFCursor(radius, radius)
-        circle = PDFEllipse(pdf.session, pdf.page, center, radius, color, size=2)
-        circle._draw()
+        colour = PDFHexMap.colourmap[colorname]
+        pdf.setStrokeColorRGB(colour[0] / 255.0, colour[1] / 255.0, colour[2] / 255.0)
+        pdf.setLineWidth(2)
+
+        startx = center[0]
+        starty = center[1]
+        pdf.ellipse(startx - radius, starty - radius, startx + radius, starty + radius, fill=0)
 
     def get_line(self, doc, start, end, colorname, width):
         """

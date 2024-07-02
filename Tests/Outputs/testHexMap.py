@@ -613,6 +613,57 @@ class testHexMap(baseTest):
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.2 > mse, "Image difference above threshold")
 
+    def test_verify_xboat_write_pdf(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
+        srcpdf = self.unpack_filename(
+            'OutputFiles/verify_subsector_xroute_write/Zarushagar Sector.pdf')
+
+        args = self._make_args()
+        args.interestingline = None
+        args.interestingtype = None
+        args.maps = True
+        args.routes = 'xroute'
+        args.subsectors = False
+
+        delta = DeltaDictionary()
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta[sector.name] = sector
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes()
+
+        secname = 'Zarushagar'
+
+        hexmap = PDFHexMap(galaxy, 'xroute')
+
+        targpath = os.path.abspath(args.output + '/Zarushagar Sector.pdf')
+        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        src_img = pymupdf.open(srcpdf)
+        src_iter = src_img.pages(0)
+        for page in src_iter:
+            src = page.get_pixmap()
+        srcfile = os.path.abspath(args.output + '/Zarushagar Sector original.png')
+        src.save(srcfile)
+        trg_img = pymupdf.open(targpath)
+        trg_iter = trg_img.pages(0)
+        for page in trg_iter:
+            trg = page.get_pixmap()
+        trgfile = os.path.abspath(args.output + '/Zarushagar Sector remix.png')
+        trg.save(trgfile)
+
+        image1 = Image.open(srcfile)
+        image2 = Image.open(trgfile)
+
+        array1 = np.array(image1)
+        array2 = np.array(image2)
+
+        mse = np.mean((array1 - array2) ** 2)
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold")
+
     def _load_ranges(self, galaxy, sourcefile):
         with open(sourcefile, "rb") as f:
             lines = f.readlines()
