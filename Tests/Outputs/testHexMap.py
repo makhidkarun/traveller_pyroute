@@ -694,6 +694,7 @@ class testHexMap(baseTest):
         galaxy.output_path = args.output
 
         galaxy.generate_routes()
+        galaxy.set_borders(args.borders, args.ally_match)
         galaxy.trade.calculate_routes()
 
         secname = ['Tuglikki', 'Provence', 'Deneb', 'Corridor']

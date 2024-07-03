@@ -12,6 +12,7 @@ from pypdflite.pdfobjects.pdfline import PDFLine
 from pypdflite.pdfobjects.pdftext import PDFText
 from reportlab.pdfgen.canvas import Canvas
 
+from PyRoute.Position.Hex import Hex
 from PyRoute.Outputs.Map import Map
 from PyRoute.StatCalculation import StatCalculation
 
@@ -265,18 +266,21 @@ class PDFHexMap(Map):
             pdf.line(rline[0][0], rline[0][1], rline[1][0], rline[1][1])
 
     def _draw_borders(self, x, y, hline, lline, rline, pdf: Canvas, width, colour):
-        q, r = self.convert_hex_to_axial(x + self.sector.dx, y + self.sector.dy - 1)
+        offset = Hex.dy_offset(y, (self.sector.dy // 40))
+        q, r = Hex.hex_to_axial(x + (self.sector.dx), offset)
 
-        if self.galaxy.borders.borders.get((q, r), False):
-            if self.galaxy.borders.borders[(q, r)] & 1:
+        border_val = self.galaxy.borders.borders_map.get((q, r), False)
+
+        if border_val is not False:
+            if border_val & Hex.BOTTOM:
                 # hline._draw()
                 pdf.line(hline[0][0], hline[0][1], hline[1][0], hline[1][1])
 
-            if self.galaxy.borders.borders[(q, r)] & 2 and y > 0:
+            if border_val & Hex.BOTTOMRIGHT and y > 0:
                 # rline._draw()
                 pdf.line(rline[0][0], rline[0][1], rline[1][0], rline[1][1])
 
-            if self.galaxy.borders.borders[(q, r)] & 4:
+            if border_val & Hex.BOTTOMLEFT:
                 # lline._draw()
                 pdf.line(lline[0][0], lline[0][1], lline[1][0], lline[1][1])
 
