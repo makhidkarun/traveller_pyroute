@@ -678,6 +678,38 @@ class PDFHexMap(Map):
             w += font.character_widths[i] if i in font.character_widths else 600
         return w * font.font_size / 1000.0
 
+    def clipping(self, startx, starty, endx, endy):
+        points_t = [0.0, 1.0]
+        line_pt_1 = [startx, starty]
+        line_pt_2 = [endx, endy]
+
+        if startx == endx:
+            if starty > endy:
+                return ((startx, min(max(starty, endy), 780)),
+                        (startx, max(min(starty, endy), 42)))
+            else:
+                return ((startx, max(min(starty, endy), 42)),
+                        (startx, min(max(starty, endy), 780)))
+
+        if starty == endy:
+            if startx > endx:
+                return ((min(max(startx, endx), 600), starty),
+                        (max(min(startx, endx), 15), starty))
+            else:
+                return ((max(min(startx, endx), 15), starty),
+                        (min(max(startx, endx), 600), starty))
+
+        points_t.append(float(15 - startx) / (endx - startx))
+        points_t.append(float(600 - startx) / (endx - startx))
+        points_t.append(float(780 - starty) / (endy - starty))
+        points_t.append(float(42 - starty) / (endy - starty))
+
+        points_t.sort()
+        result = [(pt_1 + t * (pt_2 - pt_1)) for t in (points_t[2], points_t[3]) for (pt_1, pt_2) in
+                  zip(line_pt_1, line_pt_2)]
+        logging.getLogger("PyRoute.HexMap").debug(result)
+        return (result[0], result[1]), (result[2], result[3])
+
     @property
     def compression(self):
         return self.writer.session.compression
