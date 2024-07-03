@@ -119,8 +119,9 @@ class PDFHexMap(Map):
         new_font = 'Times-Roman'
         new_size = 10
         pdf.setFont(new_font, size=new_size)
-        width = pdf.stringWidth(name, new_font, new_size)
-        x = 328 - (width/2)
+        # width = pdf.stringWidth(name, new_font, new_size)
+        # x = 328 - (width/2)
+        x = 306
         textobject = pdf.beginText(x, 779)
         textobject.textOut(name)
         textobject.setStrokeColor('black')
