@@ -520,6 +520,7 @@ class HexMap(object):
     def compression(self):
         return self.writer.session.compression
 
+
 if __name__ == '__main__':
     sector = Sector('# Core', '# 0,0')
     hexMap = HexMap(None)

@@ -99,7 +99,7 @@ class PDFHexMap(Map):
         pdf.setFont(new_font, size=new_size)
         width = pdf.stringWidth(name, new_font, new_size)
 
-        x = 306 - (width/2)
+        x = 306 - (width / 2)
         textobject = pdf.beginText(x, self.y_start - 3)
         textobject.textOut(name)
         textobject.setStrokeColor('black')
@@ -183,7 +183,7 @@ class PDFHexMap(Map):
             return
 
     def subsector_grid(self, pdf: Canvas):
-        pdf.setStrokeColorRGB(211/255.0, 211/255.0, 211/255.0)
+        pdf.setStrokeColorRGB(211 / 255.0, 211 / 255.0, 211 / 255.0)
         vlineStart = [0, self.y_start + self.xm]
         vlineEnd = [0, self.y_start + self.xm + (180 * 4)]
         for x in range(self.x_start, 595, 144):
@@ -203,7 +203,7 @@ class PDFHexMap(Map):
         hlineStart, hlineEnd, hlineStartStep, hlineEndStep, colour = self._hline(doc, width, colorname)
         llineStart, llineEnd, llineStartStep, llineEndStep, colour = self._lline(doc, width, colorname)
         rlineStart, rlineEnd, rlineStartStep, rlineEndStep, colour = self._rline(doc, width, colorname)
-        doc.setStrokeColorRGB(colour[0]/256.0, colour[1]/256.0, colour[2]/256.0)
+        doc.setStrokeColorRGB(colour[0] / 256.0, colour[1] / 256.0, colour[2] / 256.0)
         doc.setLineWidth(width)
 
         for x in range(self.x_count):
@@ -416,7 +416,7 @@ class PDFHexMap(Map):
             trade = 6
 
         tradeColor = tradeColors[trade]
-        pdf.setStrokeColorRGB(tradeColor[0]/255.0, tradeColor[1]/255.0, tradeColor[2]/255.0)
+        pdf.setStrokeColorRGB(tradeColor[0] / 255.0, tradeColor[1] / 255.0, tradeColor[2] / 255.0)
         pdf.setFillColorRGB(tradeColor[0] / 255.0, tradeColor[1] / 255.0, tradeColor[2] / 255.0)
 
         endCircle = end.sector == start.sector

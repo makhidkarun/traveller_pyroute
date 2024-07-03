@@ -5,8 +5,6 @@ Created on May 14, 2016
 """
 import logging
 
-from PyRoute.StatCalculation import StatCalculation
-
 
 class Map(object):
     x_count = 33
