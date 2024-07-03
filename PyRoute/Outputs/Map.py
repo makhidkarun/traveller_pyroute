@@ -99,42 +99,9 @@ class Map(object):
         Starting point for writing PDF files.
         Call this to output the trade maps
         """
-        logging.getLogger("PyRoute.Map").info("writing {:d} sector maps...".format(len(self.galaxy.sectors)))
-        for sector in self.galaxy.sectors.values():
-            doc = self.document(sector)
-            self.write_base_map(doc, sector)
-
-            self.draw_borders(doc, sector)
-
-            sector_trade = [star for star in self.galaxy.stars.edges(sector.worlds, True)
-                            if star[2]['trade'] > 0 and StatCalculation.trade_to_btn(star[2]['trade']) >= self.min_btn]
-
-            logging.getLogger('PyRoute.Map').debug("Worlds with trade: {}".format(len(sector_trade)))
-
-            sector_trade.sort(key=lambda line: line[2]['trade'])
-
-            for (star, neighbor, data) in sector_trade:
-                self.galaxy.stars[star][neighbor]['trade btn'] = StatCalculation.trade_to_btn(data['trade'])
-                self.trade_line(doc, [star, neighbor], data)
-
-            # Get all the worlds in this sector
-            # for (star, neighbor, data) in self.galaxy.stars.edges(sector.worlds, True):
-            #    if star.sector != sector:
-            #        continue#
-            #    if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:
-            #        self.galaxy.stars[star][neighbor]['trade btn'] = self.trade_to_btn(data['trade'])
-            #        self.trade_line(doc, [star, neighbor], data)
-            #    elif star.sector != neighbor.sector:
-            #        data = self.galaxy.stars.get_edge_data(neighbor, star)
-            #        if data is not None and \
-            #            data['trade'] > 0 and \
-            #            self.trade_to_btn(data['trade']) >= self.min_btn:
-            #            self.trade_line(doc, [star, neighbor], data)
-
-            for star in sector.worlds:
-                self.place_system(doc, star)
-
-            self.close()
+        logging.getLogger("PyRoute.HexMap").info("writing {:d} sector maps...".format(len(self.galaxy.sectors)))
+        for gal_sector in self.galaxy.sectors.values():
+            self.write_sector_pdf_map(gal_sector)
 
     def write_base_map(self, doc, sector):
         self.sector_name(doc, sector.name)
