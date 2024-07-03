@@ -75,7 +75,6 @@ class PDFHexMap(Map):
         """
         Write name at the top of the document
         """
-        # cursor = PDFCursor(5, -5, True)
         # Save out whatever font is currently set
         font_name = doc._fontname
         font_size = doc._fontsize
@@ -178,8 +177,6 @@ class PDFHexMap(Map):
         offset = 3
         point[0] += self.xm + offset
         point[1] += self.xm + offset
-        #point.x_plus(self.xm)
-        #point.y_plus(self.ym)
 
         if star.zone in ['R', 'F']:
             self.add_circle(doc, point, self.xm, 'crimson')
@@ -190,24 +187,18 @@ class PDFHexMap(Map):
 
     def subsector_grid(self, pdf: Canvas):
         pdf.setStrokeColorRGB(211/255.0, 211/255.0, 211/255.0)
-        #vlineStart = PDFCursor(0, self.y_start + self.xm)
-        #vlineEnd = PDFCursor(0, self.y_start + self.xm + (180 * 4))
         vlineStart = [0, self.y_start + self.xm]
         vlineEnd = [0, self.y_start + self.xm + (180 * 4)]
         for x in range(self.x_start, 595, 144):
             vlineStart[0] = x
             vlineEnd[0] = x
-            #pdf.add_line(cursor1=vlineStart, cursor2=vlineEnd)
             pdf.line(vlineStart[0], vlineStart[1], vlineEnd[0], vlineEnd[1])
 
-        #hlineStart = PDFCursor(self.x_start, 0)
-        #hlineEnd = PDFCursor(591, 0)
         hlineStart = [self.x_start, 0]
         hlineEnd = [591, 0]
         for y in range(self.y_start + self.xm, 780, 180):
             hlineStart[1] = y
             hlineEnd[1] = y
-            #pdf.add_line(cursor1=hlineStart, cursor2=hlineEnd)
             pdf.line(hlineStart[0], hlineStart[1], hlineEnd[0], hlineEnd[1])
 
     def hex_grid(self, doc, draw, width, colorname='gray'):
@@ -219,26 +210,18 @@ class PDFHexMap(Map):
         doc.setLineWidth(width)
 
         for x in range(self.x_count):
-            #hlineStart.x_plus()
             hlineStart[0] += hlineStartStep[0]
-            #hlineEnd.x_plus()
             hlineEnd[0] += hlineEndStep[0]
             self._hline_restart_y(x, hlineStart, hlineEnd)
             self._lline_restart_y(x, llineStart, llineEnd)
             self._rline_restart_y(x, rlineStart, rlineEnd)
 
             for y in range(self.y_count):
-                #hlineStart.y_plus()
                 hlineStart[1] += hlineStartStep[1]
-                #hlineEnd.y_plus()
                 hlineEnd[1] += hlineEndStep[1]
-                #llineStart.y_plus()
                 llineStart[1] += llineStartStep[1]
-                #llineEnd.y_plus()
                 llineEnd[1] += llineEndStep[1]
-                #rlineStart.y_plus()
                 rlineStart[1] += rlineStartStep[1]
-                #rlineEnd.y_plus()
                 rlineEnd[1] += rlineEndStep[1]
                 hline = (hlineStart, hlineEnd)
                 lline = (llineStart, llineEnd)
@@ -246,23 +229,16 @@ class PDFHexMap(Map):
 
                 draw(x, y, hline, lline, rline, doc, width, colour)
 
-            #llineStart.x_plus()
             llineStart[0] += llineStartStep[0]
-            #llineEnd.x_plus()
             llineEnd[0] += llineEndStep[0]
-            #rlineStart.x_plus()
             rlineStart[0] += rlineStartStep[0]
-            #rlineEnd.x_plus()
             rlineEnd[0] += rlineEndStep[0]
 
     def _draw_all(self, x, y, hline, lline, rline, pdf: Canvas, width, colour):
         if (x < self.x_count - 1):
-            #hline._draw()
             pdf.line(hline[0][0], hline[0][1], hline[1][0], hline[1][1])
-        #lline._draw()
         pdf.line(lline[0][0], lline[0][1], lline[1][0], lline[1][1])
         if (y > 0):
-            #rline._draw()
             pdf.line(rline[0][0], rline[0][1], rline[1][0], rline[1][1])
 
     def _draw_borders(self, x, y, hline, lline, rline, pdf: Canvas, width, colour):
@@ -273,41 +249,22 @@ class PDFHexMap(Map):
 
         if border_val is not False:
             if border_val & Hex.BOTTOM:
-                # hline._draw()
                 pdf.line(hline[0][0], hline[0][1], hline[1][0], hline[1][1])
 
             if border_val & Hex.BOTTOMRIGHT and y > 0:
-                # rline._draw()
                 pdf.line(rline[0][0], rline[0][1], rline[1][0], rline[1][1])
 
             if border_val & Hex.BOTTOMLEFT:
-                # lline._draw()
                 pdf.line(lline[0][0], lline[0][1], lline[1][0], lline[1][1])
 
     def _hline(self, pdf, width, colorname):
-        # dx/y are step sizen
-        #hlineStart = PDFCursor(0, 0)
-        #hlineStart.x = 3
-        #hlineStart.y = self.y_start - self.ym
-        #hlineStart.dx = self.xm * 3
-        #hlineStart.dy = self.ym * 2
-
         hlineStart = [3, self.y_start - self.ym]
         hlineStartStep = (self.xm * 3, self.ym * 2)
-
-        #hlineEnd = PDFCursor(0, 0)
-        #hlineEnd.x = self.xm * 2.5
-        #hlineEnd.y = self.y_start - self.ym
-        #hlineEnd.dx = self.xm * 3
-        #hlineEnd.dy = self.ym * 2
 
         hlineEnd = [self.xm * 2.5, self.y_start - self.ym]
         hlineEndStep = (self.xm * 3, self.ym * 2)
 
         colour = self.colourmap[colorname]
-        #pdf.setStrokeColorRGB(colour[0], colour[1], colour[2])
-
-        #hline = PDFLine(pdf.session, pdf.page, hlineStart, hlineEnd, stroke='solid', color=color, size=width)
 
         return hlineStart, hlineEnd, hlineStartStep, hlineEndStep, colour
 
@@ -320,26 +277,13 @@ class PDFHexMap(Map):
             hlineEnd[1] = self.y_start - 2 * self.ym
 
     def _lline(self, pdf, width, colorname):
-        #llineStart = PDFCursor(-10, 0)
-        #llineStart.x = self.x_start
-        #llineStart.dx = self.xm * 3
-        #llineStart.dy = self.ym * 2
-
         llineStart = [self.x_start, 0]
         llineStartStep = (self.xm * 3, self.ym * 2)
 
-        #llineEnd = PDFCursor(-10, 0)
-        #llineEnd.x = self.x_start + self.xm
-        #llineEnd.dx = self.xm * 3
-        #llineEnd.dy = self.ym * 2
         llineEnd = [self.x_start + self.xm, 0]
         llineEndStep = (self.xm * 3, self.ym * 2)
 
-        #color = pdf.get_color()
-        #color.set_color_by_name(colorname)
         colour = self.colourmap[colorname]
-
-        #lline = PDFLine(pdf.session, pdf.page, llineStart, llineEnd, stroke='solid', color=color, size=width)
 
         return llineStart, llineEnd, llineStartStep, llineEndStep, colour
 
@@ -367,10 +311,7 @@ class PDFHexMap(Map):
         rlineEnd = [self.x_start, 0]
         rlineEndStep = (self.xm * 3, self.ym * 2)
 
-        #color = pdf.get_color()
-        #color.set_color_by_name(colorname)
         colour = self.colourmap[colorname]
-        #rline = PDFLine(pdf.session, pdf.page, rlineStart, rlineEnd, stroke='solid', color=color, size=width)
 
         return rlineStart, rlineEnd, rlineStartStep, rlineEndStep, colour
 
@@ -383,7 +324,6 @@ class PDFHexMap(Map):
             rlineEnd[1] = self.y_start - 3 * self.ym
 
     def system(self, pdf, star):
-        #def_font = pdf.get_font()
         font_name = pdf._fontname
         font_size = pdf._fontsize
         font_leading = pdf._leading
@@ -398,37 +338,27 @@ class PDFHexMap(Map):
         else:
             row = (self.y_start - self.ym) + (star.row * self.ym * 2)
 
-        #point = PDFCursor(col, row)
         point = [col, row]
         self.zone(pdf, star, point)
         rawpoint = [col, row]
 
-        #width = self.string_width(pdf.get_font(), str(star.uwp))
         width = pdf.stringWidth(str(star.uwp), new_font, new_size)
-        ##point.y_plus(7)
-        #point.x_plus(self.ym - (width // 2))
         rawpoint[0] += self.ym - (width // 2)
         rawpoint[1] += 7
         textobject = pdf.beginText(rawpoint[0], rawpoint[1])
         textobject.textOut(str(star.uwp))
         pdf.drawText(textobject)
-        #pdf.add_text(str(star.uwp), point)
 
         if len(star.name) > 0:
             for chars in range(len(star.name), 0, -1):
-                #width = self.string_width(pdf.get_font(), star.name[:chars])
                 width = pdf.stringWidth(star.name[:chars], new_font, new_size)
                 if width <= self.xm * 3.5:
                     break
-            #point.y_plus(3.5)
-            #point.x = col
-            #point.x_plus(self.ym - (width // 2))
             rawpoint[0] = col + self.ym - (width // 2)
             rawpoint[1] += 3.5
             textobject = pdf.beginText(rawpoint[0], rawpoint[1])
             textobject.textOut(star.name[:chars])
             pdf.drawText(textobject)
-            #pdf.add_text(star.name[:chars], point)
 
         added = star.alg_code
         if star.tradeCode.subsector_capital:
@@ -439,15 +369,10 @@ class PDFHexMap(Map):
             added += ' '
 
         added += '{:d}'.format(star.ggCount)
-        #point.y_plus(3.5)
-        #point.x = col
         rawpoint[0] = col
         rawpoint[1] += 3.5
-        #width = pdf.get_font()._string_width(added)
         width = pdf.stringWidth(added)
-        # point.x_plus(self.ym - (width // 2))
         rawpoint[0] += self.ym - (width // 2)
-        #pdf.add_text(added, point)
         textobject = pdf.beginText(rawpoint[0], rawpoint[1])
         textobject.textOut(added)
         pdf.drawText(textobject)
@@ -462,19 +387,13 @@ class PDFHexMap(Map):
             added += "{}{} {}".format(star.baseCode, star.ggCount, star.importance)
         elif self.routes == 'xroute':
             added += " {}".format(star.importance)
-        #width = pdf.get_font()._string_width(added)
         width = pdf.stringWidth(added)
-        #point.y_plus(3.5)
-        #point.x = col
-        #point.x_plus(self.ym - (width // 2))
         rawpoint[0] = col + self.ym - (width // 2)
         rawpoint[1] += 3.5
-        #pdf.add_text(added, point)
         textobject = pdf.beginText(rawpoint[0], rawpoint[1])
         textobject.textOut(added)
         pdf.drawText(textobject)
 
-        #pdf.set_font(def_font)
         # Restore saved font
         pdf.setFont(font_name, font_size, font_leading)
 
@@ -500,8 +419,6 @@ class PDFHexMap(Map):
             trade = 6
 
         tradeColor = tradeColors[trade]
-        #color = pdf.get_color()
-        #color.set_color_by_number(tradeColor[0], tradeColor[1], tradeColor[2])
         pdf.setStrokeColorRGB(tradeColor[0]/255.0, tradeColor[1]/255.0, tradeColor[2]/255.0)
         pdf.setFillColorRGB(tradeColor[0] / 255.0, tradeColor[1] / 255.0, tradeColor[2] / 255.0)
 
@@ -578,8 +495,6 @@ class PDFHexMap(Map):
         self.writer.setSubject(subject)
         self.writer.setKeywords(keywords)
         self.writer.setCreator(creator)
-        #document = self.writer.get_document()
-        #document.set_margins(4)
         return self.writer
 
     def close(self):
