@@ -13,7 +13,7 @@ import os
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.Galaxy import Galaxy
 from PyRoute.SpeculativeTrade import SpeculativeTrade
-from PyRoute.Outputs.HexMap import HexMap
+from PyRoute.Outputs.PDFHexMap import PDFHexMap
 from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap
 from PyRoute.StatCalculation import StatCalculation
 
@@ -152,7 +152,7 @@ def process():
     stats.write_statistics(args.ally_count, args.ally_match, args.json_data)
 
     if args.maps:
-        pdfmap = HexMap(galaxy, args.routes, args.route_btn)
+        pdfmap = PDFHexMap(galaxy, args.routes, args.route_btn)
         pdfmap.write_maps()
 
         if args.subsectors:
