@@ -518,6 +518,8 @@ class HexMap(object):
 
     @property
     def compression(self):
+        if self.writer is None:
+            return True
         return self.writer.session.compression
 
 

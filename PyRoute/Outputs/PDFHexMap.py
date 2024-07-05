@@ -566,4 +566,8 @@ class PDFHexMap(Map):
 
     @property
     def compression(self):
-        return self.writer.session.compression
+        if self.writer is None:
+            return True
+        if 'string' == self.writer._filename:
+            return False
+        return True

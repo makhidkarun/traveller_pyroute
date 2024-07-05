@@ -128,6 +128,7 @@ class testHexMap(baseTest):
         secname = 'Zao Kfeng Ig Grilokh'
 
         hexmap = HexMap(galaxy, 'trade')
+        self.assertTrue(hexmap.compression)
 
         oldtime = b'20230911163653'
         oldmd5 = b'8419949643701e6b438d6f3f93239cf7'
@@ -136,6 +137,7 @@ class testHexMap(baseTest):
             expected_result = file.read()
 
         result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=False)
+        self.assertFalse(hexmap.compression)
         self.assertIsNotNone(result)
         # rather than try to mock datetime.now(), patch the output result.
         # this also lets us check that there's only a single match
@@ -173,9 +175,11 @@ class testHexMap(baseTest):
         secname = 'Zao Kfeng Ig Grilokh'
 
         hexmap = PDFHexMap(galaxy, 'trade')
+        self.assertTrue(hexmap.compression)
 
         targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
         result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        self.assertTrue(hexmap.compression)
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
