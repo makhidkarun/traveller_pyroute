@@ -76,7 +76,14 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
 
         if 1 == num_nodes:
             heapq.heappush(heap, (active_weights[0], active_nodes[0]))
-        else:  # Only cop the iterator overhead if there's at least 2 neighbours to queue
+        elif 2 == num_nodes:
+            heapq.heappush(heap, (active_weights[0], active_nodes[0]))
+            heapq.heappush(heap, (active_weights[1], active_nodes[1]))
+        elif 3 == num_nodes:
+            heapq.heappush(heap, (active_weights[0], active_nodes[0]))
+            heapq.heappush(heap, (active_weights[1], active_nodes[1]))
+            heapq.heappush(heap, (active_weights[2], active_nodes[2]))
+        else:  # Only cop the iterator overhead if there's at least 4 neighbours to queue
             for index in range(0, num_nodes):
                 heapq.heappush(heap, (active_weights[index], active_nodes[index]))
 
