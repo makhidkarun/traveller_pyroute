@@ -552,7 +552,7 @@ class TradeCalculation(RouteCalculation):
                 data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
                 self.star_graph.lighten_edge(start.index, end.index, data['weight'])
                 self.shortest_path_tree.lighten_edge(start.index, end.index, data['weight'])
-            if not exhausted:  # If edge is exhausted - can't trip an update - don't queue it for update
+                # Edge can only trip an update if it's not exhausted
                 edges.append((start.index, end.index))
             start = end
 
