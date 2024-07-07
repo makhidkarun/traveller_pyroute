@@ -45,10 +45,10 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
 
         if dist_tail > distance_labels[tail] or dist_tail + min_cost[tail] > max_neighbour_labels[tail]:
             # Since we've just dequeued a bad node (distance exceeding its current label, or too close to max-label),
-            # remove other bad nodes from the list to avoid tripping over them later
-            heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]
-            # While we're grooming the queue already, chuck out nodes who cannot give better distance labels
-            heap = [(distance, tail) for (distance, tail) in heap if distance + min_cost[tail] <= max_neighbour_labels[tail]]
+            # remove other bad nodes from the list to avoid tripping over them later, and chuck out nodes who
+            # can't give better distance labels
+            heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]
+                    and distance + min_cost[tail] <= max_neighbour_labels[tail]]
             heapq.heapify(heap)
             continue
 
