@@ -545,7 +545,7 @@ class TradeCalculation(RouteCalculation):
                 end.tradeCount += 1
                 end.passOver += tradePass
             data = self.galaxy.stars[start.index][end.index]
-            exhausted = data['count'] > data['exhaust']
+            exhausted = data['count'] >= data['exhaust']
             data['trade'] += tradeCr
             data['count'] += 1
             if reweight and not exhausted:
