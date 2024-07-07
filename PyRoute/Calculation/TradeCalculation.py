@@ -556,12 +556,6 @@ class TradeCalculation(RouteCalculation):
                 edges.append((start.index, end.index))
             start = end
 
-        if not self.galaxy.stars.has_edge(source.index, target.index):
-            historic_cost = self.route_cost(route) * 1.005
-            self.galaxy.historic_costs.add_edge(source.index, target.index, historic_cost)
-            self.galaxy.stars.add_edge(source.index, target.index, distance=distance, weight=historic_cost, trade=0,
-                                       btn=0, count=0, exhaust=0, route=route)
-
         # Feed the list of touched edges into the approximate-shortest-path machinery, so it can update whatever
         # distance labels it needs to stay within its approximation bound.
         if reweight and 0 < len(edges):
