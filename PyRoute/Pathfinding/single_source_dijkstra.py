@@ -39,11 +39,9 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
 
     parents = np.ones(len(graph), dtype=int) * -100  # Using -100 to track "not considered during processing"
     parents[list(seeds)] = -1  # Using -1 to flag "root node of tree"
-    node_counter = 0
 
     while heap:
         dist_tail, tail = heapq.heappop(heap)
-        node_counter += 1
 
         if dist_tail > distance_labels[tail] or dist_tail + min_cost[tail] > max_neighbour_labels[tail]:
             # Since we've just dequeued a bad node (distance exceeding its current label, or too close to max-label),
