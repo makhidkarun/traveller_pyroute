@@ -13,7 +13,6 @@ import math
 from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Outputs.HexMap import HexMap
 from PyRoute.DeltaPasses.AllegianceReducer import AllegianceReducer
 from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
 from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
@@ -27,6 +26,7 @@ from PyRoute.DeltaPasses.TwoLineReducer import TwoLineReducer
 from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.StatCalculation import StatCalculation
+from PyRoute.Outputs.PDFHexMap import PDFHexMap
 from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap
 
 
@@ -172,7 +172,7 @@ class DeltaReduce:
             stats.write_statistics(args.ally_count, args.ally_match, args.json_data)
 
             if args.maps:
-                pdfmap = HexMap(galaxy, args.routes, args.route_btn)
+                pdfmap = PDFHexMap(galaxy, args.routes, args.route_btn)
                 pdfmap.write_maps()
 
                 if args.subsectors:

@@ -32,6 +32,8 @@ class HexMap(object):
         self.min_btn = min_btn
         self.y_start = 43
         self.x_start = 15
+        self.sector = None
+        self.writer = None
 
     def write_maps(self):
         """
@@ -513,6 +515,12 @@ class HexMap(object):
                   zip(line_pt_1, line_pt_2)]
         logging.getLogger("PyRoute.HexMap").debug(result)
         return (result[0], result[1]), (result[2], result[3])
+
+    @property
+    def compression(self):
+        if self.writer is None:
+            return True
+        return self.writer.session.compression
 
 
 if __name__ == '__main__':

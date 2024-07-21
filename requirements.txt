@@ -8,8 +8,10 @@ jinja2
 jsonpickle
 lark==1.1.8
 numpy >= 2.0
+pymupdf
 pytest >= 8.0.0
 pytest-console-scripts
 pytest-randomly
 pytest-subtests
+reportlab >= 4.1.0
 ruff >= 0.3.0

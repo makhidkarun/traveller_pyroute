@@ -5,8 +5,6 @@ Created on May 14, 2016
 """
 import logging
 
-from PyRoute.StatCalculation import StatCalculation
-
 
 class Map(object):
     x_count = 33
@@ -75,10 +73,23 @@ class Map(object):
         # color.set_color_by_name(colorname)
         # hline = PDFLine(pdf.session, pdf.page, hlineStart, hlineEnd, stroke='solid', color=color, size=width)
 
+    def trade_line(self, pdf, edge, data):
+        raise NotImplementedError("Base Class")
+
+    @staticmethod
+    def string_width(font, string):
+        raise NotImplementedError("Base Class")
+
     def place_system(self, doc, star):
         """
         Write a single world information into the map
         """
+        raise NotImplementedError("Base Class")
+
+    def write_sector_pdf_map(self, gal_sector, is_live=True):
+        raise NotImplementedError("Base Class")
+
+    def system(self, pdf, star):
         raise NotImplementedError("Base Class")
 
     def write_maps(self):
@@ -86,42 +97,9 @@ class Map(object):
         Starting point for writing PDF files.
         Call this to output the trade maps
         """
-        logging.getLogger("PyRoute.Map").info("writing {:d} sector maps...".format(len(self.galaxy.sectors)))
-        for sector in self.galaxy.sectors.values():
-            doc = self.document(sector)
-            self.write_base_map(doc, sector)
-
-            self.draw_borders(doc, sector)
-
-            sector_trade = [star for star in self.galaxy.stars.edges(sector.worlds, True)
-                            if star[2]['trade'] > 0 and StatCalculation.trade_to_btn(star[2]['trade']) >= self.min_btn]
-
-            logging.getLogger('PyRoute.Map').debug("Worlds with trade: {}".format(len(sector_trade)))
-
-            sector_trade.sort(key=lambda line: line[2]['trade'])
-
-            for (star, neighbor, data) in sector_trade:
-                self.galaxy.stars[star][neighbor]['trade btn'] = StatCalculation.trade_to_btn(data['trade'])
-                self.trade_line(doc, [star, neighbor], data)
-
-            # Get all the worlds in this sector
-            # for (star, neighbor, data) in self.galaxy.stars.edges(sector.worlds, True):
-            #    if star.sector != sector:
-            #        continue#
-            #    if data['trade'] > 0 and self.trade_to_btn(data['trade']) >= self.min_btn:
-            #        self.galaxy.stars[star][neighbor]['trade btn'] = self.trade_to_btn(data['trade'])
-            #        self.trade_line(doc, [star, neighbor], data)
-            #    elif star.sector != neighbor.sector:
-            #        data = self.galaxy.stars.get_edge_data(neighbor, star)
-            #        if data is not None and \
-            #            data['trade'] > 0 and \
-            #            self.trade_to_btn(data['trade']) >= self.min_btn:
-            #            self.trade_line(doc, [star, neighbor], data)
-
-            for star in sector.worlds:
-                self.place_system(doc, star)
-
-            self.close()
+        logging.getLogger("PyRoute.HexMap").info("writing {:d} sector maps...".format(len(self.galaxy.sectors)))
+        for gal_sector in self.galaxy.sectors.values():
+            self.write_sector_pdf_map(gal_sector)
 
     def write_base_map(self, doc, sector):
         self.sector_name(doc, sector.name)
@@ -212,6 +190,7 @@ class Map(object):
                 lline._draw()
 
     def draw_borders(self, pdf, sector):
+        self.sector = sector
         self.hex_grid(pdf, self._draw_borders, 1.5, 'salmon')
 
     @staticmethod
