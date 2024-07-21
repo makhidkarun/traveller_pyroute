@@ -14,6 +14,7 @@ import math
 import networkx as nx
 import numpy as np
 
+from PyRoute.AreaItems.AreaItem import AreaItem
 from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
@@ -24,40 +25,7 @@ from PyRoute.Calculation.NoneCalculation import NoneCalculation
 from PyRoute.Calculation.XRouteCalculation import XRouteCalculation
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
-from PyRoute.StatCalculation import ObjectStatistics
 from PyRoute.AllyGen import AllyGen
-
-
-class AreaItem(object):
-    def __init__(self, name):
-        self.name = name
-        self.worlds = []
-        self.stats = ObjectStatistics()
-        self.alg = {}
-        self.alg_sorted = []
-        self._wiki_name = '[[{}]]'.format(name)
-        self.debug_flag = False
-
-    def wiki_title(self):
-        return self.wiki_name()
-
-    def wiki_name(self):
-        return self._wiki_name
-
-    def __str__(self):
-        return self.name
-
-    def world_count(self):
-        return len(self.worlds)
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-    def __setitem__(self, key, value):
-        setattr(self, key, value)
-
-    def is_well_formed(self):
-        return True
 
 
 class Allegiance(AreaItem):
