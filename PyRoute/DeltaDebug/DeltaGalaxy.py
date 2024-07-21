@@ -4,8 +4,9 @@ Created on May 21, 2023
 @author: CyberiaResurrection
 """
 
+from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, SubsectorDictionary
-from PyRoute.Galaxy import Galaxy, Sector, Subsector, Allegiance
+from PyRoute.Galaxy import Galaxy, Sector, Subsector
 from PyRoute.Star import Star
 from PyRoute.AllyGen import AllyGen
 

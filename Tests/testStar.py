@@ -10,10 +10,10 @@ import unittest
 import re
 import sys
 
+from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Position.Hex import Hex
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
-from PyRoute.Galaxy import Allegiance
 from PyRoute.StatCalculation import StatCalculation
 
 sys.path.append('../PyRoute')
