@@ -1,6 +1,7 @@
 import unittest
 
-from PyRoute.Galaxy import Sector, AreaItem
+from PyRoute.AreaItems.AreaItem import AreaItem
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Star import Star
 from PyRoute.TradeBalance import TradeBalance
 

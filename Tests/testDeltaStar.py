@@ -1,7 +1,7 @@
 import unittest
 
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.DeltaStar import DeltaStar
-from PyRoute.Galaxy import Sector
 from PyRoute.Star import Star
 
 

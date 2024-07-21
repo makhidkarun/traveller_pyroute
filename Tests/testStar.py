@@ -5,9 +5,7 @@ Created on Mar 7, 2014
 """
 import logging
 import copy
-import time
 import unittest
-import re
 import sys
 
 from PyRoute.AreaItems.Allegiance import Allegiance
@@ -17,8 +15,9 @@ from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.StatCalculation import StatCalculation
 
 sys.path.append('../PyRoute')
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Star import Star
-from PyRoute.Galaxy import Sector, Galaxy
+from PyRoute.Galaxy import Galaxy
 
 
 class TestStar(unittest.TestCase):

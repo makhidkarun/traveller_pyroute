@@ -11,7 +11,7 @@ import os
 from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
 from PyRoute.AllyGen import AllyGen
 from PyRoute.AreaItems.Allegiance import Allegiance
-from PyRoute.Galaxy import Sector
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Star import Star
 
 

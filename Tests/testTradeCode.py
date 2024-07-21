@@ -4,9 +4,9 @@ import re
 import logging
 
 sys.path.append('../PyRoute')
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.TradeCodes import TradeCodes
 from PyRoute.Star import Star
-from PyRoute.Galaxy import Sector, Galaxy
 
 
 class TestTradeCode(unittest.TestCase):
