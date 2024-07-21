@@ -10,8 +10,8 @@ import logging
 import codecs
 import os
 
+from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
-from PyRoute.Galaxy import Galaxy
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.Outputs.PDFHexMap import PDFHexMap
 from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap

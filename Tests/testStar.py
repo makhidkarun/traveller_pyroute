@@ -15,9 +15,9 @@ from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.StatCalculation import StatCalculation
 
 sys.path.append('../PyRoute')
+from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Star import Star
-from PyRoute.Galaxy import Galaxy
 
 
 class TestStar(unittest.TestCase):

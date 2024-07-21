@@ -1,9 +1,9 @@
 import json
 
+from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Subsector import Subsector
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Calculation.NoneCalculation import NoneCalculation
-from PyRoute.Galaxy import Galaxy
 from PyRoute.Star import Star
 from Tests.baseTest import baseTest
 

@@ -22,9 +22,9 @@ import logging
 import codecs
 import os
 
+from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
-from PyRoute.Galaxy import Galaxy
 
 
 logger = logging.getLogger('PyRoute')

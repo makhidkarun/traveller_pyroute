@@ -5,10 +5,10 @@ Created on May 21, 2023
 """
 
 from PyRoute.AreaItems.Allegiance import Allegiance
+from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Subsector import Subsector
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, SubsectorDictionary
-from PyRoute.Galaxy import Galaxy
 from PyRoute.Star import Star
 from PyRoute.AllyGen import AllyGen
 

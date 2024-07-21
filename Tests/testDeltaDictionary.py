@@ -5,8 +5,6 @@ from pathlib import Path
 
 from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary, SubsectorDictionary
-from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Galaxy import Galaxy
 from Tests.baseTest import baseTest
 from PyRoute.DeltaStar import DeltaStar
 
