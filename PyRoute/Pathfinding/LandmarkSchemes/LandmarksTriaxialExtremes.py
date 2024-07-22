@@ -190,4 +190,4 @@ class LandmarksTriaxialExtremes:
 
     @staticmethod
     def _size_to_landmarks(size):
-        return math.ceil(3 * math.log10(size))
+        return math.ceil(4 * math.log10(size))
