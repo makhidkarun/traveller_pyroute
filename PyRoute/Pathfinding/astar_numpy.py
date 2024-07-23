@@ -140,8 +140,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         keep = active_weights <= np.minimum(distances[active_nodes], up_threshold[active_nodes])
         # if we're not keeping anything, go around
         active_nodes = active_nodes[keep]
-        num_neighbours = len(active_nodes)
-        if 0 == num_neighbours:
+        if 0 == len(active_nodes):
             g_exhausted += 1
             continue
         active_weights = active_weights[keep]
@@ -152,14 +151,14 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         keep = augmented_weights < upbound
         if not keep.all():
             active_nodes = active_nodes[keep]
-            num_neighbours = len(active_nodes)
-            if 0 == num_neighbours:
+            if 0 == len(active_nodes):
                 f_exhausted += 1
                 continue
             active_weights = active_weights[keep]
             augmented_weights = augmented_weights[keep]
 
         if target in active_nodes:
+            num_neighbours = len(active_nodes)
             drop = active_nodes == target
             ncost = active_weights[drop][0]
 
