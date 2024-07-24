@@ -40,6 +40,13 @@ class ApproximateShortestPathForestUnified:
                                                                                    divisor=self._divisor)
             self._distances[:, i], self._max_labels[:, i] = result
 
+    def lower_bound(self, source, target):
+        raw = np.abs(self._distances[source, :] - self._distances[target, :])
+        raw = raw[~np.isinf(raw)]
+        if 0 == len(raw):
+            return 0
+        return np.max(raw)
+
     def lower_bound_bulk(self, active_nodes, target_node):
         overdrive, fastpath = self._mona_lisa_overdrive(target_node)
 

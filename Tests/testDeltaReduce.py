@@ -5,7 +5,7 @@ import unittest
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
-from PyRoute.Pathfinding.ApproximateShortestPathTreeDistanceGraph import ApproximateShortestPathTreeDistanceGraph
+from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.StatCalculation import StatCalculation
 from PyRoute.route import set_logging
@@ -281,7 +281,7 @@ class testDeltaReduce(baseTest):
 
         btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(stars[0], galaxy.stars, 0.2)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathForestUnified(stars[0], galaxy.stars, 0.2)
 
         switch = 7
         line = btn[switch]

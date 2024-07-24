@@ -3,7 +3,7 @@ Created on Sep 21, 2023
 
 @author: CyberiaResurrection
 """
-from PyRoute.Pathfinding.ApproximateShortestPathTreeDistanceGraph import ApproximateShortestPathTreeDistanceGraph
+from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
@@ -34,7 +34,7 @@ class testAStarNumpy(baseTest):
         source = galaxy.star_mapping[0]
         target = galaxy.star_mapping[36]
 
-        galaxy.trade.shortest_path_tree = ApproximateShortestPathTreeDistanceGraph(source.index, galaxy.stars, 0)
+        galaxy.trade.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, galaxy.stars, 0)
 
         heuristic = galaxy.heuristic_distance_bulk
 
