@@ -17,59 +17,11 @@ from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import Landma
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarksWTNExtremes import LandmarksWTNExtremes
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Pathfinding.ApproximateShortestPathForestDistanceGraph import ApproximateShortestPathForestDistanceGraph
 from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from Tests.baseTest import baseTest
 
 
 class testApproximateShortestPathForest(baseTest):
-    def test_triaxial_bounds_should_wrap_three_trees(self):
-        galaxy = self.set_up_zarushagar_sector()
-
-        foo = LandmarksTriaxialExtremes(galaxy)
-        landmarks, _ = foo.get_landmarks(index=True)
-        graph = galaxy.stars
-        stars = list(graph.nodes)
-        source = stars[0]
-
-        approx = ApproximateShortestPathForestDistanceGraph(source, graph, 0.2, sources=landmarks)
-        self.assertEqual(11, len(approx._trees), "Unexpected number of approx-SP trees")
-
-        src = stars[2]
-        targ = stars[80]
-
-        expected = 325.833
-        actual = approx.lower_bound(src, targ)
-        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
-
-        approx = ApproximateShortestPathForestDistanceGraph(source, graph, 0.2, sources=landmarks)
-        self.assertEqual(11, len(approx._trees), "Unexpected number of approx-SP trees")
-
-        src = stars[2]
-        targ = stars[80]
-
-        expected = 325.833
-        actual = approx.lower_bound(src, targ)
-        self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
-
-    def test_trixial_bounds_in_bulk(self):
-        galaxy = self.set_up_zarushagar_sector()
-
-        foo = LandmarksTriaxialExtremes(galaxy)
-        landmarks, _ = foo.get_landmarks(index=True)
-        graph = galaxy.stars
-        stars = list(graph.nodes)
-        source = stars[0]
-
-        approx = ApproximateShortestPathForestDistanceGraph(source, graph, 0.2, sources=landmarks)
-
-        active_nodes = [2, 80]
-        target = 80
-        expected = np.array([420.833, 0])
-        actual = approx.lower_bound_bulk(active_nodes, target)
-        self.assertIsNotNone(actual)
-
-        np.testing.assert_array_almost_equal(expected, actual, 0.000001, "Unexpected bounds array")
 
     def test_trixial_bounds_in_bulk_unified(self):
         galaxy = self.set_up_zarushagar_sector()
