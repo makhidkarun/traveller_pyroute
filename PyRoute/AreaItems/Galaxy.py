@@ -393,34 +393,6 @@ class Galaxy(AreaItem):
             star = self.star_mapping[item]
             star.is_well_formed()
 
-    def heuristic_distance(self, star, target):
-        # The general approach used for the heuristic estimate between star and target is the maximum of whatever
-        # choices are available.
-        item = (star.index, target.index)
-        # Previous-route-distances are only stored if they exceed the straight-line bound
-        if item in self.landmarks:
-            base = self.landmarks[item]
-        else:
-            base = Hex.heuristicDistance(star, target)
-        # Now we've got the maximum of the fixed bounds, compare that maximum with the dynamic-between-runs
-        # approximate-shortest-path bound.
-        sp_bound = self.trade.shortest_path_tree.lower_bound(item[0], item[1])
-        return max(base, sp_bound)
-
-    def heuristic_distance_indexes(self, star, target):
-        # The general approach used for the heuristic estimate between star and target is the maximum of whatever
-        # choices are available.
-        item = (star, target)
-        # Previous-route-distances are stored unconditionally.
-        if item in self.landmarks:
-            base = self.landmarks[item]
-        else:
-            base = Hex.heuristicDistance(self.star_mapping[star], self.star_mapping[target])
-        # Now we've got the maximum of the fixed bounds, compare that maximum with the dynamic-between-runs
-        # approximate-shortest-path bound.
-        sp_bound = self.trade.shortest_path_tree.lower_bound(star, target)
-        return 1.005 * max(base, sp_bound)
-
     def heuristic_distance_bulk(self, active_nodes, target):
         raw = self.trade.shortest_path_tree.lower_bound_bulk(active_nodes, target)
         distances = self.trade.star_graph.distances_from_target(active_nodes, target)
