@@ -75,6 +75,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     min_cost = np.zeros(len(G)) if min_cost is None else min_cost
     min_cost[target] = 0
     up_threshold = upbound - min_cost
+    upper_limit = up_threshold
+    upper_limit[source] = 0
 
     node_counter = 0
     queue_counter = 0
@@ -137,7 +139,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         active_weights = dist + raw_nodes[1]
         # filter out nodes whose active weights exceed _either_ the node's distance label _or_ the current upper bound
         # - the current node can _not_ result in a shorter path
-        keep = active_weights <= np.minimum(distances[active_nodes], up_threshold[active_nodes])
+        keep = active_weights <= upper_limit[active_nodes]
         # if we're not keeping anything, go around
         active_nodes = active_nodes[keep]
         if 0 == len(active_nodes):
@@ -165,6 +167,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             new_upbounds += 1
             distances[target] = ncost
             up_threshold = upbound - min_cost
+            upper_limit = np.minimum(upper_limit, up_threshold)
             if 0 < len(queue):
                 queue = [item for item in queue if item[0] < upbound]
                 if 0 < len(queue):
@@ -202,6 +205,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         # Now unconditionally queue _all_ nodes that are still active, worrying about filtering out the bound-busting
         # neighbours later.
         distances[active_nodes] = active_weights
+        upper_limit[active_nodes] = active_weights
         num_nodes = len(active_nodes)
 
         queue_counter += num_nodes
