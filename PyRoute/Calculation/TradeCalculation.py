@@ -286,7 +286,7 @@ class TradeCalculation(RouteCalculation):
 
         try:
             active_nodes = list(range(len(self.star_graph)))
-            upbound = self._preheat_upper_bound(star, target)
+            upbound = self._preheat_upper_bound(star, target, allow_reheat=False)
             # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
             if float('+inf') != upbound:
                 comp_id = star.component
@@ -326,6 +326,8 @@ class TradeCalculation(RouteCalculation):
         assert self.galaxy.route_no_revisit(route), "Route between " + str(star) + " and " + str(target) + " revisits at least one star"
 
         distance = self.route_distance(route)
+        cost = self.route_cost(route)
+        self.galaxy.historic_costs.add_edge(star.index, target.index, cost)
         btn = self.get_btn(star, target, distance)
 
         if self.min_btn > btn:
