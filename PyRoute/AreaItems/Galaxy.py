@@ -18,7 +18,6 @@ from PyRoute.AreaItems.AreaItem import AreaItem
 from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.AreaItems.Subsector import Subsector
 from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Calculation.TradeMPCalculation import TradeMPCalculation
