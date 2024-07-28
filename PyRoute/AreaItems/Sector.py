@@ -36,10 +36,10 @@ class Sector(AreaItem):
 
         pos_bits = positions.groups()
 
-        self._wiki_name = '[[{0} Sector|{0}]]'.format(self.sector_name())
-
         self.x = int(pos_bits[0])
         self.y = int(pos_bits[1])
+
+        self._wiki_name = '[[{0} Sector|{0}]]'.format(self.sector_name())
 
         self.dx = self.x * 32
         self.dy = self.y * 40
