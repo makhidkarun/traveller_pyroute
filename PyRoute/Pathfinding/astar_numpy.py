@@ -55,10 +55,13 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
 
     G_succ = G._arcs  # For speed-up
 
+    # pre-calc heuristics for all nodes to the target node
+    potentials = bulk_heuristic(G._nodes, target)
+
     # The queue stores priority, cost to reach, node,  and parent.
     # Uses Python heapq to keep in priority order.
     # The nodes themselves, being integers, are directly comparable.
-    queue = [(0, 0, source, None)]
+    queue = [(potentials[source], 0, source, None)]
 
     # Maps explored nodes to parent closest to the source.
     explored = {}
@@ -69,8 +72,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     floatinf = float('inf')
     upbound = floatinf if upbound is None else upbound
     assert upbound != floatinf, "Supplied upbound must not be infinite"
-    # pre-calc heuristics for all nodes to the target node
-    potentials = bulk_heuristic(G._nodes, target)
+
     # pre-calc the minimum-cost edge on each node
     min_cost = np.zeros(len(G)) if min_cost is None else min_cost
     min_cost[target] = 0
