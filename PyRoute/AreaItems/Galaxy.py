@@ -400,7 +400,7 @@ class Galaxy(AreaItem):
         # admissible
         raw = np.maximum(raw, distances)
 
-        return 1.005 * raw
+        return raw
 
     def route_cost(self, route):
         """
