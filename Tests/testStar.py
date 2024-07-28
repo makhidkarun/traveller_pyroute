@@ -5,20 +5,19 @@ Created on Mar 7, 2014
 """
 import logging
 import copy
-import time
 import unittest
-import re
 import sys
 
+from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Position.Hex import Hex
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
-from PyRoute.Galaxy import Allegiance
 from PyRoute.StatCalculation import StatCalculation
 
 sys.path.append('../PyRoute')
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Star import Star
-from PyRoute.Galaxy import Sector, Galaxy
 
 
 class TestStar(unittest.TestCase):

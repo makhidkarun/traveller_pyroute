@@ -3,7 +3,7 @@ import unittest
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, integers
 
-from PyRoute.Galaxy import Sector
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Position.Hex import Hex
 
 

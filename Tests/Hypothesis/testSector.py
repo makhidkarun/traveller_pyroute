@@ -5,7 +5,7 @@ from datetime import timedelta
 from hypothesis import given, assume, example, HealthCheck, settings, reproduce_failure
 from hypothesis.strategies import text, from_regex, composite, floats, integers
 
-from PyRoute.Galaxy import Sector
+from PyRoute.AreaItems.Sector import Sector
 
 
 @composite

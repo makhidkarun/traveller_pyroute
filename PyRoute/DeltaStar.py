@@ -3,8 +3,8 @@ Created on Jun 13, 2023
 
 @author: CyberiaResurrection
 """
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
-from PyRoute.Galaxy import Sector
 from PyRoute.Nobles import Nobles
 from PyRoute.Star import Star
 from PyRoute.TradeCodes import TradeCodes

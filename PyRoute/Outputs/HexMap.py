@@ -11,7 +11,8 @@ from pypdflite.pdfobjects.pdfline import PDFLine
 from pypdflite.pdfobjects.pdfellipse import PDFEllipse
 from pypdflite.pdfobjects.pdftext import PDFText
 
-from PyRoute.Galaxy import Sector, Galaxy
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
 from PyRoute.StatCalculation import StatCalculation

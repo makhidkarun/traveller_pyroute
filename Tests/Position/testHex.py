@@ -5,7 +5,7 @@ Created on Aug 29, 2023
 """
 import unittest
 
-from PyRoute.Galaxy import Sector
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
 

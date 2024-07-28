@@ -7,10 +7,10 @@ import os
 import logging
 import math
 
+from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.Position.Hex import Hex
 from PyRoute.Outputs.GraphicMap import GraphicMap
-from PyRoute.Galaxy import Galaxy
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Outputs.FontLayer import FontLayer
 from PIL import Image, ImageDraw, ImageColor, ImageFont
