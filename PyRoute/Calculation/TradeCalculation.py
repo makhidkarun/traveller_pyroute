@@ -286,7 +286,7 @@ class TradeCalculation(RouteCalculation):
 
         try:
             active_nodes = list(range(len(self.star_graph)))
-            upbound = self._preheat_upper_bound(star, target, allow_reheat=False)
+            upbound = self._preheat_upper_bound(star, target, allow_reheat=True)
             # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
             if float('+inf') != upbound:
                 comp_id = star.component
@@ -326,8 +326,6 @@ class TradeCalculation(RouteCalculation):
         assert self.galaxy.route_no_revisit(route), "Route between " + str(star) + " and " + str(target) + " revisits at least one star"
 
         distance = self.route_distance(route)
-        cost = self.route_cost(route)
-        self.galaxy.historic_costs.add_edge(star.index, target.index, cost)
         btn = self.get_btn(star, target, distance)
 
         if self.min_btn > btn:
@@ -430,12 +428,15 @@ class TradeCalculation(RouteCalculation):
             for pair in reheat_list:
                 start = pair[0]
                 end = pair[1]
-                edge = self.galaxy.stars[start][end]
+                if start in self.galaxy.stars and end in self.galaxy.stars[start]:
+                    edge = self.galaxy.stars[start][end]
+                else:
+                    continue
                 route = edge.get('route', False)
                 if route is not False:
                     rawroute = [item.index for item in route]
                     # The 0.5% bump is to _ensure_ the newcost remains an _upper_ bound on the historic-route cost
-                    newcost = self.galaxy.route_cost(rawroute) * 1.005
+                    newcost = min(edge['weight'], self.galaxy.route_cost(rawroute) * 1.005)
                     if edge['weight'] > newcost:
                         self.galaxy.stars[start][end]['weight'] = newcost
                         self.galaxy.historic_costs.lighten_edge(start, end, newcost)
@@ -516,6 +517,7 @@ class TradeCalculation(RouteCalculation):
         - reduce the weight of routes used to allow more trade to flow
         """
         distance = self.route_distance(route)
+        cost = self.route_cost(route)
 
         source = route[0]
         target = route[-1]
@@ -527,6 +529,10 @@ class TradeCalculation(RouteCalculation):
 
         self.galaxy.landmarks[(source.index, target.index)] = distance
         self.galaxy.landmarks[(target.index, source.index)] = distance
+        if 2 < len(route):
+            self.galaxy.stars.add_edge(source.index, target.index, distance=distance, weight=cost, trade=0, btn=0,
+                                       count=0, exhaust=0, route=route)
+            self.galaxy.historic_costs.add_edge(source.index, target.index, cost)
 
         # Gather basic statistics.
         tradeBTN = self.get_btn(source, target, distance)
