@@ -655,7 +655,7 @@ class TradeCodes(object):
     def canonicalise(self, star):
         self._fix_trade_code(star, 'As', '0', '0', '0')
         self._fix_trade_code(star, 'Ic', None, '01', '123456789A')
-        self._fix_trade_code(star, 'De', '0123456789ABC', '23456789', '0')
+        self._fix_trade_code(star, 'De', None, '23456789', '0')
         self._fix_trade_code(star, 'Po', None, '2345', '0123')
         self._fix_trade_code(star, 'Fl', None, 'ABC', '123456789A')
         self._fix_trade_code(star, 'He', '3456789ABC', '2479ABC', '012')
