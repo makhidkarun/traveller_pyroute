@@ -65,13 +65,14 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
 
     # Maps explored nodes to parent closest to the source.
     explored = {}
-    # Traces lowest distance from source node found for each node
-    distances = np.ones(len(G)) * float('+inf')
-    distances[source] = 0
+
     # Tracks shortest _complete_ path found so far
     floatinf = float('inf')
     upbound = floatinf if upbound is None else upbound
     assert upbound != floatinf, "Supplied upbound must not be infinite"
+    # Traces lowest distance from source node found for each node
+    distances = np.ones(len(G)) * floatinf
+    distances[source] = 0
 
     # pre-calc the minimum-cost edge on each node
     min_cost = np.zeros(len(G)) if min_cost is None else min_cost
