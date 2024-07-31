@@ -380,6 +380,7 @@ class Galaxy(AreaItem):
             sector = self.sectors[item]
             assert isinstance(sector, Sector), "Galaxy sectors must be instance of Sector object"
             result, msg = sector.is_well_formed()
+            assert result, msg
         for item in self.alg:
             allegiance = self.alg[item]
             assert isinstance(allegiance, Allegiance), "Galaxy allegiances must be instance of Allegiance object"
