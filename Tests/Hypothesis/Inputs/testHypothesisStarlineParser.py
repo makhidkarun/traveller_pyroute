@@ -328,6 +328,7 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 0000000-0 (00000000000000 - (000-0) -  B - A 000   0?', 'weird')
     @example('0000 000000000000000 0000000-0 [00000000000000 - -  [0000] - - A 000   00?', 'weird')
     @example('0000 000000000000000 0000000-0 (00000000000000       B A A 000 0 0?)0000000000', 'weird')
+    @example('0000 000000000000000 0000000-0 (00000000000000 - (000-0) -  B A A 000   0?', 'weird')
     def test_starline_parser_against_regex(self, s, match):
         # if it's a known weird-parse case, assume it out now
         assume(match != 'weird')
