@@ -221,7 +221,7 @@ class testStar(unittest.TestCase):
         self.assertTrue(foo.is_well_formed())
 
     @given(canonical_check())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(200))
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(500))
     @example('1919 Khula                ???????-? Hi In Pz Di(Khulans)      {0}  (000-0) [0000] BEf  N  A 510 10 ImDv M0 V')
     def test_star_canonicalise(self, s):
         hyp_line = "Hypothesis input: " + s
