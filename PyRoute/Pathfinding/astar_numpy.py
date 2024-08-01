@@ -114,11 +114,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
                            'un_exhausted': un_exhausted, 'targ_exhausted': targ_exhausted}
             return path, diagnostics
 
-        if 0 == node_counter % 49 and 0 < len(queue):
-            # Trim queue items that can not result in a shorter path
-            queue = [item for item in queue if not (item[1] > distances[item[2]])]
-            heapify(queue)
-
         if curnode in explored:
             revisited += 1
             # Do not override the parent of starting node
