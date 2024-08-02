@@ -213,6 +213,15 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         elif 2 == num_nodes:
             heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
             heappush(queue, (augmented_weights[1], active_weights[1], active_nodes[1], curnode))
+        elif 3 == num_nodes:
+            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
+            heappush(queue, (augmented_weights[1], active_weights[1], active_nodes[1], curnode))
+            heappush(queue, (augmented_weights[2], active_weights[2], active_nodes[2], curnode))
+        elif 4 == num_nodes:
+            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
+            heappush(queue, (augmented_weights[1], active_weights[1], active_nodes[1], curnode))
+            heappush(queue, (augmented_weights[2], active_weights[2], active_nodes[2], curnode))
+            heappush(queue, (augmented_weights[3], active_weights[3], active_nodes[3], curnode))
         else:
             for i in range(num_nodes):
                 heappush(queue, (augmented_weights[i], active_weights[i], active_nodes[i], curnode))
