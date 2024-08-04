@@ -39,19 +39,18 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
 
     parents = np.ones(len(graph), dtype=int) * -100  # Using -100 to track "not considered during processing"
     parents[list(seeds)] = -1  # Using -1 to flag "root node of tree"
-    node_counter = 0
 
     while heap:
         dist_tail, tail = heapq.heappop(heap)
-        node_counter += 1
 
         if dist_tail > distance_labels[tail] or dist_tail + min_cost[tail] > max_neighbour_labels[tail]:
             # Since we've just dequeued a bad node (distance exceeding its current label, or too close to max-label),
-            # remove other bad nodes from the list to avoid tripping over them later
-            heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]
-            # While we're grooming the queue already, chuck out nodes who cannot give better distance labels
-            heap = [(distance, tail) for (distance, tail) in heap if distance + min_cost[tail] <= max_neighbour_labels[tail]]
-            heapq.heapify(heap)
+            # remove other bad nodes from the list to avoid tripping over them later, and chuck out nodes who
+            # can't give better distance labels
+            if heap:
+                heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]
+                        and distance + min_cost[tail] <= max_neighbour_labels[tail]]
+                heapq.heapify(heap)
             continue
 
         # Link weights are strictly positive, thus lower bounded by zero. Thus, when the current dist_tail value exceeds
@@ -78,7 +77,14 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
 
         if 1 == num_nodes:
             heapq.heappush(heap, (active_weights[0], active_nodes[0]))
-        else:  # Only cop the iterator overhead if there's at least 2 neighbours to queue
+        elif 2 == num_nodes:
+            heapq.heappush(heap, (active_weights[0], active_nodes[0]))
+            heapq.heappush(heap, (active_weights[1], active_nodes[1]))
+        elif 3 == num_nodes:
+            heapq.heappush(heap, (active_weights[0], active_nodes[0]))
+            heapq.heappush(heap, (active_weights[1], active_nodes[1]))
+            heapq.heappush(heap, (active_weights[2], active_nodes[2]))
+        else:  # Only cop the iterator overhead if there's at least 4 neighbours to queue
             for index in range(0, num_nodes):
                 heapq.heappush(heap, (active_weights[index], active_nodes[index]))
 

@@ -13,10 +13,9 @@ import unittest
 import networkx as nx
 import numpy as np
 
-from PyRoute.Pathfinding.ApproximateShortestPathTreeDistanceGraph import ApproximateShortestPathTreeDistanceGraph
+from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Pathfinding.ApproximateShortestPathTree import ApproximateShortestPathTree
 from Tests.baseTest import baseTest
 
 
@@ -42,7 +41,7 @@ class testApproximateShortestPathTree(baseTest):
         stars = list(graph.nodes)
         source = stars[0]
 
-        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0.2)
+        approx = ApproximateShortestPathForestUnified(source, graph, 0.2)
         self.assertEqual(496, len(approx._distances), "Distances dictionary has unexpected length")
 
         src = stars[2]
@@ -73,7 +72,7 @@ class testApproximateShortestPathTree(baseTest):
         stars = list(graph.nodes)
         source = stars[0]
 
-        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0.2)
+        approx = ApproximateShortestPathForestUnified(source, graph, 0.2)
 
         src = stars[20]
         targ = stars[19]
@@ -103,7 +102,7 @@ class testApproximateShortestPathTree(baseTest):
         stars = list(graph.nodes)
         source = stars[0]
 
-        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0.2)
+        approx = ApproximateShortestPathForestUnified(source, graph, 0.2)
 
         src = stars[2]
 
@@ -131,7 +130,7 @@ class testApproximateShortestPathTree(baseTest):
         graph = galaxy.stars
         stars = list(graph.nodes)
         source = stars[0]
-        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0.2)
+        approx = ApproximateShortestPathForestUnified(source, graph, 0.2)
 
         active_nodes = [20, 19, 1]
         target = 1
@@ -162,7 +161,7 @@ class testApproximateShortestPathTree(baseTest):
         stars = list(graph.nodes)
         source = stars[0]
 
-        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0.2)
+        approx = ApproximateShortestPathForestUnified(source, graph, 0.2)
         # verify that all distances as at ctor are finite
         distances = approx._distances
         old_num = len(distances)
@@ -200,7 +199,7 @@ class testApproximateShortestPathTree(baseTest):
         stars = list(graph.nodes)
         source = stars[0]
 
-        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0.2)
+        approx = ApproximateShortestPathForestUnified(source, graph, 0.2)
 
         # auxiliary network dijkstra calculation to dish out parent nodes
         paths = nx.single_source_dijkstra_path(graph, source)
@@ -242,7 +241,7 @@ class testApproximateShortestPathTree(baseTest):
         leafnode = stars[30]
         subnode = stars[paths[leafnode][-2]]
 
-        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0)
+        approx = ApproximateShortestPathForestUnified(source, graph, 0)
 
         # seed expected distances
         with open(jsonfile, 'r') as file:
@@ -257,7 +256,7 @@ class testApproximateShortestPathTree(baseTest):
                 exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
 
-        distance_check = list(expected_distances.values()) == approx._distances
+        distance_check = list(expected_distances.values()) == approx._distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT creation")
 
         # adjust weight
@@ -297,7 +296,7 @@ class testApproximateShortestPathTree(baseTest):
         source = stars[0]
         leafnode = stars[30]
 
-        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0)
+        approx = ApproximateShortestPathForestUnified(source, graph, 0)
 
         # auxiliary network dijkstra calculation to dish out parent nodes
         paths = nx.single_source_dijkstra_path(graph, source)
@@ -316,7 +315,7 @@ class testApproximateShortestPathTree(baseTest):
                 exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
 
-        distance_check = list(expected_distances.values()) == approx._distances
+        distance_check = list(expected_distances.values()) == approx._distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT creation")
 
         # adjust weight
@@ -335,7 +334,7 @@ class testApproximateShortestPathTree(baseTest):
 
         approx.update_edges([edge])
 
-        distance_check = list(expected_distances.values()) == approx._distances
+        distance_check = list(expected_distances.values()) == approx._distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT restart")
 
     def test_verify_multiple_near_root_edges_propagate(self):
@@ -359,7 +358,7 @@ class testApproximateShortestPathTree(baseTest):
         stars = list(graph.nodes)
         source = stars[4]
 
-        approx = ApproximateShortestPathTreeDistanceGraph(source, graph, 0)
+        approx = ApproximateShortestPathForestUnified(source, graph, 0)
 
         edges = [(stars[3], stars[2]), (stars[2], source)]
 
@@ -367,8 +366,6 @@ class testApproximateShortestPathTree(baseTest):
             graph[item[0]][item[1]]['weight'] *= 0.9
 
         approx.update_edges(edges)
-
-
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
@@ -393,6 +390,7 @@ class testApproximateShortestPathTree(baseTest):
         args.debugflag = False
         args.mp_threads = 1
         return args
+
 
 if __name__ == '__main__':
     unittest.main()

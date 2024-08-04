@@ -40,6 +40,13 @@ class ApproximateShortestPathForestUnified:
                                                                                    divisor=self._divisor)
             self._distances[:, i], self._max_labels[:, i] = result
 
+    def lower_bound(self, source, target):
+        raw = np.abs(self._distances[source, :] - self._distances[target, :])
+        raw = raw[~np.isinf(raw)]
+        if 0 == len(raw):
+            return 0
+        return np.max(raw)
+
     def lower_bound_bulk(self, active_nodes, target_node):
         overdrive, fastpath = self._mona_lisa_overdrive(target_node)
 
@@ -51,12 +58,13 @@ class ApproximateShortestPathForestUnified:
             else:
                 raw = np.abs(self._distances[active_nodes, :] - self._distances[target_node, :])
         else:
-            actives = self._distances[:, overdrive]
-            actives = actives[active_nodes, :]
-            target = self._distances[target_node, overdrive]
             # if we haven't got _any_ active lines, throw hands up and spit back zeros
             if not overdrive.any():
                 return np.zeros(len(active_nodes), dtype=float)
+            actives = self._distances[:, overdrive]
+            if len(active_nodes) != self._graph_len:
+                actives = actives[active_nodes, :]
+            target = self._distances[target_node, overdrive]
 
             raw = np.abs(actives - target)
 
@@ -104,6 +112,7 @@ class ApproximateShortestPathForestUnified:
 
             # If that bound no longer holds, it's due to the edge (u, v) having its weight decreased during pathfinding.
             # Tag each incident node as needing updates.
+            delta *= self._divisor
 
             if np.max(delta) >= weight:
                 dropnodes.add(left)

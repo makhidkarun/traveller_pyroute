@@ -55,26 +55,31 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
 
     G_succ = G._arcs  # For speed-up
 
+    # pre-calc heuristics for all nodes to the target node
+    potentials = bulk_heuristic(G._nodes, target)
+
     # The queue stores priority, cost to reach, node,  and parent.
     # Uses Python heapq to keep in priority order.
     # The nodes themselves, being integers, are directly comparable.
-    queue = [(0, 0, source, None)]
+    queue = [(potentials[source], 0, source, None)]
 
     # Maps explored nodes to parent closest to the source.
     explored = {}
-    # Traces lowest distance from source node found for each node
-    distances = np.ones(len(G)) * float('+inf')
-    distances[source] = 0
+
     # Tracks shortest _complete_ path found so far
     floatinf = float('inf')
     upbound = floatinf if upbound is None else upbound
     assert upbound != floatinf, "Supplied upbound must not be infinite"
-    # pre-calc heuristics for all nodes to the target node
-    potentials = bulk_heuristic(G._nodes, target)
+    # Traces lowest distance from source node found for each node
+    distances = np.ones(len(G)) * floatinf
+    distances[source] = 0
+
     # pre-calc the minimum-cost edge on each node
     min_cost = np.zeros(len(G)) if min_cost is None else min_cost
     min_cost[target] = 0
     up_threshold = upbound - min_cost
+    upper_limit = up_threshold
+    upper_limit[source] = 0
 
     node_counter = 0
     queue_counter = 0
@@ -109,11 +114,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
                            'un_exhausted': un_exhausted, 'targ_exhausted': targ_exhausted}
             return path, diagnostics
 
-        if 0 == node_counter % 49 and 0 < len(queue):
-            # Trim queue items that can not result in a shorter path
-            queue = [item for item in queue if not (item[1] > distances[item[2]])]
-            heapify(queue)
-
         if curnode in explored:
             revisited += 1
             # Do not override the parent of starting node
@@ -137,11 +137,10 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         active_weights = dist + raw_nodes[1]
         # filter out nodes whose active weights exceed _either_ the node's distance label _or_ the current upper bound
         # - the current node can _not_ result in a shorter path
-        keep = active_weights <= np.minimum(distances[active_nodes], up_threshold[active_nodes])
+        keep = active_weights <= upper_limit[active_nodes]
         # if we're not keeping anything, go around
         active_nodes = active_nodes[keep]
-        num_neighbours = len(active_nodes)
-        if 0 == num_neighbours:
+        if 0 == len(active_nodes):
             g_exhausted += 1
             continue
         active_weights = active_weights[keep]
@@ -150,16 +149,15 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         # Even if we have the target node as a candidate neighbour, of itself, that's _no_ guarantee that the target
         # as neighbour will give a better upper bound.
         keep = augmented_weights < upbound
-        if not keep.all():
-            active_nodes = active_nodes[keep]
-            num_neighbours = len(active_nodes)
-            if 0 == num_neighbours:
-                f_exhausted += 1
-                continue
-            active_weights = active_weights[keep]
-            augmented_weights = augmented_weights[keep]
+        active_nodes = active_nodes[keep]
+        if 0 == len(active_nodes):
+            f_exhausted += 1
+            continue
+        active_weights = active_weights[keep]
+        augmented_weights = augmented_weights[keep]
 
         if target in active_nodes:
+            num_neighbours = len(active_nodes)
             drop = active_nodes == target
             ncost = active_weights[drop][0]
 
@@ -167,13 +165,14 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             new_upbounds += 1
             distances[target] = ncost
             up_threshold = upbound - min_cost
+            upper_limit = np.minimum(upper_limit, up_threshold)
             if 0 < len(queue):
                 queue = [item for item in queue if item[0] < upbound]
                 if 0 < len(queue):
                     # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
                     queue = [item for item in queue if not (item[1] > distances[item[2]])]
                     # And while we're here, trim elements who are too close to upbound
-                    queue = [item for item in queue if item[1] + min_cost[item[2]] <= upbound]
+                    queue = [item for item in queue if item[1] <= up_threshold[item[2]]]
                     # Finally, dedupe the queue after cleaning all bound-busts out and 2 or more elements are left.
                     # Empty or single-element sets cannot require deduplication, and are already heaps themselves.
                     if 1 < len(queue):
@@ -204,11 +203,27 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         # Now unconditionally queue _all_ nodes that are still active, worrying about filtering out the bound-busting
         # neighbours later.
         distances[active_nodes] = active_weights
+        upper_limit[active_nodes] = active_weights
         num_nodes = len(active_nodes)
 
         queue_counter += num_nodes
 
-        for i in range(num_nodes):
-            heappush(queue, (augmented_weights[i], active_weights[i], active_nodes[i], curnode))
+        if 1 == num_nodes:
+            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
+        elif 2 == num_nodes:
+            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
+            heappush(queue, (augmented_weights[1], active_weights[1], active_nodes[1], curnode))
+        elif 3 == num_nodes:
+            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
+            heappush(queue, (augmented_weights[1], active_weights[1], active_nodes[1], curnode))
+            heappush(queue, (augmented_weights[2], active_weights[2], active_nodes[2], curnode))
+        elif 4 == num_nodes:
+            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
+            heappush(queue, (augmented_weights[1], active_weights[1], active_nodes[1], curnode))
+            heappush(queue, (augmented_weights[2], active_weights[2], active_nodes[2], curnode))
+            heappush(queue, (augmented_weights[3], active_weights[3], active_nodes[3], curnode))
+        else:
+            for i in range(num_nodes):
+                heappush(queue, (augmented_weights[i], active_weights[i], active_nodes[i], curnode))
 
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")

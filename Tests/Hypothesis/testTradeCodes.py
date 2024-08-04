@@ -107,6 +107,7 @@ class testTradeCodes(unittest.TestCase):
     @example('A655000-0', '000000000000000')
     @example('A000000-0', 'Ba')
     @example('ABDA000-0', '000000000000000')
+    @example('?d20000-0', 'An Cw')
     def test_verify_canonicalisation_is_idempotent(self, s, trade_line):
         s = s[0:9]
         if isinstance(trade_line, list):

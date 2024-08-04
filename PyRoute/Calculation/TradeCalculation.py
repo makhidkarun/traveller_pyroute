@@ -286,7 +286,7 @@ class TradeCalculation(RouteCalculation):
 
         try:
             active_nodes = list(range(len(self.star_graph)))
-            upbound = self._preheat_upper_bound(star, target)
+            upbound = self._preheat_upper_bound(star, target, allow_reheat=True)
             # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
             if float('+inf') != upbound:
                 comp_id = star.component
@@ -395,6 +395,9 @@ class TradeCalculation(RouteCalculation):
                 nubound = midbound[mindex]
                 upbound = min(upbound, nubound)
                 reheat_list.add((stardex, common[mindex]))
+                maxdex = np.argmax(midbound)
+                if maxdex != mindex:
+                    reheat_list.add((stardex, common[maxdex]))
 
         # Case 2 - Historic-route source neighbour to direct target neighbour
         hist_src = self.galaxy.historic_costs._arcs[stardex]
@@ -409,6 +412,9 @@ class TradeCalculation(RouteCalculation):
                 nubound = midbound[mindex]
                 upbound = min(upbound, nubound)
                 reheat_list.add((targdex, common[mindex]))
+                maxdex = np.argmax(midbound)
+                if maxdex != mindex:
+                    reheat_list.add((targdex, common[maxdex]))
 
         # Case 3 - Historic-route source neighbour to historic-route target neighbour
         if 0 < len(hist_src[0]) and 0 < len(hist_targ[0]):
@@ -423,17 +429,24 @@ class TradeCalculation(RouteCalculation):
                 upbound = min(upbound, nubound)
                 reheat_list.add((stardex, common[mindex]))
                 reheat_list.add((targdex, common[mindex]))
+                maxdex = np.argmax(midbound)
+                if maxdex != mindex:
+                    reheat_list.add((stardex, common[maxdex]))
+                    reheat_list.add((targdex, common[maxdex]))
 
         if reheat and 0 < len(reheat_list):
             for pair in reheat_list:
                 start = pair[0]
                 end = pair[1]
-                edge = self.galaxy.stars[start][end]
+                if start in self.galaxy.stars and end in self.galaxy.stars[start]:
+                    edge = self.galaxy.stars[start][end]
+                else:
+                    continue
                 route = edge.get('route', False)
                 if route is not False:
                     rawroute = [item.index for item in route]
                     # The 0.5% bump is to _ensure_ the newcost remains an _upper_ bound on the historic-route cost
-                    newcost = self.galaxy.route_cost(rawroute) * 1.005
+                    newcost = min(edge['weight'], self.galaxy.route_cost(rawroute) * 1.005)
                     if edge['weight'] > newcost:
                         self.galaxy.stars[start][end]['weight'] = newcost
                         self.galaxy.historic_costs.lighten_edge(start, end, newcost)
@@ -514,6 +527,7 @@ class TradeCalculation(RouteCalculation):
         - reduce the weight of routes used to allow more trade to flow
         """
         distance = self.route_distance(route)
+        cost = self.route_cost(route)
 
         source = route[0]
         target = route[-1]
@@ -525,6 +539,10 @@ class TradeCalculation(RouteCalculation):
 
         self.galaxy.landmarks[(source.index, target.index)] = distance
         self.galaxy.landmarks[(target.index, source.index)] = distance
+        if 2 < len(route):
+            self.galaxy.stars.add_edge(source.index, target.index, distance=distance, weight=cost, trade=0, btn=0,
+                                       count=0, exhaust=0, route=route)
+            self.galaxy.historic_costs.add_edge(source.index, target.index, cost)
 
         # Gather basic statistics.
         tradeBTN = self.get_btn(source, target, distance)
@@ -545,22 +563,16 @@ class TradeCalculation(RouteCalculation):
                 end.tradeCount += 1
                 end.passOver += tradePass
             data = self.galaxy.stars[start.index][end.index]
-            exhausted = data['count'] > data['exhaust']
+            exhausted = data['count'] >= data['exhaust']
             data['trade'] += tradeCr
             data['count'] += 1
             if reweight and not exhausted:
                 data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
                 self.star_graph.lighten_edge(start.index, end.index, data['weight'])
                 self.shortest_path_tree.lighten_edge(start.index, end.index, data['weight'])
-            if not exhausted:  # If edge is exhausted - can't trip an update - don't queue it for update
+                # Edge can only trip an update if it's not exhausted
                 edges.append((start.index, end.index))
             start = end
-
-        if not self.galaxy.stars.has_edge(source.index, target.index):
-            historic_cost = self.route_cost(route) * 1.005
-            self.galaxy.historic_costs.add_edge(source.index, target.index, historic_cost)
-            self.galaxy.stars.add_edge(source.index, target.index, distance=distance, weight=historic_cost, trade=0,
-                                       btn=0, count=0, exhaust=0, route=route)
 
         # Feed the list of touched edges into the approximate-shortest-path machinery, so it can update whatever
         # distance labels it needs to stay within its approximation bound.

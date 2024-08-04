@@ -7,7 +7,6 @@ import copy
 
 import networkx as nx
 
-from PyRoute.Position.Hex import Hex
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
@@ -47,7 +46,7 @@ class XRouteCalculation(RouteCalculation):
         if len(self.capital) == 0:
             return
         for star in self.secCapitals:
-            self.get_route_between(self.capital[0], star, self.calc_trade(25), Hex.heuristicDistance)
+            self.get_route_between(self.capital[0], star, self.calc_trade(25))
 
         for star in self.secCapitals:
             localCapital = {'coreward': None, 'spinward': None, 'trailing': None, 'rimward': None,
@@ -83,7 +82,7 @@ class XRouteCalculation(RouteCalculation):
 
             for neighbor in localCapital.values():
                 if neighbor and not self.galaxy.ranges.has_edge(star, neighbor):
-                    self.get_route_between(star, neighbor, self.calc_trade(25), Hex.heuristicDistance)
+                    self.get_route_between(star, neighbor, self.calc_trade(25))
 
     def routes_pass_2(self):
         # Step 2a - re-weight the routes to be more weighted to J4 than J6
@@ -106,17 +105,17 @@ class XRouteCalculation(RouteCalculation):
                         # if we couldn't find a nearest sector capital, don't try finding a route to one
                         if capital[0] is None:
                             continue
-                        self.get_route_between(capital[0], star, self.calc_trade(23), Hex.heuristicDistance)
+                        self.get_route_between(capital[0], star, self.calc_trade(23))
             else:
                 for star in subCap:
                     if self.galaxy.ranges.has_edge(secCap[0], star):
                         continue
-                    self.get_route_between(secCap[0], star, self.calc_trade(23), self.galaxy.heuristic_distance_indexes)
+                    self.get_route_between(secCap[0], star, self.calc_trade(23))
 
         for star in self.subCapitals:
             routes = [neighbor for neighbor in self.subCapitals if neighbor != star and neighbor.distance(star) <= 40]
             for neighbor in routes:
-                self.get_route_between(star, neighbor, self.calc_trade(23), self.galaxy.heuristic_distance_indexes)
+                self.get_route_between(star, neighbor, self.calc_trade(23))
 
     def routes_pass_3(self):
         self.reweight_routes(self.impt_weight)
@@ -136,7 +135,7 @@ class XRouteCalculation(RouteCalculation):
                 if star.distance(neighbour_world) > 4:
                     continue
                 if neighbor in jumpStations:
-                    self.get_route_between(star, neighbor, self.calc_trade(21), None)
+                    self.get_route_between(star, neighbor, self.calc_trade(21))
                     jumpStations.append(star)
             if star.tradeCount == 0:
                 important2.append(star)
@@ -145,7 +144,7 @@ class XRouteCalculation(RouteCalculation):
         for star in important2:
             for neighbor in self.galaxy.stars.neighbors(star.index):
                 if neighbor in jumpStations:
-                    self.get_route_between(star, neighbor, self.calc_trade(21), None)
+                    self.get_route_between(star, neighbor, self.calc_trade(21))
                     jumpStations.append(star)
             if star.tradeCount == 0:
                 important3.append(star)
@@ -154,7 +153,7 @@ class XRouteCalculation(RouteCalculation):
         capitalList = self.capital + self.secCapitals + self.subCapitals
         for star in important3:
             capital = self.find_nearest_capital(star, capitalList)
-            self.get_route_between(capital[0], star, self.calc_trade(21), None)
+            self.get_route_between(capital[0], star, self.calc_trade(21))
 
     def calculate_routes(self):
         self.calculate_components()
@@ -199,7 +198,7 @@ class XRouteCalculation(RouteCalculation):
                 return world
         return None
 
-    def get_route_between(self, star, target, trade, heuristic):
+    def get_route_between(self, star, target, trade):
         try:
             mincost = copy.deepcopy(self.star_graph._min_cost)
             upbound = self.shortest_path_tree.triangle_upbound(star, target) * 1.005
