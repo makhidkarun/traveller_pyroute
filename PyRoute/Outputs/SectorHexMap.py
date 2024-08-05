@@ -142,9 +142,11 @@ class SectorHexMap(Map):
 
             (start_x, start_y), (end_x, end_y) = self.clipping(start_x, start_y, end_x, end_y)
             if up:
-                assert start_y >= end_y, "Misaligned to-coreward trade segment between " + str(start) + " and " + str(end)
+                assert start_y >= end_y,\
+                    "Misaligned to-coreward trade segment between " + str(start) + " and " + str(end)
             if down:
-                assert start_y <= end_y, "Misaligned to-rimward trade segment between " + str(start) + " and " + str(end)
+                assert start_y <= end_y,\
+                    "Misaligned to-rimward trade segment between " + str(start) + " and " + str(end)
 
         else:
             end_y = self.y_start + (self.ym * 2 * end_row) - (self.ym * (1 if end_col & 1 else 0))
