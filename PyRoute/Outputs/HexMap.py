@@ -13,12 +13,13 @@ from pypdflite.pdfobjects.pdftext import PDFText
 
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Outputs.SectorHexMap import SectorHexMap
 from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
 from PyRoute.StatCalculation import StatCalculation
 
 
-class HexMap(object):
+class HexMap(SectorHexMap):
     """
     Draw the trade routes as calculated, sector by sector onto PDF files.
     Used pypdflite to directly generate the PDF files.

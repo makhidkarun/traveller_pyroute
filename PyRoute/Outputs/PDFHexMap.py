@@ -9,11 +9,11 @@ import logging
 from reportlab.pdfgen.canvas import Canvas
 
 from PyRoute.Position.Hex import Hex
-from PyRoute.Outputs.Map import Map
+from PyRoute.Outputs.SectorHexMap import SectorHexMap
 from PyRoute.StatCalculation import StatCalculation
 
 
-class PDFHexMap(Map):
+class PDFHexMap(SectorHexMap):
 
     colourmap = {'gray': (128, 128, 128), 'salmon': (255, 140, 105), 'goldenrod': (218, 165, 32),
                  'crimson': (220, 20, 60)}
