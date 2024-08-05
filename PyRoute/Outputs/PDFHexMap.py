@@ -40,9 +40,7 @@ class PDFHexMap(SectorHexMap):
         Write name at the top of the document
         """
         # Save out whatever font is currently set
-        font_name = doc._fontname
-        font_size = doc._fontsize
-        font_leading = doc._leading
+        font_leading, font_name, font_size = self._save_font(doc)
         new_font = 'Times-Roman'
         new_size = 30
         doc.setFont(new_font, size=new_size)
@@ -57,9 +55,7 @@ class PDFHexMap(SectorHexMap):
 
     def coreward_sector(self, pdf, name):
         # Save out whatever font is currently set
-        font_name = pdf._fontname
-        font_size = pdf._fontsize
-        font_leading = pdf._leading
+        font_leading, font_name, font_size = self._save_font(pdf)
 
         new_font = 'Times-Roman'
         new_size = 10
@@ -76,9 +72,7 @@ class PDFHexMap(SectorHexMap):
 
     def rimward_sector(self, pdf, name):
         # Save out whatever font is currently set
-        font_name = pdf._fontname
-        font_size = pdf._fontsize
-        font_leading = pdf._leading
+        font_leading, font_name, font_size = self._save_font(pdf)
 
         new_font = 'Times-Roman'
         new_size = 10
@@ -95,9 +89,7 @@ class PDFHexMap(SectorHexMap):
 
     def spinward_sector(self, pdf, name):
         # Save out whatever font is currently set
-        font_name = pdf._fontname
-        font_size = pdf._fontsize
-        font_leading = pdf._leading
+        font_leading, font_name, font_size = self._save_font(pdf)
 
         new_font = 'Times-Roman'
         new_size = 10
@@ -117,9 +109,7 @@ class PDFHexMap(SectorHexMap):
 
     def trailing_sector(self, pdf, name):
         # Save out whatever font is currently set
-        font_name = pdf._fontname
-        font_size = pdf._fontsize
-        font_leading = pdf._leading
+        font_leading, font_name, font_size = self._save_font(pdf)
 
         new_font = 'Times-Roman'
         new_size = 10
@@ -279,9 +269,7 @@ class PDFHexMap(SectorHexMap):
             rlineEnd[1] = self.y_start - 3 * self.ym
 
     def system(self, pdf, star):
-        font_name = pdf._fontname
-        font_size = pdf._fontsize
-        font_leading = pdf._leading
+        font_leading, font_name, font_size = self._save_font(pdf)
 
         new_font = 'Times-Roman'
         new_size = 4
@@ -439,3 +427,9 @@ class PDFHexMap(SectorHexMap):
         if 'string' == self.writer._filename:
             return False
         return True
+
+    def _save_font(self, pdf):
+        font_name = pdf._fontname
+        font_size = pdf._fontsize
+        font_leading = pdf._leading
+        return font_leading, font_name, font_size
