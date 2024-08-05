@@ -24,12 +24,7 @@ class PDFHexMap(SectorHexMap):
         self.writer = None
 
     def write_sector_pdf_map(self, gal_sector, is_live=True):
-        pdf_doc = self.document(gal_sector, is_live)
-        self.write_base_map(pdf_doc, gal_sector)
-        self.draw_borders(pdf_doc, gal_sector)
-        worlds = [item.index for item in gal_sector.worlds]
-        comm_routes = [star for star in self.galaxy.stars.edges(worlds, True)
-                       if star[2].get('xboat', False) or star[2].get('comm', False)]
+        comm_routes, pdf_doc, worlds = self._setup_sector_pdf_map(gal_sector, is_live)
         pdf_doc.setLineWidth(1)
         for (star, neighbor, data) in comm_routes:
             srcstar = self.galaxy.star_mapping[star]
