@@ -14,6 +14,38 @@ class SectorHexMap(Map):
     def comm_line(self, pdf, edge):
         raise NotImplementedError("Base Class")
 
+    def clipping(self, startx, starty, endx, endy):
+        points_t = [0.0, 1.0]
+        line_pt_1 = [startx, starty]
+        line_pt_2 = [endx, endy]
+
+        if startx == endx:
+            if starty > endy:
+                return ((startx, min(max(starty, endy), 780)),
+                        (startx, max(min(starty, endy), 42)))
+            else:
+                return ((startx, max(min(starty, endy), 42)),
+                        (startx, min(max(starty, endy), 780)))
+
+        if starty == endy:
+            if startx > endx:
+                return ((min(max(startx, endx), 600), starty),
+                        (max(min(startx, endx), 15), starty))
+            else:
+                return ((max(min(startx, endx), 15), starty),
+                        (min(max(startx, endx), 600), starty))
+
+        points_t.append(float(15 - startx) / (endx - startx))
+        points_t.append(float(600 - startx) / (endx - startx))
+        points_t.append(float(780 - starty) / (endy - starty))
+        points_t.append(float(42 - starty) / (endy - starty))
+
+        points_t.sort()
+        result = [(pt_1 + t * (pt_2 - pt_1)) for t in (points_t[2], points_t[3]) for (pt_1, pt_2) in
+                  zip(line_pt_1, line_pt_2)]
+        logging.getLogger("PyRoute.HexMap").debug(result)
+        return (result[0], result[1]), (result[2], result[3])
+
     def _setup_sector_pdf_map(self, gal_sector, is_live):
         pdf_doc = self.document(gal_sector, is_live)
         self.write_base_map(pdf_doc, gal_sector)
@@ -81,3 +113,35 @@ class SectorHexMap(Map):
             trade = 6
         tradeColor = tradeColors[trade]
         return end, start, tradeColor
+
+    def _get_line_endpoints(self, end, start):
+        starty = self.y_start + (self.ym * 2 * start.row) - (self.ym * (1 if start.col & 1 else 0))
+        startx = (self.xm * 3 * start.col) + self.ym
+        endRow = end.row
+        endCol = end.col
+        if end.sector != start.sector:
+            up = False
+            down = False
+            if end.sector.x < start.sector.x:
+                endCol -= 32
+            if end.sector.x > start.sector.x:
+                endCol += 32
+            if end.sector.y > start.sector.y:
+                endRow -= 40
+                up = True
+            if end.sector.y < start.sector.y:
+                endRow += 40
+                down = True
+            endy = self.y_start + (self.ym * 2 * endRow) - (self.ym * (1 if endCol & 1 else 0))
+            endx = (self.xm * 3 * endCol) + self.ym
+
+            (startx, starty), (endx, endy) = self.clipping(startx, starty, endx, endy)
+            if up:
+                assert starty >= endy, "Misaligned to-coreward trade segment between " + str(start) + " and " + str(end)
+            if down:
+                assert starty <= endy, "Misaligned to-rimward trade segment between " + str(start) + " and " + str(end)
+
+        else:
+            endy = self.y_start + (self.ym * 2 * endRow) - (self.ym * (1 if endCol & 1 else 0))
+            endx = (self.xm * 3 * endCol) + self.ym
+        return endx, endy, startx, starty
