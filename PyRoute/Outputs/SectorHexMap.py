@@ -49,3 +49,15 @@ class SectorHexMap(Map):
             self.spinward_sector(pdf_doc, gal_sector.spinward.name)
         if gal_sector.trailing:
             self.trailing_sector(pdf_doc, gal_sector.trailing.name)
+
+    def _system_write_additional_data(self, star):
+        added = ''
+        tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
+        tradeThrough = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
+        if self.routes == 'trade':
+            added += "{:X}{:X}{:X}{:d}".format(star.wtn, tradeIn, tradeThrough, star.starportSize)
+        elif self.routes == 'comm':
+            added += "{}{} {}".format(star.baseCode, star.ggCount, star.importance)
+        elif self.routes == 'xroute':
+            added += " {}".format(star.importance)
+        return added

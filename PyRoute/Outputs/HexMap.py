@@ -314,16 +314,7 @@ class HexMap(SectorHexMap):
         point.x_plus(self.ym - (width // 2))
         pdf.add_text(added, point)
 
-        added = ''
-        tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
-        tradeThrough = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
-
-        if self.routes == 'trade':
-            added += "{:X}{:X}{:X}{:d}".format(star.wtn, tradeIn, tradeThrough, star.starportSize)
-        elif self.routes == 'comm':
-            added += "{}{} {}".format(star.baseCode, star.ggCount, star.importance)
-        elif self.routes == 'xroute':
-            added += " {}".format(star.importance)
+        added = self._system_write_additional_data(star)
         width = pdf.get_font()._string_width(added)
         point.y_plus(3.5)
         point.x = col
