@@ -114,7 +114,7 @@ class SectorHexMap(Map):
         if trade < 0:
             return None, None, None
         if trade > 6:
-            logging.getLogger('PyRoute.HexMap').warning("trade calculated over %d" % self.min_btn + 6)
+            logging.getLogger('PyRoute.HexMap').warning("trade calculated over %d" % (self.min_btn + 6))
             trade = 6
         trade_colour = trade_colours[trade]
         return end, start, trade_colour
