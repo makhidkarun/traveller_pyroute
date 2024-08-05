@@ -29,16 +29,7 @@ class PDFHexMap(SectorHexMap):
         self._sector_map_comm_and_trade_routes(comm_routes, pdf_doc, worlds)
 
         pdf_doc.setStrokeColorRGB(0, 0, 0)
-        for star in gal_sector.worlds:
-            self.system(pdf_doc, star)
-        if gal_sector.coreward:
-            self.coreward_sector(pdf_doc, gal_sector.coreward.name)
-        if gal_sector.rimward:
-            self.rimward_sector(pdf_doc, gal_sector.rimward.name)
-        if gal_sector.spinward:
-            self.spinward_sector(pdf_doc, gal_sector.spinward.name)
-        if gal_sector.trailing:
-            self.trailing_sector(pdf_doc, gal_sector.trailing.name)
+        self._sector_map_systems_and_sectors(gal_sector, pdf_doc)
         if is_live:
             return self.writer.save()
         return self.writer.getpdfdata()

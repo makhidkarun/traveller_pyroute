@@ -37,3 +37,15 @@ class SectorHexMap(Map):
             srcstar = self.galaxy.star_mapping[star]
             trgstar = self.galaxy.star_mapping[neighbor]
             self.trade_line(pdf_doc, [srcstar, trgstar], data)
+
+    def _sector_map_systems_and_sectors(self, gal_sector, pdf_doc):
+        for star in gal_sector.worlds:
+            self.system(pdf_doc, star)
+        if gal_sector.coreward:
+            self.coreward_sector(pdf_doc, gal_sector.coreward.name)
+        if gal_sector.rimward:
+            self.rimward_sector(pdf_doc, gal_sector.rimward.name)
+        if gal_sector.spinward:
+            self.spinward_sector(pdf_doc, gal_sector.spinward.name)
+        if gal_sector.trailing:
+            self.trailing_sector(pdf_doc, gal_sector.trailing.name)

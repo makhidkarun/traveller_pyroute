@@ -62,16 +62,7 @@ class HexMap(SectorHexMap):
         #            data['trade'] > 0 and \
         #            self.trade_to_btn(data['trade']) >= self.min_btn:
         #            self.trade_line(pdf, [star, neighbor], data)
-        for star in gal_sector.worlds:
-            self.system(pdf_doc, star)
-        if gal_sector.coreward:
-            self.coreward_sector(pdf_doc, gal_sector.coreward.name)
-        if gal_sector.rimward:
-            self.rimward_sector(pdf_doc, gal_sector.rimward.name)
-        if gal_sector.spinward:
-            self.spinward_sector(pdf_doc, gal_sector.spinward.name)
-        if gal_sector.trailing:
-            self.trailing_sector(pdf_doc, gal_sector.trailing.name)
+        self._sector_map_systems_and_sectors(gal_sector, pdf_doc)
         return self.writer.close()
 
     def write_base_map(self, pdf, sector):
