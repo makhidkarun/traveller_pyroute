@@ -6,7 +6,7 @@ Created on Aug 05, 2024
 import logging
 
 from PyRoute.Outputs.Map import Map
-from StatCalculation import StatCalculation
+from PyRoute.StatCalculation import StatCalculation
 
 
 class SectorHexMap(Map):
@@ -61,3 +61,23 @@ class SectorHexMap(Map):
         elif self.routes == 'xroute':
             added += " {}".format(star.importance)
         return added
+
+    def _trade_line_setup(self, data, edge):
+        tradeColors = [(255, 0, 0),  # Red
+                       (224, 224, 16),  # yellow - darker
+                       (0, 255, 0),  # green
+                       (0, 255, 255),  # Cyan
+                       (96, 96, 255),  # blue - lighter
+                       (128, 0, 128),  # purple
+                       (148, 0, 211),  # violet
+                       ]
+        start = edge[0]
+        end = edge[1]
+        trade = StatCalculation.trade_to_btn(data['trade']) - self.min_btn
+        if trade < 0:
+            return None, None, None
+        if trade > 6:
+            logging.getLogger('PyRoute.HexMap').warn("trade calculated over %d" % self.min_btn + 6)
+            trade = 6
+        tradeColor = tradeColors[trade]
+        return end, start, tradeColor
