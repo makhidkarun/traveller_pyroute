@@ -89,10 +89,10 @@ class SectorHexMap(Map):
 
     def _system_write_additional_data(self, star):
         added = ''
-        tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
-        tradeThrough = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
+        trade_in = StatCalculation.trade_to_btn(star.tradeIn)
+        trade_through = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
         if self.routes == 'trade':
-            added += "{:X}{:X}{:X}{:d}".format(star.wtn, tradeIn, tradeThrough, star.starportSize)
+            added += "{:X}{:X}{:X}{:d}".format(star.wtn, trade_in, trade_through, star.starportSize)
         elif self.routes == 'comm':
             added += "{}{} {}".format(star.baseCode, star.ggCount, star.importance)
         elif self.routes == 'xroute':
@@ -100,7 +100,7 @@ class SectorHexMap(Map):
         return added
 
     def _trade_line_setup(self, data, edge):
-        tradeColors = [(255, 0, 0),  # Red
+        trade_colours = [(255, 0, 0),  # Red
                        (224, 224, 16),  # yellow - darker
                        (0, 255, 0),  # green
                        (0, 255, 255),  # Cyan
@@ -116,29 +116,29 @@ class SectorHexMap(Map):
         if trade > 6:
             logging.getLogger('PyRoute.HexMap').warn("trade calculated over %d" % self.min_btn + 6)
             trade = 6
-        tradeColor = tradeColors[trade]
-        return end, start, tradeColor
+        trade_colour = trade_colours[trade]
+        return end, start, trade_colour
 
     def _get_line_endpoints(self, end, start):
         starty = self.y_start + (self.ym * 2 * start.row) - (self.ym * (1 if start.col & 1 else 0))
         startx = (self.xm * 3 * start.col) + self.ym
-        endRow = end.row
-        endCol = end.col
+        end_row = end.row
+        end_col = end.col
         if end.sector != start.sector:
             up = False
             down = False
             if end.sector.x < start.sector.x:
-                endCol -= 32
+                end_col -= 32
             if end.sector.x > start.sector.x:
-                endCol += 32
+                end_col += 32
             if end.sector.y > start.sector.y:
-                endRow -= 40
+                end_row -= 40
                 up = True
             if end.sector.y < start.sector.y:
-                endRow += 40
+                end_row += 40
                 down = True
-            endy = self.y_start + (self.ym * 2 * endRow) - (self.ym * (1 if endCol & 1 else 0))
-            endx = (self.xm * 3 * endCol) + self.ym
+            endy = self.y_start + (self.ym * 2 * end_row) - (self.ym * (1 if end_col & 1 else 0))
+            endx = (self.xm * 3 * end_col) + self.ym
 
             (startx, starty), (endx, endy) = self.clipping(startx, starty, endx, endy)
             if up:
@@ -147,6 +147,6 @@ class SectorHexMap(Map):
                 assert starty <= endy, "Misaligned to-rimward trade segment between " + str(start) + " and " + str(end)
 
         else:
-            endy = self.y_start + (self.ym * 2 * endRow) - (self.ym * (1 if endCol & 1 else 0))
-            endx = (self.xm * 3 * endCol) + self.ym
+            endy = self.y_start + (self.ym * 2 * end_row) - (self.ym * (1 if end_col & 1 else 0))
+            endx = (self.xm * 3 * end_col) + self.ym
         return endx, endy, startx, starty
