@@ -48,19 +48,7 @@ class HexMap(SectorHexMap):
 
     def write_sector_pdf_map(self, gal_sector, is_live=True):
         comm_routes, pdf_doc, worlds = self._setup_sector_pdf_map(gal_sector, is_live)
-        for (star, neighbor, data) in comm_routes:
-            srcstar = self.galaxy.star_mapping[star]
-            trgstar = self.galaxy.star_mapping[neighbor]
-            self.comm_line(pdf_doc, [srcstar, trgstar])
-        sector_trade = [star for star in self.galaxy.stars.edges(worlds, True)
-                        if star[2]['trade'] > 0 and StatCalculation.trade_to_btn(star[2]['trade']) >= self.min_btn]
-        logging.getLogger('PyRoute.HexMap').debug("Worlds with trade: {}".format(len(sector_trade)))
-        sector_trade.sort(key=lambda line: line[2]['trade'])
-        for (star, neighbor, data) in sector_trade:
-            self.galaxy.stars[star][neighbor]['trade btn'] = StatCalculation.trade_to_btn(data['trade'])
-            srcstar = self.galaxy.star_mapping[star]
-            trgstar = self.galaxy.star_mapping[neighbor]
-            self.trade_line(pdf_doc, [srcstar, trgstar], data)
+        self._sector_map_comm_and_trade_routes(comm_routes, pdf_doc, worlds)
         # Get all the worlds in this sector
         # for (star, neighbor, data) in self.galaxy.stars.edges(sector.worlds, True):
         #    if star.sector != sector:
