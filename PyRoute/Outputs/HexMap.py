@@ -25,11 +25,7 @@ class HexMap(SectorHexMap):
     """
 
     def __init__(self, galaxy, routes, min_btn=8):
-        self.galaxy = galaxy
-        self.routes = routes
-        self.ym = 9  # half a hex height
-        self.xm = 6  # half the length of one side
-        self.colorStart = 0
+        super(HexMap, self).__init__(galaxy, routes)
         self.min_btn = min_btn
         self.y_start = 43
         self.x_start = 15
