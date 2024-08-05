@@ -101,13 +101,13 @@ class SectorHexMap(Map):
 
     def _trade_line_setup(self, data, edge):
         trade_colours = [(255, 0, 0),  # Red
-                       (224, 224, 16),  # yellow - darker
-                       (0, 255, 0),  # green
-                       (0, 255, 255),  # Cyan
-                       (96, 96, 255),  # blue - lighter
-                       (128, 0, 128),  # purple
-                       (148, 0, 211),  # violet
-                       ]
+                         (224, 224, 16),  # yellow - darker
+                         (0, 255, 0),  # green
+                         (0, 255, 255),  # Cyan
+                         (96, 96, 255),  # blue - lighter
+                         (128, 0, 128),  # purple
+                         (148, 0, 211),  # violet
+                         ]
         start = edge[0]
         end = edge[1]
         trade = StatCalculation.trade_to_btn(data['trade']) - self.min_btn
