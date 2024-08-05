@@ -11,6 +11,11 @@ from PyRoute.StatCalculation import StatCalculation
 
 class SectorHexMap(Map):
 
+    def __init__(self, galaxy, routes, min_btn=8):
+        super(SectorHexMap, self).__init__(galaxy, routes)
+        self.min_btn = min_btn
+        self.writer = None
+
     def comm_line(self, pdf, edge):
         raise NotImplementedError("Base Class")
 

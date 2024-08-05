@@ -17,9 +17,7 @@ class PDFHexMap(SectorHexMap):
                  'crimson': (220, 20, 60)}
 
     def __init__(self, galaxy, routes, min_btn=8):
-        super(PDFHexMap, self).__init__(galaxy, routes)
-        self.min_btn = min_btn
-        self.writer = None
+        super(PDFHexMap, self).__init__(galaxy, routes, min_btn)
 
     def write_sector_pdf_map(self, gal_sector, is_live=True):
         comm_routes, pdf_doc, worlds = self._setup_sector_pdf_map(gal_sector, is_live)

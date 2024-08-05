@@ -25,12 +25,10 @@ class HexMap(SectorHexMap):
     """
 
     def __init__(self, galaxy, routes, min_btn=8):
-        super(HexMap, self).__init__(galaxy, routes)
-        self.min_btn = min_btn
+        super(HexMap, self).__init__(galaxy, routes, min_btn)
         self.y_start = 43
         self.x_start = 15
         self.sector = None
-        self.writer = None
 
     def write_maps(self):
         """
