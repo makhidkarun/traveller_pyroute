@@ -147,6 +147,8 @@ def process():
     delta = DeltaDictionary()
     for sector_file in sectors_list:
         sector = SectorDictionary.load_traveller_map_file(sector_file)
+        if sector is None:
+            continue
         delta[sector.name] = sector
 
     logger.error("%s sectors read" % len(delta))
