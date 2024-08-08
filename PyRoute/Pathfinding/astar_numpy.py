@@ -15,7 +15,6 @@ Compared to the ancestral networkx version of astar_path, this code:
         When a new upper bound is found, discards queue entries whose f-values bust the new upper bound
         When a _longer_ path is found to a previously-queued node, discards queue entries whose g-values bust
             the corresponding node's distance label
-        Every 49 nodes, discards queue entries who bust their corresponding node's distance label
 
 """
 from heapq import heappop, heappush, heapify
@@ -135,20 +134,11 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         raw_nodes = G_succ[curnode]
         active_nodes = raw_nodes[0]
         active_weights = dist + raw_nodes[1]
-        # filter out nodes whose active weights exceed _either_ the node's distance label _or_ the current upper bound
-        # - the current node can _not_ result in a shorter path
-        keep = active_weights <= upper_limit[active_nodes]
-        # if we're not keeping anything, go around
-        active_nodes = active_nodes[keep]
-        if 0 == len(active_nodes):
-            g_exhausted += 1
-            continue
-        active_weights = active_weights[keep]
         augmented_weights = active_weights + potentials[active_nodes]
 
         # Even if we have the target node as a candidate neighbour, of itself, that's _no_ guarantee that the target
         # as neighbour will give a better upper bound.
-        keep = augmented_weights < upbound
+        keep = np.logical_and(augmented_weights < upbound, active_weights <= upper_limit[active_nodes])
         active_nodes = active_nodes[keep]
         if 0 == len(active_nodes):
             f_exhausted += 1
