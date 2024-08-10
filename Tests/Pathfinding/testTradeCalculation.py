@@ -31,7 +31,7 @@ class testTradeCalculation(baseTest):
         galaxy.trade.calculate_routes()
 
     def test_nodes_not_duplicated_2(self):
-        sourcefile = self.unpack_filename('DeltaFiles/duplicate_node_blowup/Verge.sec-old')
+        sourcefile = self.unpack_filename('DeltaFiles/duplicate_node_blowup/Verge.sec')
 
         args = self._make_args()
         args.route_btn = 15
