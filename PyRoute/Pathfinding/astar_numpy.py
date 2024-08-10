@@ -141,7 +141,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         keep = np.logical_and(augmented_weights < upbound, active_weights <= upper_limit[active_nodes])
         active_nodes = active_nodes[keep]
         if 0 == len(active_nodes):
-            f_exhausted += 1
+            g_exhausted += 1
             continue
         active_weights = active_weights[keep]
         augmented_weights = augmented_weights[keep]
