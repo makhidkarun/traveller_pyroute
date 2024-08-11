@@ -394,10 +394,11 @@ class TradeCalculation(RouteCalculation):
                 mindex = np.argmin(midbound)
                 nubound = midbound[mindex]
                 upbound = min(upbound, nubound)
-                reheat_list.add((stardex, common[mindex]))
-                maxdex = np.argmax(midbound)
-                if maxdex != mindex:
-                    reheat_list.add((stardex, common[maxdex]))
+                if reheat:
+                    reheat_list.add((stardex, common[mindex]))
+                    maxdex = np.argmax(midbound)
+                    if maxdex != mindex:
+                        reheat_list.add((stardex, common[maxdex]))
 
         # Case 2 - Historic-route source neighbour to direct target neighbour
         hist_src = self.galaxy.historic_costs._arcs[stardex]
@@ -411,10 +412,11 @@ class TradeCalculation(RouteCalculation):
                 mindex = np.argmin(midbound)
                 nubound = midbound[mindex]
                 upbound = min(upbound, nubound)
-                reheat_list.add((targdex, common[mindex]))
-                maxdex = np.argmax(midbound)
-                if maxdex != mindex:
-                    reheat_list.add((targdex, common[maxdex]))
+                if reheat:
+                    reheat_list.add((targdex, common[mindex]))
+                    maxdex = np.argmax(midbound)
+                    if maxdex != mindex:
+                        reheat_list.add((targdex, common[maxdex]))
 
         # Case 3 - Historic-route source neighbour to historic-route target neighbour
         if 0 < len(hist_src[0]) and 0 < len(hist_targ[0]):
@@ -427,12 +429,13 @@ class TradeCalculation(RouteCalculation):
                 mindex = np.argmin(midbound)
                 nubound = midbound[mindex]
                 upbound = min(upbound, nubound)
-                reheat_list.add((stardex, common[mindex]))
-                reheat_list.add((targdex, common[mindex]))
-                maxdex = np.argmax(midbound)
-                if maxdex != mindex:
-                    reheat_list.add((stardex, common[maxdex]))
-                    reheat_list.add((targdex, common[maxdex]))
+                if reheat:
+                    reheat_list.add((stardex, common[mindex]))
+                    reheat_list.add((targdex, common[mindex]))
+                    maxdex = np.argmax(midbound)
+                    if maxdex != mindex:
+                        reheat_list.add((stardex, common[maxdex]))
+                        reheat_list.add((targdex, common[maxdex]))
 
         if reheat and 0 < len(reheat_list):
             for pair in reheat_list:

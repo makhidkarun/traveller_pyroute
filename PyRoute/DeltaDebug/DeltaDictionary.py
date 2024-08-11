@@ -333,8 +333,14 @@ class SectorDictionary(dict):
         lines = None
 
         # read travellermap file in, line by line
-        with codecs.open(filename, 'r', 'utf-8') as infile:
-            lines = [line for line in infile]
+        try:
+            with codecs.open(filename, 'r', 'utf-8') as infile:
+                try:
+                    lines = [line for line in infile]
+                except (OSError, IOError):
+                    return None
+        except FileNotFoundError:
+            return None
 
         nameline = lines[3]  # assuming the definitive name line is the 4th line in what got read in
         name = nameline.strip('#')

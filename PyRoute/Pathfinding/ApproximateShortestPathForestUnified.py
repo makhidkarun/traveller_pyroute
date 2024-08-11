@@ -112,7 +112,6 @@ class ApproximateShortestPathForestUnified:
 
             # If that bound no longer holds, it's due to the edge (u, v) having its weight decreased during pathfinding.
             # Tag each incident node as needing updates.
-            delta *= self._divisor
 
             if np.max(delta) >= weight:
                 dropnodes.add(left)
