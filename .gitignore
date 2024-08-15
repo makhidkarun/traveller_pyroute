@@ -41,3 +41,6 @@ sectors/
 maps/
 diffs/
 test_data/
+PyRoute/Pathfinding/astar_numpy.c
+PyRoute/Pathfinding/astar_numpy.cpython*
+PyRoute/Pathfinding/astar_numpy.html
