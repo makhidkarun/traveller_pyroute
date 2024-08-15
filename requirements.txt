@@ -1,6 +1,7 @@
 networkx
 pypdflite @ git+https://github.com/tjoneslo/pypdflite.git@python3
 inflect
+Cython
 Pillow >= 10.0
 wikitools3==3.0.1
 hypothesis >= 6.97.0
