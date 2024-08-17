@@ -60,7 +60,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     # The queue stores priority, cost to reach, node,  and parent.
     # Uses Python heapq to keep in priority order.
     # The nodes themselves, being integers, are directly comparable.
-    queue = [(potentials[source], 0.0, source, None)]
+    queue = [(potentials[source], 0.0, source, -1)]
 
     # Maps explored nodes to parent closest to the source.
     explored = {}
@@ -97,7 +97,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         if curnode == target:
             path = [curnode]
             node = parent
-            while node is not None:
+            while node != -1:
                 assert node not in path, "Node " + str(node) + " duplicated in discovered path"
                 path.append(node)
                 node = explored[node]
@@ -116,7 +116,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         if curnode in explored:
             revisited += 1
             # Do not override the parent of starting node
-            if explored[curnode] is None:
+            if explored[curnode] == -1:
                 continue
 
             # Skip bad paths that were enqueued before finding a better one
