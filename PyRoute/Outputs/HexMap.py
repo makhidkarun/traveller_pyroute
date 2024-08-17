@@ -13,28 +13,22 @@ from pypdflite.pdfobjects.pdftext import PDFText
 
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Outputs.SectorHexMap import SectorHexMap
 from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
-from PyRoute.StatCalculation import StatCalculation
 
 
-class HexMap(object):
+class HexMap(SectorHexMap):
     """
     Draw the trade routes as calculated, sector by sector onto PDF files.
     Used pypdflite to directly generate the PDF files.
     """
 
     def __init__(self, galaxy, routes, min_btn=8):
-        self.galaxy = galaxy
-        self.routes = routes
-        self.ym = 9  # half a hex height
-        self.xm = 6  # half the length of one side
-        self.colorStart = 0
-        self.min_btn = min_btn
+        super(HexMap, self).__init__(galaxy, routes, min_btn)
         self.y_start = 43
         self.x_start = 15
         self.sector = None
-        self.writer = None
 
     def write_maps(self):
         """
@@ -46,25 +40,8 @@ class HexMap(object):
             self.write_sector_pdf_map(gal_sector)
 
     def write_sector_pdf_map(self, gal_sector, is_live=True):
-        pdf_doc = self.document(gal_sector, is_live)
-        self.write_base_map(pdf_doc, gal_sector)
-        self.draw_borders(pdf_doc, gal_sector)
-        worlds = [item.index for item in gal_sector.worlds]
-        comm_routes = [star for star in self.galaxy.stars.edges(worlds, True)
-                       if star[2].get('xboat', False) or star[2].get('comm', False)]
-        for (star, neighbor, data) in comm_routes:
-            srcstar = self.galaxy.star_mapping[star]
-            trgstar = self.galaxy.star_mapping[neighbor]
-            self.comm_line(pdf_doc, [srcstar, trgstar])
-        sector_trade = [star for star in self.galaxy.stars.edges(worlds, True)
-                        if star[2]['trade'] > 0 and StatCalculation.trade_to_btn(star[2]['trade']) >= self.min_btn]
-        logging.getLogger('PyRoute.HexMap').debug("Worlds with trade: {}".format(len(sector_trade)))
-        sector_trade.sort(key=lambda line: line[2]['trade'])
-        for (star, neighbor, data) in sector_trade:
-            self.galaxy.stars[star][neighbor]['trade btn'] = StatCalculation.trade_to_btn(data['trade'])
-            srcstar = self.galaxy.star_mapping[star]
-            trgstar = self.galaxy.star_mapping[neighbor]
-            self.trade_line(pdf_doc, [srcstar, trgstar], data)
+        comm_routes, pdf_doc, worlds = self._setup_sector_pdf_map(gal_sector, is_live)
+        self._sector_map_comm_and_trade_routes(comm_routes, pdf_doc, worlds)
         # Get all the worlds in this sector
         # for (star, neighbor, data) in self.galaxy.stars.edges(sector.worlds, True):
         #    if star.sector != sector:
@@ -78,16 +55,7 @@ class HexMap(object):
         #            data['trade'] > 0 and \
         #            self.trade_to_btn(data['trade']) >= self.min_btn:
         #            self.trade_line(pdf, [star, neighbor], data)
-        for star in gal_sector.worlds:
-            self.system(pdf_doc, star)
-        if gal_sector.coreward:
-            self.coreward_sector(pdf_doc, gal_sector.coreward.name)
-        if gal_sector.rimward:
-            self.rimward_sector(pdf_doc, gal_sector.rimward.name)
-        if gal_sector.spinward:
-            self.spinward_sector(pdf_doc, gal_sector.spinward.name)
-        if gal_sector.trailing:
-            self.trailing_sector(pdf_doc, gal_sector.trailing.name)
+        self._sector_map_systems_and_sectors(gal_sector, pdf_doc)
         return self.writer.close()
 
     def write_base_map(self, pdf, sector):
@@ -339,16 +307,7 @@ class HexMap(object):
         point.x_plus(self.ym - (width // 2))
         pdf.add_text(added, point)
 
-        added = ''
-        tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
-        tradeThrough = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
-
-        if self.routes == 'trade':
-            added += "{:X}{:X}{:X}{:d}".format(star.wtn, tradeIn, tradeThrough, star.starportSize)
-        elif self.routes == 'comm':
-            added += "{}{} {}".format(star.baseCode, star.ggCount, star.importance)
-        elif self.routes == 'xroute':
-            added += " {}".format(star.importance)
+        added = self._system_write_additional_data(star)
         width = pdf.get_font()._string_width(added)
         point.y_plus(3.5)
         point.x = col
@@ -359,26 +318,9 @@ class HexMap(object):
 
     def trade_line(self, pdf, edge, data):
 
-        tradeColors = [(255, 0, 0),  # Red
-                       (224, 224, 16),  # yellow - darker
-                       (0, 255, 0),  # green
-                       (0, 255, 255),  # Cyan
-                       (96, 96, 255),  # blue - lighter
-                       (128, 0, 128),  # purple
-                       (148, 0, 211),  # violet
-                       ]
-
-        start = edge[0]
-        end = edge[1]
-
-        trade = StatCalculation.trade_to_btn(data['trade']) - self.min_btn
-        if trade < 0:
+        end, start, tradeColor = self._trade_line_setup(data, edge)
+        if tradeColor is None:
             return
-        if trade > 6:
-            logging.getLogger('PyRoute.HexMap').warn("trade calculated over %d" % self.min_btn + 6)
-            trade = 6
-
-        tradeColor = tradeColors[trade]
         color = pdf.get_color()
         color.set_color_by_number(tradeColor[0], tradeColor[1], tradeColor[2])
 
@@ -412,38 +354,6 @@ class HexMap(object):
 
         line = PDFLine(pdf.session, pdf.page, lineStart, lineEnd, stroke='solid', color=color, size=3)
         line._draw()
-
-    def _get_line_endpoints(self, end, start):
-        starty = self.y_start + (self.ym * 2 * (start.row)) - (self.ym * (1 if start.col & 1 else 0))
-        startx = (self.xm * 3 * (start.col)) + self.ym
-        endRow = end.row
-        endCol = end.col
-        if (end.sector != start.sector):
-            up = False
-            down = False
-            if end.sector.x < start.sector.x:
-                endCol -= 32
-            if end.sector.x > start.sector.x:
-                endCol += 32
-            if end.sector.y > start.sector.y:
-                endRow -= 40
-                up = True
-            if end.sector.y < start.sector.y:
-                endRow += 40
-                down = True
-            endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
-            endx = (self.xm * 3 * endCol) + self.ym
-
-            (startx, starty), (endx, endy) = self.clipping(startx, starty, endx, endy)
-            if up:
-                assert starty >= endy, "Misaligned to-coreward trade segment between " + str(start) + " and " + str(end)
-            if down:
-                assert starty <= endy, "Misaligned to-rimward trade segment between " + str(start) + " and " + str(end)
-
-        else:
-            endy = self.y_start + (self.ym * 2 * (endRow)) - (self.ym * (1 if endCol & 1 else 0))
-            endx = (self.xm * 3 * endCol) + self.ym
-        return endx, endy, startx, starty
 
     def zone(self, pdf, star, point):
         point.x_plus(self.ym)
@@ -484,38 +394,6 @@ class HexMap(object):
         for i in string:
             w += font.character_widths[i] if i in font.character_widths else 600
         return w * font.font_size / 1000.0
-
-    def clipping(self, startx, starty, endx, endy):
-        points_t = [0.0, 1.0]
-        line_pt_1 = [startx, starty]
-        line_pt_2 = [endx, endy]
-
-        if startx == endx:
-            if starty > endy:
-                return ((startx, min(max(starty, endy), 780)),
-                        (startx, max(min(starty, endy), 42)))
-            else:
-                return ((startx, max(min(starty, endy), 42)),
-                        (startx, min(max(starty, endy), 780)))
-
-        if starty == endy:
-            if startx > endx:
-                return ((min(max(startx, endx), 600), starty),
-                        (max(min(startx, endx), 15), starty))
-            else:
-                return ((max(min(startx, endx), 15), starty),
-                        (min(max(startx, endx), 600), starty))
-
-        points_t.append(float(15 - startx) / (endx - startx))
-        points_t.append(float(600 - startx) / (endx - startx))
-        points_t.append(float(780 - starty) / (endy - starty))
-        points_t.append(float(42 - starty) / (endy - starty))
-
-        points_t.sort()
-        result = [(pt_1 + t * (pt_2 - pt_1)) for t in (points_t[2], points_t[3]) for (pt_1, pt_2) in
-                  zip(line_pt_1, line_pt_2)]
-        logging.getLogger("PyRoute.HexMap").debug(result)
-        return (result[0], result[1]), (result[2], result[3])
 
     @property
     def compression(self):
