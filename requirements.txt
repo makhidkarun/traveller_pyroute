@@ -8,7 +8,7 @@ hypothesis >= 6.97.0
 jinja2
 jsonpickle
 lark==1.1.8
-numpy >= 2.0
+numpy == 1.26
 pymupdf
 pytest >= 8.0.0
 pytest-console-scripts

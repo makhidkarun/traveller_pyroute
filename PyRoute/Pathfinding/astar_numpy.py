@@ -22,6 +22,8 @@ from heapq import heappop, heappush, heapify
 import networkx as nx
 import numpy as np
 
+from PyRoute.Pathfinding.astar_numpy_core import astar_get_neighbours
+
 
 def _calc_branching_factor(nodes_queued, path_len):
     if path_len == nodes_queued:
@@ -131,20 +133,11 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
 
         explored[curnode] = parent
 
-        raw_nodes = G_succ[curnode]
-        active_nodes = raw_nodes[0]
-        active_weights = dist + raw_nodes[1]
-        augmented_weights = active_weights + potentials[active_nodes]
-
-        # Even if we have the target node as a candidate neighbour, of itself, that's _no_ guarantee that the target
-        # as neighbour will give a better upper bound.
-        keep = np.logical_and(augmented_weights < upbound, active_weights <= upper_limit[active_nodes])
-        active_nodes = active_nodes[keep]
+        active_nodes, active_weights, augmented_weights = astar_get_neighbours(G_succ, curnode, dist, potentials,
+                                                                               upbound, upper_limit)
         if 0 == len(active_nodes):
             g_exhausted += 1
             continue
-        active_weights = active_weights[keep]
-        augmented_weights = augmented_weights[keep]
 
         if target in active_nodes:
             num_neighbours = len(active_nodes)
