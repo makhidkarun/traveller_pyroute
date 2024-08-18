@@ -32,7 +32,11 @@ def astar_get_neighbours(G_succ: list[tuple[cnp.ndarray(cython.int), cnp.ndarray
     return active_nodes, active_weights, augmented_weights
 
 
-def astar_push_to_queue(active_nodes, active_weights, augmented_weights, curnode, queue):
+def astar_push_to_queue(active_nodes: cnp.ndarray(cython.int), active_weights: cnp.ndarray(cython.float),
+                        augmented_weights: cnp.ndarray(cython.float), curnode: cython.int,
+                        queue: list[tuple[cnp.ndarray(cython.float), cnp.ndarray(cython.float), cnp.ndarray(cython.int),
+                                          cnp.ndarray(cython.int)]]):
+    num_nodes: cython.float
     num_nodes = len(active_nodes)
     if 1 == num_nodes:
         heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
