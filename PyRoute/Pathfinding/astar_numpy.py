@@ -22,7 +22,7 @@ from heapq import heappop, heappush, heapify
 import networkx as nx
 import numpy as np
 
-from PyRoute.Pathfinding.astar_numpy_core import astar_get_neighbours
+from PyRoute.Pathfinding.astar_numpy_core import astar_get_neighbours, astar_push_to_queue
 
 
 def _calc_branching_factor(nodes_queued, path_len):
@@ -186,26 +186,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         # neighbours later.
         distances[active_nodes] = active_weights
         upper_limit[active_nodes] = active_weights
-        num_nodes = len(active_nodes)
+        queue_counter += len(active_nodes)
 
-        queue_counter += num_nodes
-
-        if 1 == num_nodes:
-            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
-        elif 2 == num_nodes:
-            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
-            heappush(queue, (augmented_weights[1], active_weights[1], active_nodes[1], curnode))
-        elif 3 == num_nodes:
-            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
-            heappush(queue, (augmented_weights[1], active_weights[1], active_nodes[1], curnode))
-            heappush(queue, (augmented_weights[2], active_weights[2], active_nodes[2], curnode))
-        elif 4 == num_nodes:
-            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
-            heappush(queue, (augmented_weights[1], active_weights[1], active_nodes[1], curnode))
-            heappush(queue, (augmented_weights[2], active_weights[2], active_nodes[2], curnode))
-            heappush(queue, (augmented_weights[3], active_weights[3], active_nodes[3], curnode))
-        else:
-            for i in range(num_nodes):
-                heappush(queue, (augmented_weights[i], active_weights[i], active_nodes[i], curnode))
+        astar_push_to_queue(active_nodes, active_weights, augmented_weights, curnode, queue)
 
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
