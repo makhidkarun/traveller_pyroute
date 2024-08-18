@@ -10,14 +10,15 @@ import numpy as np
 from heapq import heappop, heappush, heapify
 
 
-def astar_get_neighbours(G_succ: cython.list[tuple[cnp.ndarray(cython.int), cnp.ndarray(cython.float)]], curnode: cython.int,
-                         dist: cython.float, potentials, upbound: cython.float, upper_limit) -> \
-                         cython.tuple[cnp.ndarray(cython.int), cnp.ndarray(cython.float), cnp.ndarray(cython.float)]:
-    raw_nodes: cython.tuple[cnp.ndarray(cython.int), cnp.ndarray(cython.float)]
-    active_nodes: cnp.ndarray(cython.int)
-    active_weights: cnp.ndarray(cython.float)
-    augmented_weights: cnp.ndarray(cython.float)
-    keep: cnp.ndarray(cython.py_bool)
+def astar_get_neighbours(G_succ: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]], curnode: cython.int,
+                         dist: cython.float, potentials: cnp.ndarray[cython.float], upbound: cython.float,
+                         upper_limit: cnp.ndarray[cython.float]) -> \
+                         cython.tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float], cnp.ndarray[cython.float]]:
+    raw_nodes: cython.tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
+    active_nodes: cnp.ndarray[cython.int]
+    active_weights: cnp.ndarray[cython.float]
+    augmented_weights: cnp.ndarray[cython.float]
+    keep: cnp.ndarray[cython.py_bool]
 
     raw_nodes = G_succ[curnode]
     active_nodes = raw_nodes[0]
