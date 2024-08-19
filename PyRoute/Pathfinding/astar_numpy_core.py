@@ -10,7 +10,7 @@ import numpy as np
 from heapq import heappop, heappush, heapify
 
 
-def astar_get_neighbours(G_succ: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]], curnode: cython.int,
+def astar_get_neighbours(g_succ: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]], curnode: cython.int,
                          dist: cython.float, potentials: cnp.ndarray[cython.float], upbound: cython.float,
                          upper_limit: cnp.ndarray[cython.float]) -> \
                          cython.tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float], cnp.ndarray[cython.float]]:
@@ -20,7 +20,7 @@ def astar_get_neighbours(G_succ: cython.list[tuple[cnp.ndarray[cython.int], cnp.
     augmented_weights: cnp.ndarray[cython.float]
     keep: cnp.ndarray[cython.py_bool]
 
-    raw_nodes = G_succ[curnode]
+    raw_nodes = g_succ[curnode]
     active_nodes = raw_nodes[0]
     active_weights = dist + raw_nodes[1]
     augmented_weights = active_weights + potentials[active_nodes]
