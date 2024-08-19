@@ -10,6 +10,10 @@ import numpy as np
 from _heapq import heappop, heappush, heapify
 
 
+@cython.boundscheck(False)
+@cython.initializedcheck(False)
+@cython.nonecheck(False)
+@cython.wraparound(False)
 def astar_get_neighbours(g_succ: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]], curnode: cython.int,
                          dist: cython.float, potentials: cnp.ndarray[cython.float], upbound: cython.float,
                          upper_limit: cnp.ndarray[cython.float]) -> \
