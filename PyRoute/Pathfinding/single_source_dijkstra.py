@@ -30,13 +30,12 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
     if seeds is None:
         seeds = {source}
 
-    floatinf = float('+inf')
-    min_cost = np.zeros(len(graph)) if min_cost is None else min_cost
-    max_neighbour_labels = max_labels if max_labels is not None else np.ones(len(graph), dtype=float) * floatinf
+    min_cost = np.zeros(len(graph), dtype=float) if min_cost is None else min_cost
+    max_neighbour_labels = max_labels if max_labels is not None else np.ones(len(graph), dtype=float) * float('+inf')
 
     arcs = graph._arcs
 
-    heap = [(distance_labels[seed], seed) for seed in seeds if 0 < len(arcs[seed][0])]
+    heap = [(distance_labels[seed], seed) for seed in seeds]
     heapq.heapify(heap)
 
     parents = np.ones(len(graph), dtype=int) * -100  # Using -100 to track "not considered during processing"
