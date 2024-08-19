@@ -9,6 +9,10 @@ cnp.import_array()
 from _heapq import heappop, heappush, heapify
 
 
+@cython.boundscheck(False)
+@cython.initializedcheck(False)
+@cython.nonecheck(False)
+@cython.wraparound(False)
 def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]],
                   distance_labels: cnp.ndarray[cython.float], divisor: cython.float,
                   heap: cython.list[tuple[cnp.ndarray[cython.float], cnp.ndarray[cython.float]]],
