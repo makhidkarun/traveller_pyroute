@@ -29,6 +29,8 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     num_nodes: cython.size_t
     index: cython.size_t
     distance_labels_view: cython.double[:] = distance_labels
+    active_nodes_view: cython.long[:]
+    active_weights_view: cython.double[:]
 
     while heap:
         dist_tail, tail = heappop(heap)
@@ -63,10 +65,12 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
         active_weights = dist_tail + divisor * active_costs[keep]
 
         parents[active_nodes] = tail
+        active_nodes_view = active_nodes
+        active_weights_view = active_weights
 
         for index in range(0, num_nodes):
-            act_wt = active_weights[index]
-            act_nod = active_nodes[index]
+            act_wt = active_weights_view[index]
+            act_nod = active_nodes_view[index]
             distance_labels_view[act_nod] = act_wt
             #heappush(heap, (active_weights[index], active_nodes[index]))
             heappush(heap, (act_wt, act_nod))
