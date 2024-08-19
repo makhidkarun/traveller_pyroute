@@ -7,7 +7,7 @@ import cython
 from cython.cimports.numpy import numpy as cnp
 cnp.import_array()
 import numpy as np
-from heapq import heappop, heappush, heapify
+from _heapq import heappop, heappush, heapify
 
 
 def astar_get_neighbours(g_succ: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]], curnode: cython.int,
@@ -33,6 +33,10 @@ def astar_get_neighbours(g_succ: cython.list[tuple[cnp.ndarray[cython.int], cnp.
     return active_nodes, active_weights, augmented_weights
 
 
+@cython.boundscheck(False)
+@cython.initializedcheck(False)
+@cython.nonecheck(False)
+@cython.wraparound(False)
 def astar_push_to_queue(active_nodes: cython.long[:], active_weights: cython.double[:],
                         augmented_weights: cython.double[:], curnode: cython.int,
                         queue: list[tuple[cython.double, cython.double, cython.long, cython.long]]):
