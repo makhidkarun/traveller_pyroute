@@ -29,19 +29,21 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     num_nodes: cython.size_t
     index: cython.size_t
     distance_labels_view: cython.double[:] = distance_labels
+    max_neighbour_labels_view: cython.double[:] = max_neighbour_labels
+    min_cost_view: cython.double[:] = min_cost
     active_nodes_view: cython.long[:]
     active_weights_view: cython.double[:]
 
     while heap:
         dist_tail, tail = heappop(heap)
 
-        if dist_tail > distance_labels_view[tail] or dist_tail + min_cost[tail] > max_neighbour_labels[tail]:
+        if dist_tail > distance_labels_view[tail] or dist_tail + min_cost_view[tail] > max_neighbour_labels_view[tail]:
             # Since we've just dequeued a bad node (distance exceeding its current label, or too close to max-label),
             # remove other bad nodes from the list to avoid tripping over them later, and chuck out nodes who
             # can't give better distance labels
             if heap:
                 heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels_view[tail]
-                        and distance + min_cost[tail] <= max_neighbour_labels[tail]]
+                        and distance + min_cost_view[tail] <= max_neighbour_labels_view[tail]]
                 heapify(heap)
             continue
 
@@ -54,7 +56,7 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
         active_costs = neighbours[1]
         active_labels = distance_labels[active_nodes]
         # update max label
-        max_neighbour_labels[tail] = max(active_labels)
+        max_neighbour_labels_view[tail] = max(active_labels)
         # It's not worth (time wise) being cute and trying to break this up, forcing jumps in and out of numpy
         keep = active_costs < (active_labels - dist_tail)
         active_nodes = active_nodes[keep]
