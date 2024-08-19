@@ -22,8 +22,10 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     active_nodes: cnp.ndarray[cython.int]
     active_costs: cnp.ndarray[cython.float]
     active_labels: cnp.ndarray[cython.float]
+    active_weights: cnp.ndarray[cython.float]
     keep: cnp.ndarray[cython.py_bool]
     num_nodes: cython.int
+    index: cython.int
 
     while heap:
         dist_tail, tail = heappop(heap)
