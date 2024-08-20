@@ -42,8 +42,9 @@ def astar_get_neighbours(g_succ: cython.list[tuple[cnp.ndarray[cython.int], cnp.
 @cython.nonecheck(False)
 @cython.wraparound(False)
 def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weights: cnp.ndarray[cython.float],
-                             augmented_weights: cnp.ndarray[cython.float], curnode, distances, min_cost, new_upbounds,
-                             queue, queue_counter, targ_exhausted, target: cython.int, upbound, upper_limit):
+                             augmented_weights: cnp.ndarray[cython.float], curnode: cython.int, distances, min_cost,
+                             new_upbounds: cython.int, queue, queue_counter: cython.int, targ_exhausted: cython.int,
+                             target: cython.int, upbound, upper_limit):
     i: cython.size_t
     active_nodes_view: cython.long[:] = active_nodes
     active_weights_view: cython.double[:] = active_weights
