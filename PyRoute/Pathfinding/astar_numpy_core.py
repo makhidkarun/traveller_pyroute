@@ -41,15 +41,21 @@ def astar_get_neighbours(g_succ: cython.list[tuple[cnp.ndarray[cython.int], cnp.
 @cython.initializedcheck(False)
 @cython.nonecheck(False)
 @cython.wraparound(False)
-def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weights, augmented_weights, curnode,
-                             distances, min_cost, new_upbounds, queue, queue_counter, targ_exhausted, target, upbound,
-                             upper_limit):
+def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weights: cnp.ndarray[cython.float],
+                             augmented_weights: cnp.ndarray[cython.float], curnode, distances, min_cost, new_upbounds,
+                             queue, queue_counter, targ_exhausted, target, upbound, upper_limit):
     i: cython.size_t
     active_nodes_view: cython.long[:] = active_nodes
+    active_weights_view: cython.double[:] = active_weights
+    augmented_weights_view: cython.double[:] = augmented_weights
     num_nodes: cython.int = len(active_nodes_view)
     targdex: cython.int = -1
     act_nod: cython.int
+    act_wt: cython.double
     target: cython.int
+
+    distances_view: cython.double[:] = distances
+    upper_limit_view: cython.double[:]
 
     for i in range(num_nodes):
         act_nod = active_nodes_view[i]
@@ -85,17 +91,24 @@ def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weigh
         # its augmented weight is _equal_ to upbound
         keep = augmented_weights < upbound
         active_nodes = active_nodes[keep]
+        active_nodes_view = active_nodes
         if 0 == len(active_nodes):
             targ_exhausted += 1
 
         active_weights = active_weights[keep]
         augmented_weights = augmented_weights[keep]
+        active_weights_view = active_weights
+        augmented_weights_view = augmented_weights
+
+    upper_limit_view = upper_limit
     # Now unconditionally queue _all_ nodes that are still active, worrying about filtering out the bound-busting
     # neighbours later.
-    distances[active_nodes] = active_weights
-    upper_limit[active_nodes] = active_weights
     num_nodes = len(active_nodes)
     queue_counter += num_nodes
     for i in range(num_nodes):
-        heappush(queue, (augmented_weights[i], active_weights[i], active_nodes[i], curnode))
+        act_nod = active_nodes_view[i]
+        act_wt = active_weights_view[i]
+        distances_view[act_nod] = act_wt
+        upper_limit_view[act_nod] = act_wt
+        heappush(queue, (augmented_weights_view[i], active_weights_view[i], active_nodes_view[i], curnode))
     return new_upbounds, queue, queue_counter, targ_exhausted, upbound, upper_limit
