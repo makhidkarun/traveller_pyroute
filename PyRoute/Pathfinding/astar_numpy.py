@@ -190,6 +190,9 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         upper_limit[active_nodes] = active_weights
         queue_counter += len(active_nodes)
 
-        astar_push_to_queue(active_nodes, active_weights, augmented_weights, curnode, queue)
+        num_nodes = len(active_nodes)
+
+        for i in range(num_nodes):
+            heappush(queue, (augmented_weights[i], active_weights[i], active_nodes[i], curnode))
 
     raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
