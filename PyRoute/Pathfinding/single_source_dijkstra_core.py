@@ -24,6 +24,7 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     active_labels: cnp.ndarray[cython.float]
     active_weights: cnp.ndarray[cython.float]
     act_wt: cython.float
+    raw_wt: cython.float
     act_nod: cython.int
     keep: cnp.ndarray[cython.py_bool]
     num_nodes: cython.size_t
@@ -34,6 +35,7 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     parents_view: cython.long[:] = parents
     active_nodes_view: cython.long[:]
     active_costs_view: cython.double[:]
+    active_labels_view: cython.double[:]
     tail: cython.int
     dist_tail: cython.float
     distance: cython.float
@@ -59,23 +61,20 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
         active_nodes = neighbours[0]
         active_costs = neighbours[1]
         active_labels = distance_labels[active_nodes]
+        active_nodes_view = active_nodes
+        active_costs_view = active_costs
+        active_labels_view = active_labels
         # update max label
         max_neighbour_labels_view[tail] = max(active_labels)
-        # It's not worth (time wise) being cute and trying to break this up, forcing jumps in and out of numpy
-        keep = active_costs < (active_labels - dist_tail)
-        active_nodes = active_nodes[keep]
-        active_nodes_view = active_nodes
         num_nodes = len(active_nodes_view)
 
-        if 0 == num_nodes:
-            continue
-        active_costs = active_costs[keep]
-
-        active_costs_view = active_costs
-
         for index in range(0, num_nodes):
+            raw_wt = dist_tail + active_costs_view[index]
+            if raw_wt >= active_labels_view[index]:
+                continue
             act_wt = dist_tail + divisor * active_costs_view[index]
             act_nod = active_nodes_view[index]
+
             distance_labels_view[act_nod] = act_wt
             parents_view[act_nod] = tail
             heappush(heap, (act_wt, act_nod))
