@@ -35,3 +35,54 @@ def astar_get_neighbours(g_succ: cython.list[tuple[cnp.ndarray[cython.int], cnp.
     active_weights = active_weights[keep]
     augmented_weights = augmented_weights[keep]
     return active_nodes, active_weights, augmented_weights
+
+
+@cython.boundscheck(False)
+@cython.initializedcheck(False)
+@cython.nonecheck(False)
+@cython.wraparound(False)
+def astar_process_neighbours(active_nodes, active_weights, augmented_weights, curnode, distances, min_cost,
+                             new_upbounds, queue, queue_counter, targ_exhausted, target, upbound, upper_limit):
+    if target in active_nodes:
+        drop = active_nodes == target
+        ncost = active_weights[drop][0]
+
+        upbound = ncost
+        new_upbounds += 1
+        distances[target] = ncost
+        up_threshold = upbound - min_cost
+        upper_limit = np.minimum(upper_limit, up_threshold)
+
+        if 0 < len(queue):
+            queue = [item for item in queue if item[0] < upbound]
+            if 0 < len(queue):
+                # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
+                # or is too close to upbound
+                queue = [item for item in queue if item[1] <= upper_limit[item[2]]]
+                # Finally, dedupe the queue after cleaning all bound-busts out and 2 or more elements are left.
+                # Empty or single-element sets cannot require deduplication, and are already heaps themselves.
+                if 1 < len(queue):
+                    queue = list(set(queue))
+                    heapify(queue)
+        # heappush(queue, (ncost + 0, ncost, target, curnode))
+        heappush(queue, (ncost, ncost, target, curnode))
+        queue_counter += 1
+
+        # As we have a tighter upper bound, apply it to the neighbours as well - target will be excluded because
+        # its augmented weight is _equal_ to upbound
+        keep = augmented_weights < upbound
+        active_nodes = active_nodes[keep]
+        if 0 == len(active_nodes):
+            targ_exhausted += 1
+
+        active_weights = active_weights[keep]
+        augmented_weights = augmented_weights[keep]
+    # Now unconditionally queue _all_ nodes that are still active, worrying about filtering out the bound-busting
+    # neighbours later.
+    distances[active_nodes] = active_weights
+    upper_limit[active_nodes] = active_weights
+    num_nodes = len(active_nodes)
+    queue_counter += num_nodes
+    for i in range(num_nodes):
+        heappush(queue, (augmented_weights[i], active_weights[i], active_nodes[i], curnode))
+    return new_upbounds, queue, queue_counter, targ_exhausted, upbound, upper_limit
