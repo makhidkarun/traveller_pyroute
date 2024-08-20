@@ -194,9 +194,10 @@ class TradeCalculation(RouteCalculation):
         self.calculate_components()
 
         btn_skipped = [(s, n) for (s, n) in self.galaxy.ranges.edges() if s.component != n.component]
-        self.logger.debug(f"Found {len(btn_skipped)} non-component routes, removing from ranges graph")
+        self.logger.info(f"Found {len(btn_skipped)} non-component routes, removing from ranges graph")
         for s, n in btn_skipped:
             self.galaxy.ranges.remove_edge(s, n)
+        self.logger.info(f"Removed {len(btn_skipped)} non-component routes from ranges graph")
 
         btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
@@ -215,8 +216,10 @@ class TradeCalculation(RouteCalculation):
 
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
+        self.logger.info(f"Finding pathfinding landmarks")
         self.star_graph = DistanceGraph(self.galaxy.stars)
         landmarks, self.component_landmarks = self.get_landmarks(index=True, btn=btn)
+        self.logger.info(f"Pathfinding landmarks found")
 
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
         source.is_landmark = True
