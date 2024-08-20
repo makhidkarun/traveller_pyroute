@@ -22,7 +22,7 @@ from heapq import heappop, heappush, heapify
 import networkx as nx
 import numpy as np
 
-from PyRoute.Pathfinding.astar_numpy_core import astar_get_neighbours, astar_push_to_queue
+from PyRoute.Pathfinding.astar_numpy_core import astar_get_neighbours
 
 
 def _calc_branching_factor(nodes_queued, path_len):
@@ -142,7 +142,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             continue
 
         if target in active_nodes:
-            num_neighbours = len(active_nodes)
             drop = active_nodes == target
             ncost = active_weights[drop][0]
 
@@ -151,6 +150,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             distances[target] = ncost
             up_threshold = upbound - min_cost
             upper_limit = np.minimum(upper_limit, up_threshold)
+
             if 0 < len(queue):
                 queue = [item for item in queue if item[0] < upbound]
                 if 0 < len(queue):
@@ -165,21 +165,13 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             # heappush(queue, (ncost + 0, ncost, target, curnode))
             heappush(queue, (ncost, ncost, target, curnode))
             queue_counter += 1
-            #  If target node is only active node, and is neighbour node of only active queue element, bail out now
-            #  and dodge the now-known-to-be-pointless neighbourhood bookkeeping.
-            if 1 == len(queue) and 1 == len(active_nodes):
-                targ_exhausted += 1
-                continue
+
             # As we have a tighter upper bound, apply it to the neighbours as well - target will be excluded because
             # its augmented weight is _equal_ to upbound
             keep = augmented_weights < upbound
             active_nodes = active_nodes[keep]
-
-            # if there _was_ one neighbour to process, that was the target, so neighbour list is now empty.
-            # Likewise, if the new upper bound has emptied the neighbour list, go around.
-            if 1 == num_neighbours or 0 == len(active_nodes):
+            if 0 == len(active_nodes):
                 targ_exhausted += 1
-                continue
 
             active_weights = active_weights[keep]
             augmented_weights = augmented_weights[keep]
@@ -188,9 +180,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
         # neighbours later.
         distances[active_nodes] = active_weights
         upper_limit[active_nodes] = active_weights
-        queue_counter += len(active_nodes)
-
         num_nodes = len(active_nodes)
+        queue_counter += num_nodes
 
         for i in range(num_nodes):
             heappush(queue, (augmented_weights[i], active_weights[i], active_nodes[i], curnode))
