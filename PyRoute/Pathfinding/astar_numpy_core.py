@@ -60,6 +60,7 @@ def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weigh
     distances_view: cython.double[:] = distances
     upper_limit_view: cython.double[:]
     ncost: cython.double
+    up_threshold: cnp.ndarray[cython.float]
 
     for i in range(num_nodes):
         act_nod = active_nodes_view[i]
@@ -68,7 +69,7 @@ def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weigh
             break
 
     if -1 != targdex:
-        ncost = active_weights[targdex]
+        ncost = active_weights_view[targdex]
 
         upbound = ncost
         new_upbounds += 1
