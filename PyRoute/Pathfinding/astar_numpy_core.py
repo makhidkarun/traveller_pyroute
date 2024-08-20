@@ -63,6 +63,7 @@ def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weigh
     upper_limit_view: cython.double[:]
     ncost: cython.double
     up_threshold: cnp.ndarray[cython.float]
+    item: tuple[cython.float, cython.float, cython.int, cython.int]
 
     if 0 == len(active_nodes_view):
         return new_upbounds, queue, queue_counter, targ_exhausted, upbound, upper_limit
@@ -79,8 +80,7 @@ def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weigh
         upbound = ncost
         new_upbounds += 1
         distances_view[target] = ncost
-        up_threshold = upbound - min_cost
-        upper_limit = np.minimum(upper_limit, up_threshold)
+        upper_limit = np.minimum(upper_limit, upbound - min_cost)
 
         if 0 < len(queue):
             queue = [item for item in queue if item[0] < upbound]
@@ -113,12 +113,12 @@ def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weigh
     upper_limit_view = upper_limit
     # Now unconditionally queue _all_ nodes that are still active, worrying about filtering out the bound-busting
     # neighbours later.
-    num_nodes = len(active_nodes)
+    num_nodes = len(active_nodes_view)
     queue_counter += num_nodes
     for i in range(num_nodes):
         act_nod = active_nodes_view[i]
         act_wt = active_weights_view[i]
         distances_view[act_nod] = act_wt
         upper_limit_view[act_nod] = act_wt
-        heappush(queue, (augmented_weights_view[i], active_weights_view[i], active_nodes_view[i], curnode))
+        heappush(queue, (augmented_weights_view[i], act_wt, act_nod, curnode))
     return new_upbounds, queue, queue_counter, targ_exhausted, upbound, upper_limit
