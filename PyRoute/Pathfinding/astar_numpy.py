@@ -135,11 +135,9 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
 
         explored[curnode] = parent
 
-        active_nodes, active_weights, augmented_weights = astar_get_neighbours(G_succ, curnode, dist, potentials,
-                                                                               upbound, upper_limit)
-        if 0 == len(active_nodes):
-            g_exhausted += 1
-            continue
+        active_nodes, active_weights, augmented_weights, g_exhausted = astar_get_neighbours(G_succ, curnode, dist,
+                                                                                            g_exhausted, potentials,
+                                                                                            upbound, upper_limit)
 
         new_upbounds, queue, queue_counter, targ_exhausted, upbound, upper_limit = astar_process_neighbours(
             active_nodes, active_weights, augmented_weights, curnode, distances, min_cost, new_upbounds, queue,

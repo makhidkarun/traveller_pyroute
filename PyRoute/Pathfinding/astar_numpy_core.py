@@ -15,8 +15,8 @@ from _heapq import heappop, heappush, heapify
 @cython.nonecheck(False)
 @cython.wraparound(False)
 def astar_get_neighbours(g_succ: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]], curnode: cython.int,
-                         dist: cython.float, potentials: cnp.ndarray[cython.float], upbound: cython.float,
-                         upper_limit: cnp.ndarray[cython.float]) -> \
+                         dist: cython.float, g_exhausted: cython.int, potentials: cnp.ndarray[cython.float],
+                         upbound: cython.float, upper_limit: cnp.ndarray[cython.float]) -> \
                          cython.tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float], cnp.ndarray[cython.float]]:
     raw_nodes: cython.tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
     active_nodes: cnp.ndarray[cython.int]
@@ -34,7 +34,9 @@ def astar_get_neighbours(g_succ: cython.list[tuple[cnp.ndarray[cython.int], cnp.
     active_nodes = active_nodes[keep]
     active_weights = active_weights[keep]
     augmented_weights = augmented_weights[keep]
-    return active_nodes, active_weights, augmented_weights
+    if 0 == len(active_nodes):
+        g_exhausted += 1
+    return active_nodes, active_weights, augmented_weights, g_exhausted
 
 
 @cython.boundscheck(False)
@@ -61,6 +63,9 @@ def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weigh
     upper_limit_view: cython.double[:]
     ncost: cython.double
     up_threshold: cnp.ndarray[cython.float]
+
+    if 0 == len(active_nodes_view):
+        return new_upbounds, queue, queue_counter, targ_exhausted, upbound, upper_limit
 
     for i in range(num_nodes):
         act_nod = active_nodes_view[i]
