@@ -41,11 +41,24 @@ def astar_get_neighbours(g_succ: cython.list[tuple[cnp.ndarray[cython.int], cnp.
 @cython.initializedcheck(False)
 @cython.nonecheck(False)
 @cython.wraparound(False)
-def astar_process_neighbours(active_nodes, active_weights, augmented_weights, curnode, distances, min_cost,
-                             new_upbounds, queue, queue_counter, targ_exhausted, target, upbound, upper_limit):
-    if target in active_nodes:
-        drop = active_nodes == target
-        ncost = active_weights[drop][0]
+def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weights, augmented_weights, curnode,
+                             distances, min_cost, new_upbounds, queue, queue_counter, targ_exhausted, target, upbound,
+                             upper_limit):
+    i: cython.size_t
+    active_nodes_view: cython.long[:] = active_nodes
+    num_nodes: cython.int = len(active_nodes_view)
+    targdex: cython.int = -1
+    act_nod: cython.int
+    target: cython.int
+
+    for i in range(num_nodes):
+        act_nod = active_nodes_view[i]
+        if act_nod == target:
+            targdex = i
+            break
+
+    if -1 != targdex:
+        ncost = active_weights[targdex]
 
         upbound = ncost
         new_upbounds += 1
