@@ -20,7 +20,6 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
                   parents: cnp.ndarray[cython.int]):
     neighbours: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
     active_nodes: cnp.ndarray[cython.int]
-    active_costs: cnp.ndarray[cython.float]
     active_labels: cnp.ndarray[cython.float]
     active_weights: cnp.ndarray[cython.float]
     act_wt: cython.float
@@ -59,10 +58,9 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
         # when the sum of dist_tail and that edge's weight equals or exceeds the corresponding node's distance label.
         neighbours = arcs[tail]
         active_nodes = neighbours[0]
-        active_costs = neighbours[1]
         active_labels = distance_labels[active_nodes]
         active_nodes_view = active_nodes
-        active_costs_view = active_costs
+        active_costs_view = neighbours[1]
         active_labels_view = active_labels
         # update max label
         max_neighbour_labels_view[tail] = max(active_labels)
