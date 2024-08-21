@@ -38,8 +38,8 @@ def _calc_branching_factor(nodes_queued, path_len):
 
 
 @cython.infer_types(True)
-def astar_numpy_core(G_succ, diagnostics, distances: cnp.ndarray[cython.float], explored, min_cost, potentials, queue,
-                     source, target, upbound):
+def astar_numpy_core(G_succ, diagnostics, distances: cnp.ndarray[cython.float], explored, min_cost, potentials, source,
+                     target, upbound):
     upper_limit: cnp.ndarray[cython.float] = upbound - min_cost
     upper_limit_view: cython.double[:] = upper_limit
     upper_limit_view[source] = 0.0
@@ -62,6 +62,11 @@ def astar_numpy_core(G_succ, diagnostics, distances: cnp.ndarray[cython.float], 
     dist: cython.float
     curnode: cython.int
     parent: cython.int
+
+    # The queue stores priority, cost to reach, node,  and parent.
+    # Uses Python heapq to keep in priority order.
+    # The nodes themselves, being integers, are directly comparable.
+    queue = [(potentials[source], 0.0, source, -1)]
 
     while queue:
         # Pop the smallest item from queue.

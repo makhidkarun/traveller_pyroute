@@ -32,11 +32,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     # pre-calc heuristics for all nodes to the target node
     potentials = bulk_heuristic(G._nodes, target)
 
-    # The queue stores priority, cost to reach, node,  and parent.
-    # Uses Python heapq to keep in priority order.
-    # The nodes themselves, being integers, are directly comparable.
-    queue = [(potentials[source], 0.0, source, -1)]
-
     # Maps explored nodes to parent closest to the source.
     explored = {}
     # Length of graph G
@@ -53,8 +48,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     # pre-calc the minimum-cost edge on each node
     min_cost = np.zeros(len_G) if min_cost is None else min_cost
     min_cost[target] = 0.0
-    bestpath, diag = astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potentials, queue,
-                                      source, target, upbound)
+    bestpath, diag = astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potentials, source, target,
+                                      upbound)
 
     if 0 == len(bestpath):
         raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
