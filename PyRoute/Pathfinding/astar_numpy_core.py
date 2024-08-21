@@ -48,7 +48,7 @@ def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potenti
     new_upbounds = 0
     targ_exhausted = 0
     revis_continue = 0
-    bestpath = []
+    path = []
     diag = {}
     while queue:
         # Pop the smallest item from queue.
@@ -64,8 +64,7 @@ def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potenti
                 node = explored[node]
             path.reverse()
             if diagnostics is not True:
-                bestpath = path
-                return bestpath, diag
+                return path, diag
             branch = _calc_branching_factor(queue_counter, len(path) - 1)
             neighbour_bound = node_counter - 1 + revis_continue - revisited
             un_exhausted = neighbour_bound - f_exhausted - g_exhausted - targ_exhausted
@@ -73,8 +72,7 @@ def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potenti
                            'num_jumps': len(path) - 1, 'nodes_revisited': revisited, 'neighbour_bound': neighbour_bound,
                            'new_upbounds': new_upbounds, 'g_exhausted': g_exhausted, 'f_exhausted': f_exhausted,
                            'un_exhausted': un_exhausted, 'targ_exhausted': targ_exhausted}
-            bestpath = path
-            return bestpath, diag
+            return path, diag
 
         if curnode in explored:
             revisited += 1
@@ -158,4 +156,4 @@ def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potenti
             distances[act_nod] = act_wt
             upper_limit[act_nod] = act_wt
             heappush(queue, (augmented_weights[i], act_wt, act_nod, curnode))
-    return bestpath, diagnostics
+    return path, diagnostics
