@@ -92,6 +92,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     new_upbounds = 0
     targ_exhausted = 0
     revis_continue = 0
+    bestpath = []
+    diagnostics = {}
 
     while queue:
         # Pop the smallest item from queue.
@@ -107,7 +109,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
                 node = explored[node]
             path.reverse()
             if diagnostics is not True:
-                return path, {}
+                bestpath = path
+                break
             branch = _calc_branching_factor(queue_counter, len(path) - 1)
             neighbour_bound = node_counter - 1 + revis_continue - revisited
             un_exhausted = neighbour_bound - f_exhausted - g_exhausted - targ_exhausted
@@ -115,7 +118,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
                            'num_jumps': len(path) - 1, 'nodes_revisited': revisited, 'neighbour_bound': neighbour_bound,
                            'new_upbounds': new_upbounds, 'g_exhausted': g_exhausted, 'f_exhausted': f_exhausted,
                            'un_exhausted': un_exhausted, 'targ_exhausted': targ_exhausted}
-            return path, diagnostics
+            bestpath = path
+            break
 
         if curnode in explored:
             revisited += 1
@@ -143,4 +147,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             active_nodes, active_weights, augmented_weights, curnode, distances, min_cost, new_upbounds, queue,
             queue_counter, targ_exhausted, target, upbound, upper_limit)
 
-    raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
+    if 0 == len(bestpath):
+        raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
+    return bestpath, diagnostics
