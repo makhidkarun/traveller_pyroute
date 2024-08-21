@@ -38,10 +38,13 @@ def _calc_branching_factor(nodes_queued, path_len):
 
 
 @cython.infer_types(True)
-def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potentials, queue, source, target, upbound):
+def astar_numpy_core(G_succ, diagnostics, distances: cnp.ndarray[cython.float], explored, min_cost, potentials, queue,
+                     source, target, upbound):
     upper_limit: cnp.ndarray[cython.float] = upbound - min_cost
     upper_limit_view: cython.double[:] = upper_limit
     upper_limit_view[source] = 0.0
+    distances_view: cython.double[:] = distances
+
     node_counter: cython.int = 0
     queue_counter: cython.int = 0
     revisited: cython.int = 0
@@ -55,6 +58,10 @@ def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potenti
 
     act_nod: cython.int
     act_wt: cython.float
+
+    dist: cython.float
+    curnode: cython.int
+    parent: cython.int
 
     while queue:
         # Pop the smallest item from queue.
@@ -87,14 +94,14 @@ def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potenti
                 continue
 
             # Skip bad paths that were enqueued before finding a better one
-            qcost = distances[curnode]
+            qcost = distances_view[curnode]
             if qcost <= dist:
-                queue = [item for item in queue if not (item[1] > distances[item[2]])]
+                queue = [item for item in queue if not (item[1] > distances_view[item[2]])]
                 heapify(queue)
                 continue
             # If we've found a better path, update
             revis_continue += 1
-            distances[curnode] = dist
+            distances_view[curnode] = dist
 
         explored[curnode] = parent
 
@@ -123,7 +130,7 @@ def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potenti
         if -1 != targdex:
             upbound = active_weights[targdex]
             new_upbounds += 1
-            distances[target] = upbound
+            distances_view[target] = upbound
             upper_limit = np.minimum(upper_limit, upbound - min_cost)
             upper_limit_view = upper_limit
 
@@ -160,7 +167,7 @@ def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potenti
         for i in range(num_nodes):
             act_nod = active_nodes[i]
             act_wt = active_weights[i]
-            distances[act_nod] = act_wt
+            distances_view[act_nod] = act_wt
             upper_limit_view[act_nod] = act_wt
             heappush(queue, (augmented_weights[i], act_wt, act_nod, curnode))
     return path, diagnostics
