@@ -38,6 +38,10 @@ def _calc_branching_factor(nodes_queued, path_len):
 
 
 @cython.infer_types(True)
+@cython.boundscheck(False)
+@cython.initializedcheck(False)
+@cython.nonecheck(False)
+@cython.wraparound(False)
 def astar_numpy_core(G_succ, diagnostics, distances: cnp.ndarray[cython.float], explored, min_cost, potentials,
                      source: cython.int, target: cython.int, upbound):
     upper_limit: cnp.ndarray[cython.float] = upbound - min_cost
