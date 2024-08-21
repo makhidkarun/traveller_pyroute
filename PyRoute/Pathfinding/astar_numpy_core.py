@@ -61,7 +61,6 @@ def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weigh
 
     distances_view: cython.double[:] = distances
     upper_limit_view: cython.double[:]
-    ncost: cython.double
     up_threshold: cnp.ndarray[cython.float]
     item: tuple[cython.float, cython.float, cython.int, cython.int]
 
@@ -75,11 +74,9 @@ def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weigh
             break
 
     if -1 != targdex:
-        ncost = active_weights_view[targdex]
-
-        upbound = ncost
+        upbound = active_weights_view[targdex]
         new_upbounds += 1
-        distances_view[target] = ncost
+        distances_view[target] = upbound
         upper_limit = np.minimum(upper_limit, upbound - min_cost)
 
         if 0 < len(queue):
@@ -94,7 +91,7 @@ def astar_process_neighbours(active_nodes: cnp.ndarray[cython.int], active_weigh
                     queue = list(set(queue))
                     heapify(queue)
         # heappush(queue, (ncost + 0, ncost, target, curnode))
-        heappush(queue, (ncost, ncost, target, curnode))
+        heappush(queue, (upbound, upbound, target, curnode))
         queue_counter += 1
 
         # As we have a tighter upper bound, apply it to the neighbours as well - target will be excluded because
