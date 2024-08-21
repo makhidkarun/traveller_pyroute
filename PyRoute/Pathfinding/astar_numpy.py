@@ -153,9 +153,56 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
             g_exhausted += 1
             continue
 
-        new_upbounds, queue, queue_counter, targ_exhausted, upbound, upper_limit = astar_process_neighbours(
-            active_nodes, active_weights, augmented_weights, curnode, distances, min_cost, new_upbounds, queue,
-            queue_counter, targ_exhausted, target, upbound, upper_limit)
+        targdex = -1
+
+        for i in range(len(active_nodes)):
+            act_nod = active_nodes[i]
+            if act_nod == target:
+                targdex = i
+                break
+
+        if -1 != targdex:
+            upbound = active_weights[targdex]
+            new_upbounds += 1
+            distances[target] = upbound
+            upper_limit = np.minimum(upper_limit, upbound - min_cost)
+
+            if 0 < len(queue):
+                queue = [item for item in queue if item[0] < upbound]
+                if 0 < len(queue):
+                    # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
+                    # or is too close to upbound
+                    queue = [item for item in queue if item[1] <= upper_limit[item[2]]]
+                    # Finally, dedupe the queue after cleaning all bound-busts out and 2 or more elements are left.
+                    # Empty or single-element sets cannot require deduplication, and are already heaps themselves.
+                    if 1 < len(queue):
+                        queue = list(set(queue))
+                        heapify(queue)
+            # heappush(queue, (ncost + 0, ncost, target, curnode))
+            heappush(queue, (upbound, upbound, target, curnode))
+            queue_counter += 1
+
+            # As we have a tighter upper bound, apply it to the neighbours as well - target will be excluded because
+            # its augmented weight is _equal_ to upbound
+            keep = augmented_weights < upbound
+            active_nodes = active_nodes[keep]
+            if 0 == len(active_nodes):
+                targ_exhausted += 1
+                continue
+
+            active_weights = active_weights[keep]
+            augmented_weights = augmented_weights[keep]
+
+        # Now unconditionally queue _all_ nodes that are still active, worrying about filtering out the bound-busting
+        # neighbours later.
+        num_nodes = len(active_nodes)
+        queue_counter += num_nodes
+        for i in range(num_nodes):
+            act_nod = active_nodes[i]
+            act_wt = active_weights[i]
+            distances[act_nod] = act_wt
+            upper_limit[act_nod] = act_wt
+            heappush(queue, (augmented_weights[i], act_wt, act_nod, curnode))
 
     if 0 == len(bestpath):
         raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
