@@ -38,8 +38,9 @@ def _calc_branching_factor(nodes_queued, path_len):
 
 
 def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potentials, queue, source, target, upbound):
-    upper_limit = upbound - min_cost
-    upper_limit[source] = 0.0
+    upper_limit: cnp.ndarray[cython.float] = upbound - min_cost
+    upper_limit_view: cython.double[:] = upper_limit
+    upper_limit_view[source] = 0.0
     node_counter: cython.int = 0
     queue_counter: cython.int = 0
     revisited: cython.int = 0
@@ -50,6 +51,10 @@ def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potenti
     revis_continue: cython.int = 0
     path = []
     diag = {}
+
+    act_nod: cython.int
+    act_wt: cython.float
+
     while queue:
         # Pop the smallest item from queue.
         _, dist, curnode, parent = heappop(queue)
@@ -119,6 +124,7 @@ def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potenti
             new_upbounds += 1
             distances[target] = upbound
             upper_limit = np.minimum(upper_limit, upbound - min_cost)
+            upper_limit_view = upper_limit
 
             if 0 < len(queue):
                 queue = [item for item in queue if item[0] < upbound]
@@ -154,6 +160,6 @@ def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potenti
             act_nod = active_nodes[i]
             act_wt = active_weights[i]
             distances[act_nod] = act_wt
-            upper_limit[act_nod] = act_wt
+            upper_limit_view[act_nod] = act_wt
             heappush(queue, (augmented_weights[i], act_wt, act_nod, curnode))
     return path, diagnostics
