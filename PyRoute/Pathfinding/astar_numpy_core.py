@@ -40,14 +40,14 @@ def _calc_branching_factor(nodes_queued, path_len):
 def astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potentials, queue, source, target, upbound):
     upper_limit = upbound - min_cost
     upper_limit[source] = 0.0
-    node_counter = 0
-    queue_counter = 0
-    revisited = 0
-    g_exhausted = 0
-    f_exhausted = 0
-    new_upbounds = 0
-    targ_exhausted = 0
-    revis_continue = 0
+    node_counter: cython.int = 0
+    queue_counter: cython.int = 0
+    revisited: cython.int = 0
+    g_exhausted: cython.int = 0
+    f_exhausted: cython.int = 0
+    new_upbounds: cython.int = 0
+    targ_exhausted: cython.int = 0
+    revis_continue: cython.int = 0
     path = []
     diag = {}
     while queue:
