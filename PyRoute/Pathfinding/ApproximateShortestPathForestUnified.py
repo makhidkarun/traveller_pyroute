@@ -3,6 +3,9 @@ Created on Feb 29, 2024
 
 @author: CyberiaResurrection
 """
+import cython
+from cython.cimports.numpy import numpy as cnp
+cnp.import_array()
 import copy
 import functools
 
@@ -12,7 +15,19 @@ from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph
 
 
+@cython.cclass
 class ApproximateShortestPathForestUnified:
+
+    _graph: object
+    _source: object
+    _epsilon: cython.float
+    _divisor: cython.float
+    _sources: list
+    _seeds: list
+    _num_trees: cython.int
+    _graph_len: cython.int
+    _distances: cnp.ndarray(cython.float, ndim=2)
+    _max_labels: cnp.ndarray(cython.float, ndim=2)
 
     def __init__(self, source, graph, epsilon, sources=None):
         seeds, source, num_trees = self._get_sources(graph, source, sources)

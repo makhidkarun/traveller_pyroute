@@ -4,7 +4,7 @@ from Cython.Build import cythonize
 
 setup(
     ext_modules=cythonize(
-        ['astar_numpy_core.py', 'single_source_dijkstra_core.py'],
+        ['astar_numpy_core.py', 'single_source_dijkstra_core.py', 'ApproximateShortestPathForestUnified.py'],
         annotate=True
     )
 )
