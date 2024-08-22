@@ -62,6 +62,11 @@ class ApproximateShortestPathForestUnified:
             return 0
         return np.max(raw)
 
+    @cython.infer_types(True)
+    @cython.boundscheck(False)
+    @cython.initializedcheck(False)
+    @cython.nonecheck(False)
+    @cython.wraparound(False)
     def lower_bound_bulk(self, active_nodes, target_node):
         overdrive, fastpath = self._mona_lisa_overdrive(target_node)
 
