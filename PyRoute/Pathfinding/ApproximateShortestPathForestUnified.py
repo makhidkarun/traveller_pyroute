@@ -193,16 +193,16 @@ class ApproximateShortestPathForestUnified:
                                              'star']) + " has undefined component.  Has calculate_components() been run?")
             seeds = [[source]]
         if sources is not None:
-            for source in sources:
-                if isinstance(source, Star) and sources[source].component is None:
+            for src in sources:
+                if isinstance(src, Star) and sources[src].component is None:
                     raise ValueError("Source node " + str(
-                        sources[source]) + " has undefined component.  Has calculate_components() been run?")
-                if isinstance(source, int):
-                    if 'star' not in graph.nodes[source]:
-                        raise ValueError("Source node # " + str(source) + " does not have star attribute")
-                    if graph.nodes[source]['star'].component is None:
+                        sources[src]) + " has undefined component.  Has calculate_components() been run?")
+                if isinstance(src, int):
+                    if 'star' not in graph.nodes[src]:
+                        raise ValueError("Source node # " + str(src) + " does not have star attribute")
+                    if graph.nodes[src]['star'].component is None:
                         raise ValueError(
-                            "Source node " + str(graph.nodes[source][
+                            "Source node " + str(graph.nodes[src][
                                                      'star']) + " has undefined component.  Has calculate_components() been run?")
             if isinstance(sources, dict):
                 seeds = [list(sources.values())]
