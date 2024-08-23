@@ -68,6 +68,9 @@ class ApproximateShortestPathForestUnified:
     @cython.nonecheck(False)
     @cython.wraparound(False)
     def lower_bound_bulk(self, active_nodes: cnp.ndarray[cython.int], target_node: cython.int):
+        raw: cnp.ndarray(cython.float, ndim=2)
+        overdrive: cnp.ndarray[cython.bint]
+        fastpath: cython.bint
         overdrive, fastpath = self._mona_lisa_overdrive(target_node)
 
         if fastpath:  # Fastpath - all overdrive elements are _finite_, so all rows are retrieved
