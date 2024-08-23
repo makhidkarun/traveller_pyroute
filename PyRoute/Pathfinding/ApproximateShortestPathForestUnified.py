@@ -103,8 +103,9 @@ class ApproximateShortestPathForestUnified:
 
     #  Gratuitous William Gibson reference is gratuitous.
     @functools.cache
-    def _mona_lisa_overdrive(self, target_node):
-        result = copy.deepcopy(self._distances[target_node, :] != float('+inf'))
+    def _mona_lisa_overdrive(self, target_node: cython.int) -> tuple[cnp.array[cython.bint], cython.bint]:
+        result: cnp.ndarray[cython.bint]
+        result = self._distances[target_node, :] != float('+inf')
         return result, result.all()
 
     def update_edges(self, edges):
