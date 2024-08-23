@@ -118,6 +118,8 @@ class ApproximateShortestPathForestUnified:
         dropnodes = set()
         dropspecific = []
         tree_dex = np.array(list(range(self._num_trees)), dtype=int)
+        targdex: cython.int = -1
+        i: cython.int
         for _ in tree_dex:
             dropspecific.append(set())
         for item in edges:
@@ -127,8 +129,11 @@ class ApproximateShortestPathForestUnified:
             rightdist = self._distances[right, :]
             rightdist[np.isinf(rightdist)] = 0
             shelf = self._graph._arcs[left]
-            keep = shelf[0] == right
-            weight = shelf[1][keep][0]
+            for i in range(len(shelf)):
+                if shelf[i][0] == right:
+                    targdex = i
+                    break
+            weight = shelf[1][targdex]
             delta = abs(leftdist - rightdist)
             # Given distance labels, L, on nodes u and v, assuming u's label being smaller,
             # and edge cost between u and v of d(u, v):
