@@ -300,7 +300,7 @@ class TradeCalculation(RouteCalculation):
 
             mincost = self.star_graph.min_cost(active_nodes, target.index, indirect=True)
             rawroute, diag = astar_path_numpy(self.star_graph, star.index, target.index,
-                                              self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound,
+                                              self.shortest_path_tree.lower_bound_bulk, min_cost=mincost, upbound=upbound,
                                               diagnostics=self.debug_flag)
 
             if self.debug_flag:
