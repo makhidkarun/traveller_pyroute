@@ -109,7 +109,12 @@ class ApproximateShortestPathForestUnified:
         result = self._distances[target_node, :] != float('+inf')
         return result, result.all()
 
-    def update_edges(self, edges):
+    @cython.infer_types(True)
+    @cython.boundscheck(False)
+    @cython.initializedcheck(False)
+    @cython.nonecheck(False)
+    @cython.wraparound(False)
+    def update_edges(self, edges: list[tuple[cython.int, cython.int]]):
         dropnodes = set()
         dropspecific = []
         tree_dex = np.array(list(range(self._num_trees)), dtype=int)
