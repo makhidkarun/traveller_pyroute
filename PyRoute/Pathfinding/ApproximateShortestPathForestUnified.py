@@ -120,6 +120,9 @@ class ApproximateShortestPathForestUnified:
         tree_dex = np.array(list(range(self._num_trees)), dtype=int)
         targdex: cython.int = -1
         i: cython.int
+        min_cost: cnp.ndarray[cython.float]
+        shelf: cnp.ndarray[cython.int]
+
         for _ in tree_dex:
             dropspecific.append(set())
         for item in edges:
@@ -152,9 +155,9 @@ class ApproximateShortestPathForestUnified:
                 dropnodes.add(left)
                 dropnodes.add(right)
                 overdrive = tree_dex[delta >= weight]
-                for k in overdrive:
-                    dropspecific[k].add(left)
-                    dropspecific[k].add(right)
+                for i in overdrive:
+                    dropspecific[i].add(left)
+                    dropspecific[i].add(right)
 
         # if no nodes are to be dropped, nothing to do - bail out
         if 0 == len(dropnodes):
