@@ -143,17 +143,6 @@ def astar_numpy_core(G_succ, diagnostics, distances: cnp.ndarray[cython.float], 
             upper_limit = np.minimum(upper_limit, upbound - min_cost)
             upper_limit_view = upper_limit
 
-            if 0 < len(queue):
-                queue = [item for item in queue if item[0] < upbound]
-                if 0 < len(queue):
-                    # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
-                    # or is too close to upbound
-                    queue = [item for item in queue if item[1] <= upper_limit[item[2]]]
-                    # Finally, dedupe the queue after cleaning all bound-busts out and 2 or more elements are left.
-                    # Empty or single-element sets cannot require deduplication, and are already heaps themselves.
-                    if 1 < len(queue):
-                        queue = list(set(queue))
-                        heapify(queue)
             # heappush(queue, (ncost + 0, ncost, target, curnode))
             heappush(queue, (upbound, upbound, target, curnode))
             queue_counter += 1

@@ -12,13 +12,10 @@ Compared to the ancestral networkx version of astar_path, this code:
         - Sanity and correctness of this upper bound are the _caller_'s responsibility
         - If the supplied upper bound produces a pathfinding failure, so be it
     Grooms the node queue in the following cases:
-        When a new upper bound is found, discards queue entries whose f-values bust the new upper bound
         When a _longer_ path is found to a previously-queued node, discards queue entries whose g-values bust
             the corresponding node's distance label
 
 """
-from heapq import heappop, heappush, heapify
-
 import networkx as nx
 import numpy as np
 
