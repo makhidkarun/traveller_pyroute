@@ -46,10 +46,12 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
                      distances: cnp.ndarray[cython.float], explored: dict[cython.int, cython.int],
                      min_cost: cnp.ndarray[cython.float], potentials: cnp.ndarray[cython.float], source: cython.int,
                      target: cython.int, upbound: cython.float):
+    min_cost[target] = 0.0
     upper_limit: cnp.ndarray[cython.float] = upbound - min_cost
     upper_limit_view: cython.double[:] = upper_limit
     upper_limit_view[source] = 0.0
     distances_view: cython.double[:] = distances
+    distances_view[source] = 0.0
 
     node_counter: cython.int = 0
     queue_counter: cython.int = 0

@@ -40,11 +40,9 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     assert upbound != floatinf, "Supplied upbound must not be infinite"
     # Traces lowest distance from source node found for each node
     distances = np.ones(len_G) * floatinf
-    distances[source] = 0.0
 
     # pre-calc the minimum-cost edge on each node
     min_cost = np.zeros(len_G) if min_cost is None else min_cost
-    min_cost[target] = 0.0
     bestpath, diag = astar_numpy_core(G_succ, diagnostics, distances, explored, min_cost, potentials, source, target,
                                       upbound)
 
