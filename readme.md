@@ -27,6 +27,10 @@ The map generation requires several fonts not normally installed in the system:
 
     apt-get install fonts-dejavu fonts-liberation fonts-freefont-ttf fonts-ancient-scripts fonts-symbola
 
+The back-end map-generation stuff needs compiling with:
+
+    python PyRoute/Pathfinding/setup.py build-ext --inplace
+
 For the math and layout of hex maps, I recommend the
 [Hexagonal Grids](http://www.redblobgames.com/grids/hexagons/) page which contains every item you
 will need to draw and manage hexagon maps.I recommend all the articles on the Red 
