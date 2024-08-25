@@ -10,10 +10,16 @@ import numpy as np
 from _heapq import heappop, heappush, heapify
 
 
-def _calc_branching_factor(nodes_queued, path_len):
-    if path_len == nodes_queued:
+@cython.cdivision(True)
+def _calc_branching_factor(nodes_queued: cython.int, path_len: cython.int):
+    old: cython.float
+    new: cython.float
+    rhs: cython.float
+    power: cython.float
+    if path_len == nodes_queued or 1 > path_len or 1 > nodes_queued:
         return 1.0
 
+    power = 1.0 / path_len
     # Letting nodes_queued be S, and path_len be d, we're trying to solve for the value of r in the following:
     # S = r * ( r ^ (d-1) - 1 ) / ( r - 1 )
     # Applying some sixth-grade algebra:
@@ -27,12 +33,12 @@ def _calc_branching_factor(nodes_queued, path_len):
     # r* = (Sr - S + r) ^ (1/d)
     # iterating until r* and r sufficiently converge.
 
-    old = 0
-    new = 0.5 * (1 + nodes_queued ** (1 / path_len))
+    old = 0.0
+    new = 0.5 * (1 + nodes_queued ** (power))
     while 0.001 <= abs(new - old):
         old = new
         rhs = nodes_queued * new - nodes_queued + new
-        new = rhs ** (1 / path_len)
+        new = rhs ** (power)
 
     return round(new, 3)
 
