@@ -78,9 +78,9 @@ class ApproximateShortestPathForestUnified:
             # If all nodes are active, we're on the speedypath - no need to slice self._distances
             # and incur 9x relative overhead
             if len(active_nodes) == self._graph_len:
-                raw = np.abs(self._distances - self._distances[target_node, :])
+                raw = (self._distances - self._distances[target_node, :])
             else:
-                raw = np.abs(self._distances[active_nodes, :] - self._distances[target_node, :])
+                raw = (self._distances[active_nodes, :] - self._distances[target_node, :])
         else:
             # if we haven't got _any_ active lines, throw hands up and spit back zeros
             if not overdrive.any():
@@ -90,9 +90,9 @@ class ApproximateShortestPathForestUnified:
                 actives = actives[active_nodes, :]
             target = self._distances[target_node, overdrive]
 
-            raw = np.abs(actives - target)
+            raw = actives - target
 
-        return np.max(raw, axis=1)
+        return np.max(np.abs(raw), axis=1)
 
     def triangle_upbound(self, source, target):
         stardex = source.index if not isinstance(source, int) else source
