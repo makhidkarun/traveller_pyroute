@@ -123,7 +123,7 @@ class ApproximateShortestPathForestUnified:
         min_cost: cnp.ndarray[cython.float]
         shelf: cnp.ndarray[cython.int]
 
-        for _ in tree_dex:
+        for _ in range(self._num_trees):
             dropspecific.append(set())
         for item in edges:
             left = item[0]
