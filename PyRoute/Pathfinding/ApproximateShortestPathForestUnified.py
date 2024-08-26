@@ -72,7 +72,8 @@ class ApproximateShortestPathForestUnified:
         raw: cnp.ndarray(cython.float, ndim=2)
         overdrive: cnp.ndarray[cython.bint]
         fastpath: cython.bint
-        overdrive, fastpath = self._mona_lisa_overdrive(target_node)
+        anypath: cython.bint
+        overdrive, fastpath, anypath = self._mona_lisa_overdrive(target_node)
 
         if fastpath:  # Fastpath - all overdrive elements are _finite_, so all rows are retrieved
             # If all nodes are active, we're on the speedypath - no need to slice self._distances
@@ -83,7 +84,7 @@ class ApproximateShortestPathForestUnified:
                 raw = (self._distances[active_nodes, :] - self._distances[target_node, :])
         else:
             # if we haven't got _any_ active lines, throw hands up and spit back zeros
-            if not overdrive.any():
+            if not anypath:
                 return np.zeros(len(active_nodes), dtype=float)
             actives = self._distances[:, overdrive]
             if len(active_nodes) != self._graph_len:
@@ -104,10 +105,10 @@ class ApproximateShortestPathForestUnified:
 
     #  Gratuitous William Gibson reference is gratuitous.
     @functools.cache
-    def _mona_lisa_overdrive(self, target_node: cython.int) -> tuple[cnp.array[cython.bint], cython.bint]:
+    def _mona_lisa_overdrive(self, target_node: cython.int) -> tuple[cnp.array[cython.bint], cython.bint, cython.bint]:
         result: cnp.ndarray[cython.bint]
         result = self._distances[target_node, :] != float('+inf')
-        return result, result.all()
+        return result, result.all(), result.any()
 
     @cython.infer_types(True)
     @cython.boundscheck(False)
