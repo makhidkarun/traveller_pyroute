@@ -158,7 +158,7 @@ class LandmarksTriaxialExtremes:
             static = np.maximum(distances, min_cost)
 
             while slotcount < slots:
-                lobound = approx.lower_bound_bulk(all_nodes, first_star.index)
+                lobound = approx.lower_bound_bulk(first_star.index)
                 lobound = np.maximum(lobound, static)
 
                 distance_labels = np.ones(self.graph_len) * float('+inf')

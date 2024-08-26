@@ -27,7 +27,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=N
     G_succ = G._arcs  # For speed-up
 
     # pre-calc heuristics for all nodes to the target node
-    potentials = bulk_heuristic(G._nodes, target)
+    potentials = bulk_heuristic(target)
 
     # Length of graph G
     len_G = len(G)

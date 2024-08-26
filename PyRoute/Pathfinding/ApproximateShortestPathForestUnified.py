@@ -67,8 +67,7 @@ class ApproximateShortestPathForestUnified:
     @cython.initializedcheck(False)
     @cython.nonecheck(False)
     @cython.wraparound(False)
-    def lower_bound_bulk(self, active_nodes: cnp.ndarray[cython.int], target_node: cython.int)\
-            -> cnp.ndarray[cython.float]:
+    def lower_bound_bulk(self, target_node: cython.int) -> cnp.ndarray[cython.float]:
         raw: cnp.ndarray(cython.float, ndim=2)
         overdrive: cnp.ndarray[cython.bint]
         fastpath: cython.bint
@@ -76,19 +75,12 @@ class ApproximateShortestPathForestUnified:
         overdrive, fastpath, anypath = self._mona_lisa_overdrive(target_node)
 
         if fastpath:  # Fastpath - all overdrive elements are _finite_, so all rows are retrieved
-            # If all nodes are active, we're on the speedypath - no need to slice self._distances
-            # and incur 9x relative overhead
-            if len(active_nodes) == self._graph_len:
-                raw = (self._distances - self._distances[target_node, :])
-            else:
-                raw = (self._distances[active_nodes, :] - self._distances[target_node, :])
+            raw = (self._distances - self._distances[target_node, :])
         else:
             # if we haven't got _any_ active lines, throw hands up and spit back zeros
             if not anypath:
-                return np.zeros(len(active_nodes), dtype=float)
+                return np.zeros(self._graph_len, dtype=float)
             actives = self._distances[:, overdrive]
-            if len(active_nodes) != self._graph_len:
-                actives = actives[active_nodes, :]
             target = self._distances[target_node, overdrive]
 
             raw = actives - target

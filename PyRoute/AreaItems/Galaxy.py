@@ -393,8 +393,9 @@ class Galaxy(AreaItem):
             star = self.star_mapping[item]
             star.is_well_formed()
 
-    def heuristic_distance_bulk(self, active_nodes, target):
-        raw = self.trade.shortest_path_tree.lower_bound_bulk(active_nodes, target)
+    def heuristic_distance_bulk(self, target):
+        active_nodes = self.stars.nodes.values()
+        raw = self.trade.shortest_path_tree.lower_bound_bulk(target)
         distances = self.trade.star_graph.distances_from_target(active_nodes, target)
         # Case-wise maximum of 2 or more admissible heuristics (approx-SP bound, existing route distances) is itself
         # admissible
