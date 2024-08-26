@@ -76,6 +76,7 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
     dist: cython.float
     curnode: cython.int
     parent: cython.int
+    counter: cython.int
 
     # Maps explored nodes to parent closest to the source.
     explored: dict[cython.int, cython.int] = {}
@@ -130,24 +131,14 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
         raw_nodes = G_succ[curnode]
         active_nodes = raw_nodes[0]
         active_weights = dist + raw_nodes[1]
-        augmented_weights = active_weights + potentials[active_nodes]
         # Even if we have the target node as a candidate neighbour, of itself, that's _no_ guarantee that the target
         # as neighbour will give a better upper bound.
-        #keep = np.logical_and(augmented_weights < upbound, active_weights <= upper_limit[active_nodes])
         keep = active_weights <= upper_limit[active_nodes]
         active_nodes = active_nodes[keep]
         active_weights = active_weights[keep]
-        augmented_weights = augmented_weights[keep]
         if 0 == len(active_nodes):
             g_exhausted += 1
             continue
-        keep = augmented_weights < upbound
-        active_nodes = active_nodes[keep]
-        if 0 == len(active_nodes):
-            g_exhausted += 1
-            continue
-        active_weights = active_weights[keep]
-        augmented_weights = augmented_weights[keep]
 
         targdex = -1
 
@@ -170,23 +161,35 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
 
             # As we have a tighter upper bound, apply it to the neighbours as well - target will be excluded because
             # its augmented weight is _equal_ to upbound
-            keep = augmented_weights < upbound
+            keep = active_nodes != target
             active_nodes = active_nodes[keep]
             if 0 == len(active_nodes):
                 targ_exhausted += 1
                 continue
 
             active_weights = active_weights[keep]
-            augmented_weights = augmented_weights[keep]
 
         # Now unconditionally queue _all_ nodes that are still active, worrying about filtering out the bound-busting
         # neighbours later.
         num_nodes = len(active_nodes)
-        queue_counter += num_nodes
+        counter = 0
         for i in range(num_nodes):
             act_nod = active_nodes[i]
             act_wt = active_weights[i]
+            aug_wt = act_wt + potentials[act_nod]
+            if aug_wt >= upbound:
+                continue
             distances_view[act_nod] = act_wt
             upper_limit_view[act_nod] = act_wt
-            heappush(queue, (augmented_weights[i], act_wt, act_nod, curnode))
+            heappush(queue, (aug_wt, act_wt, act_nod, curnode))
+            counter += 1
+
+        if 0 == counter:
+            if -1 != targdex:
+                targ_exhausted += 1
+            else:
+                g_exhausted += 1
+        else:
+            queue_counter += counter
+
     return path, diagnostics
