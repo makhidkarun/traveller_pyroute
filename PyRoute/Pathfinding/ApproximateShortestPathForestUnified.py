@@ -121,7 +121,7 @@ class ApproximateShortestPathForestUnified:
         targdex: cython.int = -1
         i: cython.int
         min_cost: cnp.ndarray[cython.float]
-        shelf: cnp.ndarray[cython.int]
+        shelf: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
 
         for _ in range(self._num_trees):
             dropspecific.append(set())
