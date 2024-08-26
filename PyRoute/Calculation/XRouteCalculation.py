@@ -201,7 +201,7 @@ class XRouteCalculation(RouteCalculation):
     def get_route_between(self, star, target, trade):
         try:
             mincost = copy.deepcopy(self.star_graph._min_cost)
-            upbound = self.shortest_path_tree.triangle_upbound(star, target) * 1.005
+            upbound = self.shortest_path_tree.triangle_upbound(star.index, target.index) * 1.005
             route, _ = astar_path_numpy(self.star_graph, star.index, target.index,
                                            self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
         except nx.NetworkXNoPath:

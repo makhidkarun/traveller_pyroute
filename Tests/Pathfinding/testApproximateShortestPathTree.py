@@ -42,7 +42,7 @@ class testApproximateShortestPathTree(baseTest):
         source = stars[0]
 
         approx = ApproximateShortestPathForestUnified(source, graph, 0.2)
-        self.assertEqual(496, len(approx._distances), "Distances dictionary has unexpected length")
+        self.assertEqual(496, len(approx.distances), "Distances dictionary has unexpected length")
 
         src = stars[2]
         targ = stars[80]
@@ -135,8 +135,9 @@ class testApproximateShortestPathTree(baseTest):
         active_nodes = [20, 19, 1]
         target = 1
 
-        result = approx.lower_bound_bulk(active_nodes, target)
+        result = approx.lower_bound_bulk(target)
         self.assertIsNotNone(result)
+        result = result[active_nodes]
         expected = np.array([15.833, 15.000, 0])
         np.testing.assert_array_almost_equal(expected, result, 0.000001, "Unexpected bounds array")
 
@@ -163,7 +164,7 @@ class testApproximateShortestPathTree(baseTest):
 
         approx = ApproximateShortestPathForestUnified(source, graph, 0.2)
         # verify that all distances as at ctor are finite
-        distances = approx._distances
+        distances = approx.distances
         old_num = len(distances)
 
         # auxiliary network dijkstra calculation to dish out parent nodes
@@ -176,7 +177,7 @@ class testApproximateShortestPathTree(baseTest):
         edges = [(leaf, inter)]
 
         approx.update_edges(edges)
-        self.assertEqual(old_num, len(approx._distances))
+        self.assertEqual(old_num, len(approx.distances))
 
     def test_drop_third_level_intermediate_nodes_in_same_component_and_regenerate(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
@@ -213,7 +214,7 @@ class testApproximateShortestPathTree(baseTest):
         edges = [(inter, hi)]
 
         approx.update_edges(edges)
-        self.assertEqual(496, len(approx._distances))
+        self.assertEqual(496, len(approx.distances))
 
     def test_verify_changed_leaf_edge_trip_update(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
@@ -256,21 +257,21 @@ class testApproximateShortestPathTree(baseTest):
                 exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
 
-        distance_check = list(expected_distances.values()) == approx._distances[:, 0]
+        distance_check = list(expected_distances.values()) == approx.distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT creation")
 
         # adjust weight
         oldweight = galaxy.stars[subnode][leafnode]['weight']
         galaxy.stars[subnode][leafnode]['weight'] -= 1
         galaxy.trade.star_graph.lighten_edge(subnode, leafnode, oldweight - 1)
-        approx._graph.lighten_edge(subnode, leafnode, oldweight - 1)
+        approx.graph.lighten_edge(subnode, leafnode, oldweight - 1)
 
         # tell SPT weight has changed
         edge = (subnode, leafnode)
         approx.update_edges([edge])
 
         # verify update tripped
-        self.assertEqual(expected_distances[leafnode] - 1, approx._distances[leafnode], "Leaf node distance not updated")
+        self.assertEqual(expected_distances[leafnode] - 1, approx.distances[leafnode], "Leaf node distance not updated")
 
     def test_verify_near_root_edge_propagates(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
@@ -315,14 +316,14 @@ class testApproximateShortestPathTree(baseTest):
                 exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
 
-        distance_check = list(expected_distances.values()) == approx._distances[:, 0]
+        distance_check = list(expected_distances.values()) == approx.distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT creation")
 
         # adjust weight
         oldweight = galaxy.stars[source][right]['weight']
         galaxy.stars[source][right]['weight'] -= 1
         galaxy.trade.star_graph.lighten_edge(source, right, oldweight - 1)
-        approx._graph.lighten_edge(source, right, oldweight - 1)
+        approx.graph.lighten_edge(source, right, oldweight - 1)
 
         # tell SPT weight has changed
         edge = (source, right)
@@ -334,7 +335,7 @@ class testApproximateShortestPathTree(baseTest):
 
         approx.update_edges([edge])
 
-        distance_check = list(expected_distances.values()) == approx._distances[:, 0]
+        distance_check = list(expected_distances.values()) == approx.distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT restart")
 
     def test_verify_multiple_near_root_edges_propagate(self):

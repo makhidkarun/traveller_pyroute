@@ -26,7 +26,7 @@ class ApproximateShortestPathForestUnified:
     _seeds: list
     _num_trees: cython.int
     _graph_len: cython.int
-    _distances: cnp.ndarray(cython.float, ndim=2)
+    _distances: cython.declare(cnp.ndarray(cython.float, ndim=2), 'readonly')
     _max_labels: cnp.ndarray(cython.float, ndim=2)
 
     def __init__(self, source, graph, epsilon, sources=None):
@@ -230,3 +230,11 @@ class ApproximateShortestPathForestUnified:
     @property
     def num_trees(self):
         return self._num_trees
+
+    @property
+    def distances(self):
+        return self._distances
+
+    @property
+    def graph(self):
+        return self._graph

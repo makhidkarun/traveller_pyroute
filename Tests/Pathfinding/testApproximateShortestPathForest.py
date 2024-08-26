@@ -33,13 +33,14 @@ class testApproximateShortestPathForest(baseTest):
         source = stars[0]
 
         approx = ApproximateShortestPathForestUnified(source, graph, 0.2, sources=landmarks)
-        self.assertEqual(11, approx._num_trees)
+        self.assertEqual(11, approx.num_trees)
 
         active_nodes = [2, 80]
         target = 80
         expected = np.array([420.833, 0])
-        actual = approx.lower_bound_bulk(active_nodes, target)
+        actual = approx.lower_bound_bulk(target)
         self.assertIsNotNone(actual)
+        actual = actual[active_nodes]
 
         np.testing.assert_array_almost_equal(expected, actual, 0.000001, "Unexpected bounds array")
 
@@ -53,7 +54,7 @@ class testApproximateShortestPathForest(baseTest):
         source = stars[0]
 
         approx = ApproximateShortestPathForestUnified(source, graph, 0.2, sources=landmarks)
-        self.assertEqual(11, approx._num_trees)
+        self.assertEqual(11, approx.num_trees)
 
     def test_unified_can_handle_bulk_lobound_from_singleton_component(self):
         galaxy = self.set_up_zarushagar_sector()
@@ -61,13 +62,12 @@ class testApproximateShortestPathForest(baseTest):
         foo = LandmarksTriaxialExtremes(galaxy)
         landmarks, _ = foo.get_landmarks(index=True)
         graph = galaxy.stars
-        stars = list(graph.nodes)
         source = [item for item in graph if graph.nodes()[item]['star'].component == 0][0]
         targ = [item for item in graph if graph.nodes()[item]['star'].component == 1][0]
 
         approx = ApproximateShortestPathForestUnified(source, graph, 0.2, sources=landmarks)
 
-        bulk_lo = approx.lower_bound_bulk(stars, targ)
+        bulk_lo = approx.lower_bound_bulk(targ)
         # Approx-sp lower bounds to a singleton component should be zero, as they are irrelevant in actual pathfinding
         self.assertEqual(0, max(bulk_lo), "Unexpected lobound")
 
@@ -83,7 +83,7 @@ class testApproximateShortestPathForest(baseTest):
 
         approx = ApproximateShortestPathForestUnified(source, graph, 0.2, sources=landmarks)
 
-        bulk_lo = approx.lower_bound_bulk(stars, source)
+        bulk_lo = approx.lower_bound_bulk(source)
         self.assertEqual(float('+inf'), bulk_lo[targ])
 
     def test_verify_near_root_edge_propagates(self):
@@ -128,14 +128,14 @@ class testApproximateShortestPathForest(baseTest):
                 exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
 
-        distance_check = list(expected_distances.values()) == approx._distances[:,0]
+        distance_check = list(expected_distances.values()) == approx.distances[:,0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT creation")
 
         # adjust weight
         oldweight = galaxy.stars[source][right]['weight']
         galaxy.stars[source][right]['weight'] -= 1
         galaxy.trade.star_graph.lighten_edge(source, right, oldweight - 1)
-        approx._graph.lighten_edge(source, right, oldweight - 1)
+        approx.graph.lighten_edge(source, right, oldweight - 1)
 
         # tell SPT weight has changed
         edge = (source, right)
@@ -146,7 +146,7 @@ class testApproximateShortestPathForest(baseTest):
 
         approx.update_edges([edge])
 
-        distance_check = list(expected_distances.values()) == approx._distances[:, 0]
+        distance_check = list(expected_distances.values()) == approx.distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT restart")
 
     def test_add_tree_to_unified_forest(self):
@@ -171,17 +171,16 @@ class testApproximateShortestPathForest(baseTest):
         source = stars[0]
 
         seeds = [{0: 1}, {0: 2}, {0: 3}]
-        active_nodes = list(range(37))
 
         approx = ApproximateShortestPathForestUnified(source, graph, epsilon=0.1, sources=seeds)
         self.assertEqual(3, approx.num_trees)
-        oldbound = approx.lower_bound_bulk(active_nodes, source)
+        oldbound = approx.lower_bound_bulk(source)
 
         nu_seed = {0: 4}
         approx.expand_forest(nu_seed)
 
         self.assertEqual(4, approx.num_trees)
-        nubound = approx.lower_bound_bulk(active_nodes, source)
+        nubound = approx.lower_bound_bulk(source)
 
         delta = nubound - oldbound
         self.assertGreater(max(delta), 0, "At least one heuristic value should be improved by extra tree")
