@@ -133,13 +133,21 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
         augmented_weights = active_weights + potentials[active_nodes]
         # Even if we have the target node as a candidate neighbour, of itself, that's _no_ guarantee that the target
         # as neighbour will give a better upper bound.
-        keep = np.logical_and(augmented_weights < upbound, active_weights <= upper_limit[active_nodes])
+        #keep = np.logical_and(augmented_weights < upbound, active_weights <= upper_limit[active_nodes])
+        keep = active_weights <= upper_limit[active_nodes]
         active_nodes = active_nodes[keep]
         active_weights = active_weights[keep]
         augmented_weights = augmented_weights[keep]
         if 0 == len(active_nodes):
             g_exhausted += 1
             continue
+        keep = augmented_weights < upbound
+        active_nodes = active_nodes[keep]
+        if 0 == len(active_nodes):
+            g_exhausted += 1
+            continue
+        active_weights = active_weights[keep]
+        augmented_weights = augmented_weights[keep]
 
         targdex = -1
 
