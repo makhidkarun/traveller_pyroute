@@ -58,6 +58,7 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
     upper_limit_view[source] = 0.0
     distances_view: cython.double[:] = distances
     distances_view[source] = 0.0
+    potentials_view: cython.double[:] = potentials
 
     node_counter: cython.int = 0
     queue_counter: cython.int = 0
@@ -84,7 +85,7 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
     # The queue stores priority, cost to reach, node,  and parent.
     # Uses Python heapq to keep in priority order.
     # The nodes themselves, being integers, are directly comparable.
-    queue = [(potentials[source], 0.0, source, -1)]
+    queue = [(potentials_view[source], 0.0, source, -1)]
 
     while queue:
         # Pop the smallest item from queue.
@@ -176,7 +177,7 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
         for i in range(num_nodes):
             act_nod = active_nodes[i]
             act_wt = active_weights[i]
-            aug_wt = act_wt + potentials[act_nod]
+            aug_wt = act_wt + potentials_view[act_nod]
             if aug_wt >= upbound:
                 continue
             distances_view[act_nod] = act_wt
