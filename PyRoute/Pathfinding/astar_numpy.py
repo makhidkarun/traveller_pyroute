@@ -76,11 +76,9 @@ def astar_path_numpy(G, source: cython.int, target: cython.int, bulk_heuristic,
     len_G = len(G)
 
     # Tracks shortest _complete_ path found so far
-    floatinf = float('inf')
-    upbound = floatinf if upbound is None else upbound
-    assert upbound != floatinf, "Supplied upbound must not be infinite"
+    upbound = np.finfo(np.float64).max if upbound is None else upbound
     # Traces lowest distance from source node found for each node
-    distances = np.ones(len_G) * floatinf
+    distances = np.ones(len_G) * float('inf')
 
     # pre-calc the minimum-cost edge on each node
     min_cost = np.zeros(len_G) if min_cost is None else min_cost
