@@ -96,6 +96,7 @@ class ApproximateShortestPathForestUnified:
 
     #  Gratuitous William Gibson reference is gratuitous.
     @functools.cache
+    @cython.cfunc
     def _mona_lisa_overdrive(self, target_node: cython.int) -> tuple[cnp.array[cython.bint], cython.bint, cython.bint]:
         result: cnp.ndarray[cython.bint]
         result = self._distances[target_node, :] != float('+inf')
