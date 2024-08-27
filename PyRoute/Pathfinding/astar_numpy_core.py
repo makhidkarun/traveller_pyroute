@@ -120,7 +120,7 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
             # Skip bad paths that were enqueued before finding a better one
             qcost = distances_view[curnode]
             if qcost <= dist:
-                queue = [item for item in queue if not (item[1] > distances_view[item[2]])]
+                queue = [item for item in queue if not (item[1] > upper_limit_view[item[2]])]
                 heapify(queue)
                 continue
             # If we've found a better path, update
