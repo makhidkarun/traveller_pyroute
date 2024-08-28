@@ -58,6 +58,9 @@ def _calc_branching_factor(nodes_queued: cython.int, path_len: cython.int):
     return round(new, 3)
 
 
+@cython.boundscheck(False)
+@cython.initializedcheck(False)
+@cython.wraparound(False)
 def astar_path_numpy(G, source: cython.int, target: cython.int, bulk_heuristic,
                      min_cost: typing.Optional[cnp.ndarray[cython.float]] = None,
                      upbound=None, diagnostics: cython.bint = False):
