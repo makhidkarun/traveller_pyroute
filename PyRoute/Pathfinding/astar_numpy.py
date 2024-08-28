@@ -98,6 +98,7 @@ def astar_path_numpy(G, source: cython.int, target: cython.int, bulk_heuristic,
 @cython.initializedcheck(False)
 @cython.nonecheck(False)
 @cython.wraparound(False)
+@cython.returns(tuple[list[cython.int], dict])
 def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]], diagnostics: cython.bint,
                      distances: cnp.ndarray[cython.float], min_cost: cnp.ndarray[cython.float],
                      potentials: cnp.ndarray[cython.float], source: cython.int, target: cython.int,
