@@ -289,13 +289,12 @@ class TradeCalculation(RouteCalculation):
 
         try:
             upbound = self._preheat_upper_bound(star, target, allow_reheat=True)
-            # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
-            if float('+inf') != upbound:
-                comp_id = star.component
-                upbound = round(upbound * 1.005 + 0.0005, 3)
-                if star.index in self.component_landmarks[comp_id]:
-                    if target.index not in self.component_landmarks[comp_id]:
-                        target, star = star, target
+            # Increase upbound value by 0.5%, and round result up to 3 decimal places
+            comp_id = star.component
+            upbound = round(upbound * 1.005 + 0.0005, 3)
+            if star.index in self.component_landmarks[comp_id]:
+                if target.index not in self.component_landmarks[comp_id]:
+                    target, star = star, target
 
             mincost = self.star_graph.min_cost(target.index, indirect=True)
             rawroute, diag = astar_path_numpy(self.star_graph, star.index, target.index,
@@ -319,8 +318,6 @@ class TradeCalculation(RouteCalculation):
                 self.pathfinding_data['neighbourhood_size'][moshdex] = neighbourhood_size
 
         except nx.NetworkXNoPath:
-            assert upbound != float('+inf'),\
-                f"Pathfinding failure between {star} and {target} contradicts path implied by finite upbound"
             return
 
         route = [self.galaxy.star_mapping[item] for item in rawroute]
