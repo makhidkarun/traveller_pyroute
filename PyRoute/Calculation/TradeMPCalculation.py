@@ -55,7 +55,7 @@ def intrasector_process(working_queue, processed_queue):
                     if float('+inf') != upbound:
                         upbound = round(upbound * 1.005 + 0.0005, 3)
 
-                    mincost = tradeCalculation.star_graph.min_cost(active_nodes, neighbor.index, indirect=True)
+                    mincost = tradeCalculation.star_graph.min_cost(neighbor.index, indirect=True)
                     rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star.index, neighbor.index,
                                                tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
                 except nx.NetworkXNoPath:
@@ -92,7 +92,7 @@ def long_route_process(working_queue, processed_queue):
             active_nodes = list(range(len(tradeCalculation.star_graph)))
             upbound = tradeCalculation._preheat_upper_bound(star, neighbor)
 
-            mincost = tradeCalculation.star_graph.min_cost(active_nodes, neighbor, indirect=True)
+            mincost = tradeCalculation.star_graph.min_cost(neighbor, indirect=True)
             rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star, neighbor,
                                        tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
         except nx.NetworkXNoPath:
@@ -301,7 +301,7 @@ class TradeMPCalculation(TradeCalculation):
                     if target.index not in self.component_landmarks[comp_id]:
                         target, star = star, target
 
-            mincost = self.star_graph.min_cost(active_nodes, target.index, indirect=True)
+            mincost = self.star_graph.min_cost(target.index, indirect=True)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
                                            self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
         except nx.NetworkXNoPath:

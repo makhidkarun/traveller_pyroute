@@ -39,15 +39,12 @@ class DistanceGraph(DistanceBase):
             mask = np.ma.array(self._min_cost, mask=items)
             self._min_mask.append(mask)
 
-    def min_cost(self, active_nodes, target, indirect=False):
+    def min_cost(self, target, indirect=False):
         min_cost = copy.deepcopy(self._min_cost)
         min_cost[target] = 0
 
         if indirect is not True:
-            if len(active_nodes) == len(self):
-                return min_cost
-
-            return min_cost[active_nodes]
+            return min_cost
 
         min_indirect = copy.deepcopy(self._min_indirect)
         neighbours = self._arcs[target][0]  # Skip neighbours of target and target itself in the indirect leg
@@ -56,10 +53,7 @@ class DistanceGraph(DistanceBase):
 
         min_cost += min_indirect
 
-        if len(active_nodes) == len(self):
-            return min_cost
-
-        return min_cost[active_nodes]
+        return min_cost
 
     def lighten_edge(self, u, v, weight):
         self._lighten_arc(u, v, weight)

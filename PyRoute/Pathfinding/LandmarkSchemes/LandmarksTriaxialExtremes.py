@@ -154,7 +154,7 @@ class LandmarksTriaxialExtremes:
             assert slotcount == len(seeds), f"S-t transpose-trigger landmark skipped in component {component_id}"
             approx = ApproximateShortestPathForestUnified(source, self.galaxy.stars, epsilon=self.galaxy.trade.epsilon, sources=seeds)
             distances = self.galaxy.trade.star_graph.distances_from_target(all_nodes, first_star.index)
-            min_cost = self.galaxy.trade.star_graph.min_cost(all_nodes, first_star.index)
+            min_cost = self.galaxy.trade.star_graph.min_cost(first_star.index)
             static = np.maximum(distances, min_cost)
 
             while slotcount < slots:
