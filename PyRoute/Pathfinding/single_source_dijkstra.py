@@ -36,7 +36,4 @@ def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
 
     arcs = graph._arcs
 
-    parents = np.ones(len(graph), dtype=int) * -100  # Using -100 to track "not considered during processing"
-    parents[seeds] = -1  # Using -1 to flag "root node of tree"
-
-    return dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, min_cost, parents)
+    return dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, min_cost)

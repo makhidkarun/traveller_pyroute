@@ -9,6 +9,8 @@ from cython.cimports.numpy import numpy as cnp
 from cython.cimports.minmaxheap import MinMaxHeap, dijkstra_t
 cnp.import_array()
 
+import numpy as np
+
 
 @cython.boundscheck(False)
 @cython.initializedcheck(False)
@@ -17,8 +19,7 @@ cnp.import_array()
 def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]],
                   distance_labels: cnp.ndarray[cython.float], divisor: cython.float,
                   seeds: cython.list[cython.int],
-                  max_neighbour_labels: cnp.ndarray[cython.float], min_cost: cnp.ndarray[cython.float],
-                  parents: cnp.ndarray[cython.int]):
+                  max_neighbour_labels: cnp.ndarray[cython.float], min_cost: cnp.ndarray[cython.float]):
     neighbours: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
     active_nodes: cnp.ndarray[cython.int]
     active_labels: cnp.ndarray[cython.float]
@@ -32,6 +33,7 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     distance_labels_view: cython.double[:] = distance_labels
     max_neighbour_labels_view: cython.double[:] = max_neighbour_labels
     min_cost_view: cython.double[:] = min_cost
+    parents: cnp.ndarray[cython.int] = np.ones(len(arcs), dtype=int) * -100  # Using -100 to track "not considered during processing"
     parents_view: cython.long[:] = parents
     active_nodes_view: cython.long[:]
     active_costs_view: cython.double[:]
@@ -46,6 +48,7 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     for index in range(len(seeds)):
         act_nod = seeds[index]
         heap.insert({'act_wt': distance_labels_view[act_nod], 'act_nod': act_nod})
+        parents_view[act_nod] = -1  # Using -1 to flag "root node of tree"
 
     while 0 < heap.size():
         result = heap.popmin()
