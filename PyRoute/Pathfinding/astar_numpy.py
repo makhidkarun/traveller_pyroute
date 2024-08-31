@@ -1,3 +1,4 @@
+# distutils: language = c++
 """
 Created on Feb 22, 2024
 
@@ -18,11 +19,11 @@ Compared to the ancestral networkx version of astar_path, this code:
 """
 import cython
 from cython.cimports.numpy import numpy as cnp
+from cython.cimports.minmaxheap import MinMaxHeap, astar_t
 cnp.import_array()
 import networkx as nx
 import numpy as np
 import typing
-from _heapq import heappop, heappush, heapify
 
 
 @cython.cdivision(True)
@@ -136,11 +137,16 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
     # The queue stores priority, cost to reach, node,  and parent.
     # Uses Python heapq to keep in priority order.
     # The nodes themselves, being integers, are directly comparable.
-    queue = [(potentials_view[source], 0.0, source, -1)]
+    queue: MinMaxHeap[astar_t] = MinMaxHeap[astar_t]()
+    queue.reserve(500)
+    queue.insert({'augment': potentials_view[source], 'dist': 0.0, 'curnode': source, 'parent': -1})
 
-    while queue:
+    while 0 < queue.size():
         # Pop the smallest item from queue.
-        _, dist, curnode, parent = heappop(queue)
+        result = queue.popmin()
+        dist = result.dist
+        curnode = result.curnode
+        parent = result.parent
         node_counter += 1
 
         if curnode == target:
@@ -168,11 +174,9 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
             if explored[curnode] == -1:
                 continue
 
-            # Skip bad paths that were enqueued before finding a better one
+            # We've found a bad path, just move on
             qcost = distances_view[curnode]
             if qcost <= dist:
-                queue = [item for item in queue if not (item[1] > upper_limit_view[item[2]])]
-                heapify(queue)
                 continue
             # If we've found a better path, update
             revis_continue += 1
@@ -207,8 +211,7 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
             upper_limit = np.minimum(upper_limit, upbound - min_cost)
             upper_limit_view = upper_limit
 
-            # heappush(queue, (ncost + 0, ncost, target, curnode))
-            heappush(queue, (upbound, upbound, target, curnode))
+            queue.insert({'augment': upbound, 'dist': upbound, 'curnode': target, 'parent': curnode})
             queue_counter += 1
 
             # As we have a tighter upper bound, apply it to the neighbours as well - target will be excluded because
@@ -233,7 +236,7 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
                 continue
             distances_view[act_nod] = act_wt
             upper_limit_view[act_nod] = act_wt
-            heappush(queue, (aug_wt, act_wt, act_nod, curnode))
+            queue.insert({'augment': aug_wt, 'dist': act_wt, 'curnode': act_nod, 'parent': curnode})
             counter += 1
 
         if 0 == counter:
