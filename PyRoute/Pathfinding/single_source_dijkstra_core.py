@@ -1,3 +1,4 @@
+# distutils: language = c++
 """
 Created on Aug 19, 2024
 
@@ -5,8 +6,8 @@ Created on Aug 19, 2024
 """
 import cython
 from cython.cimports.numpy import numpy as cnp
+from cython.cimports.minmaxheap import MinMaxHeap, dijkstra_t
 cnp.import_array()
-from _heapq import heappop, heappush, heapify
 
 
 @cython.boundscheck(False)
@@ -38,22 +39,20 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     tail: cython.int
     dist_tail: cython.float
     distance: cython.float
-    heap: list[tuple[cython.float, cython.int]]
+    heap: MinMaxHeap[dijkstra_t]
 
-    heap = [(distance_labels[seed], seed) for seed in seeds]
-    heapify(heap)
+    heap = MinMaxHeap[dijkstra_t]()
+    heap.reserve(1000)
+    for index in range(len(seeds)):
+        act_nod = seeds[index]
+        heap.insert({'act_wt': distance_labels_view[act_nod], 'act_nod': act_nod})
 
-    while heap:
-        dist_tail, tail = heappop(heap)
+    while 0 < heap.size():
+        result = heap.popmin()
+        dist_tail = result.act_wt
+        tail = result.act_nod
 
         if dist_tail > distance_labels_view[tail] or dist_tail + min_cost_view[tail] > max_neighbour_labels_view[tail]:
-            # Since we've just dequeued a bad node (distance exceeding its current label, or too close to max-label),
-            # remove other bad nodes from the list to avoid tripping over them later, and chuck out nodes who
-            # can't give better distance labels
-            if heap:
-                heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels_view[tail]
-                        and distance + min_cost_view[tail] <= max_neighbour_labels_view[tail]]
-                heapify(heap)
             continue
 
         # Link weights are strictly positive, thus lower bounded by zero. Thus, when the current dist_tail value exceeds
@@ -81,6 +80,6 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
 
             distance_labels_view[act_nod] = act_wt
             parents_view[act_nod] = tail
-            heappush(heap, (act_wt, act_nod))
+            heap.insert({'act_wt': act_wt, 'act_nod': act_nod})
 
     return distance_labels, parents, max_neighbour_labels
