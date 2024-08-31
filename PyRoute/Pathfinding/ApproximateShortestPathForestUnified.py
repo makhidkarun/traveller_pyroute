@@ -62,12 +62,14 @@ class ApproximateShortestPathForestUnified:
             return 0
         return np.max(raw)
 
+    @cython.ccall
     @cython.infer_types(True)
     @cython.boundscheck(False)
     @cython.initializedcheck(False)
     @cython.nonecheck(False)
     @cython.wraparound(False)
-    def lower_bound_bulk(self, target_node: cython.int) -> cnp.ndarray[cython.float]:
+    @cython.returns(cnp.ndarray)
+    def lower_bound_bulk(self, target_node: cython.int):
         raw: cnp.ndarray(cython.float, ndim=2)
         overdrive: cnp.ndarray[cython.bint]
         fastpath: cython.bint
