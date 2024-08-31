@@ -15,7 +15,7 @@ from _heapq import heappop, heappush, heapify
 @cython.wraparound(False)
 def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]],
                   distance_labels: cnp.ndarray[cython.float], divisor: cython.float,
-                  heap: cython.list[tuple[cython.float, cython.int]],
+                  seeds: cython.list[cython.int],
                   max_neighbour_labels: cnp.ndarray[cython.float], min_cost: cnp.ndarray[cython.float],
                   parents: cnp.ndarray[cython.int]):
     neighbours: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
@@ -38,6 +38,10 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     tail: cython.int
     dist_tail: cython.float
     distance: cython.float
+    heap: list[tuple[cython.float, cython.int]]
+
+    heap = [(distance_labels[seed], seed) for seed in seeds]
+    heapify(heap)
 
     while heap:
         dist_tail, tail = heappop(heap)
