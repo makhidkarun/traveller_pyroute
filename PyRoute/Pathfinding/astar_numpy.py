@@ -191,11 +191,11 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
         # as neighbour will give a better upper bound.
         keep = active_weights <= upper_limit[active_nodes]
         active_nodes = active_nodes[keep]
-        active_weights = active_weights[keep]
         if 0 == len(active_nodes):
             g_exhausted += 1
             continue
 
+        active_weights = active_weights[keep]
         targdex = -1
 
         for i in range(len(active_nodes)):
