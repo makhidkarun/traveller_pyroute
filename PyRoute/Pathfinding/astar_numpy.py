@@ -103,12 +103,15 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
     distances_view: cython.double[:] = distances
     distances_view[source] = 0.0
     potentials_view: cython.double[:] = potentials
+    active_nodes_view: cython.long[:]
+    active_costs_view: cython.double[:]
 
     node_counter: cython.int = 0
     queue_counter: cython.int = 0
     revisited: cython.int = 0
     g_exhausted: cython.int = 0
     f_exhausted: cython.int = 0
+    nu_upbound: cython.float
     new_upbounds: cython.int = 0
     targ_exhausted: cython.int = 0
     revis_continue: cython.int = 0
@@ -177,52 +180,33 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
         explored[curnode] = parent
 
         raw_nodes = G_succ[curnode]
-        active_nodes = raw_nodes[0]
-        active_weights = dist + raw_nodes[1]
-        # Even if we have the target node as a candidate neighbour, of itself, that's _no_ guarantee that the target
-        # as neighbour will give a better upper bound.
-        keep = active_weights <= distances[active_nodes]
-        active_nodes = active_nodes[keep]
-        if 0 == len(active_nodes):
-            g_exhausted += 1
-            continue
+        active_nodes_view = raw_nodes[0]
+        active_costs_view = raw_nodes[1]
 
-        active_weights = active_weights[keep]
         targdex = -1
 
-        for i in range(len(active_nodes)):
-            act_nod = active_nodes[i]
+        num_nodes = len(active_nodes_view)
+        for i in range(num_nodes):
+            act_nod = active_nodes_view[i]
             if act_nod == target:
                 targdex = i
+                nu_upbound = dist + active_costs_view[targdex]
+                if nu_upbound < upbound:
+                    upbound = nu_upbound
+                    new_upbounds += 1
+                    distances_view[target] = upbound
                 break
-
-        if -1 != targdex:
-            upbound = active_weights[targdex]
-            new_upbounds += 1
-            distances_view[target] = upbound
-
-            queue.insert({'augment': upbound, 'dist': upbound, 'curnode': target, 'parent': curnode})
-            queue_counter += 1
-
-            # As we have a tighter upper bound, apply it to the neighbours as well - target will be excluded because
-            # its augmented weight is _equal_ to upbound
-            keep = active_nodes != target
-            active_nodes = active_nodes[keep]
-            if 0 == len(active_nodes):
-                targ_exhausted += 1
-                continue
-
-            active_weights = active_weights[keep]
 
         # Now unconditionally queue _all_ nodes that are still active, worrying about filtering out the bound-busting
         # neighbours later.
-        num_nodes = len(active_nodes)
         counter = 0
         for i in range(num_nodes):
-            act_nod = active_nodes[i]
-            act_wt = active_weights[i]
+            act_nod = active_nodes_view[i]
+            act_wt = dist + active_costs_view[i]
+            if act_wt > distances_view[act_nod]:
+                continue
             aug_wt = act_wt + potentials_view[act_nod]
-            if aug_wt >= upbound:
+            if aug_wt > upbound:
                 continue
             distances_view[act_nod] = act_wt
             queue.insert({'augment': aug_wt, 'dist': act_wt, 'curnode': act_nod, 'parent': curnode})
