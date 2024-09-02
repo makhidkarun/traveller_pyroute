@@ -288,10 +288,10 @@ class TradeCalculation(RouteCalculation):
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
-            upbound = self._preheat_upper_bound(star, target, allow_reheat=True)
-            # Increase upbound value by 0.5%, and round result up to 3 decimal places
+            # Get upper bound value, and increase by 0.5% to ensure it _is_ an upper bound
+            upbound = self._preheat_upper_bound(star, target, allow_reheat=True) * 1.005
+
             comp_id = star.component
-            upbound = round(upbound * 1.005 + 0.0005, 3)
             if star.index in self.component_landmarks[comp_id]:
                 if target.index not in self.component_landmarks[comp_id]:
                     target, star = star, target
