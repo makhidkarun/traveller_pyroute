@@ -538,7 +538,7 @@ class TradeCalculation(RouteCalculation):
 
         self.galaxy.landmarks[(source.index, target.index)] = distance
         self.galaxy.landmarks[(target.index, source.index)] = distance
-        if 2 < len(route):
+        if 2 < len(route) and not (source.index in self.galaxy.stars and target.index in self.galaxy.stars[source.index]):
             self.galaxy.stars.add_edge(source.index, target.index, distance=distance, weight=cost, trade=0, btn=0,
                                        count=0, exhaust=0, route=route)
             self.galaxy.historic_costs.add_edge(source.index, target.index, cost)
