@@ -296,9 +296,8 @@ class TradeCalculation(RouteCalculation):
                 if target.index not in self.component_landmarks[comp_id]:
                     target, star = star, target
 
-            mincost = self.star_graph.min_cost(target.index, indirect=True)
             rawroute, diag = astar_path_numpy(self.star_graph, star.index, target.index,
-                                              self.shortest_path_tree.lower_bound_bulk, min_cost=mincost, upbound=upbound,
+                                              self.shortest_path_tree.lower_bound_bulk, upbound=upbound,
                                               diagnostics=self.debug_flag)
 
             if self.debug_flag:

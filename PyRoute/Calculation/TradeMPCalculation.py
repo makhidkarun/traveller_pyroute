@@ -89,12 +89,10 @@ def long_route_process(working_queue, processed_queue):
             break
 
         try:
-            active_nodes = list(range(len(tradeCalculation.star_graph)))
             upbound = tradeCalculation._preheat_upper_bound(star, neighbor)
 
-            mincost = tradeCalculation.star_graph.min_cost(neighbor, indirect=True)
             rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star, neighbor,
-                                       tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
+                                       tradeCalculation.galaxy.heuristic_distance_bulk, upbound=upbound)
         except nx.NetworkXNoPath:
             continue
 
@@ -291,7 +289,6 @@ class TradeMPCalculation(TradeCalculation):
             f"This route from {star} to {target} has already been processed in reverse"
 
         try:
-            active_nodes = list(range(len(self.star_graph)))
             upbound = self._preheat_upper_bound(star, target)
             # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
             if float('+inf') != upbound:
@@ -301,9 +298,8 @@ class TradeMPCalculation(TradeCalculation):
                     if target.index not in self.component_landmarks[comp_id]:
                         target, star = star, target
 
-            mincost = self.star_graph.min_cost(target.index, indirect=True)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
-                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
+                                           self.galaxy.heuristic_distance_bulk, upbound=upbound)
         except nx.NetworkXNoPath:
             return
 
