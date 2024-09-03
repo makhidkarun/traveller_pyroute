@@ -179,9 +179,8 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
 
         explored[curnode] = parent
 
-        raw_nodes = G_succ[curnode]
-        active_nodes_view = raw_nodes[0]
-        active_costs_view = raw_nodes[1]
+        active_nodes_view = G_succ[curnode][0]
+        active_costs_view = G_succ[curnode][1]
 
         targdex = -1
 
