@@ -239,3 +239,7 @@ class ApproximateShortestPathForestUnified:
     @property
     def graph(self):
         return self._graph
+
+    @property
+    def sources(self):
+        return self._sources

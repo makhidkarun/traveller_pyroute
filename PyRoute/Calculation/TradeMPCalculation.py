@@ -54,9 +54,8 @@ def intrasector_process(working_queue, processed_queue):
                     if float('+inf') != upbound:
                         upbound = round(upbound * 1.005 + 0.0005, 3)
 
-                    mincost = tradeCalculation.star_graph.min_cost(neighbor.index, indirect=True)
                     rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star.index, neighbor.index,
-                                               tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
+                                               tradeCalculation.galaxy.heuristic_distance_bulk, upbound=upbound)
                 except nx.NetworkXNoPath:
                     continue
 
@@ -205,7 +204,7 @@ class TradeMPCalculation(TradeCalculation):
     def process_long_routes(self, btn):
 
         self.shortest_path_tree = ApproximateShortestPathForestUnified(0, self.galaxy.stars,
-                                             0, sources=self.shortest_path_tree._sources)
+                                             0, sources=self.shortest_path_tree.sources)
 
         # Create the Queues for sending data between processes.
         find_queue = Queue()
