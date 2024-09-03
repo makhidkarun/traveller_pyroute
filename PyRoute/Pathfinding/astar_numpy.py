@@ -145,7 +145,7 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
         node_counter += 1
 
         if curnode == target:
-            path = [curnode]
+            path.append(curnode)
             node = parent
             while node != -1:
                 assert node not in path, "Node " + str(node) + " duplicated in discovered path"
