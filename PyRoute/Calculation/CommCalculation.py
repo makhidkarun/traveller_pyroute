@@ -3,8 +3,6 @@ Created on Aug 09, 2023
 
 @author: CyberiaResurrection
 """
-import copy
-
 import networkx as nx
 
 from PyRoute.AllyGen import AllyGen

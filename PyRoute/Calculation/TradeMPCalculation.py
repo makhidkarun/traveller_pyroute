@@ -49,7 +49,6 @@ def intrasector_process(working_queue, processed_queue):
                     continue
 
                 try:
-                    active_nodes = list(range(len(tradeCalculation.star_graph)))
                     upbound = tradeCalculation._preheat_upper_bound(star, neighbor)
                     # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
                     if float('+inf') != upbound:

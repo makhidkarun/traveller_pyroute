@@ -7,9 +7,10 @@ Created on Aug 19, 2024
 import cython
 from cython.cimports.numpy import numpy as cnp
 from cython.cimports.minmaxheap import MinMaxHeap, dijkstra_t
-cnp.import_array()
 
 import numpy as np
+
+cnp.import_array()
 
 
 @cython.boundscheck(False)
@@ -23,11 +24,9 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     neighbours: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
     active_nodes: cnp.ndarray[cython.int]
     active_labels: cnp.ndarray[cython.float]
-    active_weights: cnp.ndarray[cython.float]
     act_wt: cython.float
     raw_wt: cython.float
     act_nod: cython.int
-    keep: cnp.ndarray[cython.py_bool]
     num_nodes: cython.size_t
     index: cython.size_t
     distance_labels_view: cython.double[:] = distance_labels
@@ -40,7 +39,6 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     active_labels_view: cython.double[:]
     tail: cython.int
     dist_tail: cython.float
-    distance: cython.float
     heap: MinMaxHeap[dijkstra_t]
 
     heap = MinMaxHeap[dijkstra_t]()

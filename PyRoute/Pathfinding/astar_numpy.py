@@ -20,10 +20,11 @@ Compared to the ancestral networkx version of astar_path, this code:
 import cython
 from cython.cimports.numpy import numpy as cnp
 from cython.cimports.minmaxheap import MinMaxHeap, astar_t
-cnp.import_array()
+
 import networkx as nx
 import numpy as np
-import typing
+
+cnp.import_array()
 
 
 @cython.cdivision(True)
@@ -67,7 +68,6 @@ def astar_path_numpy(G, source: cython.int, target: cython.int, bulk_heuristic,
     G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]]
     potentials: cnp.ndarray[cython.float]
     len_G: cython.int
-    floatinf: cython.float
     upbound: cython.float
     distances: cnp.ndarray[cython.float]
     G_succ = G._arcs  # For speed-up

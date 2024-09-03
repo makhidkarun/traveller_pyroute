@@ -9,7 +9,6 @@ where less than the entire shortest path tree needs to be regenerated due to a l
 the specific input format used in PyRoute.
 
 """
-import heapq
 import numpy as np
 
 from PyRoute.Pathfinding.single_source_dijkstra_core import dijkstra_core

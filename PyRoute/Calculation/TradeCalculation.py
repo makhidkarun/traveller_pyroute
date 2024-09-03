@@ -216,10 +216,10 @@ class TradeCalculation(RouteCalculation):
 
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
-        self.logger.info(f"Finding pathfinding landmarks")
+        self.logger.info("Finding pathfinding landmarks")
         self.star_graph = DistanceGraph(self.galaxy.stars)
         landmarks, self.component_landmarks = self.get_landmarks(index=True, btn=btn)
-        self.logger.info(f"Pathfinding landmarks found")
+        self.logger.info("Pathfinding landmarks found")
 
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
         source.is_landmark = True

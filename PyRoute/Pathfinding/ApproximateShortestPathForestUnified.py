@@ -5,14 +5,14 @@ Created on Feb 29, 2024
 """
 import cython
 from cython.cimports.numpy import numpy as cnp
-cnp.import_array()
-import copy
 import functools
 
 import numpy as np
 from PyRoute.Star import Star
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph, explicit_shortest_path_dijkstra_distance_graph
+
+cnp.import_array()
 
 
 @cython.cclass
