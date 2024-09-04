@@ -218,6 +218,7 @@ class TradeCalculation(RouteCalculation):
         # components, even those with only one star.
         self.logger.info("Finding pathfinding landmarks")
         self.star_graph = DistanceGraph(self.galaxy.stars)
+        self.logger.info("Generating pathfinding landmarks")
         landmarks, self.component_landmarks = self.get_landmarks(index=True, btn=btn)
         self.logger.info("Pathfinding landmarks found")
 
