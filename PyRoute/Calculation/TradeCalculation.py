@@ -536,7 +536,7 @@ class TradeCalculation(RouteCalculation):
         rangedata['actual distance'] = distance
         rangedata['jumps'] = len(route) - 1
 
-        if 2 < len(route) and not (source.index in self.galaxy.stars and target.index in self.galaxy.stars[source.index]):
+        if 5 < len(route) and not (source.index in self.galaxy.stars and target.index in self.galaxy.stars[source.index]):
             self.galaxy.stars.add_edge(source.index, target.index, distance=distance, weight=cost, trade=0, btn=0,
                                        count=0, exhaust=0, route=route)
             self.galaxy.historic_costs.add_edge(source.index, target.index, cost)
