@@ -22,22 +22,17 @@ class DistanceGraph(DistanceBase):
         ]
         self._min_cost = np.zeros(len(self._nodes))
         self._min_indirect = np.zeros(len(self._nodes))
-        self._min_mask = []
         self._floatinf = float('+inf')
         for i in range(0, len(self._nodes)):
             node_edges = self._arcs[i][1]
             if 0 < len(node_edges):
                 self._min_cost[i] = min(node_edges)
         for i in range(0, len(self._nodes)):
-            items = np.ones(len(self._nodes), dtype=int)
             node_neighbours = self._arcs[i][0]
             if 0 == len(node_neighbours):
                 self._min_indirect[i] = 0
             else:
                 self._min_indirect[i] = min(self._min_cost[node_neighbours])
-            items[node_neighbours] = 0
-            mask = np.ma.array(self._min_cost, mask=items)
-            self._min_mask.append(mask)
 
     def min_cost(self, target, indirect=False):
         min_cost = copy.deepcopy(self._min_cost)
