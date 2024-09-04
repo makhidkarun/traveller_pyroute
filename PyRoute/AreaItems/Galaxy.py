@@ -47,7 +47,6 @@ class Galaxy(AreaItem):
         self.output_path = 'maps'
         self.max_jump_range = max_jump
         self.min_btn = min_btn
-        self.landmarks = dict()
         self.historic_costs = None
         self.big_component = None
         self.star_mapping = dict()
