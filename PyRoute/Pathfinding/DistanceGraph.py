@@ -17,21 +17,21 @@ class DistanceGraph(DistanceBase):
     def __init__(self, graph):
         super().__init__(graph)
         self._arcs = [
-            (np.array(graph.adj[u], dtype=int), np.array([data['weight'] for data in list(graph.adj[u].values())], dtype=float))
+            (
+                np.array(graph.adj[u], dtype=int),
+                np.array([data['weight'] for data in list(graph.adj[u].values())], dtype=float)
+            )
             for u in self._nodes
         ]
         self._min_cost = np.zeros(len(self._nodes))
         self._min_indirect = np.zeros(len(self._nodes))
-        self._floatinf = float('+inf')
         for i in range(0, len(self._nodes)):
             node_edges = self._arcs[i][1]
             if 0 < len(node_edges):
                 self._min_cost[i] = min(node_edges)
         for i in range(0, len(self._nodes)):
             node_neighbours = self._arcs[i][0]
-            if 0 == len(node_neighbours):
-                self._min_indirect[i] = 0
-            else:
+            if 0 < len(node_neighbours):
                 self._min_indirect[i] = min(self._min_cost[node_neighbours])
 
     def min_cost(self, target, indirect=False):
