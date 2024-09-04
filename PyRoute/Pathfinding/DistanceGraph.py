@@ -14,6 +14,8 @@ from PyRoute.Pathfinding.DistanceBase import DistanceBase
 
 class DistanceGraph(DistanceBase):
 
+    __slots__ = '_arcs', '_positions', '_nodes', '_indexes', '_min_cost', '_min_indirect'
+
     def __init__(self, graph):
         super().__init__(graph)
         self._arcs = [
