@@ -67,7 +67,7 @@ class Galaxy(AreaItem):
     # def read_sectors(self, sectors, pop_code, ru_calc,
     #                 route_reuse, trade_choice, route_btn, mp_threads, debug_flag, fix_pop=False):
     def read_sectors(self, options):
-        assert isinstance(options, ReadSectorOptions)
+        assert isinstance(options, ReadSectorOptions), "options parm not ReadSectorOptions, is " + type(options).__name__
         route_reuse = options.route_reuse
         trade_choice = options.trade_choice
         route_btn = options.route_btn

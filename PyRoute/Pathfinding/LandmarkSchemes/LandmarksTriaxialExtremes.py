@@ -136,15 +136,18 @@ class LandmarksTriaxialExtremes:
                     if seconddex in component_landmarks[item[0].component]:
                         continue
                     counters[firstdex] += 1
-                max_counter = max(counters.values())
-                max_candidates = {k: v for (k, v) in counters.items() if v == max_counter}
-                source = list(max_candidates.keys())[0]
-                if index:
-                    result[6][component_id] = source
-                    component_landmarks[component_id].add(source)
+                if 0 == len(counters.values()):
+                    btn = None
                 else:
-                    nusource = [item for item in stars if stars.index == source]
-                    result[6][component_id] = nusource[0]
+                    max_counter = max(counters.values())
+                    max_candidates = {k: v for (k, v) in counters.items() if v == max_counter}
+                    source = list(max_candidates.keys())[0]
+                    if index:
+                        result[6][component_id] = source
+                        component_landmarks[component_id].add(source)
+                    else:
+                        nusource = [item for item in stars if stars.index == source]
+                        result[6][component_id] = nusource[0]
 
             if 7 == slots:
                 continue
