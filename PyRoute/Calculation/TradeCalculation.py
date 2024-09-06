@@ -100,7 +100,8 @@ class TradeCalculation(RouteCalculation):
             # Don't filter if, despite the route being too small, it's within the max jump range.  Such stars can still
             # have trade routes flowing _through_ them, just not _from_ or _to_ them.
             if self.galaxy.max_jump_range < star.distance(neighbor):
-                return True
+                return False
+            return True
         return False
 
     def base_range_routes(self, star, neighbor):
