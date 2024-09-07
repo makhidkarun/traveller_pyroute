@@ -40,7 +40,8 @@ class UWPCodes(object):
 
 
 class Star(object):
-    __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code', 'hex', 'deep_space_station'
+    __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code', 'hex',\
+                'deep_space_station', 'is_redzone'
 
     def __init__(self):
         self.worlds = None

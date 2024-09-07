@@ -120,7 +120,7 @@ class testApproximateShortestPathForest(baseTest):
             expected_string = json.load(file)
 
         expected_distances = dict()
-        component = [item for item in stars if graph.nodes[item]['star'].component == graph.nodes[source]['star'].component]
+        component = [item for item in stars]
         for item in component:
             exp_dist = 0
             rawstar = graph.nodes[item]['star']
@@ -128,6 +128,7 @@ class testApproximateShortestPathForest(baseTest):
                 exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
 
+        expected_distances[19] = float('+inf')
         distance_check = list(expected_distances.values()) == approx.distances[:,0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT creation")
 

@@ -4,6 +4,7 @@ Created on Mar 15, 2014
 @author: tjoneslo
 """
 import functools
+import itertools
 import math
 
 import numpy as np
@@ -15,6 +16,7 @@ from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 from PyRoute.TradeBalance import TradeBalance
 from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
+from PyRoute.Star import Star
 
 
 class TradeCalculation(RouteCalculation):
@@ -132,11 +134,11 @@ class TradeCalculation(RouteCalculation):
         return max_dist
 
     def _raw_ranges(self):
-        ranges = super()._raw_ranges()
         max_route_dist = max(self.btn_range)
 
-        ranges = ((star, neighbour) for (star, neighbour) in ranges
-                  if star.distance(neighbour) <= self._max_dist(star.wtn, neighbour.wtn, True))
+        ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(self.galaxy.ranges, 2)
+                  if not star.is_redzone and not neighbour.is_redzone
+                  and star.distance(neighbour) <= self._max_dist(star.wtn, neighbour.wtn, True)]
         self.logger.info("Routes with endpoints more than " + str(max_route_dist) + " pc apart, trimmed")
 
         return ranges
@@ -626,7 +628,7 @@ class TradeCalculation(RouteCalculation):
             target) + " must be positive"
         return weight
 
-    def unilateral_filter(self, star):
+    def unilateral_filter(self, star: Star):
         if star.zone in ['R', 'F']:
             return True
         if star.tradeCode.barren:

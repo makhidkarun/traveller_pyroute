@@ -24,16 +24,17 @@ class testShortestPathCalc(baseTest):
             expected_string = json.load(file)
 
         expected_distances = dict()
-        component = [item for item in stars if graph.nodes[item]['star'].component == graph.nodes[source]['star'].component]
+        component = [item for item in stars]
         for item in component:
-            exp_dist = 0
+            exp_dist = 0.0
             rawstar = graph.nodes[item]['star']
             if str(rawstar) in expected_string:
                 exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
 
+        expected_distances[19] = float('+inf')
         distance_labels = np.ones(len(graph)) * float('+inf')
-        distance_labels[source] = 0
+        distance_labels[source] = 0.0
         actual_distances, _ = implicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
 
         self.assertEqual(list(expected_distances.values()), list(actual_distances), "Unexpected distances after SPT creation")
@@ -50,16 +51,17 @@ class testShortestPathCalc(baseTest):
             expected_string = json.load(file)
 
         expected_distances = dict()
-        component = [item for item in stars if graph.nodes[item]['star'].component == graph.nodes[source]['star'].component]
+        component = [item for item in stars]
         for item in component:
-            exp_dist = 0
+            exp_dist = 0.0
             rawstar = graph.nodes[item]['star']
             if str(rawstar) in expected_string:
                 exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
 
+        expected_distances[19] = float('+inf')
         distance_labels = np.ones(len(graph)) * float('+inf')
-        distance_labels[source] = 0
+        distance_labels[source] = 0.0
         expected_parents = np.ones(len(graph), dtype=int) * -1
         expected_parents[1] = 6
         expected_parents[2] = 1
@@ -79,7 +81,7 @@ class testShortestPathCalc(baseTest):
         expected_parents[16] = 9
         expected_parents[17] = 15
         expected_parents[18] = 11
-        expected_parents[19] = 8
+        expected_parents[19] = -100
         expected_parents[20] = 8
         expected_parents[21] = 14
         expected_parents[22] = 11
@@ -87,11 +89,11 @@ class testShortestPathCalc(baseTest):
         expected_parents[24] = 15
         expected_parents[25] = 24
         expected_parents[26] = 17
-        expected_parents[27] = 19
+        expected_parents[27] = 32
         expected_parents[28] = 24
         expected_parents[29] = 26
         expected_parents[30] = 23
-        expected_parents[31] = 27
+        expected_parents[31] = 33
         expected_parents[32] = 34
         expected_parents[33] = 34
         expected_parents[34] = 24

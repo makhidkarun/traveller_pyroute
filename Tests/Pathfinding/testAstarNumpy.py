@@ -39,8 +39,8 @@ class testAStarNumpy(baseTest):
         heuristic = galaxy.heuristic_distance_bulk
 
         exp_route = [0, 8, 9, 15, 24, 36]
-        exp_diagnostics = {'branch_factor': 1.816, 'f_exhausted': 0, 'g_exhausted': 7, 'neighbour_bound': 20,
-                            'new_upbounds': 1, 'nodes_expanded': 23, 'nodes_queued': 22, 'nodes_revisited': 2,
+        exp_diagnostics = {'branch_factor': 1.789, 'f_exhausted': 0, 'g_exhausted': 6, 'neighbour_bound': 19,
+                            'new_upbounds': 1, 'nodes_expanded': 22, 'nodes_queued': 21, 'nodes_revisited': 2,
                             'num_jumps': 5, 'un_exhausted': 11, 'targ_exhausted': 2}
 
         upbound = galaxy.trade.shortest_path_tree.triangle_upbound(source.index, target.index) * 1.005

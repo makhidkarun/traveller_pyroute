@@ -77,7 +77,7 @@ class testApproximateShortestPathTree(baseTest):
         src = stars[20]
         targ = stars[19]
 
-        expected = 0.833
+        expected = 0.0
         actual = approx.lower_bound(src, targ)
         self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
@@ -138,7 +138,7 @@ class testApproximateShortestPathTree(baseTest):
         result = approx.lower_bound_bulk(target)
         self.assertIsNotNone(result)
         result = result[active_nodes]
-        expected = np.array([15.833, 15.000, 0])
+        expected = np.array([15.833, float('+inf'), 0])
         np.testing.assert_array_almost_equal(expected, result, 0.000001, "Unexpected bounds array")
 
     def test_drop_first_level_intermediate_nodes_in_same_component(self):
@@ -249,13 +249,14 @@ class testApproximateShortestPathTree(baseTest):
             expected_string = json.load(file)
 
         expected_distances = dict()
-        component = [item for item in stars if graph.nodes[item]['star'].component == graph.nodes[source]['star'].component]
+        component = [item for item in stars]
         for item in component:
-            exp_dist = 0
+            exp_dist = 0.0
             rawstar = graph.nodes[item]['star']
             if str(rawstar) in expected_string:
                 exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
+        expected_distances[19] = float('+inf')
 
         distance_check = list(expected_distances.values()) == approx.distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT creation")
@@ -308,13 +309,14 @@ class testApproximateShortestPathTree(baseTest):
             expected_string = json.load(file)
 
         expected_distances = dict()
-        component = [item for item in stars if graph.nodes[item]['star'].component == graph.nodes[source]['star'].component]
+        component = [item for item in stars]
         for item in component:
             exp_dist = 0
             rawstar = graph.nodes[item]['star']
             if str(rawstar) in expected_string:
                 exp_dist = expected_string[str(rawstar)]
             expected_distances[item] = exp_dist
+        expected_distances[19] = float('+inf')
 
         distance_check = list(expected_distances.values()) == approx.distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT creation")
