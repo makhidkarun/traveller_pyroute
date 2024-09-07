@@ -81,7 +81,7 @@ def astar_path_numpy(G, source: cython.int, target: cython.int, bulk_heuristic,
     # Tracks shortest _complete_ path found so far
     upbound = np.finfo(np.float64).max if upbound is None else upbound
     # Traces lowest distance from source node found for each node
-    distances = np.ones(len_G) * upbound
+    distances = np.ones(len_G, dtype=float) * upbound
 
     bestpath, diag = astar_numpy_core(G_succ, diagnostics, distances, potentials, source, target, upbound)
 
