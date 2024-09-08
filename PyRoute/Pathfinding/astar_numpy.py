@@ -219,4 +219,4 @@ def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cyt
         else:
             queue_counter += counter
 
-    return path, diagnostics
+    return path, diag
