@@ -361,13 +361,13 @@ class TradeCalculation(RouteCalculation):
         src_adj = self.star_graph._arcs[stardex]
         trg_adj = self.star_graph._arcs[targdex]
 
-        # Case 0a - Source and target are directly connected
+        # Case 0 - Source and target are directly connected
         keep = src_adj[0] == targdex
         if keep.any():
             flip = src_adj[1][keep]
             upbound = min(upbound, flip[0])
 
-        # Case 0b - Source and target have at least one mutual neighbour
+        # Case 1 - Source and target have at least one mutual neighbour
         # Although this may seem redundant after Case 0a returns a finite bound, it's not, especially towards the
         # bitter end of pathfinding with lower route-reuse values.  In such case, it's not uncommon to have an indirect
         # bound through a mutual neighbour be lower (and thus better) than the direct link.
@@ -380,43 +380,11 @@ class TradeCalculation(RouteCalculation):
             nubound = midbound[mindex]
             upbound = min(upbound, nubound)
 
-        # Case 1 - Direct source neighbour to historic-route target neighbour
+        # Grab arrays to support Case 2
         hist_targ = self.galaxy.historic_costs._arcs[targdex]
-        if 0 < len(hist_targ[0]):
-            # Dig out the common neighbours, _and_ their indexes in the respective adjacency lists
-            common, src, trg = np.intersect1d(src_adj[0], hist_targ[0], assume_unique=True, return_indices=True)
-            if 0 < len(common):
-                midleft = src_adj[1][src]
-                midright = hist_targ[1][trg]
-                midbound = midleft + midright
-                mindex = np.argmin(midbound)
-                nubound = midbound[mindex]
-                upbound = min(upbound, nubound)
-                if reheat:
-                    reheat_list.add((stardex, common[mindex]))
-                    maxdex = np.argmax(midbound)
-                    if maxdex != mindex:
-                        reheat_list.add((stardex, common[maxdex]))
-
-        # Case 2 - Historic-route source neighbour to direct target neighbour
         hist_src = self.galaxy.historic_costs._arcs[stardex]
-        if 0 < len(hist_src[0]):
-            # Dig out the common neighbours, _and_ their indexes in the respective adjacency lists
-            common, src, trg = np.intersect1d(hist_src[0], trg_adj[0], assume_unique=True, return_indices=True)
-            if 0 < len(common):
-                midleft = hist_src[1][src]
-                midright = trg_adj[1][trg]
-                midbound = midleft + midright
-                mindex = np.argmin(midbound)
-                nubound = midbound[mindex]
-                upbound = min(upbound, nubound)
-                if reheat:
-                    reheat_list.add((targdex, common[mindex]))
-                    maxdex = np.argmax(midbound)
-                    if maxdex != mindex:
-                        reheat_list.add((targdex, common[maxdex]))
 
-        # Case 3 - Historic-route source neighbour to historic-route target neighbour
+        # Case 2 - Historic-route source neighbour to historic-route target neighbour
         if 0 < len(hist_src[0]) and 0 < len(hist_targ[0]):
             # Dig out the common neighbours, _and_ their indexes in the respective adjacency lists
             common, src, trg = np.intersect1d(hist_src[0], hist_targ[0], assume_unique=True, return_indices=True)
