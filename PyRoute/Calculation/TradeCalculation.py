@@ -518,11 +518,12 @@ class TradeCalculation(RouteCalculation):
 
         edges = []
         start = source
+        for end in route[1:-1]:
+            end.tradeOver += tradeCr
+            end.tradeCount += 1
+            end.passOver += tradePass
+
         for end in route[1:]:
-            if end != target:
-                end.tradeOver += tradeCr
-                end.tradeCount += 1
-                end.passOver += tradePass
             data = self.galaxy.stars[start.index][end.index]
             # exhausted = data['count'] >= data['exhaust']
             if reweight and not (data['count'] >= data['exhaust']):
