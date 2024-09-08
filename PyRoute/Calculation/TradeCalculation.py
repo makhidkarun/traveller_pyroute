@@ -415,7 +415,7 @@ class TradeCalculation(RouteCalculation):
                 if route is not False:
                     rawroute = [item.index for item in route]
                     # The 0.5% bump is to _ensure_ the newcost remains an _upper_ bound on the historic-route cost
-                    newcost = min(edge['weight'], self.galaxy.route_cost(rawroute) * 1.005)
+                    newcost = self.galaxy.route_cost(rawroute) * 1.005
                     if edge['weight'] > newcost:
                         self.galaxy.stars[start][end]['weight'] = newcost
                         self.galaxy.historic_costs.lighten_edge(start, end, newcost)
