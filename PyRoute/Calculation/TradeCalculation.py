@@ -340,12 +340,6 @@ class TradeCalculation(RouteCalculation):
             assert 1e-16 > delta * delta,\
                 "Route weight between " + str(star) + " and " + str(target) + " should not be direction sensitive.  Forward weight " + str(fwd_weight) + ", rev weight " + str(rev_weight) + ", delta " + str(abs(delta))
 
-        try:
-            self.cross_check_totals()
-        except AssertionError as e:
-            msg = str(star.name) + "-" + str(target.name) + ": Before: " + str(e)
-            raise AssertionError(msg)
-
         # Update the trade route (edges)
         tradeCr, tradePass = self.route_update_simple(route, True)
         self.update_statistics(star, target, tradeCr, tradePass)
@@ -622,27 +616,17 @@ class TradeCalculation(RouteCalculation):
         self.allegiance_passenger_balance.multilateral_balance()
 
     def cross_check_totals(self):
-        total_sector_pax = 0
-        total_sector_trade = 0
-        total_allegiance_pax = 0
-        total_allegiance_trade = 0
         grand_total_pax = self.galaxy.stats.passengers
         grand_total_trade = self.galaxy.stats.trade
 
-        for sector in self.galaxy.sectors.values():
-            total_sector_pax += sector.stats.passengers
-            total_sector_trade += sector.stats.trade + sector.stats.tradeExt
+        total_sector_pax = sum([item.stats.passengers for item in self.galaxy.sectors.values()])
+        total_sector_trade = sum([item.stats.trade + item.stats.tradeExt for item in self.galaxy.sectors.values()])
 
-        base_allegiances = dict()
-        for raw_alg in self.galaxy.alg:
-            base_alg = AllyGen.same_align(raw_alg)
-            if base_alg not in base_allegiances:
-                base_allegiances[base_alg] = 0
+        base_allegiances = {AllyGen.same_align(item) for item in self.galaxy.alg}
 
-        for base_alg in base_allegiances:
-            alg = self.galaxy.alg[base_alg]
-            total_allegiance_pax += alg.stats.passengers
-            total_allegiance_trade += alg.stats.trade + alg.stats.tradeExt
+        total_allegiance_pax = sum([self.galaxy.alg[item].stats.passengers for item in base_allegiances])
+        total_allegiance_trade = sum([self.galaxy.alg[item].stats.trade + self.galaxy.alg[item].stats.tradeExt
+                                      for item in base_allegiances])
 
         assert grand_total_pax == total_sector_pax + self.sector_passenger_balance.sum, "Sector total pax not balanced with galaxy pax"
         assert grand_total_trade == total_sector_trade + self.sector_trade_balance.sum, "Sector total trade not balanced with galaxy trade"
