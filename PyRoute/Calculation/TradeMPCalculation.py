@@ -49,7 +49,7 @@ def intrasector_process(working_queue, processed_queue):
                     continue
 
                 try:
-                    upbound = tradeCalculation._preheat_upper_bound(star, neighbor)
+                    upbound = tradeCalculation._preheat_upper_bound(star.index, neighbor.index)
                     # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
                     if float('+inf') != upbound:
                         upbound = round(upbound * 1.005 + 0.0005, 3)
@@ -287,7 +287,7 @@ class TradeMPCalculation(TradeCalculation):
             f"This route from {star} to {target} has already been processed in reverse"
 
         try:
-            upbound = self._preheat_upper_bound(star, target)
+            upbound = self._preheat_upper_bound(star.index, target.index)
             # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
             if float('+inf') != upbound:
                 comp_id = star.component
