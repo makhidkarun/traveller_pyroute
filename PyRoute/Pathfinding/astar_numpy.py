@@ -26,6 +26,8 @@ import numpy as np
 
 cnp.import_array()
 
+float64max = np.finfo(np.float64).max
+
 
 @cython.cdivision(True)
 def _calc_branching_factor(nodes_queued: cython.int, path_len: cython.int):
@@ -65,7 +67,7 @@ def _calc_branching_factor(nodes_queued: cython.int, path_len: cython.int):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 def astar_path_numpy(G, source: cython.int, target: cython.int, bulk_heuristic,
-                     upbound=None, diagnostics: cython.bint = False):
+                     upbound: cython.float = float64max, diagnostics: cython.bint = False):
     G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]]
     potentials: cnp.ndarray[cython.float]
     upbound: cython.float
@@ -75,8 +77,6 @@ def astar_path_numpy(G, source: cython.int, target: cython.int, bulk_heuristic,
     # pre-calc heuristics for all nodes to the target node
     potentials = bulk_heuristic(target)
 
-    # Tracks shortest _complete_ path found so far
-    upbound = np.finfo(np.float64).max if upbound is None else upbound
     # Traces lowest distance from source node found for each node
     distances = np.ones(len(G_succ), dtype=float) * upbound
 
