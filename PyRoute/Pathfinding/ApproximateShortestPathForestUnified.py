@@ -41,7 +41,7 @@ class ApproximateShortestPathForestUnified:
         self._seeds = seeds
         self._num_trees = num_trees
         self._graph_len = len(self._graph)
-        self._distances = np.ones((self._graph_len, self._num_trees)) * float('+inf')
+        self._distances = np.ones((self._graph_len, self._num_trees), order='F') * float('+inf')
         self._max_labels = np.ones((self._graph_len, self._num_trees)) * float('+inf')
 
         min_cost = self._graph.min_cost(list(range(self._graph_len)), 0)
