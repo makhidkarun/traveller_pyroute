@@ -1,4 +1,5 @@
 # distutils: language = c++
+# cython: profile=True
 """
 Created on Feb 22, 2024
 

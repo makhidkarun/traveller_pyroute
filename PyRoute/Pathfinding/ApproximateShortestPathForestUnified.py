@@ -1,3 +1,4 @@
+# cython: profile=True
 """
 Created on Feb 29, 2024
 
