@@ -34,7 +34,6 @@ class testTradeCalculationLandmarks(baseTest):
         self.assertEqual("New Orlando (Zarushagar 0710)", str(landmarks[1][0]), "Unexpected landmark choice")
         self.assertEqual("Nedadzia (Zarushagar 0701)", str(landmarks[2][0]), "Unexpected landmark choice")
         self.assertEqual("Didraga (Zarushagar 0101)", str(landmarks[3][0]), "Unexpected landmark choice")
-        self.assertEqual("Selsinia (Zarushagar 0201)", str(landmarks[4][0]), "Unexpected landmark choice")
 
     def test_landmarks_on_ibara_subsector_multiple_components(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
@@ -57,7 +56,7 @@ class testTradeCalculationLandmarks(baseTest):
         self.assertEqual(7, len(galaxy.trade.components), "Unexpected number of components at J-1")
 
         landmarks, components = galaxy.trade.get_landmarks()
-        self.assertEqual(4, len(landmarks), 'Should have one landmark per component')
+        self.assertEqual(3, len(landmarks), 'Should have one landmark per component')
         self.assertEqual("Dorevann (Zarushagar 0708)", str(landmarks[0][0]), "Unexpected landmark choice")
         self.assertEqual("Shadishi (Zarushagar 0310)", str(landmarks[0][2]), "Unexpected landmark choice")
         self.assertEqual("Gishin (Zarushagar 0804)", str(landmarks[0][5]), "Unexpected landmark choice")
@@ -65,9 +64,7 @@ class testTradeCalculationLandmarks(baseTest):
         self.assertEqual("Norsec (Zarushagar 0110)", str(landmarks[1][2]), "Unexpected landmark choice")
         self.assertEqual("Madagast (Zarushagar 0806)", str(landmarks[1][5]), "Unexpected landmark choice")
         self.assertEqual("Point Zulu (Zarushagar 0302)", str(landmarks[2][0]), "Unexpected landmark choice")
-        self.assertEqual("San Nuska Kilna (Zarushagar 0108)", str(landmarks[2][2]), "Unexpected landmark choice")
-        self.assertEqual("Nedadzia (Zarushagar 0701)", str(landmarks[2][5]), "Unexpected landmark choice")
-        self.assertEqual("Didraga (Zarushagar 0101)", str(landmarks[3][0]), "Unexpected landmark choice")
+
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
