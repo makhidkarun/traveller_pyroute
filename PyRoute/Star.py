@@ -4,6 +4,7 @@ Created on Mar 5, 2014
 @author: tjoneslo
 """
 import copy
+import functools
 import logging
 import bisect
 import random
@@ -292,11 +293,12 @@ class Star(object):
     def oldskool(self):
         return self.uwp.oldskool is True
 
-    def distance(self, star):
-        hex1 = self.hex.hex_position()
-        hex2 = star.hex.hex_position()
+    @functools.cached_property
+    def hex_position(self):
+        return self.hex.hex_position()
 
-        return Hex.axial_distance(hex1, hex2)
+    def distance(self, star):
+        return Hex.axial_distance(self.hex_position, star.hex_position)
 
     def subsector(self):
         subsector = ["ABCD", "EFGH", "IJKL", "MNOP"]
