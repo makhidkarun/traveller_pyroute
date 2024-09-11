@@ -353,7 +353,6 @@ class TradeCalculation(RouteCalculation):
         reheat_list = set()
 
         src_adj = self.star_graph._arcs[stardex]
-        trg_adj = self.star_graph._arcs[targdex]
 
         # Case 0 - Source and target are directly connected
         keep = src_adj[0] == targdex
@@ -361,24 +360,11 @@ class TradeCalculation(RouteCalculation):
             flip = src_adj[1][keep]
             upbound = min(upbound, flip[0])
 
-        # Case 1 - Source and target have at least one mutual neighbour
-        # Although this may seem redundant after Case 0a returns a finite bound, it's not, especially towards the
-        # bitter end of pathfinding with lower route-reuse values.  In such case, it's not uncommon to have an indirect
-        # bound through a mutual neighbour be lower (and thus better) than the direct link.
-        common, src, trg = np.intersect1d(src_adj[0], trg_adj[0], assume_unique=True, return_indices=True)
-        if 0 < len(common):
-            midleft = src_adj[1][src]
-            midright = trg_adj[1][trg]
-            midbound = midleft + midright
-            mindex = np.argmin(midbound)
-            nubound = midbound[mindex]
-            upbound = min(upbound, nubound)
-
-        # Grab arrays to support Case 2
+        # Grab arrays to support Case 1
         hist_targ = self.galaxy.historic_costs._arcs[targdex]
         hist_src = self.galaxy.historic_costs._arcs[stardex]
 
-        # Case 2 - Historic-route source neighbour to historic-route target neighbour
+        # Case 1 - Historic-route source neighbour to historic-route target neighbour
         if 0 < len(hist_src[0]) and 0 < len(hist_targ[0]):
             # Dig out the common neighbours, _and_ their indexes in the respective adjacency lists
             common, src, trg = np.intersect1d(hist_src[0], hist_targ[0], assume_unique=True, return_indices=True)
