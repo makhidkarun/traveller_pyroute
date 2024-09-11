@@ -27,8 +27,14 @@ The map generation requires several fonts not normally installed in the system:
 
     apt-get install fonts-dejavu fonts-liberation fonts-freefont-ttf fonts-ancient-scripts fonts-symbola
 
+To support the back-end map generation stuff:
+
+    cd {PACKAGES_DIR}/numpy/
+    cp __init__.cython-30.pxd numpy.pxd
+
 The back-end map-generation stuff needs compiling with:
 
+    cd {PACKAGE_ROOT}
     python PyRoute/Pathfinding/setup.py build-ext --inplace
 
 For the math and layout of hex maps, I recommend the
