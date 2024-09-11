@@ -341,7 +341,7 @@ class TradeCalculation(RouteCalculation):
                 "Route weight between " + str(star) + " and " + str(target) + " should not be direction sensitive.  Forward weight " + str(fwd_weight) + ", rev weight " + str(rev_weight) + ", delta " + str(abs(delta))
 
         # Update the trade route (edges)
-        tradeCr, tradePass = self.route_update_simple(route, True)
+        tradeCr, tradePass = self.route_update_simple(route, True, distance=distance)
         self.update_statistics(star, target, tradeCr, tradePass)
 
     def _preheat_upper_bound(self, stardex, targdex, allow_reheat=True):
@@ -482,14 +482,14 @@ class TradeCalculation(RouteCalculation):
             return (name_from, name_to)
         return (name_to, name_from)
 
-    def route_update_simple(self, route, reweight=True):
+    def route_update_simple(self, route, reweight=True, distance=None):
         """
         Update the trade calculations based upon the route selected.
         - add the trade values for the worlds, and edges
         - add a count for the worlds and edges
         - reduce the weight of routes used to allow more trade to flow
         """
-        distance = self.route_distance(route)
+        distance = distance if isinstance(distance, int) else self.route_distance(route)
 
         source = route[0]
         target = route[-1]
