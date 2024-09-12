@@ -13,9 +13,7 @@ Compared to the ancestral networkx version of astar_path, this code:
     Takes an optional externally-supplied upper bound
         - Sanity and correctness of this upper bound are the _caller_'s responsibility
         - If the supplied upper bound produces a pathfinding failure, so be it
-    Grooms the node queue in the following cases:
-        When a _longer_ path is found to a previously-queued node, discards queue entries whose g-values bust
-            the corresponding node's distance label
+
 
 """
 import cython
