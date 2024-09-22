@@ -27,15 +27,23 @@ The map generation requires several fonts not normally installed in the system:
 
     apt-get install fonts-dejavu fonts-liberation fonts-freefont-ttf fonts-ancient-scripts fonts-symbola
 
+To find the numpy package directory:
+
+    pip3 show numpy
+
 To support the back-end map generation stuff:
 
-    cd {PACKAGES_DIR}/numpy/
+    pushd ./
+    cd {NUMPY_PACKAGE_DIR}/
     cp __init__.cython-30.pxd numpy.pxd
+    popd
 
 The back-end map-generation stuff needs compiling with:
 
-    cd {PACKAGE_ROOT}
-    python PyRoute/Pathfinding/setup.py build-ext --inplace
+    pushd ./
+    cd {PACKAGE_ROOT}/PyRoute/Pathfinding/
+    python3 setup.py build_ext --inplace
+    popd
 
 For the math and layout of hex maps, I recommend the
 [Hexagonal Grids](http://www.redblobgames.com/grids/hexagons/) page which contains every item you
