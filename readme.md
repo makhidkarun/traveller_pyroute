@@ -16,8 +16,7 @@ the two WTNs and adjusted for distance and other factors.
 The routes followed for trade are created by the shortest path algorithms from [NetworkX](http://networkx.github.io/), 
 a library for managing graphs. You will need version 2.1 or later for the Unicode handling. 
 
-The final output, the map of trade routes, is created by [PyPDFLite](https://github.com/katerina7479/pypdflite). You 
-will need the python3 branch version of this library. 
+The final output, the map of trade routes, is created by [ReportLab](https://pypi.org/project/reportlab/).
 
 You can install the required libraries using pip:
 
