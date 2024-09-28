@@ -169,7 +169,7 @@ class Galaxy(AreaItem):
         star.is_well_formed()
         return star_counter + 1
 
-    def set_area_alg(self, star, area, algs):
+    def set_area_alg(self, star, area, algs: dict):
         full_alg = algs.get(star.alg_code, Allegiance(star.alg_code, 'Unknown Allegiance', base=False))
         base_alg = algs.get(star.alg_base_code, Allegiance(star.alg_base_code, 'Unknown Allegiance', base=True))
 

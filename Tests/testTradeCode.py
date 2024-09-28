@@ -158,6 +158,9 @@ class TestTradeCode(unittest.TestCase):
         code = TradeCodes(line)
         result, msg = code.is_well_formed()
         self.assertTrue(result, msg)
+        self.assertEqual(1, len(code.homeworld_list))
+        self.assertEqual(["MiyaX"], code.homeworld_list)
+        self.assertEqual(["Asla1", "S\'mr0", "MiyaX"], code.sophont_list)
 
     def testAvoidFakeoutHomeworldAtEnd(self):
         line = '000000000(0) 00'
