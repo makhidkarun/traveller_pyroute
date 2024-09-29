@@ -45,10 +45,10 @@ class Allegiance(AreaItem):
             raise ValueError("Name must not be empty string")
         if code.startswith('As'):
             if 5 < name.count(','):
-                raise ValueError("Name must have at most five commas")
+                raise ValueError("Name " + name + ", must have at most five commas")
         else:
             if 1 < name.count(','):
-                raise ValueError("Name must have at most one comma")
+                raise ValueError("Name " + name + ", must have at most one comma")
         namelen = 0
         while namelen != len(name):
             namelen = len(name)
