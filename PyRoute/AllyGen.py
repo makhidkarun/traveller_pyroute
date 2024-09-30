@@ -166,6 +166,7 @@ class AllyGen(object):
         return alg.code[0:2] == 'Cs'
 
     @staticmethod
+    @functools.cache
     def same_align(alg):
         for sameAlg in AllyGen.sameAligned:
             if alg in sameAlg:

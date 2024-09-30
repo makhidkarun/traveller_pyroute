@@ -43,9 +43,7 @@ class Hex(object):
     # Used to calculate distances for the AllyGen, which keeps only the q/r (axial) coordinates.
     @staticmethod
     def axial_distance(Hex1, Hex2):
-        dq = Hex1[0] - Hex2[0]
-        dr = Hex1[1] - Hex2[1]
-        return Hex._axial_core(dq, dr)
+        return Hex._axial_core(Hex1[0] - Hex2[0], Hex1[1] - Hex2[1])
 
     @staticmethod
     @functools.cache

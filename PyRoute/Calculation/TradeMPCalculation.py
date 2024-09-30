@@ -9,8 +9,18 @@ from multiprocessing import Queue, Pool
 from queue import Empty
 
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
-from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
-from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
+try:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
+except ModuleNotFoundError:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+except ImportError:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+try:
+    from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
+except ModuleNotFoundError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+except ImportError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
 
 # Convert the TradeMPCalculation to a global variable to allow the child processes to access it, and all the data.
 tradeCalculation = None
@@ -49,15 +59,13 @@ def intrasector_process(working_queue, processed_queue):
                     continue
 
                 try:
-                    active_nodes = list(range(len(tradeCalculation.star_graph)))
-                    upbound = tradeCalculation._preheat_upper_bound(star, neighbor)
+                    upbound = tradeCalculation._preheat_upper_bound(star.index, neighbor.index)
                     # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
                     if float('+inf') != upbound:
                         upbound = round(upbound * 1.005 + 0.0005, 3)
 
-                    mincost = tradeCalculation.star_graph.min_cost(active_nodes, neighbor.index, indirect=True)
                     rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star.index, neighbor.index,
-                                               tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
+                                               tradeCalculation.galaxy.heuristic_distance_bulk, upbound=upbound)
                 except nx.NetworkXNoPath:
                     continue
 
@@ -89,12 +97,10 @@ def long_route_process(working_queue, processed_queue):
             break
 
         try:
-            active_nodes = list(range(len(tradeCalculation.star_graph)))
             upbound = tradeCalculation._preheat_upper_bound(star, neighbor)
 
-            mincost = tradeCalculation.star_graph.min_cost(active_nodes, neighbor, indirect=True)
             rawroute, _ = astar_path_numpy(tradeCalculation.star_graph, star, neighbor,
-                                       tradeCalculation.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
+                                       tradeCalculation.galaxy.heuristic_distance_bulk, upbound=upbound)
         except nx.NetworkXNoPath:
             continue
 
@@ -208,7 +214,7 @@ class TradeMPCalculation(TradeCalculation):
     def process_long_routes(self, btn):
 
         self.shortest_path_tree = ApproximateShortestPathForestUnified(0, self.galaxy.stars,
-                                             0, sources=self.shortest_path_tree._sources)
+                                             0, sources=self.shortest_path_tree.sources)
 
         # Create the Queues for sending data between processes.
         find_queue = Queue()
@@ -291,8 +297,7 @@ class TradeMPCalculation(TradeCalculation):
             f"This route from {star} to {target} has already been processed in reverse"
 
         try:
-            active_nodes = list(range(len(self.star_graph)))
-            upbound = self._preheat_upper_bound(star, target)
+            upbound = self._preheat_upper_bound(star.index, target.index)
             # Increase a finite upbound value by 0.5%, and round result up to 3 decimal places
             if float('+inf') != upbound:
                 comp_id = star.component
@@ -301,9 +306,8 @@ class TradeMPCalculation(TradeCalculation):
                     if target.index not in self.component_landmarks[comp_id]:
                         target, star = star, target
 
-            mincost = self.star_graph.min_cost(active_nodes, target.index, indirect=True)
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
-                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
+                                           self.galaxy.heuristic_distance_bulk, upbound=upbound)
         except nx.NetworkXNoPath:
             return
 

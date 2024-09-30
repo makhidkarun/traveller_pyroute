@@ -41,3 +41,7 @@ sectors/
 maps/
 diffs/
 test_data/
+PyRoute/Pathfinding/*.c
+PyRoute/Pathfinding/*.cpp
+PyRoute/Pathfinding/*.cpython*
+PyRoute/Pathfinding/*.html

@@ -16,8 +16,7 @@ the two WTNs and adjusted for distance and other factors.
 The routes followed for trade are created by the shortest path algorithms from [NetworkX](http://networkx.github.io/), 
 a library for managing graphs. You will need version 2.1 or later for the Unicode handling. 
 
-The final output, the map of trade routes, is created by [PyPDFLite](https://github.com/katerina7479/pypdflite). You 
-will need the python3 branch version of this library. 
+The final output, the map of trade routes, is created by [ReportLab](https://pypi.org/project/reportlab/).
 
 You can install the required libraries using pip:
 
@@ -26,6 +25,24 @@ You can install the required libraries using pip:
 The map generation requires several fonts not normally installed in the system:
 
     apt-get install fonts-dejavu fonts-liberation fonts-freefont-ttf fonts-ancient-scripts fonts-symbola
+
+To find the numpy package directory:
+
+    pip3 show numpy
+
+To support the back-end map generation stuff:
+
+    pushd ./
+    cd {NUMPY_PACKAGE_DIR}/
+    cp __init__.cython-30.pxd numpy.pxd
+    popd
+
+The back-end map-generation stuff needs compiling with:
+
+    pushd ./
+    cd {PACKAGE_ROOT}/PyRoute/Pathfinding/
+    python3 setup.py build_ext --inplace
+    popd
 
 For the math and layout of hex maps, I recommend the
 [Hexagonal Grids](http://www.redblobgames.com/grids/hexagons/) page which contains every item you

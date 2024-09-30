@@ -1,11 +1,8 @@
-# cython: profile=True
 """
-Created on Feb 29, 2024
+Created on Sep 15, 2024
 
 @author: CyberiaResurrection
 """
-import cython
-from cython.cimports.numpy import numpy as cnp
 import functools
 
 import numpy as np
@@ -13,22 +10,8 @@ from PyRoute.Star import Star
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph, explicit_shortest_path_dijkstra_distance_graph
 
-cnp.import_array()
 
-
-@cython.cclass
 class ApproximateShortestPathForestUnified:
-
-    _graph: object
-    _source: object
-    _epsilon: cython.float
-    _divisor: cython.float
-    _sources: list
-    _seeds: list
-    _num_trees: cython.int
-    _graph_len: cython.int
-    _distances: cython.declare(cnp.ndarray(cython.float, ndim=2), 'readonly')
-    _max_labels: cnp.ndarray(cython.float, ndim=2)
 
     def __init__(self, source, graph, epsilon, sources=None):
         seeds, source, num_trees = self._get_sources(graph, source, sources)
@@ -63,18 +46,7 @@ class ApproximateShortestPathForestUnified:
             return 0
         return np.max(raw)
 
-    @cython.ccall
-    @cython.infer_types(True)
-    @cython.boundscheck(False)
-    @cython.initializedcheck(False)
-    @cython.nonecheck(False)
-    @cython.wraparound(False)
-    @cython.returns(cnp.ndarray)
-    def lower_bound_bulk(self, target_node: cython.int):
-        raw: cnp.ndarray(cython.float, ndim=2)
-        overdrive: cnp.ndarray[cython.bint]
-        fastpath: cython.bint
-        anypath: cython.bint
+    def lower_bound_bulk(self, target_node: int):
         overdrive, fastpath, anypath = self._mona_lisa_overdrive(target_node)
 
         if fastpath:  # Fastpath - all overdrive elements are _finite_, so all rows are retrieved
@@ -90,8 +62,7 @@ class ApproximateShortestPathForestUnified:
 
         return np.max(np.abs(raw), axis=1)
 
-    def triangle_upbound(self, source: cython.int, target: cython.int):
-        raw: cnp.ndarray[cython.float]
+    def triangle_upbound(self, source: int, target: int):
         raw = self._distances[source, :] + self._distances[target, :]
         raw = raw[raw != float('+inf')]
 
@@ -99,25 +70,18 @@ class ApproximateShortestPathForestUnified:
 
     #  Gratuitous William Gibson reference is gratuitous.
     @functools.cache
-    @cython.cfunc
-    def _mona_lisa_overdrive(self, target_node: cython.int) -> tuple[cnp.array[cython.bint], cython.bint, cython.bint]:
-        result: cnp.ndarray[cython.bint]
+    def _mona_lisa_overdrive(self, target_node: int):
         result = self._distances[target_node, :] != float('+inf')
         return result, result.all(), result.any()
 
-    @cython.infer_types(True)
-    @cython.boundscheck(False)
-    @cython.initializedcheck(False)
-    @cython.nonecheck(False)
-    @cython.wraparound(False)
-    def update_edges(self, edges: list[tuple[cython.int, cython.int]]):
+    def update_edges(self, edges: list[tuple[int, int]]):
         dropnodes = set()
         dropspecific = []
         tree_dex = np.array(list(range(self._num_trees)), dtype=int)
-        targdex: cython.int = -1
-        i: cython.int
-        min_cost: cnp.ndarray[cython.float]
-        shelf: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
+        targdex: int = -1
+        i: int
+        min_cost: np.ndarray[float]
+        shelf: tuple[np.ndarray[int], np.ndarray[float]]
 
         for _ in range(self._num_trees):
             dropspecific.append(set())

@@ -43,12 +43,12 @@ class Allegiance(AreaItem):
         name = name.strip()
         if '' == name:
             raise ValueError("Name must not be empty string")
-        if code.startswith('As'):
+        if code.startswith('As') or "As" == AllyGen.same_align(code):
             if 5 < name.count(','):
-                raise ValueError("Name must have at most five commas")
+                raise ValueError("Name " + name + ", must have at most five commas")
         else:
             if 1 < name.count(','):
-                raise ValueError("Name must have at most one comma")
+                raise ValueError("Name " + name + ", must have at most one comma")
         namelen = 0
         while namelen != len(name):
             namelen = len(name)
@@ -78,7 +78,7 @@ class Allegiance(AreaItem):
         if ',' == name:
             raise ValueError("Name must not be pair of empty strings")
         if '[' in name or ']' in name:
-            raise ValueError("Name must not contain square brackets")
+            raise ValueError("Name must not contain square brackets - received " + name)
 
         names = name.split(',') if ',' in name else [name, '']
         names[0] = names[0].strip()
@@ -120,10 +120,10 @@ class Allegiance(AreaItem):
             msg = "Allegiance name should not be empty"
             return False, msg
         if '  ' in self.name:
-            msg = "Should not have successive spaces in allegiance name"
+            msg = "Should not have successive spaces in allegiance name, " + self.name
             return False, msg
         if 1 < self.name.count(','):
-            msg = "Should be at most one comma in allegiance name"
+            msg = "Should be at most one comma in allegiance name, " + self.name
             return False, msg
 
         return True, msg

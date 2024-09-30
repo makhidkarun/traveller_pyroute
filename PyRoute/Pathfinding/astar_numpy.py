@@ -1,3 +1,5 @@
+# distutils: language = c++
+# cython: profile=True
 """
 Created on Feb 22, 2024
 
@@ -11,22 +13,31 @@ Compared to the ancestral networkx version of astar_path, this code:
     Takes an optional externally-supplied upper bound
         - Sanity and correctness of this upper bound are the _caller_'s responsibility
         - If the supplied upper bound produces a pathfinding failure, so be it
-    Grooms the node queue in the following cases:
-        When a new upper bound is found, discards queue entries whose f-values bust the new upper bound
-        When a _longer_ path is found to a previously-queued node, discards queue entries whose g-values bust
-            the corresponding node's distance label
+
 
 """
-from heapq import heappop, heappush, heapify
+import cython
+from cython.cimports.numpy import numpy as cnp
+from cython.cimports.minmaxheap import MinMaxHeap, astar_t
 
 import networkx as nx
 import numpy as np
 
+cnp.import_array()
 
-def _calc_branching_factor(nodes_queued, path_len):
-    if path_len == nodes_queued:
+float64max = np.finfo(np.float64).max
+
+
+@cython.cdivision(True)
+def _calc_branching_factor(nodes_queued: cython.int, path_len: cython.int):
+    old: cython.float
+    new: cython.float
+    rhs: cython.float
+    power: cython.float
+    if path_len == nodes_queued or 1 > path_len or 1 > nodes_queued:
         return 1.0
 
+    power = 1.0 / path_len
     # Letting nodes_queued be S, and path_len be d, we're trying to solve for the value of r in the following:
     # S = r * ( r ^ (d-1) - 1 ) / ( r - 1 )
     # Applying some sixth-grade algebra:
@@ -40,179 +51,168 @@ def _calc_branching_factor(nodes_queued, path_len):
     # r* = (Sr - S + r) ^ (1/d)
     # iterating until r* and r sufficiently converge.
 
-    old = 0
-    new = 0.5 * (1 + nodes_queued ** (1 / path_len))
+    old = 0.0
+    new = 0.5 * (1 + nodes_queued ** (power))
     while 0.001 <= abs(new - old):
         old = new
         rhs = nodes_queued * new - nodes_queued + new
-        new = rhs ** (1 / path_len)
+        new = rhs ** (power)
 
     return round(new, 3)
 
 
-def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=None, diagnostics=False):
-
+@cython.boundscheck(False)
+@cython.initializedcheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+def astar_path_numpy(G, source: cython.int, target: cython.int, bulk_heuristic,
+                     upbound: cython.float = float64max, diagnostics: cython.bint = False):
+    G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]]
+    potentials: cnp.ndarray[cython.float]
+    upbound: cython.float
+    distances: cnp.ndarray[cython.float]
     G_succ = G._arcs  # For speed-up
 
     # pre-calc heuristics for all nodes to the target node
-    potentials = bulk_heuristic(G._nodes, target)
+    potentials = bulk_heuristic(target)
+
+    # Traces lowest distance from source node found for each node
+    distances = np.ones(len(G_succ), dtype=float) * upbound
+
+    bestpath, diag = astar_numpy_core(G_succ, diagnostics, distances, potentials, source, target, upbound)
+
+    if 0 == len(bestpath):
+        raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
+    return bestpath, diag
+
+
+@cython.cfunc
+@cython.infer_types(True)
+@cython.boundscheck(False)
+@cython.initializedcheck(False)
+@cython.nonecheck(False)
+@cython.wraparound(False)
+@cython.returns(tuple[list[cython.int], dict])
+def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]], diagnostics: cython.bint,
+                     distances: cnp.ndarray[cython.float], potentials: cnp.ndarray[cython.float], source: cython.int,
+                     target: cython.int, upbound: cython.float):
+    distances_view: cython.double[:] = distances
+    distances_view[source] = 0.0
+    potentials_view: cython.double[:] = potentials
+    active_nodes_view: cython.long[:]
+    active_costs_view: cython.double[:]
+
+    node_counter: cython.int = 0
+    queue_counter: cython.int = 0
+    revisited: cython.int = 0
+    g_exhausted: cython.int = 0
+    f_exhausted: cython.int = 0
+    nu_upbound: cython.float
+    new_upbounds: cython.int = 0
+    targ_exhausted: cython.int = 0
+    revis_continue: cython.int = 0
+    path: list[cython.int] = []
+    diag = {}
+
+    act_nod: cython.int
+    act_wt: cython.float
+
+    dist: cython.float
+    curnode: cython.int
+    parent: cython.int
+    counter: cython.int
+
+    # Maps explored nodes to parent closest to the source.
+    explored: dict[cython.int, cython.int] = {}
 
     # The queue stores priority, cost to reach, node,  and parent.
     # Uses Python heapq to keep in priority order.
     # The nodes themselves, being integers, are directly comparable.
-    queue = [(potentials[source], 0, source, None)]
+    queue: MinMaxHeap[astar_t] = MinMaxHeap[astar_t]()
+    queue.reserve(500)
+    queue.insert({'augment': potentials_view[source], 'dist': 0.0, 'curnode': source, 'parent': -1})
 
-    # Maps explored nodes to parent closest to the source.
-    explored = {}
-
-    # Tracks shortest _complete_ path found so far
-    floatinf = float('inf')
-    upbound = floatinf if upbound is None else upbound
-    assert upbound != floatinf, "Supplied upbound must not be infinite"
-    # Traces lowest distance from source node found for each node
-    distances = np.ones(len(G)) * floatinf
-    distances[source] = 0
-
-    # pre-calc the minimum-cost edge on each node
-    min_cost = np.zeros(len(G)) if min_cost is None else min_cost
-    min_cost[target] = 0
-    up_threshold = upbound - min_cost
-    upper_limit = up_threshold
-    upper_limit[source] = 0
-
-    node_counter = 0
-    queue_counter = 0
-    revisited = 0
-    g_exhausted = 0
-    f_exhausted = 0
-    new_upbounds = 0
-    targ_exhausted = 0
-    revis_continue = 0
-
-    while queue:
+    while 0 < queue.size():
         # Pop the smallest item from queue.
-        _, dist, curnode, parent = heappop(queue)
+        result = queue.popmin()
+        dist = result.dist
+        curnode = result.curnode
+        parent = result.parent
         node_counter += 1
 
         if curnode == target:
-            path = [curnode]
+            path.append(curnode)
             node = parent
-            while node is not None:
+            while node != -1:
                 assert node not in path, "Node " + str(node) + " duplicated in discovered path"
                 path.append(node)
                 node = explored[node]
             path.reverse()
             if diagnostics is not True:
-                return path, {}
+                return path, diag
             branch = _calc_branching_factor(queue_counter, len(path) - 1)
             neighbour_bound = node_counter - 1 + revis_continue - revisited
             un_exhausted = neighbour_bound - f_exhausted - g_exhausted - targ_exhausted
-            diagnostics = {'nodes_expanded': node_counter, 'nodes_queued': queue_counter, 'branch_factor': branch,
+            diag = {'nodes_expanded': node_counter, 'nodes_queued': queue_counter, 'branch_factor': branch,
                            'num_jumps': len(path) - 1, 'nodes_revisited': revisited, 'neighbour_bound': neighbour_bound,
                            'new_upbounds': new_upbounds, 'g_exhausted': g_exhausted, 'f_exhausted': f_exhausted,
                            'un_exhausted': un_exhausted, 'targ_exhausted': targ_exhausted}
-            return path, diagnostics
+            return path, diag
 
         if curnode in explored:
             revisited += 1
             # Do not override the parent of starting node
-            if explored[curnode] is None:
+            if explored[curnode] == -1:
                 continue
 
-            # Skip bad paths that were enqueued before finding a better one
-            qcost = distances[curnode]
+            # We've found a bad path, just move on
+            qcost = distances_view[curnode]
             if qcost <= dist:
-                queue = [item for item in queue if not (item[1] > distances[item[2]])]
-                heapify(queue)
                 continue
             # If we've found a better path, update
             revis_continue += 1
-            distances[curnode] = dist
+            distances_view[curnode] = dist
 
         explored[curnode] = parent
 
-        raw_nodes = G_succ[curnode]
-        active_nodes = raw_nodes[0]
-        active_weights = dist + raw_nodes[1]
-        augmented_weights = active_weights + potentials[active_nodes]
+        active_nodes_view = G_succ[curnode][0]
+        active_costs_view = G_succ[curnode][1]
 
-        # Even if we have the target node as a candidate neighbour, of itself, that's _no_ guarantee that the target
-        # as neighbour will give a better upper bound.
-        keep = np.logical_and(augmented_weights < upbound, active_weights <= upper_limit[active_nodes])
-        active_nodes = active_nodes[keep]
-        if 0 == len(active_nodes):
-            g_exhausted += 1
-            continue
-        active_weights = active_weights[keep]
-        augmented_weights = augmented_weights[keep]
+        targdex = -1
 
-        if target in active_nodes:
-            num_neighbours = len(active_nodes)
-            drop = active_nodes == target
-            ncost = active_weights[drop][0]
-
-            upbound = ncost
-            new_upbounds += 1
-            distances[target] = ncost
-            up_threshold = upbound - min_cost
-            upper_limit = np.minimum(upper_limit, up_threshold)
-            if 0 < len(queue):
-                queue = [item for item in queue if item[0] < upbound]
-                if 0 < len(queue):
-                    # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
-                    # or is too close to upbound
-                    queue = [item for item in queue if item[1] <= upper_limit[item[2]]]
-                    # Finally, dedupe the queue after cleaning all bound-busts out and 2 or more elements are left.
-                    # Empty or single-element sets cannot require deduplication, and are already heaps themselves.
-                    if 1 < len(queue):
-                        queue = list(set(queue))
-                        heapify(queue)
-            # heappush(queue, (ncost + 0, ncost, target, curnode))
-            heappush(queue, (ncost, ncost, target, curnode))
-            queue_counter += 1
-            #  If target node is only active node, and is neighbour node of only active queue element, bail out now
-            #  and dodge the now-known-to-be-pointless neighbourhood bookkeeping.
-            if 1 == len(queue) and 1 == len(active_nodes):
-                targ_exhausted += 1
-                continue
-            # As we have a tighter upper bound, apply it to the neighbours as well - target will be excluded because
-            # its augmented weight is _equal_ to upbound
-            keep = augmented_weights < upbound
-            active_nodes = active_nodes[keep]
-
-            # if there _was_ one neighbour to process, that was the target, so neighbour list is now empty.
-            # Likewise, if the new upper bound has emptied the neighbour list, go around.
-            if 1 == num_neighbours or 0 == len(active_nodes):
-                targ_exhausted += 1
-                continue
-
-            active_weights = active_weights[keep]
-            augmented_weights = augmented_weights[keep]
+        num_nodes = len(active_nodes_view)
+        for i in range(num_nodes):
+            act_nod = active_nodes_view[i]
+            if act_nod == target:
+                targdex = i
+                nu_upbound = dist + active_costs_view[targdex]
+                if nu_upbound < upbound:
+                    upbound = nu_upbound
+                    new_upbounds += 1
+                    distances_view[target] = upbound
+                break
 
         # Now unconditionally queue _all_ nodes that are still active, worrying about filtering out the bound-busting
         # neighbours later.
-        distances[active_nodes] = active_weights
-        upper_limit[active_nodes] = active_weights
-        num_nodes = len(active_nodes)
+        counter = 0
+        for i in range(num_nodes):
+            act_nod = active_nodes_view[i]
+            act_wt = dist + active_costs_view[i]
+            if act_wt > distances_view[act_nod]:
+                continue
+            aug_wt = act_wt + potentials_view[act_nod]
+            if aug_wt > upbound:
+                continue
+            distances_view[act_nod] = act_wt
+            queue.insert({'augment': aug_wt, 'dist': act_wt, 'curnode': act_nod, 'parent': curnode})
+            counter += 1
 
-        queue_counter += num_nodes
-
-        if 1 == num_nodes:
-            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
-        elif 2 == num_nodes:
-            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
-            heappush(queue, (augmented_weights[1], active_weights[1], active_nodes[1], curnode))
-        elif 3 == num_nodes:
-            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
-            heappush(queue, (augmented_weights[1], active_weights[1], active_nodes[1], curnode))
-            heappush(queue, (augmented_weights[2], active_weights[2], active_nodes[2], curnode))
-        elif 4 == num_nodes:
-            heappush(queue, (augmented_weights[0], active_weights[0], active_nodes[0], curnode))
-            heappush(queue, (augmented_weights[1], active_weights[1], active_nodes[1], curnode))
-            heappush(queue, (augmented_weights[2], active_weights[2], active_nodes[2], curnode))
-            heappush(queue, (augmented_weights[3], active_weights[3], active_nodes[3], curnode))
+        if 0 == counter:
+            if -1 != targdex:
+                targ_exhausted += 1
+            else:
+                g_exhausted += 1
         else:
-            for i in range(num_nodes):
-                heappush(queue, (augmented_weights[i], active_weights[i], active_nodes[i], curnode))
+            queue_counter += counter
 
-    raise nx.NetworkXNoPath(f"Node {target} not reachable from {source}")
+    return path, diag

@@ -32,6 +32,18 @@ jobs:
         run: |
           # now run configured options
           ruff check --preview PyRoute
+      - name: Run non-cython tests
+        run: |
+          pytest -k testAstarOverSubsector
+      - name: Set up cython build
+        run: |
+          cd $LD_LIBRARY_PATH/python3.9/site-packages/numpy/
+          ls -al
+          cp __init__.cython-30.pxd numpy.pxd
+      - name: Build cython modules
+        run: |
+          cd PyRoute/Pathfinding
+          python3 setup.py build_ext --inplace
       - name: Test with pytest
         run: |
           pytest

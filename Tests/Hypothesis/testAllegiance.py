@@ -64,7 +64,7 @@ class testAllegiance(unittest.TestCase):
             "Code must be string - received",
             "Code must not exceed 4 characters - received",
             "Name must not be empty string",
-            "Name must have at most one comma",
+            "must have at most one comma",
             "Name must not contain square brackets",
             'First part of name string must not be an empty string itself',
             'Second part of name string must not be an empty string itself',
@@ -107,7 +107,7 @@ class testAllegiance(unittest.TestCase):
             'First part of name string must not be an empty string itself',
             'Name must not contain square brackets',
             'Second part of name string must not be an empty string itself',
-            'Name must have at most one comma'
+            'must have at most one comma'
         ]
 
         try:
@@ -148,7 +148,7 @@ class testAllegiance(unittest.TestCase):
             'Name must not contain square brackets',
             'First part of name string must not be an empty string itself',
             'Second part of name string must not be an empty string itself',
-            'Name must have at most one comma'
+            'must have at most one comma'
         ]
 
         try:

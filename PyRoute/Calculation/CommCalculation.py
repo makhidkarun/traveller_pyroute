@@ -3,14 +3,22 @@ Created on Aug 09, 2023
 
 @author: CyberiaResurrection
 """
-import copy
-
 import networkx as nx
 
 from PyRoute.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
-from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
-from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
+try:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
+except ModuleNotFoundError:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+except ImportError:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+try:
+    from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
+except ModuleNotFoundError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+except ImportError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
 
 
 class CommCalculation(RouteCalculation):
@@ -201,10 +209,9 @@ class CommCalculation(RouteCalculation):
 
     def get_route_between(self, star, target):
         try:
-            mincost = copy.deepcopy(self.star_graph._min_cost)
-            upbound = self.shortest_path_tree.triangle_upbound(star, target) * 1.005
+            upbound = self.shortest_path_tree.triangle_upbound(star.index, target.index) * 1.005
             route, _ = astar_path_numpy(self.star_graph, star.index, target.index,
-                                           self.galaxy.heuristic_distance_bulk, min_cost=mincost, upbound=upbound)
+                                           self.galaxy.heuristic_distance_bulk, upbound=upbound)
         except nx.NetworkXNoPath:
             return
 

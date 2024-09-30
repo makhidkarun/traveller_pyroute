@@ -3,6 +3,7 @@ Created on Feb 25, 2024
 
 @author: CyberiaResurrection
 """
+import functools
 import numpy as np
 
 from PyRoute.Pathfinding.DistanceBase import DistanceBase
@@ -37,6 +38,7 @@ class RouteLandmarkGraph(DistanceBase):
         else:
             self._lighten_arc(u, v, weight)
 
+    @functools.cache
     def _check_index(self, item):
         if not isinstance(item, int):
             raise IndexError("Index must be integer between 0 and " + str(len(self) - 1))

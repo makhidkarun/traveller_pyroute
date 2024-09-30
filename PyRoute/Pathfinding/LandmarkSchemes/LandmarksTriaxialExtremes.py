@@ -7,7 +7,12 @@ import math
 import numpy as np
 from collections import defaultdict
 
-from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
+try:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
+except ModuleNotFoundError:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+except ImportError:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarkAvoidHelper import LandmarkAvoidHelper
 from PyRoute.Pathfinding.single_source_dijkstra import explicit_shortest_path_dijkstra_distance_graph
 
@@ -136,15 +141,18 @@ class LandmarksTriaxialExtremes:
                     if seconddex in component_landmarks[item[0].component]:
                         continue
                     counters[firstdex] += 1
-                max_counter = max(counters.values())
-                max_candidates = {k: v for (k, v) in counters.items() if v == max_counter}
-                source = list(max_candidates.keys())[0]
-                if index:
-                    result[6][component_id] = source
-                    component_landmarks[component_id].add(source)
+                if 0 == len(counters.values()):
+                    btn = None
                 else:
-                    nusource = [item for item in stars if stars.index == source]
-                    result[6][component_id] = nusource[0]
+                    max_counter = max(counters.values())
+                    max_candidates = {k: v for (k, v) in counters.items() if v == max_counter}
+                    source = list(max_candidates.keys())[0]
+                    if index:
+                        result[6][component_id] = source
+                        component_landmarks[component_id].add(source)
+                    else:
+                        nusource = [item for item in stars if stars.index == source]
+                        result[6][component_id] = nusource[0]
 
             if 7 == slots:
                 continue
@@ -154,11 +162,11 @@ class LandmarksTriaxialExtremes:
             assert slotcount == len(seeds), f"S-t transpose-trigger landmark skipped in component {component_id}"
             approx = ApproximateShortestPathForestUnified(source, self.galaxy.stars, epsilon=self.galaxy.trade.epsilon, sources=seeds)
             distances = self.galaxy.trade.star_graph.distances_from_target(all_nodes, first_star.index)
-            min_cost = self.galaxy.trade.star_graph.min_cost(all_nodes, first_star.index)
+            min_cost = self.galaxy.trade.star_graph.min_cost(first_star.index)
             static = np.maximum(distances, min_cost)
 
             while slotcount < slots:
-                lobound = approx.lower_bound_bulk(all_nodes, first_star.index)
+                lobound = approx.lower_bound_bulk(first_star.index)
                 lobound = np.maximum(lobound, static)
 
                 distance_labels = np.ones(self.graph_len) * float('+inf')
@@ -190,4 +198,4 @@ class LandmarksTriaxialExtremes:
 
     @staticmethod
     def _size_to_landmarks(size):
-        return math.ceil(4 * math.log10(size))
+        return math.ceil(2 * math.log10(size))

@@ -47,7 +47,6 @@ class Galaxy(AreaItem):
         self.output_path = 'maps'
         self.max_jump_range = max_jump
         self.min_btn = min_btn
-        self.landmarks = dict()
         self.historic_costs = None
         self.big_component = None
         self.star_mapping = dict()
@@ -68,7 +67,7 @@ class Galaxy(AreaItem):
     # def read_sectors(self, sectors, pop_code, ru_calc,
     #                 route_reuse, trade_choice, route_btn, mp_threads, debug_flag, fix_pop=False):
     def read_sectors(self, options):
-        assert isinstance(options, ReadSectorOptions)
+        assert isinstance(options, ReadSectorOptions), "options parm not ReadSectorOptions, is " + type(options).__name__
         route_reuse = options.route_reuse
         trade_choice = options.trade_choice
         route_btn = options.route_btn
@@ -170,7 +169,7 @@ class Galaxy(AreaItem):
         star.is_well_formed()
         return star_counter + 1
 
-    def set_area_alg(self, star, area, algs):
+    def set_area_alg(self, star, area, algs: dict):
         full_alg = algs.get(star.alg_code, Allegiance(star.alg_code, 'Unknown Allegiance', base=False))
         base_alg = algs.get(star.alg_base_code, Allegiance(star.alg_base_code, 'Unknown Allegiance', base=True))
 
@@ -393,8 +392,9 @@ class Galaxy(AreaItem):
             star = self.star_mapping[item]
             star.is_well_formed()
 
-    def heuristic_distance_bulk(self, active_nodes, target):
-        raw = self.trade.shortest_path_tree.lower_bound_bulk(active_nodes, target)
+    def heuristic_distance_bulk(self, target):
+        active_nodes = self.stars.nodes.values()
+        raw = self.trade.shortest_path_tree.lower_bound_bulk(target)
         distances = self.trade.star_graph.distances_from_target(active_nodes, target)
         # Case-wise maximum of 2 or more admissible heuristics (approx-SP bound, existing route distances) is itself
         # admissible

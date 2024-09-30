@@ -3,17 +3,32 @@ Created on Sep 21, 2023
 
 @author: CyberiaResurrection
 """
-from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
+goodimport = True
+try:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
+except ModuleNotFoundError:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    goodimport = False
+except ImportError:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    goodimport = False
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from Tests.baseTest import baseTest
-from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
-
+try:
+    from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
+except ModuleNotFoundError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+    goodimport = False
+except ImportError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+    goodimport = False
 
 class testAStarNumpy(baseTest):
 
     def testAStarOverSubsector(self):
+        self.maxDiff = None
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -39,11 +54,16 @@ class testAStarNumpy(baseTest):
         heuristic = galaxy.heuristic_distance_bulk
 
         exp_route = [0, 8, 9, 15, 24, 36]
-        exp_diagnostics = {'branch_factor': 1.789, 'f_exhausted': 0, 'g_exhausted': 4, 'neighbour_bound': 15,
-                            'new_upbounds': 1, 'nodes_expanded': 17, 'nodes_queued': 21, 'nodes_revisited': 1,
-                            'num_jumps': 5, 'un_exhausted': 10, 'targ_exhausted': 1}
+        if goodimport:
+            exp_diagnostics = {'branch_factor': 1.789, 'f_exhausted': 0, 'g_exhausted': 6, 'neighbour_bound': 19,
+                            'new_upbounds': 1, 'nodes_expanded': 22, 'nodes_queued': 21, 'nodes_revisited': 2,
+                            'num_jumps': 5, 'un_exhausted': 11, 'targ_exhausted': 2}
+        else:
+            exp_diagnostics = {'branch_factor': 1.762, 'f_exhausted': 0, 'g_exhausted': 3, 'neighbour_bound': 14,
+                               'new_upbounds': 1, 'nodes_expanded': 16, 'nodes_queued': 20, 'nodes_revisited': 1,
+                               'num_jumps': 5, 'targ_exhausted': 1, 'un_exhausted': 10}
 
-        upbound = galaxy.trade.shortest_path_tree.triangle_upbound(source, target) * 1.005
+        upbound = galaxy.trade.shortest_path_tree.triangle_upbound(source.index, target.index) * 1.005
         act_route, diagnostics = astar_path_numpy(dist_graph, source.index, target.index, heuristic, upbound=upbound,
                                                   diagnostics=True)
         self.assertEqual(exp_route, act_route)
