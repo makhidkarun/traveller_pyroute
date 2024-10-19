@@ -9,7 +9,7 @@ from operator import itemgetter
 import os
 
 from PyRoute.Allies.AllyGen import AllyGen
-from PyRoute.AreaItems.Galaxy import Galaxy
+import PyRoute.AreaItems.Galaxy as Galaxy
 from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
 
