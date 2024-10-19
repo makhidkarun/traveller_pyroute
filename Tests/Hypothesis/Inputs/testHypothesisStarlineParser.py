@@ -76,6 +76,7 @@ def comparison_line(draw):
         '0000 000000000000000 0000000-0 [00000000000000 - -  [0000] - - A 000   00?',
         '0000 000000000000000 0000000-0 (00000000000000       B A A 000 0 0?)0000000000',
         ' 0 0000000-0 (00000000000000 - (000-0) - B A A 000   0?'
+        '0111 -2Z4ig11RbxW010 0000001-1 wJED9E(E(T (HN6 -  (113-0) -  - - B  114       00y'
     ]
 
     candidate = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
@@ -308,6 +309,7 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 ???????-? 000000000000000       - - A 000    --0', False)
     @example('0000 000000000000000 ???????-? 000000000000000 {0} -  [0000]   - A   000   ?0', False)
     @example('0001 000000000000000 ???????-? 000000000000000       - - A 000   --0', False)
+    @example('0111 -2Z4ig11RbxW010 0000001-1 wJED9E(E(T (HN6 -  (113-0) -  - - B  114       00y', False)
     # Weird parsing cases
     @example('0000 000000000000000 ???????-? (00000000000000       - - 0 000   00?)', 'weird')
     @example('0000 000000000000000 ???????-? [00000000000000       - - 0 000   00?]', 'weird')
