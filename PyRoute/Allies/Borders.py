@@ -9,12 +9,13 @@ from operator import itemgetter
 import os
 
 from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.Position.Hex import Hex
 
 
 class Borders(object):
 
-    def __init__(self, galaxy):
+    def __init__(self, galaxy: Galaxy):
         """
         Constructor
         """
@@ -24,7 +25,7 @@ class Borders(object):
         self.allyMap = {}  # 2D array using (q,r) as key, with allegiance code as data
         self.logger = logging.getLogger('PyRoute.Borders')
 
-    def create_borders(self, match, enforce=True):
+    def create_borders(self, match: str, enforce=True):
         """
             Create borders around various allegiances, Algorithm one.
             From the nroute.c generation system. Every world controls a
@@ -55,7 +56,7 @@ class Borders(object):
 
         self._generate_borders(self.allyMap, enforce)
 
-    def _generate_borders(self, allyMap, enforce=True):
+    def _generate_borders(self, allyMap: dict, enforce=True):
         """
         This is deep, dark magic.  Futzing with this will break the border drawing process.
 
@@ -116,7 +117,7 @@ class Borders(object):
             assert result, msg
 
     @staticmethod
-    def _set_border(allyMap, cand_hex, direction):
+    def _set_border(allyMap: dict, cand_hex: tuple[int, int], direction: int):
         """
         Determine if the allegiance is different in the direction,
         hence requiring adding a border to the map.
@@ -137,27 +138,27 @@ class Borders(object):
         return False
 
     @staticmethod
-    def step_map(allyMap):
+    def step_map(allyMap: dict):
         newMap = {}
         for cand_hex in allyMap.keys():
             Borders._check_direction(allyMap, cand_hex, newMap)
         return newMap
 
     @staticmethod
-    def _check_direction(allyMap, cand_hex, newMap):
+    def _check_direction(allyMap: dict, cand_hex: tuple[int, int], newMap: dict):
         newMap[cand_hex] = allyMap[cand_hex]
         for direction in range(6):
             neighbor = Hex.get_neighbor(cand_hex, direction)
             if neighbor not in allyMap:
                 newMap[neighbor] = allyMap[cand_hex]
 
-    def _output_map(self, allyMap, stage):
+    def _output_map(self, allyMap: dict, stage: int):
         path = os.path.join(self.galaxy.output_path, 'allyMap%s.txt' % stage)
         with open(path, "wb") as f:
             for key, value in allyMap.items():
                 f.write("{}-{}: border: {}\n".format(key[0], key[1], value))
 
-    def create_ally_map(self, match, enforce=True):
+    def create_ally_map(self, match: str, enforce=True):
         """
             Create borders around various allegiances, Algorithm Two.
             From the AllyGen http://dotclue.org/t20/ code created by J. Greely.
@@ -171,7 +172,7 @@ class Borders(object):
         # self._output_map(allyMap, 3)
         self._generate_borders(self.allyMap, enforce)
 
-    def _ally_map(self, match):
+    def _ally_map(self, match: str):
         # Create list of stars
         allyMap, starMap, stars = self._unpack_stars_and_maps(match)
 
@@ -254,7 +255,7 @@ class Borders(object):
 
         return allyMap
 
-    def create_erode_border(self, match, enforce=True):
+    def create_erode_border(self, match: str, enforce=True):
         """
         Create borders around various allegiances, Algorithm Three.
         From TravellerMap http://travellermap.com/borders/doc.htm
@@ -278,7 +279,7 @@ class Borders(object):
         self.allyMap = allyMap
         self._generate_borders(allyMap, enforce)
 
-    def _erode(self, allyMap, starMap):
+    def _erode(self, allyMap: dict, starMap: dict):
         """
         Remove edges.
         """
@@ -325,7 +326,7 @@ class Borders(object):
                 newMap[cand_hex] = ally_map_candidate
         return changed, newMap
 
-    def _break_spans(self, allyMap, starMap):
+    def _break_spans(self, allyMap: dict, starMap: dict):
         """'
         BreakSpans - Find a span of four empty (edge) hexes
         and break the span by setting one to not aligned.
@@ -353,7 +354,7 @@ class Borders(object):
 
         return changed, allyMap
 
-    def _check_aligned(self, starMap, edgeMap, cand_hex, direction, distance):
+    def _check_aligned(self, starMap: dict, edgeMap: dict, cand_hex: tuple[int, int], direction: int, distance: int):
         startAlleg = edgeMap[cand_hex]
         checkHex = Hex.get_neighbor(cand_hex, direction, distance)
         # Occupied hex does not count as aligned for this check
@@ -362,7 +363,7 @@ class Borders(object):
         checkAlleg = edgeMap.get(checkHex, None)
         return AllyGen.are_allies(startAlleg, checkAlleg)
 
-    def _build_bridges(self, allyMap, starMap):
+    def _build_bridges(self, allyMap: dict, starMap: dict):
         """
         Build a bridge between two worlds one hex apart as to avoid
         disrupting contiguous empires.
@@ -370,7 +371,7 @@ class Borders(object):
         for cand_hex in starMap.keys():
             self._search_range(cand_hex, allyMap, starMap)
 
-    def _search_range(self, cand_hex, allyMap, starMap):
+    def _search_range(self, cand_hex: tuple[int, int], allyMap: dict, starMap: dict):
         newBridge = None
         checked = []
         star_candidate = starMap[cand_hex]
@@ -401,7 +402,7 @@ class Borders(object):
         if newBridge:
             allyMap[newBridge] = star_candidate
 
-    def _erode_map(self, match):
+    def _erode_map(self, match: str):
         """
         Generate the initial map of allegiances for the erode map.
         Note: This does not match the original system.
@@ -465,7 +466,7 @@ class Borders(object):
 
         return allyMap, starMap
 
-    def _unpack_stars_and_maps(self, match):
+    def _unpack_stars_and_maps(self, match: str):
         stars = self.galaxy.star_mapping.values()
         allyMap = defaultdict(set)
         starMap = {}
@@ -483,7 +484,7 @@ class Borders(object):
             starMap[(star.q, star.r)] = alg
         return allyMap, starMap, stars
 
-    def _collapse_allegiance_if_needed(self, alg, match):
+    def _collapse_allegiance_if_needed(self, alg: str, match: str):
         if 'collapse' == match:
             alg = AllyGen.same_align(alg)
         elif 'separate' == match:
@@ -516,7 +517,7 @@ class Borders(object):
                     return False, msg
         return True, ''
 
-    def _bottom_left_edge(self, cand_hex, border_val):
+    def _bottom_left_edge(self, cand_hex: tuple[int, int], border_val: int):
         msg = ''
         if border_val and Hex.BOTTOMLEFT:
             return True, msg  # bottom edge is left-connected, move on
@@ -528,7 +529,7 @@ class Borders(object):
         msg = "Bottom edge of " + str(cand_hex) + " is not left-connected"
         return False, msg
 
-    def _bottom_right_edge(self, cand_hex, border_val):
+    def _bottom_right_edge(self, cand_hex: tuple[int, int], border_val: int):
         msg = ''
         if border_val and Hex.BOTTOMRIGHT:
             return True, msg  # bottom edge is right-connected, move on
@@ -540,7 +541,7 @@ class Borders(object):
         msg = "Bottom edge of " + str(cand_hex) + " is not right-connected"
         return False, msg
 
-    def _left_left_edge(self, cand_hex, border_val):
+    def _left_left_edge(self, cand_hex: tuple[int, int], border_val: int):
         msg = ''
         neighbour = Hex.get_neighbor(cand_hex, 3)
         neighbour_val = self.borders.get(neighbour, False)
@@ -553,7 +554,7 @@ class Borders(object):
         msg = "Bottom-left edge of " + str(cand_hex) + " is not left-connected"
         return False, msg
 
-    def _left_right_edge(self, cand_hex, border_val):
+    def _left_right_edge(self, cand_hex: tuple[int, int], border_val: int):
         msg = ''
         if border_val and Hex.BOTTOM:
             return True, msg  # left edge is right-connected, move on
@@ -566,7 +567,7 @@ class Borders(object):
         msg = "Bottom-left edge of " + str(cand_hex) + " is not right-connected"
         return False, msg
 
-    def _right_left_edge(self, cand_hex, border_val):
+    def _right_left_edge(self, cand_hex: tuple[int, int], border_val: int):
         msg = ''
         if border_val and Hex.BOTTOM:
             return True, msg  # right edge is left-connected, move on
@@ -580,7 +581,7 @@ class Borders(object):
         msg = "Bottom-right edge of " + str(cand_hex) + " is not left-connected"
         return False, msg
 
-    def _right_right_edge(self, cand_hex, border_val):
+    def _right_right_edge(self, cand_hex: tuple[int, int], border_val: int):
         msg = ''
         neighbour = Hex.get_neighbor(cand_hex, 1)
         neighbour_val = self.borders.get(neighbour, False)
