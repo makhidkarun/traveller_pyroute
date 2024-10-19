@@ -14,6 +14,7 @@ import networkx as nx
 import numpy as np
 
 from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.Allies.Borders import Borders
 from PyRoute.AreaItems.AreaItem import AreaItem
 from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.AreaItems.Subsector import Subsector
@@ -43,7 +44,7 @@ class Galaxy(AreaItem):
         self.ranges = nx.Graph()
         self.stars = nx.Graph()
         self.sectors = {}
-        self.borders = AllyGen(self)
+        self.borders = Borders(self)
         self.output_path = 'maps'
         self.max_jump_range = max_jump
         self.min_btn = min_btn
