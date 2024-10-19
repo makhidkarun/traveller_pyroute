@@ -133,44 +133,44 @@ class AllyGen(object):
     }
 
     @staticmethod
-    def is_unclaimed(alg: typing.Optional[str]):
+    def is_unclaimed(alg: typing.Optional[str]) -> bool:
         return alg in AllyGen.noOne
 
     @staticmethod
-    def is_nonaligned(alg: typing.Optional[str], strict=False):
+    def is_nonaligned(alg: typing.Optional[str], strict=False) -> bool:
         if strict:
             return alg in AllyGen.nonAligned
         return alg in AllyGen.nonAligned or alg in AllyGen.noOne
 
     @staticmethod
-    def is_wilds(alg: Allegiance):
+    def is_wilds(alg: Allegiance) -> bool:
         return alg.code[0:2] == 'Na' or alg.code in ['Wild', 'VaEx', 'Va']
 
     @staticmethod
-    def is_client_state(alg: Allegiance):
+    def is_client_state(alg: Allegiance) -> bool:
         return alg.code[0:2] == 'Cs'
 
     @staticmethod
     @functools.cache
-    def same_align(alg: typing.Optional[str]):
+    def same_align(alg: typing.Optional[str]) -> str:
         for sameAlg in AllyGen.sameAligned:
             if alg in sameAlg:
                 return sameAlg[0]
         return alg
 
     @staticmethod
-    def imperial_align(alg: typing.Optional[str]):
+    def imperial_align(alg: typing.Optional[str]) -> bool:
         return AllyGen.same_align(alg) == 'Im'
 
     @staticmethod
-    def same_align_name(alg: typing.Optional[str], alg_name: typing.Optional[str]):
+    def same_align_name(alg: typing.Optional[str], alg_name: typing.Optional[str]) -> str:
         if alg in AllyGen.nonAligned:
             return alg_name
         else:
             return alg_name.split(',')[0].strip()
 
     @staticmethod
-    def population_align(alg: typing.Optional[str], name: str):
+    def population_align(alg: typing.Optional[str], name: str) -> str:
         # Try getting the default cases
         code = AllyGen.default_population.get(alg, AllyGen.default_population.get(AllyGen.same_align(alg), None))
 
@@ -198,8 +198,8 @@ class AllyGen(object):
         return code
 
     @staticmethod
-    def sort_allegiances(alg_list: dict, base_match_only: bool):
-        # The logic: 
+    def sort_allegiances(alg_list: dict, base_match_only: bool) -> list:
+        # The logic:
         # base_match_only == true -> --ally-match=collapse
         # only what matches the base allegiances
         # base_match_only == false -> --ally-match=separate
@@ -222,7 +222,7 @@ class AllyGen(object):
         return algs
 
     @staticmethod
-    def are_owned_allies(alg1: typing.Optional[str], alg2: typing.Optional[str]):
+    def are_owned_allies(alg1: typing.Optional[str], alg2: typing.Optional[str]) -> bool:
         """
         Public function to determine if the Allegiances of two
         world are considered allied for the owned world checks.
@@ -240,7 +240,7 @@ class AllyGen(object):
 
     @staticmethod
     @functools.cache
-    def are_allies(alg1: typing.Optional[str], alg2: typing.Optional[str]):
+    def are_allies(alg1: typing.Optional[str], alg2: typing.Optional[str]) -> bool:
         """
         Public function to determine if the Allegiance of two
         worlds are considered allied for trade purposes or not.
