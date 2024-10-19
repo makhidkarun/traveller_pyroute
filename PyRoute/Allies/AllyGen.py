@@ -143,12 +143,12 @@ class AllyGen(object):
         return alg in AllyGen.nonAligned or alg in AllyGen.noOne
 
     @staticmethod
-    def is_wilds(alg: Allegiance) -> bool:
-        return alg.code[0:2] == 'Na' or alg.code in ['Wild', 'VaEx', 'Va']
+    def is_wilds(alg: str) -> bool:
+        return alg[0:2] == 'Na' or alg in ['Wild', 'VaEx', 'Va']
 
     @staticmethod
-    def is_client_state(alg: Allegiance) -> bool:
-        return alg.code[0:2] == 'Cs'
+    def is_client_state(alg: str) -> bool:
+        return alg[0:2] == 'Cs'
 
     @staticmethod
     @functools.cache
