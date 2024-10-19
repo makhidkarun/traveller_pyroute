@@ -12,7 +12,7 @@ import math
 
 from PyRoute.Position.Hex import Hex
 
-from PyRoute.AllyGen import AllyGen
+from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.SystemData.Utilities import Utilities
 from collections import OrderedDict
 

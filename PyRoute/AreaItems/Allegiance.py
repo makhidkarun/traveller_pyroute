@@ -5,7 +5,7 @@ Created on 21 Jul, 2024
 """
 import copy
 
-from PyRoute.AllyGen import AllyGen
+from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.AreaItems.AreaItem import AreaItem
 
 

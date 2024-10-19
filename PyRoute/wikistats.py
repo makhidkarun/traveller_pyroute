@@ -14,7 +14,7 @@ import inflect
 import jsonpickle
 from networkx.readwrite import json_graph
 from PyRoute.Nobles import Nobles
-from PyRoute.AllyGen import AllyGen
+from PyRoute.Allies.AllyGen import AllyGen
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 

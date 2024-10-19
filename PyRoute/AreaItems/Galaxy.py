@@ -13,7 +13,7 @@ import math
 import networkx as nx
 import numpy as np
 
-from PyRoute.AllyGen import AllyGen
+from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.AreaItems.AreaItem import AreaItem
 from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.AreaItems.Subsector import Subsector

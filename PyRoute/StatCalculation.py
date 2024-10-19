@@ -7,7 +7,7 @@ import logging
 import math
 from PyRoute.wikistats import WikiStats
 from collections import OrderedDict
-from PyRoute.AllyGen import AllyGen
+from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.Star import UWPCodes
 from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
 
