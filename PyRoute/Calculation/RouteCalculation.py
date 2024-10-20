@@ -12,9 +12,9 @@ from collections import defaultdict
 
 import networkx as nx
 
+from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
-from PyRoute.AllyGen import AllyGen
 
 
 class RouteCalculation(object):

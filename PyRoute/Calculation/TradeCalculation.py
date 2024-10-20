@@ -11,7 +11,7 @@ import numpy as np
 import networkx as nx
 
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
-from PyRoute.AllyGen import AllyGen
+from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified

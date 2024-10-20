@@ -5,7 +5,7 @@ Created on 21 Jul, 2024
 """
 import copy
 
-from PyRoute.AllyGen import AllyGen
+from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.AreaItems.AreaItem import AreaItem
 
 
@@ -103,13 +103,13 @@ class Allegiance(AreaItem):
         return '{} ({})'.format(self.name, self.code)
 
     def is_unclaimed(self):
-        return AllyGen.is_unclaimed(self)
+        return AllyGen.is_unclaimed(self.code)
 
     def is_wilds(self):
-        return AllyGen.is_wilds(self)
+        return AllyGen.is_wilds(self.code)
 
     def is_client_state(self):
-        return AllyGen.is_client_state(self)
+        return AllyGen.is_client_state(self.code)
 
     def are_allies(self, other):
         return AllyGen.are_allies(self.code, other.code)

@@ -1,6 +1,6 @@
 import unittest
 
-from PyRoute.AllyGen import AllyGen
+from PyRoute.Allies.AllyGen import AllyGen
 
 
 class testAllyGen(unittest.TestCase):
@@ -34,6 +34,26 @@ class testAllyGen(unittest.TestCase):
     def test_zhodani_in_name_of_population_alignment(self):
         expected = 'Zhod'
         actual = AllyGen.population_align('Na', 'Zhodani')
+        self.assertEqual(expected, actual)
+
+    def test_is_wilds_none(self):
+        expected = False
+        actual = AllyGen.is_wilds(None)
+        self.assertEqual(expected, actual)
+
+    def test_is_wilds_single_char(self):
+        expected = False
+        actual = AllyGen.is_wilds('a')
+        self.assertEqual(expected, actual)
+
+    def test_is_client_state_none(self):
+        expected = False
+        actual = AllyGen.is_client_state(None)
+        self.assertEqual(expected, actual)
+
+    def test_is_client_state_single_char(self):
+        expected = False
+        actual = AllyGen.is_client_state('a')
         self.assertEqual(expected, actual)
 
 if __name__ == '__main__':
