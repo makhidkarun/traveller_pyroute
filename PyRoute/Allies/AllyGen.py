@@ -144,10 +144,14 @@ class AllyGen(object):
 
     @staticmethod
     def is_wilds(alg: str) -> bool:
+        if alg is None:
+            return False
         return alg[0:2] == 'Na' or alg in ['Wild', 'VaEx', 'Va']
 
     @staticmethod
     def is_client_state(alg: str) -> bool:
+        if alg is None:
+            return False
         return alg[0:2] == 'Cs'
 
     @staticmethod
