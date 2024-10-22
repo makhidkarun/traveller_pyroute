@@ -367,5 +367,52 @@ class testDeltaStar(unittest.TestCase):
         badline = '' if 0 == len(invalid) else invalid[0]
         self.assertEqual(0, len(invalid), 'At least one missing trade code not added: \n' + starline + '\n' + badline)
 
+    @given(starline())
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))
+    @example('0101 0                    A000000-0 As Ba                                  { 0 } (000+0) [0001] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 As Ba                                  { 0 } (000+0) [0010] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 As Ba                                  { 0 } (000+0) [0100] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 As Ba                                  { 0 } (000+0) [1000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 As Ba                                  { 0 } (001+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 As Ba                                  { 0 } (010+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A00B000-0 As Ba                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
+    @example('0101 0                    A0G0000-0 As Ba                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
+    def test_canonicalise_barren_worlds(self, starline):
+        sector = Sector('# Core', '# 0, 0')
+        star1 = None
+        allowed_errors = [
+            'Input UWP malformed'
+        ]
+
+        try:
+            star1 = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        except ValueError as e:
+            rep = str(e)
+
+            if rep in allowed_errors:
+                pass
+            else:
+                raise e
+        assume(star1 is not None)
+        star1.index = 0
+        star1.allegiance_base = 'NaHu'
+
+        assume('0' == str(star1.pop) and 'Ba' in star1.tradeCode.codes)
+
+        canonical_result, canonical_messages = star1.check_canonical()
+
+        star1.canonicalise()
+
+        nu_result, nu_messages = star1.check_canonical()
+        invalid = [item for item in nu_messages if ('should be 0 for barren worlds' in item or 'does not match' in item)]
+
+        self.assertTrue(
+            len(canonical_messages) >= len(nu_messages),
+            'New canonical-check messages should not happen: \n' + starline
+        )
+        badline = '' if 0 == len(invalid) else invalid[0]
+        self.assertEqual(0, len(invalid), 'At least one characteristic not canonicalised: \n' + starline + '\n' + badline)
+
+
 if __name__ == '__main__':
     unittest.main()
