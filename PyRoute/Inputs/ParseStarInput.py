@@ -219,3 +219,55 @@ class ParseStarInput:
             transformed = ParseStarInput.transformer.transform(result)
 
         return transformed, is_station
+
+    @staticmethod
+    def check_tl(star, fullmsg=None):
+        if '???-' in str(star.uwp) or star.tl_unknown:
+            return
+
+        max_tl, min_tl = ParseStarInput.check_tl_core(star)
+
+        if min_tl <= star.tl <= max_tl:
+            return
+
+        msg = '{}-{} Calculated TL "{}" not in range {}-{}'.format(star, star.uwp, star.tl, min_tl, max_tl)
+
+        if not isinstance(fullmsg, list):
+            star.logger.error(msg)
+        else:
+            fullmsg.append(msg)
+
+    @staticmethod
+    def check_tl_core(star):
+        mod = 0
+        if star.size in '01':
+            mod += 2
+        elif star.size in '234':
+            mod += 1
+        if star.atmo in '0123ABCDEF':
+            mod += 1
+        if star.hydro in '9A':
+            mod += 1
+        if 'A' == star.hydro:
+            mod += 1
+        if star.pop in '123459ABCDEF':
+            mod += 1
+        if star.pop in '9ABCDEF':
+            mod += 1
+        if star.pop in 'ABCDEF':
+            mod += 2
+        if star.gov in '05':
+            mod += 1
+        elif 'D' == star.gov:
+            mod -= 2
+        if 'X' == star.port:
+            mod -= 4
+        if star.port in 'ABC':
+            mod += 2
+        if star.port in 'AB':
+            mod += 2
+        if 'A' == star.port:
+            mod += 2
+        min_tl = max(0, mod + 1)
+        max_tl = mod + 6
+        return max_tl, min_tl
