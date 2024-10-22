@@ -213,7 +213,7 @@ class DeltaStar(Star):
         self._check_trade_code(msg, 'Po', None, '2345', '0123')
         self._check_trade_code(msg, 'He', '3456789ABC', '2479ABC', '012')
         self._check_trade_code(msg, 'Wa', '3456789', '3456789DEF', 'A')
-        self._check_trade_code(msg, 'Oc', 'ABCD', '3456789DEF', 'A')
+        self._check_trade_code(msg, 'Oc', 'ABCDEF', '3456789DEF', 'A')
         self._check_trade_code(msg, 'Va', None, '0', None)
 
         code = 'Ba'
