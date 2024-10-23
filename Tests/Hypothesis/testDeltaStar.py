@@ -498,6 +498,75 @@ class testDeltaStar(unittest.TestCase):
         badline = '' if 0 == len(invalid) else invalid[0]
         self.assertEqual(0, len(invalid), 'At least one characteristic not canonicalised: \n' + starline + '\n' + badline)
 
+    """
+    Given a regex-matching string that results in a Star object when parsed, that Star should cleanly canonicalise
+    """
+    @given(mixed_starline())
+    @settings(
+        suppress_health_check=[HealthCheck(3), HealthCheck(2)],  # suppress slow-data health check, too-much filtering
+        deadline=timedelta(1000))
+    @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00 D')
+    @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   00 D')
+    @example('0101 000000000000000 A000200-0 000000000000000 {0} -  [0000] - - 0 000   00 D')
+    @example('0101 000000000000000 A000a00-0 000000000000000 {0} (000-0) [0000] - - 0 000   00 D')
+    @example('0101 000000000000000 A000Z00-0 000000000000000 {0} (000-0) [0000] - - 0 000   00 D')
+    @example('2123 Medurma              A9D7954-C Hi An Cs Di(Miyavine) Asla1 S\'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V            Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322')
+    @example('0101 0                    A000400-0 As Ba                                  { 0 } (001+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 Cp Cp Cp Cp Cp Cp Cp Cp Cp Cp          { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000600-0 Cp Cx Cs Mr Da RsA RsB RsG             { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000600-0 Cp Cx Cs Mr Da RsA                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000100-C As Lo Va                              { 1 }  (001+1) [1217] B    -  A 000 0  NaHu G5 V')
+    @example('0101 0                    A000100-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000900-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 As Ri                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
+    @example('0101 0                    A244500-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000000-0 As As                                  { 0 } (001+0) [0000] B - A 000 0 NaHu G5 V')
+    def test_canonicalise_from_regex_match_and_verify_idempotency(self, starline):
+        sector = Sector('# Core', '# 0, 0')
+        foo = None
+        allowed_errors = [
+            'Input UWP malformed',
+            'No stars found'
+        ]
+
+        try:
+            foo = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        except ValueError as e:
+            rep = str(e)
+
+            if rep in allowed_errors:
+                pass
+            else:
+                raise e
+        assume(foo is not None)
+
+        foo.index = 0
+        foo.allegiance_base = 'NaHu'
+
+        self.assertIsNotNone(foo._hash, "Hash not calculated for original star")
+        well_formed = foo.is_well_formed()
+        assume(well_formed)
+
+        foo.canonicalise()
+        nu_result, nu_messages = foo.check_canonical()  # Should be in canonical form after canonicalise call
+
+        badline = '' if 0 == len(nu_messages) else nu_messages[0]
+        self.assertEqual(0, len(nu_messages), 'At least one characteristic not canonicalised: \n' + starline + '\n' + badline)
+
+        # Now verify canonicalisation is idempotent on resulting string
+        first_round = foo.parse_to_line()
+        nu_foo = DeltaStar.parse_line_into_star(first_round, sector, 'fixed', 'fixed')
+        self.assertIsNotNone(nu_foo, "Canonicalised line should parse cleanly")
+        nu_foo.canonicalise()
+
+        nu_result, nu_messages = nu_foo.check_canonical()  # Should be in canonical form after canonicalise call
+
+        badline = '' if 0 == len(nu_messages) else nu_messages[0]
+        self.assertEqual(0, len(nu_messages), 'At least one characteristic not canonicalised: \n' + starline + '\n' + badline)
+
+        second_round = nu_foo.parse_to_line()
+        self.assertEqual(first_round, second_round, 'Canonicalisation should be idempotent.\nHypothesis input: ' + starline + '\n')
+
 
 if __name__ == '__main__':
     unittest.main()
