@@ -424,6 +424,7 @@ class Star(object):
         resources = self._ehex_to_int(self.economics[1])
         labor = self._ehex_to_int(self.economics[2])
         infrastructure = self._ehex_to_int(self.economics[3])
+        efficiency = self._ehex_to_int(self.economics[5])
 
         if 8 > self.uwp.tl_code:
             nu_resources = self._int_to_ehex(max(0, min(12, resources)))
@@ -455,6 +456,15 @@ class Star(object):
 
         if nu_infrastructure is not None:
             self.economics = self.economics[0:3] + nu_infrastructure + self.economics[4:]
+
+        nu_efficiency = None
+        if self.tradeCode.barren:
+            nu_efficiency = '0'
+        elif efficiency == 0:
+            nu_efficiency = '1'
+
+        if nu_efficiency is not None:
+            self.economics = self.economics[0:5] + nu_efficiency + self.economics[6:]
 
     def check_cx(self):
         if not self.economics:

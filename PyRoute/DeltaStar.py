@@ -151,7 +151,7 @@ class DeltaStar(Star):
             code = 'Va'
             line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)
             msg.append(line)
-        if 0 == efficiency:
+        if not self.tradeCode.barren and 0 == efficiency:
             line = '{} - EX Calculated efficiency 0 should be coded as 1 (implied by p18, book 3 of T5.10)'.format(self)
 
             msg.append(line)
