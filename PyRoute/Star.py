@@ -765,7 +765,7 @@ class Star(object):
     def canonicalise(self):
         self.uwp.canonicalise()
         self.tradeCode.canonicalise(self)
+        self.calculate_importance()
         self.fix_ex()
         self.fix_cx()
         self.star_list_object.canonicalise()
-        self.calculate_importance()
