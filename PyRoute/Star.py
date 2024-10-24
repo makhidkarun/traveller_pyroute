@@ -470,8 +470,6 @@ class Star(object):
             self.economics = self.economics[0:5] + nu_efficiency + self.economics[6:]
 
     def check_cx(self):
-        if not self.economics:
-            return
         if not self.social:
             return
         pop = self.popCode
@@ -511,8 +509,6 @@ class Star(object):
                 format(self, symbols, max(1, self.tl - 5), self.tl + 5))
 
     def fix_cx(self):
-        if not self.economics:
-            return
         if not self.social:
             return
         pop = self.popCode
