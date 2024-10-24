@@ -673,6 +673,8 @@ class TradeCodes(object):
         self._fix_econ_code(star, 'Ri', '68', None, '678')
 
         self._fix_all_pop_codes(star)
+        self._drop_invalid_trade_code('O:' + star.position)
+        self._drop_invalid_trade_code('C:' + star.position)
 
     def _fix_trade_code(self, star, code, size, atmo, hydro):
         size = '0123456789ABCDEF' if size is None else size

@@ -165,6 +165,13 @@ class DeltaStar(Star):
             line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode.codeset)
             msg.append(line)
 
+        if ('O:' + self.position) in self.tradeCode.codes:
+            line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, 'O:' + self.position, self.tradeCode.codes)
+            msg.append(line)
+        if ('C:' + self.position) in self.tradeCode.codeset:
+            line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, 'C:' + self.position, self.tradeCode.codes)
+            msg.append(line)
+
         if self.social is not None:
             symbols = self._ehex_to_int(self.social[4] if self.social is not None else '1')  # TL + flux, min 1
             strangeness = self._ehex_to_int(self.social[3] if self.social is not None else '1')  # flux + 5
