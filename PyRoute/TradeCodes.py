@@ -690,6 +690,7 @@ class TradeCodes(object):
             self._add_missing_trade_code(code)
 
     def _fix_econ_code(self, star, code, atmo, hydro, pop):
+        mapping = {'In': 'industrial', 'Ri': 'rich', 'Ag': 'agricultural'}
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
         pop = '0123456789ABCD' if pop is None else pop
@@ -704,8 +705,13 @@ class TradeCodes(object):
             self._drop_invalid_trade_code(code)
         elif phys_match and not code_match:
             self._add_missing_trade_code(code)
+        if code in mapping:
+            mappi = mapping[code]
+            if mappi in self.__dict__:
+                del self.__dict__[mappi]
 
     def _fix_pop_code(self, star, code, pop):
+        mapping = {'Lo': 'low', 'Hi': 'high', 'Ni': 'nonindustrial', 'Ba': 'barren'}
         pop_match = star.pop in pop
         code_match = code in self.codeset
 
@@ -716,6 +722,10 @@ class TradeCodes(object):
             self._drop_invalid_trade_code(code)
         elif pop_match and not code_match:
             self._add_missing_trade_code(code)
+        if code in mapping:
+            mappi = mapping[code]
+            if mappi in self.__dict__:
+                del self.__dict__[mappi]
 
     def _fix_all_pop_codes(self, star):
         self._fix_pop_code(star, 'Ba', '0')

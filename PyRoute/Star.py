@@ -13,6 +13,7 @@ import math
 from PyRoute.Position.Hex import Hex
 
 from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.SystemData.Utilities import Utilities
 from collections import OrderedDict
 
@@ -138,6 +139,8 @@ class Star(object):
         result += str(self.uwp)
         star_list = str(self.star_list_object)
         result += " " + str(self.tradeCode).ljust(38)
+        if " " != result[-1]:
+            result += " "
         if self.oldskool:  # If Ix, Ex and Cx were all missing on the way _in_, they should be missing on the way _out_
             imp_chunk = ' '
             econ = ' '
@@ -560,6 +563,14 @@ class Star(object):
         if nu_symbols is not None:
             self.social = self.social[0:4] + nu_symbols + self.social[5:]
 
+    def fix_tl(self):
+        if self.tl_unknown:  # if TL is unknown, no point canonicalising it
+            return
+
+        max_tl, min_tl = ParseStarInput.check_tl_core(self)
+        new_tl = max(min_tl, min(max_tl, self.tl))
+        self.tl = Utilities.int_to_ehex(new_tl)
+
     def calculate_ru(self, ru_calc):
         if not self.economics:
             self.ru = 0
@@ -775,7 +786,9 @@ class Star(object):
     def canonicalise(self):
         self.uwp.canonicalise()
         self.tradeCode.canonicalise(self)
+        self.fix_tl()
         self.calculate_importance()
         self.fix_ex()
         self.fix_cx()
         self.star_list_object.canonicalise()
+        self.calculate_importance()
