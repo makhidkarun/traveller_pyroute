@@ -147,13 +147,10 @@ class DeltaStar(Star):
                                                                                          12 + self.importance)
                 msg.append(line)
 
-        self._check_trade_code(msg, 'Va', None, '0', None)
         if not self.tradeCode.barren and 0 == efficiency:
             line = '{} - EX Calculated efficiency 0 should be coded as 1 (implied by p18, book 3 of T5.10)'.format(self)
 
             msg.append(line)
-
-        self._check_trade_code(msg, 'As', '0', '0', '0')
 
         if ('O:' + self.position) in self.tradeCode.codes:
             line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, 'O:' + self.position, self.tradeCode.codes)
@@ -203,6 +200,7 @@ class DeltaStar(Star):
                                                                                           max(self.popCode - 1, 0))
                 msg.append(line)
 
+        self._check_trade_code(msg, 'As', '0', '0', '0')
         self._check_trade_code(msg, 'De', None, '23456789', '0')
         self._check_trade_code(msg, 'Ga', '678', '568', '567')
         self._check_trade_code(msg, 'Fl', None, 'ABC', '123456789A')
