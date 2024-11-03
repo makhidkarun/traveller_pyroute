@@ -147,10 +147,7 @@ class DeltaStar(Star):
                                                                                          12 + self.importance)
                 msg.append(line)
 
-        if '0' == str(self.atmo) and 'Va' not in self.tradeCode.codeset:
-            code = 'Va'
-            line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)
-            msg.append(line)
+        self._check_trade_code(msg, 'Va', None, '0', None)
         if not self.tradeCode.barren and 0 == efficiency:
             line = '{} - EX Calculated efficiency 0 should be coded as 1 (implied by p18, book 3 of T5.10)'.format(self)
 
