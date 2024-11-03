@@ -187,6 +187,7 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A00B000-0 Va                                     { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000E00-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
     @example('0101 0                    AD01000-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
+    @example('0101 0                    AD20000-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
     def test_check_canonicalisation(self, starline):
         outer_logger = logging.getLogger("PyRoute.Star")
         inner_logger = logging.getLogger("PyRoute.TradeCodes")
@@ -333,6 +334,7 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A655000-0 As As                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A00B000-0 As As                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000E00-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
+    @example('0101 0                    A320000-0 As As                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     def test_canonicalise_missing_trade_codes(self, starline):
         sector = Sector('# Core', '# 0, 0')
         star1 = None
@@ -525,6 +527,7 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A244500-0 As As C:0101                           { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
     @example('0101 000000000000000 ???????-? 000000000000000       - - A 000 0 00')
     @example('0101 000000000000000 ???????-? 000000000000000 - -  [0001] B - A 000   00')
+    @example('0101 0                    A201000-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
     def test_canonicalise_from_regex_match_and_verify_idempotency(self, starline):
         assume('00' != starline[0:2] and '00' != starline[2:4])
         assume(33 > int(starline[0:2]) and 41 > int(starline[2:4]))

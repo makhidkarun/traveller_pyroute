@@ -203,7 +203,7 @@ class DeltaStar(Star):
                                                                                           max(self.popCode - 1, 0))
                 msg.append(line)
 
-        self._check_trade_code(msg, 'De', '0123456789ABC', '23456789', '0')
+        self._check_trade_code(msg, 'De', None, '23456789', '0')
         self._check_trade_code(msg, 'Ga', '678', '568', '567')
         self._check_trade_code(msg, 'Fl', None, 'ABC', '123456789A')
         self._check_trade_code(msg, 'Ic', None, '01', '123456789A')
