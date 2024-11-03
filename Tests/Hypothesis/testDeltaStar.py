@@ -335,6 +335,9 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A00B000-0 As As                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000E00-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
     @example('0101 0                    A320000-0 As As                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
+    @example('0101 0                    A000E00-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
+    @example('0101 0                    AD00000-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
+    @example('0101 0                    AD20000-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
     def test_canonicalise_missing_trade_codes(self, starline):
         sector = Sector('# Core', '# 0, 0')
         star1 = None
