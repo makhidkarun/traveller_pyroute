@@ -156,14 +156,7 @@ class DeltaStar(Star):
 
             msg.append(line)
 
-        if '0' == str(self.atmo) and '0' == str(self.size) and '0' == str(self.hydro) and 'As' not in self.tradeCode.codeset:
-            code = 'As'
-            line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)
-            msg.append(line)
-        elif 'As' in self.tradeCode.codeset and not ('0' == str(self.atmo) and '0' == str(self.size) and '0' == str(self.hydro)):
-            code = 'As'
-            line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode.codeset)
-            msg.append(line)
+        self._check_trade_code(msg, 'As', '0', '0', '0')
 
         if ('O:' + self.position) in self.tradeCode.codes:
             line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, 'O:' + self.position, self.tradeCode.codes)
