@@ -5,10 +5,12 @@ Created on Dec 27, 2023
 """
 import re
 
-from lark import Transformer, Token
+from lark import Token
+
+from PyRoute.Inputs.BaseTransformer import BaseTransformer
 
 
-class StarlineTransformer(Transformer):
+class StarlineTransformer(BaseTransformer):
 
     strip_list = [
         'pbg',
