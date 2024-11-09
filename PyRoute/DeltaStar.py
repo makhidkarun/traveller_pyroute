@@ -125,8 +125,9 @@ class DeltaStar(Star):
         efficiency = None
 
         if self.economics is not None:
-            infrastructure = self._ehex_to_int(self.economics[3] if self.economics is not None else '0')
+            infrastructure = self._ehex_to_int(self.economics[3])
             efficiency = self._ehex_to_int(self.economics[5])
+            labor = self._ehex_to_int(self.economics[2])
             if self.tradeCode.barren and infrastructure != 0:
                 line = '{} - EX Calculated infrastructure {} does not match generated infrastructure {}'.format(self,
                                                                                                                 infrastructure,
@@ -146,6 +147,10 @@ class DeltaStar(Star):
                 line = '{} - EX Calculated infrastructure {} not in range 0 - {}'.format(self, infrastructure,
                                                                                          12 + self.importance)
                 msg.append(line)
+            if labor != max(self.popCode - 1, 0):
+                line = '{} - EX Calculated labor {} does not match generated labor {}'.format(self, labor,
+                                                                                          max(self.popCode - 1, 0))
+                msg.append(line)
 
         if not self.tradeCode.barren and 0 == efficiency:
             line = '{} - EX Calculated efficiency 0 should be coded as 1 (implied by p18, book 3 of T5.10)'.format(self)
@@ -160,11 +165,10 @@ class DeltaStar(Star):
             msg.append(line)
 
         if self.social is not None:
-            symbols = self._ehex_to_int(self.social[4] if self.social is not None else '1')  # TL + flux, min 1
-            strangeness = self._ehex_to_int(self.social[3] if self.social is not None else '1')  # flux + 5
-            acceptance = self._ehex_to_int(self.social[2] if self.social is not None else '1')  # pop + Ix, min 1
-            homogeneity = self._ehex_to_int(self.social[1] if self.social is not None else '1')  # pop + flux, min 1
-            labor = self._ehex_to_int(self.economics[2] if self.economics is not None else '0')
+            symbols = self._ehex_to_int(self.social[4])  # TL + flux, min 1
+            strangeness = self._ehex_to_int(self.social[3])  # flux + 5
+            acceptance = self._ehex_to_int(self.social[2])  # pop + Ix, min 1
+            homogeneity = self._ehex_to_int(self.social[1])  # pop + flux, min 1
             pop = self.popCode
             if pop == 0 and symbols != 0:
                 line = '{} - CX Calculated symbols {} should be 0 for barren worlds'.format(self, symbols)
@@ -194,10 +198,6 @@ class DeltaStar(Star):
             elif pop != 0 and not max(1, pop - 5) <= homogeneity <= pop + 5:
                 line = '{} - CX Calculated homogeneity {} not in range {} - {}'.format(self, homogeneity, max(1, pop - 5),
                                                                                    pop + 5)
-                msg.append(line)
-            if self.economics is not None and labor != max(self.popCode - 1, 0):
-                line = '{} - EX Calculated labor {} does not match generated labor {}'.format(self, labor,
-                                                                                          max(self.popCode - 1, 0))
                 msg.append(line)
 
         self._check_trade_code(msg, 'As', '0', '0', '0')
