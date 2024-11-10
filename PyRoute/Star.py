@@ -13,6 +13,7 @@ import math
 from PyRoute.Position.Hex import Hex
 
 from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.SystemData.Utilities import Utilities
 from collections import OrderedDict
 
@@ -138,6 +139,8 @@ class Star(object):
         result += str(self.uwp)
         star_list = str(self.star_list_object)
         result += " " + str(self.tradeCode).ljust(38)
+        if " " != result[-1]:
+            result += " "
         if self.oldskool:  # If Ix, Ex and Cx were all missing on the way _in_, they should be missing on the way _out_
             imp_chunk = ' '
             econ = ' '
@@ -276,6 +279,10 @@ class Star(object):
     @tl.setter
     def tl(self, value):
         self.uwp.tl = value
+
+    @property
+    def tl_unknown(self):
+        return '?' == self.uwp.tl
 
     @property
     def star_list(self):
@@ -420,6 +427,7 @@ class Star(object):
         resources = self._ehex_to_int(self.economics[1])
         labor = self._ehex_to_int(self.economics[2])
         infrastructure = self._ehex_to_int(self.economics[3])
+        efficiency = self._ehex_to_int(self.economics[5])
 
         if 8 > self.uwp.tl_code:
             nu_resources = self._int_to_ehex(max(0, min(12, resources)))
@@ -452,9 +460,16 @@ class Star(object):
         if nu_infrastructure is not None:
             self.economics = self.economics[0:3] + nu_infrastructure + self.economics[4:]
 
+        nu_efficiency = None
+        if self.tradeCode.barren:
+            nu_efficiency = '0'
+        elif efficiency == 0:
+            nu_efficiency = '1'
+
+        if nu_efficiency is not None:
+            self.economics = self.economics[0:5] + nu_efficiency + self.economics[6:]
+
     def check_cx(self):
-        if not self.economics:
-            return
         if not self.social:
             return
         pop = self.popCode
@@ -462,16 +477,16 @@ class Star(object):
         homogeneity = self._ehex_to_int(self.social[1])  # pop + flux, min 1
         if pop == 0 and homogeneity != 0:
             self.logger.warning(
-                '{} - CX calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity))
+                '{} - CX Calculated homogeneity {} should be 0 for barren worlds'.format(self, homogeneity))
         elif pop != 0 and not max(1, pop - 5) <= homogeneity <= pop + 5:
             self.logger.warning(
-                '{} - CX calculated homogeneity {} not in range {} - {}'.
+                '{} - CX Calculated homogeneity {} not in range {} - {}'.
                 format(self, homogeneity, max(1, pop - 5), pop + 5))
 
         acceptance = self._ehex_to_int(self.social[2])  # pop + Ix, min 1
         if pop == 0 and acceptance != 0:
             self.logger.warning(
-                '{} - CX calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
+                '{} - CX Calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
         elif pop != 0 and not max(1, pop + self.importance) == acceptance:
             self.logger.warning(
                 '{} - CX Calculated acceptance {} does not match generated acceptance {}'.
@@ -480,22 +495,20 @@ class Star(object):
         strangeness = self._ehex_to_int(self.social[3])  # flux + 5
         if pop == 0 and strangeness != 0:
             self.logger.warning(
-                '{} - CX calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness))
+                '{} - CX Calculated strangeness {} should be 0 for barren worlds'.format(self, strangeness))
         elif pop != 0 and not 1 <= strangeness <= 10:
             self.logger.warning(
-                '{} - CX calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10))
+                '{} - CX Calculated strangeness {} not in range {} - {}'.format(self, strangeness, 1, 10))
 
         symbols = self._ehex_to_int(self.social[4])  # TL + flux, min 1
         if pop == 0 and symbols != 0:
-            self.logger.warning('{} - CX calculated symbols {} should be 0 for barren worlds'.format(self, symbols))
+            self.logger.warning('{} - CX Calculated symbols {} should be 0 for barren worlds'.format(self, symbols))
         elif pop != 0 and not max(1, self.tl - 5) <= symbols <= self.tl + 5:
             self.logger.warning(
-                '{} - CX calculated symbols {} not in range {} - {}'.
+                '{} - CX Calculated symbols {} not in range {} - {}'.
                 format(self, symbols, max(1, self.tl - 5), self.tl + 5))
 
     def fix_cx(self):
-        if not self.economics:
-            return
         if not self.social:
             return
         pop = self.popCode
@@ -545,6 +558,14 @@ class Star(object):
 
         if nu_symbols is not None:
             self.social = self.social[0:4] + nu_symbols + self.social[5:]
+
+    def fix_tl(self):
+        if self.tl_unknown:  # if TL is unknown, no point canonicalising it
+            return
+
+        max_tl, min_tl = ParseStarInput.check_tl_core(self)
+        new_tl = max(min_tl, min(max_tl, self.tl))
+        self.tl = Utilities.int_to_ehex(new_tl)
 
     def calculate_ru(self, ru_calc):
         if not self.economics:
@@ -761,6 +782,8 @@ class Star(object):
     def canonicalise(self):
         self.uwp.canonicalise()
         self.tradeCode.canonicalise(self)
+        self.fix_tl()
+        self.calculate_importance()
         self.fix_ex()
         self.fix_cx()
         self.star_list_object.canonicalise()
