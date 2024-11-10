@@ -177,6 +177,7 @@ class BaseTransformer(Transformer):
         tree = self._preprocess_trade_and_extensions(tree)
         tree = self._preprocess_extensions_and_nbz(tree)
         tree = self._preprocess_trade_and_nbz(tree)
+        tree = self._preprocess_tree_suspect_empty_trade_code(tree)
         tree = self._transform_tree(tree)
         parsed = {'ix': None, 'ex': None, 'cx': None, 'residual': ''}
 
@@ -305,6 +306,29 @@ class BaseTransformer(Transformer):
                     base.children[0].value = relocate[1].value
                     nobles.children[0].value = relocate[0].value
                     trade.children = trade.children[:-2]
+
+        return tree
+
+    def _is_noble(self, noble_string):
+        noble = "BCcDEeFfGH"
+        return all(char in noble for char in noble_string)
+
+    def _preprocess_tree_suspect_empty_trade_code(self, tree):
+        if 1 != len(tree.children[2].children):
+            return tree
+        if 1 != len(tree.children[3].children):
+            return tree
+        if 5 < len(tree.children[2].children[0]):
+            return tree
+        if 5 != len(tree.children[3].children[0]):
+            return tree
+        all_noble = self._is_noble(tree.children[2].children[0])
+        if not all_noble:
+            return tree
+        tree.children[6].children[0].value = tree.children[5].children[0].value
+        tree.children[5].children[0].value = tree.children[4].children[0].value
+        tree.children[4].children[0].value = tree.children[2].children[0].value
+        tree.children[2].children[0].value = ""
 
         return tree
 
