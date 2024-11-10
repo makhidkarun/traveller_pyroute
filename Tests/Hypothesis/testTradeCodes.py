@@ -161,6 +161,7 @@ class testTradeCodes(unittest.TestCase):
     @given(from_regex(regex=UWP.match, alphabet='0123456789abcdefghjklmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWYXZ -{}()[]?\'+*'),
            trade_code(max_size=1, min_size=1),
            booleans())
+    @example('?000000-0', ['De'], False)
     def test_has_code_but_not_uwp(self, s, trade_line, forward):
         s = s[0:9]
         if isinstance(trade_line, list):
