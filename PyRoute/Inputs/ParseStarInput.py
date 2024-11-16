@@ -217,10 +217,13 @@ class ParseStarInput:
             ParseStarInput.station_transformer.raw = line
             ParseStarInput.station_transformer.crankshaft = False
 
-        if is_station:
-            transformed = ParseStarInput.station_transformer.transform(result)
+        if not isinstance(result, list):
+            if is_station:
+                transformed = ParseStarInput.station_transformer.transform(result)
+            else:
+                transformed = ParseStarInput.transformer.transform(result)
         else:
-            transformed = ParseStarInput.transformer.transform(result)
+            transformed = result
 
         return transformed, is_station
 
@@ -231,9 +234,16 @@ class ParseStarInput:
             return
         data = list(matches.groups())
         parsed = {'position': data[0], 'name': data[1], 'uwp': data[2], 'trade': data[3]}
-        parsed['ix'] = data[8]
-        parsed['ex'] = data[9]
-        parsed['cx'] = data[10]
+        raw_extensions = data[4].replace('  ', ' ')
+        if 2 <= raw_extensions.count(' '):
+            bitz = raw_extensions.split(' ')
+            parsed['ix'] = bitz[0]
+            parsed['ex'] = bitz[1]
+            parsed['cx'] = bitz[2]
+        else:
+            parsed['ix'] = ' ' if data[8] is None else data[8]
+            parsed['ex'] = ' ' if data[9] is None else data[9]
+            parsed['cx'] = ' ' if data[10] is None else data[10]
         parsed['nobles'] = data[11]
         parsed['base'] = data[12]
         parsed['zone'] = data[13]
