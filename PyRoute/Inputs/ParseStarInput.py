@@ -197,11 +197,15 @@ class ParseStarInput:
             else:
                 result, line = ParseStarInput.parser.parse(line)
         except UnexpectedCharacters:
-            star.logger.error("Unmatched line: {}".format(line))
-            return None, None
+            result = ParseStarInput._unpack_starline_fallback(line)
+            if result is None:
+                star.logger.error("Unmatched line: {}".format(line))
+                return None, None
         except UnexpectedEOF:
-            star.logger.error("Unmatched line: {}".format(line))
-            return None, None
+            result = ParseStarInput._unpack_starline_fallback(line)
+            if result is None:
+                star.logger.error("Unmatched line: {}".format(line))
+                return None, None
         if ParseStarInput.transformer is None:
             ParseStarInput.transformer = StarlineTransformer(raw=line)
         else:
@@ -219,6 +223,30 @@ class ParseStarInput:
             transformed = ParseStarInput.transformer.transform(result)
 
         return transformed, is_station
+
+    @staticmethod
+    def _unpack_starline_fallback(line):
+        matches = ParseStarInput.starline.match(line)
+        if matches is None:
+            return
+        data = list(matches.groups())
+        parsed = {'position': data[0], 'name': data[1], 'uwp': data[2], 'trade': data[3]}
+        parsed['ix'] = data[8]
+        parsed['ex'] = data[9]
+        parsed['cx'] = data[10]
+        parsed['nobles'] = data[11]
+        parsed['base'] = data[12]
+        parsed['zone'] = data[13]
+        parsed['pbg'] = data[14]
+        parsed['worlds'] = data[15]
+        parsed['allegiance'] = data[16]
+        parsed['residual'] = data[17]
+
+        extensions = parsed['ix'] + ' ' + parsed['ex'] + ' ' + parsed['cx']
+
+        spacer = ' '
+        data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'], parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'], parsed['zone'].upper(), parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
+        return data
 
     @staticmethod
     def check_tl(star, fullmsg=None):
