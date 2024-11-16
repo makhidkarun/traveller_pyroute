@@ -757,6 +757,15 @@ class Star(object):
         assert self.hex is not None, "Star " + str(self.name) + " is missing hex attribute"
         result, msg = self.hex.is_well_formed()
         assert result, msg
+        assert hasattr(self, 'economics'), "Star " + str(self.name) + " is missing economics attribute"
+        assert hasattr(self, 'social'), "Star " + str(self.name) + " is missing social attribute"
+        if self.economics is not None:
+            assert (isinstance(self.economics, str) and 7 == len(self.economics)),\
+                "Star " + str(self.name) + " economics must be None or 7-char string"
+        if self.social is not None:
+            assert (isinstance(self.social, str) and 6 == len(self.social)),\
+                "Star " + str(self.name) + " social must be None or 6-char string"
+
         assert hasattr(self, 'allegiance_base'), "Star " + str(self.name) + " is missing base allegiance attribute"
         assert self.allegiance_base is not None, "Star " + str(self.name) + " has empty base allegiance attribute"
         result, msg = self.uwp.is_well_formed()

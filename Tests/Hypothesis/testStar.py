@@ -4,11 +4,15 @@ import unittest
 from datetime import timedelta
 
 from hypothesis import given, assume, example, HealthCheck, settings
-from hypothesis.strategies import text, from_regex, composite, booleans
+from hypothesis.strategies import text, from_regex, composite, booleans, none
 
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
+from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
+from PyRoute.SystemData.StarList import StarList
+from PyRoute.SystemData.UWP import UWP
+from PyRoute.TradeCodes import TradeCodes
 
 @composite
 def importance_starline(draw):
@@ -254,6 +258,55 @@ class testStar(unittest.TestCase):
             cm.output,
             hyp_line
         )
+
+    @given(from_regex(UWP.match, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'),
+           from_regex(r'^\([0-9A-Za-z]{3}[+-]\d\)'),
+           from_regex(r'^\[[0-9A-Za-z]{4}\]'),
+           none())
+    @example('?000000-0', '(000-0)', '[0000]', None)
+    @example('?000000-0', '(000-0)0', '[0000]', 'Star Sample economics must be None or 7-char string')
+    @example('?000000-0', '(000-0)', '[0000]0', 'Star Sample social must be None or 6-char string')
+    @example('?000000-0', '000-0)', '[0000]', 'Star Sample economics must be None or 7-char string')
+    @example('?000000-0', '(000-0)', '[000]', 'Star Sample social must be None or 6-char string')
+    def test_check_economics_social_and_ru(self, uwp, ex, cx, well_formed_kaboom):
+        assume('?' not in uwp)
+        uwp_obj = None
+
+        try:
+            uwp_obj = UWP(uwp)
+        except ValueError:
+            pass
+        assume(uwp_obj is not None)
+
+        if well_formed_kaboom is None:
+            ex = ex[0:7]
+            cx = cx[0:6]
+
+        foo = Star()
+        foo.name = 'Sample'
+        foo.sector = Sector('# Core', '# 0, 0')
+        foo.hex = Hex(foo.sector, '0101')
+        foo.alg_base_code = 'Na'
+        foo.uwp = uwp_obj
+        foo.tradeCode = TradeCodes('')
+        foo.index = 0
+        foo.allegiance_base = foo.alg_base_code
+        foo.star_list_object = StarList('')
+        foo.economics = ex
+        foo.social = cx
+        try:
+            self.assertTrue(foo.is_well_formed())
+        except AssertionError as e:
+            if well_formed_kaboom is not None:
+                self.assertEqual(well_formed_kaboom, str(e), "Unexpected well-formed check error")
+                return
+            else:
+                raise e
+
+        foo.calculate_importance()
+        foo.check_ex()
+        foo.check_cx()
+        foo.calculate_ru('fixed')
 
 
 if __name__ == '__main__':

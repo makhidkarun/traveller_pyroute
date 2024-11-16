@@ -78,7 +78,10 @@ def comparison_line(draw):
         ' 0 0000000-0 (00000000000000 - (000-0) - B A A 000   0?'
         '0111 -2Z4ig11RbxW010 0000001-1 wJED9E(E(T (HN6 -  (113-0) -  - - B  114       00y',
         '0000 000000000000000 ???????-? (00000000000 )B       - - A 000   ?00',
-        '0000 000000000000000 ???????-? (0 0000000000)A       - - A 000    ?0'
+        '0000 000000000000000 ???????-? (0 0000000000)A       - - A 000    ?0',
+        '2732 sa0)OkeWHEk4Mmb ???????-? (8PvzPS]UbZypt6 - (8Pv-2) [GZks] f  * g 88C   E7',
+        '0000 000000000000000 ???????-? [00000000000]0]       - - A 000    ?0',
+        '0000 000000000000000 ???????-? (00000000000000 - (000-0) [0000] BB     - A 000   ?0'
     ]
 
     candidate = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
@@ -88,6 +91,10 @@ def comparison_line(draw):
     if '{' in data[3] and '}' in data[3] and '[' in data[3] and ']' in data[3] and '(' in data[3] and ')' in data[3]:
         assume(False)  # Skip generating cases where all three extensions end up in trade codes
     if '*' in data[3]:
+        assume(False)
+    if ('(' in data[3] and ')' not in data[3]) or ('(' not in data[3] and ')' in data[3]):
+        assume(False)
+    if ('[' in data[3] and ']' not in data[3]) or ('[' not in data[3] and ']' in data[3]):
         assume(False)
     bitz = data[3].split(' ')
     numbitz = len(bitz)
@@ -312,6 +319,7 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 ???????-? 000000000000000 {0} -  [0000]   - A   000   ?0', False)
     @example('0001 000000000000000 ???????-? 000000000000000       - - A 000   --0', False)
     @example('0111 -2Z4ig11RbxW010 0000001-1 wJED9E(E(T (HN6 -  (113-0) -  - - B  114       00y', False)
+    @example('0000 000000000000000 ???????-? [0000000000]00]       - - A 000    ?0', False)
     # Weird parsing cases
     @example('0000 000000000000000 ???????-? (00000000000000       - - 0 000   00?)', 'weird')
     @example('0000 000000000000000 ???????-? [00000000000000       - - 0 000   00?]', 'weird')
@@ -326,6 +334,7 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 ???????-? 000000000000000       - - A 000   000?000-0 ', 'weird')
     @example('0000 000000000000000 0000000-0 000000000000000       - - A 000   00?0000-0 ', 'weird')
     @example('2234 00001111111111[ 1234446-N (111114GK\'ehilp - (005-1) -  B - U  112       WW', 'weird')
+    @example('2732 sa0)OkeWHEk4Mmb ???????-? (8PvzPS]UbZypt6 - (8Pv-2) [GZks] f  * g 88C   E7', 'weird')
     @example('0000 000000000000000 ???????-? (0 000000000)0?       - - A 000   00?', 'weird')
     @example('0000 000000000000000 ???????-? 000000000000 (0 - (000-0) [0000] B - A 000   00?', 'weird')
     @example('0000 000000000000000 0000000-0 (00000000000000       B - A 000   ?0)0000000000', 'weird')
@@ -335,6 +344,8 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0000 000000000000000 0000000-0 (00000000000000 - (000-0) -  B A A 000   0?', 'weird')
     @example('0000 000000000000000 ???????-? (00000000000 )B       - - A 000   ?00', 'weird')
     @example('0000 000000000000000 ???????-? (0 0000000000)A       - - A 000    ?0', 'weird')
+    @example('0000 000000000000000 ???????-? [00000000000]0]       - - A 000    ?0', 'weird')
+    @example('0000 000000000000000 ???????-? (00000000000000 - (000-0) [0000] BB     - A 000   ?0', 'weird')
     def test_starline_parser_against_regex(self, s, match):
         # if it's a known weird-parse case, assume it out now
         assume(match != 'weird')
