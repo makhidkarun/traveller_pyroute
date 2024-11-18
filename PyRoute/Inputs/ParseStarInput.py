@@ -50,6 +50,8 @@ class ParseStarInput:
     station_parser = None
     station_transformer = None
     deep_space = {}
+    valid_zone = 'arufgbARUFGB-'
+    valid_nobles = 'BCcDEeFfGH-'
 
     @staticmethod
     def parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=False):
@@ -84,7 +86,7 @@ class ParseStarInput:
         if ('' == star.baseCode) or ('-' != star.baseCode and 1 == len(star.baseCode) and not star.baseCode.isalpha()):
             star.baseCode = '-'
         star.zone = data[13].strip()
-        if not star.zone or star.zone not in 'arufgbARUFGB-':
+        if not star.zone or star.zone not in ParseStarInput.valid_zone:
             star.zone = '-'
         star.zone = star.zone.upper()
         star.ggCount = 0 if (len(data[14]) < 3 or not data[14][2] or data[14][2] in 'X?') else int(data[14][2], 16)

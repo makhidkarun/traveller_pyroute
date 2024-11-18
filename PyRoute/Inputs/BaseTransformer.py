@@ -390,9 +390,21 @@ class BaseTransformer(Transformer):
                             self.raw = self.raw[index:]
 
     def _square_up_parsed_zero(self, rawstring, parsed):
+        from PyRoute.Inputs.ParseStarInput import ParseStarInput
         bitz = [item for item in rawstring.split(' ') if '' != item]
         if 3 == len(bitz) and bitz[0] == parsed['nobles'] and bitz[1] == parsed['base'] and bitz[2] == parsed['zone']:
             return parsed
+        if 2 == len(bitz) and "" == parsed['zone']:
+            if 2 < len(bitz[0]):  # bitz[0] can only possibly be nobles, so return
+                return parsed
+            if 1 < len(bitz[1]):  # if bitz[1] is more than one char, it can't be a trade zone, so return
+                return parsed
+            non_noble = [item for item in bitz[0] if item not in ParseStarInput.valid_nobles]
+            if 0 < len(non_noble):  # If one or more chars in bitz[0] is not a valid noble call, then we have a base code and trade zone
+                parsed['zone'] = parsed['base']
+                parsed['base'] = parsed['nobles']
+                parsed['nobles'] = ''
+                return parsed
         if 3 == len(bitz):
             parsed['nobles'] = bitz[0]
             parsed['base'] = bitz[1]
