@@ -21,9 +21,9 @@ class ParseStarInput:
     regex = """
 ^([0-3]\d[0-4]\d) +
 (.{15,}) +
-(\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?]) +
+([A-HXYa-hxy][0-9A-Fa-f]\w\w[0-9A-Fa-f][0-9A-Xa-x][0-9A-Ja-j]-\w|\?\?\?\?\?\?\?-\?|[A-HXYa-hxy\?][0-9A-Fa-f\?][\w\?]{2,2}[0-9A-Fa-f\?][0-9A-Xa-x\?][0-9A-Ja-j\?]-[\w\?]) +
 (.{15,}) +
-((\{ *[+-]?[0-6] ?\}|-) +(\([0-9A-Za-z]{3}[+-]\d\)|- ) +(\[[0-9A-Za-z]{4}\]|- )|( ) ( ) ( )) +
+((\{ *[ +-]?[0-6] ?\}|-) +(\([0-9A-Za-z]{3}[+-]\d\)|- ) +(\[[0-9A-Za-z]{4}\]|- )|( ) ( ) ( )) +
 ([BcCDeEfFGH]{1,5}|-| ) +
 ([A-Z]{1,3}|-|\*) +
 ([ARUFGBarufgb]|-| ) +
@@ -119,7 +119,10 @@ class ParseStarInput:
         star.tradeCode.check_world_codes(star, fix_pop=fix_pop)
 
         if data[5] and data[5].startswith('{'):
-            imp = int(data[5][1:-1].strip())
+            raw_imp = data[5][1:-1].strip()
+            imp = 0
+            if '' != raw_imp:
+                imp = int(raw_imp)
             star.calculate_importance()
             if imp != star.importance:
                 star.logger.warning(
@@ -236,7 +239,7 @@ class ParseStarInput:
             return
         data = list(matches.groups())
         parsed = {'position': data[0], 'name': data[1], 'uwp': data[2], 'trade': data[3]}
-        raw_extensions = data[4].replace('  ', ' ')
+        raw_extensions = data[4].replace('  ', ' ').replace('{ ', '{').replace(' }', '}')
         if 2 <= raw_extensions.count(' '):
             bitz = raw_extensions.split(' ')
             parsed['ix'] = bitz[0]
