@@ -21,9 +21,9 @@ class ParseStarInput:
     regex = """
 ^([0-3]\d[0-4]\d) +
 (.{15,}) +
-(\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?]) +
+([A-HXYa-hxy][0-9A-Fa-f]\w\w[0-9A-Fa-f][0-9A-Xa-x][0-9A-Ja-j]-\w|\?\?\?\?\?\?\?-\?|[A-HXYa-hxy\?][0-9A-Fa-f\?][\w\?]{2,2}[0-9A-Fa-f\?][0-9A-Xa-x\?][0-9A-Ja-j\?]-[\w\?]) +
 (.{15,}) +
-((\{ *[+-]?[0-6] ?\}|-) +(\([0-9A-Za-z]{3}[+-]\d\)|- ) +(\[[0-9A-Za-z]{4}\]|- )|( ) ( ) ( )) +
+((\{ *[ +-]?[0-6] ?\}|-) +(\([0-9A-Za-z]{3}[+-]\d\)|- ) +(\[[0-9A-Za-z]{4}\]|- )|( ) ( ) ( )) +
 ([BcCDeEfFGH]{1,5}|-| ) +
 ([A-Z]{1,3}|-|\*) +
 ([ARUFGBarufgb]|-| ) +
@@ -50,6 +50,8 @@ class ParseStarInput:
     station_parser = None
     station_transformer = None
     deep_space = {}
+    valid_zone = 'arufgbARUFGB-'
+    valid_nobles = 'BCcDEeFfGH-'
 
     @staticmethod
     def parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=False):
@@ -84,7 +86,7 @@ class ParseStarInput:
         if ('' == star.baseCode) or ('-' != star.baseCode and 1 == len(star.baseCode) and not star.baseCode.isalpha()):
             star.baseCode = '-'
         star.zone = data[13].strip()
-        if not star.zone or star.zone not in 'arufgbARUFGB-':
+        if not star.zone or star.zone not in ParseStarInput.valid_zone:
             star.zone = '-'
         star.zone = star.zone.upper()
         star.ggCount = 0 if (len(data[14]) < 3 or not data[14][2] or data[14][2] in 'X?') else int(data[14][2], 16)
@@ -117,7 +119,10 @@ class ParseStarInput:
         star.tradeCode.check_world_codes(star, fix_pop=fix_pop)
 
         if data[5] and data[5].startswith('{'):
-            imp = int(data[5][1:-1].strip())
+            raw_imp = data[5][1:-1].strip()
+            imp = 0
+            if '' != raw_imp:
+                imp = int(raw_imp)
             star.calculate_importance()
             if imp != star.importance:
                 star.logger.warning(
@@ -197,11 +202,15 @@ class ParseStarInput:
             else:
                 result, line = ParseStarInput.parser.parse(line)
         except UnexpectedCharacters:
-            star.logger.error("Unmatched line: {}".format(line))
-            return None, None
+            result = ParseStarInput._unpack_starline_fallback(line)
+            if result is None:
+                star.logger.error("Unmatched line: {}".format(line))
+                return None, None
         except UnexpectedEOF:
-            star.logger.error("Unmatched line: {}".format(line))
-            return None, None
+            result = ParseStarInput._unpack_starline_fallback(line)
+            if result is None:
+                star.logger.error("Unmatched line: {}".format(line))
+                return None, None
         if ParseStarInput.transformer is None:
             ParseStarInput.transformer = StarlineTransformer(raw=line)
         else:
@@ -213,12 +222,46 @@ class ParseStarInput:
             ParseStarInput.station_transformer.raw = line
             ParseStarInput.station_transformer.crankshaft = False
 
-        if is_station:
-            transformed = ParseStarInput.station_transformer.transform(result)
+        if not isinstance(result, list):
+            if is_station:
+                transformed = ParseStarInput.station_transformer.transform(result)
+            else:
+                transformed = ParseStarInput.transformer.transform(result)
         else:
-            transformed = ParseStarInput.transformer.transform(result)
+            transformed = result
 
         return transformed, is_station
+
+    @staticmethod
+    def _unpack_starline_fallback(line):
+        matches = ParseStarInput.starline.match(line)
+        if matches is None:
+            return
+        data = list(matches.groups())
+        parsed = {'position': data[0], 'name': data[1], 'uwp': data[2], 'trade': data[3]}
+        raw_extensions = data[4].replace('  ', ' ').replace('{ ', '{').replace(' }', '}')
+        if 2 <= raw_extensions.count(' '):
+            bitz = raw_extensions.split(' ')
+            parsed['ix'] = bitz[0]
+            parsed['ex'] = bitz[1]
+            parsed['cx'] = bitz[2]
+        else:
+            parsed['ix'] = ' ' if data[8] is None else data[8]
+            parsed['ex'] = ' ' if data[9] is None else data[9]
+            parsed['cx'] = ' ' if data[10] is None else data[10]
+        parsed['nobles'] = data[11]
+        parsed['base'] = data[12]
+        parsed['zone'] = data[13]
+        parsed['pbg'] = data[14]
+        parsed['worlds'] = data[15]
+        parsed['allegiance'] = data[16]
+        parsed['residual'] = data[17]
+
+        extensions = parsed['ix'] + ' ' + parsed['ex'] + ' ' + parsed['cx']
+
+        spacer = ' '
+        data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'], parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'], parsed['zone'].upper(), parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
+        return data
 
     @staticmethod
     def check_tl(star, fullmsg=None):

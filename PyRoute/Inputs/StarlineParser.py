@@ -20,7 +20,7 @@ class StarlineParser:
 
     position: /^([0-3]\d[0-4]\d)/
 
-    starname: /(.{15,}) ([\w\?]{7,7}-[\w\?]) /
+    starname: /(.{15,}) ([A-HXYa-hxy\?][0-9A-Fa-f\?][\w\?]{2,2}[0-9A-Fa-f\?][0-9A-Xa-x\?][0-9A-Ja-j\?]-[\w\?]) /
 
     trade: TRADECODE*
     TRADECODE: MINOR_DIEBACK | BINARY | POPCODE | MINOR_SOPHONT | OWNED_COLONY | MAJOR_SOPHONT | RESIDUAL | SINGLETON
@@ -35,7 +35,7 @@ class StarlineParser:
 
     extensions: ix ex cx | /( ) ( ) ( )/
 
-    ix: /\{ *[+-]?[0-6] ?\}|-/
+    ix: /\{ *[ +-]?[0-6] ?\}|-/
     ex: /\([0-9A-Za-z]{3}[+-]\d\)|-/
     cx: /(\[[0-9A-Za-z]{4}[\]\}]|-)/
 
