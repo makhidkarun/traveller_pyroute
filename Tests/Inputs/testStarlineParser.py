@@ -161,7 +161,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_6(self):
-        txt = '0000 000000000000000 0000000-0 000000000000000       - - R 000   000000'
+        txt = '0000 000000000000000 ?000000-0 000000000000000       - - R 000   000000'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -171,7 +171,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
-        self.assertEqual('0000000-0', transformed[2], 'Unexpected UWP')
+        self.assertEqual('?000000-0', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
         self.assertEqual('', transformed[4])
         self.assertEqual(None, transformed[5])
@@ -261,7 +261,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_10(self):
-        txt = '0000 000000000000000 0000000-0 000000000000000       - -      - 000   00'
+        txt = '0000 000000000000000 ?000000-0 000000000000000       - -      - 000   00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -271,7 +271,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
         self.assertEqual('0000', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
-        self.assertEqual('0000000-0', transformed[2], 'Unexpected UWP')
+        self.assertEqual('?000000-0', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
         self.assertEqual('', transformed[4])
         self.assertEqual(None, transformed[5])
