@@ -243,14 +243,23 @@ class RouteCalculation(object):
     def is_sector_pass_balanced(self):
         pass
 
+    def is_sector_trade_volume_balanced(self):
+        pass
+
     def is_allegiance_trade_balanced(self):
         pass
 
     def is_allegiance_pass_balanced(self):
         pass
 
+    def is_allegiance_trade_volume_balanced(self):
+        pass
+
     def multilateral_balance_trade(self):
         pass
 
     def multilateral_balance_pass(self):
+        pass
+
+    def multilateral_balance_trade_volume(self):
         pass
