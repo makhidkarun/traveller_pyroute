@@ -351,8 +351,8 @@ class TradeCalculation(RouteCalculation):
                 "Route weight between " + str(star) + " and " + str(target) + " should not be direction sensitive.  Forward weight " + str(fwd_weight) + ", rev weight " + str(rev_weight) + ", delta " + str(abs(delta))
 
         # Update the trade route (edges)
-        tradeCr, tradePass = self.route_update_simple(route, True, distance=distance)
-        self.update_statistics(star, target, tradeCr, tradePass)
+        tradeCr, tradePass, tradeDton = self.route_update_simple(route, True, distance=distance)
+        self.update_statistics(star, target, tradeCr, tradePass, tradeDton)
 
     def _preheat_upper_bound(self, stardex, targdex, allow_reheat=True):
         # Don't reheat on _every_ route, but reheat frequently enough to keep historic costs sort-of firm.
@@ -518,6 +518,7 @@ class TradeCalculation(RouteCalculation):
 
         # Gather basic statistics.
         tradeBTN = self.get_btn(source, target, distance)
+        tradeDton = self.calc_trade_tonnage(tradeBTN, distance)
         tradeCr = self.calc_trade(tradeBTN)
         source.tradeIn += tradeCr // 2
         target.tradeIn += tradeCr // 2
@@ -552,7 +553,7 @@ class TradeCalculation(RouteCalculation):
         if reweight and 0 < len(edges):
             self.shortest_path_tree.update_edges(edges)
 
-        return (tradeCr, tradePass)
+        return (tradeCr, tradePass, tradeDton)
 
     @staticmethod
     def route_distance(route):
