@@ -158,6 +158,18 @@ class RouteCalculation(object):
         return RouteCalculation.btn_jump_mod[jump_index]
 
     @staticmethod
+    def get_vol_offset(distance):
+        if distance < 50:
+            return 0
+        elif distance < 100:
+            return -1
+        elif distance < 500:
+            return -2
+        elif distance < 1000:
+            return -3
+        return -4
+
+    @staticmethod
     @functools.cache
     def get_max_btn(star_wtn, neighbour_wtn):
         if neighbour_wtn > star_wtn:
@@ -176,6 +188,15 @@ class RouteCalculation(object):
             trade = 10 ** (btn // 2)
 
         return trade
+
+    @staticmethod
+    def calc_trade_tonnage(btn, distance):
+        offset = RouteCalculation.get_vol_offset(distance)
+        dton = btn + offset - 9
+
+        if 0 > dton:
+            return 0
+        return RouteCalculation.calc_trade(max(0, dton))
 
     @staticmethod
     @functools.cache
