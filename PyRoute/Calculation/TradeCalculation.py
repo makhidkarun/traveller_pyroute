@@ -94,11 +94,16 @@ class TradeCalculation(RouteCalculation):
         self.sector_passenger_balance = TradeBalance(stat_field="passengers", region=galaxy)
         # Track inter-sector trade imbalances
         self.sector_trade_balance = TradeBalance(stat_field="tradeExt", region=galaxy, target="trade")
+        # Track inter-sector trade volume imbalances
+        self.sector_trade_volume_balance = TradeBalance(stat_field="tradeDtonExt", region=galaxy, target="trade")
         # Track inter-allegiance passenger imbalances
         self.allegiance_passenger_balance = TradeBalance(stat_field="passengers", region=galaxy, field="alg",
                                                          star_field="allegiance_base", target_property="code")
         # Track inter-allegiance trade imbalances
         self.allegiance_trade_balance = TradeBalance(stat_field="trade", region=galaxy, field="alg",
+                                                     star_field="allegiance_base", target_property="code")
+        # Track inter-allegiance trade imbalances
+        self.allegiance_trade_volume_balance = TradeBalance(stat_field="tradeDtonExt", region=galaxy, field="alg",
                                                      star_field="allegiance_base", target_property="code")
 
     def base_route_filter(self, star, neighbor):
@@ -428,6 +433,8 @@ class TradeCalculation(RouteCalculation):
                 self.sector_trade_balance.log_odd_unit(star, target)
             if 1 == (tradePass & 1):
                 self.sector_passenger_balance.log_odd_unit(star, target)
+            if 1 == (tradeDton & 1):
+                self.sector_trade_volume_balance.log_odd_unit(star, target)
         else:
             star.sector.stats.trade += tradeCr
             star.sector.stats.passengers += tradePass
@@ -469,6 +476,11 @@ class TradeCalculation(RouteCalculation):
                     self.galaxy.alg[starcode].stats.passengers += 1
                 else:
                     self.allegiance_passenger_balance.log_odd_unit(star, target)
+            if 1 == (tradeDton & 1):
+                if double_up:
+                    self.galaxy.alg[starcode].stats.tradeDtonExt += 1
+                else:
+                    self.allegiance_trade_volume_balance.log_odd_unit(star, target)
 
         self.galaxy.stats.trade += tradeCr
         self.galaxy.stats.passengers += tradePass
