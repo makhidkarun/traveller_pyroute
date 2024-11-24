@@ -414,7 +414,7 @@ class TradeCalculation(RouteCalculation):
 
         return upbound
 
-    def update_statistics(self, star, target, tradeCr, tradePass, tradeDton=None):
+    def update_statistics(self, star, target, tradeCr, tradePass, tradeDton=0):
         if star.sector != target.sector:
             star.sector.stats.tradeExt += tradeCr // 2
             target.sector.stats.tradeExt += tradeCr // 2
@@ -422,9 +422,8 @@ class TradeCalculation(RouteCalculation):
             target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr // 2
             star.sector.stats.passengers += tradePass // 2
             target.sector.stats.passengers += tradePass // 2
-            if tradeDton is not None:
-                star.sector.stats.tradeDtonExt += tradeDton // 2
-                target.sector.stats.tradeDtonExt += tradeDton // 2
+            star.sector.stats.tradeDtonExt += tradeDton // 2
+            target.sector.stats.tradeDtonExt += tradeDton // 2
             if 1 == (tradeCr & 1):
                 self.sector_trade_balance.log_odd_unit(star, target)
             if 1 == (tradePass & 1):
@@ -432,18 +431,15 @@ class TradeCalculation(RouteCalculation):
         else:
             star.sector.stats.trade += tradeCr
             star.sector.stats.passengers += tradePass
-            if tradeDton is not None:
-                star.sector.stats.tradeDton += tradeDton
+            star.sector.stats.tradeDton += tradeDton
             if star.subsector() == target.subsector():
                 star.sector.subsectors[star.subsector()].stats.trade += tradeCr
-                if tradeDton is not None:
-                    star.sector.subsectors[star.subsector()].stats.tradeDton += tradeDton
+                star.sector.subsectors[star.subsector()].stats.tradeDton += tradeDton
             else:
                 star.sector.subsectors[star.subsector()].stats.tradeExt += tradeCr // 2
                 target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr // 2
-                if tradeDton is not None:
-                    star.sector.subsectors[star.subsector()].stats.tradeDtonExt += tradeDton // 2
-                    target.sector.subsectors[target.subsector()].stats.tradeDtonExt += tradeDton // 2
+                star.sector.subsectors[star.subsector()].stats.tradeDtonExt += tradeDton // 2
+                target.sector.subsectors[target.subsector()].stats.tradeDtonExt += tradeDton // 2
         starcode = AllyGen.same_align(star.alg_code)
         targcode = AllyGen.same_align(target.alg_code)
         # By definition, _any_ nonalighed system is _not_ allied to anything - even nonaligned systems of the same
@@ -455,16 +451,14 @@ class TradeCalculation(RouteCalculation):
         if AllyGen.are_allies(star.alg_code, target.alg_code):
             self.galaxy.alg[starcode].stats.trade += tradeCr
             self.galaxy.alg[starcode].stats.passengers += tradePass
-            if tradeDton is not None:
-                self.galaxy.alg[starcode].stats.tradeDton += tradeDton
+            self.galaxy.alg[starcode].stats.tradeDton += tradeDton
         else:
             self.galaxy.alg[starcode].stats.tradeExt += tradeCr // 2
             self.galaxy.alg[targcode].stats.tradeExt += tradeCr // 2
             self.galaxy.alg[starcode].stats.passengers += tradePass // 2
             self.galaxy.alg[targcode].stats.passengers += tradePass // 2
-            if tradeDton is not None:
-                self.galaxy.alg[starcode].stats.tradeDtonExt += tradeDton // 2
-                self.galaxy.alg[targcode].stats.tradeDtonExt += tradeDton // 2
+            self.galaxy.alg[starcode].stats.tradeDtonExt += tradeDton // 2
+            self.galaxy.alg[targcode].stats.tradeDtonExt += tradeDton // 2
             if 1 == (tradeCr & 1):
                 if double_up:
                     self.galaxy.alg[starcode].stats.tradeExt += 1
