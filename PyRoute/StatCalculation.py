@@ -47,6 +47,8 @@ class ObjectStatistics(object):
         self.trade = 0
         self.tradeExt = 0
         self.tradeVol = 0
+        self.tradeDton = 0
+        self.tradeDtonExt = 0
         self.percapita = 0
         self.number = 0
         self.milBudget = 0
