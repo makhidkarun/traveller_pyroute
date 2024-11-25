@@ -158,6 +158,7 @@ class RouteCalculation(object):
         return RouteCalculation.btn_jump_mod[jump_index]
 
     @staticmethod
+    @functools.cache
     def get_vol_offset(distance):
         if distance < 50:
             return 0
@@ -196,7 +197,7 @@ class RouteCalculation(object):
 
         if 0 > dton:
             return 0
-        return RouteCalculation.calc_trade(max(0, dton))
+        return RouteCalculation.calc_trade(dton)
 
     @staticmethod
     @functools.cache
