@@ -182,6 +182,14 @@ class SectorDictionary(dict):
                 0 == allegiance.stats.tradeExt,
                 "TradeExt stats not reset on SectorDictionary deepcopy"
             )
+            DeltaLogicError.delta_assert(
+                0 == allegiance.stats.tradeDton,
+                "Trade volume stats not reset on SectorDictionary deepcopy"
+            )
+            DeltaLogicError.delta_assert(
+                0 == allegiance.stats.tradeDtonExt,
+                "TradeDtonExt stats not reset on SectorDictionary deepcopy"
+            )
 
         return foo
 
@@ -269,6 +277,8 @@ class SectorDictionary(dict):
             stats.passengers = 0
             stats.trade = 0
             stats.tradeExt = 0
+            stats.tradeDton = 0
+            stats.tradeDtonExt = 0
 
         return new_dict
 
