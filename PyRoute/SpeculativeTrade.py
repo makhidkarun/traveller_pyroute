@@ -54,7 +54,7 @@ class SpeculativeTrade(object):
             return
         for (world, neighbor) in self.stars.edges():
             worldstar = self.stars.nodes[world]['star']
-            neighborstar = self.stars.nodes[world]['star']
+            neighborstar = self.stars.nodes[neighbor]['star']
             distance = worldstar.distance(neighborstar)
             source_market = max(self.get_market_price(worldstar, neighborstar) - distance, 0)
             target_market = max(self.get_market_price(neighborstar, worldstar) - distance, 0)
