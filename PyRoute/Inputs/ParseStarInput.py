@@ -240,8 +240,13 @@ class ParseStarInput:
         data = list(matches.groups())
         parsed = {'position': data[0], 'name': data[1], 'uwp': data[2], 'trade': data[3]}
         raw_extensions = data[4].replace('  ', ' ').replace('{ ', '{').replace(' }', '}')
+        oldlen = 0
+        while oldlen != len(raw_extensions):
+            oldlen = len(raw_extensions)
+            raw_extensions = raw_extensions.replace('  ', ' ').replace('{ ', '{').replace(' }', '}')
         if 2 <= raw_extensions.count(' '):
             bitz = raw_extensions.split(' ')
+            bitz = [item for item in bitz if '' != item]
             parsed['ix'] = bitz[0]
             parsed['ex'] = bitz[1]
             parsed['cx'] = bitz[2]
