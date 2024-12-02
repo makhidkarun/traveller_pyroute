@@ -86,7 +86,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17])
 
     def test_parser_screwball_synthetic_starline_3(self):
-        txt = '0000 000000000000000 ???????-? 000000000000000       - - - 000 00 00'
+        txt = '0101 000000000000000 ???????-? 000000000000000       - - - 000 00 00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -94,7 +94,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0000', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('???????-?', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
@@ -111,7 +111,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_4(self):
-        txt = '0001 000000000000000 ???????-? 000000000000000         - Q   000   00'
+        txt = '0101 000000000000000 ???????-? 000000000000000         - Q   000   00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -119,7 +119,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0001', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('???????-?', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
@@ -136,7 +136,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_5(self):
-        txt = '0000 000000000000000 ???????-? 0000000-0000000       - - a 000   00'
+        txt = '0101 000000000000000 ???????-? 0000000-0000000       - - a 000   00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -144,7 +144,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0000', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('???????-?', transformed[2], 'Unexpected UWP')
         self.assertEqual('0000000-0000000', transformed[3], 'Unexpected trade codes')
@@ -161,7 +161,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_6(self):
-        txt = '0000 000000000000000 ?000000-0 000000000000000       - - R 000   000000'
+        txt = '0101 000000000000000 ?000000-0 000000000000000       - - R 000   000000'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -169,7 +169,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0000', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('?000000-0', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
@@ -186,7 +186,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_7(self):
-        txt = '0000 000000000000000 ???????-? 000000000000000         - F 000   00'
+        txt = '0101 000000000000000 ???????-? 000000000000000         - F 000   00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -194,7 +194,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0000', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('???????-?', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
@@ -211,7 +211,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_8(self):
-        txt = '0000 000000000000000 ???????-? 000000000000000 {   0} -  [0000] - - F 000   00'
+        txt = '0101 000000000000000 ???????-? 000000000000000 {   0} -  [0000] - - F 000   00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -219,7 +219,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0000', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('???????-?', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
@@ -236,7 +236,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_9(self):
-        txt = '0000 000000000000000 ???????-? 000000000000000       - - -   000   00'
+        txt = '0101 000000000000000 ???????-? 000000000000000       - - -   000   00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -244,7 +244,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0000', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('???????-?', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
@@ -261,7 +261,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_10(self):
-        txt = '0000 000000000000000 ?000000-0 000000000000000       - -      - 000   00'
+        txt = '0101 000000000000000 ?000000-0 000000000000000       - -      - 000   00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -269,7 +269,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0000', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('?000000-0', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
@@ -286,7 +286,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_11(self):
-        txt = '0000 000000000000000 ???????-? 000000000000000       - - A 000   00000 '
+        txt = '0101 000000000000000 ???????-? 000000000000000       - - A 000   00000 '
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -294,7 +294,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0000', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('???????-?', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
@@ -311,7 +311,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('0', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_12(self):
-        txt = '0000 000000000000000 ???????-? 000000000000000       - -  R   000   00'
+        txt = '0101 000000000000000 ???????-? 000000000000000       - -  R   000   00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -319,7 +319,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0000', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('???????-?', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
@@ -336,7 +336,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_13(self):
-        txt = '0000 000000000000000 ???????-? 000000000000000       - - g 000  0 00000'
+        txt = '0101 000000000000000 ???????-? 000000000000000       - - g 000  0 00000'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -344,7 +344,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0000', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('???????-?', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
@@ -361,7 +361,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('0', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_14(self):
-        txt = '0000 000000000000000 ???????-? 000000000000000       - -      f 000 0010 00+'
+        txt = '0101 000000000000000 ???????-? 000000000000000       - -      f 000 0010 00+'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -369,7 +369,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0000', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('???????-?', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
@@ -436,7 +436,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('+', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_17(self):
-        txt = '0000 000000000000000 ???????-? 000000000000000         -   000   A00'
+        txt = '0101 000000000000000 ???????-? 000000000000000         -   000   A00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -444,7 +444,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0000', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('???????-?', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
@@ -486,7 +486,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_19(self):
-        txt = '0000 000000000000000 ???????-? 000000000000000 {0} - -  - 000 0 000   00'
+        txt = '0101 000000000000000 ???????-? 000000000000000 {0} - -  - 000 0 000   00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -494,7 +494,7 @@ class testStarlineParser(unittest.TestCase):
         xform = StarlineTransformer(raw=txt)
         transformed = xform.transform(result)
         self.assertTrue(isinstance(transformed, list), "Transformed result not list")
-        self.assertEqual('0000', transformed[0], 'Unexpected hex position')
+        self.assertEqual('0101', transformed[0], 'Unexpected hex position')
         self.assertEqual('000000000000000', transformed[1], 'Unexpected name')
         self.assertEqual('???????-?', transformed[2], 'Unexpected UWP')
         self.assertEqual('000000000000000', transformed[3], 'Unexpected trade codes')
