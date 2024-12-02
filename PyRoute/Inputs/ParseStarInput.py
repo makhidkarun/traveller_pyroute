@@ -76,8 +76,12 @@ class ParseStarInput:
         star.tradeCode = TradeCodes(data[3].strip())
         star.ownedBy = star.tradeCode.owned_by(star)
 
-        star.economics = data[6].strip().upper() if data[6] and data[6].strip() != '-' else None
-        star.social = data[7].strip().upper() if data[7] and data[7].strip() != '-' else None
+        raw_economics = data[6].strip().upper() if data[6] else None
+        if raw_economics is not None:
+            star.economics = raw_economics if 7 == len(raw_economics) else None
+        raw_social = data[7].strip().upper() if data[7] else None
+        if raw_social is not None:
+            star.social = raw_social if 6 == len(raw_social) else None
 
         star.nobles = Nobles()
         star.nobles.count(data[11])
