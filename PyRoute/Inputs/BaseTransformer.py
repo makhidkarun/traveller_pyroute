@@ -32,7 +32,7 @@ class BaseTransformer(Transformer):
         tradelen = sum([len(item) for item in args[2]]) + len(args[2]) - 1
         if 16 < tradelen and 3 <= len(args[2]) and 1 == len(args[3]) and '' == args[3][0].value.strip():  # Square up overspilled trade codes
             if '' == args[4][0].value and '' != args[5][0].value and '' == args[6][0].value:
-                move_fwd = 3 == len(args[5][0].value)  # Will base code still make sense as PBG?
+                move_fwd = 3 == len(args[5][0].value) and args[5][0].value[0].isdigit()  # Will base code still make sense as PBG?
                 move_rev = 3 == len(args[7][2][0].value)  # Will allegiance code still make sense as PBG?
                 if move_fwd and not move_rev:
                     last = args[2][-1]
