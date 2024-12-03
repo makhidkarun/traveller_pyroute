@@ -157,9 +157,10 @@ class Star(object):
         ggCount = str(Utilities.int_to_ehex(self.ggCount))
         worlds = self.worlds
         basecode = str(self.baseCode).upper()
+        alg_code = self.alg_code if "" != self.alg_code.strip() else "--"
 
         result += basecode.ljust(2) + " " + str(self.zone).ljust(1) + " " + popM + belts + ggCount + " "
-        result += str(worlds).ljust(2) + " " + str(self.alg_code).ljust(4) + " "
+        result += str(worlds).ljust(2) + " " + str(alg_code).ljust(4) + " "
         result += str(star_list).ljust(14) + " " + " ".join(self.routes).ljust(41)
 
         return result
