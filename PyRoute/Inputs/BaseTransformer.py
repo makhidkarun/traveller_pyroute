@@ -477,7 +477,7 @@ class BaseTransformer(Transformer):
             if 2 == len(trimbitz):
                 allegiance = trimbitz[1]
                 rawtrim = rawtrim.replace(allegiance, '', 1)
-                if alg.isdigit() and 5 > len(alg) and 1 < len(allegiance):  # if first trimbit fits in worlds field, stick it there
+                if alg.isdigit() and 5 > len(alg) and 1 < len(allegiance) and (not allegiance[0].islower()):  # if first trimbit fits in worlds field, stick it there
                     parsed['worlds'] = alg
                     parsed['allegiance'] = allegiance
                     parsed['residual'] = rawtrim.strip()
