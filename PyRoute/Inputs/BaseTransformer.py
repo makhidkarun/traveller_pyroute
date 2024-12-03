@@ -431,15 +431,17 @@ class BaseTransformer(Transformer):
                 parsed['zone'] = ''
                 return parsed
             if not rawstring.endswith('   '):
-                parsed['nobles'] = ''
-                parsed['base'] = bitz[0]
-                parsed['zone'] = bitz[1]
-                return parsed
+                if 4 > len(bitz[0]):
+                    parsed['nobles'] = ''
+                    parsed['base'] = bitz[0]
+                    parsed['zone'] = bitz[1]
+                    return parsed
             if rawstring.startswith('   '):
-                parsed['nobles'] = ''
-                parsed['base'] = bitz[0]
-                parsed['zone'] = bitz[1]
-                return parsed
+                if 4 > len(bitz[0]):
+                    parsed['nobles'] = ''
+                    parsed['base'] = bitz[0]
+                    parsed['zone'] = bitz[1]
+                    return parsed
             else:
                 parsed['nobles'] = bitz[0]
                 parsed['base'] = bitz[1]
