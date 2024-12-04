@@ -372,6 +372,8 @@ class testHypothesisStarlineParser(unittest.TestCase):
             data[11] = data[11].strip()
         if data[13] is not None:
             data[13] = data[13].strip().upper()
+        if data[15] is not None and ' ' == data[15]:
+            data[15] = '0'
         if data[17] is not None:
             data[17] = StarlineTransformer.boil_down_double_spaces(data[17].strip())
 
