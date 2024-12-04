@@ -56,7 +56,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('K', transformed[12])
         self.assertEqual('-', transformed[13])
         self.assertEqual('013', transformed[14])
-        self.assertEqual(' ', transformed[15])
+        self.assertEqual('0', transformed[15])
         self.assertEqual('Kk', transformed[16])
         self.assertEqual('M1 V', transformed[17])
 
@@ -81,7 +81,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12])
         self.assertEqual('-', transformed[13])
         self.assertEqual('004', transformed[14])
-        self.assertEqual(' ', transformed[15])
+        self.assertEqual('0', transformed[15])
         self.assertEqual('Na', transformed[16])
         self.assertEqual('', transformed[17])
 
@@ -106,7 +106,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('-', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('00', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -131,7 +131,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('Q', transformed[12], 'Unexpected base code')
         self.assertEqual('', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -156,7 +156,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('A', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -181,7 +181,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('R', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('0000', transformed[16], 'Unexpected allegiance')
         self.assertEqual('00', transformed[17], 'Unexpected residual')
 
@@ -206,7 +206,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('F', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -231,7 +231,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('F', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -256,7 +256,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('-', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -281,7 +281,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('-', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -306,7 +306,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('A', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('0000', transformed[16], 'Unexpected allegiance')
         self.assertEqual('0', transformed[17], 'Unexpected residual')
 
@@ -331,7 +331,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('R', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -406,7 +406,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('U', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -431,7 +431,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('R', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('10', transformed[16], 'Unexpected allegiance')
         self.assertEqual('+', transformed[17], 'Unexpected residual')
 
@@ -456,7 +456,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('A00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -481,7 +481,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('', transformed[13], 'Unexpected trade zone')
         self.assertEqual('001', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('000', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -506,7 +506,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('000', transformed[12], 'Unexpected base code')
         self.assertEqual('0', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -556,7 +556,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('A', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -582,7 +582,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
@@ -608,7 +608,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[12], 'Unexpected base code')
         self.assertEqual('', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
-        self.assertEqual(' ', transformed[15], 'Unexpected worlds count')
+        self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 

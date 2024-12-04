@@ -198,7 +198,7 @@ class BaseTransformer(Transformer):
         self.trim_raw_string(parsed)
         rawbitz = self._trim_raw_bitz(parsed)
         parsed = self._square_up_parsed_zero(rawbitz[0], parsed)
-        parsed = self._square_up_parsed_one(rawbitz[1], parsed)
+        # parsed = self._square_up_parsed_one(rawbitz[1], parsed)
         parsed = self._square_up_allegiance_overflow(parsed)
 
         no_extensions = parsed['ix'] is None and parsed['ex'] is None and parsed['cx'] is None
