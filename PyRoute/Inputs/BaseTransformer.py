@@ -376,6 +376,12 @@ class BaseTransformer(Transformer):
                 continue
             rawval = tree[dataval]
             if rawval is not None:
+                if rawval.startswith('{ '):
+                    oldlen = 0
+                    while oldlen != len(self.raw):
+                        oldlen = len(self.raw)
+                        self.raw = self.raw.replace('{  ', '{ ')
+
                 index = self.raw.find(rawval)
                 self.raw = self.raw.replace(rawval, '', 1)
                 if 0 < index:

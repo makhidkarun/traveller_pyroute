@@ -126,6 +126,9 @@ class testStar(unittest.TestCase):
     @example("0101 000000000000000  ?000000-0                 {3 }  (7TG-1) [2IBt]   EHEG  -    569 9 C5'")
     @example('0101 000000000000000 ???????-? 0000000000000 B       - - A 000   00')
     @example('0101 111111111111000 A000011-1  000000000000100 {0} (100-0) -  - - B 001   10')
+    @example('1804    ORx}KK-E66IM+\'RwvRrB1     ???????-?      bI9cqWeGEH9jJlGJi7   {  -2}  -    -  FEee    A        48X          11{2l')
+    @example('1804         0ORx}KK-E6wvRrB1     ???????-?      bI9cqWeGEH9jJlGJ   {   -2}  -    -  FEee    A        48X          11{2l')
+    @example('0603  Xfdr5TXRv*E?Nwk  ecUr4ug-c 26yTW ?tP0 AVh5X+         AAA   7XX   11')
     def test_parse_line_to_star(self, s):
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
@@ -319,7 +322,6 @@ class testStar(unittest.TestCase):
         foo.check_ex()
         foo.check_cx()
         foo.calculate_ru('fixed')
-
 
 if __name__ == '__main__':
     unittest.main()
