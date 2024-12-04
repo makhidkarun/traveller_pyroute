@@ -26,7 +26,7 @@ class StarlineParser:
     TRADECODE: MINOR_DIEBACK | BINARY | POPCODE | MINOR_SOPHONT | OWNED_COLONY | MAJOR_SOPHONT | RESIDUAL | SINGLETON
     BINARY.3: /[A-Z][a-z]/
     POPCODE.3: /[A-Z][a-z!]{1,3}[W\d]{0,1}/
-    MINOR_SOPHONT.3: /\([^\)\{]{1,}\)[W\d\?]{0,1}/
+    MINOR_SOPHONT.3: /\([^\)\{\(]{1,}\)[W\d\?]{0,1}/
     MINOR_DIEBACK.3: /Di\([^\)]{1,}\)[\d]{0,1}/
     MAJOR_SOPHONT.3: /\[[^\]\{]{1,}\][W\d\?]{0,1}/
     OWNED_COLONY.3: /[OC]:[X\d\?]{0,4}/ | /[OC]:[A-Z][A-Za-z]{3,3}[-\:]{0,1}\d{4,4}/
