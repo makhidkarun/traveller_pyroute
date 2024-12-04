@@ -169,6 +169,8 @@ class BaseTransformer(Transformer):
     def world_alg_transform(self, world_alg):
         if 1 == len(world_alg):
             return world_alg[0][0], world_alg[0][1], world_alg[0][2]
+        if '' == world_alg[1][0].value.strip():
+            world_alg[1][0].value = '0'
         return world_alg[0][0].value, world_alg[1][0].value, world_alg[2][0].value
 
     def transform(self, tree):
