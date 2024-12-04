@@ -45,12 +45,12 @@ class StarlineParser:
 
     zone: /([ARUFGBarufgb]|-| )[ ]{0,}/
 
-    pbg: /[0-9X?][0-9A-FX?][0-9A-FX?]/
+    pbg: /[0-9X?][0-9A-FX?][0-9A-FX?] /
 
     residual: /(.{1,})/
 
     world_alg: pbg worlds allegiance
-    worlds: /(\d{1,2} | |-)/
+    worlds: /(\d{1,} | |- )/
 
     allegiance: /[A-Z0-9?-][A-Za-z0-9?-]{1,3}/
 
