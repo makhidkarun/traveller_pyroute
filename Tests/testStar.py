@@ -252,6 +252,24 @@ class TestStar(unittest.TestCase):
         self.assertEqual(TradeCalculation.calc_passengers(14), 100)
         self.assertEqual(TradeCalculation.calc_passengers(15), 500)
 
+    def testCalcTradeTonnage(self):
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(0, 0), 0)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(9, 0), 1)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(9, 49), 1)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(9, 50), 0)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(10, 50), 1)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(10, 99), 1)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(10, 100), 0)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(11, 99), 5)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(11, 100), 1)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(11, 499), 1)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(11, 500), 0)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(12, 500), 1)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(12, 999), 1)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(12, 1000), 0)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(13, 999), 5)
+        self.assertEqual(TradeCalculation.calc_trade_tonnage(13, 1000), 1)
+
     def testHashValueSameAfterCaching(self):
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V  ",

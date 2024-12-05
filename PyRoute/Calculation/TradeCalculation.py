@@ -94,11 +94,16 @@ class TradeCalculation(RouteCalculation):
         self.sector_passenger_balance = TradeBalance(stat_field="passengers", region=galaxy)
         # Track inter-sector trade imbalances
         self.sector_trade_balance = TradeBalance(stat_field="tradeExt", region=galaxy, target="trade")
+        # Track inter-sector trade volume imbalances
+        self.sector_trade_volume_balance = TradeBalance(stat_field="tradeDtonExt", region=galaxy, target="trade")
         # Track inter-allegiance passenger imbalances
         self.allegiance_passenger_balance = TradeBalance(stat_field="passengers", region=galaxy, field="alg",
                                                          star_field="allegiance_base", target_property="code")
         # Track inter-allegiance trade imbalances
         self.allegiance_trade_balance = TradeBalance(stat_field="trade", region=galaxy, field="alg",
+                                                     star_field="allegiance_base", target_property="code")
+        # Track inter-allegiance trade imbalances
+        self.allegiance_trade_volume_balance = TradeBalance(stat_field="tradeDtonExt", region=galaxy, field="alg",
                                                      star_field="allegiance_base", target_property="code")
 
     def base_route_filter(self, star, neighbor):
@@ -351,8 +356,8 @@ class TradeCalculation(RouteCalculation):
                 "Route weight between " + str(star) + " and " + str(target) + " should not be direction sensitive.  Forward weight " + str(fwd_weight) + ", rev weight " + str(rev_weight) + ", delta " + str(abs(delta))
 
         # Update the trade route (edges)
-        tradeCr, tradePass = self.route_update_simple(route, True, distance=distance)
-        self.update_statistics(star, target, tradeCr, tradePass)
+        tradeCr, tradePass, tradeDton = self.route_update_simple(route, True, distance=distance)
+        self.update_statistics(star, target, tradeCr, tradePass, tradeDton)
 
     def _preheat_upper_bound(self, stardex, targdex, allow_reheat=True):
         # Don't reheat on _every_ route, but reheat frequently enough to keep historic costs sort-of firm.
@@ -414,7 +419,7 @@ class TradeCalculation(RouteCalculation):
 
         return upbound
 
-    def update_statistics(self, star, target, tradeCr, tradePass):
+    def update_statistics(self, star, target, tradeCr, tradePass, tradeDton=0):
         if star.sector != target.sector:
             star.sector.stats.tradeExt += tradeCr // 2
             target.sector.stats.tradeExt += tradeCr // 2
@@ -422,19 +427,26 @@ class TradeCalculation(RouteCalculation):
             target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr // 2
             star.sector.stats.passengers += tradePass // 2
             target.sector.stats.passengers += tradePass // 2
+            star.sector.stats.tradeDtonExt += tradeDton // 2
+            target.sector.stats.tradeDtonExt += tradeDton // 2
             if 1 == (tradeCr & 1):
                 self.sector_trade_balance.log_odd_unit(star, target)
             if 1 == (tradePass & 1):
                 self.sector_passenger_balance.log_odd_unit(star, target)
+            if 1 == (tradeDton & 1):
+                self.sector_trade_volume_balance.log_odd_unit(star, target)
         else:
             star.sector.stats.trade += tradeCr
             star.sector.stats.passengers += tradePass
+            star.sector.stats.tradeDton += tradeDton
             if star.subsector() == target.subsector():
                 star.sector.subsectors[star.subsector()].stats.trade += tradeCr
+                star.sector.subsectors[star.subsector()].stats.tradeDton += tradeDton
             else:
                 star.sector.subsectors[star.subsector()].stats.tradeExt += tradeCr // 2
                 target.sector.subsectors[target.subsector()].stats.tradeExt += tradeCr // 2
-
+                star.sector.subsectors[star.subsector()].stats.tradeDtonExt += tradeDton // 2
+                target.sector.subsectors[target.subsector()].stats.tradeDtonExt += tradeDton // 2
         starcode = AllyGen.same_align(star.alg_code)
         targcode = AllyGen.same_align(target.alg_code)
         # By definition, _any_ nonalighed system is _not_ allied to anything - even nonaligned systems of the same
@@ -446,11 +458,14 @@ class TradeCalculation(RouteCalculation):
         if AllyGen.are_allies(star.alg_code, target.alg_code):
             self.galaxy.alg[starcode].stats.trade += tradeCr
             self.galaxy.alg[starcode].stats.passengers += tradePass
+            self.galaxy.alg[starcode].stats.tradeDton += tradeDton
         else:
             self.galaxy.alg[starcode].stats.tradeExt += tradeCr // 2
             self.galaxy.alg[targcode].stats.tradeExt += tradeCr // 2
             self.galaxy.alg[starcode].stats.passengers += tradePass // 2
             self.galaxy.alg[targcode].stats.passengers += tradePass // 2
+            self.galaxy.alg[starcode].stats.tradeDtonExt += tradeDton // 2
+            self.galaxy.alg[targcode].stats.tradeDtonExt += tradeDton // 2
             if 1 == (tradeCr & 1):
                 if double_up:
                     self.galaxy.alg[starcode].stats.tradeExt += 1
@@ -461,9 +476,15 @@ class TradeCalculation(RouteCalculation):
                     self.galaxy.alg[starcode].stats.passengers += 1
                 else:
                     self.allegiance_passenger_balance.log_odd_unit(star, target)
+            if 1 == (tradeDton & 1):
+                if double_up:
+                    self.galaxy.alg[starcode].stats.tradeDtonExt += 1
+                else:
+                    self.allegiance_trade_volume_balance.log_odd_unit(star, target)
 
         self.galaxy.stats.trade += tradeCr
         self.galaxy.stats.passengers += tradePass
+        self.galaxy.stats.tradeDton += tradeDton
 
         try:
             self.cross_check_totals()
@@ -503,6 +524,7 @@ class TradeCalculation(RouteCalculation):
 
         # Gather basic statistics.
         tradeBTN = self.get_btn(source, target, distance)
+        tradeDton = self.calc_trade_tonnage(tradeBTN, distance)
         tradeCr = self.calc_trade(tradeBTN)
         source.tradeIn += tradeCr // 2
         target.tradeIn += tradeCr // 2
@@ -537,7 +559,7 @@ class TradeCalculation(RouteCalculation):
         if reweight and 0 < len(edges):
             self.shortest_path_tree.update_edges(edges)
 
-        return (tradeCr, tradePass)
+        return (tradeCr, tradePass, tradeDton)
 
     @staticmethod
     def route_distance(route):
@@ -598,11 +620,17 @@ class TradeCalculation(RouteCalculation):
     def is_sector_pass_balanced(self):
         self.sector_passenger_balance.is_balanced()
 
+    def is_sector_trade_volume_balanced(self):
+        self.sector_trade_volume_balance.is_balanced()
+
     def is_allegiance_trade_balanced(self):
         self.allegiance_trade_balance.is_balanced()
 
     def is_allegiance_pass_balanced(self):
         self.allegiance_passenger_balance.is_balanced()
+
+    def is_allegiance_trade_volume_balanced(self):
+        self.allegiance_trade_volume_balance.is_balanced()
 
     def multilateral_balance_trade(self):
         self.sector_trade_balance.multilateral_balance()
@@ -612,20 +640,31 @@ class TradeCalculation(RouteCalculation):
         self.sector_passenger_balance.multilateral_balance()
         self.allegiance_passenger_balance.multilateral_balance()
 
+    def multilateral_balance_trade_volume(self):
+        self.sector_trade_volume_balance.multilateral_balance()
+        self.allegiance_trade_volume_balance.multilateral_balance()
+
     def cross_check_totals(self):
         grand_total_pax = self.galaxy.stats.passengers
         grand_total_trade = self.galaxy.stats.trade
+        grand_total_volume = self.galaxy.stats.tradeDton
 
         total_sector_pax = sum([item.stats.passengers for item in self.galaxy.sectors.values()])
         total_sector_trade = sum([item.stats.trade + item.stats.tradeExt for item in self.galaxy.sectors.values()])
+        total_sector_volume = sum([item.stats.tradeDton + item.stats.tradeDtonExt
+                                   for item in self.galaxy.sectors.values()])
 
         base_allegiances = {AllyGen.same_align(item) for item in self.galaxy.alg}
 
         total_allegiance_pax = sum([self.galaxy.alg[item].stats.passengers for item in base_allegiances])
         total_allegiance_trade = sum([self.galaxy.alg[item].stats.trade + self.galaxy.alg[item].stats.tradeExt
                                       for item in base_allegiances])
+        total_allegiance_volume = sum([self.galaxy.alg[item].stats.tradeDton + self.galaxy.alg[item].stats.tradeDtonExt
+                                      for item in base_allegiances])
 
         assert grand_total_pax == total_sector_pax + self.sector_passenger_balance.sum, "Sector total pax not balanced with galaxy pax"
         assert grand_total_trade == total_sector_trade + self.sector_trade_balance.sum, "Sector total trade not balanced with galaxy trade"
+        assert grand_total_volume == total_sector_volume + self.sector_trade_volume_balance.sum, "Sector total trade volume not balanced with galaxy trade volume"
         assert grand_total_pax == total_allegiance_pax + self.allegiance_passenger_balance.sum, "Allegiance total pax " + str(total_allegiance_pax + self.allegiance_passenger_balance.sum) + " not balanced with galaxy pax " + str(grand_total_pax)
         assert grand_total_trade == total_allegiance_trade + self.allegiance_trade_balance.sum, "Allegiance total trade not balanced with galaxy trade"
+        assert grand_total_volume == total_allegiance_volume + self.allegiance_trade_volume_balance.sum, "Allegiance total trade volume not balanced with galaxy trade volume"

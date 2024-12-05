@@ -8,7 +8,9 @@
 |align="right"|{{'{:,d}'.format(stats.sum_ru)}}
 |align="right"|{{'{:,d}'.format(stats.tradeVol // (10**9))}}
 |align="right"|{{'{:,d}'.format(stats.trade // (10**9))}}
+|align="right"|{{'{:,d}'.format(stats.tradeDton // (10**6))}}
 |align="right"|{{'{:,d}'.format(stats.tradeExt // (10**9))}}
+|align="right"|{{'{:,d}'.format(stats.tradeDtonExt // (10**6))}}
 |align="right"|{{'{:,d}'.format(stats.shipyards)}}
 |align="right"|{{'{:,.2f}'.format(stats.col_be)}}
 |align="right"|{{'{:,d}'.format(stats.passengers // 1000000)}}

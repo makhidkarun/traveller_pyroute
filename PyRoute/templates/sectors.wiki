@@ -3,7 +3,7 @@
 == Sectors ==
 {| class="wikitable sortable" width="90%"
 |+ Analysis per Sector
-!Sector!! X,Y !! Worlds !! Population (millions) !! % of Population !! Economy (Bcr) !! Per Capita (Cr) !! RU !! Trade Volume (BCr / year) !! Int. Trade (BCr / year) !! Ext. Trade (BCr/year) !! Shipyard Capacity (MTons) !! Colonial Army (BEs) !! Travellers (M / year) !! SPA Pop
+!Sector!! X,Y !! Worlds !! Population (millions) !! % of Population !! Economy (Bcr) !! Per Capita (Cr) !! RU !! Trade Volume (BCr / year) !! Int. Trade (BCr / year) !! Int. Trade (MDton / year) !! Ext. Trade (BCr/year) !! Ext. Trade (MDton / year) !! Shipyard Capacity (MTons) !! Colonial Army (BEs) !! Travellers (M / year) !! SPA Pop
 {% for sector in sectors.values() -%}
 |-
 | {{sector.wiki_name()}}

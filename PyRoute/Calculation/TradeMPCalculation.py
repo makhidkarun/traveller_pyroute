@@ -206,8 +206,8 @@ class TradeMPCalculation(TradeCalculation):
                 # Using the route found by the child process update the stars / routes graphs in the parent process
                 start = route[0]
                 target = route[-1]
-                tradeCr, tradePass = self.route_update_simple(route, True)
-                self.update_statistics(start, target, tradeCr, tradePass)
+                tradeCr, tradePass, tradeDton = self.route_update_simple(route, True)
+                self.update_statistics(start, target, tradeCr, tradePass, tradeDton)
                 count += 1
         self.logger.info(f"Intra-sector route processing completed. Processed {count} routes")
 
@@ -251,8 +251,8 @@ class TradeMPCalculation(TradeCalculation):
                 # Using the route found by the child process update the stars / routes graphs in the parent process
                 start = route[0]
                 target = route[-1]
-                tradeCr, tradePass = self.route_update_simple(route, False)
-                self.update_statistics(start, target, tradeCr, tradePass)
+                tradeCr, tradePass, tradeDton = self.route_update_simple(route, False)
+                self.update_statistics(start, target, tradeCr, tradePass, tradeDton)
                 processed += 1
         self.logger.info(f"Long route processing completed. process {processed} routes")
 
@@ -326,5 +326,5 @@ class TradeMPCalculation(TradeCalculation):
                 f"Route weight between {repr(star)} and {repr(target)} should not be direction sensitive.  Forward weight {fwd_weight}, rev weight {rev_weight}. delta {abs(delta)}"
 
         # Update the trade route (edges)
-        tradeCr, tradePass = self.route_update_simple(route, True)
-        self.update_statistics(star, target, tradeCr, tradePass)
+        tradeCr, tradePass, tradeDton = self.route_update_simple(route, True)
+        self.update_statistics(star, target, tradeCr, tradePass, tradeDton)

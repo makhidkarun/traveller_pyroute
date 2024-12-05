@@ -47,6 +47,8 @@ class ObjectStatistics(object):
         self.trade = 0
         self.tradeExt = 0
         self.tradeVol = 0
+        self.tradeDton = 0
+        self.tradeDtonExt = 0
         self.percapita = 0
         self.number = 0
         self.milBudget = 0
@@ -153,8 +155,10 @@ class StatCalculation(object):
     def calculate_statistics(self, ally_match):
         self.galaxy.trade.is_sector_trade_balanced()
         self.galaxy.trade.is_sector_pass_balanced()
+        self.galaxy.trade.is_sector_trade_volume_balanced()
         self.galaxy.trade.is_allegiance_trade_balanced()
         self.galaxy.trade.is_allegiance_pass_balanced()
+        self.galaxy.trade.is_allegiance_trade_volume_balanced()
         self.galaxy.trade.cross_check_totals()
 
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
@@ -222,6 +226,7 @@ class StatCalculation(object):
 
         self.galaxy.trade.is_sector_trade_balanced()
         self.galaxy.trade.is_sector_pass_balanced()
+        self.galaxy.trade.is_sector_trade_volume_balanced()
 
     def add_alg_stats(self, area, star, alg):
         algStats = area.alg[alg].stats

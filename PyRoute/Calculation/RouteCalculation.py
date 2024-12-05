@@ -159,6 +159,19 @@ class RouteCalculation(object):
 
     @staticmethod
     @functools.cache
+    def get_vol_offset(distance):
+        if distance < 50:
+            return 0
+        elif distance < 100:
+            return -1
+        elif distance < 500:
+            return -2
+        elif distance < 1000:
+            return -3
+        return -4
+
+    @staticmethod
+    @functools.cache
     def get_max_btn(star_wtn, neighbour_wtn):
         if neighbour_wtn > star_wtn:
             return RouteCalculation.get_max_btn(neighbour_wtn, star_wtn)
@@ -176,6 +189,15 @@ class RouteCalculation(object):
             trade = 10 ** (btn // 2)
 
         return trade
+
+    @staticmethod
+    def calc_trade_tonnage(btn, distance):
+        offset = RouteCalculation.get_vol_offset(distance)
+        dton = btn + offset - 9
+
+        if 0 > dton:
+            return 0
+        return RouteCalculation.calc_trade(dton)
 
     @staticmethod
     @functools.cache
@@ -222,14 +244,23 @@ class RouteCalculation(object):
     def is_sector_pass_balanced(self):
         pass
 
+    def is_sector_trade_volume_balanced(self):
+        pass
+
     def is_allegiance_trade_balanced(self):
         pass
 
     def is_allegiance_pass_balanced(self):
         pass
 
+    def is_allegiance_trade_volume_balanced(self):
+        pass
+
     def multilateral_balance_trade(self):
         pass
 
     def multilateral_balance_pass(self):
+        pass
+
+    def multilateral_balance_trade_volume(self):
         pass
