@@ -486,7 +486,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
     def test_parser_screwball_synthetic_starline_19(self):
-        txt = '0101 000000000000000 ???????-? 000000000000000 {0} - -  - 000 0 000   00'
+        txt = '0101 000000000000000 ???????-? 000000000000000 {0} - -  - AAA U 000   00'
 
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -503,8 +503,8 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('-', transformed[6])
         self.assertEqual('-', transformed[7])
         self.assertEqual('-', transformed[11], 'Unexpected nobles code')
-        self.assertEqual('000', transformed[12], 'Unexpected base code')
-        self.assertEqual('0', transformed[13], 'Unexpected trade zone')
+        self.assertEqual('AAA', transformed[12], 'Unexpected base code')
+        self.assertEqual('U', transformed[13], 'Unexpected trade zone')
         self.assertEqual('000', transformed[14], 'Unexpected PBG code')
         self.assertEqual('0', transformed[15], 'Unexpected worlds count')
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
