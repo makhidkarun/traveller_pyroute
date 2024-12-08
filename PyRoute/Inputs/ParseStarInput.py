@@ -277,6 +277,7 @@ class ParseStarInput:
 
     @staticmethod
     def _unpack_starline_tweak(data):
+        data[1] = data[1].replace('  ', ' ')
         if data[16].startswith('--') and '----' != data[16]:
             if 2 < len(data[16]):
                 data[17] = data[16][2:] + " " + data[17]
