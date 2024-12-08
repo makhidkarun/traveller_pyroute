@@ -532,9 +532,9 @@ class BaseTransformer(Transformer):
         if alleg.startswith('----') and 4 <= len(alleg):
             parsed['allegiance'] = '----'
             parsed['residual'] = alleg[4:] + parsed['residual']
-        elif alleg.startswith('--') and 2 <= len(alleg):
+        elif alleg.startswith('--') and 4 <= len(alleg):
             parsed['allegiance'] = '--'
-            parsed['residual'] = alleg[2:] + parsed['residual']
+            parsed['residual'] = alleg[2:] + ' ' + parsed['residual']
         else:
             counter = 0
             while counter < len(alleg) and (alleg[counter].isalnum() or '-' == alleg[counter] or '?' == alleg[counter]) and 4 > counter:

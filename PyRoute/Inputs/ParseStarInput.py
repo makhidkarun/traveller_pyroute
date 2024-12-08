@@ -271,6 +271,17 @@ class ParseStarInput:
 
         spacer = ' '
         data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'], parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'], parsed['zone'].upper(), parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
+
+        data = ParseStarInput._unpack_starline_tweak(data)
+        return data
+
+    @staticmethod
+    def _unpack_starline_tweak(data):
+        if data[16].startswith('--') and '----' != data[16]:
+            if 2 < len(data[16]):
+                data[17] = data[16][2:] + " " + data[17]
+                data[16] = '--'
+
         return data
 
     @staticmethod
