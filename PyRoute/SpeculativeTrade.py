@@ -54,7 +54,7 @@ class SpeculativeTrade(object):
             return
         for (world, neighbor) in self.stars.edges():
             worldstar = self.stars.nodes[world]['star']
-            neighborstar = self.stars.nodes[world]['star']
+            neighborstar = self.stars.nodes[neighbor]['star']
             distance = worldstar.distance(neighborstar)
             source_market = max(self.get_market_price(worldstar, neighborstar) - distance, 0)
             target_market = max(self.get_market_price(neighborstar, worldstar) - distance, 0)
@@ -96,39 +96,38 @@ class SpeculativeTrade(object):
 
     def T5_calculate_tradegoods(self, star):
         cost = 3.0
-        cost -= 1 if star.tradeCode.agricultural else 0
-        cost -= 1 if star.tradeCode.asteroid else 0
+        cost += SpeculativeTrade._calc_tradegoods_core(star)
         cost += 1 if star.tradeCode.barren else 0
-        cost += 1 if star.tradeCode.desert else 0
-        cost += 1 if star.tradeCode.fluid else 0
-        cost -= 1 if star.tradeCode.high else 0
         cost -= 1 if star.tradeCode.industrial else 0
         cost += 1 if star.tradeCode.low else 0
-        cost += 1 if star.tradeCode.nonindustrial else 0
-        cost -= 1 if star.tradeCode.poor else 0
-        cost += 1 if star.tradeCode.rich else 0
-        cost += 1 if star.tradeCode.vacuum else 0
         cost += star.tl / 10.0
 
         return cost
 
     def CT_calculate_tradegoods(self, star):
         cost = 4.0
-        cost -= 1 if star.tradeCode.agricultural else 0
-        cost -= 1 if star.tradeCode.asteroid else 0
-        cost += 1 if star.tradeCode.desert else 0
-        cost += 1 if star.tradeCode.fluid else 0
-        cost -= 1 if star.tradeCode.high else 0
+        cost += SpeculativeTrade._calc_tradegoods_core(star)
         cost -= 1 if star.tradeCode else 0
         cost += 2 if star.tradeCode.low else 0
-        cost += 1 if star.tradeCode.nonindustrial else 0
-        cost -= 1 if star.tradeCode.poor else 0
-        cost += 1 if star.tradeCode.rich else 0
-        cost += 1 if star.tradeCode.vacuum else 0
         cost += star.tl / 10.0
         cost -= 1 if 'A' in star.port else 0
         cost += 1 if 'C' in star.port else 0
         cost += 2 if 'D' in star.port else 0
         cost += 3 if 'E' in star.port else 0
         cost += 5 if 'X' in star.port else 0
+        return cost
+
+    @staticmethod
+    def _calc_tradegoods_core(star):
+        cost = 0
+        cost -= 1 if star.tradeCode.agricultural else 0
+        cost -= 1 if star.tradeCode.asteroid else 0
+        cost += 1 if star.tradeCode.desert else 0
+        cost += 1 if star.tradeCode.fluid else 0
+        cost -= 1 if star.tradeCode.high else 0
+        cost += 1 if star.tradeCode.nonindustrial else 0
+        cost -= 1 if star.tradeCode.poor else 0
+        cost += 1 if star.tradeCode.rich else 0
+        cost += 1 if star.tradeCode.vacuum else 0
+
         return cost
