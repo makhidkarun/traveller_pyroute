@@ -323,6 +323,7 @@ class testHypothesisStarlineParser(unittest.TestCase):
     @example('0111 -2Z4ig11RbxW010 0000001-1 wJED9E(E(T (HN6 -  (113-0) -  - - B  114       00y', False)
     @example('0101 000000000000000 ???????-? [0000000000]00]       - - A 000    ?0', False)
     @example('0101 000000000000000 ???????-? (00000000000)0)       - - A 000   00?', False)
+    @example('0140 000000000000000 ???????-? [0 0000000)(]00       - - A 000   ?00', False)
     # Weird parsing cases
     @example('0101 000000000000000 ???????-? (00000000000000       - - 0 000   00?)', 'weird')
     @example('0101 000000000000000 ???????-? [00000000000000       - - 0 000   00?]', 'weird')

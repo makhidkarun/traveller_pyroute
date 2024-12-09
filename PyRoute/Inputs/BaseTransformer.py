@@ -344,17 +344,21 @@ class BaseTransformer(Transformer):
         if trade_ext in raw:
             return 0
         trade_ext = ''
+        i = 0
+        num_child = len(children) - 1
         for item in children:  # Dig out the largest left-subset of trade children that are in the raw string
             trade_ext += item.value + ' '
             if trade_ext in raw:  # if it worked with one space appended, try a second space
-                trade_ext += ' '
-                if trade_ext not in raw:  # if it didn't, drop the second space
-                    trade_ext = trade_ext[:-1]
+                if i == num_child or item.value != children[i+1].value:
+                    trade_ext += ' '
+                    if trade_ext not in raw:  # if it didn't, drop the second space
+                        trade_ext = trade_ext[:-1]
             else:  # if appending the space didn't work, try without it
                 trade_ext = trade_ext[:-1]
             # after all that, if we've overrun (such as a nobles code getting transplanted), throw hands up and move on
             if trade_ext not in raw:
                 overrun += 1
+            i += 1
         return overrun
 
     def _square_up_parsed(self, parsed):
