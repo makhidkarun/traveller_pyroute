@@ -82,7 +82,8 @@ def comparison_line(draw):
         '2732 sa0)OkeWHEk4Mmb ???????-? (8PvzPS]UbZypt6 - (8Pv-2) [GZks] f  * g 88C   E7',
         '0101 000000000000000 ???????-? [00000000000]0]       - - A 000    ?0',
         '0101 000000000000000 ???????-? (00000000000000 - (000-0) [0000] BB     - A 000   ?0',
-        '0101 000000000000000 ???????-? (00000000000)0)       - - A 000   00?'
+        '0101 000000000000000 ???????-? (00000000000)0)       - - A 000   00?',
+        '0140 000000000000000 ???????-? [0 0000000)(]00       - - A 000   ?00'
     ]
 
     candidate = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))

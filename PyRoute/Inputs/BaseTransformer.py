@@ -349,7 +349,11 @@ class BaseTransformer(Transformer):
         for item in children:  # Dig out the largest left-subset of trade children that are in the raw string
             trade_ext += item.value + ' '
             if trade_ext in raw:  # if it worked with one space appended, try a second space
-                if i == num_child or item.value != children[i+1].value:
+                substr = False
+                if i < num_child:
+                    substr = children[i+1].value.rfind(item.value) == (len(children[i+1].value) - len(item.value))
+
+                if not substr:
                     trade_ext += ' '
                     if trade_ext not in raw:  # if it didn't, drop the second space
                         trade_ext = trade_ext[:-1]
