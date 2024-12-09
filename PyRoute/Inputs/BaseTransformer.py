@@ -343,7 +343,7 @@ class BaseTransformer(Transformer):
             trade_ext += item.value + ' '
         if trade_ext in raw:
             return 0
-        trade_ext = ''
+        trade_ext = ' '
         i = 0
         num_child = len(children) - 1
         for item in children:  # Dig out the largest left-subset of trade children that are in the raw string
