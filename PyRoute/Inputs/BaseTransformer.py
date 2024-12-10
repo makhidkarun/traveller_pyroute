@@ -272,7 +272,11 @@ class BaseTransformer(Transformer):
         if trade_final_keep:
             return tree
 
-        overrun = self._calc_trade_overrun(trade.children, self.raw)
+        starname = tree.children[1].children[0].value
+        bitz = starname.split(' ')
+        bitz = [item for item in bitz if '' != item]
+        rawbitz = self.raw.split(bitz[-1])
+        overrun = self._calc_trade_overrun(trade.children, rawbitz[1])
         if 0 == overrun:  # if the reconstructed trade code is fully in the raw string, nothing to do - bail out now
             return tree
         nobles = tree.children[4]
