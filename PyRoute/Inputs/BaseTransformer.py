@@ -347,9 +347,14 @@ class BaseTransformer(Transformer):
             trade_ext += item.value + ' '
         if trade_ext in raw:
             return 0
+        num_child = len(children) - 1
+        gubbinz = [item.value for item in children]
+        for k in range(num_child, 1, -1):
+            trade_bar = " ".join(gubbinz[:k])
+            if trade_bar in raw:
+                return len(children) - k
         trade_ext = ' '
         i = 0
-        num_child = len(children) - 1
         for item in children:  # Dig out the largest left-subset of trade children that are in the raw string
             trade_ext += item.value + ' '
             if trade_ext in raw:  # if it worked with one space appended, try a second space
