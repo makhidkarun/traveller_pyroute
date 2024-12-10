@@ -340,6 +340,7 @@ class BaseTransformer(Transformer):
 
     @staticmethod
     def _calc_trade_overrun(children, raw):
+        from PyRoute.Inputs.ParseStarInput import ParseStarInput
         trade_ext = ''
         overrun = 0
         # first check whether trade codes are straight up aligned
@@ -352,7 +353,10 @@ class BaseTransformer(Transformer):
         for k in range(num_child, 1, -1):
             trade_bar = " ".join(gubbinz[:k])
             if trade_bar in raw:
-                return len(children) - k
+                overrun = len(children) - k
+                if not ParseStarInput.can_be_nobles(gubbinz[k]):
+                    overrun -= 1
+                return overrun
         trade_ext = ' '
         i = 0
         for item in children:  # Dig out the largest left-subset of trade children that are in the raw string
