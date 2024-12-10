@@ -336,3 +336,11 @@ class ParseStarInput:
         min_tl = max(0, mod + 1)
         max_tl = mod + 6
         return max_tl, min_tl
+
+    @staticmethod
+    def can_be_nobles(segment) -> bool:
+        if not isinstance(segment, str):
+            return False
+
+        non_noble = [item for item in segment if item not in ParseStarInput.valid_nobles]
+        return 0 == len(non_noble)
