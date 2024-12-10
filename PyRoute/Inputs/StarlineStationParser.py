@@ -22,8 +22,9 @@ class StarlineStationParser:
 
     starname: /(.{15,}) ([A-HXYa-hxy\?][0-9A-Fa-f\?][\w\?]{2,2}[0-9A-Fa-f\?][0-9A-Xa-x\?][0-9A-Ja-j\?]-[\w\?]) /
 
-    trade: TRADECODE*
+    trade: BLANK | TRADECODE*
     TRADECODE: MINOR_DIEBACK | BINARY | POPCODE | MINOR_SOPHONT | OWNED_COLONY | MAJOR_SOPHONT | RESIDUAL | SINGLETON
+    BLANK: /   /
     BINARY.3: /[A-Z][a-z]/
     POPCODE.3: /[A-Z][a-z!]{1,3}[W\d]{0,1}/
     MINOR_SOPHONT.3: /\([^\)\{\(]{1,}\)[W\d\?]{0,1}/
