@@ -147,6 +147,7 @@ class testStar(unittest.TestCase):
     @example('0140 000000000000000 A000000-0 F 0000000000000       C     - F   000   00')
     @example('0940  ouV)anT-eB00111    A111110-X RH?xJy Hcb-O-a}   ov4111111         EBCCH    -    B   2FA    070R')
     @example('0940 ouV)anT-eB00111 ?11111A-X ?HHJOR-- abcxy}  1         BCCE - B 001   00R')
+    @example('0140 000000000000000 A000000-0 00 0000000  + 0 00         - A   000    00')
     def test_parse_line_to_star(self, s):
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')

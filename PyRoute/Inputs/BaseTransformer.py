@@ -350,12 +350,16 @@ class BaseTransformer(Transformer):
             return 0
         num_child = len(children) - 1
         gubbinz = [item.value for item in children]
+        nobles = [item for item in gubbinz if ParseStarInput.can_be_nobles(item)]
+        if 0 == len(nobles):
+            return 0
         for k in range(num_child, 1, -1):
             trade_bar = " ".join(gubbinz[:k])
             if trade_bar in raw:
                 overrun = len(children) - k
-                if not ParseStarInput.can_be_nobles(gubbinz[k]):
-                    overrun -= 1
+                for j in range(k, len(children)):
+                    if not ParseStarInput.can_be_nobles(gubbinz[j]):
+                        overrun -= 1
                 return overrun
         trade_ext = ' '
         i = 0
