@@ -342,6 +342,9 @@ class ParseStarInput:
         if not isinstance(segment, str):
             return False
 
+        if '-' == segment.strip():
+            return True
+
         non_noble = [item for item in segment if item not in ParseStarInput.valid_nobles]
         return 0 == len(non_noble)
 
