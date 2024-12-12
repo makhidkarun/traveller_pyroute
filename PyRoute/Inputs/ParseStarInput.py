@@ -130,7 +130,7 @@ class ParseStarInput:
             star.calculate_importance()
             if imp != star.importance:
                 star.logger.warning(
-                    '{}-{} Calculated importance {} does not match generated importance {}'.
+                    '{}-{} IX Calculated importance {} does not match generated importance {}'.
                     format(star, star.baseCode, star.importance, imp))
         else:
             star.calculate_importance()
