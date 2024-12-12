@@ -262,6 +262,7 @@ class BaseTransformer(Transformer):
         return tree
 
     def _preprocess_trade_and_nbz(self, tree):
+        from PyRoute.Inputs.ParseStarInput import ParseStarInput
         trade = tree.children[2]
         tradelen = sum([len(item.value) for item in trade.children]) + (len(trade.children) - 1)
         if 17 > tradelen:
@@ -276,7 +277,11 @@ class BaseTransformer(Transformer):
         bitz = starname.split(' ')
         bitz = [item for item in bitz if '' != item]
         rawbitz = self.raw.split(bitz[-1])
-        overrun = self._calc_trade_overrun(trade.children, rawbitz[1])
+
+        if ParseStarInput.can_be_nobles(tree.children[4].children[0].value) and ParseStarInput.can_be_base(tree.children[5].children[0].value):
+            overrun = 0
+        else:
+            overrun = self._calc_trade_overrun(trade.children, rawbitz[1])
         if 0 == overrun:  # if the reconstructed trade code is fully in the raw string, nothing to do - bail out now
             return tree
         nobles = tree.children[4]
