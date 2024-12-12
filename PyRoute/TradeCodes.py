@@ -314,11 +314,11 @@ class TradeCodes(object):
             return True
         msg = None
         if star_match and not code_match:
-            msg = '{} - Calculated "{}" not in trade codes {}'.format(star, code, self.codeset)
+            msg = '{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset)
 
         if code_match and not star_match:
-            msg = '{} - Found invalid "{}" code on world with {} population: {}'.format(star, code, star.pop,
-                                                                                       self.codeset)
+            msg = '{}-{} Found invalid "{}" code on world with {} population: {}'.format(star, str(star.uwp), code,
+                                                                                         star.pop, self.codeset)
         if isinstance(listmsg, list):
             listmsg.append(msg)
         else:

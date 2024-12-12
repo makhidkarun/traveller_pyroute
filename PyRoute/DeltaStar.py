@@ -277,11 +277,12 @@ class DeltaStar(Star):
         code_match = code in self.tradeCode.codeset
 
         if pop_match and not code_match:
-            line = '{} - Calculated "{}" not in trade codes {}'.format(self, code, self.tradeCode.codeset)
+            line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)
             msg.append(line)
         if code_match and not pop_match:
-            line = '{} - Found invalid "{}" code on world with {} population: {}'.format(self, code, self.pop,
-                                                                                       self.tradeCode.codeset)
+            line = '{}-{} Found invalid "{}" code on world with {} population: {}'.format(self, self.uwp, code,
+                                                                                          self.pop,
+                                                                                          self.tradeCode.codeset)
             msg.append(line)
             check = False
         return check
