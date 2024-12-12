@@ -353,6 +353,10 @@ class BaseTransformer(Transformer):
         nobles = [item for item in gubbinz if ParseStarInput.can_be_nobles(item)]
         if 0 == len(nobles):
             return 0
+        if 1 < len(gubbinz):
+            if ParseStarInput.can_be_nobles(gubbinz[-2]) and ParseStarInput.can_be_base(gubbinz[-1]):
+                return 2
+
         for k in range(num_child, 1, -1):
             trade_bar = " ".join(gubbinz[:k])
             if trade_bar in raw:
