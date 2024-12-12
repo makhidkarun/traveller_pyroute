@@ -344,3 +344,16 @@ class ParseStarInput:
 
         non_noble = [item for item in segment if item not in ParseStarInput.valid_nobles]
         return 0 == len(non_noble)
+
+    @staticmethod
+    def can_be_base(segment) -> bool:
+        if not isinstance(segment, str):
+            return False
+
+        if '-' == segment or '*' == segment or ' ' == segment:
+            return True
+
+        if 3 < len(segment):
+            return False
+
+        return segment.isupper()
