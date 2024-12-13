@@ -278,7 +278,8 @@ class BaseTransformer(Transformer):
         bitz = [item for item in bitz if '' != item]
         rawbitz = self.raw.split(bitz[-1])
 
-        if ParseStarInput.can_be_nobles(tree.children[4].children[0].value) and ParseStarInput.can_be_base(tree.children[5].children[0].value):
+        if ParseStarInput.can_be_nobles(tree.children[4].children[0].value) and \
+                ParseStarInput.can_be_base(tree.children[5].children[0].value):
             overrun = 0
         else:
             overrun = self._calc_trade_overrun(trade.children, rawbitz[1])
@@ -287,9 +288,6 @@ class BaseTransformer(Transformer):
         nobles = tree.children[4]
         base = tree.children[5]
         zone = tree.children[6]
-        world_alg = tree.children[7]
-        pbg = world_alg.children[0]
-        worlds = world_alg.children[1]
 
         if 0 < overrun:
             relocate = trade.children[-overrun:]
@@ -307,13 +305,6 @@ class BaseTransformer(Transformer):
             elif 2 == overrun:
                 if '' == nobles.children[0].value.strip() and '' == zone.children[0].value.strip():
                     zone.children[0].value = base.children[0].value
-                    base.children[0].value = relocate[1].value
-                    nobles.children[0].value = relocate[0].value
-                    trade.children = trade.children[:-2]
-                elif '' != nobles.children[0].value.strip() and '' == zone.children[0].value.strip():
-                    worlds.children[0].value = pbg.children[0].value
-                    pbg.children[0].value = base.children[0].value
-                    zone.children[0].value = nobles.children[0].value
                     base.children[0].value = relocate[1].value
                     nobles.children[0].value = relocate[0].value
                     trade.children = trade.children[:-2]
