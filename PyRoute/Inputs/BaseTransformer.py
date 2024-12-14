@@ -368,7 +368,7 @@ class BaseTransformer(Transformer):
             if trade_ext in raw:  # if it worked with one space appended, try a second space
                 substr = False
                 if i < num_child:
-                    substr = children[i+1].value.rfind(item.value) == (len(children[i+1].value) - len(item.value))
+                    substr = children[i + 1].value.rfind(item.value) == (len(children[i + 1].value) - len(item.value))
 
                 if not substr:
                     trade_ext += ' '
