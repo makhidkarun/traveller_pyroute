@@ -315,6 +315,12 @@ class BaseTransformer(Transformer):
         noble = "BCcDEeFfGH"
         return all(char in noble for char in noble_string)
 
+    def _is_zone(self, zone_string):
+        if 1 != len(zone_string):
+            return False
+        from PyRoute.Inputs.ParseStarInput import ParseStarInput
+        return zone_string[0] in ParseStarInput.valid_zone
+
     def _preprocess_tree_suspect_empty_trade_code(self, tree):
         if 1 != len(tree.children[2].children):
             return tree
@@ -326,6 +332,8 @@ class BaseTransformer(Transformer):
             return tree
         all_noble = self._is_noble(tree.children[2].children[0])
         if not all_noble:
+            return tree
+        if self._is_zone(tree.children[6].children[0].value.strip()):
             return tree
         tree.children[6].children[0].value = tree.children[5].children[0].value
         tree.children[5].children[0].value = tree.children[4].children[0].value
