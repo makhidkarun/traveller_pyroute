@@ -54,19 +54,6 @@ class BaseTransformer(Transformer):
                     args[6][0].value = args[5][0].value
                     args[5][0].value = args[4][0].value
                     args[4][0].value = ''
-        elif '*' != args[5][0].value and 3 == len(args[3]):
-            if '' == args[4][0].value and '' != args[5][0].value and '' == args[6][0].value:
-                if args[7][0][0].value == args[7][2][0].value:
-                    args[4][0].value = args[5][0].value
-                    args[5][0].value = args[7][0][0].value
-                    args[6][0].value = args[7][1][0].value
-                    args[7][0][0].value = args[7][2][0].value
-                    args[7][1][0].value = ' '
-                    if 9 == len(args):
-                        args[7][2][0].value = args[8][0].value
-                        args[8][0].value = ''
-                    else:
-                        args[7][2][0].value = ''
         if 8 == len(args):  # If there's no residual argument
             if 1 < len(args[7]):
                 tailend = args[7][2][0].value
@@ -105,6 +92,8 @@ class BaseTransformer(Transformer):
 
     def nobles(self, args):
         args[0].value = args[0].value.strip()
+        if '' == args[0].value:
+            args[0].value = '-'
         return args
 
     def base(self, args):
