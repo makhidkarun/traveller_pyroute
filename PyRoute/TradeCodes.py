@@ -147,9 +147,13 @@ class TradeCodes(object):
                     codes.append(raw)
                 continue
             if 7 < len(raw) and '(' == raw[0] and ')' == raw[-2]:  # Let older-style sophont codes through
+                if not (raw[-1] in 'WX?' or raw[-1].isdigit()):
+                    raw = raw[:-1]
                 codes.append(raw)
                 continue
             if 7 < len(raw) and '[' == raw[0] and ']' == raw[-2]:  # Let older-style sophont codes through
+                if not (raw[-1] in 'WX?' or raw[-1].isdigit()):
+                    raw = raw[:-1]
                 codes.append(raw)
                 continue
             if 2 == len(raw) and ('W' == raw[1] or raw[1].isdigit()):
