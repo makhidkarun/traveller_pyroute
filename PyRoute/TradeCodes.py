@@ -170,7 +170,8 @@ class TradeCodes(object):
             if not raw.endswith(')') and ')' in raw and raw.startswith('(') and 7 > len(raw):
                 continue
             if not raw.startswith('(') and not raw.endswith(')') and '(' in raw and ')' in raw:
-                continue
+                if not raw.startswith('[') and not raw.endswith(']'):
+                    continue
             if 7 == len(raw) and '(' == raw[0] and ')' == raw[5]:  # Let preprocessed sophont codes through
                 codes.append(raw)
                 continue
