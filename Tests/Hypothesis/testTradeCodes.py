@@ -71,6 +71,7 @@ class testTradeCodes(unittest.TestCase):
     @example(' Ga Lt (minor)  ')
     @example('[000000000(] ])')
     @example('[00000000(] ])A')
+    @example('[00000000(0)A0]')
     def test_parse_text_to_trade_code(self, s):
         trade = TradeCodes(s)
 

@@ -112,6 +112,13 @@ class TradeCodes(object):
         homeworld_matches = TradeCodes.dieback.findall(initial_codes)
         # bolt on direct [homeworld] candidates
         homeworld_major = [item for item in self.codes if item.startswith('[') and 1 == item.count('[') and 1 == item.count(']')]
+        # reject homeworld matches that are strict subsect of any major homeworld matches
+        if 0 < len(homeworld_matches) and 0 < len(homeworld_major):
+            for match in homeworld_matches:
+                over = [item for item in homeworld_major if match in item]
+                if 0 < len(over):
+                    homeworld_matches.remove(match)
+
         deadworlds = [item for item in self.codes if 5 == len(item) and 'X' == item[4]]
         for homeworld in homeworld_matches:
             self._process_homeworld(homeworld, homeworlds_found, initial_codes)
