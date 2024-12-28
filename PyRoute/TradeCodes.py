@@ -136,6 +136,8 @@ class TradeCodes(object):
                 continue
             if ')' == raw:
                 continue
+            if raw.startswith(')]') or raw.startswith('])'):
+                continue
             if raw.startswith('Di('):
                 if not raw.endswith(')') and i < num_codes - 1:
                     next = raw_codes[i + 1]
