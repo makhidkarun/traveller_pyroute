@@ -72,6 +72,11 @@ class testTradeCodes(unittest.TestCase):
     @example('[000000000(] ])')
     @example('[00000000(] ])A')
     @example('[00000000(0)A0]')
+    @example('[00000000(] a)A')
+    @example('[00000000( )(0)')
+    @example('(0000000000)(0)')
+    @example('[0000000000[]]A')
+    @example('[000000000)] 0(')
     def test_parse_text_to_trade_code(self, s):
         trade = TradeCodes(s)
 

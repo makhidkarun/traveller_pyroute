@@ -118,6 +118,10 @@ class TradeCodes(object):
                 over = [item for item in homeworld_major if match in item]
                 if 0 < len(over):
                     homeworld_matches.remove(match)
+        # reject homeworld matches that contain major homeworld fragments or are otherwise empty
+        if 0 < len(homeworld_matches):
+            homeworld_matches = [item for item in homeworld_matches if ']' not in item and '[' not in item]
+            homeworld_matches = [item for item in homeworld_matches if '' != item[1:-1].strip()]
 
         deadworlds = [item for item in self.codes if 5 == len(item) and 'X' == item[4]]
         for homeworld in homeworld_matches:
