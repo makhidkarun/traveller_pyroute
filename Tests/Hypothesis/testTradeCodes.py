@@ -77,8 +77,16 @@ class testTradeCodes(unittest.TestCase):
     @example('(0000000000)(0)')
     @example('[0000000000[]]A')
     @example('[000000000)] 0(')
+    @example('[000000000] (0)')
+    @example('o 00000000000 s')
+    @example('[00000000] A00W')
     def test_parse_text_to_trade_code(self, s):
-        trade = TradeCodes(s)
+        trade = None
+        try:
+            trade = TradeCodes(s)
+        except ValueError as e:
+            if 'Can only have at most one W-pop sophont' == str(e):
+                assume(False)
 
         result, msg = trade.is_well_formed()
         self.assertTrue(result, msg)

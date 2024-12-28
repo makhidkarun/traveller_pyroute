@@ -73,7 +73,12 @@ class ParseStarInput:
             if 'Input UWP malformed' == str(e):
                 return None
             raise e
-        star.tradeCode = TradeCodes(data[3].strip())
+        try:
+            star.tradeCode = TradeCodes(data[3].strip())
+        except ValueError as e:
+            if 'Can only have at most one W-pop sophont' == str(e):
+                return None
+            raise e
         star.ownedBy = star.tradeCode.owned_by(star)
 
         raw_economics = data[6].strip().upper() if data[6] else None

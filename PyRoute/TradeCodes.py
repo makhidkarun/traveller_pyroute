@@ -112,6 +112,16 @@ class TradeCodes(object):
         homeworld_matches = TradeCodes.dieback.findall(initial_codes)
         # bolt on direct [homeworld] candidates
         homeworld_major = [item for item in self.codes if item.startswith('[') and 1 == item.count('[') and 1 == item.count(']')]
+        # catch situation with two or more W-pop sophonts - can't happen
+        if 1 < (len(homeworld_matches) + len(homeworld_major) + len(self.sophont_list)):
+            w_pop = [item for item in homeworld_matches if item.endswith(')')]
+            m_pop = [item for item in homeworld_major if item.endswith(']')]
+            s_pop = [item for item in self.sophont_list if item.endswith('W')]
+            if 1 < (len(w_pop) + len(m_pop) + len(s_pop)):
+                raise ValueError("Can only have at most one W-pop sophont")
+
+        # catch pseudo-[homeworld] candidates
+        pseudo_major = [item for item in self.codes if item.startswith('[') and (1 < item.count('[') and 1 < item.count(']'))]
         # reject homeworld matches that are strict subsect of any major homeworld matches
         if 0 < len(homeworld_matches) and 0 < len(homeworld_major):
             for match in homeworld_matches:
