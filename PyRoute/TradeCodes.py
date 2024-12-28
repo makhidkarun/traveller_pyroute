@@ -64,8 +64,8 @@ class TradeCodes(object):
     }
 
     # Search regexen
-    search = re.compile(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W|\?)?')
-    search_major = re.compile(r'\w{,2}\[([^)]{,4})[^)]*\](\d|W|\?)?')
+    search = re.compile(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W|X|\?)?')
+    search_major = re.compile(r'\w{,2}\[([^)]{,4})[^)]*\](\d|W|X|\?)?')
     sophont = re.compile(r"[A-Za-z\'!]{1}[\w\'!]{2,4}(\d|W|\?)")
     dieback = re.compile(r"[Di]*\([^)]+\)\d?")
 
@@ -178,15 +178,17 @@ class TradeCodes(object):
                 codes.append(raw)
                 continue
             if not raw.startswith('(') and not raw.startswith('['):  # this isn't a sophont code
-                codes.append(raw)
-                continue
+                if not raw.endswith(')') and not raw.endswith(']'):
+                    codes.append(raw)
+                    continue
             if raw.endswith(')') or raw.endswith(']'):  # this _is_ a sophont code
-                if raw.startswith('[') and raw.endswith(']'):
-                    raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _major_ race homeworld
-                elif raw.startswith('(') and raw.endswith(')'):
-                    raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _minor_ race homeworld
-                codes.append(raw)
-                continue
+                if raw.startswith('(') or raw.startswith('['):
+                    if raw.startswith('[') and raw.endswith(']'):
+                        raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _major_ race homeworld
+                    elif raw.startswith('(') and raw.endswith(')'):
+                        raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _minor_ race homeworld
+                    codes.append(raw)
+                    continue
             if i < num_codes - 1:
                 next = raw_codes[i + 1]
                 if next.endswith(')') or next.endswith(']'):
