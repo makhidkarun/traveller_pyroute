@@ -140,6 +140,10 @@ class TradeCodes(object):
             self._process_major_race_homeworld(homeworld, homeworlds_found)
         for deadworld in deadworlds:
             self._process_deadworld(deadworld, homeworlds_found)
+        # bolt on pseudo_major results so they don't get counted as something else
+        homeworlds_found.extend(pseudo_major)
+        for item in pseudo_major:
+            self.codes.remove(item)
         return homeworlds_found
 
     def _preprocess_initial_codes(self, initial_codes):
