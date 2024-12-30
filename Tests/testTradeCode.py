@@ -131,7 +131,7 @@ class TestTradeCode(unittest.TestCase):
                 [
                     'ERROR:PyRoute.TradeCodes:Shana Ma (Core 0104)-E551112-7 Calculated "Po" not in trade codes [\'Wa\']',
                     'ERROR:PyRoute.TradeCodes:Shana Ma (Core 0104)-E551112-7 Found invalid "Wa" in trade codes: [\'Wa\']',
-                    'ERROR:PyRoute.TradeCodes:Shana Ma (Core 0104) - Calculated "Lo" not in trade codes [\'Wa\']',
+                    'ERROR:PyRoute.TradeCodes:Shana Ma (Core 0104)-E551112-7 Calculated "Lo" not in trade codes [\'Wa\']',
                 ],
                 log.output
             )

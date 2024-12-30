@@ -10,7 +10,7 @@ from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarkAvoidHelper import LandmarkAvoidHelper
 from Tests.baseTest import baseTest
-from single_source_dijkstra import explicit_shortest_path_dijkstra_distance_graph
+from PyRoute.Pathfinding.single_source_dijkstra import explicit_shortest_path_dijkstra_distance_graph
 
 
 class testLandmarkAvoidHelper(baseTest):

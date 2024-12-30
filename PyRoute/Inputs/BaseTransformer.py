@@ -32,7 +32,7 @@ class BaseTransformer(Transformer):
         tradelen = sum([len(item) for item in args[2]]) + len(args[2]) - 1
         if 16 < tradelen and 3 <= len(args[2]) and 1 == len(args[3]) and '' == args[3][0].value.strip():  # Square up overspilled trade codes
             if '' == args[4][0].value and '' != args[5][0].value and '' == args[6][0].value:
-                move_fwd = 3 == len(args[5][0].value)  # Will base code still make sense as PBG?
+                move_fwd = 3 == len(args[5][0].value) and args[5][0].value[0].isdigit()  # Will base code still make sense as PBG?
                 move_rev = 3 == len(args[7][2][0].value)  # Will allegiance code still make sense as PBG?
                 if move_fwd and not move_rev:
                     last = args[2][-1]
@@ -54,19 +54,6 @@ class BaseTransformer(Transformer):
                     args[6][0].value = args[5][0].value
                     args[5][0].value = args[4][0].value
                     args[4][0].value = ''
-        elif '*' != args[5][0].value and 3 == len(args[3]):
-            if '' == args[4][0].value and '' != args[5][0].value and '' == args[6][0].value:
-                if args[7][0][0].value == args[7][2][0].value:
-                    args[4][0].value = args[5][0].value
-                    args[5][0].value = args[7][0][0].value
-                    args[6][0].value = args[7][1][0].value
-                    args[7][0][0].value = args[7][2][0].value
-                    args[7][1][0].value = ' '
-                    if 9 == len(args):
-                        args[7][2][0].value = args[8][0].value
-                        args[8][0].value = ''
-                    else:
-                        args[7][2][0].value = ''
         if 8 == len(args):  # If there's no residual argument
             if 1 < len(args[7]):
                 tailend = args[7][2][0].value
@@ -105,6 +92,8 @@ class BaseTransformer(Transformer):
 
     def nobles(self, args):
         args[0].value = args[0].value.strip()
+        if '' == args[0].value:
+            args[0].value = '-'
         return args
 
     def base(self, args):
@@ -169,6 +158,8 @@ class BaseTransformer(Transformer):
     def world_alg_transform(self, world_alg):
         if 1 == len(world_alg):
             return world_alg[0][0], world_alg[0][1], world_alg[0][2]
+        if '' == world_alg[1][0].value.strip():
+            world_alg[1][0].value = '0'
         return world_alg[0][0].value, world_alg[1][0].value, world_alg[2][0].value
 
     def transform(self, tree):
@@ -196,7 +187,7 @@ class BaseTransformer(Transformer):
         self.trim_raw_string(parsed)
         rawbitz = self._trim_raw_bitz(parsed)
         parsed = self._square_up_parsed_zero(rawbitz[0], parsed)
-        parsed = self._square_up_parsed_one(rawbitz[1], parsed)
+        # parsed = self._square_up_parsed_one(rawbitz[1], parsed)
         parsed = self._square_up_allegiance_overflow(parsed)
 
         no_extensions = parsed['ix'] is None and parsed['ex'] is None and parsed['cx'] is None
@@ -260,6 +251,7 @@ class BaseTransformer(Transformer):
         return tree
 
     def _preprocess_trade_and_nbz(self, tree):
+        from PyRoute.Inputs.ParseStarInput import ParseStarInput
         trade = tree.children[2]
         tradelen = sum([len(item.value) for item in trade.children]) + (len(trade.children) - 1)
         if 17 > tradelen:
@@ -270,15 +262,21 @@ class BaseTransformer(Transformer):
         if trade_final_keep:
             return tree
 
-        overrun = self._calc_trade_overrun(trade.children, self.raw)
+        starname = tree.children[1].children[0].value
+        bitz = starname.split(' ')
+        bitz = [item for item in bitz if '' != item]
+        rawbitz = self.raw.split(bitz[-1])
+
+        if ParseStarInput.can_be_nobles(tree.children[4].children[0].value) and \
+                ParseStarInput.can_be_base(tree.children[5].children[0].value):
+            overrun = 0
+        else:
+            overrun = self._calc_trade_overrun(trade.children, rawbitz[1])
         if 0 == overrun:  # if the reconstructed trade code is fully in the raw string, nothing to do - bail out now
             return tree
         nobles = tree.children[4]
         base = tree.children[5]
         zone = tree.children[6]
-        world_alg = tree.children[7]
-        pbg = world_alg.children[0]
-        worlds = world_alg.children[1]
 
         if 0 < overrun:
             relocate = trade.children[-overrun:]
@@ -299,19 +297,18 @@ class BaseTransformer(Transformer):
                     base.children[0].value = relocate[1].value
                     nobles.children[0].value = relocate[0].value
                     trade.children = trade.children[:-2]
-                elif '' != nobles.children[0].value.strip() and '' == zone.children[0].value.strip():
-                    worlds.children[0].value = pbg.children[0].value
-                    pbg.children[0].value = base.children[0].value
-                    zone.children[0].value = nobles.children[0].value
-                    base.children[0].value = relocate[1].value
-                    nobles.children[0].value = relocate[0].value
-                    trade.children = trade.children[:-2]
 
         return tree
 
     def _is_noble(self, noble_string):
         noble = "BCcDEeFfGH"
         return all(char in noble for char in noble_string)
+
+    def _is_zone(self, zone_string):
+        if 1 != len(zone_string):
+            return False
+        from PyRoute.Inputs.ParseStarInput import ParseStarInput
+        return zone_string[0] in ParseStarInput.valid_zone
 
     def _preprocess_tree_suspect_empty_trade_code(self, tree):
         if 1 != len(tree.children[2].children):
@@ -325,6 +322,8 @@ class BaseTransformer(Transformer):
         all_noble = self._is_noble(tree.children[2].children[0])
         if not all_noble:
             return tree
+        if self._is_zone(tree.children[6].children[0].value.strip()):
+            return tree
         tree.children[6].children[0].value = tree.children[5].children[0].value
         tree.children[5].children[0].value = tree.children[4].children[0].value
         tree.children[4].children[0].value = tree.children[2].children[0].value
@@ -334,6 +333,7 @@ class BaseTransformer(Transformer):
 
     @staticmethod
     def _calc_trade_overrun(children, raw):
+        from PyRoute.Inputs.ParseStarInput import ParseStarInput
         trade_ext = ''
         overrun = 0
         # first check whether trade codes are straight up aligned
@@ -341,18 +341,42 @@ class BaseTransformer(Transformer):
             trade_ext += item.value + ' '
         if trade_ext in raw:
             return 0
-        trade_ext = ''
+        num_child = len(children) - 1
+        gubbinz = [item.value for item in children]
+        nobles = [item for item in gubbinz if ParseStarInput.can_be_nobles(item)]
+        if 0 == len(nobles):
+            return 0
+        if 1 < len(gubbinz):
+            if ParseStarInput.can_be_nobles(gubbinz[-2]) and ParseStarInput.can_be_base(gubbinz[-1]):
+                return 2
+
+        for k in range(num_child, 1, -1):
+            trade_bar = " ".join(gubbinz[:k])
+            if trade_bar in raw:
+                overrun = len(children) - k
+                for j in range(k, len(children)):
+                    if not ParseStarInput.can_be_nobles(gubbinz[j]):
+                        overrun -= 1
+                return overrun
+        trade_ext = ' '
+        i = 0
         for item in children:  # Dig out the largest left-subset of trade children that are in the raw string
             trade_ext += item.value + ' '
             if trade_ext in raw:  # if it worked with one space appended, try a second space
-                trade_ext += ' '
-                if trade_ext not in raw:  # if it didn't, drop the second space
-                    trade_ext = trade_ext[:-1]
+                substr = False
+                if i < num_child:
+                    substr = children[i + 1].value.rfind(item.value) == (len(children[i + 1].value) - len(item.value))
+
+                if not substr:
+                    trade_ext += ' '
+                    if trade_ext not in raw:  # if it didn't, drop the second space
+                        trade_ext = trade_ext[:-1]
             else:  # if appending the space didn't work, try without it
                 trade_ext = trade_ext[:-1]
             # after all that, if we've overrun (such as a nobles code getting transplanted), throw hands up and move on
             if trade_ext not in raw:
                 overrun += 1
+            i += 1
         return overrun
 
     def _square_up_parsed(self, parsed):
@@ -376,6 +400,12 @@ class BaseTransformer(Transformer):
                 continue
             rawval = tree[dataval]
             if rawval is not None:
+                if rawval.startswith('{ '):
+                    oldlen = 0
+                    while oldlen != len(self.raw):
+                        oldlen = len(self.raw)
+                        self.raw = self.raw.replace('{  ', '{ ')
+
                 index = self.raw.find(rawval)
                 self.raw = self.raw.replace(rawval, '', 1)
                 if 0 < index:
@@ -425,15 +455,17 @@ class BaseTransformer(Transformer):
                 parsed['zone'] = ''
                 return parsed
             if not rawstring.endswith('   '):
-                parsed['nobles'] = ''
-                parsed['base'] = bitz[0]
-                parsed['zone'] = bitz[1]
-                return parsed
+                if 4 > len(bitz[0]):
+                    parsed['nobles'] = ''
+                    parsed['base'] = bitz[0]
+                    parsed['zone'] = bitz[1]
+                    return parsed
             if rawstring.startswith('   '):
-                parsed['nobles'] = ''
-                parsed['base'] = bitz[0]
-                parsed['zone'] = bitz[1]
-                return parsed
+                if 4 > len(bitz[0]):
+                    parsed['nobles'] = ''
+                    parsed['base'] = bitz[0]
+                    parsed['zone'] = bitz[1]
+                    return parsed
             else:
                 parsed['nobles'] = bitz[0]
                 parsed['base'] = bitz[1]
@@ -469,7 +501,7 @@ class BaseTransformer(Transformer):
             if 2 == len(trimbitz):
                 allegiance = trimbitz[1]
                 rawtrim = rawtrim.replace(allegiance, '', 1)
-                if alg.isdigit() and 5 > len(alg) and 1 < len(allegiance):  # if first trimbit fits in worlds field, stick it there
+                if alg.isdigit() and 5 > len(alg) and 1 < len(allegiance) and (not allegiance[0].islower()):  # if first trimbit fits in worlds field, stick it there
                     parsed['worlds'] = alg
                     parsed['allegiance'] = allegiance
                     parsed['residual'] = rawtrim.strip()
@@ -522,9 +554,9 @@ class BaseTransformer(Transformer):
         if alleg.startswith('----') and 4 <= len(alleg):
             parsed['allegiance'] = '----'
             parsed['residual'] = alleg[4:] + parsed['residual']
-        elif alleg.startswith('--') and 2 <= len(alleg):
+        elif alleg.startswith('--') and 4 <= len(alleg):
             parsed['allegiance'] = '--'
-            parsed['residual'] = alleg[2:] + parsed['residual']
+            parsed['residual'] = alleg[2:] + ' ' + parsed['residual']
         else:
             counter = 0
             while counter < len(alleg) and (alleg[counter].isalnum() or '-' == alleg[counter] or '?' == alleg[counter]) and 4 > counter:

@@ -19,7 +19,7 @@ from PyRoute.TradeCodes import TradeCodes
 
 class ParseStarInput:
     regex = """
-^([0-3]\d[0-4]\d) +
+^((?:0[1-9]|[1-2]\d|3[0-2])(?:0[1-9]|40|[1-3]\d)) +
 (.{15,}) +
 ([A-HXYa-hxy][0-9A-Fa-f]\w\w[0-9A-Fa-f][0-9A-Xa-x][0-9A-Ja-j]-\w|\?\?\?\?\?\?\?-\?|[A-HXYa-hxy\?][0-9A-Fa-f\?][\w\?]{2,2}[0-9A-Fa-f\?][0-9A-Xa-x\?][0-9A-Ja-j\?]-[\w\?]) +
 (.{15,}) +
@@ -76,8 +76,12 @@ class ParseStarInput:
         star.tradeCode = TradeCodes(data[3].strip())
         star.ownedBy = star.tradeCode.owned_by(star)
 
-        star.economics = data[6].strip().upper() if data[6] and data[6].strip() != '-' else None
-        star.social = data[7].strip().upper() if data[7] and data[7].strip() != '-' else None
+        raw_economics = data[6].strip().upper() if data[6] else None
+        if raw_economics is not None:
+            star.economics = raw_economics if 7 == len(raw_economics) else None
+        raw_social = data[7].strip().upper() if data[7] else None
+        if raw_social is not None:
+            star.social = raw_social if 6 == len(raw_social) else None
 
         star.nobles = Nobles()
         star.nobles.count(data[11])
@@ -126,7 +130,7 @@ class ParseStarInput:
             star.calculate_importance()
             if imp != star.importance:
                 star.logger.warning(
-                    '{}-{} Calculated importance {} does not match generated importance {}'.
+                    '{}-{} IX Calculated importance {} does not match generated importance {}'.
                     format(star, star.baseCode, star.importance, imp))
         else:
             star.calculate_importance()
@@ -266,6 +270,18 @@ class ParseStarInput:
 
         spacer = ' '
         data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'], parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'], parsed['zone'].upper(), parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
+
+        data = ParseStarInput._unpack_starline_tweak(data)
+        return data
+
+    @staticmethod
+    def _unpack_starline_tweak(data):
+        data[1] = data[1].replace('  ', ' ')
+        if data[16].startswith('--') and '----' != data[16]:
+            if 2 < len(data[16]):
+                data[17] = data[16][2:] + " " + data[17]
+                data[16] = '--'
+
         return data
 
     @staticmethod
@@ -319,3 +335,27 @@ class ParseStarInput:
         min_tl = max(0, mod + 1)
         max_tl = mod + 6
         return max_tl, min_tl
+
+    @staticmethod
+    def can_be_nobles(segment) -> bool:
+        if not isinstance(segment, str):
+            return False
+
+        if '-' == segment.strip():
+            return True
+
+        non_noble = [item for item in segment if item not in ParseStarInput.valid_nobles]
+        return 0 == len(non_noble)
+
+    @staticmethod
+    def can_be_base(segment) -> bool:
+        if not isinstance(segment, str):
+            return False
+
+        if '-' == segment or '*' == segment or ' ' == segment:
+            return True
+
+        if 3 < len(segment):
+            return False
+
+        return segment.isupper()

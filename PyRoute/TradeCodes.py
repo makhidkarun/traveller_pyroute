@@ -147,9 +147,15 @@ class TradeCodes(object):
                     codes.append(raw)
                 continue
             if 7 < len(raw) and '(' == raw[0] and ')' == raw[-2]:  # Let older-style sophont codes through
+                if not (raw[-1] in 'WX?' or raw[-1].isdigit()):
+                    raw = raw[:-1]
+                    raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _minor_ race homeworld
                 codes.append(raw)
                 continue
             if 7 < len(raw) and '[' == raw[0] and ']' == raw[-2]:  # Let older-style sophont codes through
+                if not (raw[-1] in 'WX?' or raw[-1].isdigit()):
+                    raw = raw[:-1]
+                    raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _major_ race homeworld
                 codes.append(raw)
                 continue
             if 2 == len(raw) and ('W' == raw[1] or raw[1].isdigit()):
@@ -166,7 +172,8 @@ class TradeCodes(object):
             if not raw.endswith(')') and ')' in raw and raw.startswith('(') and 7 > len(raw):
                 continue
             if not raw.startswith('(') and not raw.endswith(')') and '(' in raw and ')' in raw:
-                continue
+                if not raw.startswith('[') and not raw.endswith(']'):
+                    continue
             if 7 == len(raw) and '(' == raw[0] and ')' == raw[5]:  # Let preprocessed sophont codes through
                 codes.append(raw)
                 continue
@@ -314,11 +321,11 @@ class TradeCodes(object):
             return True
         msg = None
         if star_match and not code_match:
-            msg = '{} - Calculated "{}" not in trade codes {}'.format(star, code, self.codeset)
+            msg = '{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset)
 
         if code_match and not star_match:
-            msg = '{} - Found invalid "{}" code on world with {} population: {}'.format(star, code, star.pop,
-                                                                                       self.codeset)
+            msg = '{}-{} Found invalid "{}" code on world with {} population: {}'.format(star, str(star.uwp), code,
+                                                                                         star.pop, self.codeset)
         if isinstance(listmsg, list):
             listmsg.append(msg)
         else:
