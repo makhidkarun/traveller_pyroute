@@ -18,7 +18,7 @@ class StarlineStationParser:
     starline_grammar = r"""
     starline: position starname trade extensions nobles base zone world_alg? residual?
 
-    position: /^((0[1-9]|[1-2]\d|3[0-2])(0[1-9]|40|[1-3]\d))/
+    position: /^((?:0[1-9]|[1-2]\d|3[0-2])(?:0[1-9]|40|[1-3]\d))/
 
     starname: /(.{15,}) ([A-HXYa-hxy\?][0-9A-Fa-f\?][\w\?]{2,2}[0-9A-Fa-f\?][0-9A-Xa-x\?][0-9A-Ja-j\?]-[\w\?]) /
 

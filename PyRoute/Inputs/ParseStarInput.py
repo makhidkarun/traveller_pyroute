@@ -19,7 +19,7 @@ from PyRoute.TradeCodes import TradeCodes
 
 class ParseStarInput:
     regex = """
-^((0[1-9]|[1-2]\d|3[0-2])(0[1-9]|40|[1-3]\d)) +
+^((?:0[1-9]|[1-2]\d|3[0-2])(?:0[1-9]|40|[1-3]\d)) +
 (.{15,}) +
 ([A-HXYa-hxy][0-9A-Fa-f]\w\w[0-9A-Fa-f][0-9A-Xa-x][0-9A-Ja-j]-\w|\?\?\?\?\?\?\?-\?|[A-HXYa-hxy\?][0-9A-Fa-f\?][\w\?]{2,2}[0-9A-Fa-f\?][0-9A-Xa-x\?][0-9A-Ja-j\?]-[\w\?]) +
 (.{15,}) +
@@ -242,7 +242,6 @@ class ParseStarInput:
         if matches is None:
             return
         data = list(matches.groups())
-        del data[2], data[1]
         parsed = {'position': data[0], 'name': data[1], 'uwp': data[2], 'trade': data[3]}
         raw_extensions = data[4].replace('  ', ' ').replace('{ ', '{').replace(' }', '}')
         oldlen = 0
