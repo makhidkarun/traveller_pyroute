@@ -237,6 +237,13 @@ class TradeCodes(object):
         left_bracket = raw[0]
         right_bracket = ']' if '[' == left_bracket else ')'
 
+        if '(' == left_bracket:
+            raw = '(' + raw.lstrip('(')
+            raw = raw.rstrip(')') + ')'
+        elif '[' == left_bracket:
+            raw = '[' + raw.lstrip('[')
+            raw = raw.rstrip(']') + ']'
+
         trim = raw[1:-1]
         if 35 < len(trim):
             trim = trim[0:35]
