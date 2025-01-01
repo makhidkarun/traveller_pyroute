@@ -124,6 +124,7 @@ class TradeCodes(object):
 
         # catch pseudo-[homeworld] candidates
         pseudo_major = [item for item in self.codes if item.startswith('[') and (1 < item.count('[') and 1 < item.count(']'))]
+        pseudo_major.extend([item for item in self.codes if item.startswith('[]')])
         # reject homeworld matches that are strict subsect of any major homeworld matches
         if 0 < len(homeworld_matches) and 0 < len(homeworld_major):
             for match in homeworld_matches:
@@ -298,6 +299,8 @@ class TradeCodes(object):
         @type homeworld: string
         @type homeworlds_found: list
         """
+        if homeworld.startswith('[]'):
+            return
         full_name = re.sub(r'\[([^)]+)\][\d|W]?', r'\1', homeworld)
         pop = 'W' if ']' == homeworld[-1] else homeworld[-1]
         homeworlds_found.append(homeworld)
