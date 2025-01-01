@@ -67,7 +67,7 @@ class TradeCodes(object):
 
     # Search regexen
     search = re.compile(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W|X|\?)?')
-    search_major = re.compile(r'\w{,2}\[([^)]{,4})[^)]*\](\d|W|X|\?)?')
+    search_major = re.compile(r'\w{,2}\[([^()]{,4})[^)]*\](\d|W|X|\?)?')
     sophont = re.compile(r"[A-Za-z\'!]{1}[\w\'!]{2,4}(\d|W|\?)")
     dieback = re.compile(r"[Di]*\([^)]+\)\d?")
 
@@ -184,7 +184,7 @@ class TradeCodes(object):
                         combo = raw + ' ' + next
                         codes.append(combo)
                         raw_codes[i + 1] = ''
-                    elif ')' == next[-2] and next[-1].isdigit():
+                    elif 2 < len(next) and ')' == next[-2] and next[-1].isdigit():
                         combo = raw + ' ' + next[:-1]
                         codes.append(combo)
                         raw_codes[i + 1] = ''
@@ -201,6 +201,11 @@ class TradeCodes(object):
                 if not (raw[-1] in 'WX?' or raw[-1].isdigit()):
                     raw = raw[:-1]
                     raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _major_ race homeworld
+                else:
+                    pop = raw[-1]
+                    raw = raw[:-1]
+                    raw = self._trim_overlong_homeworld_code(raw)
+                    raw = raw + pop
                 codes.append(raw)
                 continue
             if 2 == len(raw) and ('W' == raw[1] or raw[1].isdigit()):
@@ -284,6 +289,8 @@ class TradeCodes(object):
             raw = raw.rstrip(']') + ']'
 
         trim = raw[1:-1]
+        trim = trim.replace(left_bracket, '')
+        trim = trim.replace(right_bracket, '')
         if 35 < len(trim):
             trim = trim[0:35]
 
