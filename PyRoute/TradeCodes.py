@@ -204,7 +204,8 @@ class TradeCodes(object):
             if not raw.startswith('(') and '(' in raw and raw.endswith(')'):
                 continue
             if not raw.endswith(')') and ')' in raw and raw.startswith('(') and 7 > len(raw):
-                continue
+                if not (')' == raw[-2] and (raw[-1] in 'WX?' or raw[-1].isdigit())):
+                    continue
             if 3 < len(raw) and 'Di(' in raw:
                 moshdex = raw.find('Di(')
                 stub = raw[moshdex:]
@@ -224,14 +225,24 @@ class TradeCodes(object):
                 if not raw.endswith(')') and not raw.endswith(']'):
                     codes.append(raw)
                     continue
-            if raw.endswith(')') or raw.endswith(']'):  # this _is_ a sophont code
-                if raw.startswith('(') or raw.startswith('['):
+            if raw.startswith('(') or raw.startswith('['):  # this _is_ a sophont code
+                if raw.endswith(')') or raw.endswith(']'):
                     if raw.startswith('[') and raw.endswith(']'):
                         raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _major_ race homeworld
                     elif raw.startswith('(') and raw.endswith(')'):
                         raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _minor_ race homeworld
                     codes.append(raw)
                     continue
+                elif 1 < len(raw) and raw[-2] in ')]':
+                    if raw[-1] in 'W?' or raw[-1].isdigit():
+                        pop = raw[-1]
+                    else:
+                        pop = ''
+                    raw = raw[:-1]
+                    raw = self._trim_overlong_homeworld_code(raw)
+                    codes.append(raw + pop)
+                    continue
+
             if i < num_codes - 1:
                 next = raw_codes[i + 1]
                 if next.endswith(')') or next.endswith(']'):
@@ -242,9 +253,11 @@ class TradeCodes(object):
 
         codes = sorted(codes)
 
-        initial_codes = ' '.join(codes)
+        final_codes = ' '.join(codes)
+        if initial_codes != final_codes:
+            codes, final_codes = self._preprocess_initial_codes(final_codes)
 
-        return codes, initial_codes
+        return codes, final_codes
 
     def _trim_overlong_homeworld_code(self, raw):
         # We're assuming raw is a (homeworld) code - not handling pop codes at the moment

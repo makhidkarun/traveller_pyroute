@@ -87,6 +87,11 @@ class testTradeCodes(unittest.TestCase):
     @example('000000DDi(0 1)0')
     @example('0000009e []ADi(')
     @example('0000009e ()ADi(')
+    @example('0000000 [0]0Di(')
+    @example('0000000 (0)0Di(')
+    @example('0000000 [0]?Di(')
+    @example('0000000 (0)?Di(')
+    @example('0000000 [0]ADi(')
     def test_parse_text_to_trade_code(self, s):
         trade = None
         try:
