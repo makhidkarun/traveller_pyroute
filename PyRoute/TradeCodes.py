@@ -116,8 +116,8 @@ class TradeCodes(object):
         homeworld_major = [item for item in self.codes if item.startswith('[') and 1 == item.count('[') and 1 == item.count(']')]
         # catch situation with two or more W-pop sophonts - can't happen
         if 1 < (len(homeworld_matches) + len(homeworld_major) + len(self.sophont_list)):
-            w_pop = [item for item in homeworld_matches if item.endswith(')')]
-            m_pop = [item for item in homeworld_major if item.endswith(']')]
+            w_pop = [item for item in homeworld_matches if item.endswith(')') or item.endswith('W')]
+            m_pop = [item for item in homeworld_major if item.endswith(']') or item.endswith('W')]
             s_pop = [item for item in self.sophont_list if item.endswith('W')]
             if 1 < (len(w_pop) + len(m_pop) + len(s_pop)):
                 raise MultipleWPopError("Can only have at most one W-pop sophont")
@@ -658,7 +658,7 @@ class TradeCodes(object):
         big_sophs = [code for code in self.sophont_list if code.endswith('W')]
         if 1 < len(big_sophs):
             sophs = ' '.join(big_sophs)
-            msg = "Can have at most one W-pop sophont.  Have " + sophs
+            msg = "Can only have at most one W-pop sophont.  Have " + sophs
             return False, msg
 
         return result, msg

@@ -100,6 +100,9 @@ class testTradeCodes(unittest.TestCase):
     @example('0000000000Di( 0')
     @example('000 [DDi(0)]0]0')
     @example('(0000)00 DDi(0)')
+    @example('(00000000) [0]W')
+    @example('(00000000)W [0]')
+    @example('(00000000)W [0]W')
     def test_parse_text_to_trade_code(self, s):
         trade = None
         try:
