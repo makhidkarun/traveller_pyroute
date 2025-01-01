@@ -217,11 +217,6 @@ class TradeCodes(object):
                     pop = raw[1]
                     codes.append('Droy' + pop)
                     continue
-            if not raw.startswith('(') and '(' in raw and raw.endswith(')'):
-                continue
-            if not raw.endswith(')') and ')' in raw and raw.startswith('(') and 7 > len(raw):
-                if not (')' == raw[-2] and (raw[-1] in 'WX?' or raw[-1].isdigit())):
-                    continue
             if 3 < len(raw) and 'Di(' in raw:
                 moshdex = raw.find('Di(')
                 stub = raw[moshdex:]
@@ -230,10 +225,16 @@ class TradeCodes(object):
                 raw_codes.insert(i + 1, stub)
                 num_codes += 1
                 continue
+            if not raw.startswith('(') and '(' in raw and raw.endswith(')'):
+                continue
+            if not raw.endswith(')') and ')' in raw and raw.startswith('(') and 7 > len(raw):
+                if not (')' == raw[-2] and (raw[-1] in 'WX?' or raw[-1].isdigit())):
+                    continue
             if not raw.startswith('(') and not raw.endswith(')') and '(' in raw and ')' in raw:
                 if not raw.startswith('[') and not raw.endswith(']'):
                     continue
-            if 7 == len(raw) and '(' == raw[0] and ')' == raw[5]:  # Let preprocessed sophont codes through
+            if 7 <= len(raw) and '(' == raw[0] and ')' == raw[5]:  # Let preprocessed sophont codes through
+                raw = raw[0:7]
                 codes.append(raw)
                 continue
             if not raw.startswith('(') and not raw.startswith('['):  # this isn't a sophont code
