@@ -155,7 +155,9 @@ class TradeCodes(object):
         # "(Carte Blanche)", and bolt them together
         num_codes = len(raw_codes)
         codes = []
-        for i in range(0, num_codes):
+        i = -1
+        while i < num_codes - 1:
+            i += 1
             raw = raw_codes[i]
             # Filter duplicates
             if raw in codes:
@@ -170,6 +172,11 @@ class TradeCodes(object):
                 raw = '[' + raw.lstrip('[')
             if raw.startswith('(('):
                 raw = '(' + raw.lstrip('(')
+            if 2 < len(raw):
+                if raw.startswith('[]'):
+                    raw = raw[2:]
+                elif raw.startswith('()'):
+                    raw = raw[2:]
             if raw.startswith('Di('):
                 if not raw.endswith(')') and i < num_codes - 1:
                     next = raw_codes[i + 1]
@@ -215,9 +222,8 @@ class TradeCodes(object):
                 stub = raw[moshdex:]
                 raw = raw[:moshdex]
                 codes.append(raw)
-                if i < num_codes - 1:
-                    raw_codes.insert(i + 1, stub)
-                    num_codes += 1
+                raw_codes.insert(i + 1, stub)
+                num_codes += 1
                 continue
             if not raw.startswith('(') and not raw.endswith(')') and '(' in raw and ')' in raw:
                 if not raw.startswith('[') and not raw.endswith(']'):
