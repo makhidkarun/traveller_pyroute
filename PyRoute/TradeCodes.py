@@ -9,6 +9,8 @@ import re
 import logging
 import sys
 
+from PyRoute.Errors.MultipleWPopError import MultipleWPopError
+
 
 class TradeCodes(object):
     """
@@ -118,7 +120,7 @@ class TradeCodes(object):
             m_pop = [item for item in homeworld_major if item.endswith(']')]
             s_pop = [item for item in self.sophont_list if item.endswith('W')]
             if 1 < (len(w_pop) + len(m_pop) + len(s_pop)):
-                raise ValueError("Can only have at most one W-pop sophont")
+                raise MultipleWPopError("Can only have at most one W-pop sophont")
 
         # catch pseudo-[homeworld] candidates
         pseudo_major = [item for item in self.codes if item.startswith('[') and (1 < item.count('[') and 1 < item.count(']'))]

@@ -7,6 +7,7 @@ import re
 
 from lark import UnexpectedCharacters, UnexpectedEOF
 
+from PyRoute.Errors.MultipleWPopError import MultipleWPopError
 from PyRoute.Inputs.StarlineStationParser import StarlineStationParser
 from PyRoute.Inputs.StarlineStationTransformer import StarlineStationTransformer
 from PyRoute.Inputs.StarlineTransformer import StarlineTransformer
@@ -75,10 +76,8 @@ class ParseStarInput:
             raise e
         try:
             star.tradeCode = TradeCodes(data[3].strip())
-        except ValueError as e:
-            if 'Can only have at most one W-pop sophont' == str(e):
-                return None
-            raise e
+        except MultipleWPopError:
+            return None
         star.ownedBy = star.tradeCode.owned_by(star)
 
         raw_economics = data[6].strip().upper() if data[6] else None

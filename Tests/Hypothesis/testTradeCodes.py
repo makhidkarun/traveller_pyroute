@@ -5,6 +5,7 @@ from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, from_regex, composite, sampled_from, lists, floats, booleans
 
 from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Errors.MultipleWPopError import MultipleWPopError
 from PyRoute.TradeCodes import TradeCodes
 from PyRoute.Star import Star
 from PyRoute.SystemData.UWP import UWP
@@ -86,9 +87,8 @@ class testTradeCodes(unittest.TestCase):
         trade = None
         try:
             trade = TradeCodes(s)
-        except ValueError as e:
-            if 'Can only have at most one W-pop sophont' == str(e):
-                assume(False)
+        except MultipleWPopError as e:
+            assume(False)
 
         result, msg = trade.is_well_formed()
         if not msg.endswith(' not in allowed list'):
