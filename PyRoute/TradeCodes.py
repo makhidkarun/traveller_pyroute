@@ -172,6 +172,10 @@ class TradeCodes(object):
                         combo = raw + ' ' + next
                         codes.append(combo)
                         raw_codes[i + 1] = ''
+                    elif ')' == next[-2] and next[-1].isdigit():
+                        combo = raw + ' ' + next[:-1]
+                        codes.append(combo)
+                        raw_codes[i + 1] = ''
                 else:
                     codes.append(raw)
                 continue
@@ -199,6 +203,15 @@ class TradeCodes(object):
             if not raw.startswith('(') and '(' in raw and raw.endswith(')'):
                 continue
             if not raw.endswith(')') and ')' in raw and raw.startswith('(') and 7 > len(raw):
+                continue
+            if 3 < len(raw) and 'Di(' in raw:
+                moshdex = raw.find('Di(')
+                stub = raw[moshdex:]
+                raw = raw[:moshdex]
+                codes.append(raw)
+                if i < num_codes - 1:
+                    raw_codes.insert(i + 1, stub)
+                    num_codes += 1
                 continue
             if not raw.startswith('(') and not raw.endswith(')') and '(' in raw and ')' in raw:
                 if not raw.startswith('[') and not raw.endswith(']'):
