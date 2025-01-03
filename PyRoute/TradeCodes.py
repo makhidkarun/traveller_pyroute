@@ -78,7 +78,7 @@ class TradeCodes(object):
         Constructor
         """
         self.logger = logging.getLogger('PyRoute.TradeCodes')
-        self.codes, initial_codes = self._preprocess_initial_codes(initial_codes)
+        self.codes, initial_codes = self._preprocess_initial_codes(initial_codes.strip())
         self.pcode = set(TradeCodes.pcodes) & set(self.codes)
         self.dcode = set(TradeCodes.dcodes) & set(self.codes)
         self.xcode = TradeCodes.ext_codes & set(self.codes)
