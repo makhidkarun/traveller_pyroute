@@ -9,6 +9,8 @@ import re
 import logging
 import sys
 
+from PyRoute.Errors.MultipleWPopError import MultipleWPopError
+
 
 class TradeCodes(object):
     """
@@ -64,8 +66,8 @@ class TradeCodes(object):
     }
 
     # Search regexen
-    search = re.compile(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W|\?)?')
-    search_major = re.compile(r'\w{,2}\[([^)]{,4})[^)]*\](\d|W|\?)?')
+    search = re.compile(r'\w{,2}\(([^)]{,4})[^)]*\)(\d|W|X|\?)?')
+    search_major = re.compile(r'\w{,2}\[([^()]{,4})[^)]*\](\d|W|X|\?)?')
     sophont = re.compile(r"[A-Za-z\'!]{1}[\w\'!]{2,4}(\d|W|\?)")
     dieback = re.compile(r"[Di]*\([^)]+\)\d?")
 
@@ -76,7 +78,7 @@ class TradeCodes(object):
         Constructor
         """
         self.logger = logging.getLogger('PyRoute.TradeCodes')
-        self.codes, initial_codes = self._preprocess_initial_codes(initial_codes)
+        self.codes, initial_codes = self._preprocess_initial_codes(initial_codes.strip())
         self.pcode = set(TradeCodes.pcodes) & set(self.codes)
         self.dcode = set(TradeCodes.dcodes) & set(self.codes)
         self.xcode = TradeCodes.ext_codes & set(self.codes)
@@ -112,6 +114,28 @@ class TradeCodes(object):
         homeworld_matches = TradeCodes.dieback.findall(initial_codes)
         # bolt on direct [homeworld] candidates
         homeworld_major = [item for item in self.codes if item.startswith('[') and 1 == item.count('[') and 1 == item.count(']')]
+        # catch situation with two or more W-pop sophonts - can't happen
+        if 1 < (len(homeworld_matches) + len(homeworld_major) + len(self.sophont_list)):
+            w_pop = [item for item in homeworld_matches if item.endswith(')') or item.endswith('W')]
+            m_pop = [item for item in homeworld_major if item.endswith(']') or item.endswith('W')]
+            s_pop = [item for item in self.sophont_list if item.endswith('W')]
+            if 1 < (len(w_pop) + len(m_pop) + len(s_pop)):
+                raise MultipleWPopError("Can only have at most one W-pop sophont")
+
+        # catch pseudo-[homeworld] candidates
+        pseudo_major = [item for item in self.codes if item.startswith('[') and (1 < item.count('[') and 1 < item.count(']'))]
+        pseudo_major.extend([item for item in self.codes if item.startswith('[]')])
+        # reject homeworld matches that are strict subsect of any major homeworld matches
+        if 0 < len(homeworld_matches) and 0 < len(homeworld_major):
+            for match in homeworld_matches:
+                over = [item for item in homeworld_major if match in item]
+                if 0 < len(over):
+                    homeworld_matches.remove(match)
+        # reject homeworld matches that contain major homeworld fragments or are otherwise empty
+        if 0 < len(homeworld_matches):
+            homeworld_matches = [item for item in homeworld_matches if ']' not in item and '[' not in item]
+            homeworld_matches = [item for item in homeworld_matches if '' != item[1:-1].strip()]
+
         deadworlds = [item for item in self.codes if 5 == len(item) and 'X' == item[4]]
         for homeworld in homeworld_matches:
             self._process_homeworld(homeworld, homeworlds_found, initial_codes)
@@ -119,6 +143,10 @@ class TradeCodes(object):
             self._process_major_race_homeworld(homeworld, homeworlds_found)
         for deadworld in deadworlds:
             self._process_deadworld(deadworld, homeworlds_found)
+        # bolt on pseudo_major results so they don't get counted as something else
+        homeworlds_found.extend(pseudo_major)
+        for item in pseudo_major:
+            self.codes.remove(item)
         return homeworlds_found
 
     def _preprocess_initial_codes(self, initial_codes):
@@ -127,7 +155,9 @@ class TradeCodes(object):
         # "(Carte Blanche)", and bolt them together
         num_codes = len(raw_codes)
         codes = []
-        for i in range(0, num_codes):
+        i = -1
+        while i < num_codes - 1:
+            i += 1
             raw = raw_codes[i]
             # Filter duplicates
             if raw in codes:
@@ -136,11 +166,26 @@ class TradeCodes(object):
                 continue
             if ')' == raw:
                 continue
+            if raw.startswith(')]') or raw.startswith('])'):
+                continue
+            if raw.startswith('[['):
+                raw = '[' + raw.lstrip('[')
+            if raw.startswith('(('):
+                raw = '(' + raw.lstrip('(')
+            if 2 < len(raw):
+                if raw.startswith('[]'):
+                    raw = raw[2:]
+                elif raw.startswith('()'):
+                    raw = raw[2:]
             if raw.startswith('Di('):
                 if not raw.endswith(')') and i < num_codes - 1:
                     next = raw_codes[i + 1]
                     if next.endswith(')'):
                         combo = raw + ' ' + next
+                        codes.append(combo)
+                        raw_codes[i + 1] = ''
+                    elif 2 < len(next) and ')' == next[-2] and next[-1].isdigit():
+                        combo = raw + ' ' + next[:-1]
                         codes.append(combo)
                         raw_codes[i + 1] = ''
                 else:
@@ -156,6 +201,11 @@ class TradeCodes(object):
                 if not (raw[-1] in 'WX?' or raw[-1].isdigit()):
                     raw = raw[:-1]
                     raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _major_ race homeworld
+                else:
+                    pop = raw[-1]
+                    raw = raw[:-1]
+                    raw = self._trim_overlong_homeworld_code(raw)
+                    raw = raw + pop
                 codes.append(raw)
                 continue
             if 2 == len(raw) and ('W' == raw[1] or raw[1].isdigit()):
@@ -167,26 +217,48 @@ class TradeCodes(object):
                     pop = raw[1]
                     codes.append('Droy' + pop)
                     continue
+            if 3 < len(raw) and 'Di(' in raw:
+                moshdex = raw.find('Di(')
+                stub = raw[moshdex:]
+                raw = raw[:moshdex]
+                codes.append(raw)
+                raw_codes.insert(i + 1, stub)
+                num_codes += 1
+                continue
             if not raw.startswith('(') and '(' in raw and raw.endswith(')'):
                 continue
             if not raw.endswith(')') and ')' in raw and raw.startswith('(') and 7 > len(raw):
-                continue
+                if not (')' == raw[-2] and (raw[-1] in 'WX?' or raw[-1].isdigit())):
+                    continue
             if not raw.startswith('(') and not raw.endswith(')') and '(' in raw and ')' in raw:
                 if not raw.startswith('[') and not raw.endswith(']'):
                     continue
-            if 7 == len(raw) and '(' == raw[0] and ')' == raw[5]:  # Let preprocessed sophont codes through
+            if 7 <= len(raw) and '(' == raw[0] and ')' == raw[5]:  # Let preprocessed sophont codes through
+                raw = raw[0:7]
                 codes.append(raw)
                 continue
             if not raw.startswith('(') and not raw.startswith('['):  # this isn't a sophont code
-                codes.append(raw)
-                continue
-            if raw.endswith(')') or raw.endswith(']'):  # this _is_ a sophont code
-                if raw.startswith('[') and raw.endswith(']'):
-                    raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _major_ race homeworld
-                elif raw.startswith('(') and raw.endswith(')'):
-                    raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _minor_ race homeworld
-                codes.append(raw)
-                continue
+                if not raw.endswith(')') and not raw.endswith(']'):
+                    codes.append(raw)
+                    continue
+            if raw.startswith('(') or raw.startswith('['):  # this _is_ a sophont code
+                if raw.endswith(')') or raw.endswith(']'):
+                    if raw.startswith('[') and raw.endswith(']'):
+                        raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _major_ race homeworld
+                    elif raw.startswith('(') and raw.endswith(')'):
+                        raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _minor_ race homeworld
+                    codes.append(raw)
+                    continue
+                elif 1 < len(raw) and raw[-2] in ')]':
+                    if raw[-1] in 'W?' or raw[-1].isdigit():
+                        pop = raw[-1]
+                    else:
+                        pop = ''
+                    raw = raw[:-1]
+                    raw = self._trim_overlong_homeworld_code(raw)
+                    codes.append(raw + pop)
+                    continue
+
             if i < num_codes - 1:
                 next = raw_codes[i + 1]
                 if next.endswith(')') or next.endswith(']'):
@@ -197,9 +269,11 @@ class TradeCodes(object):
 
         codes = sorted(codes)
 
-        initial_codes = ' '.join(codes)
+        final_codes = ' '.join(codes)
+        if initial_codes != final_codes:
+            codes, final_codes = self._preprocess_initial_codes(final_codes)
 
-        return codes, initial_codes
+        return codes, final_codes
 
     def _trim_overlong_homeworld_code(self, raw):
         # We're assuming raw is a (homeworld) code - not handling pop codes at the moment
@@ -208,7 +282,16 @@ class TradeCodes(object):
         left_bracket = raw[0]
         right_bracket = ']' if '[' == left_bracket else ')'
 
+        if '(' == left_bracket:
+            raw = '(' + raw.lstrip('(')
+            raw = raw.rstrip(')') + ')'
+        elif '[' == left_bracket:
+            raw = '[' + raw.lstrip('[')
+            raw = raw.rstrip(']') + ']'
+
         trim = raw[1:-1]
+        trim = trim.replace(left_bracket, '')
+        trim = trim.replace(right_bracket, '')
         if 35 < len(trim):
             trim = trim[0:35]
 
@@ -247,6 +330,8 @@ class TradeCodes(object):
         @type homeworld: string
         @type homeworlds_found: list
         """
+        if homeworld.startswith('[]'):
+            return
         full_name = re.sub(r'\[([^)]+)\][\d|W]?', r'\1', homeworld)
         pop = 'W' if ']' == homeworld[-1] else homeworld[-1]
         homeworlds_found.append(homeworld)
@@ -573,7 +658,7 @@ class TradeCodes(object):
         big_sophs = [code for code in self.sophont_list if code.endswith('W')]
         if 1 < len(big_sophs):
             sophs = ' '.join(big_sophs)
-            msg = "Can have at most one W-pop sophont.  Have " + sophs
+            msg = "Can only have at most one W-pop sophont.  Have " + sophs
             return False, msg
 
         return result, msg
