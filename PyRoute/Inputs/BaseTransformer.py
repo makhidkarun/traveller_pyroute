@@ -182,7 +182,6 @@ class BaseTransformer(Transformer):
                           and 1 == self.raw.count('-   ')
         tree = self._preprocess_trade_and_extensions(tree)
         tree = self._preprocess_extensions_and_nbz(tree)
-        tree = self._preprocess_trade_and_nbz(tree)
         tree = self._preprocess_tree_suspect_empty_trade_code(tree)
         tree = self._transform_tree(tree)
         parsed = {'ix': None, 'ex': None, 'cx': None, 'residual': ''}
@@ -262,60 +261,6 @@ class BaseTransformer(Transformer):
         nobles.children[0].value = extensions.children[4].value
         if 5 < len(extensions.children):
             zone.children[0].value = extensions.children[5].value
-
-        return tree
-
-    def _preprocess_trade_and_nbz(self, tree):
-        from PyRoute.Inputs.ParseStarInput import ParseStarInput
-        trade = tree.children[2]
-        tradelen = sum([len(item.value) for item in trade.children]) + (len(trade.children) - 1)
-        if 17 > tradelen:
-            return tree
-
-        trade_last = trade.children[-1].value
-        trade_final_keep = trade_last.startswith('O:') or trade_last.startswith('C:')
-        if trade_final_keep:
-            return tree
-
-        starname = tree.children[1].children[0].value
-        bitz = starname.split(' ')
-        bitz = [item for item in bitz if '' != item]
-        rawbitz = self.raw.split(bitz[-1])
-
-        if ParseStarInput.can_be_nobles(tree.children[4].children[0].children[0].value) and \
-                ParseStarInput.can_be_base(tree.children[5].children[0].children[0].value):
-            overrun = 0
-        else:
-            overrun = self._calc_trade_overrun(trade.children, rawbitz[1])
-        if 0 == overrun:  # if the reconstructed trade code is fully in the raw string, nothing to do - bail out now
-            return tree
-
-        nobles = tree.children[4].children[0]
-        base = tree.children[4].children[1]
-        zone = tree.children[4].children[2]
-        world_alg = tree.children[5]
-        pbg = world_alg.children[0]
-        worlds = world_alg.children[1]
-
-        if 0 < overrun:
-            relocate = trade.children[-overrun:]
-            if 1 == overrun:
-                relval = relocate[0].value
-                if '*' == relval:
-                    zone.children[0].value = base.children[0].value
-                    base.children[0].value = relval
-                    nobles.children[0].value = ''
-                else:
-                    zone.children[0].value = base.children[0].value
-                    base.children[0].value = nobles.children[0].value
-                    nobles.children[0].value = relval
-                trade.children = trade.children[:-1]
-            elif 2 == overrun:
-                if '' == nobles.children[0].value.strip() and '' == zone.children[0].value.strip():
-                    zone.children[0].value = base.children[0].value
-                    base.children[0].value = relocate[1].value
-                    nobles.children[0].value = relocate[0].value
-                    trade.children = trade.children[:-2]
 
         return tree
 
