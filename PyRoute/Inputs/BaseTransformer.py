@@ -181,7 +181,6 @@ class BaseTransformer(Transformer):
             1].children[0].value and '' == tree.children[4].children[2].children[0].value.strip() and 1 == self.raw.count(' -')\
                           and 1 == self.raw.count('-   ')
         tree = self._preprocess_trade_and_extensions(tree)
-        tree = self._preprocess_extensions_and_nbz(tree)
         tree = self._preprocess_tree_suspect_empty_trade_code(tree)
         tree = self._transform_tree(tree)
         parsed = {'ix': None, 'ex': None, 'cx': None, 'residual': ''}
@@ -246,21 +245,6 @@ class BaseTransformer(Transformer):
             bitz[2].type = 'cx'
         trade.children = trade.children[:counter]
         extensions.children.extend(bitz)
-
-        return tree
-
-    def _preprocess_extensions_and_nbz(self, tree):
-        extensions = tree.children[3]
-        if 5 > len(extensions.children):  # Nothing to move around, bail out
-            return tree
-
-        nobles = tree.children[4].children[0]
-        # base = tree.children[4].children[1]
-        zone = tree.children[4].children[2]
-
-        nobles.children[0].value = extensions.children[4].value
-        if 5 < len(extensions.children):
-            zone.children[0].value = extensions.children[5].value
 
         return tree
 
