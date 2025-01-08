@@ -29,45 +29,55 @@ class BaseTransformer(Transformer):
         self.crankshaft = False
 
     def starline(self, args):
-        tradelen = sum([len(item) for item in args[2]]) + len(args[2]) - 1
-        if 16 < tradelen and 3 <= len(args[2]) and 1 == len(args[3]) and '' == args[3][0].value.strip():  # Square up overspilled trade codes
-            if '' == args[4].children[0][0].value and '' != args[4].children[1][0].value and '' == args[4].children[2][0].value:
-                move_fwd = 3 == len(args[4].children[1][0].value) and args[4].children[1][0].value.isdigit()  # Will base code still make sense as PBG?
-                move_rev = 3 == len(args[5][2][0].value)  # Will allegiance code still make sense as PBG?
+        # These are the as-parsed values, and we're confirming the values as needed
+        trade = args[2]
+        extensions = args[3]
+        nobles = args[4].children[0][0]
+        base = args[4].children[1][0]
+        zone = args[4].children[2][0]
+        pbg = args[5][0][0]
+        worlds = args[5][1][0]
+        allegiance = args[5][2][0]
+
+        tradelen = sum([len(item) for item in trade]) + len(trade) - 1
+        if 16 < tradelen and 3 <= len(trade) and 1 == len(extensions) and '' == extensions[0].value.strip():  # Square up overspilled trade codes
+            if '' == nobles.value and '' != base.value and '' == zone.value:
+                move_fwd = 3 == len(base.value) and base.value.isdigit()  # Will base code still make sense as PBG?
+                move_rev = 3 == len(allegiance.value)  # Will allegiance code still make sense as PBG?
                 if move_fwd and not move_rev:
-                    last = args[2][-1]
-                    mid = args[2][-2]
-                    args[4].children[2][0].value = args[4].children[1][0].value
-                    args[4].children[1][0].value = last
-                    args[4].children[0][0].value = mid
-                    args[2] = args[2][:-2]
+                    last = trade[-1]
+                    mid = trade[-2]
+                    zone.value = base.value
+                    base.value = last
+                    nobles.value = mid
+                    trade = trade[:-2]
                 elif move_rev and not move_fwd:
                     pass
                 elif move_fwd and move_rev:
                     pass
 
-        if '*' != args[4].children[1][0].value and '' != args[4].children[1][0].value and 3 != len(args[3]):
-            if not self.crankshaft and args[4].children[2][0].value.upper() not in self.zone_active:
-                if '' == args[4].children[0][0].value:
-                    args[4].children[0][0].value = args[4].children[1][0].value
-                    args[4].children[1][0].value = args[4].children[2][0].value
-                elif '' == args[4].children[2][0].value:  # if only 1 extension child?
-                    args[4].children[2][0].value = args[4].children[1][0].value
-                    args[4].children[1][0].value = args[4].children[0][0].value
-                    args[4].children[0][0].value = ''
-        elif '*' != args[4].children[1][0].value and 3 == len(args[3]):
-            if '' == args[4].children[0][0].value and '' != args[4].children[1][0].value and '' == args[4].children[2][0].value:
-                if args[5][0][0].value == args[5][2][0].value:
-                    args[4].children[0][0].value = args[4].children[1][0].value
-                    args[4].children[1][0].value = args[5][0][0].value
-                    args[4].children[2][0].value = args[5][1][0].value
-                    args[5][0][0].value = args[5][2][0].value
-                    args[5][1][0].value = ' '
+        if '*' != base.value and '' != base.value and 3 != len(extensions):
+            if not self.crankshaft and zone.value.upper() not in self.zone_active:
+                if '' == nobles.value:
+                    nobles.value = base.value
+                    base.value = zone.value
+                elif '' == zone.value:  # if only 1 extension child?
+                    zone.value = base.value
+                    base.value = nobles.value
+                    nobles.value = ''
+        elif '*' != base.value and 3 == len(extensions):
+            if '' == nobles.value and '' != base.value and '' == zone.value:
+                if pbg.value == allegiance.value:
+                    nobles.value = base.value
+                    base.value = pbg.value
+                    zone.value = worlds.value
+                    pbg.value = allegiance.value
+                    worlds.value = ' '
                     if 7 == len(args):
-                        args[5][2][0].value = args[6][0].value
+                        allegiance.value = args[6][0].value
                         args[6][0].value = ''
                     else:
-                        args[5][2][0].value = ''
+                        allegiance.value = ''
         if 8 == len(args):  # If there's no residual argument
             if 1 < len(args[7]):
                 tailend = args[7][2][0].value
