@@ -36,8 +36,8 @@ class BaseTransformer(Transformer):
         base = args[4].children[1][0]
         zone = args[4].children[2][0]
         pbg = args[5][0][0]
-        worlds = args[5][1][0]
-        allegiance = args[5][2][0]
+        worlds = args[5][1][0] if 1 < len(args[5]) else Token('__ANON__11', ' ')
+        allegiance = args[5][2][0] if 2 < len(args[5]) else Token('__ANON__12', ' ')
 
         tradelen = sum([len(item) for item in trade]) + len(trade) - 1
         if 16 < tradelen and 3 <= len(trade) and 1 == len(extensions) and '' == extensions[0].value.strip():  # Square up overspilled trade codes
