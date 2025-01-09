@@ -112,10 +112,14 @@ class BaseTransformer(Transformer):
 
     def base(self, args):
         args[0].value = args[0].value.strip()
+        if '' == args[0].value:
+            args[0].value = '-'
         return args
 
     def zone(self, args):
         args[0].value = args[0].value.strip()
+        if '' == args[0].value:
+            args[0].value = '-'
         return args
 
     def pbg(self, args):
