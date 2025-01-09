@@ -28,7 +28,7 @@ def trade_code(draw):
 
 
 @composite
-def starline(draw):
+def starline(draw, barren_world=False):
     col = draw(integers(min_value=1, max_value=32))
     row = draw(integers(min_value=1, max_value=40))
     posn = str(col).rjust(2, '0') + str(row).rjust(2, '0')
@@ -39,9 +39,13 @@ def starline(draw):
     uwp_alphabet = '0123456789ABCDEFGH'
 
     uwp = port + draw(text(min_size=6, max_size=6, alphabet=uwp_alphabet)) + '-' + draw(text(min_size=1, max_size=1, alphabet=uwp_alphabet))
+    if barren_world:
+        uwp = uwp[0:4] + "0" + uwp[5:]
 
     # TODO - tradecode picks
     trade_array = draw(trade_code())
+    if barren_world:
+        trade_array.append('Ba')
     tradeCodes = ' '.join(trade_array)
 
     extension_alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -372,7 +376,7 @@ class testDeltaStar(unittest.TestCase):
         badline = '' if 0 == len(invalid) else invalid[0]
         self.assertEqual(0, len(invalid), 'At least one missing trade code not added: \n' + starline + '\n' + badline)
 
-    @given(starline())
+    @given(starline(barren_world=True))
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))
     @example('0101 0                    A000000-0 As Ba                                  { 0 } (000+0) [0001] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000000-0 As Ba                                  { 0 } (000+0) [0010] - - A 000 0 NaHu G5 V')
