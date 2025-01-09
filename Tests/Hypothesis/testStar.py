@@ -159,6 +159,7 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? [000000000000000000000000000000000000]?       - - A 000   00', '0101 000000000000000      ???????-? [00000000000000000000000000000000000]?                       -    -  A 000 0  00                                                           ')
     @example('0101 02111111111111) ???????-? [oPrh00011111GitpHqwhA{KRNf{rpjqI}7bj]A        - - B 000   100', '0101 02111111111111)      ???????-? [oPrh00011111GitpHqwhA{KRNf{rpjqI}7b]                       -    -  B 000 0  100                                                          ')
     @example('0101 000000000000000 ???????-? [0000000)(]X [        - - B 001   100', '0101 000000000000000      ???????-? [0000000)(]X                                                -    -  B 001 0  100                                                          ')
+    @example('2931 Dinenruum            E432679-6 Na Ni Po Da                           { -3 } (851-2) [7367] B    -  A 122 10 ImDc K1 IV M3 V M4 V', '2931 Dinenruum            E432679-6 Da Na Ni Po                           { -3 } (851-2) [7367] B    -  A 122 10 ImDc K1 IV M3 V M4 V                                          ')
     def test_parse_line_to_star(self, s, t):
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
