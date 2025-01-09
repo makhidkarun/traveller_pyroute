@@ -29,31 +29,55 @@ class BaseTransformer(Transformer):
         self.crankshaft = False
 
     def starline(self, args):
-        tradelen = sum([len(item) for item in args[2]]) + len(args[2]) - 1
-        if 16 < tradelen and 3 <= len(args[2]) and 1 == len(args[3]) and '' == args[3][0].value.strip():  # Square up overspilled trade codes
-            if '' == args[4][0].value and '' != args[5][0].value and '' == args[6][0].value:
-                move_fwd = 3 == len(args[5][0].value) and args[5][0].value[0].isdigit()  # Will base code still make sense as PBG?
-                move_rev = 3 == len(args[7][2][0].value)  # Will allegiance code still make sense as PBG?
+        # These are the as-parsed values, and we're confirming the values as needed
+        trade = args[2]
+        extensions = args[3]
+        nobles = args[4].children[0][0]
+        base = args[4].children[1][0]
+        zone = args[4].children[2][0]
+        pbg = args[5][0][0]
+        worlds = args[5][1][0] if 1 < len(args[5]) else Token('__ANON__11', ' ')
+        allegiance = args[5][2][0] if 2 < len(args[5]) else Token('__ANON__12', ' ')
+
+        tradelen = sum([len(item) for item in trade]) + len(trade) - 1
+        if 16 < tradelen and 3 <= len(trade) and 1 == len(extensions) and '' == extensions[0].value.strip():  # Square up overspilled trade codes
+            if '' == nobles.value and '' != base.value and '' == zone.value:
+                move_fwd = 3 == len(base.value) and base.value.isdigit()  # Will base code still make sense as PBG?
+                move_rev = 3 == len(allegiance.value)  # Will allegiance code still make sense as PBG?
                 if move_fwd and not move_rev:
-                    last = args[2][-1]
-                    mid = args[2][-2]
-                    args[6][0].value = args[5][0].value
-                    args[5][0].value = last
-                    args[4][0].value = mid
-                    args[2] = args[2][:-2]
+                    last = trade[-1]
+                    mid = trade[-2]
+                    zone.value = base.value
+                    base.value = last
+                    nobles.value = mid
+                    trade = trade[:-2]
                 elif move_rev and not move_fwd:
                     pass
                 elif move_fwd and move_rev:
                     pass
-        if '*' != args[5][0].value and '' != args[5][0].value and 3 != len(args[3]):
-            if not self.crankshaft and args[6][0].value.upper() not in self.zone_active:
-                if '' == args[4][0].value:
-                    args[4][0].value = args[5][0].value
-                    args[5][0].value = args[6][0].value
-                elif '' == args[6][0].value:  # if only 1 extension child?
-                    args[6][0].value = args[5][0].value
-                    args[5][0].value = args[4][0].value
-                    args[4][0].value = ''
+
+        if '*' != base.value and '' != base.value and 3 != len(extensions):
+            if not self.crankshaft and zone.value.upper() not in self.zone_active:
+                if '' == nobles.value:
+                    nobles.value = base.value
+                    base.value = zone.value
+                elif '' == zone.value:  # if only 1 extension child?
+                    zone.value = base.value
+                    base.value = nobles.value
+                    nobles.value = ''
+        elif '*' != base.value and 3 == len(extensions):
+            if '' == nobles.value and '' != base.value and '' == zone.value:
+                if pbg.value == allegiance.value:
+                    nobles.value = base.value
+                    base.value = pbg.value
+                    zone.value = worlds.value
+                    pbg.value = allegiance.value
+                    worlds.value = ' '
+                    if 7 == len(args):
+                        allegiance.value = args[6][0].value
+                        args[6][0].value = ''
+                    else:
+                        allegiance.value = ''
         if 8 == len(args):  # If there's no residual argument
             if 1 < len(args[7]):
                 tailend = args[7][2][0].value
@@ -98,10 +122,14 @@ class BaseTransformer(Transformer):
 
     def base(self, args):
         args[0].value = args[0].value.strip()
+        if '' == args[0].value:
+            args[0].value = '-'
         return args
 
     def zone(self, args):
         args[0].value = args[0].value.strip()
+        if '' == args[0].value:
+            args[0].value = '-'
         return args
 
     def pbg(self, args):
@@ -143,7 +171,7 @@ class BaseTransformer(Transformer):
     def extensions_transform(self, extensions):
         if 1 == len(extensions):  # Fallback no-extensions
             return None, None, None
-        data = {}
+        data = {'ix': '', 'ex': '', 'cx': ''}
         for kid in extensions:
             if isinstance(kid, Token):
                 val = str(kid.type)
@@ -163,11 +191,10 @@ class BaseTransformer(Transformer):
         return world_alg[0][0].value, world_alg[1][0].value, world_alg[2][0].value
 
     def transform(self, tree):
-        self.crankshaft = '' == tree.children[4].children[0].value.strip() and '-' == tree.children[5].children[
-            0].value and '' == tree.children[6].children[0].value.strip() and 1 == self.raw.count(' -') and 1 == self.raw.count('-   ')
+        self.crankshaft = '' == tree.children[4].children[0].children[0].value.strip() and '-' == tree.children[4].children[
+            1].children[0].value and '' == tree.children[4].children[2].children[0].value.strip() and 1 == self.raw.count(' -')\
+                          and 1 == self.raw.count('-   ')
         tree = self._preprocess_trade_and_extensions(tree)
-        tree = self._preprocess_extensions_and_nbz(tree)
-        tree = self._preprocess_trade_and_nbz(tree)
         tree = self._preprocess_tree_suspect_empty_trade_code(tree)
         tree = self._transform_tree(tree)
         parsed = {'ix': None, 'ex': None, 'cx': None, 'residual': ''}
@@ -176,12 +203,12 @@ class BaseTransformer(Transformer):
         parsed['name'], parsed['uwp'] = self.starname_transform(tree[1][0].value)
         parsed['trade'] = self.trade_transform(tree[2])
         parsed['ix'], parsed['ex'], parsed['cx'] = self.extensions_transform(tree[3])
-        parsed['nobles'] = tree[4][0].value
-        parsed['base'] = tree[5][0].value
-        parsed['zone'] = tree[6][0].value
-        parsed['pbg'], parsed['worlds'], parsed['allegiance'] = self.world_alg_transform(tree[7])
-        if 9 == len(tree):
-            parsed['residual'] = tree[8][0].value
+        parsed['nobles'] = tree[4].children[0][0].value
+        parsed['base'] = tree[4].children[1][0].value
+        parsed['zone'] = tree[4].children[2][0].value
+        parsed['pbg'], parsed['worlds'], parsed['allegiance'] = self.world_alg_transform(tree[5])
+        if 7 == len(tree):
+            parsed['residual'] = tree[6][0].value
 
         parsed = self._square_up_parsed(parsed)
         self.trim_raw_string(parsed)
@@ -235,71 +262,6 @@ class BaseTransformer(Transformer):
 
         return tree
 
-    def _preprocess_extensions_and_nbz(self, tree):
-        extensions = tree.children[3]
-        if 5 > len(extensions.children):  # Nothing to move around, bail out
-            return tree
-
-        nobles = tree.children[4]
-        # base = tree.children[5]
-        zone = tree.children[6]
-
-        nobles.children[0].value = extensions.children[4].value
-        if 5 < len(extensions.children):
-            zone.children[0].value = extensions.children[5].value
-
-        return tree
-
-    def _preprocess_trade_and_nbz(self, tree):
-        from PyRoute.Inputs.ParseStarInput import ParseStarInput
-        trade = tree.children[2]
-        tradelen = sum([len(item.value) for item in trade.children]) + (len(trade.children) - 1)
-        if 17 > tradelen:
-            return tree
-
-        trade_last = trade.children[-1].value
-        trade_final_keep = trade_last.startswith('O:') or trade_last.startswith('C:')
-        if trade_final_keep:
-            return tree
-
-        starname = tree.children[1].children[0].value
-        bitz = starname.split(' ')
-        bitz = [item for item in bitz if '' != item]
-        rawbitz = self.raw.split(bitz[-1])
-
-        if ParseStarInput.can_be_nobles(tree.children[4].children[0].value) and \
-                ParseStarInput.can_be_base(tree.children[5].children[0].value):
-            overrun = 0
-        else:
-            overrun = self._calc_trade_overrun(trade.children, rawbitz[1])
-        if 0 == overrun:  # if the reconstructed trade code is fully in the raw string, nothing to do - bail out now
-            return tree
-        nobles = tree.children[4]
-        base = tree.children[5]
-        zone = tree.children[6]
-
-        if 0 < overrun:
-            relocate = trade.children[-overrun:]
-            if 1 == overrun:
-                relval = relocate[0].value
-                if '*' == relval:
-                    zone.children[0].value = base.children[0].value
-                    base.children[0].value = relval
-                    nobles.children[0].value = ''
-                else:
-                    zone.children[0].value = base.children[0].value
-                    base.children[0].value = nobles.children[0].value
-                    nobles.children[0].value = relval
-                trade.children = trade.children[:-1]
-            elif 2 == overrun:
-                if '' == nobles.children[0].value.strip() and '' == zone.children[0].value.strip():
-                    zone.children[0].value = base.children[0].value
-                    base.children[0].value = relocate[1].value
-                    nobles.children[0].value = relocate[0].value
-                    trade.children = trade.children[:-2]
-
-        return tree
-
     def _is_noble(self, noble_string):
         noble = "BCcDEeFfGH"
         return all(char in noble for char in noble_string)
@@ -322,11 +284,11 @@ class BaseTransformer(Transformer):
         all_noble = self._is_noble(tree.children[2].children[0])
         if not all_noble:
             return tree
-        if self._is_zone(tree.children[6].children[0].value.strip()):
+        if self._is_zone(tree.children[4].children[2].children[0].value.strip()):
             return tree
-        tree.children[6].children[0].value = tree.children[5].children[0].value
-        tree.children[5].children[0].value = tree.children[4].children[0].value
-        tree.children[4].children[0].value = tree.children[2].children[0].value
+        tree.children[4].children[2].children[0].value = tree.children[4].children[1].children[0].value
+        tree.children[4].children[1].children[0].value = tree.children[4].children[0].children[0].value
+        tree.children[4].children[0].children[0].value = tree.children[2].children[0].value
         tree.children[2].children[0].value = ""
 
         return tree

@@ -16,7 +16,7 @@ def dashrepl(m):
 class StarlineStationParser:
 
     starline_grammar = r"""
-    starline: position starname trade extensions nobles base zone world_alg? residual?
+    starline: position starname trade extensions nbz world_alg? residual?
 
     position: /^((?:0[1-9]|[1-2]\d|3[0-2])(?:0[1-9]|40|[1-3]\d))/
 
@@ -40,7 +40,9 @@ class StarlineStationParser:
     ex: /\([0-9A-Za-z]{3}[+-]\d\)|-/
     cx: /(\[[0-9A-Za-z]{4}[\]\}]|-)/
 
-    nobles: /([BcCDeEfFGH]{1,5}|-| ) /
+    nbz: nobles base zone
+
+    nobles: /([BcCDeEfFGH]{1,5}|-| )/
 
     base: /([A-Z]{1,3}|-|\*) /
 
