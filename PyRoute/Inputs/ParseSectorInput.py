@@ -17,17 +17,14 @@ class ParseSectorInput:
 
         headers = []
         starlines = []
-        isheader = True
         for line in lines:
             if not isinstance(line, str):
                 continue
 
-            if isheader:
-                headers.append(line)
-                if line.startswith('----'):
-                    isheader = False
-            else:
-                if line.startswith('#') or len(line) < 20:
-                    continue
+            if line[0].isdigit():
                 starlines.append(line)
+            else:
+                headers.append(line)
+            continue
+
         return headers, starlines
