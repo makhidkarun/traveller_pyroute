@@ -113,26 +113,31 @@ class Galaxy(AreaItem):
 
             headers, starlines = ParseSectorInput.partition_lines(lines)
 
-            for line in headers:
-                if line.startswith('Hex'):
-                    break
-                if line.startswith('# Subsector'):
-                    data = line[11:].split(':', 1)
-                    pos = data[0].strip()
-                    name = data[1].strip()
-                    sec.subsectors[pos] = Subsector(name, pos, sec)
-                if line.startswith('# Alleg:'):
-                    alg_code = line[8:].split(':', 1)[0].strip()
-                    alg_name = line[8:].split(':', 1)[1].strip().strip('"')
+            # dig out allegiances
+            allegiances = [line for line in headers if line.startswith('# Alleg:')]
 
-                    # A work around for the base Na codes which may be empire dependent.
-                    alg_race = AllyGen.population_align(alg_code, alg_name)
+            for line in allegiances:
+                alg_code = line[8:].split(':', 1)[0].strip()
+                alg_name = line[8:].split(':', 1)[1].strip().strip('"')
 
-                    base = AllyGen.same_align(alg_code)
-                    if base not in self.alg:
-                        self.alg[base] = Allegiance(base, AllyGen.same_align_name(base, alg_name), base=True, population=alg_race)
-                    if alg_code not in self.alg:
-                        self.alg[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)
+                # A work around for the base Na codes which may be empire dependent.
+                alg_race = AllyGen.population_align(alg_code, alg_name)
+
+                base = AllyGen.same_align(alg_code)
+                if base not in self.alg:
+                    self.alg[base] = Allegiance(base, AllyGen.same_align_name(base, alg_name), base=True,
+                                                population=alg_race)
+                if alg_code not in self.alg:
+                    self.alg[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)
+
+            # dig out subsector names, and use them to seed the dict entries
+            sublines = [line for line in headers if line.startswith('# Subsector ')]
+
+            for line in sublines:
+                data = line[11:].split(':', 1)
+                pos = data[0].strip()
+                name = data[1].strip()
+                sec.subsectors[pos] = Subsector(name, pos, sec)
 
             for line in starlines:
                 star = Star.parse_line_into_star(line, sec, pop_code, ru_calc, fix_pop=fix_pop)
