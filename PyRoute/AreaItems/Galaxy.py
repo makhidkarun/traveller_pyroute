@@ -10,6 +10,7 @@ import os
 import ast
 import itertools
 import math
+
 import networkx as nx
 import numpy as np
 
@@ -84,6 +85,7 @@ class Galaxy(AreaItem):
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
         ParseStarInput.deep_space = {} if (options.deep_space is None or not isinstance(options.deep_space, dict)) else options.deep_space
         for sector in sectors:
+            lines = []
             try:
                 with codecs.open(sector, 'r', 'utf-8') as infile:
                     try:
@@ -94,6 +96,10 @@ class Galaxy(AreaItem):
             except FileNotFoundError:
                 self.logger.error("sector file %s not found" % sector)
                 continue
+
+            if 0 == len(lines):
+                continue
+
             self.logger.debug('reading %s ' % sector)
 
             sec = Sector(lines[3], lines[4])
