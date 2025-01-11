@@ -12,6 +12,7 @@ from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
 from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Inputs.ParseSectorInput import ParseSectorInput
 from PyRoute.Star import Star
 
 
@@ -354,7 +355,7 @@ class SectorDictionary(dict):
         position = lines[4]
 
         sector = SectorDictionary(name.strip(), basename)
-        headers, starlines = SectorDictionary._partition_file(lines)
+        headers, starlines = ParseSectorInput.partition_lines(lines)
         sector.headers = headers
         sector.position = position.strip()
 

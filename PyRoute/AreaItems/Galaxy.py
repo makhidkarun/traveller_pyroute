@@ -20,6 +20,7 @@ from PyRoute.AreaItems.AreaItem import AreaItem
 from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.AreaItems.Subsector import Subsector
 from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Inputs.ParseSectorInput import ParseSectorInput
 from PyRoute.Star import Star
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Calculation.TradeMPCalculation import TradeMPCalculation
@@ -109,6 +110,8 @@ class Galaxy(AreaItem):
             else:
                 self.logger.error("sector file %s loads duplicate sector %s" % (sector, str(sec)))
                 continue
+
+            headers, starlines = ParseSectorInput.partition_lines(lines)
 
             for lineno, line in enumerate(lines):
                 if line.startswith('Hex'):
