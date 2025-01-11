@@ -113,7 +113,7 @@ class Galaxy(AreaItem):
 
             headers, starlines = ParseSectorInput.partition_lines(lines)
 
-            for lineno, line in enumerate(lines):
+            for line in headers:
                 if line.startswith('Hex'):
                     break
                 if line.startswith('# Subsector'):
@@ -134,9 +134,7 @@ class Galaxy(AreaItem):
                     if alg_code not in self.alg:
                         self.alg[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)
 
-            for line in lines[lineno + 2:]:
-                if line.startswith('#') or len(line) < 20:
-                    continue
+            for line in starlines:
                 star = Star.parse_line_into_star(line, sec, pop_code, ru_calc, fix_pop=fix_pop)
                 if star:
                     assert star not in sec.worlds, "Star " + str(star) + " duplicated in sector " + str(sec)
