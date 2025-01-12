@@ -42,4 +42,4 @@ class testUniqueSectors(baseTest):
                 outfile.close()
 
                 self.assertEqual(len(outlines), len(inlines), filename + " has at least one duplicate")
-
+                self.assertEqual(outlines, inlines, "Lines in " + filename + " not correctly sorted")
