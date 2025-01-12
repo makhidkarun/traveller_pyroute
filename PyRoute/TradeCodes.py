@@ -570,6 +570,10 @@ class TradeCodes(object):
         return 'De' in self.codeset
 
     @functools.cached_property
+    def icy_world(self) -> bool:
+        return 'Ic' in self.codeset
+
+    @functools.cached_property
     def fluid(self):
         return 'Fl' in self.codeset
 
