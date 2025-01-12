@@ -47,9 +47,7 @@ def process():
         logger.error("Sector file " + srcfile + " not found.  Cannot continue.")
         raise e
 
-    line_set = set()
-    for line in lines:
-        line_set.add(line)
+    line_set = set(lines)
 
     lines = list(line_set)
     lines.sort()
