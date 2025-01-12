@@ -71,7 +71,6 @@ Iwahfuah
 K'trekreer
 Kaa G!'kul
 Karleaya
-Kruse
 Katoonah
 Kfazz Ghik
 Khaeaw
@@ -82,9 +81,9 @@ Knaeleng
 Knoellighz
 Kolire
 Kring Noor
+Kruse
 Ksinanirz
 Ktiin'gzat
-K'trekreer
 Langere
 Leonidae
 Ley Sector
@@ -108,8 +107,8 @@ Numbis
 Nuughe
 Oeghz Vaerrghr
 Old Expanses
-Phlask
 Phlange
+Phlask
 Porlock
 Provence
 Raakaan
