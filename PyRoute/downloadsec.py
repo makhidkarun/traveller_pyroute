@@ -44,6 +44,7 @@ if __name__ == '__main__':
                         help='Include route information in the sector downloads')
     parser.add_argument('sector_list', help='List of sectors to download')
     parser.add_argument('output_dir', help='output directory for sector data and xml metadata')
+    parser.add_argument('--milieu', default="M1105", help="Milieu of data to download")
     args = parser.parse_args()
 
     sectorsList = [line for line in codecs.open(args.sector_list, 'r', 'utf-8')]
@@ -51,7 +52,7 @@ if __name__ == '__main__':
     for sector in sectorsList:
         sector = sector.rstrip()
         print('Downloading %s' % sector)
-        params = {'sector': sector, 'type': 'SecondSurvey'}
+        params = {'sector': sector, 'type': 'SecondSurvey', "milieu": args.milieu}
         if args.routes:
             params['routes'] = '1'
         params = urllib.parse.urlencode(params)

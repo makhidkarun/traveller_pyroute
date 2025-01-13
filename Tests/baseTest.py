@@ -1,10 +1,16 @@
 import argparse
+import logging
 import os
 import tempfile
 import unittest
 
 
 class baseTest(unittest.TestCase):
+
+    # Set up logging information
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.DEBUG)
+
     def unpack_filename(self, filename):
         # try unpacked filename directly
         sourcefile = os.path.abspath(filename)
@@ -56,6 +62,7 @@ class baseTest(unittest.TestCase):
         args.interestingline = None
 
         return args
+
 
 if __name__ == '__main__':
     unittest.main()
