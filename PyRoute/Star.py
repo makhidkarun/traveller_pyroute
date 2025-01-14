@@ -97,6 +97,15 @@ class Star(object):
         self.hex = None
         self.deep_space_station = False
         self._oldskool = False
+        # Generated trade values
+        self.tradeIn = None
+        self.tradeOver = None
+        self.tradeCount = None
+        self.passIn = None
+        self.passOver = None
+        self.starportSize = None
+        self.starportBudget = None
+        self.starportPop = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
