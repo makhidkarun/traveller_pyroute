@@ -8,6 +8,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 from PyRoute.Outputs.Colour import Colour
 from PyRoute.Outputs.Cursor import Cursor
+from PyRoute.Outputs.FontLayer import FontLayer
 from PyRoute.Outputs.Map import MapOutput, Scheme
 
 
@@ -21,8 +22,10 @@ class PDFMap(MapOutput):
     def __init__(self, galaxy, routes: str, output_path: str, writer: str):
         super(PDFMap, self).__init__(galaxy, routes, output_path, writer)
         self.doc: canvas.Canvas
+        self.font_layer = FontLayer()
 
-        pdfmetrics.registerFont(TTFont('Zapf', 'ZapfDingbats-Regular.ttf'))
+        zapf_path = self.font_layer.getpath('ZapfDingbats-Regular.ttf')
+        pdfmetrics.registerFont(TTFont('Zapf', zapf_path))
 
         self.fonts: dict[str, [str, float]] = {
             'title': ('Times-Bold', 25),
