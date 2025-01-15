@@ -13,7 +13,7 @@ class baseTest(unittest.TestCase):
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.DEBUG)
 
-    def unpack_filename(self, filename):
+    def unpack_filename(self, filename: str) -> str:
         return UnpackFilename.unpack_filename(filename)
 
     def unpack_workdir(self, dirname):
