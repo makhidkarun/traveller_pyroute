@@ -119,7 +119,7 @@ class testHexMap(baseTest):
         hexmap = ClassicModePDFSectorMap(galaxy, 'trade', args.output, "dense")
 
         targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
-        result = hexmap.write_sector_map(galaxy.sectors[secname])
+        _ = hexmap.write_sector_map(galaxy.sectors[secname])
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
@@ -183,7 +183,7 @@ class testHexMap(baseTest):
         hexmap = ClassicModePDFSectorMap(galaxy, 'trade', args.output, "dense")
 
         targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
-        result = hexmap.write_sector_map(galaxy.sectors[secname])
+        _ = hexmap.write_sector_map(galaxy.sectors[secname])
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
@@ -248,7 +248,7 @@ class testHexMap(baseTest):
         hexmap = ClassicModePDFSectorMap(galaxy, 'comm', args.output, "dense")
 
         targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
-        result = hexmap.write_sector_map(galaxy.sectors[secname])
+        _ = hexmap.write_sector_map(galaxy.sectors[secname])
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
@@ -465,7 +465,7 @@ class testHexMap(baseTest):
         hexmap = ClassicModePDFSectorMap(galaxy, 'xroute', args.output, "dense")
 
         targpath = os.path.abspath(args.output + '/Zarushagar Sector.pdf')
-        result = hexmap.write_sector_map(galaxy.sectors[secname])
+        _ = hexmap.write_sector_map(galaxy.sectors[secname])
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
