@@ -12,6 +12,7 @@ from pymupdf import pymupdf
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
+from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
 from PyRoute.Outputs.PDFHexMap import PDFHexMap
 from PyRoute.Position.Hex import Hex
 from Tests.baseTest import baseTest
