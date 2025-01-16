@@ -6,6 +6,13 @@ Created on Mar 26, 2014
 import functools
 import typing
 
+from typing_extensions import TypeAlias
+from PyRoute.Outputs.Colour import Colour
+from PyRoute.Position.Hex import HexPos
+
+Alg: TypeAlias = typing.Optional[str]
+AllyMap: TypeAlias = dict[HexPos, Alg]
+
 
 class AllyGen(object):
     """
@@ -17,13 +24,16 @@ class AllyGen(object):
                   'VaEx',
                   'CsCa', 'CsHv', 'CsIm', 'CsMP', 'CsVa', 'CsZh', 'CsRe', 'CsMo', 'CsRr', "CsTw",
                   'Wild']
-    sameAligned = [('Im', 'ImAp', 'ImDa', 'ImDc', 'ImDd', 'ImDg', 'ImDi', 'ImDs', 'ImDv',
-                    'ImLa', 'ImLc', 'ImLu', 'ImSy', 'ImVd'),
+    sameAligned: list[tuple[Alg]] = [('Im', 'ImAp', 'ImDa', 'ImDc', 'ImDd', 'ImDg', 'ImDi', 'ImDs', 'ImDv',
+                    'ImLa', 'ImLc', 'ImLu', 'ImSy', 'ImVd',
+                    'I0', 'I1', 'I2', 'I3', 'I4', 'I5'),  # Testing values,
                    ('As', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8',
                     'A9', 'TE', 'Of', 'If',
                     'AsIf', 'AsMw', 'AsOf', 'AsSc', 'AsSF', 'AsT0', 'AsT1', 'AsT2',
                     'AsT3', 'AsT4', 'AsT5', 'AsT6', 'AsT7', 'AsT8', 'AsT9', 'AsTA',
                     'AsTv', 'AsTz', 'AsVc', 'AsWc', 'AsXX'),
+                   ('Cr', 'CrRg'),
+                   ('Kr', 'KrPr'),
                    ('Hv', 'HvFd', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H?', 'Hf'),
                    ('JP', 'J-', 'Jh', 'Hl', 'JuPr',
                     'JAOz', 'JAsi', 'JCoK', 'JHhk', 'JLum', 'JMen',
@@ -45,7 +55,7 @@ class AllyGen(object):
                    ('Zh', 'ZhAx', 'ZhCa', 'ZhCh', 'ZhCo', 'ZhIa', 'ZhIN',
                     'ZhJp', 'ZhMe', 'ZhOb', 'ZhSh', 'ZhVQ')]
 
-    default_population = {
+    default_population: dict[Alg, str] = {
         "As": "Asla",
         "Cr": "Huma",
         "Dr": "Droy",
@@ -96,7 +106,7 @@ class AllyGen(object):
         "ZhCa": "Vlaz"
     }
 
-    alleg_border_colours = {
+    alleg_border_colors: dict[Alg, Colour] = {
         "Im": "red",
         "As": "yellow",
         "Cr": "gold",
@@ -129,52 +139,53 @@ class AllyGen(object):
         "SwCf": "blue",
         "VAug": "olive",
         "VDzF": "olive",
+        'I0': 'red', 'I1': 'red', 'I2': 'red', 'I3': 'red', 'I4': 'red',  # Testing Colors
         "NONE": "white",  # Default color
     }
 
     @staticmethod
-    def is_unclaimed(alg: typing.Optional[str]) -> bool:
+    def is_unclaimed(alg: Alg) -> bool:
         return alg in AllyGen.noOne
 
     @staticmethod
-    def is_nonaligned(alg: typing.Optional[str], strict=False) -> bool:
+    def is_nonaligned(alg: Alg, strict=False) -> bool:
         if strict:
             return alg in AllyGen.nonAligned
         return alg in AllyGen.nonAligned or alg in AllyGen.noOne
 
     @staticmethod
-    def is_wilds(alg: str) -> bool:
+    def is_wilds(alg: Alg) -> bool:
         if alg is None:
             return False
         return alg[0:2] == 'Na' or alg in ['Wild', 'VaEx', 'Va']
 
     @staticmethod
-    def is_client_state(alg: str) -> bool:
+    def is_client_state(alg: Alg) -> bool:
         if alg is None:
             return False
         return alg[0:2] == 'Cs'
 
     @staticmethod
     @functools.cache
-    def same_align(alg: typing.Optional[str]) -> str:
+    def same_align(alg: Alg) -> str:
         for sameAlg in AllyGen.sameAligned:
             if alg in sameAlg:
                 return sameAlg[0]
         return alg
 
     @staticmethod
-    def imperial_align(alg: typing.Optional[str]) -> bool:
+    def imperial_align(alg: Alg) -> bool:
         return AllyGen.same_align(alg) == 'Im'
 
     @staticmethod
-    def same_align_name(alg: typing.Optional[str], alg_name: typing.Optional[str]) -> str:
+    def same_align_name(alg: Alg, alg_name: typing.Optional[str]) -> str:
         if alg in AllyGen.nonAligned:
             return alg_name
         else:
             return alg_name.split(',')[0].strip()
 
     @staticmethod
-    def population_align(alg: typing.Optional[str], name: str) -> str:
+    def population_align(alg: Alg, name: str) -> str:
         # Try getting the default cases
         code = AllyGen.default_population.get(alg, AllyGen.default_population.get(AllyGen.same_align(alg), None))
 
@@ -202,7 +213,7 @@ class AllyGen(object):
         return code
 
     @staticmethod
-    def sort_allegiances(alg_list: dict, base_match_only: bool) -> list:
+    def sort_allegiances(alg_list: dict, base_match_only: bool) -> list[Alg]:
         # The logic:
         # base_match_only == true -> --ally-match=collapse
         # only what matches the base allegiances
@@ -226,7 +237,7 @@ class AllyGen(object):
         return algs
 
     @staticmethod
-    def are_owned_allies(alg1: typing.Optional[str], alg2: typing.Optional[str]) -> bool:
+    def are_owned_allies(alg1: Alg, alg2: Alg) -> bool:
         """
         Public function to determine if the Allegiances of two
         world are considered allied for the owned world checks.
@@ -244,7 +255,7 @@ class AllyGen(object):
 
     @staticmethod
     @functools.cache
-    def are_allies(alg1: typing.Optional[str], alg2: typing.Optional[str]) -> bool:
+    def are_allies(alg1: Alg, alg2: Alg) -> bool:
         """
         Public function to determine if the Allegiance of two
         worlds are considered allied for trade purposes or not.
