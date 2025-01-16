@@ -12,6 +12,7 @@ from pymupdf import pymupdf
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.HexMap import HexMap
+from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
 from PyRoute.Outputs.PDFHexMap import PDFHexMap
 from Tests.baseTest import baseTest
 
@@ -104,53 +105,6 @@ class testHexMap(baseTest):
                 self.assertEqual('ReportLab', document._doc.info.creator)
                 self.assertEqual(expected_path, document._filename)
 
-    def test_verify_empty_sector_write(self):
-        sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
-
-        outfile = self.unpack_filename('OutputFiles/verify_empty_sector_write/Zao Kfeng Ig Grilokh empty.txt')
-
-        args = self._make_args()
-        args.interestingline = None
-        args.interestingtype = None
-        args.maps = True
-        args.subsectors = True
-
-        delta = DeltaDictionary()
-        sector = SectorDictionary.load_traveller_map_file(sourcefile)
-        delta[sector.name] = sector
-
-        galaxy = DeltaGalaxy(args.btn, args.max_jump)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
-                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
-
-        galaxy.output_path = args.output
-
-        secname = 'Zao Kfeng Ig Grilokh'
-
-        hexmap = HexMap(galaxy, 'trade')
-        self.assertTrue(hexmap.compression)
-
-        oldtime = b'20230911163653'
-        oldmd5 = b'8419949643701e6b438d6f3f93239cf7'
-
-        with open(outfile, 'rb') as file:
-            expected_result = file.read()
-
-        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=False)
-        self.assertFalse(hexmap.compression)
-        self.assertIsNotNone(result)
-        # rather than try to mock datetime.now(), patch the output result.
-        # this also lets us check that there's only a single match
-        matches = self.timeline.search(result)
-        self.assertEqual(1, len(matches.groups()), 'Should be exactly one create-date match')
-        result = self.timeline.sub(oldtime, result)
-        # likewise patch md5 outout
-        matches = self.md5line.findall(result)
-        self.assertEqual(2, len(matches), 'Should be exactly two MD5 matches')
-        result = self.md5line.sub(oldmd5, result)
-
-        self.assertEqual(expected_result, result)
-
     def test_verify_empty_sector_write_pdf(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
         srcpdf = self.unpack_filename(
@@ -174,12 +128,11 @@ class testHexMap(baseTest):
 
         secname = 'Zao Kfeng Ig Grilokh'
 
-        hexmap = PDFHexMap(galaxy, 'trade')
-        self.assertTrue(hexmap.compression)
+        hexmap = LightModePDFSectorMap(galaxy, 'trade', args.output, "light")
 
         targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
-        _ = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
-        self.assertTrue(hexmap.compression)
+        #_ = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        hexmap.write_maps()
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
@@ -200,7 +153,8 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference above threshold")
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
+
 
     @pytest.mark.xfail(reason='Flaky on ubuntu')
     def test_verify_subsector_trade_write(self):
@@ -238,29 +192,6 @@ class testHexMap(baseTest):
         self._load_ranges(galaxy, rangesfile)
         self.assertEqual(27, len(galaxy.ranges.nodes()), "Unexpected number of ranges nodes")
         self.assertEqual(44, len(galaxy.ranges.edges), "Unexpected number of ranges edges")
-
-        secname = 'Zao Kfeng Ig Grilokh'
-
-        hexmap = HexMap(galaxy, 'trade')
-
-        oldtime = b'20230912001440'
-        oldmd5 = b'b1f97f6ac37340ab332a9a0568711ec0'
-
-        with open(outfile, 'rb') as file:
-            expected_result = file.read()
-
-        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=False)
-        self.assertIsNotNone(result)
-        # rather than try to mock datetime.now(), patch the output result.
-        # this also lets us check that there's only a single match
-        matches = self.timeline.search(result)
-        self.assertEqual(1, len(matches.groups()), 'Should be exactly one create-date match')
-        result = self.timeline.sub(oldtime, result)
-        # likewise patch md5 output
-        matches = self.md5line.findall(result)
-        self.assertEqual(2, len(matches), 'Should be exactly two MD5 matches')
-        result = self.md5line.sub(oldmd5, result)
-        self.assertEqual(expected_result, result)
 
     def test_verify_subsector_trade_write_pdf(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
@@ -300,10 +231,11 @@ class testHexMap(baseTest):
 
         secname = 'Zao Kfeng Ig Grilokh'
 
-        hexmap = PDFHexMap(galaxy, 'trade')
+        hexmap = LightModePDFSectorMap(galaxy, 'trade', args.output, "light")
 
         targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
-        _ = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        #_ = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        hexmap.write_maps()
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
@@ -324,7 +256,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference above threshold")
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
 
     def test_verify_subsector_comm_write(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
@@ -362,29 +294,6 @@ class testHexMap(baseTest):
         self._load_ranges(galaxy, rangesfile)
         self.assertEqual(27, len(galaxy.ranges.nodes()), "Unexpected number of ranges nodes")
         self.assertEqual(28, len(galaxy.ranges.edges), "Unexpected number of ranges edges")
-
-        secname = 'Zao Kfeng Ig Grilokh'
-
-        hexmap = HexMap(galaxy, 'trade')
-
-        oldtime = b'20230912013953'
-        oldmd5 = b'ff091edb9d8ca0abacea39e5791a9843'
-
-        with open(outfile, 'rb') as file:
-            expected_result = file.read()
-
-        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=False)
-        self.assertIsNotNone(result)
-        # rather than try to mock datetime.now(), patch the output result.
-        # this also lets us check that there's only a single match
-        matches = self.timeline.search(result)
-        self.assertEqual(1, len(matches.groups()), 'Should be exactly one create-date match')
-        result = self.timeline.sub(oldtime, result)
-        # likewise patch md5 output
-        matches = self.md5line.findall(result)
-        self.assertEqual(2, len(matches), 'Should be exactly two MD5 matches')
-        result = self.md5line.sub(oldmd5, result)
-        self.assertEqual(expected_result, result)
 
     def test_verify_subsector_comm_write_pdf(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
@@ -425,10 +334,11 @@ class testHexMap(baseTest):
 
         secname = 'Zao Kfeng Ig Grilokh'
 
-        hexmap = PDFHexMap(galaxy, 'comm')
+        hexmap = LightModePDFSectorMap(galaxy, 'comm', args.output, "light")
 
         targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
-        _ = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        # _ = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        hexmap.write_maps()
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
@@ -449,7 +359,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference above threshold")
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
 
     def test_verify_coreward_rimward_sector(self):
         source1file = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
@@ -481,12 +391,12 @@ class testHexMap(baseTest):
         zaokpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
         ngatpath = os.path.abspath(args.output + '/Ngathksirz Sector.pdf')
 
-        hexmap = PDFHexMap(galaxy, 'trade')
+        hexmap = LightModePDFSectorMap(galaxy, 'trade', args.output, "light")
 
         secname = 'Zao Kfeng Ig Grilokh'
-        hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        hexmap.write_sector_map(galaxy.sectors[secname])
         secname = 'Ngathksirz'
-        hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        hexmap.write_sector_map(galaxy.sectors[secname])
 
         srczaok = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector original.png')
         srcngat = os.path.abspath(args.output + '/Ngathksirz Sector original.png')
@@ -524,7 +434,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference above threshold")
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
 
         image1 = Image.open(srcngat)
         image2 = Image.open(trgngat)
@@ -532,7 +442,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference above threshold")
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Ngathksirz sector")
 
     def test_verify_spinward_trailing_sector(self):
         source1file = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
@@ -564,12 +474,12 @@ class testHexMap(baseTest):
         zaokpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
         ngatpath = os.path.abspath(args.output + '/Knaeleng Sector.pdf')
 
-        hexmap = PDFHexMap(galaxy, 'trade')
+        hexmap = LightModePDFSectorMap(galaxy, 'trade', args.output, "light")
 
         secname = 'Zao Kfeng Ig Grilokh'
-        hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        hexmap.write_sector_map(galaxy.sectors[secname])
         secname = 'Knaeleng'
-        hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        hexmap.write_sector_map(galaxy.sectors[secname])
 
         srczaok = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector original.png')
         srcngat = os.path.abspath(args.output + '/Knaeleng Sector original.png')
@@ -607,7 +517,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference above threshold")
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
 
         image1 = Image.open(srcngat)
         image2 = Image.open(trgngat)
@@ -615,7 +525,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference above threshold")
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Knaeleng sector")
 
     def test_verify_xboat_write_pdf(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
@@ -642,10 +552,11 @@ class testHexMap(baseTest):
 
         secname = 'Zarushagar'
 
-        hexmap = PDFHexMap(galaxy, 'xroute')
+        hexmap = LightModePDFSectorMap(galaxy, 'xroute', args.output, "light")
 
         targpath = os.path.abspath(args.output + '/Zarushagar Sector.pdf')
-        _ = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        #_ = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        hexmap.write_maps()
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
@@ -666,7 +577,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold")
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zarushagar sector")
 
     def test_verify_quadripoint_trade_write(self):
         source1file = self.unpack_filename('DeltaFiles/quadripoint_trade_write/Tuglikki.sec')
@@ -703,9 +614,9 @@ class testHexMap(baseTest):
 
         secname = ['Tuglikki', 'Provence', 'Deneb', 'Corridor']
 
-        hexmap = PDFHexMap(galaxy, 'trade', args.btn)
+        hexmap = LightModePDFSectorMap(galaxy, 'trade', args.output, "light")
         for sector_name in secname:
-            hexmap.write_sector_pdf_map(galaxy.sectors[sector_name], is_live=True)
+            hexmap.write_sector_map(galaxy.sectors[sector_name])
 
         fullname = ['Tuglikki Sector', 'Provence Sector', 'Deneb Sector', 'Corridor Sector']
         srcstem = self.unpack_filename('OutputFiles/verify_quadripoint_trade_write/Corridor Sector.pdf')
