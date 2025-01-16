@@ -6,13 +6,14 @@ from PIL import Image
 
 import networkx as nx
 import numpy as np
-import pytest
 from pymupdf import pymupdf
 
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
 from PyRoute.Outputs.SubsectorMap import SubsectorMap
+from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
+from PyRoute.Outputs.PDFHexMap import PDFHexMap
 from PyRoute.Position.Hex import Hex
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from Tests.baseTest import baseTest
