@@ -3,19 +3,12 @@ import os
 import tempfile
 import unittest
 
+from PyRoute.Utilities.UnpackFilename import UnpackFilename
+
 
 class baseTest(unittest.TestCase):
     def unpack_filename(self, filename):
-        # try unpacked filename directly
-        sourcefile = os.path.abspath(filename)
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../' + filename)
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('Tests/' + filename)
-        if not os.path.isfile(sourcefile):
-            sourcefile = os.path.abspath('../Tests/' + filename)
-
-        return sourcefile
+        return UnpackFilename.unpack_filename(filename)
 
     def unpack_workdir(self, dirname):
         # try unpacked directory directly
