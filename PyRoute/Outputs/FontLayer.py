@@ -3,12 +3,15 @@ Created on Dec 04, 2021
 
 @author: CyberiaResurrection
 
-A dirt-simple adapter layer to abstract the differences in where Linux distros (currently, Ubuntu and Fedora)
-store their font files away from the rest of the project
+A dirt-simple adapter layer that used to abstract the differences in where Linux distros (currently, Ubuntu and Fedora)
+store their font files away from the rest of the project.  Now, it still serves as a SPOT for font locations, even
+though they're now bundled with the project.
 """
 
-from os import path
+import os
 import functools
+
+from PyRoute.Utilities.UnpackFilename import UnpackFilename
 
 
 class FontLayer(object):
@@ -16,20 +19,27 @@ class FontLayer(object):
 
     def __init__(self):
         self.fontdict['DejaVuSerifCondensed.ttf'] = [
-            '/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf',
-            '/usr/share/fonts/dejavu-serif-fonts/DejaVuSerifCondensed.ttf'
+            UnpackFilename.unpack_filename('../PyRoute/Fonts/DejaVuSerifCondensed.ttf')
+        ]
+        self.fontdict['DejaVuSerifCondensed-Bold.ttf'] = [
+            UnpackFilename.unpack_filename('../PyRoute/Fonts/DejaVuSerifCondensed-Bold.ttf')
         ]
         self.fontdict['LiberationMono-Bold.ttf'] = [
-            '/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf',
-            '/usr/share/fonts/liberation-mono/LiberationMono-Bold.ttf'
+            UnpackFilename.unpack_filename('../PyRoute/Fonts/LiberationMono-Bold.ttf')
         ]
         self.fontdict['FreeMono.ttf'] = [
-            '/usr/share/fonts/truetype/freefont/FreeMono.ttf',
-            '/usr/share/fonts/gnu-free/FreeMono.ttf'
+            UnpackFilename.unpack_filename('../PyRoute/Fonts/FreeMono.ttf')
         ]
         self.fontdict['Symbola-hint.ttf'] = [
-            '/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf',
-            '/usr/share/fonts/gdouros-symbola/Symbola.ttf'
+            UnpackFilename.unpack_filename('../PyRoute/Fonts/Symbola-hint.ttf')
+        ]
+
+        self.fontdict['ZapfDingbats_Regular.ttf'] = [
+            UnpackFilename.unpack_filename('../PyRoute/Fonts/ZapfDingbats-Regular.ttf')
+        ]
+
+        self.fontdict['ZapfDingbats-Regular.ttf'] = [
+            UnpackFilename.unpack_filename('../PyRoute/Fonts/ZapfDingbats-Regular.ttf')
         ]
 
     @functools.cache
@@ -40,10 +50,8 @@ class FontLayer(object):
 
         for item in filelist:
             # for moment, don't care whether is a hard or softlinked file
-            if path.exists(item):
-                if not path.isdir(item):
+            if os.path.exists(item):
+                if not os.path.isdir(item):
                     return item
 
-        assert False, "Font mapping for " + filename + " not found"
-
-        return None
+        assert False, "Font mapping for " + filename + " not found.  Tried " + " ".join(filelist)
