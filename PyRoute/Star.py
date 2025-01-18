@@ -97,6 +97,15 @@ class Star(object):
         self.hex = None
         self.deep_space_station = False
         self._oldskool = False
+        # Generated trade values
+        self.tradeIn = None
+        self.tradeOver = None
+        self.tradeCount = None
+        self.passIn = None
+        self.passOver = None
+        self.starportSize = None
+        self.starportBudget = None
+        self.starportPop = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -155,9 +164,9 @@ class Star(object):
         popM = str(Utilities.int_to_ehex(self.popM))
         belts = str(Utilities.int_to_ehex(self.belts))
         ggCount = str(Utilities.int_to_ehex(self.ggCount))
-        worlds = self.worlds
+        worlds = str(self.worlds)
         basecode = str(self.baseCode).upper()
-        alg_code = self.alg_code if "" != self.alg_code.strip() else "--"
+        alg_code = str(self.alg_code) if "" != self.alg_code.strip() else "--"
 
         result += basecode.ljust(2) + " " + str(self.zone).ljust(1) + " " + popM + belts + ggCount + " "
         result += str(worlds).ljust(2) + " " + str(alg_code).ljust(4) + " "
@@ -313,6 +322,9 @@ class Star(object):
         index_y = (self.col - 1) // 8
         index_x = (self.row - 1) // 10
         return subsector[index_x][index_y]
+
+    def wilderness_refuel(self) -> bool:
+        return self.uwpCodes['Hydrographics'] in '23456789A' and self.uwpCodes['Atmosphere'] not in 'ABC'
 
     def calculate_gwp(self, pop_code):
         calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400,
