@@ -138,7 +138,7 @@ class HexSystem4Lines(HexSystem):
         self.zone(star, point.copy())
 
         point.y_plus(3.5)
-        self.doc.add_text_centred(star.uwp, point, 'system_uwp')
+        self.doc.add_text_centred(str(star.uwp), point, 'system_uwp')
 
         if len(star.name) > 0:
             point.y_plus(3.5)

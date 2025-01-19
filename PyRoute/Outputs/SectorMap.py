@@ -62,8 +62,8 @@ class SectorMap(Map):
         grid.hex_grid(grid.draw_borders, 1, colour=self.colours['hexes'])
 
     def write_base_map(self, area: Sector):
-        self.area_name_title(area.name)
         self.fill_background()
+        self.area_name_title(area.name)
         self.subsector_grid()
         grid = HexGrid(self, self.start, self.hex_size, 32, 40)
         grid.hex_grid(grid.draw_all, 1, colour=self.colours['hexes'])

@@ -8,6 +8,7 @@ import os
 from PyRoute.AreaItems.Galaxy import Galaxy
 
 from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Outputs.PDFMap import PDFMap
 from PyRoute.Outputs.SectorMap import SectorMap
 
@@ -15,6 +16,7 @@ from PyRoute.Outputs.SectorMap import SectorMap
 class ClassicModePDFSectorMap(PDFMap, SectorMap):
     def __init__(self, galaxy: Galaxy, routes: str, output_path: str, writer: str):
         super(ClassicModePDFSectorMap, self).__init__(galaxy, routes, output_path, writer)
+        self.fonts['title'] = ('Times-Roman', 30)
 
     def document(self, area_name: str, is_live=True):
         document = super(ClassicModePDFSectorMap, self).document(area_name, is_live)
@@ -27,3 +29,13 @@ class ClassicModePDFSectorMap(PDFMap, SectorMap):
             document._filename = path
 
         return document
+
+    def area_name_title(self, area_name: str) -> None:
+        cursor = Cursor(self.image_size.x // 2, 0.5)
+        self.add_text_centred(area_name, cursor, 'title')
+
+    def statistics(self, sector: Sector):
+        return
+
+    def map_key(self, area: Sector):
+        return
