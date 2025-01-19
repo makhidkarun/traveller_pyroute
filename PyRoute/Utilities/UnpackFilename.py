@@ -7,10 +7,10 @@ Created on Jan 19, 2025
 import os
 
 
-class UnpackFilename:
+class UnpackFilename(object):
 
     @staticmethod
-    def unpack_filename(filename):
+    def unpack_filename(filename: str) -> str:
         # try unpacked filename directly
         sourcefile = os.path.abspath(filename)
         if not os.path.isfile(sourcefile):
