@@ -6,7 +6,7 @@ Created on May 14, 2016
 import logging
 
 
-class Map(object):
+class OldMap(object):
     x_count = 33
     y_count = 41
     y_start = 43

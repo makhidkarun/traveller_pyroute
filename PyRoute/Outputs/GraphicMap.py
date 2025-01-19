@@ -9,10 +9,10 @@ from PIL import Image, ImageDraw, ImageColor, ImageFont
 
 from PyRoute.Outputs.GraphicLine import GraphicLine
 from PyRoute.Outputs.Cursor import Cursor
-from PyRoute.Outputs.Map import Map
+from PyRoute.Outputs.OldMap import OldMap
 
 
-class GraphicMap(Map):
+class GraphicMap(OldMap):
     image_size = (612, 792)
     corePos = (image_size[0] / 2, 40)
     rimPos = (image_size[0] / 2, image_size[1] - 10)
