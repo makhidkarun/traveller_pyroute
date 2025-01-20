@@ -58,7 +58,8 @@ class PDFMap(MapOutput):
             'amber zone': 'goldenrod',
             'gg refuel': 'goldenrod',
             'wild refuel': 'lightblue',
-            'comm': toColor('rgb(83, 204, 106)')
+            'comm': toColor('rgb(83, 204, 106)'),
+            'trade': 'red'
         }
         self.logger.debug("Completed PDFMap init")
 
@@ -114,19 +115,26 @@ class PDFMap(MapOutput):
         self.doc.setFillColor(self.colours[scheme])
         self.doc.drawString(start.x, start.y, text)
 
-    def add_text_centred(self, text: str, start: Cursor, scheme: Scheme, max_width: int = -1):
+    def add_text_centred(self, text: str, start: Cursor, scheme: Scheme, max_width: int = -1, offset: bool = False):
         font_info = self.get_font(scheme)
         self.doc.setFont(font_info[0], size=font_info[1])
         self.doc.setFillColor(self.colours[scheme])
         out_text = text
+        offset_x = 0
         if max_width > 0 and len(text) > 0:
             for chars in range(len(text), 0, -1):
                 width = self.doc.stringWidth(text[:chars], font_info[0], font_info[1])
                 if width <= max_width:
                     out_text = text[:chars]
+                    if offset and width // 2 != int(width) / 2:
+                        offset_x = 1.0
                     break
+        elif len(text) > 0:
+            width = self.doc.stringWidth(text, font_info[0], font_info[1])
+            if offset and width // 2 != int(width) / 2:
+                offset_x = 1.0
 
-        self.doc.drawCentredString(start.x, start.y + font_info[1], out_text)
+        self.doc.drawCentredString(start.x + offset_x, start.y + font_info[1], out_text)
 
     def add_text_rotated(self, text: str, start: Cursor, scheme: Scheme, rotation: int) -> None:
         self.doc.saveState()

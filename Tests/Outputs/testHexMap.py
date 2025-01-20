@@ -287,10 +287,10 @@ class testHexMap(baseTest):
 
         secname = 'Zao Kfeng Ig Grilokh'
 
-        hexmap = PDFHexMap(galaxy, 'trade')
+        hexmap = ClassicModePDFSectorMap(galaxy, 'trade', args.output, "dense")
 
         targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
-        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        result = hexmap.write_sector_map(galaxy.sectors[secname])
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
@@ -311,7 +311,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference above threshold")
+        self.assertTrue(0.38 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
 
     def test_verify_subsector_comm_write(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')

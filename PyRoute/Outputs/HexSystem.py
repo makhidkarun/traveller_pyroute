@@ -137,12 +137,12 @@ class HexSystem4Lines(HexSystem):
     def _place_system_information(self, point: Cursor, star: Star) -> None:
         self.zone(star, point.copy())
 
-        point.y_plus(3.5)
-        self.doc.add_text_centred(str(star.uwp), point, 'system_uwp')
+        point.y_plus(3.0)
+        self.doc.add_text_centred(str(star.uwp), point, 'system_uwp', offset=True)
 
         if len(star.name) > 0:
             point.y_plus(3.5)
-            self.doc.add_text_centred(star.name, point, 'system_uwp', self.hex_size.x * 3)
+            self.doc.add_text_centred(star.name, point, 'system_uwp', self.hex_size.x * 3.5, offset=True)
 
         added = star.alg_code
         if star.tradeCode.subsector_capital:
@@ -153,7 +153,7 @@ class HexSystem4Lines(HexSystem):
             added += ' '
         added += '{:d}'.format(star.ggCount)
         point.y_plus(3.5)
-        self.doc.add_text_centred(added, point, 'system_uwp')
+        self.doc.add_text_centred(added, point, 'system_uwp', offset=True)
 
         point.y_plus(3.5)
         tradeIn = StatCalculation.trade_to_btn(star.tradeIn)

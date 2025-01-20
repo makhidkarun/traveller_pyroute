@@ -11,6 +11,7 @@ from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Outputs.HexGrid import HexGrid
 from PyRoute.Outputs.HexSystem import HexSystem
 from PyRoute.Outputs.Map import Map
+from PyRoute.StatCalculation import StatCalculation
 
 
 class SectorMap(Map):
@@ -49,7 +50,7 @@ class SectorMap(Map):
             self.spinward_name(sector.spinward.name)
 
         self.draw_comm_routes(sector)
-        # self.draw_sector_trade(sector)
+        self.draw_trade_routes(sector)
 
         for star in sector.worlds:
             self.system_writer.place_system(star)
@@ -193,3 +194,38 @@ class SectorMap(Map):
         end_cursor.y_plus(self.hex_size.y)
         clip_start, clip_end = Map.clipping(self.start, self.image_size, start_cursor, end_cursor)
         self.add_line(clip_start, clip_end, colour, stroke='dashed', width=2)
+
+    def draw_trade_routes(self, area: Sector):
+        sector_indexes = [star.index for star in area.worlds]
+        trade_routes = [star for star in self.galaxy.stars.edges(sector_indexes, True)
+                        if star[2]['trade'] > 0 and StatCalculation.trade_to_btn(star[2]['trade']) >= self.galaxy.min_btn]
+        trade_routes.sort(key=lambda x: x[2]['trade'])
+        for (star, neighbor, data) in trade_routes:
+            star_actual = self.galaxy.star_mapping[star]
+            neighbor_actual = self.galaxy.star_mapping[neighbor]
+            self.trade_line(star_actual, neighbor_actual, area, data)
+
+    def trade_line(self, start: Star, end: Star, sector: Sector, data: dict) -> None:
+        colour = self.colours['trade']
+
+        start_cursor = self.system_writer.location(start.hex)
+        start_cursor.y_plus(self.hex_size.y)
+        pos = end.hex
+        if end.sector != sector:
+            endRow = end.hex.row
+            endCol = end.hex.col
+
+            if end.sector.x < sector.x:
+                endCol -= 32
+            if end.sector.x > sector.x:
+                endCol += 32
+            if end.sector.y < sector.y:
+                endRow += 40
+            if end.sector.y > sector.y:
+                endRow -= 40
+            pos = f"{endCol}{endRow}"
+
+        end_cursor = self.system_writer.location(pos)
+        end_cursor.y_plus(self.hex_size.y)
+        clip_start, clip_end = Map.clipping(self.start, self.image_size, start_cursor, end_cursor)
+        self.add_line(clip_start, clip_end, colour, stroke='solid', width=2)
