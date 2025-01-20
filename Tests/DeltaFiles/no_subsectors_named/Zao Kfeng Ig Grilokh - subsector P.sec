@@ -41,30 +41,30 @@
 
 Hex  Name                 UWP       Remarks              {Ix} (Ex) [Cx] N B  Z PBG W A  Stellar          Routes
 ---- -------------------- --------- -------------------- ---- ---- ---- - -- - --- - -- ---------------- ------
-2531 Khese                C795448-7 Ni                                  - -  - 803   Va G9 V                   
-2535 Lluekhagoun          B525332-9 Lo Ni                               - K  - 803   Va F8 II                  
+2531 Khese                C795448-7 Ni Pa                               - -  - 803   Va G9 V
+2535 Lluekhagoun          B525332-9 Lo                                  - K  - 803   Va F8 II
 2540 Khedhungaer          C55077A-5 De Po                               - K  - 523   Ve F3 V                   
 2633 Khaenukh             E400559-8 Ni Va                               - C  - 502   Va G4 V                   
-2638 Oekoks               A645878-C                                     - -  - 503   Ve F0 V D                 
+2638 Oekoks               A645878-C Pa Ph Pi                            - -  - 503   Ve F0 V D
 2640 Godogh               E544697-3 Ag Ni                               - C  - 816   Ve M2 V D                 
-2734 Afousoerr            C456975-5 Hi In                               - K  - 803   Va F0 V                   
-2739 Sueuvorrerr          C000848-8 As Na                               - C  - 404   Ve D                      
-2835 Uekhngaeng           C211888-5 Ic Na                               - C  - 900   Ve F5 V                   
+2734 Afousoerr            C456975-5 Hi                                  - K  - 803   Va F0 V
+2739 Sueuvorrerr          C000848-8 As Ph Pi Na Va                      - C  - 404   Ve D
+2835 Uekhngaeng           C211888-5 Ic Na Ph Pi                         - C  - 900   Ve F5 V
 2836 Ruezoe               D652778-0 Po                                  - K  - 216   Ve M8 V D                 
 2932 Edzfungknuen         A636687-B Ni                                  - K  - 304   Va F7 V M4 V              
-2935 Aekae                D87A342-8 Lo Ni Wa                            - C  - 603   Ve F9 V                   
+2935 Aekae                D87A342-8 Lo Wa                               - C  - 603   Ve F9 V
 2938 Ouorrkfozaeg         X334410-0 Ni                                  - C  - 800   Ve M6 V                   
-3036 Eoeoa                CAAAA77-B Fl Hi In Wa                         - C  - 604   Ve M3 V                   
+3036 Eoeoa                CAAAA77-B Fl Hi In                            - C  - 604   Ve M3 V
 3037 Ghavoegh             E999584-5 Ni                                  - -  - 524   Ve K0 V                   
-3040 Daggotaghou          A51177B-6 Ic Na                               - -  - 810   Ve G9 V                   
+3040 Daggotaghou          A51177B-6 Ic Na Pi                            - -  - 810   Ve G9 V
 3131 Gvangrruth           CAA7447-7 Fl Ni                               - K  - 412   Ve F7 V                   
-3132 Suekog               C796330-4 Lo Ni                               - K  - 110   Ve F9 V                   
+3132 Suekog               C796330-4 Lo                                  - K  - 110   Ve F9 V
 3133 Agogzghukuer         A230764-B De Na Po                            - K  - 110   Ve M6 V D                 
-3136 Koerouzougz          B566144-7 Lo Ni                               - K  - 912   Ve F6 V                   
-3139 Uerzoullugz          B7549AE-A Hi In                               - K  - 904   Ve F4 V D                 
-3140 Sullakhugz           C483269-3 Lo Ni                               - C  - 403   Ve G5 V                   
-3231 Kagvagz              D200975-7 Hi Na Va                            - C  - 825   Ve F0 V D                 
-3233 Khaerokots           C200973-7 Hi Na Va                            - -  - 901   Ve M6 V D                 
+3136 Koerouzougz          B566144-7 Lo                                  - K  - 912   Ve F6 V
+3139 Uerzoullugz          B7549AE-A Hi                                  - K  - 904   Ve F4 V D
+3140 Sullakhugz           C483269-3 Lo                                  - C  - 403   Ve G5 V
+3231 Kagvagz              D200975-7 Hi In Na Va                         - C  - 825   Ve F0 V D
+3233 Khaerokots           C200973-7 Hi In Na Va                         - -  - 901   Ve M6 V D
 3234 Adhoukhorr           D451577-2 Ni Po                               - -  - 314   Ve F5 V                   
-3235 Ueksorrughz          C647879-3                                     - -  - 814   Ve G5 V                   
+3235 Ueksorrughz          C647879-3 Pa Ph Pi                            - -  - 814   Ve G5 V
 3239 Rraghzaeg            A7A4764-6 Fl                                  - K  - 203   Ve K7 V M5 V              
