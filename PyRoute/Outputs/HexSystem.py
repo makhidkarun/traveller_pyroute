@@ -9,10 +9,11 @@ from PyRoute.SystemData.UWP import UWP
 
 
 class HexSystem(object):
-    def __init__(self, doc: MapOutput, start: Cursor, hex_size: Cursor):
+    def __init__(self, doc: MapOutput, start: Cursor, hex_size: Cursor, routes: str = "trade"):
         self.doc: MapOutput = doc
         self.start: Cursor = start
         self.hex_size: Cursor = hex_size
+        self.routes = routes
 
     def place_system(self, star: Star) -> None:
         self._place_system_information(self.location(star.hex), star)
@@ -48,13 +49,13 @@ class HexSystem(object):
             return
 
     @staticmethod
-    def set_system_writer(writer: str, doc: MapOutput, start: Cursor, hex_size: Cursor):
+    def set_system_writer(writer: str, doc: MapOutput, start: Cursor, hex_size: Cursor, routes: str = "trade"):
         writers = {
             'light': HexSystemClassicLayout,
             'medium': HexSystem3Lines,
             'dense': HexSystem4Lines,
         }
-        return writers[writer](doc, start, hex_size)
+        return writers[writer](doc, start, hex_size, routes)
 
     def map_key_base(self, start: Cursor, end: Cursor):
         background = self.doc.colours['background']
@@ -93,8 +94,8 @@ class HexSystem(object):
 
 class HexSystem3Lines(HexSystem):
 
-    def __init__(self, doc: MapOutput, start: Cursor, hex_size: Cursor):
-        super(HexSystem3Lines, self).__init__(doc, start, hex_size)
+    def __init__(self, doc: MapOutput, start: Cursor, hex_size: Cursor, routes: str = "trade"):
+        super(HexSystem3Lines, self).__init__(doc, start, hex_size, routes)
 
     def _place_system_information(self, point: Cursor, star: Star):
         self.clear_hex(point.copy())
@@ -131,8 +132,8 @@ class HexSystem3Lines(HexSystem):
 
 class HexSystem4Lines(HexSystem):
 
-    def __init__(self, doc: MapOutput, start: Cursor, hex_size: Cursor):
-        super(HexSystem4Lines, self).__init__(doc, start, hex_size)
+    def __init__(self, doc: MapOutput, start: Cursor, hex_size: Cursor, routes: str = "trade"):
+        super(HexSystem4Lines, self).__init__(doc, start, hex_size, routes)
 
     def _place_system_information(self, point: Cursor, star: Star) -> None:
         self.zone(star, point.copy())
@@ -156,10 +157,20 @@ class HexSystem4Lines(HexSystem):
         self.doc.add_text_centred(added, point, 'system_uwp', offset=True)
 
         point.y_plus(3.5)
-        tradeIn = StatCalculation.trade_to_btn(star.tradeIn)
-        tradeThrough = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
-        added = "{:X}{:X}{:X}{:d}".format(star.wtn, tradeIn, tradeThrough, star.starportSize)
-        self.doc.add_text_centred(added, point, 'system_uwp')
+        added = self._system_write_additional_data(star)
+        self.doc.add_text_centred(added, point, 'system_uwp', offset=True)
+
+    def _system_write_additional_data(self, star):
+        added = ''
+        trade_in = StatCalculation.trade_to_btn(star.tradeIn)
+        trade_through = StatCalculation.trade_to_btn(star.tradeIn + star.tradeOver)
+        if self.routes == 'trade':
+            added += "{:X}{:X}{:X}{:d}".format(star.wtn, trade_in, trade_through, star.starportSize)
+        elif self.routes == 'comm':
+            added += "{}{} {}".format(star.baseCode, star.ggCount, star.importance)
+        elif self.routes == 'xroute':
+            added += " {}".format(star.importance)
+        return added
 
     def map_key(self, start: Cursor, end: Cursor):
         _ = self.map_key_base(start, end)
@@ -167,8 +178,8 @@ class HexSystem4Lines(HexSystem):
 
 class HexSystemClassicLayout(HexSystem):
 
-    def __init__(self, doc: MapOutput, start: Cursor, hex_size: Cursor):
-        super(HexSystemClassicLayout, self).__init__(doc, start, hex_size)
+    def __init__(self, doc: MapOutput, start: Cursor, hex_size: Cursor, routes: str = "trade"):
+        super(HexSystemClassicLayout, self).__init__(doc, start, hex_size, routes)
 
     def _place_system_information(self, point: Cursor, star: Star) -> None:
         self.zone(star, point.copy())

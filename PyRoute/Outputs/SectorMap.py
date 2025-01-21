@@ -36,7 +36,7 @@ class SectorMap(Map):
 
     def write_sector_map(self, sector: Sector) -> None:
         self.doc = self.document(sector.name + " Sector", False)
-        self.system_writer = HexSystem.set_system_writer(self.system_writer_type, self, self.start, self.hex_size)
+        self.system_writer = HexSystem.set_system_writer(self.system_writer_type, self, self.start, self.hex_size, self.routes)
         self.write_base_map(sector)
         self.draw_borders(sector)
 
