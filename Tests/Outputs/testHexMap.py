@@ -629,20 +629,20 @@ class testHexMap(baseTest):
 
         secname = 'Zarushagar'
 
-        hexmap = PDFHexMap(galaxy, 'xroute')
+        hexmap = ClassicModePDFSectorMap(galaxy, 'xroute', args.output, "dense")
 
         targpath = os.path.abspath(args.output + '/Zarushagar Sector.pdf')
-        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        result = hexmap.write_sector_map(galaxy.sectors[secname])
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
-            src = page.get_pixmap()
+            src = page.get_pixmap(dpi=144)
         srcfile = os.path.abspath(args.output + '/Zarushagar Sector original.png')
         src.save(srcfile)
         trg_img = pymupdf.open(targpath)
         trg_iter = trg_img.pages(0)
         for page in trg_iter:
-            trg = page.get_pixmap()
+            trg = page.get_pixmap(dpi=144)
         trgfile = os.path.abspath(args.output + '/Zarushagar Sector remix.png')
         trg.save(trgfile)
 
@@ -653,7 +653,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zarushagar sector")
+        self.assertTrue(0.1 > mse, "Image difference " + str(mse) + " above threshold for Zarushagar sector")
 
     def test_verify_quadripoint_trade_write(self):
         source1file = self.unpack_filename('DeltaFiles/quadripoint_trade_write/Tuglikki.sec')

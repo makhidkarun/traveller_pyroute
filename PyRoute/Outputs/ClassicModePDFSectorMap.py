@@ -29,6 +29,7 @@ class ClassicModePDFSectorMap(PDFMap, SectorMap):
         self.fonts['system_uwp'] = ('Times-Roman', 4)
         self.colours['grid'] = toColor('rgb(211, 211, 211)')
         self.colours['hexes'] = 'gray'
+        self.colours['comm'] = toColor('rgb(102, 178, 102)')
 
     def document(self, area_name: str, is_live=True):
         document = super(ClassicModePDFSectorMap, self).document(area_name, is_live)
@@ -58,6 +59,31 @@ class ClassicModePDFSectorMap(PDFMap, SectorMap):
 
     def map_key(self, area: Sector):
         return
+
+    def comm_line(self, start: Star, end: Star, sector: Sector) -> None:
+        colour = self.colours['comm']
+
+        start_cursor = self.system_writer.location(start.hex)
+        start_cursor.y_plus(self.hex_size.y)
+        pos = end.hex
+        if end.sector != sector:
+            endRow = end.hex.row
+            endCol = end.hex.col
+
+            if end.sector.x < sector.x:
+                endCol -= 32
+            if end.sector.x > sector.x:
+                endCol += 32
+            if end.sector.y < sector.y:
+                endRow += 40
+            if end.sector.y > sector.y:
+                endRow -= 40
+            pos = f"{endCol}{endRow}"
+
+        end_cursor = self.system_writer.location(pos)
+        end_cursor.y_plus(self.hex_size.y)
+        clip_start, clip_end = Map.clipping(self.start, self.image_size, start_cursor, end_cursor)
+        self.add_line(clip_start, clip_end, colour, stroke='solid', width=3)
 
     def trade_line(self, start: Star, end: Star, sector: Sector, data: dict) -> None:
         colour, scheme = self._trade_line_setup(data)

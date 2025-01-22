@@ -175,6 +175,16 @@ class HexSystem4Lines(HexSystem):
     def map_key(self, start: Cursor, end: Cursor):
         _ = self.map_key_base(start, end)
 
+    def zone(self, star: Star, center: Cursor) -> None:
+        center.y_plus(self.hex_size.y)
+        radius = int(self.hex_size.x)
+        if star.zone in ['R', 'F']:
+            self.doc.add_circle(center, radius, 2, False, 'red zone')
+        elif star.zone in ['A', 'U']:
+            self.doc.add_circle(center, radius, 2, False, 'amber zone')
+        else:
+            return
+
 
 class HexSystemClassicLayout(HexSystem):
 
