@@ -44,11 +44,10 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         expected_ally_map[(4, 35)] = 'ImDs'
 
         expected_borders = {
-            (3, 36): 2, (4, 35): 7, (4, 36): 1, (5, 35): 4
+            (4, 35): ['blue', None, 'purple'], (4, 36): ['green', 'yellow', None], (5, 35): [None, None, 'olive'],
+            (5, 36): [None, 'red', None]
         }
-        expected_borders_map = {
-            (4, 35): 3, (4, 36): 5, (5, 34): 2, (5, 35): 4
-        }
+        expected_borders_map = {}
 
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
@@ -69,11 +68,11 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         expected_ally_map[(4, 34)] = 'ImDs'
 
         expected_borders = {
-            (3, 35): 2, (3, 36): 2, (4, 34): 7, (4, 35): 6, (4, 36): 1, (5, 34): 4, (5, 35): 4
+            (4, 34): ['blue', None, 'purple'], (4, 35): [None, 'yellow', 'purple'], (4, 36): ['green', 'yellow', None],
+            (5, 34): [None, None, 'olive'], (5, 35): [None, 'red', 'olive'], (5, 36): [None, 'red', None]
         }
-        expected_borders_map = {
-            (4, 34): 3, (4, 35): 6, (4, 36): 5, (5, 33): 2, (5, 34): 6, (5, 35): 4
-        }
+        expected_borders_map = {}
+
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
@@ -93,11 +92,11 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         expected_ally_map[(5, 33)] = 'ImDs'
 
         expected_borders = {
-            (4, 34): 2, (4, 35): 2, (5, 33): 7, (5, 34): 6, (5, 35): 1, (6, 33): 4, (6, 34): 4
+            (5, 33): ['blue', None, None], (5, 34): [None, 'orange', 'black'], (5, 35): ['green', 'orange', 'black'],
+            (6, 33): [None, 'maroon', 'pink'], (6, 34): [None, 'maroon', 'pink']
         }
-        expected_borders_map = {
-            (5, 33): 7, (5, 34): 6, (5, 35): 1, (6, 33): 6, (6, 34): 6
-        }
+        expected_borders_map = {}
+
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
@@ -164,27 +163,24 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
                              (-22, 9): 'ImDi', (-22, 10): 'ImDi', (-22, 11): None, (-21, 2): None, (-21, 3): None,
                              (-21, 4): None, (-21, 5): None, (-21, 6): None, (-21, 7): None, (-21, 8): None,
                              (-21, 9): None, (-21, 10): None}
-        expected_borders = {(-36, 7): 2, (-36, 8): 2, (-36, 9): 2, (-36, 10): 2, (-36, 11): 2, (-36, 12): 2,
-                            (-36, 13): 2, (-36, 14): 2, (-35, 6): 5, (-35, 7): 4, (-35, 8): 4, (-35, 9): 4,
-                            (-35, 10): 4, (-35, 11): 4, (-35, 12): 4, (-35, 13): 4, (-35, 14): 3, (-35, 15): 2,
-                            (-35, 16): 2, (-35, 17): 2, (-35, 18): 2, (-34, 5): 7, (-34, 14): 4, (-34, 15): 4,
-                            (-34, 16): 4, (-34, 17): 4, (-34, 18): 3, (-33, 5): 1, (-33, 18): 3, (-32, 4): 7,
-                            (-32, 18): 3, (-31, 4): 1, (-31, 18): 1, (-30, 3): 7, (-30, 17): 7, (-29, 3): 3,
-                            (-29, 17): 1, (-28, 3): 3, (-28, 16): 7, (-27, 3): 3, (-27, 16): 3, (-26, 3): 3,
-                            (-26, 16): 1, (-25, 3): 3, (-25, 15): 5, (-24, 3): 3, (-24, 14): 5, (-23, 3): 3,
-                            (-23, 12): 2, (-23, 13): 5, (-22, 3): 3, (-22, 4): 2, (-22, 5): 2, (-22, 6): 2, (-22, 7): 2,
-                            (-22, 8): 2, (-22, 9): 2, (-22, 10): 2, (-22, 11): 5, (-22, 12): 4, (-21, 3): 4,
-                            (-21, 4): 4, (-21, 5): 4, (-21, 6): 4, (-21, 7): 4, (-21, 8): 4, (-21, 9): 4, (-21, 10): 4}
-        expected_borders_map = {(-35, 6): 7, (-35, 7): 6, (-35, 8): 6, (-35, 9): 6, (-35, 10): 6, (-35, 11): 6,
-                                (-35, 12): 6, (-35, 13): 6, (-35, 14): 1, (-34, 5): 3, (-34, 14): 6, (-34, 15): 6,
-                                (-34, 16): 6, (-34, 17): 6, (-34, 18): 5, (-33, 4): 2, (-33, 5): 1, (-33, 17): 2,
-                                (-33, 18): 1, (-32, 4): 3, (-32, 18): 5, (-31, 3): 2, (-31, 4): 1, (-31, 17): 2,
-                                (-31, 18): 1, (-30, 3): 3, (-30, 17): 3, (-29, 2): 2, (-29, 3): 1, (-29, 16): 2,
-                                (-29, 17): 1, (-28, 3): 5, (-28, 16): 3, (-27, 2): 2, (-27, 3): 1, (-27, 15): 2,
-                                (-27, 16): 1, (-26, 3): 5, (-26, 16): 5, (-25, 2): 2, (-25, 3): 1, (-25, 15): 5,
-                                (-24, 3): 5, (-24, 14): 3, (-23, 2): 2, (-23, 3): 1, (-23, 13): 5, (-22, 3): 5,
-                                (-22, 11): 3, (-22, 12): 6, (-21, 2): 2, (-21, 3): 6, (-21, 4): 6, (-21, 5): 6,
-                                (-21, 6): 6, (-21, 7): 6, (-21, 8): 6, (-21, 9): 6, (-21, 10): 4}
+        expected_borders = {(-35, 6): ['white', None, None], (-35, 7): [None, 'white', 'white'], (-35, 8): [None, 'white', 'white'],
+                            (-35, 9): [None, 'white', 'white'], (-35, 10): [None, 'white', 'white'], (-35, 11): [None, 'white', 'white'],
+                            (-35, 12): [None, 'white', 'white'], (-35, 13): [None, 'white', 'white'], (-35, 14): ['white', 'white', 'white'],
+                            (-34, 5): ['white', None, 'white'], (-34, 14): [None, 'white', 'white'], (-34, 15): [None, 'white', 'white'],
+                            (-34, 16): [None, 'white', 'white'], (-34, 17): [None, 'white', 'white'], (-34, 18): ['white', 'white', None],
+                            (-33, 5): ['white', None, 'white'], (-33, 18): ['white', None, 'white'], (-32, 4): ['white', None, 'white'],
+                            (-32, 18): ['white', 'white', None], (-31, 4): ['white', None, 'white'], (-31, 18): ['white', None, 'white'],
+                            (-30, 3): ['white', None, 'white'], (-30, 17): ['white', None, 'white'], (-29, 3): ['white', None, 'white'],
+                            (-29, 17): ['white', None, 'white'], (-28, 3): ['white', 'white', None], (-28, 16): ['white', None, 'white'],
+                            (-27, 3): ['white', None, 'white'], (-27, 16): ['white', None, 'white'], (-26, 3): ['white', 'white', None],
+                            (-26, 16): ['white', 'white', None], (-25, 3): ['white', None, 'white'], (-25, 15): ['white', None, None],
+                            (-25, 16): [None, 'white', None], (-24, 3): ['white', 'white', None], (-24, 14): ['white', None, 'white'],
+                            (-23, 3): ['white', None, 'white'], (-23, 13): ['white', None, None], (-23, 14): [None, 'white', None],
+                            (-22, 3): ['white', 'white', None], (-22, 11): ['white', None, 'white'], (-22, 12): [None, 'white', 'white'],
+                            (-21, 3): [None, None, 'white'], (-21, 4): [None, 'white', 'white'], (-21, 5): [None, 'white', 'white'],
+                            (-21, 6): [None, 'white', 'white'], (-21, 7): [None, 'white', 'white'],  (-21, 8): [None, 'white', 'white'],
+                            (-21, 9): [None, 'white', 'white'],  (-21, 10): [None, 'white', 'white'], (-21, 11): [None, 'white', None]}
+        expected_borders_map = {}
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
@@ -210,7 +206,7 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
 
         expected_ally_map = self.load_dict_from_json(mapfile)
         expected_borders = self.load_dict_from_json(borderfile)
-        expected_borders_map = self.load_dict_from_json(bordermapfile)
+        expected_borders_map = {}
 
         ally_map = dict(self.borders.allyMap)
         borders = dict(self.borders.borders)
@@ -241,7 +237,7 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
 
         expected_ally_map = self.load_dict_from_json(mapfile)
         expected_borders = self.load_dict_from_json(borderfile)
-        expected_borders_map = self.load_dict_from_json(bordermapfile)
+        expected_borders_map = {}
 
         ally_map = dict(self.borders.allyMap)
         borders = dict(self.borders.borders)
