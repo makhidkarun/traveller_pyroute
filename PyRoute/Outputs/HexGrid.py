@@ -89,7 +89,7 @@ class HexGrid(object):
 
         if self.borders.borders.get((q, r), False):
             border_colours = self.borders.borders[(q, r)]
-            if border_colours[0] and x < self.x_count - 1:
+            if border_colours[0] and x < self.x_count:
                 hline.draw_colour("salmon" if legacy else border_colours[0])
             if border_colours[1] and y > 0:
                 rline.draw_colour("salmon" if legacy else border_colours[1])

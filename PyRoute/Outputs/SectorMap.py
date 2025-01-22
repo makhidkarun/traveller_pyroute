@@ -192,7 +192,7 @@ class SectorMap(Map):
 
         end_cursor = self.system_writer.location(pos)
         end_cursor.y_plus(self.hex_size.y)
-        clip_start, clip_end = Map.clipping(self.start, self.image_size, start_cursor, end_cursor)
+        clip_start, clip_end = self.line_clipping(start_cursor, end_cursor)
         self.add_line(clip_start, clip_end, colour, stroke='dashed', width=2)
 
     def draw_trade_routes(self, area: Sector):
@@ -227,5 +227,9 @@ class SectorMap(Map):
 
         end_cursor = self.system_writer.location(pos)
         end_cursor.y_plus(self.hex_size.y)
-        clip_start, clip_end = Map.clipping(self.start, self.image_size, start_cursor, end_cursor)
+        clip_start, clip_end = self.line_clipping(start_cursor, end_cursor)
         self.add_line(clip_start, clip_end, colour, stroke='solid', width=2)
+
+    def line_clipping(self, start_cursor, end_cursor) -> (Cursor, Cursor):
+        clip_start, clip_end = Map.clipping(self.start, self.image_size, start_cursor, end_cursor)
+        return clip_start, clip_end

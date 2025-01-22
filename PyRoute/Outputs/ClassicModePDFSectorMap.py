@@ -57,7 +57,7 @@ class ClassicModePDFSectorMap(PDFMap, SectorMap):
     def draw_borders(self, sector: Sector):
         grid = HexGrid(self, self.start, self.hex_size, 32, 40, legacy=True)
         grid.set_borders(self.galaxy.borders, sector.dx, sector.dy)
-        grid.hex_grid(grid.draw_borders, 1, colour=self.colours['hexes'])
+        grid.hex_grid(grid.draw_borders, 1.5, colour=self.colours['hexes'])
 
     def statistics(self, sector: Sector):
         return
@@ -87,7 +87,7 @@ class ClassicModePDFSectorMap(PDFMap, SectorMap):
 
         end_cursor = self.system_writer.location(pos)
         end_cursor.y_plus(self.hex_size.y)
-        clip_start, clip_end = Map.clipping(self.start, self.image_size, start_cursor, end_cursor)
+        clip_start, clip_end = self.line_clipping(start_cursor, end_cursor)
         self.add_line(clip_start, clip_end, colour, stroke='solid', width=3)
 
     def trade_line(self, start: Star, end: Star, sector: Sector, data: dict) -> None:
@@ -114,7 +114,7 @@ class ClassicModePDFSectorMap(PDFMap, SectorMap):
 
         end_cursor = self.system_writer.location(pos)
         end_cursor.y_plus(self.hex_size.y)
-        clip_start, clip_end = Map.clipping(self.start, self.image_size, start_cursor, end_cursor)
+        clip_start, clip_end = self.line_clipping(start_cursor, end_cursor)
         self.add_circle(clip_start, 3, 1, True, scheme)
         if end.sector == start.sector:
             self.add_circle(clip_end, 3, 1, True, scheme)
@@ -143,12 +143,42 @@ class ClassicModePDFSectorMap(PDFMap, SectorMap):
             self.colours[key] = trade_colour
         return trade_colour, key
 
+    def coreward_name(self, name: str) -> None:
+        cursor = Cursor(self.image_size.x // 2, self.start.y - 13)
+        self.add_text_centred(name, cursor, 'sector')
+
     def spinward_name(self, name: str):
-        y = self.start.y + self.hex_size.x + self.subsector_height + self.subsector_height
+        y = 390
         cursor = Cursor(self.start.x - 5, y)
         self.add_text_rotated(name, cursor, 'sector', 90)
 
     def trailing_name(self, name: str):
-        y = self.start.y + self.hex_size.x + self.subsector_height + self.subsector_height + 12
-        cursor = Cursor(self.image_size.x - 14, y)
+        y = 421
+        x = 598
+
+        cursor = Cursor(x, y)
         self.add_text_rotated(name, cursor, 'sector', -90)
+
+    def rimward_name(self, name: str) -> None:
+        cursor = Cursor(306, self.image_size.y - 13)
+        self.add_text(name, cursor, 'sector')
+
+    def line_clipping(self, start_cursor, end_cursor) -> (Cursor, Cursor):
+        clip_start, clip_end = super(ClassicModePDFSectorMap, self).line_clipping(start_cursor, end_cursor)
+        if 790 == clip_end.y:
+            dy_offset = 10
+            orig_dx = clip_end.x - clip_start.x
+            orig_dy = clip_end.y - clip_start.y
+            fraction = (orig_dy - dy_offset) / orig_dy
+            new_dx = (orig_dx * fraction)
+            clip_end.x_plus(new_dx - orig_dx)
+            clip_end.y_plus(-dy_offset)
+        if 603 == clip_end.x:
+            dx_offset = 3
+            orig_dx = clip_end.x - clip_start.x
+            orig_dy = clip_end.y - clip_start.y
+            fraction = (orig_dx - dx_offset) / orig_dx
+            new_dy = (orig_dy * fraction)
+            clip_end.x_plus(-dx_offset)
+            clip_end.y_plus(new_dy - orig_dy)
+        return clip_start, clip_end

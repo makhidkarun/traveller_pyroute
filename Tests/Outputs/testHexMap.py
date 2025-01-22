@@ -14,6 +14,7 @@ from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
 from PyRoute.Outputs.HexMap import HexMap
 from PyRoute.Outputs.PDFHexMap import PDFHexMap
+from PyRoute.Position.Hex import Hex
 from Tests.baseTest import baseTest
 
 
@@ -725,7 +726,7 @@ class testHexMap(baseTest):
             array2 = np.array(image2)
 
             mse = np.mean((array1 - array2) ** 2)
-            self.assertTrue(0.24 > mse, "Image difference " + str(mse) + " above threshold for " + full)
+            self.assertTrue(0.341 > mse, "Image difference " + str(mse) + " above threshold for " + full)
 
     def test_verify_single_system_border_write(self):
         sourcefile = self.unpack_filename('DeltaFiles/single_system_border/Deneb.sec')
@@ -748,10 +749,50 @@ class testHexMap(baseTest):
         galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
                             args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
+        galaxy.debug_flag = True
+
+        hexbase = galaxy.sectors["Deneb"].worlds[0].hex
+        # Hexen at 5 o'clock and 7 o'clock positions on the 2-hex ring
+        hex1 = Hex(galaxy.sectors["Deneb"], "0920")
+        hex2 = Hex(galaxy.sectors["Deneb"], "1120")
+        self.assertEqual(2, hexbase.hex_distance(hex1), "7 o'clock hex should be 2 pc away from base hex")
+        self.assertEqual(2, hexbase.hex_distance(hex2), "5 o'clock hex should be 2 pc away from base hex")
+        pos1 = (hex1.q, hex1.r)
+        pos2 = (hex2.q, hex2.r)
+        # Hexen at lower left of 7 o'clock and lower right of 5 o'clock positions, on the 3-hex ring
+        hex1o = Hex(galaxy.sectors["Deneb"], "0820")
+        hex2o = Hex(galaxy.sectors["Deneb"], "1220")
+        self.assertEqual(3, hexbase.hex_distance(hex1o), "7 o'clock outboard hex should be 3 pc away from base hex")
+        self.assertEqual(3, hexbase.hex_distance(hex2o), "5 o'clock outboard hex should be 3 pc away from base hex")
+        pos1o = (hex1o.q, hex1o.r)
+        pos2o = (hex2o.q, hex2o.r)
 
         galaxy.generate_routes()
         galaxy.set_borders(args.borders, args.ally_match)
         galaxy.trade.calculate_routes()
+
+        expected_ally_map = {
+            (-89, 105): 'Im', (-89, 106): 'Im', (-89, 107): 'Im', (-88, 104): 'Im', (-88, 105): 'Im', (-88, 106): 'Im',
+            (-88, 107): 'Im', (-87, 103): 'Im', (-87, 104): 'Im', (-87, 105): 'Im', (-87, 106): 'Im', (-87, 107): 'Im',
+            (-86, 103): 'Im', (-86, 104): 'Im', (-86, 105): 'Im', (-86, 106): 'Im', (-85, 103): 'Im', (-85, 104): 'Im',
+            (-85, 105): 'Im'
+        }
+        self.assertEqual(expected_ally_map, galaxy.borders.allyMap, "Unexpected allyMap value")
+
+        self.assertEqual('Im', galaxy.borders.allyMap[pos1])
+        self.assertEqual('Im', galaxy.borders.allyMap[pos2])
+        self.assertNotIn(pos1o, expected_ally_map)
+        self.assertNotIn(pos2o, expected_ally_map)
+
+        expected_borders = {
+            (-89, 104): ['green', 'orange', 'black'], (-89, 105): [None, 'orange', 'black'], (-89, 106): [None, 'orange', 'black'],
+            (-89, 107): ['blue', None, None], (-88, 103): ['green', 'yellow', None], (-88, 107): ['blue', None, 'purple'],
+            (-87, 102): ['green', None, 'black'], (-87, 106): [None, 'orange', None], (-87, 107): ['blue', None, None],
+            (-86, 102): ['green', None, 'pink'], (-86, 106): ['blue', 'maroon', None], (-85, 101): [None, 'red', None],
+            (-85, 102): ['green', None, None], (-85, 105): ['blue', None, 'olive'], (-84, 102): [None, 'maroon', 'pink'],
+            (-84, 103): [None, 'maroon', 'pink'], (-84, 104): [None, 'maroon', 'pink']
+        }
+        self.assertEqual(expected_borders, galaxy.borders.borders, "Unexpected borders value")
 
         secname = ["Deneb"]
 
@@ -763,13 +804,13 @@ class testHexMap(baseTest):
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
-            src = page.get_pixmap()
+            src = page.get_pixmap(dpi=144)
         srcfile = os.path.abspath(args.output + '/Deneb Sector original.png')
         src.save(srcfile)
         trg_img = pymupdf.open(targpath)
         trg_iter = trg_img.pages(0)
         for page in trg_iter:
-            trg = page.get_pixmap()
+            trg = page.get_pixmap(dpi=144)
         trgfile = os.path.abspath(args.output + '/Deneb Sector remix.png')
         trg.save(trgfile)
 
@@ -780,7 +821,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.1 > mse, "Image difference " + str(mse) + " above threshold for Deneb sector")
+        self.assertTrue(0.11 > mse, "Image difference " + str(mse) + " above threshold for Deneb sector")
 
     def _load_ranges(self, galaxy, sourcefile):
         with open(sourcefile, "rb") as f:

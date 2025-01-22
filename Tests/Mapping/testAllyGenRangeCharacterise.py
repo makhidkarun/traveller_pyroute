@@ -39,12 +39,12 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         }
 
         expected_borders = {
-            (2, 35): ['blue', None, 'purple'], (2, 36): [None, 'yellow', 'purple'], (2, 37): [None, 'yellow', 'purple'],
-            (2, 38): ['green', 'yellow', None], (3, 34): ['blue', None, None], (3, 35): [None, 'orange', None],
-            (3, 38): ['green', None, 'black'],  (4, 33): ['blue', None, 'purple'], (4, 38): ['green', 'yellow', None],
-            (5, 33): ['blue', None, 'olive'], (5, 37): ['green', None, None], (5, 38): [None, 'red', None],
-            (6, 33): ['blue', 'maroon', None], (6, 36): ['green', None, 'pink'], (7, 33): [None, None, 'olive'],
-            (7, 34): [None, 'red', 'olive'], (7, 35): [None, 'red', 'olive'], (7, 36): [None, 'red', None]
+            (2, 34): ['green', 'yellow', None], (2, 35): [None, 'yellow', 'purple'], (2, 36): [None, 'yellow', 'purple'],
+            (2, 37): ['blue', None, 'purple'], (3, 33): ['green', None, 'black'], (3, 36): [None, 'orange', None],
+            (3, 37): ['blue', None, None], (4, 32): ['green', 'yellow', None], (4, 37): ['blue', None, 'purple'],
+            (5, 31): [None, 'red', None], (5, 32): ['green', None, None], (5, 36): ['blue', None, 'olive'],
+            (6, 32): ['green', None, 'pink'], (6, 35): ['blue', 'maroon', None], (7, 31): [None, 'red', None],
+            (7, 32): [None, 'red', 'olive'], (7, 33): [None, 'red', 'olive'], (7, 34): [None, None, 'olive']
         }
         expected_borders_map = {}
 
@@ -70,13 +70,13 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
             (5, 33): 'ImDs', (5, 34): 'ImDs', (5, 35): 'ImDs', (5, 36): 'ImDs',
             (6, 32): 'ImDs', (6, 33): 'ImDs', (6, 34): 'ImDs', (6, 35): 'ImDs'}
         expected_borders = {
-            (2, 34): ['blue', None, 'purple'], (2, 35): [None, 'yellow', 'purple'], (2, 36): [None, 'yellow', 'purple'],
-            (2, 37): [None, 'yellow', 'purple'], (2, 38): ['green', 'yellow', None], (3, 33): ['blue', None, None],
-            (3, 34): [None, 'orange', None], (3, 38): ['green', None, 'black'], (4, 32): ['blue', None, 'purple'],
-            (4, 38): ['green', 'yellow', None], (5, 32): ['blue', None, 'olive'], (5, 37): ['green', None, None],
-            (5, 38): [None, 'red', None], (6, 32): ['blue', 'maroon', None], (6, 36): ['green', None, 'pink'],
-            (7, 32): [None, None, 'olive'], (7, 33): [None, 'red', 'olive'], (7, 34): [None, 'red', 'olive'],
-            (7, 35): [None, 'red', 'olive'], (7, 36): [None, 'red', None]
+            (2, 33): ['green', 'yellow', None], (2, 34): [None, 'yellow', 'purple'], (2, 35): [None, 'yellow', 'purple'],
+            (2, 36): [None, 'yellow', 'purple'], (2, 37): ['blue', None, 'purple'], (3, 32): ['green', None, 'black'],
+            (3, 36): [None, 'orange', None], (3, 37): ['blue', None, None], (4, 31): ['green', 'yellow', None],
+            (4, 37): ['blue', None, 'purple'], (5, 30): [None, 'red', None], (5, 31): ['green', None, None],
+            (5, 36): ['blue', None, 'olive'], (6, 31): ['green', None, 'pink'], (6, 35): ['blue', 'maroon', None],
+            (7, 30): [None, 'red', None], (7, 31): [None, 'red', 'olive'], (7, 32): [None, 'red', 'olive'],
+            (7, 33): [None, 'red', 'olive'], (7, 34): [None, None, 'olive'],
         }
         expected_borders_map = {}
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
@@ -102,13 +102,13 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
             (7, 31): 'ImDs', (7, 32): 'ImDs', (7, 33): 'ImDs', (7, 34): 'ImDs'
         }
         expected_borders = {
-            (3, 33): ['blue', None, None], (3, 34): [None, 'orange', 'black'], (3, 35): [None, 'orange', 'black'],
-            (3, 36): [None, 'orange', 'black'], (3, 37): ['green', 'orange', 'black'], (4, 32): ['blue', None, 'purple'],
-            (4, 37): ['green', 'yellow', None], (5, 31): ['blue', None, None], (5, 32): [None, 'orange', None],
-            (5, 37): ['green', None, 'black'], (6, 31): ['blue', 'maroon', None], (6, 36): ['green', None, 'pink'],
-            (7, 31): ['blue', None, 'olive'], (7, 35): ['green', None, None], (7, 36): [None, 'red', None],
-            (8, 31): [None, 'maroon', 'pink'], (8, 32): [None, 'maroon', 'pink'], (8, 33): [None, 'maroon', 'pink'],
-            (8, 34): [None, 'maroon', 'pink']
+            (3, 32): ['green', 'orange', 'black'], (3, 33): [None, 'orange', 'black'], (3, 34): [None, 'orange', 'black'],
+            (3, 35): [None, 'orange', 'black'], (3, 36): ['blue', None, None], (4, 31): ['green', 'yellow', None],
+            (4, 36): ['blue', None, 'purple'], (5, 30): ['green', None, 'black'], (5, 35): [None, 'orange', None],
+            (5, 36): ['blue', None, None], (6, 30): ['green', None, 'pink'], (6, 35): ['blue', 'maroon', None],
+            (7, 29): [None, 'red', None], (7, 30): ['green', None, None], (7, 34): ['blue', None, 'olive'],
+            (8, 30): [None, 'maroon', 'pink'], (8, 31): [None, 'maroon', 'pink'], (8, 32): [None, 'maroon', 'pink'],
+            (8, 33): [None, 'maroon', 'pink'],
         }
         expected_borders_map = {}
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
@@ -167,24 +167,25 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
                              (-24, 9): 'ImDi', (-24, 10): 'ImDi', (-24, 11): 'ImDi', (-24, 12): 'ImDi',
                              (-23, 4): 'ImDi', (-23, 5): 'ImDi', (-23, 6): 'ImDi', (-23, 7): 'ImDi', (-23, 8): 'ImDi',
                              (-23, 9): 'ImDi', (-23, 10): 'ImDi', (-23, 11): 'ImDi' }
-        expected_borders = {(-34, 6): ['white', None, 'white'], (-34, 7): [None, 'white', 'white'], (-34, 8): [None, 'white', 'white'],
-                            (-34, 9): [None, 'white', 'white'], (-34, 10): [None, 'white', 'white'], (-34, 11): [None, 'white', 'white'],
-                            (-34, 12): [None, 'white', 'white'], (-34, 13): ['white', 'white', None], (-34, 15): ['white', None, 'white'],
-                            (-34, 16): [None, 'white', 'white'], (-34, 17): [None, 'white', 'white'], (-34, 18): ['white', 'white', None],
-                            (-33, 5): ['white', None, None], (-33, 6): [None, 'white', None], (-33, 13): [None, None, 'white'],
-                            (-33, 14): [None, 'white', 'white'], (-33, 15): [None, 'white', None], (-33, 18): ['white', None, 'white'],
-                            (-32, 4): ['white', None, 'white'], (-32, 18): ['white', 'white', None], (-31, 4): ['white', None, 'white'],
-                            (-31, 17): ['white', None, None], (-31, 18): [None, 'white', None], (-30, 3): ['white', None, 'white'],
-                            (-30, 16): ['white', None, 'white'], (-29, 3): ['white', None, 'white'], (-29, 15): ['white', None, None],
-                            (-29, 16): [None, 'white', None], (-28, 2): ['white', None, 'white'], (-28, 15): ['white', 'white', None],
-                            (-27, 2): ['white', None, 'white'], (-27, 15): ['white', None, 'white'], (-26, 1): ['white', None, 'white'],
-                            (-26, 15): ['white', 'white', None], (-25, 1): ['white', None, 'white'], (-25, 14): ['white', None, None],
-                            (-25, 15): [None, 'white', None], (-24, 1): ['white', 'white', None], (-24, 13): ['white', None, 'white'],
-                            (-23, 1): [None, None, 'white'], (-23, 2): [None, 'white', 'white'], (-23, 3): [None, 'white', 'white'],
-                            (-23, 4): ['white', 'white', 'white'], (-23, 12): ['white', None, None], (-23, 13): [None, 'white', None],
+        expected_borders = {(-34, 5): ['white', 'white', None], (-34, 6): [None, 'white', 'white'], (-34, 7): [None, 'white', 'white'],
+                            (-34, 8): [None, 'white', 'white'], (-34, 9): [None, 'white', 'white'], (-34, 10): [None, 'white', 'white'],
+                            (-34, 11): [None, 'white', 'white'], (-34, 12): ['white', None, 'white'], (-34, 14): ['white', 'white', None],
+                            (-34, 15): [None, 'white', 'white'], (-34, 16): [None, 'white', 'white'], (-34, 17): ['white', None, 'white'],
+                            (-33, 4): ['white', None, 'white'], (-33, 11): [None, 'white', None], (-33, 12): [None, 'white', 'white'],
+                            (-33, 13): [None, None, 'white'], (-33, 16): [None, 'white', None], (-33, 17): ['white', None, None],
+                            (-32, 3): ['white', 'white', None], (-32, 17): ['white', None, 'white'], (-31, 2): [None, 'white', None],
+                            (-31, 3): ['white', None, None], (-31, 16): ['white', None, 'white'], (-30, 2): ['white', 'white', None],
+                            (-30, 15): ['white', 'white', None], (-29, 1): [None, 'white', None], (-29, 2): ['white', None, None],
+                            (-29, 14): ['white', None, 'white'], (-28, 1): ['white', 'white', None], (-28, 14): ['white', None, 'white'],
+                            (-27, 0): [None, 'white', None], (-27, 1): ['white', None, None], (-27, 13): [None, 'white', None],
+                            (-27, 14): ['white', None, None], (-26, 0): ['white', 'white', None], (-26, 14): ['white', None, 'white'],
+                            (-25, -1): [None, 'white', None], (-25, 0): ['white', None, None], (-25, 13): ['white', None, 'white'],
+                            (-24, 0): ['white', None, 'white'], (-24, 12): ['white', 'white', None], (-23, -1): [None, 'white', None],
+                            (-23, 0): [None, 'white', 'white'], (-23, 1): [None, 'white', 'white'], (-23, 2): [None, 'white', 'white'],
+                            (-23, 3): ['white', None, None], (-23, 11): ['white', None, 'white'], (-22, 3): [None, 'white', 'white'],
                             (-22, 4): [None, 'white', 'white'], (-22, 5): [None, 'white', 'white'], (-22, 6): [None, 'white', 'white'],
                             (-22, 7): [None, 'white', 'white'], (-22, 8): [None, 'white', 'white'], (-22, 9): [None, 'white', 'white'],
-                            (-22, 10): [None, 'white', 'white'], (-22, 11): [None, 'white', 'white']}
+                            (-22, 10): [None, 'white', 'white']}
         expected_borders_map = {}
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
