@@ -50,7 +50,7 @@ class ClassicModePDFSectorMap(PDFMap, SectorMap):
         grid.hex_grid(grid.draw_all, 0.5, colour=self.colours['hexes'])
 
     def area_name_title(self, area_name: str) -> None:
-        cursor = Cursor(self.image_size.x // 2, 0.5)
+        cursor = Cursor(self.image_size.x // 2, 0.9)
         self.add_text_centred(area_name, cursor, 'title')
 
     def statistics(self, sector: Sector):
