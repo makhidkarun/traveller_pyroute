@@ -468,12 +468,12 @@ class testHexMap(baseTest):
         zaokpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
         ngatpath = os.path.abspath(args.output + '/Ngathksirz Sector.pdf')
 
-        hexmap = PDFHexMap(galaxy, 'trade')
+        hexmap = ClassicModePDFSectorMap(galaxy, 'trade', args.output, "dense")
 
         secname = 'Zao Kfeng Ig Grilokh'
-        hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        hexmap.write_sector_map(galaxy.sectors[secname])
         secname = 'Ngathksirz'
-        hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        hexmap.write_sector_map(galaxy.sectors[secname])
 
         srczaok = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector original.png')
         srcngat = os.path.abspath(args.output + '/Ngathksirz Sector original.png')
@@ -483,25 +483,25 @@ class testHexMap(baseTest):
         src_img = pymupdf.open(source1pdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
-            src = page.get_pixmap()
+            src = page.get_pixmap(dpi=144)
         src.save(srczaok)
 
         src_img = pymupdf.open(source2pdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
-            src = page.get_pixmap()
+            src = page.get_pixmap(dpi=144)
         src.save(srcngat)
 
         trg_img = pymupdf.open(zaokpath)
         trg_iter = trg_img.pages(0)
         for page in trg_iter:
-            trg = page.get_pixmap()
+            trg = page.get_pixmap(dpi=144)
         trg.save(trgzaok)
 
         trg_img = pymupdf.open(ngatpath)
         trg_iter = trg_img.pages(0)
         for page in trg_iter:
-            trg = page.get_pixmap()
+            trg = page.get_pixmap(dpi=144)
         trg.save(trgngat)
 
         image1 = Image.open(srczaok)
@@ -511,7 +511,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference above threshold")
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
 
         image1 = Image.open(srcngat)
         image2 = Image.open(trgngat)
@@ -519,7 +519,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference above threshold")
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Ngathksirz sector")
 
     def test_verify_spinward_trailing_sector(self):
         source1file = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
@@ -551,12 +551,12 @@ class testHexMap(baseTest):
         zaokpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
         ngatpath = os.path.abspath(args.output + '/Knaeleng Sector.pdf')
 
-        hexmap = PDFHexMap(galaxy, 'trade')
+        hexmap = ClassicModePDFSectorMap(galaxy, 'trade', args.output, "dense")
 
         secname = 'Zao Kfeng Ig Grilokh'
-        hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        hexmap.write_sector_map(galaxy.sectors[secname])
         secname = 'Knaeleng'
-        hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=True)
+        hexmap.write_sector_map(galaxy.sectors[secname])
 
         srczaok = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector original.png')
         srcngat = os.path.abspath(args.output + '/Knaeleng Sector original.png')
@@ -566,25 +566,25 @@ class testHexMap(baseTest):
         src_img = pymupdf.open(source1pdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
-            src = page.get_pixmap()
+            src = page.get_pixmap(dpi=144)
         src.save(srczaok)
 
         src_img = pymupdf.open(source2pdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
-            src = page.get_pixmap()
+            src = page.get_pixmap(dpi=144)
         src.save(srcngat)
 
         trg_img = pymupdf.open(zaokpath)
         trg_iter = trg_img.pages(0)
         for page in trg_iter:
-            trg = page.get_pixmap()
+            trg = page.get_pixmap(dpi=144)
         trg.save(trgzaok)
 
         trg_img = pymupdf.open(ngatpath)
         trg_iter = trg_img.pages(0)
         for page in trg_iter:
-            trg = page.get_pixmap()
+            trg = page.get_pixmap(dpi=144)
         trg.save(trgngat)
 
         image1 = Image.open(srczaok)
@@ -594,7 +594,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference above threshold")
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
 
         image1 = Image.open(srcngat)
         image2 = Image.open(trgngat)
@@ -602,7 +602,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference above threshold")
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Knaeleng sector")
 
     def test_verify_xboat_write_pdf(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
@@ -653,7 +653,7 @@ class testHexMap(baseTest):
         array2 = np.array(image2)
 
         mse = np.mean((array1 - array2) ** 2)
-        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold")
+        self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zarushagar sector")
 
     def test_verify_quadripoint_trade_write(self):
         source1file = self.unpack_filename('DeltaFiles/quadripoint_trade_write/Tuglikki.sec')

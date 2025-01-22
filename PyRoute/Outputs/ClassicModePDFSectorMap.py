@@ -111,3 +111,13 @@ class ClassicModePDFSectorMap(PDFMap, SectorMap):
         if key not in self.colours:
             self.colours[key] = trade_colour
         return trade_colour, key
+
+    def spinward_name(self, name: str):
+        y = self.start.y + self.hex_size.x + self.subsector_height + self.subsector_height
+        cursor = Cursor(self.start.x - 5, y)
+        self.add_text_rotated(name, cursor, 'sector', 90)
+
+    def trailing_name(self, name: str):
+        y = self.start.y + self.hex_size.x + self.subsector_height + self.subsector_height + 12
+        cursor = Cursor(self.image_size.x - 14, y)
+        self.add_text_rotated(name, cursor, 'sector', -90)
