@@ -47,12 +47,17 @@ class ClassicModePDFSectorMap(PDFMap, SectorMap):
         self.fill_background()
         self.area_name_title(area.name)
         self.subsector_grid()
-        grid = HexGrid(self, self.start, self.hex_size, 32, 40)
+        grid = HexGrid(self, self.start, self.hex_size, 32, 40, legacy=True)
         grid.hex_grid(grid.draw_all, 0.5, colour=self.colours['hexes'])
 
     def area_name_title(self, area_name: str) -> None:
         cursor = Cursor(self.image_size.x // 2, 0.9)
         self.add_text_centred(area_name, cursor, 'title')
+
+    def draw_borders(self, sector: Sector):
+        grid = HexGrid(self, self.start, self.hex_size, 32, 40, legacy=True)
+        grid.set_borders(self.galaxy.borders, sector.dx, sector.dy)
+        grid.hex_grid(grid.draw_borders, 1, colour=self.colours['hexes'])
 
     def statistics(self, sector: Sector):
         return

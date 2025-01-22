@@ -33,7 +33,7 @@ class HexGrid(object):
     rows/cols : number of rows and columns of hexes to draw
     size x/y determine the width and height of each hex.
     """
-    def __init__(self, doc: MapOutput, start: Cursor, size: Cursor, rows: int, cols: int):
+    def __init__(self, doc: MapOutput, start: Cursor, size: Cursor, rows: int, cols: int, legacy: bool = False):
         self.hex_grid_colour: Colour = 'gray'
         self.doc: MapOutput = doc
 
@@ -44,6 +44,7 @@ class HexGrid(object):
         self.borders: Borders = None
         self.sector_dx: int = 0
         self.sector_dy: int = 0
+        self.legacy = legacy
 
     def hex_grid(self, draw, width: int, colour: Colour):
         hline = HLine(self.doc, self, width, colour)
@@ -82,19 +83,18 @@ class HexGrid(object):
         self.sector_dy = sector_dy
 
     def draw_borders(self, x: int, y: int, hline, lline, rline) -> None:
+        legacy = self.legacy
         offset = Hex.dy_offset(y, (self.sector_dy // 40))
         q, r = Hex.hex_to_axial(x + (self.sector_dx), offset - 1)
 
         if self.borders.borders.get((q, r), False):
             border_colours = self.borders.borders[(q, r)]
-            # TODO: Replace with full-blown borders remix
-            border_colours = ['salmon', 'salmon', 'salmon']
             if border_colours[0] and x < self.x_count - 1:
-                hline.draw_colour(border_colours[0])
+                hline.draw_colour("salmon" if legacy else border_colours[0])
             if border_colours[1] and y > 0:
-                rline.draw_colour(border_colours[1])
+                rline.draw_colour("salmon" if legacy else border_colours[1])
             if border_colours[2]:
-                lline.draw_colour(border_colours[2])
+                lline.draw_colour("salmon" if legacy else border_colours[2])
 
 
 class LineDraw (object):
