@@ -1,4 +1,3 @@
-
 from PyRoute.Outputs.Map import MapOutput
 from PyRoute.Outputs.HexGrid import HexGrid
 from PyRoute.Outputs.Cursor import Cursor
@@ -25,11 +24,27 @@ class HexSystem(object):
         raise NotImplementedError("Base Class")
 
     def location(self, star_hex: Hex) -> Cursor:
-        col = (self.hex_size.x * 3 * star_hex.col) + int(self.hex_size.x * 1.5)
-        if star_hex.col & 1:
-            row = (self.start.y - self.hex_size.y * 2) + (star_hex.row * self.hex_size.y * 2)
+        star_col = None
+        star_row = None
+        if isinstance(star_hex, Hex):
+            star_col = star_hex.col
+            star_row = star_hex.row
+        elif isinstance(star_hex, str):
+            if 4 == len(star_hex) and '-' not in star_hex:
+                star_col = int(star_hex[0:2])
+                star_row = int(star_hex[2:4])
+            elif 4 == len(star_hex) and '-' == star_hex[0]:
+                star_col = int(star_hex[0:2])
+                star_row = int(star_hex[2:4])
+            elif 4 == len(star_hex) and '-' == star_hex[2]:
+                star_col = int(star_hex[0:2])
+                star_row = int(star_hex[2:4])
+
+        col = (self.hex_size.x * 3 * star_col) + int(self.hex_size.x * 1.5)
+        if star_col & 1:
+            row = (self.start.y - self.hex_size.y * 2) + (star_row * self.hex_size.y * 2)
         else:
-            row = (self.start.y - self.hex_size.y) + (star_hex.row * self.hex_size.y * 2)
+            row = (self.start.y - self.hex_size.y) + (star_row * self.hex_size.y * 2)
         return Cursor(col, row)
 
     def clear_hex(self, center: Cursor):

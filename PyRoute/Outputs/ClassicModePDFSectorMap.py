@@ -105,7 +105,7 @@ class ClassicModePDFSectorMap(PDFMap, SectorMap):
                 endRow += 40
             if end.sector.y > sector.y:
                 endRow -= 40
-            pos = f"{endCol}{endRow}"
+            pos = f"{endCol:02d}{endRow:02d}"
 
         end_cursor = self.system_writer.location(pos)
         end_cursor.y_plus(self.hex_size.y)

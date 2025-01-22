@@ -690,9 +690,9 @@ class testHexMap(baseTest):
 
         secname = ['Tuglikki', 'Provence', 'Deneb', 'Corridor']
 
-        hexmap = PDFHexMap(galaxy, 'trade', args.btn)
+        hexmap = ClassicModePDFSectorMap(galaxy, 'trade', args.output, "dense")
         for sector_name in secname:
-            hexmap.write_sector_pdf_map(galaxy.sectors[sector_name], is_live=True)
+            hexmap.write_sector_map(galaxy.sectors[sector_name])
 
         fullname = ['Tuglikki Sector', 'Provence Sector', 'Deneb Sector', 'Corridor Sector']
         srcstem = self.unpack_filename('OutputFiles/verify_quadripoint_trade_write/Corridor Sector.pdf')
@@ -756,9 +756,9 @@ class testHexMap(baseTest):
         secname = ["Deneb"]
 
         targpath = os.path.abspath(args.output + '/Deneb Sector.pdf')
-        hexmap = PDFHexMap(galaxy, 'trade', args.btn)
+        hexmap = ClassicModePDFSectorMap(galaxy, 'trade', args.output, "dense")
         for sector_name in secname:
-            hexmap.write_sector_pdf_map(galaxy.sectors[sector_name], is_live=True)
+            hexmap.write_sector_map(galaxy.sectors[sector_name])
 
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)

@@ -87,6 +87,8 @@ class HexGrid(object):
 
         if self.borders.borders.get((q, r), False):
             border_colours = self.borders.borders[(q, r)]
+            # TODO: Replace with full-blown borders remix
+            border_colours = ['salmon', 'salmon', 'salmon']
             if border_colours[0] and x < self.x_count - 1:
                 hline.draw_colour(border_colours[0])
             if border_colours[1] and y > 0:
