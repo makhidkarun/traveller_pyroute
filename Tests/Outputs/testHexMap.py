@@ -706,7 +706,7 @@ class testHexMap(baseTest):
             src_img = pymupdf.open(srcpdf)
             src_iter = src_img.pages(0)
             for page in src_iter:
-                src = page.get_pixmap()
+                src = page.get_pixmap(dpi=144)
 
             srcfile = os.path.abspath(args.output + '/' + full + ' original.png')
             src.save(srcfile)
@@ -714,7 +714,7 @@ class testHexMap(baseTest):
             trg_img = pymupdf.open(trgpdf)
             trg_iter = trg_img.pages(0)
             for page in trg_iter:
-                trg = page.get_pixmap()
+                trg = page.get_pixmap(dpi=144)
             trgfile = os.path.abspath(args.output + '/' + full + ' remix.png')
             trg.save(trgfile)
 
