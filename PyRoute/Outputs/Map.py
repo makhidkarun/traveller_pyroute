@@ -84,6 +84,9 @@ class MapOutput(object):
     def add_text_centred(self, text: str, start: Cursor, scheme: Scheme, max_width: int = -1, offset: bool = False) -> None:
         raise NotImplementedError("Base Class")
 
+    def add_text_centred_legacy(self, text: str, start: Cursor, scheme: Scheme, max_width: int = -1) -> None:
+        raise NotImplementedError("Base Class")
+
     def add_text_rotated(self, text: str, start: Cursor, scheme: Scheme, rotation: int) -> None:
         raise NotImplementedError("Base Class")
 

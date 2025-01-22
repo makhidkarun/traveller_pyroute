@@ -139,11 +139,11 @@ class HexSystem4Lines(HexSystem):
         self.zone(star, point.copy())
 
         point.y_plus(3.0)
-        self.doc.add_text_centred(str(star.uwp), point, 'system_uwp', offset=True)
+        self.doc.add_text_centred_legacy(str(star.uwp), point, 'system_uwp')
 
         if len(star.name) > 0:
             point.y_plus(3.5)
-            self.doc.add_text_centred(star.name, point, 'system_uwp', self.hex_size.x * 3.5, offset=True)
+            self.doc.add_text_centred_legacy(star.name, point, 'system_uwp', self.hex_size.x * 3.5)
 
         added = star.alg_code
         if star.tradeCode.subsector_capital:
@@ -154,11 +154,11 @@ class HexSystem4Lines(HexSystem):
             added += ' '
         added += '{:d}'.format(star.ggCount)
         point.y_plus(3.5)
-        self.doc.add_text_centred(added, point, 'system_uwp', offset=True)
+        self.doc.add_text_centred_legacy(added, point, 'system_uwp')
 
         point.y_plus(3.5)
         added = self._system_write_additional_data(star)
-        self.doc.add_text_centred(added, point, 'system_uwp', offset=True)
+        self.doc.add_text_centred_legacy(added, point, 'system_uwp')
 
     def _system_write_additional_data(self, star):
         added = ''
