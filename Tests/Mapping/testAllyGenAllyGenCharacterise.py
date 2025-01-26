@@ -188,7 +188,6 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
 
-    @pytest.mark.xfail
     def testAllyGenBorderOnFarFrontiersSector(self):
         sourcefile = self.unpack_filename('BorderGeneration/Far Frontiers.sec')
         mapfile = self.unpack_filename('BorderGeneration/Far Frontiers-allymap-allymap.json')
@@ -264,7 +263,6 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
             self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
 
-    @pytest.mark.xfail
     def testAllyGenBorderOnVanguardReachesSector(self):
         sourcefile = self.unpack_filename('BorderGeneration/Vanguard Reaches.sec')
         mapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-allymap-allymap.json')

@@ -229,7 +229,8 @@ class Borders(object):
             if len(ally_map[cand_hex]) == 1:
                 ally_map[cand_hex] = ally_map[cand_hex].pop()[0]
             else:
-                ally_list = sorted([algs for algs in ally_map[cand_hex]], key=itemgetter(1))
+                raw_ally_list = [algs for algs in ally_map[cand_hex]]
+                ally_list = sorted(raw_ally_list, key=itemgetter(1, 0))
                 if ally_list[0][1] == 0:
                     ally_map[cand_hex] = ally_list[0][0]
                 else:
