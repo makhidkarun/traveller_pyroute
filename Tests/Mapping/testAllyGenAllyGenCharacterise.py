@@ -227,6 +227,43 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
             self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
 
+    def testAllyGenBorderOnFarFrontiersPartialSector(self):
+        sourcefile = self.unpack_filename('BorderGeneration/Far Frontiers - partial.sec')
+        mapfile = self.unpack_filename('BorderGeneration/Far Frontiers-partial-allymap-allymap.json')
+        borderfile = self.unpack_filename('BorderGeneration/Far Frontiers-partial-allymap-border.json')
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+
+        self.galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        self.galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        self.borders = self.galaxy.borders
+        self.borders.create_ally_map('separate', True)
+
+        expected_ally_map = self.load_dict_from_json(mapfile)
+        expected_borders = self.load_dict_from_json(borderfile)
+        expected_borders_map = {}
+
+        ally_map = dict(self.borders.allyMap)
+        borders = dict(self.borders.borders)
+        borders_map = dict(self.borders.borders_map)
+
+        if expected_ally_map != ally_map:
+            combo = dict(expected_ally_map.items() & ally_map.items())
+            expected_ally_map = {key: expected_ally_map[key] for key in expected_ally_map if key not in combo}
+            ally_map = {key: ally_map[key] for key in ally_map if key not in combo}
+            self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
+        if expected_borders != borders:
+            combo = dict(expected_borders.items() & borders.items())
+            expected_borders = {key: expected_borders[key] for key in expected_borders if key not in combo}
+            borders = {key: borders[key] for key in borders if key not in combo}
+            self.assertEqual(expected_borders, borders, "Unexpected borders value")
+        self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+
     @pytest.mark.xfail
     def testAllyGenBorderOnVanguardReachesSector(self):
         sourcefile = self.unpack_filename('BorderGeneration/Vanguard Reaches.sec')
