@@ -70,5 +70,6 @@ class TestAllyGenBase(baseTest):
             rawstrip = rawkey.strip('()')
             bitz = rawstrip.split(',')
             nu_key = (int(bitz[0]), int(bitz[1]))
+            assert nu_key not in mid, "Key " + str(nu_key) + " duplicated in dict file " + rawfile
             mid[nu_key] = value
         return mid

@@ -8,10 +8,16 @@ Created on Sep 12, 2023
 class Cursor(object):
 
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
+        self._x = x
+        self._y = y
         self.dx = 0
         self.dy = 0
+
+    def __eq__(self, other):
+        return self._x == other._x and self._y == other._y
+
+    def __str__(self):
+        return f"{self._x}, {self._y}"
 
     def set_deltas(self, dx=2, dy=2):
         self.dx = dx
@@ -39,24 +45,16 @@ class Cursor(object):
         """
         Mutable x addition. Defaults to set delta value.
         """
-        if dx is None:
-            self.x += self.dx
-        else:
-            self.x = self.x + dx
+        self._x += dx if dx is not None else self.dx
 
     def y_plus(self, dy=None):
         """
         Mutable y addition. Defaults to set delta value.
         """
-        if dy is None:
-            self.y += self.dy
-        else:
-            self.y = self.y + dy
+        self._y += dy if dy is not None else self.dy
 
     def copy(self):
         new_cursor = self.__class__(self.x, self.y)
         new_cursor.set_deltas(self.dx, self.dy)
         return new_cursor
 
-    def __str__(self):
-        return "({:f}, {:f})".format(self.x, self.y)
