@@ -190,7 +190,6 @@ class testHexMap(baseTest):
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
 
-    @pytest.mark.xfail(reason='Flaky on ubuntu')
     def test_verify_subsector_trade_write(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
         outfile = self.unpack_filename('OutputFiles/verify_subsector_trade_write/Zao Kfeng Ig Grilokh - subsector P - trade.txt')

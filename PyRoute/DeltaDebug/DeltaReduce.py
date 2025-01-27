@@ -172,7 +172,7 @@ class DeltaReduce:
             stats.write_statistics(args.ally_count, args.ally_match, args.json_data)
 
             if args.maps:
-                pdfmap = ClassicModePDFSectorMap(galaxy, args.routes, args.output_path, "dense")
+                pdfmap = ClassicModePDFSectorMap(galaxy, args.routes, args.output, "dense")
                 pdfmap.write_maps()
 
                 if args.subsectors:
