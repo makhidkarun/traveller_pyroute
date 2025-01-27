@@ -14,7 +14,6 @@ from PyRoute.Star import Star
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Outputs.HexGrid import HexGrid
-from PyRoute.Outputs.Map import Map
 from PyRoute.Outputs.PDFMap import PDFMap
 from PyRoute.Outputs.SectorMap import SectorMap
 from PyRoute.StatCalculation import StatCalculation
@@ -138,7 +137,7 @@ class ClassicModePDFSectorMap(PDFMap, SectorMap):
         trade_colour = trade_colours[trade]
         trade_string = "rgb" + str(trade_colour)
         trade_colour = toColor(trade_string)
-        key = "trade"+str(trade)
+        key = "trade" + str(trade)
         if key not in self.colours:
             self.colours[key] = trade_colour
         return trade_colour, key
