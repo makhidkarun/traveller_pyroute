@@ -12,7 +12,6 @@ from pymupdf import pymupdf
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
-from PyRoute.Outputs.HexMap import HexMap
 from PyRoute.Outputs.PDFHexMap import PDFHexMap
 from PyRoute.Position.Hex import Hex
 from Tests.baseTest import baseTest
@@ -94,53 +93,6 @@ class testHexMap(baseTest):
                 self.assertEqual('ReportLab', doc_info.creator)
                 self.assertEqual(expected_path, document._filename)
 
-    def test_verify_empty_sector_write(self):
-        sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
-
-        outfile = self.unpack_filename('OutputFiles/verify_empty_sector_write/Zao Kfeng Ig Grilokh empty.txt')
-
-        args = self._make_args()
-        args.interestingline = None
-        args.interestingtype = None
-        args.maps = True
-        args.subsectors = True
-
-        delta = DeltaDictionary()
-        sector = SectorDictionary.load_traveller_map_file(sourcefile)
-        delta[sector.name] = sector
-
-        galaxy = DeltaGalaxy(args.btn, args.max_jump)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
-                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
-
-        galaxy.output_path = args.output
-
-        secname = 'Zao Kfeng Ig Grilokh'
-
-        hexmap = HexMap(galaxy, 'trade')
-        self.assertTrue(hexmap.compression)
-
-        oldtime = b'20230911163653'
-        oldmd5 = b'8419949643701e6b438d6f3f93239cf7'
-
-        with open(outfile, 'rb') as file:
-            expected_result = file.read()
-
-        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=False)
-        self.assertFalse(hexmap.compression)
-        self.assertIsNotNone(result)
-        # rather than try to mock datetime.now(), patch the output result.
-        # this also lets us check that there's only a single match
-        matches = self.timeline.search(result)
-        self.assertEqual(1, len(matches.groups()), 'Should be exactly one create-date match')
-        result = self.timeline.sub(oldtime, result)
-        # likewise patch md5 outout
-        matches = self.md5line.findall(result)
-        self.assertEqual(2, len(matches), 'Should be exactly two MD5 matches')
-        result = self.md5line.sub(oldmd5, result)
-
-        self.assertEqual(expected_result, result)
-
     def test_verify_empty_sector_write_pdf(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
         srcpdf = self.unpack_filename(
@@ -189,65 +141,6 @@ class testHexMap(baseTest):
 
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
-
-    def test_verify_subsector_trade_write(self):
-        sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
-        outfile = self.unpack_filename('OutputFiles/verify_subsector_trade_write/Zao Kfeng Ig Grilokh - subsector P - trade.txt')
-
-        starsfile = self.unpack_filename('OutputFiles/verify_subsector_trade_write/trade stars.txt')
-        rangesfile = self.unpack_filename('OutputFiles/verify_subsector_trade_write/trade ranges.txt')
-
-        args = self._make_args()
-        args.interestingline = None
-        args.interestingtype = None
-        args.maps = True
-        args.subsectors = True
-        args.routes = 'trade'
-
-        delta = DeltaDictionary()
-        sector = SectorDictionary.load_traveller_map_file(sourcefile)
-        delta[sector.name] = sector
-
-        galaxy = DeltaGalaxy(args.btn, args.max_jump)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
-                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
-        galaxy.output_path = args.output
-
-        galaxy.generate_routes()
-
-        with open(starsfile, 'rb') as file:
-            galaxy.stars = nx.read_edgelist(file, nodetype=int)
-        self.assertEqual(26, len(galaxy.stars.nodes()), "Unexpected number of stars nodes")
-        self.assertEqual(53, len(galaxy.stars.edges), "Unexpected number of stars edges")
-        for item in galaxy.stars.edges(data=True):
-            self.assertIn('trade', item[2], 'Trade value not set during edgelist read')
-
-        self._load_ranges(galaxy, rangesfile)
-        self.assertEqual(27, len(galaxy.ranges.nodes()), "Unexpected number of ranges nodes")
-        self.assertEqual(44, len(galaxy.ranges.edges), "Unexpected number of ranges edges")
-
-        secname = 'Zao Kfeng Ig Grilokh'
-
-        hexmap = HexMap(galaxy, 'trade')
-
-        oldtime = b'20230912001440'
-        oldmd5 = b'604d97d7d2268961667eac93a740b15a'
-
-        with open(outfile, 'rb') as file:
-            expected_result = file.read()
-
-        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=False)
-        self.assertIsNotNone(result)
-        # rather than try to mock datetime.now(), patch the output result.
-        # this also lets us check that there's only a single match
-        matches = self.timeline.search(result)
-        self.assertEqual(1, len(matches.groups()), 'Should be exactly one create-date match')
-        result = self.timeline.sub(oldtime, result)
-        # likewise patch md5 output
-        matches = self.md5line.findall(result)
-        self.assertEqual(2, len(matches), 'Should be exactly two MD5 matches')
-        result = self.md5line.sub(oldmd5, result)
-        self.assertEqual(expected_result, result)
 
     def test_verify_subsector_trade_write_pdf(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
@@ -312,66 +205,6 @@ class testHexMap(baseTest):
 
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.38 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
-
-    def test_verify_subsector_comm_write(self):
-        sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
-        outfile = self.unpack_filename('OutputFiles/verify_subsector_comm_write/Zao Kfeng Ig Grilokh - subsector P - comm.txt')
-
-        starsfile = self.unpack_filename('OutputFiles/verify_subsector_comm_write/comm stars.txt')
-
-        rangesfile = self.unpack_filename('OutputFiles/verify_subsector_comm_write/comm ranges.txt')
-
-        args = self._make_args()
-        args.interestingline = None
-        args.interestingtype = None
-        args.maps = True
-        args.routes = 'comm'
-        args.subsectors = True
-
-        delta = DeltaDictionary()
-        sector = SectorDictionary.load_traveller_map_file(sourcefile)
-        delta[sector.name] = sector
-
-        galaxy = DeltaGalaxy(args.btn, args.max_jump)
-        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
-                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
-        galaxy.output_path = args.output
-
-        galaxy.generate_routes()
-
-        with open(starsfile, 'rb') as file:
-            galaxy.stars = nx.read_edgelist(file, nodetype=int)
-        self.assertEqual(5, len(galaxy.stars.nodes()), "Unexpected number of stars nodes")
-        self.assertEqual(4, len(galaxy.stars.edges), "Unexpected number of stars edges")
-        for item in galaxy.stars.edges(data=True):
-            self.assertIn('trade', item[2], 'Trade value not set during edgelist read')
-
-        self._load_ranges(galaxy, rangesfile)
-        self.assertEqual(27, len(galaxy.ranges.nodes()), "Unexpected number of ranges nodes")
-        self.assertEqual(36, len(galaxy.ranges.edges), "Unexpected number of ranges edges")
-
-        secname = 'Zao Kfeng Ig Grilokh'
-
-        hexmap = HexMap(galaxy, 'trade')
-
-        oldtime = b'20230912013953'
-        oldmd5 = b'ff091edb9d8ca0abacea39e5791a9843'
-
-        with open(outfile, 'rb') as file:
-            expected_result = file.read()
-
-        result = hexmap.write_sector_pdf_map(galaxy.sectors[secname], is_live=False)
-        self.assertIsNotNone(result)
-        # rather than try to mock datetime.now(), patch the output result.
-        # this also lets us check that there's only a single match
-        matches = self.timeline.search(result)
-        self.assertEqual(1, len(matches.groups()), 'Should be exactly one create-date match')
-        result = self.timeline.sub(oldtime, result)
-        # likewise patch md5 output
-        matches = self.md5line.findall(result)
-        self.assertEqual(2, len(matches), 'Should be exactly two MD5 matches')
-        result = self.md5line.sub(oldmd5, result)
-        self.assertEqual(expected_result, result)
 
     def test_verify_subsector_comm_write_pdf(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
