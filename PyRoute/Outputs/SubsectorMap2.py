@@ -32,7 +32,7 @@ class GraphicSubsectorMap(GraphicMap):
     font_layer = None
 
     def __init__(self, galaxy, routes, trade_version):
-        super(GraphicSubsectorMap, self).__init__(galaxy, routes)
+        super(GraphicSubsectorMap, self).__init__(galaxy, routes, galaxy.output_path, "")
         self.x_start = 56
         self.y_start = 56
         self.ym = 48  # half a hex height
@@ -52,7 +52,8 @@ class GraphicSubsectorMap(GraphicMap):
 
     def document(self, sector):
         self.sector = sector
-        self.image = Image.new("RGB", self.image_size, "black")
+        img_size = (self.image_size.x, self.image_size.y)
+        self.image = Image.new("RGB", img_size, "black")
         return ImageDraw.Draw(self.image)
 
     def close(self, subsector_name):
@@ -71,7 +72,7 @@ class GraphicSubsectorMap(GraphicMap):
                     # Assign a default name to stop file writes blowing up
                     subsector.name = sector.name + "-" + subsector.position
                 img = self.document(sector)
-                self.write_base_map(img, subsector)
+                self.write_base_map(subsector)
                 if self.trade_version != 'None':
                     img = self.trade_lines(img, subsector)
                 for star in subsector.worlds:

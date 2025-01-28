@@ -11,10 +11,10 @@ from PIL import Image, ImageDraw, ImageColor, ImageFont
 from PyRoute.Outputs.Colour import Colour
 from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Outputs.FontLayer import FontLayer
-from PyRoute.Outputs.Map import MapOutput, Scheme
+from PyRoute.Outputs.Map import Map, Scheme
 
 
-class GraphicMap(MapOutput):
+class GraphicMap(Map):
     fillBlack = (0, 0, 0, 255)
     fillWhite = (255, 255, 255, 255)
     fillBlue = (50, 215, 255, 255)
