@@ -1,3 +1,7 @@
+import os
+
+from PIL import Image
+
 from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Outputs.GraphicMap import GraphicMap
 from PyRoute.Outputs.HexGrid import HexGrid
@@ -11,8 +15,8 @@ class SubsectorMap(GraphicMap):
         super(SubsectorMap, self).__init__(galaxy, routes, output_path, "")
         self.output_suffix = " Subsector"
         self.image_size = Cursor(826, 1272)
-        self.xm = 28  # half the length of one side
-        self.ym = 48  # half a hex height
+        self.start = Cursor(56, 56)
+        self.hex_size = Cursor(28, 48)
 
         self.colours['background'] = 'black'
 
@@ -32,6 +36,11 @@ class SubsectorMap(GraphicMap):
         self.doc = self.document(subsector.name + " Subsector", True)
         self.write_base_map(subsector)
         self.close()
+
+    def close(self) -> None:
+        path = os.path.join(self.galaxy.output_path, self.area_name + ".png")
+        self.image = self.image.resize((413, 636), Image.BICUBIC)
+        self.image.save(path)
 
     def write_base_map(self, area: Subsector):
         self.fill_background()
