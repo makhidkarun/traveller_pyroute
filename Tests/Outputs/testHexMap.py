@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 from pymupdf import pymupdf
 
+from Outputs.SubsectorMap2 import GraphicSubsectorMap
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
@@ -206,6 +207,9 @@ class testHexMap(baseTest):
 
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.38 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
+
+        graphMap = GraphicSubsectorMap(galaxy, args.routes, args.speculative_version)
+        graphMap.write_maps()
 
     def test_verify_subsector_comm_write_pdf(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
