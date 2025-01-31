@@ -53,7 +53,6 @@ class SubsectorMap(GraphicMap):
         grid = HexGrid(self, self.start, self.hex_size, 8, 10)
         grid.hex_grid(grid.draw_all, 1, colour=self.colours['hexes'])
 
-
     def fill_background(self):
         background = self.colours['background']
         if background:
@@ -128,11 +127,47 @@ class SubsectorMap(GraphicMap):
         self.add_rectangle(start, end, colour, fillcolour, 7)
 
     def _draw_outer_rectangle(self, colour: str, fillcolour: str) -> None:
-        offset = 4
-        start1 = Cursor(30, 30)
-        start1.x_plus(-offset)
-        start1.y_plus(-offset)
-        end1 = Cursor(786, 1096)
-        end1.x_plus(offset)
-        end1.y_plus(offset)
-        self.add_rectangle(start1, end1, colour, fillcolour, 7)
+        offset = 1
+        upleft = Cursor(30, 30)
+        upleft.x_plus(-offset)
+        upleft.y_plus(-offset)
+        dnleft = Cursor(30, 1096)
+        dnleft.x_plus(-offset)
+        dnleft.y_plus(offset)
+        upright = Cursor(786, 30)
+        upright.x_plus(offset)
+        upright.y_plus(-offset)
+        dnright = Cursor(786, 1096)
+        dnright.x_plus(offset)
+        dnright.y_plus(offset)
+
+        upleftmid = Cursor(254, 30)
+        upleftmid.y_plus(-offset)
+        uprightmid = Cursor(568, 30)
+        uprightmid.y_plus(-offset)
+
+        dnleftmid = Cursor(254, 1096)
+        dnleftmid.y_plus(offset)
+        dnrightmid = Cursor(568, 1096)
+        dnrightmid.y_plus(offset)
+
+        upleftvert = Cursor(30, 400)
+        upleftvert.x_plus(-offset)
+        dnleftvert = Cursor(30, 722)
+        dnleftvert.x_plus(-offset)
+
+        uprightvert = Cursor(786, 400)
+        uprightvert.x_plus(offset)
+        dnrightvert = Cursor(786, 722)
+        dnrightvert.x_plus(-offset)
+
+        linewidth = 6
+
+        self.add_line(upleft, upleftmid, colour, fillcolour, linewidth)
+        self.add_line(upright, uprightmid, colour, fillcolour, linewidth)
+        self.add_line(upleft, upleftvert, colour, fillcolour, linewidth)
+        self.add_line(dnleft, dnleftvert, colour, fillcolour, linewidth)
+        self.add_line(upright, uprightvert, colour, fillcolour, linewidth)
+        self.add_line(dnright, dnrightvert, colour, fillcolour, linewidth)
+        self.add_line(dnleft, dnleftmid, colour, fillcolour, linewidth)
+        self.add_line(dnright, dnrightmid, colour, fillcolour, linewidth)
