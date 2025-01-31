@@ -1,6 +1,6 @@
 import os
 
-from PIL import Image, ImageFont
+from PIL import Image, ImageFont, ImageDraw
 
 from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Outputs.GraphicMap import GraphicMap
@@ -19,11 +19,17 @@ class SubsectorMap(GraphicMap):
         super(SubsectorMap, self).__init__(galaxy, routes, output_path, "")
         self.output_suffix = " Subsector"
         self.image_size = Cursor(826, 1272)
+        self.core_pos = Cursor(self.image_size.x / 2, 45)
+        self.rim_pos = Cursor(self.image_size.x / 2, 1121)
+        self.spin_pos = Cursor(0, 1108 / 2)
+        self.trail_pos = Cursor(780, 1108 / 2)
         self.start = Cursor(56, 56)
         self.hex_size = Cursor(28, 48)
 
         self.colours['background'] = 'black'
+        self.colours['name'] = "white"
         self.fonts['title'] = ImageFont.truetype(self.font_layer.getpath('DejaVuSerifCondensed.ttf'), 48)
+        self.fonts['name'] = ImageFont.truetype(self.font_layer.getpath('DejaVuSerifCondensed.ttf'), 32)
 
     def write_maps(self) -> None:
         maps = len(self.galaxy.sectors) * 16
@@ -52,6 +58,18 @@ class SubsectorMap(GraphicMap):
         self.subsector_grid()
         grid = HexGrid(self, self.start, self.hex_size, 8, 10)
         grid.hex_grid(grid.draw_all, 1, colour=self.colours['hexes'])
+        if area.coreward:
+            core_sub = area.coreward.name
+            self.coreward_name(core_sub)
+        if area.rimward:
+            core_sub = area.rimward.name
+            self.rimward_name(core_sub)
+        if area.spinward:
+            core_sub = area.spinward.name
+            self.spinward_name(core_sub)
+        if area.trailing:
+            core_sub = area.trailing.name
+            self.trailing_name(core_sub)
 
     def fill_background(self):
         background = self.colours['background']
@@ -159,7 +177,7 @@ class SubsectorMap(GraphicMap):
         uprightvert = Cursor(786, 400)
         uprightvert.x_plus(offset)
         dnrightvert = Cursor(786, 722)
-        dnrightvert.x_plus(-offset)
+        dnrightvert.x_plus(offset)
 
         linewidth = 6
 
@@ -171,3 +189,19 @@ class SubsectorMap(GraphicMap):
         self.add_line(dnright, dnrightvert, colour, fillcolour, linewidth)
         self.add_line(dnleft, dnleftmid, colour, fillcolour, linewidth)
         self.add_line(dnright, dnrightmid, colour, fillcolour, linewidth)
+
+    def coreward_name(self, name: str) -> None:
+        size = self._get_text_size(self.fonts['name'], name)
+        pos = Cursor(self.core_pos.x - size[0] / 2, self.core_pos.y - size[1])
+        self.add_text(name, pos, "name")
+
+    def rimward_name(self, name: str) -> None:
+        size = self._get_text_size(self.fonts['name'], name)
+        pos = Cursor(self.rim_pos.x - size[0] / 2, self.rim_pos.y - size[1])
+        self.add_text(name, pos, "name")
+
+    def spinward_name(self, name):
+        self.add_text_rotated(name, self.spin_pos, "name", 90)
+
+    def trailing_name(self, name):
+        self.add_text_rotated(name, self.trail_pos, "name", -90)
