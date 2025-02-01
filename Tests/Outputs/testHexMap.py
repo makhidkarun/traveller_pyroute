@@ -565,8 +565,8 @@ class testHexMap(baseTest):
             mse = np.mean((array1 - array2) ** 2)
             self.assertTrue(0.341 > mse, "Image difference " + str(mse) + " above threshold for " + full)
 
-            subsec_map = GraphicSubsectorMap(galaxy, "trade", "CT")
-            subsec_map.write_maps()
+            graphMap = SubsectorMap(galaxy, args.routes, galaxy.output_path)
+            graphMap.write_maps()
 
     def test_verify_single_system_border_write(self):
         sourcefile = self.unpack_filename('DeltaFiles/single_system_border/Deneb.sec')

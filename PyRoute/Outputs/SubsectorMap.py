@@ -1,6 +1,6 @@
 import os
 
-from PIL import Image, ImageFont, ImageDraw
+from PIL import Image, ImageFont, ImageColor
 
 from PyRoute.Position.Hex import Hex
 from PyRoute.Outputs.Cursor import Cursor
@@ -8,6 +8,7 @@ from PyRoute.Outputs.GraphicMap import GraphicMap
 from PyRoute.Outputs.HexGrid import HexGrid
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Subsector import Subsector
+from PyRoute.Star import Star
 
 
 class SubsectorMap(GraphicMap):
@@ -33,9 +34,21 @@ class SubsectorMap(GraphicMap):
         self.colours['background'] = 'black'
         self.colours['name'] = "white"
         self.colours['hexes'] = "white"
+        self.colours['hexes2'] = "white"
+        self.colours['hexes3'] = "white"
+        self.colours['hexes4'] = "white"
+        self.colours['hexes4red'] = "red"
+        self.colours['hexes5'] = "white"
+        self.colours['world'] = "white"
         self.fonts['title'] = ImageFont.truetype(self.font_layer.getpath('DejaVuSerifCondensed.ttf'), 48)
         self.fonts['name'] = ImageFont.truetype(self.font_layer.getpath('DejaVuSerifCondensed.ttf'), 32)
         self.fonts['hexes'] = ImageFont.truetype(self.font_layer.getpath('LiberationMono-Bold.ttf'), 15)
+        self.fonts['world'] = ImageFont.truetype(self.font_layer.getpath('LiberationMono-Bold.ttf'), 22)
+        self.fonts['hexes2'] = ImageFont.truetype(self.font_layer.getpath('FreeMono.ttf'), 22)
+        self.fonts['hexes3'] = ImageFont.truetype(self.font_layer.getpath('FreeMono.ttf'), 36)
+        self.fonts['hexes4'] = ImageFont.truetype(self.font_layer.getpath('Symbola-hint.ttf'), 22)
+        self.fonts['hexes4red'] = ImageFont.truetype(self.font_layer.getpath('Symbola-hint.ttf'), 22)
+        self.fonts['hexes5'] = ImageFont.truetype(self.font_layer.getpath('Symbola-hint.ttf'), 36)
 
     def write_maps(self) -> None:
         maps = len(self.galaxy.sectors) * 16
@@ -77,6 +90,8 @@ class SubsectorMap(GraphicMap):
             core_sub = area.trailing.name
             self.trailing_name(core_sub)
         self.hex_locations()
+        for star in area.worlds:
+            self.place_system(star)
 
     def fill_background(self):
         background = self.colours['background']
@@ -240,3 +255,103 @@ class SubsectorMap(GraphicMap):
         point.x_plus(xm)
         #point.y_plus(ym)
         return pos, point, location
+
+    def place_system(self, star: Star) -> None:
+        point = self.get_world_centrepoint(star)
+        self.zone(star, point.copy())
+
+        # Put the point in the centre of the hex
+        xm = self.hex_size.x
+        ym = self.hex_size.y
+        point.x_plus(xm)
+        point.y_plus(ym)
+
+        # Draw the centre dot coloured to reflect the world type.
+        radius = (xm / 2) - 1
+
+        if star.tradeCode.asteroid:
+            worldCharacter = '\u2059'
+            size = self._get_text_size(self.fonts['hexes3'], worldCharacter)
+
+            pos = Cursor(point.x - size[0] / 2, point.y - size[1] * 0.45)
+            self.add_text(worldCharacter, pos, "hexes3")
+
+        else:
+            colour = ImageColor.getrgb(star.tradeCode.pcode_color)
+            self.doc.ellipse([(point.x - radius, point.y - radius), (point.x + radius, point.y + radius)], fill=colour,
+                        outline=colour)
+
+        # Write Port code
+        size = self._get_text_size(self.fonts['world'], star.port)
+        pos = Cursor(point.x - (size[0] / 2) + 1, point.y - (size[1]) - 9.6)
+        self.add_text(star.port, pos, 'world')
+
+        if star.ggCount:
+            self.print_base_char('\u25CF', 'world', point, (1.75, -1.2))
+
+        if 'N' in star.baseCode or 'K' in star.baseCode:
+            self.print_base_char('\u066D', 'hexes3', point, (-0.7, -0.4))
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
+
+        if 'S' in star.baseCode:
+            self.print_base_char('\u25B2', 'hexes4', point, (-1.8, -1.0))
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
+
+        if 'D' in star.baseCode:
+            self.print_base_char('\u25A0', 'hexes4', point, (-1.55, -0.35))
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
+
+        if 'W' in star.baseCode:
+            self.print_base_char('\u25B2', 'hexes4red', point, (-1.85, -1.0))
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
+
+        if 'I' in star.baseCode:
+            self.print_base_char('\u2316', 'hexes5', point, (-2.5, -0.5))
+            self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
+
+        station_code = star.tradeCode.research_station_char
+        if station_code:
+            self.print_base_char(station_code, 'hexes4red', point, (-2.6, -0.4))
+            self.logger.debug("Research station for {} : {}".format(star.name, star.tradeCode))
+
+    def _world_point(self, hex_row: int, hex_col: int) -> Cursor:
+        xm = self.hex_size.x
+        ym = self.hex_size.y
+        col = xm * 3 * hex_col
+        if (hex_col & 1):
+            row = (self.start.y - ym * 2) + (hex_row * ym * 2)
+        else:
+            row = (self.start.y - ym) + (hex_row * ym * 2)
+        return Cursor(col, row)
+
+    # Get the centre of the hex for writing a world
+    def get_world_centrepoint(self, star: Star) -> Cursor:
+        col = star.col + self.positions[star.subsector()][0]
+        row = star.row + self.positions[star.subsector()][1]
+        return self._world_point(row, col)
+
+    def other_subsector_point(self, star, position) -> Cursor:
+        col_out = star.col + self.positions[position][0]
+        row_out = star.row + self.positions[position][1]
+        return self._world_point(row_out, col_out)
+
+    def zone(self, star: Star, point: Cursor) -> None:
+        xm = self.hex_size.x
+        ym = self.hex_size.y
+        point.x_plus(xm)
+        point.y_plus(ym)
+
+        xm += 2
+
+        if star.zone in ['R', 'F']:
+            self.add_circle(point, xm, 6, False, 'red zone')
+        elif star.zone in ['A', 'U']:
+            self.add_circle(point, xm, 6, False, 'amber zone')
+        else:  # no zone -> do nothing
+            return
+
+    def print_base_char(self, baseCharacter: str, scheme: str, point: Cursor, multiplier: tuple[float, float]) -> None:
+        font = self.get_font(scheme)
+        size = self._get_text_size(font, baseCharacter)
+        pos = Cursor(point.x + (multiplier[0] * size[0]), point.y + (multiplier[1] * size[1]))
+        self.add_text(baseCharacter, pos, scheme)
