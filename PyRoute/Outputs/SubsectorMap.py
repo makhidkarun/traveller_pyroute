@@ -2,6 +2,7 @@ import os
 
 from PIL import Image, ImageFont, ImageDraw
 
+from PyRoute.Position.Hex import Hex
 from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Outputs.GraphicMap import GraphicMap
 from PyRoute.Outputs.HexGrid import HexGrid
@@ -14,6 +15,9 @@ class SubsectorMap(GraphicMap):
                  'E': (0, -10), 'F': (-8, -10), 'G': (-16, -10), 'H': (-24, -10),
                  'I': (0, -20), 'J': (-8, -20), 'K': (-16, -20), 'L': (-24, -20),
                  'M': (0, -30), 'N': (-8, -30), 'O': (-16, -30), 'P': (-24, -30)}
+
+    x_count = 8
+    y_count = 10
 
     def __init__(self, galaxy: Galaxy, routes: str, output_path: str):
         super(SubsectorMap, self).__init__(galaxy, routes, output_path, "")
@@ -28,8 +32,10 @@ class SubsectorMap(GraphicMap):
 
         self.colours['background'] = 'black'
         self.colours['name'] = "white"
+        self.colours['hexes'] = "white"
         self.fonts['title'] = ImageFont.truetype(self.font_layer.getpath('DejaVuSerifCondensed.ttf'), 48)
         self.fonts['name'] = ImageFont.truetype(self.font_layer.getpath('DejaVuSerifCondensed.ttf'), 32)
+        self.fonts['hexes'] = ImageFont.truetype(self.font_layer.getpath('LiberationMono-Bold.ttf'), 15)
 
     def write_maps(self) -> None:
         maps = len(self.galaxy.sectors) * 16
@@ -56,7 +62,7 @@ class SubsectorMap(GraphicMap):
     def write_base_map(self, area: Subsector):
         self.fill_background()
         self.subsector_grid()
-        grid = HexGrid(self, self.start, self.hex_size, 8, 10)
+        grid = HexGrid(self, self.start, self.hex_size, self.x_count, self.y_count)
         grid.hex_grid(grid.draw_all, 1, colour=self.colours['hexes'])
         if area.coreward:
             core_sub = area.coreward.name
@@ -70,6 +76,7 @@ class SubsectorMap(GraphicMap):
         if area.trailing:
             core_sub = area.trailing.name
             self.trailing_name(core_sub)
+        self.hex_locations()
 
     def fill_background(self):
         background = self.colours['background']
@@ -205,3 +212,31 @@ class SubsectorMap(GraphicMap):
 
     def trailing_name(self, name):
         self.add_text_rotated(name, self.trail_pos, "name", -90)
+
+    def hex_locations(self) -> None:
+        # Draw the borders and add the hex numbers
+        for x in range(1, self.x_count + 1, 1):
+            for y in range(1, self.y_count + 1, 1):
+                _, point, location = self._set_pos(x, y)
+
+                name = "{0:02d}{1:02d}".format(location[0], location[1])
+
+                self.add_text_centred(name, point, "hexes")
+
+    def _set_pos(self, x: int, y: int) -> (tuple, Cursor, tuple):
+        location = (-self.positions[self.subsector.position][0] + x, -self.positions[self.subsector.position][1] + y)
+
+        q, r = Hex.hex_to_axial(location[0] + self.subsector.sector.dx - 1, location[1] + self.subsector.sector.dy - 1)
+
+        pos = (q, r)
+        xm = self.hex_size.x
+        ym = self.hex_size.y
+        col = xm * 3 * x
+        if (x & 1):
+            row = (self.start.y - ym * 2) + (y * ym * 2)
+        else:
+            row = (self.start.y - ym) + (y * ym * 2)
+        point = Cursor(col, row)
+        point.x_plus(xm)
+        #point.y_plus(ym)
+        return pos, point, location
