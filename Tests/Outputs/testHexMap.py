@@ -12,7 +12,7 @@ from pymupdf import pymupdf
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
-from PyRoute.Outputs.PDFHexMap import PDFHexMap
+from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap
 from PyRoute.Position.Hex import Hex
 from Tests.baseTest import baseTest
 
@@ -559,6 +559,9 @@ class testHexMap(baseTest):
 
             mse = np.mean((array1 - array2) ** 2)
             self.assertTrue(0.341 > mse, "Image difference " + str(mse) + " above threshold for " + full)
+
+            subsec_map = GraphicSubsectorMap(galaxy, "trade", "CT")
+            subsec_map.write_maps()
 
     def test_verify_single_system_border_write(self):
         sourcefile = self.unpack_filename('DeltaFiles/single_system_border/Deneb.sec')

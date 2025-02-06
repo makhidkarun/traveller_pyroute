@@ -44,7 +44,7 @@
 Hex  Name                       UWP       Remarks                    {Ix}   (Ex)    [Cx]   N     B  Z PBG W  A    Stellar       
 ---- -------------------------- --------- -------------------------- ------ ------- ------ ----- -- - --- -- ---- --------------
 0102 Tersta                     C574522-7 Ag Ni An                   { -1 } (743-5) [1413] BC    -  - 320 11 ImDv F3 V          
-0104 Khouth                     A8C3999-D Fl Hi In Cp                { 4 }  (D8G+5) [AD6E] BEF   -  - 420 13 ImDv M3 V          
+0104 Khouth                     A8C3999-D Fl Hi In Cp                { 4 }  (D8G+5) [AD6E] BEF   D  - 420 13 ImDv M3 V
 0105 Ankirst                    C556112-9 Lo                         { -1 } (600-5) [1115] B     -  - 421 11 ImDv K3 V M1 V     
 0106 Ofo-Nebus                  B541488-9 He Ni Po Varg1             { 0 }  (733+1) [4459] B     N  - 701 11 ImDv M0 V M1 V     
 0109 Synez                      E864256-7 Lo                         { -3 } (410-4) [1146] B     -  - 620 9  ImDv M2 V          
