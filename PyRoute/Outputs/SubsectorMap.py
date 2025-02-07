@@ -40,10 +40,12 @@ class SubsectorMap(GraphicMap):
         self.colours['hexes4red'] = "red"
         self.colours['hexes5'] = "white"
         self.colours['world'] = "white"
+        self.colours['worldred'] = (255, 48, 48)
         self.fonts['title'] = ImageFont.truetype(self.font_layer.getpath('DejaVuSerifCondensed.ttf'), 48)
         self.fonts['name'] = ImageFont.truetype(self.font_layer.getpath('DejaVuSerifCondensed.ttf'), 32)
         self.fonts['hexes'] = ImageFont.truetype(self.font_layer.getpath('LiberationMono-Bold.ttf'), 15)
         self.fonts['world'] = ImageFont.truetype(self.font_layer.getpath('LiberationMono-Bold.ttf'), 22)
+        self.fonts['worldred'] = ImageFont.truetype(self.font_layer.getpath('LiberationMono-Bold.ttf'), 22)
         self.fonts['hexes2'] = ImageFont.truetype(self.font_layer.getpath('FreeMono.ttf'), 22)
         self.fonts['hexes3'] = ImageFont.truetype(self.font_layer.getpath('FreeMono.ttf'), 36)
         self.fonts['hexes4'] = ImageFont.truetype(self.font_layer.getpath('Symbola-hint.ttf'), 22)
@@ -92,6 +94,8 @@ class SubsectorMap(GraphicMap):
         self.hex_locations()
         for star in area.worlds:
             self.place_system(star)
+        for star in area.worlds:
+            self.write_name(star)
 
     def fill_background(self):
         background = self.colours['background']
@@ -313,6 +317,27 @@ class SubsectorMap(GraphicMap):
         if station_code:
             self.print_base_char(station_code, 'hexes4red', point, (-2.6, -0.4))
             self.logger.debug("Research station for {} : {}".format(star.name, star.tradeCode))
+
+    # Write the name of the world on the map (last).
+    def write_name(self, star):
+        point = self.get_world_centrepoint(star)
+        # Put the point in the centre of the hex
+        xm = self.hex_size.x
+        ym = self.hex_size.y
+        point.x_plus(xm)
+        point.y_plus(ym)
+
+        name = star.name
+        if star.tradeCode.high:
+            name = name.upper()
+        elif star.tradeCode.low:
+            name = name.lower()
+        size = self._get_text_size(self.fonts['world'], name)
+        pos = Cursor(point.x - (size[0] / 2) + 1, point.y + size[1] - 6)
+        if star.tradeCode.capital:
+            self.add_text(name, pos, "worldred")
+        else:
+            self.add_text(name, pos, "world")
 
     def _world_point(self, hex_row: int, hex_col: int) -> Cursor:
         xm = self.hex_size.x
