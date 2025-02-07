@@ -58,3 +58,8 @@ class Cursor(object):
         new_cursor.set_deltas(self.dx, self.dy)
         return new_cursor
 
+    def tuple(self) -> tuple[int, int]:
+        """
+        Express x,y co-ordinates as a 2-element tuple
+        """
+        return self.x, self.y
