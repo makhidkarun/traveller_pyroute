@@ -1,5 +1,4 @@
 networkx
-pypdflite @ git+https://github.com/tjoneslo/pypdflite.git@python3
 inflect
 Cython
 Pillow >= 10.0

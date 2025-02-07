@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 import tempfile
 import unittest
@@ -7,6 +8,11 @@ from PyRoute.Utilities.UnpackFilename import UnpackFilename
 
 
 class baseTest(unittest.TestCase):
+
+    # Set up logging information
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.DEBUG)
+
     def unpack_filename(self, filename):
         return UnpackFilename.unpack_filename(filename)
 
@@ -49,6 +55,7 @@ class baseTest(unittest.TestCase):
         args.interestingline = None
 
         return args
+
 
 if __name__ == '__main__':
     unittest.main()

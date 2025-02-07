@@ -217,11 +217,12 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 0000000000000 0 {0} (000-0)       -    - 0 000   00')
     @example('0101 000000000000000 ?000000-0 0000000000000 B - (000-0)   [0000] - - A 000   00')
     @example('0101 000000000000000 ?000000-0 0000000000000 B {   0} (000-0) [0000] - - A 000 0 00')
+    @example('0101 000000000000?-0 A000000-0 000000000000000 {0} -  [0000] - - A 000   00')
     def test_star_line_extension_parsing(self, s):
         econ_match = r'[ ]\([0-9A-Za-z]{3}[+-]\d\)[ ]'
         soc_match = r'[ ]\[[0-9A-Za-z]{4}\][ ]'
         imp_match = r'\{ *[+-]?[0-6] ?\}'
-        uwp_match = r' \w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?]'
+        uwp_match = r' \w\w\w\w\w\w\w-\w | \?\?\?\?\?\?\?-\? | [\w\?]{7,7}-[\w\?] '
         keep_econ = False
         keep_social = False
         keep_imp = False

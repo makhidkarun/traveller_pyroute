@@ -5,11 +5,11 @@ Created on Aug 05, 2024
 """
 import logging
 
-from PyRoute.Outputs.Map import Map
+from PyRoute.Outputs.OldMap import OldMap
 from PyRoute.StatCalculation import StatCalculation
 
 
-class SectorHexMap(Map):
+class SectorHexMap(OldMap):
 
     def __init__(self, galaxy, routes, min_btn=8):
         super(SectorHexMap, self).__init__(galaxy, routes)
