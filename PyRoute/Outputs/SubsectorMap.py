@@ -37,10 +37,10 @@ class SubsectorMap(GraphicMap):
         self.colours['hexes2'] = "white"
         self.colours['hexes3'] = "white"
         self.colours['hexes4'] = "white"
-        self.colours['hexes4red'] = "red"
+        self.colours['hexes4red'] = self.fillRed
         self.colours['hexes5'] = "white"
         self.colours['world'] = "white"
-        self.colours['worldred'] = (255, 48, 48)
+        self.colours['worldred'] = self.fillRed
         self.fonts['title'] = ImageFont.truetype(self.font_layer.getpath('DejaVuSerifCondensed.ttf'), 48)
         self.fonts['name'] = ImageFont.truetype(self.font_layer.getpath('DejaVuSerifCondensed.ttf'), 32)
         self.fonts['hexes'] = ImageFont.truetype(self.font_layer.getpath('LiberationMono-Bold.ttf'), 15)
