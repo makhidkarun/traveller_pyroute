@@ -264,25 +264,19 @@ class SubsectorMap(GraphicMap):
         return pos, point, location
 
     def trade_lines(self) -> ImageDraw:
-        img = Image.new("RGBA", self.image_size.tuple(), 0)
-        draw = ImageDraw.Draw(img)
-
         world_dex = [item.index for item in self.subsector.worlds]
         trade = [pair for pair in self.galaxy.stars.edges(world_dex, True)
                  if pair[2]['distance'] < 3 and (pair[2]['SourceMarketPrice'] > 0 or pair[2]['TargetMarketPrice'] > 0)]
 
         self.logger.info("Generating routes in {} for {} worlds".format(self.subsector.name, len(trade)))
         for (star, neighbor, data) in trade:
-            self.trade_line(draw, self.galaxy.star_mapping[star], self.galaxy.star_mapping[neighbor], data,
+            self.trade_line(self.galaxy.star_mapping[star], self.galaxy.star_mapping[neighbor], data,
                             self.subsector.position)
 
-        cropped = img.crop((53, 53, 760, 1067))
-        cropped = cropped.crop((-53, -53, 760 + (826 - 760 - 53), 1067 + (1272 - 1067 - 53)))
-        self.image = Image.alpha_composite(self.image, cropped)
         self.logger.debug("Completed trade_lines for {}".format(self.subsector.name))
         return ImageDraw.Draw(self.image)
 
-    def trade_line(self, doc: ImageDraw, star: Star, neighbor: Star, data: dict, position: str) -> None:
+    def trade_line(self, star: Star, neighbor: Star, data: dict, position: str) -> None:
         xm = self.hex_size.x
         ym = self.hex_size.y
         if star.subsector() == neighbor.subsector():
@@ -304,12 +298,12 @@ class SubsectorMap(GraphicMap):
             trade = data['SourceMarketPrice'] - 1000 - (star.trade_cost * 1000)
             if trade > 0:
                 colour = self.trade_colour(int(round(trade / 1000)))
-                self.draw_one_arc(doc, star_start, star_end, colour)
+                self.draw_one_arc(star_start, star_end, colour)
         if data['TargetMarketPrice'] > 0:
             trade = data['TargetMarketPrice'] - 1000 - (neighbor.trade_cost * 1000)
             if trade > 0:
                 colour = self.trade_colour(int(round(trade / 1000)))
-                self.draw_one_arc(doc, star_end, star_start, colour)
+                self.draw_one_arc(star_end, star_start, colour)
 
     def place_system(self, star: Star) -> None:
         point = self.get_world_centrepoint(star)
@@ -438,9 +432,9 @@ class SubsectorMap(GraphicMap):
         pos = Cursor(point.x + (multiplier[0] * size[0]), point.y + (multiplier[1] * size[1]))
         self.add_text(baseCharacter, pos, scheme)
 
-    def draw_one_arc(self, doc: ImageDraw, start: Cursor, end: Cursor, colour) -> None:
+    def draw_one_arc(self, start: Cursor, end: Cursor, colour) -> None:
         centre = self.circle_centre(start, end)
-        self.draw_arc(doc, centre, start, end, colour)
+        self.draw_arc(centre, start, end, colour)
 
     def circle_centre(self, start: Cursor, end: Cursor) -> Cursor:
         # Calculate the centre of an equilateral triangle from start and end
@@ -459,7 +453,7 @@ class SubsectorMap(GraphicMap):
 
         return Cursor(round(cx), round(cy))
 
-    def draw_arc(self, doc, centre, start, end, colour):
+    def draw_arc(self, centre, start, end, colour):
         r = math.sqrt((start.x - centre.x) ** 2 + (start.y - centre.y) ** 2)
         x1 = centre.x - r
         y1 = centre.y - r
@@ -469,5 +463,5 @@ class SubsectorMap(GraphicMap):
         endAngle = (180 / math.pi) * math.atan2(end.y - centre.y, end.x - centre.x)
 
         for i in range(-2, 2):
-            doc.arc([x1 + i, y1, x2 + i, y2], startAngle, endAngle, colour)
-            doc.arc([x1, y1 + i, x2, y2 + i], startAngle, endAngle, colour)
+            self.doc.arc([x1 + i, y1, x2 + i, y2], startAngle, endAngle, colour)
+            self.doc.arc([x1, y1 + i, x2, y2 + i], startAngle, endAngle, colour)
