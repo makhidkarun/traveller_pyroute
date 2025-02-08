@@ -690,8 +690,8 @@ class testHexMap(baseTest):
         spectrade = SpeculativeTrade(args.speculative_version, galaxy.stars)
         spectrade.process_tradegoods()
 
-        subsec_map = GraphicSubsectorMap(galaxy, args.routes, "CT")
-        subsec_map.write_maps()
+        graphMap = SubsectorMap(galaxy, args.routes, galaxy.output_path)
+        graphMap.write_maps()
 
     def test_verify_subsector_xroute_lines_on_map(self):
         sourcefile = self.unpack_filename('DeltaFiles/verify_subsector_trade_lines_on_map/Trojan Reach.sec')
@@ -720,8 +720,8 @@ class testHexMap(baseTest):
         spectrade = SpeculativeTrade(args.speculative_version, galaxy.stars)
         spectrade.process_tradegoods()
 
-        subsec_map = GraphicSubsectorMap(galaxy, args.routes, "CT")
-        subsec_map.write_maps()
+        graphMap = SubsectorMap(galaxy, args.routes, galaxy.output_path)
+        graphMap.write_maps()
 
     def _load_ranges(self, galaxy, sourcefile):
         with open(sourcefile, "rb") as f:
