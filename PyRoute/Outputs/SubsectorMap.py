@@ -75,7 +75,7 @@ class SubsectorMap(GraphicMap):
         self.image = self.image.resize((413, 636), Image.BICUBIC)
         self.image.save(path)
 
-    def write_base_map(self, area: Subsector):
+    def write_base_map(self, area: Subsector) -> None:
         self.fill_background()
         self.subsector_grid()
         grid = HexGrid(self, self.start, self.hex_size, self.x_count, self.y_count)
@@ -100,14 +100,14 @@ class SubsectorMap(GraphicMap):
         for star in area.worlds:
             self.write_name(star)
 
-    def fill_background(self):
+    def fill_background(self) -> None:
         background = self.colours['background']
         if background:
             start_cursor = Cursor(self.start.x - 14, self.start.y - 12)
             end_cursor = Cursor(611, self.start.y + self.hex_size.x + 21 + (180 * 4))
             self.add_rectangle(start_cursor, end_cursor, background, background, 1)
 
-    def subsector_grid(self):
+    def subsector_grid(self) -> None:
         sector = self.subsector.sector
         pos = Cursor(20, 1140)
         name = self.subsector.name + " / " + sector.name
@@ -229,10 +229,10 @@ class SubsectorMap(GraphicMap):
         pos = Cursor(self.rim_pos.x - size[0] / 2, self.rim_pos.y - size[1])
         self.add_text(name, pos, "name")
 
-    def spinward_name(self, name):
+    def spinward_name(self, name: str) -> None:
         self.add_text_rotated(name, self.spin_pos, "name", 90)
 
-    def trailing_name(self, name):
+    def trailing_name(self, name: str) -> None:
         self.add_text_rotated(name, self.trail_pos, "name", -90)
 
     def hex_locations(self) -> None:
@@ -263,7 +263,7 @@ class SubsectorMap(GraphicMap):
         # point.y_plus(ym)
         return pos, point, location
 
-    def trade_lines(self):
+    def trade_lines(self) -> ImageDraw:
         img = Image.new("RGBA", self.image_size.tuple(), 0)
         draw = ImageDraw.Draw(img)
 
@@ -370,7 +370,7 @@ class SubsectorMap(GraphicMap):
             self.logger.debug("Research station for {} : {}".format(star.name, star.tradeCode))
 
     # Write the name of the world on the map (last).
-    def write_name(self, star):
+    def write_name(self, star: Star) -> None:
         point = self.get_world_centrepoint(star)
         # Put the point in the centre of the hex
         xm = self.hex_size.x
@@ -406,12 +406,12 @@ class SubsectorMap(GraphicMap):
         row = star.row + self.positions[star.subsector()][1]
         return self._world_point(row, col)
 
-    def other_subsector_point(self, star, position) -> Cursor:
+    def other_subsector_point(self, star: Star, position: str) -> Cursor:
         col_out = star.col + self.positions[position][0]
         row_out = star.row + self.positions[position][1]
         return self._world_point(row_out, col_out)
 
-    def trade_colour(self, trade):
+    def trade_colour(self, trade: int) -> str:
         tcolour = {0: "#0500ff", 1: "#0012ff", 2: "#0094ff", 3: "#00ffa8",
                   4: "#8aff00", 5: "#FFd200", 6: "#FF8200", 7: "#FF3200",
                   8: "#FF0030", 9: "#FF00B0", 10: "#FF04F0", 11: "#FF0CF0"}
@@ -438,11 +438,11 @@ class SubsectorMap(GraphicMap):
         pos = Cursor(point.x + (multiplier[0] * size[0]), point.y + (multiplier[1] * size[1]))
         self.add_text(baseCharacter, pos, scheme)
 
-    def draw_one_arc(self, doc, start, end, colour):
+    def draw_one_arc(self, doc: ImageDraw, start: Cursor, end: Cursor, colour) -> None:
         centre = self.circle_centre(start, end)
         self.draw_arc(doc, centre, start, end, colour)
 
-    def circle_centre(self, start, end):
+    def circle_centre(self, start: Cursor, end: Cursor) -> Cursor:
         # Calculate the centre of an equilateral triangle from start and end
         # root3 = math.sqrt(3)
         root3 = 2
