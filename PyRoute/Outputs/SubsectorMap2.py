@@ -188,7 +188,8 @@ class GraphicSubsectorMap(GraphicMap):
         raw_x = location[0] + self.sector.dx - 1
         raw_y = location[1] + self.sector.dy - 1
 
-        q, r = self.convert_hex_to_axial(raw_x, raw_y)
+        offset = Hex.dy_offset(raw_y, (self.sector.dy // 40))
+        q, r = Hex.hex_to_axial(raw_x, offset)
 
         pos = (q, r)
         col = self.xm * 3 * x
