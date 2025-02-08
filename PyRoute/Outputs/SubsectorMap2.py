@@ -185,8 +185,10 @@ class GraphicSubsectorMap(GraphicMap):
         location = (-self.positions[self.subsector.position][0] + x,
                     -self.positions[self.subsector.position][1] + y)
 
-        q, r = self.convert_hex_to_axial(location[0] + self.sector.dx - 1,
-                                         location[1] + self.sector.dy - 1)
+        raw_x = location[0] + self.sector.dx - 1
+        raw_y = location[1] + self.sector.dy - 1
+
+        q, r = self.convert_hex_to_axial(raw_x, raw_y)
 
         pos = (q, r)
         col = self.xm * 3 * x
@@ -404,12 +406,13 @@ class GraphicSubsectorMap(GraphicMap):
         img = Image.new("RGBA", self.image_size, 0)
         draw = ImageDraw.Draw(img)
 
-        trade = [pair for pair in self.galaxy.stars.edges(subsector.worlds, True)
+        world_dex = [item.index for item in subsector.worlds]
+        trade = [pair for pair in self.galaxy.stars.edges(world_dex, True)
                  if pair[2]['distance'] < 3 and (pair[2]['SourceMarketPrice'] > 0 or pair[2]['TargetMarketPrice'] > 0)]
 
         self.logger.info("Generating routes in {} for {} worlds".format(subsector.name, len(trade)))
         for (star, neighbor, data) in trade:
-            self.trade_line(draw, star, neighbor, data, subsector.position)
+            self.trade_line(draw, self.galaxy.star_mapping[star], self.galaxy.star_mapping[neighbor], data, subsector.position)
 
         cropped = img.crop((53, 53, 760, 1067))
         cropped = cropped.crop((-53, -53, 760 + (826 - 760 - 53), 1067 + (1272 - 1067 - 53)))

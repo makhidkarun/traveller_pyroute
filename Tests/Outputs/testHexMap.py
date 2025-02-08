@@ -14,6 +14,7 @@ from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
 from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap
 from PyRoute.Position.Hex import Hex
+from PyRoute.SpeculativeTrade import SpeculativeTrade
 from Tests.baseTest import baseTest
 
 
@@ -657,6 +658,66 @@ class testHexMap(baseTest):
 
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.11 > mse, "Image difference " + str(mse) + " above threshold for Deneb sector")
+
+    def test_verify_subsector_trade_lines_on_map(self):
+        sourcefile = self.unpack_filename('DeltaFiles/verify_subsector_trade_lines_on_map/Trojan Reach.sec')
+
+        args = self._make_args()
+        args.interestingline = None
+        args.interestingtype = None
+        args.maps = True
+        args.routes = 'trade'
+        args.subsectors = False
+
+        delta = DeltaDictionary()
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta[sector.name] = sector
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        galaxy.output_path = args.output
+        galaxy.debug_flag = True
+
+        galaxy.generate_routes()
+        galaxy.set_borders(args.borders, args.ally_match)
+        galaxy.trade.calculate_routes()
+
+        spectrade = SpeculativeTrade(args.speculative_version, galaxy.stars)
+        spectrade.process_tradegoods()
+
+        subsec_map = GraphicSubsectorMap(galaxy, args.routes, "CT")
+        subsec_map.write_maps()
+
+    def test_verify_subsector_xroute_lines_on_map(self):
+        sourcefile = self.unpack_filename('DeltaFiles/verify_subsector_trade_lines_on_map/Trojan Reach.sec')
+
+        args = self._make_args()
+        args.interestingline = None
+        args.interestingtype = None
+        args.maps = True
+        args.routes = 'xroute'
+        args.subsectors = False
+
+        delta = DeltaDictionary()
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta[sector.name] = sector
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        galaxy.output_path = args.output
+        galaxy.debug_flag = True
+
+        galaxy.generate_routes()
+        galaxy.set_borders(args.borders, args.ally_match)
+        galaxy.trade.calculate_routes()
+
+        spectrade = SpeculativeTrade(args.speculative_version, galaxy.stars)
+        spectrade.process_tradegoods()
+
+        subsec_map = GraphicSubsectorMap(galaxy, args.routes, "CT")
+        subsec_map.write_maps()
 
     def _load_ranges(self, galaxy, sourcefile):
         with open(sourcefile, "rb") as f:
