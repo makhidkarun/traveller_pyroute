@@ -248,7 +248,11 @@ class SubsectorMap(GraphicMap):
     def _set_pos(self, x: int, y: int) -> (tuple, Cursor, tuple):
         location = (-self.positions[self.subsector.position][0] + x, -self.positions[self.subsector.position][1] + y)
 
-        q, r = Hex.hex_to_axial(location[0] + self.subsector.sector.dx - 1, location[1] + self.subsector.sector.dy - 1)
+        raw_x = location[0] + self.subsector.sector.dx - 1
+        raw_y = location[1] + self.subsector.sector.dy - 1
+
+        offset = Hex.dy_offset(raw_y, (self.subsector.dy // 40))
+        q, r = Hex.hex_to_axial(raw_x, offset)
 
         pos = (q, r)
         xm = self.hex_size.x
