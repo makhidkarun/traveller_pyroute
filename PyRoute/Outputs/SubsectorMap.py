@@ -264,7 +264,6 @@ class SubsectorMap(GraphicMap):
         return pos, point, location
 
     def trade_lines(self):
-        self.image = self.image.convert("RGBA")
         img = Image.new("RGBA", self.image_size.tuple(), 0)
         draw = ImageDraw.Draw(img)
 

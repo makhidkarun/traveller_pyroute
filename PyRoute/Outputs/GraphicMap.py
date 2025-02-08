@@ -73,7 +73,7 @@ class GraphicMap(Map):
     def document(self, area_name: str, is_live=True):
         background = self.colours['background']
         size = (int(self.image_size.x * self.input_scale), int(self.image_size.y * self.input_scale))
-        self.image = Image.new("RGB", size, "white" if not background else background)
+        self.image = Image.new("RGBA", size, "white" if not background else background)
         self.area_name = area_name
         return ImageDraw.Draw(self.image)
 
