@@ -3,6 +3,7 @@ import math
 
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 
+from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.Position.Hex import Hex
 from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Outputs.GraphicMap import GraphicMap
@@ -110,6 +111,7 @@ class SubsectorMap(GraphicMap):
             self.place_system(star)
         for star in area.worlds:
             self.write_name(star)
+        self.draw_borders(self.subsector)
 
     def fill_background(self) -> None:
         background = self.colours['background']
@@ -247,7 +249,7 @@ class SubsectorMap(GraphicMap):
         self.add_text_rotated(name, self.trail_pos, "name", -90)
 
     def hex_locations(self) -> None:
-        # Draw the borders and add the hex numbers
+        # Fill the hex colours and add the hex numbers
         for x in range(1, self.x_count + 1, 1):
             for y in range(1, self.y_count + 1, 1):
                 pos, point, location = self._set_pos(x, y)
@@ -256,6 +258,13 @@ class SubsectorMap(GraphicMap):
                 name = "{0:02d}{1:02d}".format(location[0], location[1])
 
                 self.add_text_centred(name, point, "hexes")
+
+    def draw_borders(self, sector) -> None:
+        # Draw the borders
+        for x in range(1, self.x_count + 1, 1):
+            for y in range(1, self.y_count + 1, 1):
+                pos, point, _ = self._set_pos(x, y)
+                self.draw_border(pos, point)
 
     def fill_aleg_hex(self, pos, point):
         if pos in self.galaxy.borders.allyMap:
@@ -272,6 +281,61 @@ class SubsectorMap(GraphicMap):
                              (point.x - xm, point.y + ym),
                              (point.x - xm * 2, point.y)],
                              outline=None, fill=colour)
+
+    def draw_border(self, pos, point):
+        start = Cursor(25, 25)
+        end = Cursor(385, 538)
+        if pos in self.galaxy.borders.allyMap:
+            aleg = self.galaxy.borders.allyMap[pos]
+            if AllyGen.is_nonaligned(aleg):
+                return
+
+            b_colour = self.borderColour.get(aleg, '#f2f2f2')
+
+            xm = self.hex_size.x
+            ym = self.hex_size.y
+
+            point = point.copy()
+            point.y_plus(ym)
+
+            for n in range(6):
+                next_hex = Hex.get_neighbor(pos, n)
+                next_aleg = self.galaxy.borders.allyMap[next_hex] \
+                    if next_hex in self.galaxy.borders.allyMap \
+                    else AllyGen.noOne[0]
+                if AllyGen.are_allies(aleg, next_aleg):
+                    continue
+                if n == 1:
+                    start.x = point.x + xm * 2
+                    start.y = point.y
+                    end.x = point.x + xm
+                    end.y = point.y - ym
+                elif n == 2:
+                    start.x = point.x - xm
+                    start.y = point.y - ym
+                    end.x = point.x + xm
+                    end.y = point.y - ym
+                elif n == 3:
+                    start.x = point.x - xm
+                    start.y = point.y - ym
+                    end.x = point.x - xm * 2
+                    end.y = point.y
+                elif n == 4:
+                    start.x = point.x - xm * 2
+                    start.y = point.y
+                    end.x = point.x - xm
+                    end.y = point.y + ym
+                elif n == 5:
+                    start.x = point.x - xm
+                    start.y = point.y + ym
+                    end.x = point.x + xm
+                    end.y = point.y + ym
+                elif n == 0:
+                    start.x = point.x + xm
+                    start.y = point.y + ym
+                    end.x = point.x + xm * 2
+                    end.y = point.y
+                self.add_line(start, end, b_colour, width=3)
 
     def _set_pos(self, x: int, y: int) -> (tuple, Cursor, tuple):
         location = (-self.positions[self.subsector.position][0] + x, -self.positions[self.subsector.position][1] + y)
