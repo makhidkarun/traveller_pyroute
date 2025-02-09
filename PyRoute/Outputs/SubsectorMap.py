@@ -21,6 +21,17 @@ class SubsectorMap(GraphicMap):
     x_count = 8
     y_count = 10
 
+    alegColour = {"Na": "#000000", "Im": "#401312", "Zh": "#26314e",
+                  "CsZh": "#000000", "CsIm": "#000000", "CsRe": "#000000",
+                  "ReDe": "#401312", "FeAr": "#3E1D2C",
+                  "SwCf": "#003C4A", "DaCf": "#222222",
+                  "VAsP": "#11470C", "VDeG": "#11470C", "VInL": "#11470C", "VOpA": "#11470C"}
+    borderColour = {"Na": "#000000", "Im": "#FF7978", "Zh": "#818ded",
+                    "CsZh": "#000000", "CsIm": "#000000", "CsRe": "#000000",
+                    "ReDe": "#FF7978", "FeAr": "#cc849f",
+                    "SwCf": "#33b2c0", "DaCf": "#d7d7d7",
+                    "VAsP": "#238E18", "VDeG": "#238E18", "VInL": "#238E18", "VOpA": "#238E18"}
+
     def __init__(self, galaxy: Galaxy, routes: str, output_path: str):
         super(SubsectorMap, self).__init__(galaxy, routes, output_path, "")
         self.output_suffix = " Subsector"
@@ -78,6 +89,7 @@ class SubsectorMap(GraphicMap):
     def write_base_map(self, area: Subsector) -> None:
         self.fill_background()
         self.subsector_grid()
+        self.hex_locations()
         grid = HexGrid(self, self.start, self.hex_size, self.x_count, self.y_count)
         grid.hex_grid(grid.draw_all, 1, colour=self.colours['hexes'])
         if area.coreward:
@@ -92,7 +104,6 @@ class SubsectorMap(GraphicMap):
         if area.trailing:
             core_sub = area.trailing.name
             self.trailing_name(core_sub)
-        self.hex_locations()
         if self.routes.lower() != 'none':
             self.trade_lines()
         for star in area.worlds:
@@ -239,11 +250,28 @@ class SubsectorMap(GraphicMap):
         # Draw the borders and add the hex numbers
         for x in range(1, self.x_count + 1, 1):
             for y in range(1, self.y_count + 1, 1):
-                _, point, location = self._set_pos(x, y)
+                pos, point, location = self._set_pos(x, y)
+                self.fill_aleg_hex(pos, point)
 
                 name = "{0:02d}{1:02d}".format(location[0], location[1])
 
                 self.add_text_centred(name, point, "hexes")
+
+    def fill_aleg_hex(self, pos, point):
+        if pos in self.galaxy.borders.allyMap:
+            point = point.copy()
+            xm = self.hex_size.x
+            ym = self.hex_size.y
+            aleg = self.galaxy.borders.allyMap[pos]
+            point.y_plus(ym)
+            colour = self.alegColour.get(aleg, '#000000')
+            self.doc.polygon([(point.x - xm, point.y - ym),
+                             (point.x + xm, point.y - ym),
+                             (point.x + xm * 2, point.y),
+                             (point.x + xm, point.y + ym),
+                             (point.x - xm, point.y + ym),
+                             (point.x - xm * 2, point.y)],
+                             outline=None, fill=colour)
 
     def _set_pos(self, x: int, y: int) -> (tuple, Cursor, tuple):
         location = (-self.positions[self.subsector.position][0] + x, -self.positions[self.subsector.position][1] + y)
