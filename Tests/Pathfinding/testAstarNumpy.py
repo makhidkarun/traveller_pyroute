@@ -3,6 +3,10 @@ Created on Sep 21, 2023
 
 @author: CyberiaResurrection
 """
+from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
+from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from Tests.baseTest import baseTest
 goodimport = True
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
@@ -12,10 +16,6 @@ except ModuleNotFoundError:
 except ImportError:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
     goodimport = False
-from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
-from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
-from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from Tests.baseTest import baseTest
 try:
     from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
