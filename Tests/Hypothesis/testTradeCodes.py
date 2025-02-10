@@ -238,5 +238,6 @@ class testTradeCodes(unittest.TestCase):
         badline = '' if result else msg[0]
         self.assertEqual(0, len(msg), "Canonicalisation failed.  " + badline + '\n' + hyp_input)
 
+
 if __name__ == '__main__':
     unittest.main()

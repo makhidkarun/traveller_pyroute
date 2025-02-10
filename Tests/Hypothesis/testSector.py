@@ -135,5 +135,6 @@ class testSector(unittest.TestCase):
                 result, msg = sector.is_well_formed()
                 self.assertTrue(result)
 
+
 if __name__ == '__main__':
     unittest.main()

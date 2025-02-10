@@ -61,5 +61,6 @@ class testHexHypothesis(unittest.TestCase):
         self.assertEqual(row, nu_row, "Row not round-tripped.  " + hyp_line)
         self.assertEqual(sector_y, nu_sector_y, "Sector_y not round-tripped.  " + hyp_line)
 
+
 if __name__ == '__main__':
     unittest.main()

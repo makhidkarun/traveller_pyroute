@@ -89,5 +89,6 @@ class testTradeCalculationLandmarks(baseTest):
         args.mp_threads = 1
         return args
 
+
 if __name__ == '__main__':
     unittest.main()
