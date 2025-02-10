@@ -362,7 +362,9 @@ class SubsectorMap(GraphicMap):
     def trade_lines(self) -> ImageDraw:
         world_dex = [item.index for item in self.subsector.worlds]
         trade = [pair for pair in self.galaxy.stars.edges(world_dex, True)
-                 if pair[2]['distance'] < 3 and (pair[2]['SourceMarketPrice'] > 0 or pair[2]['TargetMarketPrice'] > 0)]
+                 if pair[2]['distance'] < 3 and 'SourceMarketPrice' in pair[2] and
+                 (pair[2]['SourceMarketPrice'] > 0 or pair[2]['TargetMarketPrice'] > 0)
+                 ]
 
         self.logger.info("Generating routes in {} for {} worlds".format(self.subsector.name, len(trade)))
         for (star, neighbor, data) in trade:
