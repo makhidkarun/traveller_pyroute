@@ -305,7 +305,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual('[A935]', star1.social)
 
     def testStarSize(self):
-        star1 = Star.parse_line_into_star(
+        _ = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
             Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
 

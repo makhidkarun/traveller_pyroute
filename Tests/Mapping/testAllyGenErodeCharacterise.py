@@ -131,7 +131,6 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         sourcefile = self.unpack_filename('BorderGeneration/Far Frontiers.sec')
         mapfile = self.unpack_filename('BorderGeneration/Far Frontiers-erode-allymap.json')
         borderfile = self.unpack_filename('BorderGeneration/Far Frontiers-erode-border.json')
-        bordermapfile = self.unpack_filename('BorderGeneration/Far Frontiers-erode-bordermap.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -161,7 +160,6 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         sourcefile = self.unpack_filename('BorderGeneration/Vanguard Reaches.sec')
         mapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-erode-allymap.json')
         borderfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-erode-border.json')
-        bordermapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-erode-bordermap.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()

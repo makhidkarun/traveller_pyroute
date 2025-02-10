@@ -244,7 +244,7 @@ class testDeltaStar(unittest.TestCase):
                 # trim log lines of less than warning severity - "DEBUG" is set to ensure there will be output to grab
                 output = [line for line in output if 'DEBUG:' not in line and 'INFO:' not in line]
 
-                canonical_result, canonical_messages = star1.check_canonical()
+                _, canonical_messages = star1.check_canonical()
                 for msg in canonical_messages:
                     output = [line for line in output if msg not in line]
 
@@ -301,11 +301,11 @@ class testDeltaStar(unittest.TestCase):
         star1.index = 0
         star1.allegiance_base = 'NaHu'
 
-        canonical_result, canonical_messages = star1.check_canonical()
+        _, canonical_messages = star1.check_canonical()
 
         star1.canonicalise()
 
-        nu_result, nu_messages = star1.check_canonical()
+        _, nu_messages = star1.check_canonical()
         invalid = [item for item in nu_messages if 'Found invalid' in item and ('trade codes' in item or 'code on world' in item)]
 
         self.assertTrue(
@@ -362,11 +362,11 @@ class testDeltaStar(unittest.TestCase):
         star1.index = 0
         star1.allegiance_base = 'NaHu'
 
-        canonical_result, canonical_messages = star1.check_canonical()
+        _, canonical_messages = star1.check_canonical()
 
         star1.canonicalise()
 
-        nu_result, nu_messages = star1.check_canonical()
+        _, nu_messages = star1.check_canonical()
         invalid = [item for item in nu_messages if 'not in trade codes' in item]
 
         self.assertTrue(
@@ -408,11 +408,11 @@ class testDeltaStar(unittest.TestCase):
 
         assume('0' == str(star1.pop) and 'Ba' in star1.tradeCode.codes)
 
-        canonical_result, canonical_messages = star1.check_canonical()
+        _, canonical_messages = star1.check_canonical()
 
         star1.canonicalise()
 
-        nu_result, nu_messages = star1.check_canonical()
+        _, nu_messages = star1.check_canonical()
         invalid = [item for item in nu_messages if ('should be 0 for barren worlds' in item or 'does not match' in item)]
 
         self.assertTrue(
@@ -450,11 +450,11 @@ class testDeltaStar(unittest.TestCase):
 
         assume(not '0' == str(star1.pop) and 'Ba' not in star1.tradeCode.codes)
 
-        canonical_result, canonical_messages = star1.check_canonical()
+        _, canonical_messages = star1.check_canonical()
 
         star1.canonicalise()
 
-        nu_result, nu_messages = star1.check_canonical()
+        _, nu_messages = star1.check_canonical()
         invalid = [item for item in nu_messages if (' - EX Calculated ' in item)]
 
         self.assertTrue(
@@ -493,11 +493,11 @@ class testDeltaStar(unittest.TestCase):
 
         assume(not '0' == str(star1.pop) and 'Ba' not in star1.tradeCode.codes)
 
-        canonical_result, canonical_messages = star1.check_canonical()
+        _, canonical_messages = star1.check_canonical()
 
         star1.canonicalise()
 
-        nu_result, nu_messages = star1.check_canonical()
+        _, nu_messages = star1.check_canonical()
         invalid = [item for item in nu_messages if (' - CX Calculated ' in item)]
 
         self.assertTrue(
@@ -544,7 +544,7 @@ class testDeltaStar(unittest.TestCase):
 
         try:
             foo = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
-        except ValueError as e:
+        except ValueError:
             pass
 
         assume(foo is not None)
@@ -557,7 +557,7 @@ class testDeltaStar(unittest.TestCase):
         assume(well_formed)
 
         foo.canonicalise()
-        nu_result, nu_messages = foo.check_canonical()  # Should be in canonical form after canonicalise call
+        _, nu_messages = foo.check_canonical()  # Should be in canonical form after canonicalise call
 
         badline = '' if 0 == len(nu_messages) else nu_messages[0]
         self.assertEqual(0, len(nu_messages), 'At least one characteristic not canonicalised: \n' + starline + '\n' + badline)
@@ -568,7 +568,7 @@ class testDeltaStar(unittest.TestCase):
         self.assertIsNotNone(nu_foo, "Canonicalised line should parse cleanly")
         nu_foo.canonicalise()
 
-        nu_result, nu_messages = nu_foo.check_canonical()  # Should be in canonical form after canonicalise call
+        _, nu_messages = nu_foo.check_canonical()  # Should be in canonical form after canonicalise call
 
         badline = '' if 0 == len(nu_messages) else nu_messages[0]
         self.assertEqual(0, len(nu_messages), 'At least one characteristic not canonicalised: \n' + starline + '\n' + badline)

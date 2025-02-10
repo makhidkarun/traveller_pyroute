@@ -12,7 +12,7 @@ from Tests.baseTest import baseTest
 class testDistanceGraph(baseTest):
     def test_min_cost_in_single_component(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
-        galaxy, graph, source, stars = self._setup_graph(sourcefile)
+        galaxy, graph, _, _ = self._setup_graph(sourcefile)
         components = galaxy.trade.components
         self.assertEqual(2, len(components))
 
@@ -45,7 +45,7 @@ class testDistanceGraph(baseTest):
 
     def test_min_cost_in_multiple_components(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
-        galaxy, graph, source, stars = self._setup_graph(sourcefile)
+        galaxy, graph, _, _ = self._setup_graph(sourcefile)
         components = galaxy.trade.components
         self.assertEqual(11, len(components))
 

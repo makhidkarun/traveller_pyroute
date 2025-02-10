@@ -189,7 +189,6 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         sourcefile = self.unpack_filename('BorderGeneration/Far Frontiers.sec')
         mapfile = self.unpack_filename('BorderGeneration/Far Frontiers-allymap-allymap.json')
         borderfile = self.unpack_filename('BorderGeneration/Far Frontiers-allymap-border.json')
-        bordermapfile = self.unpack_filename('BorderGeneration/Far Frontiers-allymap-bordermap.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -264,7 +263,6 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         sourcefile = self.unpack_filename('BorderGeneration/Vanguard Reaches.sec')
         mapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-allymap-allymap.json')
         borderfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-allymap-border.json')
-        bordermapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-allymap-bordermap.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()

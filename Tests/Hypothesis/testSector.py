@@ -120,9 +120,9 @@ class testSector(unittest.TestCase):
             target.spinward = source
 
         result, msg = source.is_well_formed()
-        self.assertFalse(result)
+        self.assertFalse(result, msg)
         result, msg = target.is_well_formed()
-        self.assertFalse(result)
+        self.assertFalse(result, msg)
 
     def testSectorPositionRegressions(self):
         cases = [

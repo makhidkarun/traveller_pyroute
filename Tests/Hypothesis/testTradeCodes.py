@@ -107,7 +107,7 @@ class testTradeCodes(unittest.TestCase):
         trade = None
         try:
             trade = TradeCodes(s)
-        except MultipleWPopError as e:
+        except MultipleWPopError:
             assume(False)
 
         result, msg = trade.is_well_formed()
