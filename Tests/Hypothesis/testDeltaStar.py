@@ -106,8 +106,8 @@ class testDeltaStar(unittest.TestCase):
         cases = [
             # Commented out for the moment - Barren/Dieback is a bit more intricate than other pop codes, and don't want
             # perfect to be the enemy of good
-            #('0917 Deyis II             E874000-0 Ba Da (Kebkh) Re                      { -3 } (200-5) [0000] -     -  A 000 10 ImDi K4 II                                                        ',
-            # '0917 Deyis II             E874000-2 Ba Da Di(Kebkh) Re                    { -3 } (200-5) [0000] -    -  A 000 10 ImDi K4 II                                                   '),
+            # ('0917 Deyis II             E874000-0 Ba Da (Kebkh) Re                      { -3 } (200-5) [0000] -     -  A 000 10 ImDi K4 II                                                        ',
+            #  '0917 Deyis II             E874000-2 Ba Da Di(Kebkh) Re                    { -3 } (200-5) [0000] -    -  A 000 10 ImDi K4 II                                                   '),
             ('0235 Oduart               C7B3004-5 Fl Di(Oduart) Da             { -2 } (800+2) [0000] - M  A 004 10 HvFd G4 V M3 V M7 V',
              '0235 Oduart               C7B3004-5 Ba Da Di(Oduart) Fl                   { -2 } (800+0) [0000] -    M  A 004 10 HvFd G4 V M3 V M7 V                                          '),
             ('0101                      X73A000-0 Ba Lo Ni Wa                         - -  - 012   --',
