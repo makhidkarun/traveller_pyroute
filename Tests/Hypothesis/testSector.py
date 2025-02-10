@@ -14,6 +14,7 @@ def position_string(draw):
 
     return '# ' + left + ',' + right
 
+
 @composite
 def sector_name(draw):
     stem = '#' + draw(text(min_size=1))

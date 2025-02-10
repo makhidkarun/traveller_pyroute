@@ -64,7 +64,6 @@ class testTradeCalculationLandmarks(baseTest):
         self.assertEqual("Madagast (Zarushagar 0806)", str(landmarks[1][5]), "Unexpected landmark choice")
         self.assertEqual("Point Zulu (Zarushagar 0302)", str(landmarks[2][0]), "Unexpected landmark choice")
 
-
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8

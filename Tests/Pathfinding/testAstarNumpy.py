@@ -25,6 +25,7 @@ except ImportError:
     from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
     goodimport = False
 
+
 class testAStarNumpy(baseTest):
 
     def testAStarOverSubsector(self):

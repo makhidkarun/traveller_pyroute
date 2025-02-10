@@ -14,6 +14,7 @@ from PyRoute.SystemData.StarList import StarList
 from PyRoute.SystemData.UWP import UWP
 from PyRoute.TradeCodes import TradeCodes
 
+
 @composite
 def importance_starline(draw):
     keep_econ = draw(booleans())
@@ -50,6 +51,7 @@ def importance_starline(draw):
         rawline = '01' + rawline[2:]
 
     return rawline
+
 
 @composite
 def canonical_check(draw):
