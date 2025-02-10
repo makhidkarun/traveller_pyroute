@@ -14,7 +14,7 @@ from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
-from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap
+from PyRoute.Outputs.SubsectorMap import SubsectorMap
 from PyRoute.StatCalculation import StatCalculation
 
 logger = logging.getLogger('PyRoute')
@@ -156,7 +156,7 @@ def process():
         pdfmap.write_maps()
 
         if args.subsectors:
-            graphMap = GraphicSubsectorMap(galaxy, args.routes, args.speculative_version)
+            graphMap = SubsectorMap(galaxy, args.routes, galaxy.output_path)
             graphMap.write_maps()
 
     logger.info("process complete")

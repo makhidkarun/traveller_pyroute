@@ -24,10 +24,10 @@ from PyRoute.DeltaPasses.SingleLineReducer import SingleLineReducer
 from PyRoute.DeltaPasses.SubsectorReducer import SubsectorReducer
 from PyRoute.DeltaPasses.TwoLineReducer import TwoLineReducer
 from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
+from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
+from PyRoute.Outputs.SubsectorMap import SubsectorMap
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.StatCalculation import StatCalculation
-from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
-from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap
 
 
 class DeltaReduce:
@@ -176,7 +176,7 @@ class DeltaReduce:
                 pdfmap.write_maps()
 
                 if args.subsectors:
-                    graphMap = GraphicSubsectorMap(galaxy, args.routes, args.speculative_version)
+                    graphMap = SubsectorMap(galaxy, args.routes, galaxy.output_path)
                     graphMap.write_maps()
         except Exception as e:
             # special-case DeltaLogicError - that means something's gone sideways in the delta debugger itself
