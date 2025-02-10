@@ -50,16 +50,16 @@ class testTradeCalculation(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_positive_route_weight_doesnt_trip_assertion(self):
-            sector = Sector('# Core', '# 0, 0')
-            star1 = Star.parse_line_into_star(
-                "0103 Irkigkhan            B9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
-                sector, 'fixed', 'fixed')
-            star1.importance = -1
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            B9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+        star1.importance = -1
 
-            galaxy = Galaxy(min_btn=13)
-            tradecalc = TradeCalculation(galaxy)
+        galaxy = Galaxy(min_btn=13)
+        tradecalc = TradeCalculation(galaxy)
 
-            self.assertEqual(2, tradecalc.route_weight(star1, star1))
+        self.assertEqual(2, tradecalc.route_weight(star1, star1))
 
     def test_single_link_route_weight(self):
         sector = Sector('# Core', '# 0, 0')
