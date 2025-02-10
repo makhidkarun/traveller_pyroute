@@ -129,7 +129,7 @@ class testApproximateShortestPathForest(baseTest):
             expected_distances[item] = exp_dist
 
         expected_distances[19] = float('+inf')
-        distance_check = list(expected_distances.values()) == approx.distances[:,0]
+        distance_check = list(expected_distances.values()) == approx.distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT creation")
 
         # adjust weight
