@@ -1,8 +1,5 @@
-import json
-
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Position.Hex import Hex
 from Tests.Mapping.testAllyGenBase import TestAllyGenBase
 
 

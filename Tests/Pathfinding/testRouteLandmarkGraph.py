@@ -4,7 +4,6 @@ Created on Feb 25, 2024
 @author: CyberiaResurrection
 """
 import numpy as np
-import networkx as nx
 
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy

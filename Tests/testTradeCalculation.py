@@ -1,5 +1,4 @@
 import unittest
-import re
 import sys
 
 from PyRoute.Calculation.TradeCalculation import TradeCalculation

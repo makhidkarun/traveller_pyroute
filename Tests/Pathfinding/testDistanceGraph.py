@@ -3,9 +3,6 @@ Created on Mar 19, 2024
 
 @author: CyberiaResurrection
 """
-import numpy as np
-import networkx as nx
-
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph

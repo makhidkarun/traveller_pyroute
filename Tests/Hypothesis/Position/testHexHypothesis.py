@@ -1,7 +1,7 @@
 import unittest
 
-from hypothesis import given, assume, example, HealthCheck, settings
-from hypothesis.strategies import text, integers
+from hypothesis import given, example
+from hypothesis.strategies import integers
 
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Position.Hex import Hex

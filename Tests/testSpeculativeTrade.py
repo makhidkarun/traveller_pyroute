@@ -6,11 +6,8 @@ Created on Nov 28, 2024
 
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.Star import Star
-from PyRoute.SystemData.UWP import UWP
-from PyRoute.TradeCodes import TradeCodes
 from Tests.baseTest import baseTest
 import unittest
 

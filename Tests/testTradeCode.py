@@ -1,6 +1,5 @@
 import unittest
 import sys
-import re
 import logging
 
 sys.path.append('../PyRoute')

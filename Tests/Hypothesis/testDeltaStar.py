@@ -4,7 +4,7 @@ import logging
 import unittest
 
 from hypothesis import given, assume, example, HealthCheck, settings
-from hypothesis.strategies import text, lists, from_regex, composite, booleans, sampled_from, integers, floats
+from hypothesis.strategies import text, lists, from_regex, composite, sampled_from, integers, floats
 
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.DeltaStar import DeltaStar

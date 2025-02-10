@@ -5,8 +5,6 @@ Created on Aug 08, 2024
 """
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
-from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
-from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from Tests.baseTest import baseTest
 
 

@@ -1,9 +1,8 @@
-import re
 import unittest
 from datetime import timedelta
 
-from hypothesis import given, assume, example, HealthCheck, settings, reproduce_failure
-from hypothesis.strategies import text, from_regex, composite, floats, integers
+from hypothesis import given, assume, example, HealthCheck, settings
+from hypothesis.strategies import text, composite, floats, integers
 
 from PyRoute.AreaItems.Sector import Sector
 

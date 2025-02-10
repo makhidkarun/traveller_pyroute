@@ -3,8 +3,8 @@ import re
 import unittest
 from datetime import timedelta
 
-from hypothesis import given, assume, example, HealthCheck, settings, reproduce_failure
-from hypothesis.strategies import text, from_regex, composite, booleans, none
+from hypothesis import given, assume, example, HealthCheck, settings
+from hypothesis.strategies import from_regex, composite, booleans, none
 
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
