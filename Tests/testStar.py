@@ -341,7 +341,7 @@ class TestStar(unittest.TestCase):
                 target = chunk[1]
 
                 star1 = Star.parse_line_into_star(
-                    "0104 Shana Ma             E551112-"+letter+" Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    "0104 Shana Ma             E551112-" + letter + " Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
                     Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
 
                 self.assertEqual(target, star1.tl, "Unexpected mapping for TL " + letter)
@@ -361,7 +361,7 @@ class TestStar(unittest.TestCase):
                 target = chunk[1]
 
                 star1 = Star.parse_line_into_star(
-                    "0104 Shana Ma             E551112-"+letter+" Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+                    "0104 Shana Ma             E551112-" + letter + " Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
                     Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
 
                 self.assertEqual(target, star1.tl, "Unexpected mapping for TL " + letter)

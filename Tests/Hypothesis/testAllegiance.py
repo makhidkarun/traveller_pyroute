@@ -25,7 +25,7 @@ def text_starts_with(draw, starts="Na", min_size=2, max_size=4):
     max_size = max(max_size, min_size)
     start_len = len(starts)
 
-    add = draw(text(min_size=min_size-start_len, max_size=max_size-start_len))
+    add = draw(text(min_size=min_size - start_len, max_size=max_size - start_len))
 
     return starts + add
 
