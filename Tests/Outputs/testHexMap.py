@@ -13,7 +13,6 @@ from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
 from PyRoute.Outputs.SubsectorMap import SubsectorMap
-from PyRoute.Outputs.SubsectorMap2 import GraphicSubsectorMap
 from PyRoute.Position.Hex import Hex
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from Tests.baseTest import baseTest
