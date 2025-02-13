@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
     tradeColors = ['#99FF0000', '#BFFFFF00', '#8000BF00', '#9900FFFF', '#990000FF', '#BF800080', 'violet']
 
-    regex = ".*\((.*) (\d\d\d\d)\).*\((.*) (\d\d\d\d)\) .* 'trade': ([0-9]*[L]?)"
+    regex = r".*\((.*) (\d\d\d\d)\).*\((.*) (\d\d\d\d)\) .* 'trade': ([0-9]*[L]?)"
     match = re.compile(regex)
     # Kuunaa (Core 0304) Irkigkhan (Core 0103) {'distance': 2, 'btn': 13, 'weight': 41, 'trade': 1000000000}
     sectors = defaultdict(list)

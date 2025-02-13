@@ -245,7 +245,7 @@ class Galaxy(AreaItem):
                 neighborstar.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
 
     def read_routes(self, routes=None):
-        route_regex = "r^({1,}) \(({3,}) (\d\d\d\d)\) ({1,}) \(({3,}) (\d\d\d\d)\) (\{.*\})"
+        route_regex = r"^({1,}) \(({3,}) (\d\d\d\d)\) ({1,}) \(({3,}) (\d\d\d\d)\) (\{.*\})"
         routeline = re.compile(route_regex)
         path = os.path.join(self.output_path, 'ranges.txt')
         with open(path, "wb") as f:
