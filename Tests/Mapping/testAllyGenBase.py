@@ -9,9 +9,9 @@ from Tests.baseTest import baseTest
 
 
 class TestAllyGenBase(baseTest):
-    
+
     galaxy: Galaxy = None
-    
+
     def setUp(self):
         self.galaxy = Galaxy(min_btn=14)
         self.galaxy.debug_flag = True

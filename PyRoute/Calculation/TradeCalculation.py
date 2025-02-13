@@ -37,7 +37,7 @@ class TradeCalculation(RouteCalculation):
     # Weight for route over a distance. The relative cost for
     # moving freight between two worlds a given distance apart
     # in a single jump.
-    # These are made up from whole cloth.          
+    # These are made up from whole cloth.
     # distance_weight = [0, 30, 50, 70, 90, 120, 140 ]
 
     # GT Weights based upon one pass estimate
@@ -56,10 +56,10 @@ class TradeCalculation(RouteCalculation):
     max_connections = [6, 12, 18, 30, 45, 63, 84, 108, 135, 165]
 
     # Set an initial range for influence for worlds based upon their
-    # wtn. For a given world look up the range given by (wtn-8) (min 0), 
-    # and the system checks every other world in that range for trade 
-    # opportunity. See the btn_jump_mod and min btn to see how  
-    # worlds are excluded from this list. 
+    # wtn. For a given world look up the range given by (wtn-8) (min 0),
+    # and the system checks every other world in that range for trade
+    # opportunity. See the btn_jump_mod and min btn to see how
+    # worlds are excluded from this list.
     btn_range = [2, 9, 29, 59, 99, 299, 599]
 
     # Maximum WTN to process routes for
@@ -78,7 +78,7 @@ class TradeCalculation(RouteCalculation):
         self.min_wtn = route_btn
 
         # Override the default setting for route-reuse from the base class
-        # based upon program arguments. 
+        # based upon program arguments.
         self.route_reuse = route_reuse
         # Testing indicated that allowing a little more than 1 edge hit before tripping an update seemed to
         # strike the best space/time tradeoff, so default epsilon to sqrt(10/route_reuse).  The 0.1 cap is to speed up
@@ -175,18 +175,18 @@ class TradeCalculation(RouteCalculation):
             neighbor_routes = [(s, n, d) for (s, n, d) in self.galaxy.stars.edges([star], True)]
             # Need to do two sorts here:
             # BTN low to high to find them first
-            # Range high to low to find them first 
+            # Range high to low to find them first
             neighbor_routes.sort(key=lambda tn: tn[2]['btn'])
             neighbor_routes.sort(key=lambda tn: tn[2]['distance'], reverse=True)
 
             length = len(neighbor_routes)
 
-            # remove edges from the list which are 
+            # remove edges from the list which are
             # A) The most distant first
             # B) The lowest BTN for equal distant routes
             # If the neighbor has only a few (<15) connections don't remove that one
-            # until there are 20 connections left. 
-            # This may be reduced by other stars deciding you are too far away.             
+            # until there are 20 connections left.
+            # This may be reduced by other stars deciding you are too far away.
             for (s, n, d) in neighbor_routes:
                 if len(self.galaxy.stars[n]) < 15:
                     continue

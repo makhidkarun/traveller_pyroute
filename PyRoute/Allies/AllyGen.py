@@ -218,7 +218,7 @@ class AllyGen(object):
         # base_match_only == true -> --ally-match=collapse
         # only what matches the base allegiances
         # base_match_only == false -> --ally-match=separate
-        # want the non-base code or the base codes for single code allegiances. 
+        # want the non-base code or the base codes for single code allegiances.
 
         if base_match_only:
             algs = [alg for alg in list(alg_list.values()) if alg.base]

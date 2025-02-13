@@ -7,7 +7,7 @@ Created on Apr 26, 2015
 
 # Requires wikitools and poster to run correctly
 # pip install wikitools
-# pip install poster 
+# pip install poster
 #
 #
 from wikitools_py3.exceptions import WikiError, NoPage
@@ -118,10 +118,10 @@ def uploadWorlds(site, sectorFile, economicFile, era):
     page_template = '''{{{{StellarDataQuery|name={{{{World|{0}|{1}|{2}|{3}}}}} }}}}
 
 == Astrography and planetology ==
-No information yet available. 
- 
+No information yet available.
+
 == History and background ==
-No information yet available. 
+No information yet available.
 
 == References and contributors ==
 {{{{Incomplete}}}}
