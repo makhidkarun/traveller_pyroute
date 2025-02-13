@@ -2,7 +2,7 @@
 # Enable the pycodestyle (`E`) and Pyflakes (`F`) rules by default.
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
-lint.select = ["E", "F", "TID252", "E231", "NPY201", "W291", "W292", "W293", "W391", "W605", "PLW1514"]
+lint.select = ["E", "F", "TID252", "E231", "NPY201", "W"]
 lint.ignore = ["E501"]
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
