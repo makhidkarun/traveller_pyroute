@@ -47,7 +47,7 @@ if __name__ == '__main__':
     parser.add_argument('--milieu', default="M1105", help="Milieu of data to download")
     args = parser.parse_args()
 
-    sectorsList = [line for line in codecs.open(args.sector_list, 'r', 'utf-8')]
+    sectorsList = [line for line in codecs.open(args.sector_list, 'r', encoding="utf-8")]
 
     for sector in sectorsList:
         sector = sector.rstrip()

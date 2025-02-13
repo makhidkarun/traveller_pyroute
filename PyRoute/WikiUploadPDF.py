@@ -26,7 +26,7 @@ logger = logging.getLogger('WikiUpload')
 
 
 def uploadSummaryText(site, summaryFile, era, area_name):
-    with codecs.open(summaryFile, 'r', 'utf-8') as f:
+    with codecs.open(summaryFile, 'r', encoding="utf-8") as f:
         lines = f.readlines()
 
     name = 'initial table'
@@ -55,7 +55,7 @@ def uploadSummaryText(site, summaryFile, era, area_name):
 
 
 def uploadSec(site, filename, place, era):
-    with codecs.open(filename, "r", 'utf-8') as f:
+    with codecs.open(filename, "r", encoding="utf-8") as f:
         text = f.read()
     targetTitle = os.path.basename(filename).split('.')[0] + place
     target_page = site.get_page(targetTitle)
@@ -129,7 +129,7 @@ No information yet available.
 {{{{LEN}}}}
 '''
     try:
-        sectorLines = [line for line in codecs.open(sectorFile, 'r', 'utf-8')]
+        sectorLines = [line for line in codecs.open(sectorFile, 'r', encoding="utf-8")]
     except (OSError, IOError):
         logger.error("Sector file not found: {}".format(sectorFile))
         return
@@ -139,7 +139,7 @@ No information yet available.
                           or line.startswith('|}') or line.startswith('[[Category:'))]
 
     try:
-        economicLines = [line for line in codecs.open(economicFile, 'r', 'utf-8')]
+        economicLines = [line for line in codecs.open(economicFile, 'r', encoding="utf-8")]
     except (OSError, IOError):
         logger.error("Economic file not found: {}".format(economicFile))
         return

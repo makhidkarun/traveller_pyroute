@@ -82,7 +82,7 @@ if __name__ == '__main__':
     # Kuunaa (Core 0304) Irkigkhan (Core 0103) {'distance': 2, 'btn': 13, 'weight': 41, 'trade': 1000000000}
     sectors = defaultdict(list)
 
-    with open(args.route_file) as f:
+    with open(args.route_file, encoding="utf-8") as f:
         for entry in f:
             data = match.match(entry).groups()
             sectorStart = data[0]

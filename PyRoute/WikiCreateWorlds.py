@@ -279,13 +279,13 @@ def get_sources_list(sources_files):
 
 
 def get_skip_list(name):
-    with open(name) as f:
+    with open(name, encoding="utf-8") as f:
         skip_list = f.read().splitlines()
     return skip_list
 
 
 def get_max_list():
-    with open('Zar_max_present.txt') as f:
+    with open('Zar_max_present.txt', encoding="utf-8") as f:
         max_list = f.read().splitlines()
 
     return max_list

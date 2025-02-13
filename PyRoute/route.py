@@ -110,7 +110,7 @@ def process():
     deep_space_lines = []
     if raw_dss_list is not None:
         try:
-            deep_space_lines = [line for line in codecs.open(raw_dss_list, 'r', 'utf-8')]
+            deep_space_lines = [line for line in codecs.open(raw_dss_list, 'r', encoding="utf-8")]
         except (OSError, IOError):
             pass
 
@@ -174,7 +174,7 @@ def process():
 
 def get_sectors(sector, input_dir):
     try:
-        lines = [line for line in codecs.open(sector, 'r', 'utf-8')]
+        lines = [line for line in codecs.open(sector, 'r', encoding="utf-8")]
     except (OSError, IOError):
         logger.error("sector file %s not found" % sector)
     sector_list = []

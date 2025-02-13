@@ -41,7 +41,7 @@ def process():
 
     # read srcfile in, line by line:
     try:
-        with codecs.open(srcfile, 'r', 'utf-8') as infile:
+        with codecs.open(srcfile, 'r', encoding="utf-8") as infile:
             lines = [line for line in infile]
     except FileNotFoundError as e:
         logger.error("Sector file " + srcfile + " not found.  Cannot continue.")
@@ -53,7 +53,7 @@ def process():
     lines.sort()
 
     try:
-        with codecs.open(outfile, "w", "utf-8") as targfile:
+        with codecs.open(outfile, "w", encoding="utf-8") as targfile:
             targfile.writelines(lines)
     except Exception as e:
         logger.error("Deduplicated sector file " + outfile + " could not be created.  Cannot continue")

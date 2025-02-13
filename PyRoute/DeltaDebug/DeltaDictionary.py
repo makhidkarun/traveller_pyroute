@@ -355,7 +355,7 @@ class SectorDictionary(dict):
 
         out_name = os.path.join(output_dir, self.filename) + "-min"
 
-        handle = codecs.open(out_name, 'w', 'utf-8')
+        handle = codecs.open(out_name, 'w', encoding="utf-8")
         for line in self.headers:
             handle.write(line)
 

@@ -33,11 +33,11 @@ class testUniqueSectors(baseTest):
                 self.assertEqual(0, foo.returncode, "unique_sectors did not complete successfully: " + foo.stderr)
 
                 inlines = []
-                with codecs.open(srcfile, 'r', 'utf-8') as infile:
+                with codecs.open(srcfile, mode="w", encoding="utf-8") as infile:
                     inlines = [line for line in infile]
 
                 outlines = []
-                with codecs.open(outfile.name, 'r', 'utf-8') as outfile:
+                with codecs.open(outfile.name, mode="w", encoding="utf-8") as outfile:
                     outlines = [line for line in outfile]
                 outfile.close()
 
