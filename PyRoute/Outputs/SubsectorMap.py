@@ -21,6 +21,7 @@ class SubsectorMap(GraphicMap):
 
     x_count = 8
     y_count = 10
+    output_scale: float = 0.5
     subsector_grid_width = 592
     subsector_width = 144
     subsector_grid_height = 780
@@ -85,11 +86,6 @@ class SubsectorMap(GraphicMap):
         self.doc = self.document(subsector.name + " Subsector", True)
         self.write_base_map(subsector)
         self.close()
-
-    def close(self) -> None:
-        path = os.path.join(self.galaxy.output_path, self.area_name + ".png")
-        self.image = self.image.resize((413, 636), Image.BICUBIC)
-        self.image.save(path)
 
     def write_base_map(self, area: Subsector) -> None:
         self.fill_background()
