@@ -80,9 +80,9 @@ class TestTradeCode(unittest.TestCase):
                       'Scan', "Sele", 'S\'mr', 'Sred', 'Stal', 'Suer', 'Sull', 'Swan', 'Sydi', 'Syle', 'Tapa', 'Taur',
                       'Tent', 'Tlye', 'UApe', 'Ulan', 'Ursa', 'Urun', 'Varg', 'Vega', 'Yile', 'Za\'t', 'Zhod', 'Ziad']
 
-        for soph in soph_codes:
+        for raw_soph in soph_codes:
             with self.subTest():
-                soph += '1'
+                soph = raw_soph + '1'
                 code = TradeCodes(soph)
                 self.assertEqual([soph], code.sophonts, 'Sophont code ' + soph + " not in sophont-list")
                 self.assertEqual([], code.codeset, 'Codeset should be empty')
@@ -141,8 +141,8 @@ class TestTradeCode(unittest.TestCase):
             ('Major race', 'Ni Pa [Ashdak Meshukiiba] Sa ', 'Ni Pa Sa [Ashdak Meshukiiba]')
         ]
 
-        for msg, line, expected_line in cases:
-            with self.subTest(msg):
+        for raw_type, line, expected_line in cases:
+            with self.subTest(raw_type):
                 code = TradeCodes(line)
                 result, msg = code.is_well_formed()
                 self.assertTrue(result, msg)

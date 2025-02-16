@@ -128,7 +128,8 @@ class OldMap(object):
     def subsector_grid(self, doc, sector):
         vlineStart = self.cursor(0, self.y_start)
         vlineEnd = self.cursor(0, self.y_start + (180 * 4))
-        for x in range(self.x_start, 598, 144):
+        for raw_x in range(self.x_start, 598, 144):
+            x = raw_x
             if x >= self.x_start + 144:
                 x += 3
             vlineStart.x = x
