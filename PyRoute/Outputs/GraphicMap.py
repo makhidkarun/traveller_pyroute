@@ -25,10 +25,6 @@ class GraphicMap(Map):
 
     ym = 9  # half a hex height
     xm = 6  # half the length of one side
-    subsector_grid_width = 592
-    subsector_width = 144
-    subsector_grid_height = 780
-    subsector_height = 180
 
     def __init__(self, galaxy, routes: str, output_path: str, writer: str):
         super(GraphicMap, self).__init__(galaxy, routes, output_path, writer)

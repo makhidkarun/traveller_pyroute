@@ -21,6 +21,10 @@ class SubsectorMap(GraphicMap):
 
     x_count = 8
     y_count = 10
+    subsector_grid_width = 592
+    subsector_width = 144
+    subsector_grid_height = 780
+    subsector_height = 180
 
     alegColour = {"Na": "#000000", "Im": "#401312", "Zh": "#26314e",
                   "CsZh": "#000000", "CsIm": "#000000", "CsRe": "#000000",
