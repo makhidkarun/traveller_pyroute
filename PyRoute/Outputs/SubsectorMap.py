@@ -1,7 +1,6 @@
-import os
 import math
 
-from PIL import Image, ImageDraw, ImageFont, ImageColor
+from PIL import ImageDraw, ImageFont, ImageColor
 
 from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.Position.Hex import Hex
