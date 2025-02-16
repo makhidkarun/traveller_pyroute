@@ -59,13 +59,13 @@ class Cursor(object):
         new_cursor.set_deltas(self.dx, self.dy)
         return new_cursor
 
-    def tuple(self) -> tuple[int, int]:
+    def as_tuple(self) -> tuple[int, int]:
         """
         Express x,y co-ordinates as a 2-element tuple
         """
         return self.x, self.y
 
-    def scaled_tuple(self, scale: float, rounding: bool):
+    def scaled_tuple(self, scale: float, rounding: bool) -> tuple[Union[int, float], Union[int, float]]:
         if rounding:
             return int(self.x * scale), int(self.y * scale)
         return float(self.x * scale), float(self.y * scale)

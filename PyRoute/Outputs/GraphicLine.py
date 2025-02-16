@@ -17,5 +17,5 @@ class GraphicLine(object):
         self.width = max(1, int(width))
 
     def _draw(self):
-        self.image.line([self.lineStart.tuple(), self.lineEnd.tuple()], self.color,
+        self.image.line([self.lineStart.as_tuple(), self.lineEnd.as_tuple()], self.color,
                         self.width)
