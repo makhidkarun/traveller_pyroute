@@ -75,19 +75,18 @@ class GraphicMap(Map):
 
     def close(self):
         path = os.path.join(self.output_path, self.area_name + ".png")
-        resize = (int(self.image_size.x * self.input_scale * self.output_scale),
-                  int(self.image_size.y * self.input_scale * self.output_scale))
+        resize = self.image_size.scaled_tuple(self.input_scale * self.output_scale, True)
         self.image = self.image.resize(resize, Image.BICUBIC)
         self.image.save(path)
 
     def add_line(self, start: Cursor, end: Cursor, colour: Colour, stroke='solid', width: float = 1):
-        origin = (start.x * self.input_scale, start.y * self.input_scale)
-        termin = (end.x * self.input_scale, end.y * self.input_scale)
+        origin = start.scaled_tuple(self.input_scale, False)
+        termin = end.scaled_tuple(self.input_scale, False)
         self.doc.line([origin, termin], self._get_colour(colour), width=width * self.input_scale)
 
     def add_rectangle(self, start: Cursor, end: Cursor, border_colour: Colour, fill_colour: Colour, width: int):
-        origin = (start.x * self.input_scale, start.y * self.input_scale)
-        termin = (end.x * self.input_scale, end.y * self.input_scale)
+        origin = start.scaled_tuple(self.input_scale, False)
+        termin = end.scaled_tuple(self.input_scale, False)
         self.doc.rectangle([origin, termin], self._get_colour(fill_colour), self._get_colour(border_colour), width)
 
     def add_circle(self, centre: Cursor, radius: int, line_width: int, fill: bool, scheme: Scheme):
@@ -106,7 +105,7 @@ class GraphicMap(Map):
     def add_text(self, text: str, start: Cursor, scheme: Scheme) -> None:
         font = self.get_font(scheme)
         colour = self.get_colour(scheme)
-        position = (start.x * self.input_scale, start.y * self.input_scale)
+        position = start.scaled_tuple(self.input_scale, False)
         self.doc.text(position, text, font=font, fill=colour)
 
     def add_text_centred(self, text: str, start: Cursor, scheme: Scheme, max_width: int = -1) -> None:
