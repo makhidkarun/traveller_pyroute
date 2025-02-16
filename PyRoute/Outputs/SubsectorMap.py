@@ -37,7 +37,7 @@ class SubsectorMap(GraphicMap):
                     "SwCf": "#33b2c0", "DaCf": "#d7d7d7",
                     "VAsP": "#238E18", "VDeG": "#238E18", "VInL": "#238E18", "VOpA": "#238E18"}
 
-    def __init__(self, galaxy: Galaxy, routes: str, output_path: str):
+    def __init__(self, galaxy: Galaxy, routes: str, output_path: str, trade_version: str = "CT"):
         super(SubsectorMap, self).__init__(galaxy, routes, output_path, "")
         self.output_suffix = " Subsector"
         self.image_size = Cursor(826, 1272)
@@ -47,6 +47,7 @@ class SubsectorMap(GraphicMap):
         self.trail_pos = Cursor(780, 1108 / 2)
         self.start = Cursor(56, 56)
         self.hex_size = Cursor(28, 48)
+        self.trade_version = trade_version
 
         self.colours['background'] = 'black'
         self.colours['name'] = "white"
@@ -104,7 +105,7 @@ class SubsectorMap(GraphicMap):
         if area.trailing:
             core_sub = area.trailing.name
             self.trailing_name(core_sub)
-        if self.routes.lower() != 'none':
+        if self.trade_version.lower() != 'none':
             self.trade_lines()
         for star in area.worlds:
             self.place_system(star)
