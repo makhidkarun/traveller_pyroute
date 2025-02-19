@@ -19,5 +19,7 @@ class UnpackFilename(object):
             sourcefile = os.path.abspath('Tests/' + filename)
         if not os.path.isfile(sourcefile):
             sourcefile = os.path.abspath('../Tests/' + filename)
+        if not os.path.isfile(sourcefile):
+            raise BaseException(sourcefile + " not mapped to a file")
 
         return sourcefile
