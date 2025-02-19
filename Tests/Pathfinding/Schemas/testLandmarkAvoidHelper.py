@@ -54,6 +54,7 @@ class testLandmarkAvoidHelper(baseTest):
 
     def _setup_graph(self, sourcefile):
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertIsNotNone(sector, "Sector file not loaded from " + sourcefile)
         delta = DeltaDictionary()
         delta[sector.name] = sector
         args = self._make_args()
