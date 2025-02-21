@@ -14,6 +14,9 @@ from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
+from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
+from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
+from PyRoute.Outputs.SectorMap import SectorMap
 from PyRoute.Outputs.SubsectorMap import SubsectorMap
 from PyRoute.StatCalculation import StatCalculation
 
@@ -61,6 +64,8 @@ def process():
                         help='Generate sector level trade maps')
     output.add_argument('--subsector-maps', dest='subsectors', default=True, action=argparse.BooleanOptionalAction,
                         help='Generate subsector level maps')
+    output.add_argument('--map-type', dest='map_type', default='classic', choices=['classic', 'dark', 'light'],
+                        help='Type of sector maps to generate')
     output.add_argument('--min-ally-count', dest='ally_count', default=10, type=int,
                         help='Minimum number of worlds in an allegiance for output, default [10]')
     output.add_argument('--json-data', dest='json_data', default=False, action='store_true',
@@ -122,7 +127,7 @@ def process():
     readparms = ReadSectorOptions(sectors=sectors_list, pop_code=args.pop_code, ru_calc=args.ru_calc,
                                   route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
                                   mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=args.fix_pop,
-                                  deep_space=deep_space)
+                                  deep_space=deep_space, map_type=args.map_type)
     galaxy.read_sectors(readparms)
 
     # galaxy.read_sectors(sectors_list, args.pop_code, args.ru_calc,
@@ -152,7 +157,15 @@ def process():
     stats.write_statistics(args.ally_count, args.ally_match, args.json_data)
 
     if args.maps:
-        pdfmap = ClassicModePDFSectorMap(galaxy, args.routes, args.output, "dense")
+        pdfMap: SectorMap
+        maptype = args.map_type
+        if "dark" == maptype:
+            pdfmap = DarkModePDFSectorMap(galaxy, args.routes, args.output, "dense")
+        elif "light" == maptype:
+            pdfmap = LightModePDFSectorMap(galaxy, args.routes, args.output, "dense")
+        else:
+            pdfmap = ClassicModePDFSectorMap(galaxy, args.routes, args.output, "dense")
+        pdfmap.write_maps()
         pdfmap.write_maps()
 
         if args.subsectors:

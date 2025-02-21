@@ -72,6 +72,8 @@ def process():
                         help='Do not generate sector level trade maps')
     output.add_argument('--no-subsector-maps', dest='subsectors', default=True, action='store_false',
                         help='Do not generate subsector level maps')
+    output.add_argument('--map-type', dest='map_type', default='classic', choices=['classic', 'dark', 'light'],
+                        help='Type of sector maps to generate')
     output.add_argument('--min-ally-count', dest='ally_count', default=10, type=int,
                         help='Minimum number of worlds in an allegiance for output, default [10]')
     output.add_argument('--json-data', dest='json_data', default=False, action='store_true',
