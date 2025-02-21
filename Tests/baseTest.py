@@ -48,6 +48,7 @@ class baseTest(unittest.TestCase):
         args.output = tempfile.gettempdir()
         args.mp_threads = 1
         args.debug_flag = False
+        args.map_type = "classic"
         return args
 
     def _make_args_no_line(self):

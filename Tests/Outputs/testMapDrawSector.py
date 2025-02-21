@@ -33,7 +33,7 @@ class TestMapDrawSector(baseTest):
         readparms = ReadSectorOptions(sectors=[sourcefile], pop_code='fixed', ru_calc='scaled',
                                       route_reuse=10, trade_choice='none', route_btn=8,
                                       mp_threads=1, debug_flag=True, fix_pop=False,
-                                      deep_space={})
+                                      deep_space={}, map_type="classic")
         self.galaxy.read_sectors(readparms)
         self.galaxy.set_borders('erode', 'collapse')
 
