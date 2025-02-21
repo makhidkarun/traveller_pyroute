@@ -49,8 +49,8 @@ if __name__ == '__main__':
 
     sectorsList = [line for line in codecs.open(args.sector_list, 'r', encoding="utf-8")]
 
-    for sector in sectorsList:
-        sector = sector.rstrip()
+    for raw_sector in sectorsList:
+        sector = raw_sector.rstrip()
         print('Downloading %s' % sector)
         params = {'sector': sector, 'type': 'SecondSurvey', "milieu": args.milieu}
         if args.routes:
