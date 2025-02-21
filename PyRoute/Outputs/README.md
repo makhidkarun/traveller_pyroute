@@ -15,7 +15,8 @@ descriptor classes.
 These classes are the wrappers around the actual output to file. They rely on the consistent interface defined by
 the _MapOutput.py_ class to make changing where output is occurring easier to implement. 
 * _GraphicMap.py_ : This is a light wrapper around the Pillow Image library, outputs to a PNG image file.
-* _PDFMap.py_     : This is a light wrapper around the PDFLite library, outputs to a PDF file.
+* _PDFMap.py_     : This is a light wrapper around the ReportLab library, outputs to a PDF file.
+* _SubsectorMap.py_ : This is a light wrapper around the Pillow Image Library, outputs to a PNG image file.
 * _TestMap.py_    : Exists in the Tests/Outputs directory. This doesn't output anything, but simply accumulates the
      calls to the interface for validation.
 
@@ -23,6 +24,7 @@ the _MapOutput.py_ class to make changing where output is occurring easier to im
 These classes do the layout of data from a source. These, using the drawing class interface, put elements onto the output
 for the final product. 
 * _SectorMap.py_ : Draws a full sector map with some information in the upper left corner and a key in the upper right.
+* _SubsectorMap.py_ : Draws a full subsector map with location at the bottom.
 
 ## Support classes
 These classes are there as support for the main drawing process.

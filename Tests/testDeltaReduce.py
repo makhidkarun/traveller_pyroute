@@ -305,6 +305,7 @@ class testDeltaReduce(baseTest):
         args.interestingtype = None
         args.maps = True
         args.subsectors = True
+        args.map_type = "classic"
 
         delta = DeltaDictionary()
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -322,6 +323,7 @@ class testDeltaReduce(baseTest):
         args.interestingtype = None
         args.maps = True
         args.subsectors = True
+        args.map_type = "classic"
 
         delta = DeltaDictionary()
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -407,6 +409,7 @@ class testDeltaReduce(baseTest):
         args.mp_threads = 1
         args.debug_flag = False
         args.mindir = tempfile.gettempdir()
+        args.map_type = "classic"
         return args
 
     def _make_args_no_line(self):

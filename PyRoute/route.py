@@ -16,7 +16,6 @@ from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
 from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
 from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
-from PyRoute.Outputs.SectorMap import SectorMap
 from PyRoute.Outputs.SubsectorMap import SubsectorMap
 from PyRoute.StatCalculation import StatCalculation
 
@@ -157,7 +156,6 @@ def process():
     stats.write_statistics(args.ally_count, args.ally_match, args.json_data)
 
     if args.maps:
-        pdfMap: SectorMap
         maptype = args.map_type
         if "dark" == maptype:
             pdfmap = DarkModePDFSectorMap(galaxy, args.routes, args.output, "dense")
