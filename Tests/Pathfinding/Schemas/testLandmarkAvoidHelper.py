@@ -23,7 +23,7 @@ class testLandmarkAvoidHelper(baseTest):
 
         distance_labels = np.ones(len(graph)) * float('+inf')
         distance_labels[source] = 0
-        actual_distances, actual_parents = explicit_shortest_path_dijkstra_distance_graph(distgraph, source,
+        actual_distances, actual_parents, _ = explicit_shortest_path_dijkstra_distance_graph(distgraph, source,
                                                                                       distance_labels)
         lobound = np.zeros(num_stars, dtype=float)
         expected_weights = actual_distances
@@ -54,6 +54,7 @@ class testLandmarkAvoidHelper(baseTest):
 
     def _setup_graph(self, sourcefile):
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertIsNotNone(sector, "Sector file not loaded from " + sourcefile)
         delta = DeltaDictionary()
         delta[sector.name] = sector
         args = self._make_args()

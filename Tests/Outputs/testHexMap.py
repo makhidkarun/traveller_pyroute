@@ -6,13 +6,16 @@ from PIL import Image
 
 import networkx as nx
 import numpy as np
-import pytest
 from pymupdf import pymupdf
 
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
 from PyRoute.Outputs.SubsectorMap import SubsectorMap
+from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
+from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
+from PyRoute.Outputs.PDFHexMap import PDFHexMap
+from PyRoute.Outputs.SectorMap import SectorMap
 from PyRoute.Position.Hex import Hex
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from Tests.baseTest import baseTest
@@ -120,7 +123,7 @@ class testHexMap(baseTest):
         hexmap = ClassicModePDFSectorMap(galaxy, 'trade', args.output, "dense")
 
         targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
-        result = hexmap.write_sector_map(galaxy.sectors[secname])
+        _ = hexmap.write_sector_map(galaxy.sectors[secname])
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
@@ -184,7 +187,7 @@ class testHexMap(baseTest):
         hexmap = ClassicModePDFSectorMap(galaxy, 'trade', args.output, "dense")
 
         targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
-        result = hexmap.write_sector_map(galaxy.sectors[secname])
+        _ = hexmap.write_sector_map(galaxy.sectors[secname])
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
@@ -209,6 +212,47 @@ class testHexMap(baseTest):
 
         graphMap = SubsectorMap(galaxy, args.routes, galaxy.output_path)
         graphMap.write_maps()
+
+    def test_verify_subsector_trade_write_pdf_nonclassic(self):
+        sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
+
+        args = self._make_args()
+        args.interestingline = None
+        args.interestingtype = None
+        args.maps = True
+        args.subsectors = False
+        args.routes = 'trade'
+        args.map_type = "light"
+
+        delta = DeltaDictionary()
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta[sector.name] = sector
+
+        cases = [
+            ("Light map", "light"),
+            ("Dark map", "dark")
+        ]
+
+        for msg, map_type in cases:
+            with self.subTest(msg):
+                args.map_type = map_type
+
+                galaxy = DeltaGalaxy(args.btn, args.max_jump)
+                galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+                galaxy.output_path = args.output
+
+                galaxy.generate_routes()
+
+                secname = 'Zao Kfeng Ig Grilokh'
+
+                hexMap: SectorMap
+                if 'light' == map_type:
+                    hexmap = LightModePDFSectorMap(galaxy, 'trade', args.output, "dense")
+                else:
+                    hexmap = DarkModePDFSectorMap(galaxy, 'trade', args.output, "dense")
+
+                hexmap.write_sector_map(galaxy.sectors[secname])
 
     def test_verify_subsector_comm_write_pdf(self):
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
@@ -252,7 +296,7 @@ class testHexMap(baseTest):
         hexmap = ClassicModePDFSectorMap(galaxy, 'comm', args.output, "dense")
 
         targpath = os.path.abspath(args.output + '/Zao Kfeng Ig Grilokh Sector.pdf')
-        result = hexmap.write_sector_map(galaxy.sectors[secname])
+        _ = hexmap.write_sector_map(galaxy.sectors[secname])
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:
@@ -469,7 +513,7 @@ class testHexMap(baseTest):
         hexmap = ClassicModePDFSectorMap(galaxy, 'xroute', args.output, "dense")
 
         targpath = os.path.abspath(args.output + '/Zarushagar Sector.pdf')
-        result = hexmap.write_sector_map(galaxy.sectors[secname])
+        _ = hexmap.write_sector_map(galaxy.sectors[secname])
         src_img = pymupdf.open(srcpdf)
         src_iter = src_img.pages(0)
         for page in src_iter:

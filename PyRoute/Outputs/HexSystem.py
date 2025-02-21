@@ -5,6 +5,7 @@ from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
 from PyRoute.StatCalculation import StatCalculation
 from PyRoute.SystemData.UWP import UWP
+from PyRoute.TradeCodes import TradeCodes
 
 
 class HexSystem(object):
@@ -103,6 +104,12 @@ class HexSystem(object):
                          'Size': star.size,
                          'Atmosphere': star.atmo,
                          'Hydrographics': star.hydro}
+        star.tradeCode = TradeCodes('')
+        star.alg_code = ''
+        star.tradeIn = 0
+        star.tradeOver = 0
+        star.starportSize = 0
+        star.wtn = 0
 
         return star
 

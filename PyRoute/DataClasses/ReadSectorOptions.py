@@ -18,3 +18,4 @@ class ReadSectorOptions:
     debug_flag: bool = False
     fix_pop: bool = False
     deep_space: dict = None
+    map_type: str = 'classic'

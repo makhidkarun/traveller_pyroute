@@ -56,5 +56,6 @@ class testAllyGen(unittest.TestCase):
         actual = AllyGen.is_client_state('a')
         self.assertEqual(expected, actual)
 
+
 if __name__ == '__main__':
     unittest.main()
