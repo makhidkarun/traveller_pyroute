@@ -191,11 +191,8 @@ class Star(object):
 
         return result
 
-    def __unicode__(self):
-        return "{} ({} {})".format(self.name, self.sector.name, self.position)
-
     def __str__(self):
-        return "%s (%s %s)" % (self.name, self.sector.name, self.position)
+        return "{} ({} {})".format(self.name, self.sector.name, self.position)
 
     def __repr__(self):
         return "{} ({} {})".format(self.name, self.sector.name, self.position)
