@@ -89,7 +89,7 @@ class Galaxy(AreaItem):
                     try:
                         lines = [line for line in infile]
                     except (OSError, IOError):
-                        self.logger.error("sector file %s not found" % sector)
+                        self.logger.error("sector file %s can not be read", sector, exc_info=True)
                         continue
             except FileNotFoundError:
                 self.logger.error("sector file %s not found" % sector)

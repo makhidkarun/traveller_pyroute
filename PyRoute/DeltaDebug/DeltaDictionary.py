@@ -348,6 +348,7 @@ class SectorDictionary(dict):
                 try:
                     lines = [line for line in infile]
                 except (OSError, IOError):
+                    self.logger.error("sector file %s can not be read", filename, exc_info=True)
                     return None
         except FileNotFoundError:
             return None
