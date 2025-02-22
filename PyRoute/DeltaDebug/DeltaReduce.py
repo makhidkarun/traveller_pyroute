@@ -25,6 +25,8 @@ from PyRoute.DeltaPasses.SubsectorReducer import SubsectorReducer
 from PyRoute.DeltaPasses.TwoLineReducer import TwoLineReducer
 from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
+from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
+from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
 from PyRoute.Outputs.SubsectorMap import SubsectorMap
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.StatCalculation import StatCalculation
@@ -172,7 +174,13 @@ class DeltaReduce:
             stats.write_statistics(args.ally_count, args.ally_match, args.json_data)
 
             if args.maps:
-                pdfmap = ClassicModePDFSectorMap(galaxy, args.routes, args.output, "dense")
+                maptype = args.map_type
+                if "dark" == maptype:
+                    pdfmap = DarkModePDFSectorMap(galaxy, args.routes, args.output, "dense")
+                elif "light" == maptype:
+                    pdfmap = LightModePDFSectorMap(galaxy, args.routes, args.output, "dense")
+                else:
+                    pdfmap = ClassicModePDFSectorMap(galaxy, args.routes, args.output, "dense")
                 pdfmap.write_maps()
 
                 if args.subsectors:

@@ -13,7 +13,7 @@ class baseTest(unittest.TestCase):
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.DEBUG)
 
-    def unpack_filename(self, filename):
+    def unpack_filename(self, filename: str) -> str:
         return UnpackFilename.unpack_filename(filename)
 
     def unpack_workdir(self, dirname):
@@ -48,6 +48,7 @@ class baseTest(unittest.TestCase):
         args.output = tempfile.gettempdir()
         args.mp_threads = 1
         args.debug_flag = False
+        args.map_type = "classic"
         return args
 
     def _make_args_no_line(self):

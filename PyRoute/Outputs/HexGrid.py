@@ -97,7 +97,7 @@ class HexGrid(object):
                 lline.draw_colour("salmon" if legacy else border_colours[2])
 
 
-class LineDraw (object):
+class LineDraw(object):
     def __init__(self, doc: MapOutput, grid: HexGrid, width: int, colour: Colour):
         self.doc = doc
         self.width = width

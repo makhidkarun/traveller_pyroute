@@ -18,6 +18,7 @@ class testLandmarksExtremes(baseTest):
         sourcefile = self.unpack_filename('../DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertIsNotNone(sector, "Sector file not loaded from " + sourcefile)
         delta = DeltaDictionary()
         delta[sector.name] = sector
 
@@ -44,6 +45,7 @@ class testLandmarksExtremes(baseTest):
         sourcefile = self.unpack_filename('../DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertIsNotNone(sector, "Sector file not loaded from " + sourcefile)
         delta = DeltaDictionary()
         delta[sector.name] = sector
 
@@ -70,6 +72,7 @@ class testLandmarksExtremes(baseTest):
         sourcefile = self.unpack_filename('../DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertIsNotNone(sector, "Sector file not loaded from " + sourcefile)
         delta = DeltaDictionary()
         delta[sector.name] = sector
 
@@ -96,6 +99,7 @@ class testLandmarksExtremes(baseTest):
         sourcefile = self.unpack_filename('../DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertIsNotNone(sector, "Sector file not loaded from " + sourcefile)
         delta = DeltaDictionary()
         delta[sector.name] = sector
 

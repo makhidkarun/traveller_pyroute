@@ -54,18 +54,31 @@ def importance_starline(draw):
 @composite
 def canonical_check(draw):
     rawline = '1919 Khula                B575A77-E Hi In Pz Di(Khulans)      { 4 }  (D9G+4) [AE5E] BEf  N  A 510 10 ImDv M0 V'
-    uwp_match = r'(\w\w\w\w\w\w\w-\w|\?\?\?\?\?\?\?-\?|[\w\?]{7,7}-[\w\?])'
+    uwp_match = r'([A-HXYa-hxy\?][0-9A-Fa-f\?][0-9A-Xa-x\?]{2,2}[0-9A-Fa-f\?][0-9A-Xa-x\?][0-9A-Ja-j\?]-[0-9A-Xa-x\?])'
     imp_match = r'\{ *[+-]?[0-6] ?\}'
     econ_match = r'\([0-9A-Z]{3}[+-]\d\)'
     soc_match = r'\[[0-9A-Z]{4}\]'
 
     uwp_draw = draw(from_regex(uwp_match))
+    uwp_draw = uwp_draw[0:9]
     rawline = rawline.replace('B575A77-E', uwp_draw)
     imp_draw = draw(from_regex(imp_match))
+    while '{' != imp_draw[0]:
+        imp_draw = imp_draw[1:]
+    while '}' != imp_draw[-1]:
+        imp_draw = imp_draw[:-1]
     rawline = rawline.replace('{ 4 }', imp_draw)
     econ_draw = draw(from_regex(econ_match))
+    while '(' != econ_draw[0]:
+        econ_draw = econ_draw[1:]
+    while ')' != econ_draw[-1]:
+        econ_draw = econ_draw[:-1]
     rawline = rawline.replace('(D9G+4)', econ_draw)
     soc_draw = draw(from_regex(soc_match))
+    while '[' != soc_draw[0]:
+        soc_draw = soc_draw[1:]
+    while ']' != soc_draw[-1]:
+        soc_draw = soc_draw[:-1]
     rawline = rawline.replace('[AE5E]', soc_draw)
 
     return rawline
