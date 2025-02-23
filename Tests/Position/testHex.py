@@ -33,10 +33,10 @@ class testHex(unittest.TestCase):
         self.assertEqual(pos[3].hex_position(), (31, -16))
         self.assertEqual(pos[4].hex_position(), (15, 12))
 
-        for idx, (x, y) in enumerate([(1,1), (1,40), (32, 1), (32, 40), (16,20)]):
+        for idx, (x, y) in enumerate([(1, 1), (1, 40), (32, 1), (32, 40), (16, 20)]):
             offset = Hex.dy_offset(y, (self.coreSector.dy // 40))
-            q,r = Hex.hex_to_axial(x + self.coreSector.dx - 1, offset)
-            self.assertEqual(pos[idx].hex_position(), (q,r))
+            q, r = Hex.hex_to_axial(x + self.coreSector.dx - 1, offset)
+            self.assertEqual(pos[idx].hex_position(), (q, r))
 
     def testAntaresSector(self):
         pos = [
@@ -52,10 +52,10 @@ class testHex(unittest.TestCase):
         self.assertEqual(pos[3].hex_position(), (63, 8))
         self.assertEqual(pos[4].hex_position(), (47, 36))
 
-        for idx, (x, y) in enumerate([(1,1), (1,40), (32, 1), (32, 40), (16,20)]):
+        for idx, (x, y) in enumerate([(1, 1), (1, 40), (32, 1), (32, 40), (16, 20)]):
             offset = Hex.dy_offset(y, (self.antaresSector.dy // 40))
-            q,r = Hex.hex_to_axial(x + self.antaresSector.dx - 1, offset)
-            self.assertEqual(pos[idx].hex_position(), (q,r))
+            q, r = Hex.hex_to_axial(x + self.antaresSector.dx - 1, offset)
+            self.assertEqual(pos[idx].hex_position(), (q, r))
 
     def testFornast(self):
         pos = [
@@ -71,10 +71,10 @@ class testHex(unittest.TestCase):
         self.assertEqual(pos[3].hex_position(), (63, -32))
         self.assertEqual(pos[4].hex_position(), (47, -4))
 
-        for idx, (x, y) in enumerate([(1,1), (1,40), (32, 1), (32, 40), (16,20)]):
+        for idx, (x, y) in enumerate([(1, 1), (1, 40), (32, 1), (32, 40), (16, 20)]):
             offset = Hex.dy_offset(y, (self.fornastSector.dy // 40))
-            q,r = Hex.hex_to_axial(x + self.fornastSector.dx - 1, offset)
-            self.assertEqual(pos[idx].hex_position(), (q,r))
+            q, r = Hex.hex_to_axial(x + self.fornastSector.dx - 1, offset)
+            self.assertEqual(pos[idx].hex_position(), (q, r))
 
     def testSetupOddColEvenRow(self):
         pos = Hex(self.coreSector, "0140")
@@ -134,10 +134,10 @@ class testHex(unittest.TestCase):
         self.assertEqual(pos[3].hex_position(), (31, 24))
         self.assertEqual(pos[4].hex_position(), (15, 52))
 
-        for idx, (x, y) in enumerate([(1,1), (1,40), (32, 1), (32, 40), (16,20)]):
+        for idx, (x, y) in enumerate([(1, 1), (1, 40), (32, 1), (32, 40), (16, 20)]):
             offset = Hex.dy_offset(y, (self.lishunSector.dy // 40))
-            q,r = Hex.hex_to_axial(x + self.lishunSector.dx - 1, offset)
-            self.assertEqual(pos[idx].hex_position(), (q,r))
+            q, r = Hex.hex_to_axial(x + self.lishunSector.dx - 1, offset)
+            self.assertEqual(pos[idx].hex_position(), (q, r))
 
     def testDaguSector(self):
         pos = [
@@ -153,10 +153,10 @@ class testHex(unittest.TestCase):
         self.assertEqual(pos[3].hex_position(), (-1, 0))
         self.assertEqual(pos[4].hex_position(), (-17, 28))
 
-        for idx, (x, y) in enumerate([(1,1), (1,40), (32, 1), (32, 40), (16,20)]):
+        for idx, (x, y) in enumerate([(1, 1), (1, 40), (32, 1), (32, 40), (16, 20)]):
             offset = Hex.dy_offset(y, (self.daguSector.dy // 40))
-            q,r = Hex.hex_to_axial(x + self.daguSector.dx - 1, offset)
-            self.assertEqual(pos[idx].hex_position(), (q,r))
+            q, r = Hex.hex_to_axial(x + self.daguSector.dx - 1, offset)
+            self.assertEqual(pos[idx].hex_position(), (q, r))
 
     def testCoreSector2(self):
         pos = [
