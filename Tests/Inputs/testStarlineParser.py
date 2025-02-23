@@ -612,5 +612,6 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
+
 if __name__ == '__main__':
     unittest.main()

@@ -1,8 +1,5 @@
-import json
-
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Position.Hex import Hex
 from Tests.Mapping.testAllyGenBase import TestAllyGenBase
 
 
@@ -110,7 +107,7 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
                              (-27, 12): 'ImDi', (-26, 3): 'ImDi', (-26, 4): 'ImDi', (-26, 5): 'ImDi', (-26, 6): 'ImDi',
                              (-26, 7): 'ImDi', (-26, 8): 'ImDi', (-26, 9): 'ImDi', (-26, 10): 'ImDi', (-26, 11): 'ImDi',
                              (-26, 12): 'ImDi', (-25, 5): 'ImDi', (-25, 6): 'ImDi', (-25, 7): 'ImDi', (-25, 8): 'ImDi',
-                             (-25, 9): 'ImDi', (-25, 10): 'ImDi', (-25, 11): 'ImDi' }
+                             (-25, 9): 'ImDi', (-25, 10): 'ImDi', (-25, 11): 'ImDi'}
         expected_borders = {(-32, 5): ['white', 'white', None], (-32, 6): [None, 'white', 'white'], (-32, 7): [None, 'white', 'white'],
                             (-32, 8): [None, 'white', 'white'], (-32, 9): [None, 'white', 'white'], (-32, 10): [None, 'white', 'white'],
                             (-32, 11): ['white', None, 'white'], (-32, 14): ['white', 'white', None], (-32, 15): ['white', None, 'white'],
@@ -134,7 +131,6 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         sourcefile = self.unpack_filename('BorderGeneration/Far Frontiers.sec')
         mapfile = self.unpack_filename('BorderGeneration/Far Frontiers-erode-allymap.json')
         borderfile = self.unpack_filename('BorderGeneration/Far Frontiers-erode-border.json')
-        bordermapfile = self.unpack_filename('BorderGeneration/Far Frontiers-erode-bordermap.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -164,7 +160,6 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         sourcefile = self.unpack_filename('BorderGeneration/Vanguard Reaches.sec')
         mapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-erode-allymap.json')
         borderfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-erode-border.json')
-        bordermapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-erode-bordermap.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()

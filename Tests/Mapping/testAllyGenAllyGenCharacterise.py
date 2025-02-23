@@ -1,10 +1,7 @@
 from collections import defaultdict
 
-import pytest
-
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Position.Hex import Hex
 from Tests.Mapping.testAllyGenBase import TestAllyGenBase
 
 
@@ -174,7 +171,7 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
                             (-31, 17): ['white', None, None], (-30, 2): ['white', 'white', None], (-30, 16): ['white', 'white', None],
                             (-29, 1): [None, 'white', None], (-29, 2): ['white', None, None], (-29, 15): [None, 'white', None],
                             (-29, 16): ['white', None, None], (-28, 2): ['white', None, 'white'], (-28, 15): ['white', 'white', None],
-                            (-27, 1): [None, 'white', None], (-27, 2): ['white', None, None],  (-27, 14): [None, 'white', None],
+                            (-27, 1): [None, 'white', None], (-27, 2): ['white', None, None], (-27, 14): [None, 'white', None],
                             (-27, 15): ['white', None, None], (-26, 2): ['white', None, 'white'], (-26, 15): ['white', None, 'white'],
                             (-25, 1): [None, 'white', None], (-25, 2): ['white', None, None], (-25, 14): ['white', None, 'white'],
                             (-24, 2): ['white', None, 'white'], (-24, 13): ['white', 'white', None], (-23, 1): [None, 'white', None],
@@ -192,7 +189,6 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         sourcefile = self.unpack_filename('BorderGeneration/Far Frontiers.sec')
         mapfile = self.unpack_filename('BorderGeneration/Far Frontiers-allymap-allymap.json')
         borderfile = self.unpack_filename('BorderGeneration/Far Frontiers-allymap-border.json')
-        bordermapfile = self.unpack_filename('BorderGeneration/Far Frontiers-allymap-bordermap.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -267,7 +263,6 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         sourcefile = self.unpack_filename('BorderGeneration/Vanguard Reaches.sec')
         mapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-allymap-allymap.json')
         borderfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-allymap-border.json')
-        bordermapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-allymap-bordermap.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()

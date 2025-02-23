@@ -112,5 +112,6 @@ class testDeltaStarReduction(baseTest):
         nu_actual = DeltaStar.reduce(actual)
         self.assertEqual(actual, nu_actual, "Canonicalisation did not round trip")
 
+
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,5 @@
-import codecs
 import unittest
 import sys
-from pathlib import Path
 
 from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary, SubsectorDictionary

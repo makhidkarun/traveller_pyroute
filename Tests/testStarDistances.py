@@ -111,6 +111,7 @@ param_list = [
     ('3 sectors trailing, 3 sectors rimward', +3, +3, 165, 165),
 ]
 
+
 class testStarDistances(unittest.TestCase):
 
     def test_core_0101(self):
@@ -585,6 +586,7 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(expected_alt_distance, distance, "Unexpected distance")
                 distance = star2.distance(star1)
                 self.assertEqual(expected_alt_distance, distance, "Unexpected reverse distance")
+
 
 if __name__ == '__main__':
     unittest.main()

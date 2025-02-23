@@ -63,5 +63,6 @@ class testTradeCalculationPassengerBtn(unittest.TestCase):
                 actual = TradeCalculation.get_passenger_btn(0, astar, bstar)
                 self.assertEqual(expected, actual)
 
+
 if __name__ == '__main__':
     unittest.main()

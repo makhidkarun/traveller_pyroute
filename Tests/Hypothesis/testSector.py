@@ -1,9 +1,8 @@
-import re
 import unittest
 from datetime import timedelta
 
-from hypothesis import given, assume, example, HealthCheck, settings, reproduce_failure
-from hypothesis.strategies import text, from_regex, composite, floats, integers
+from hypothesis import given, assume, example, HealthCheck, settings
+from hypothesis.strategies import text, composite, floats, integers
 
 from PyRoute.AreaItems.Sector import Sector
 
@@ -14,6 +13,7 @@ def position_string(draw):
     right = draw(text(min_size=1, alphabet='+- 0123456789'))
 
     return '# ' + left + ',' + right
+
 
 @composite
 def sector_name(draw):
@@ -121,9 +121,9 @@ class testSector(unittest.TestCase):
             target.spinward = source
 
         result, msg = source.is_well_formed()
-        self.assertFalse(result)
+        self.assertFalse(result, msg)
         result, msg = target.is_well_formed()
-        self.assertFalse(result)
+        self.assertFalse(result, msg)
 
     def testSectorPositionRegressions(self):
         cases = [
@@ -135,6 +135,7 @@ class testSector(unittest.TestCase):
                 sector = Sector(name, position)
                 result, msg = sector.is_well_formed()
                 self.assertTrue(result)
+
 
 if __name__ == '__main__':
     unittest.main()

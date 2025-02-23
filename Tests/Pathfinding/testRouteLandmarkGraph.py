@@ -4,7 +4,6 @@ Created on Feb 25, 2024
 @author: CyberiaResurrection
 """
 import numpy as np
-import networkx as nx
 
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
@@ -16,7 +15,7 @@ class testRouteLandmarkGraph(baseTest):
 
     def test_subscript_bad(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
-        graph, source, stars = self._setup_graph(sourcefile)
+        graph, _, stars = self._setup_graph(sourcefile)
         num_stars = len(stars)
 
         rlg = RouteLandmarkGraph(graph)
@@ -36,7 +35,7 @@ class testRouteLandmarkGraph(baseTest):
 
     def test_subscript_empty(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
-        graph, source, stars = self._setup_graph(sourcefile)
+        graph, _, stars = self._setup_graph(sourcefile)
         num_stars = len(stars)
 
         rlg = RouteLandmarkGraph(graph)
@@ -55,7 +54,7 @@ class testRouteLandmarkGraph(baseTest):
 
     def test_add_single_then_subscript_nonempty(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
-        graph, source, stars = self._setup_graph(sourcefile)
+        graph, _, stars = self._setup_graph(sourcefile)
         num_stars = len(stars)
 
         rlg = RouteLandmarkGraph(graph)
@@ -77,7 +76,7 @@ class testRouteLandmarkGraph(baseTest):
 
     def test_add_single_edge_twice_should_update_in_place(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
-        graph, source, stars = self._setup_graph(sourcefile)
+        graph, _, stars = self._setup_graph(sourcefile)
         num_stars = len(stars)
 
         rlg = RouteLandmarkGraph(graph)
@@ -100,7 +99,7 @@ class testRouteLandmarkGraph(baseTest):
 
     def test_verify_position_creation(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
-        graph, source, stars = self._setup_graph(sourcefile)
+        graph, _, stars = self._setup_graph(sourcefile)
         num_stars = len(stars)
 
         rlg = RouteLandmarkGraph(graph)

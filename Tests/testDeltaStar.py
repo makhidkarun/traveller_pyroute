@@ -155,5 +155,6 @@ class testDeltaStar(unittest.TestCase):
                 self.assertIsInstance(remix_star, Star)
                 self.assertFalse(remix_star.tradeCode.capital, "Remixed star should not be a capital")
 
+
 if __name__ == '__main__':
     unittest.main()

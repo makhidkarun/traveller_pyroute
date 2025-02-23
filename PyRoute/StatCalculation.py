@@ -18,7 +18,7 @@ class Populations(object):
         self.homeworlds = []
         self.count = 0
         self.population = 0
-        
+
     def add_population(self, population, homeworld):
         self.count += 1
         self.population += population

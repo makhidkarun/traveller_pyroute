@@ -22,7 +22,7 @@ class WikiCreateWorld(object):
     """
     page_template = '''{{{{UWP
  |name    = {{{{World|{full name}|{sector}|{subsector}|{pos}}}}}
- |system  = 
+ |system  =
  |uc      = {uwp}
  |popc    = {popc}
  |zonec   = {zone}
@@ -43,14 +43,14 @@ class WikiCreateWorld(object):
 {{{{World summary {alg}|sector={sector}|subsector={subsector} }}}}
 * {{{{World summary allegiance|code={alg}|sector={sector}|subsector={subsector} }}}}{base summary}
 
-== Astrography and planetology == 
-No information yet available. 
- 
+== Astrography and planetology ==
+No information yet available.
+
 {star template}
 
 === System Data ===
-No information yet available. 
- 
+No information yet available.
+
 === Mainworld Data ===
 No information yet available.
 
@@ -64,7 +64,7 @@ No information yet available.
 No information yet available.
 
 == History and background ==
-No information yet available. 
+No information yet available.
 {nobility summary}
 === World Starport ===
 {{{{Starport|name= {name}|Starport={port} }}}}
@@ -73,37 +73,37 @@ No information yet available.
 {{{{WorldTech|name= {name}|WorldTech={tech} }}}}
 
 === World Government ===
-{{{{WorldGov|name= {name}|Government={gov} }}}}  
+{{{{WorldGov|name= {name}|Government={gov} }}}}
 
 ==== World Law Level ====
-No information yet available. 
+No information yet available.
 
 ==== World Military ====
-No information yet available. 
+No information yet available.
 
 === World Economy ===
-No information yet available. 
+No information yet available.
 
 ==== Trade Data ====
-No information yet available. 
+No information yet available.
 
 === World Demographics ===
-No information yet available. 
+No information yet available.
 
 === World Culture ===
-No information yet available. 
+No information yet available.
 
 ==== World Languages ====
-No information yet available. 
+No information yet available.
 
 ==== Urbanization ====
-No information yet available. 
+No information yet available.
 
 ==== World Infrastructure ====
-No information yet available. 
+No information yet available.
 
 === Historical Data ===
-No information yet available. 
+No information yet available.
 
 ==== World Timeline ====
 No information yet available.
@@ -123,12 +123,12 @@ No information yet available.
 {{{{MonostellarSystem
  |name        = {}
  |primary     = {}
-}}}} 
+}}}}
 '''
     binaryTemplate = '''
 {{{{BinaryStarSystem
  |name        = {}
- |primary     = {} 
+ |primary     = {}
  |secondary   = {}
 }}}}
 '''
@@ -230,7 +230,7 @@ No information yet available.
                       'alg': star.alg, 'pcode': pcode, 'nobility': str(star.nobles),
                       'bases': star.baseCode, 'stars': star.stars, 'belt': str(star.belts), 'worlds': star.worlds,
                       'ggcount': str(star.ggCount), 'trade': trade, 'class': classification,
-                      'star template': star_template, 'port': star.uwpCodes['Starport'], 
+                      'star template': star_template, 'port': star.uwpCodes['Starport'],
                       'tech': star.uwpCodes['Tech Level'], 'gov': star.uwpCodes['Government'],
                       'comment summary': comments, 'base summary': bases,
                       'nobility summary': nobility, 'categories': categories,
@@ -266,7 +266,7 @@ def get_category_list(category_files):
 
 def get_sources_list(sources_files):
     sources_list = {}
-    
+
     for src in sources_files:
         src_worlds = get_skip_list(src)
         src_name = src_worlds[0]
@@ -336,7 +336,7 @@ def process():
         wiki_page = wiki_review.get_page(star.wiki_short_name())
         wiki_page = wiki_page[0] if isinstance(wiki_page, (list, tuple)) else wiki_page
         if wiki_page is None:
-            
+
             logger.info("Unable to find: {}, creating new page".format(star.name))
             wiki_page = Page(site, star.wiki_short_name())
 

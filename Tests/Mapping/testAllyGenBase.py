@@ -9,9 +9,9 @@ from Tests.baseTest import baseTest
 
 
 class TestAllyGenBase(baseTest):
-    
+
     galaxy: Galaxy = None
-    
+
     def setUp(self):
         self.galaxy = Galaxy(min_btn=14)
         self.galaxy.debug_flag = True
@@ -36,7 +36,7 @@ class TestAllyGenBase(baseTest):
         self.galaxy.sectors[4] = forn_sector
         self.borders = self.galaxy.borders
 
-    def setupOneWorldAllSectors(self, loc:str = "0102"):
+    def setupOneWorldAllSectors(self, loc: str = "0102"):
         for sector in range(5):
             sec = self.galaxy.sectors[sector]
             star = Star.parse_line_into_star(
@@ -44,7 +44,7 @@ class TestAllyGenBase(baseTest):
                 sec, 'fixed', 'negative')
             self.galaxy.add_star_to_galaxy(star, sector, sec)
 
-    def setupOneWorldCoreSector(self, loc:str, counter:int, allegiance:str = "Im"):
+    def setupOneWorldCoreSector(self, loc: str, counter: int, allegiance: str = "Im"):
         star = Star.parse_line_into_star(
             f"{loc} Shana Ma             E551112-7 Lo Po                {{ -3 }} (300-3) [1113] B     - A 913 9  {allegiance} K2 IV M7 V     ",
             self.galaxy.sectors[0], 'fixed', 'negative')

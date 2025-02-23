@@ -1,8 +1,7 @@
 import unittest
-from datetime import timedelta
 
 from hypothesis import given, assume, example, HealthCheck, settings
-from hypothesis.strategies import text, from_regex, none
+from hypothesis.strategies import from_regex, none
 
 from PyRoute.SystemData.UWP import UWP
 

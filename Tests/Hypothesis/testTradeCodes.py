@@ -107,7 +107,7 @@ class testTradeCodes(unittest.TestCase):
         trade = None
         try:
             trade = TradeCodes(s)
-        except MultipleWPopError as e:
+        except MultipleWPopError:
             assume(False)
 
         result, msg = trade.is_well_formed()
@@ -237,6 +237,7 @@ class testTradeCodes(unittest.TestCase):
         result, msg = trade.check_canonical(foo)
         badline = '' if result else msg[0]
         self.assertEqual(0, len(msg), "Canonicalisation failed.  " + badline + '\n' + hyp_input)
+
 
 if __name__ == '__main__':
     unittest.main()

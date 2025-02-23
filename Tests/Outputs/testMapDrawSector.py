@@ -89,15 +89,15 @@ class TestMapDrawSector(baseTest):
 
         self.assertEqual(testmap.area_name, 'Dagudashaag')
         self.assertEqual(4429, len(testmap.lines))  # 4025 is the completed base map minus the map key
-                                                        # 262 is the borders
-                                                        # 12 for the Map Key
-                                                        # 130 is the comm routes
+                                                        # 262 is the borders  # noqa
+                                                        # 12 for the Map Key  # noqa
+                                                        # 130 is the comm routes  # noqa
         self.assertEqual(560, len(testmap.rects))   # 559 blanking rectangles behind the world name
-                                                        # 1 for the map key
+                                                        # 1 for the map key # noqa
         self.assertEqual(2177, len(testmap.texts))  # 12 is the completed base map minus the map key
-                                                        # 4 is the connected sectors
-                                                        #  9 is for the map key
-                                                        # 2152 is worlds (559 * 3 lines each)
+                                                        # 4 is the connected sectors # noqa
+                                                        #  9 is for the map key # noqa
+                                                        # 2152 is worlds (559 * 3 lines each) # noqa
         # Assert all the fonts used are in the default font list of names.
         for text in testmap.texts:
             self.assertIn(text[3], testmap.fonts)

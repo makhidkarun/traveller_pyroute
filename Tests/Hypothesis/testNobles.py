@@ -1,11 +1,7 @@
-import copy
-import logging
-import re
 import unittest
-from datetime import timedelta
 
-from hypothesis import given, assume, example, HealthCheck, settings
-from hypothesis.strategies import text, from_regex, composite, integers, floats, lists, sampled_from, booleans, none
+from hypothesis import given, assume
+from hypothesis.strategies import text
 
 from PyRoute.Nobles import Nobles
 
