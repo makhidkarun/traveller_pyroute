@@ -14,8 +14,6 @@ from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
 from PyRoute.Outputs.SubsectorMap import SubsectorMap
 from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
 from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
-from PyRoute.Outputs.PDFHexMap import PDFHexMap
-from PyRoute.Outputs.SectorMap import SectorMap
 from PyRoute.Position.Hex import Hex
 from PyRoute.SpeculativeTrade import SpeculativeTrade
 from Tests.baseTest import baseTest
@@ -246,7 +244,6 @@ class testHexMap(baseTest):
 
                 secname = 'Zao Kfeng Ig Grilokh'
 
-                hexMap: SectorMap
                 if 'light' == map_type:
                     hexmap = LightModePDFSectorMap(galaxy, 'trade', args.output, "dense")
                 else:
