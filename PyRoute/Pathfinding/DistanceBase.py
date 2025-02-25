@@ -4,11 +4,12 @@ Created on Feb 25, 2024
 @author: CyberiaResurrection
 """
 import numpy as np
+from networkx.classes import Graph
 
 
 class DistanceBase:
 
-    def __init__(self, graph):
+    def __init__(self, graph: Graph):
         raw_nodes = graph.nodes()
         self._nodes = list(raw_nodes)
         num_nodes = len(self._nodes)
@@ -20,13 +21,13 @@ class DistanceBase:
         for i in range(num_nodes):
             self._positions[i, :] = np.array(positions[i])
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._nodes)
 
-    def lighten_edge(self, u, v, weight):
+    def lighten_edge(self, u: int, v: int, weight: float) -> None:
         raise NotImplementedError("Base Class")
 
-    def distances_from_target(self, active_nodes, target):
+    def distances_from_target(self, active_nodes, target: int) -> int:
         if len(active_nodes) == len(self):
             dq = self._positions[:, 0] - self._positions[target, 0]
             dr = self._positions[:, 1] - self._positions[target, 1]
@@ -36,5 +37,5 @@ class DistanceBase:
 
         return (abs(dq) + abs(dr) + abs(dq + dr)) // 2
 
-    def _lighten_arc(self, u, v, weight):
+    def _lighten_arc(self, u: int, v: int, weight: float) -> None:
         self._arcs[u][1][self._arcs[u][0] == v] = weight
