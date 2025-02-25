@@ -241,7 +241,7 @@ class Borders(object):
                     else:
                         max_count = -1
                         max_ally = None
-                        for alg, dist in ally_dist:
+                        for alg, _ in ally_dist:
                             if AllyGen.is_nonaligned(alg, True):
                                 max_ally = alg
                                 break
@@ -478,7 +478,7 @@ class Borders(object):
                     else:
                         max_count = -1
                         max_ally = None
-                        for alg, dist in ally_dist:
+                        for alg, _ in ally_dist:
                             if not AllyGen.is_nonaligned(alg, True) and \
                                     self.galaxy.alg[alg].stats.number > max_count:
                                 max_ally = alg

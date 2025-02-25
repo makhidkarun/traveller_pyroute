@@ -210,7 +210,7 @@ No information yet available.
 
         pages = [target_page] if not isinstance(target_page, (list, tuple)) else target_page
 
-        for page in pages:
+        for _ in pages:
             pass
 
         try:

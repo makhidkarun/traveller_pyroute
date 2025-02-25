@@ -147,7 +147,7 @@ class CommCalculation(RouteCalculation):
         total = len(routes)
         processed = 0
         self.logger.info('Routes: {}'.format(total))
-        for (star, neighbor, data) in routes:
+        for (star, neighbor, _) in routes:
             if total > 100 and processed % (total // 20) == 0:
                 self.logger.info('processed {} routes, at {}%'.format(processed, processed // (total // 100)))
             self.get_route_between(star, neighbor)
