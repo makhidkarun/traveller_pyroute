@@ -366,7 +366,7 @@ class TradeCodes(object):
         del state['ownedBy']
         return state
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict: dict = {}):
         state = self.__dict__.copy()
 
         foo = TradeCodes('')

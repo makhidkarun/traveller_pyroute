@@ -114,7 +114,7 @@ class ObjectStatistics(object):
         del state['homeworlds']
         return state
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict: dict = {}):
         state = self.__dict__.copy()
         foo = ObjectStatistics()
         foo.__dict__.update(state)
