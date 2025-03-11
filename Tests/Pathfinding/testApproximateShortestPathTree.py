@@ -4,9 +4,7 @@ Created on Aug 08, 2023
 @author: CyberiaResurrection
 """
 import argparse
-import copy
 import json
-import os
 import tempfile
 import unittest
 
@@ -212,7 +210,6 @@ class testApproximateShortestPathTree(baseTest):
 
         leaf = [item for item in stars if -1 != graph.nodes[item]['star'].name.find('Dorsiki')][0]
         leafpath = paths[leaf]
-        mid = leafpath[-2]
         hi = leafpath[-3]
         inter = leafpath[-4]
 
@@ -243,7 +240,7 @@ class testApproximateShortestPathTree(baseTest):
 
         stars = list(graph.nodes)
         source = stars[0]
-        distances, paths = nx.single_source_dijkstra(graph, source)
+        _, paths = nx.single_source_dijkstra(graph, source)
         leafnode = stars[30]
         subnode = stars[paths[leafnode][-2]]
 
@@ -334,7 +331,6 @@ class testApproximateShortestPathTree(baseTest):
 
         # tell SPT weight has changed
         edge = (source, right)
-        dropnodes = [right]
 
         for item in expected_distances:
             if expected_distances[item] > 0 and 'Selsinia (Zarushagar 0201)' != str(graph.nodes[item]['star']):

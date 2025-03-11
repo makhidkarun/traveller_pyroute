@@ -3,18 +3,13 @@ Created on Feb 19, 2024
 
 @author: CyberiaResurrection
 """
-import argparse
-import copy
 import json
-import os
-import tempfile
 import unittest
 
 import networkx as nx
 import numpy as np
 
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
-from PyRoute.Pathfinding.LandmarkSchemes.LandmarksWTNExtremes import LandmarksWTNExtremes
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 try:
@@ -134,7 +129,7 @@ class testApproximateShortestPathForest(baseTest):
             expected_distances[item] = exp_dist
 
         expected_distances[19] = float('+inf')
-        distance_check = list(expected_distances.values()) == approx.distances[:,0]
+        distance_check = list(expected_distances.values()) == approx.distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT creation")
 
         # adjust weight

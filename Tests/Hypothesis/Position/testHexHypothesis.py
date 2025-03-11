@@ -1,7 +1,7 @@
 import unittest
 
-from hypothesis import given, assume, example, HealthCheck, settings
-from hypothesis.strategies import text, integers
+from hypothesis import given, example
+from hypothesis.strategies import integers
 
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Position.Hex import Hex
@@ -60,6 +60,7 @@ class testHexHypothesis(unittest.TestCase):
 
         self.assertEqual(row, nu_row, "Row not round-tripped.  " + hyp_line)
         self.assertEqual(sector_y, nu_sector_y, "Sector_y not round-tripped.  " + hyp_line)
+
 
 if __name__ == '__main__':
     unittest.main()

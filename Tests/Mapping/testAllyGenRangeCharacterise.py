@@ -1,6 +1,5 @@
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Position.Hex import Hex
 from Tests.Mapping.testAllyGenBase import TestAllyGenBase
 
 
@@ -141,7 +140,7 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
                              (-33, 13): 'ImDi', (-33, 14): 'ImDi', (-33, 15): 'ImDi', (-33, 16): 'ImDi',
                              (-33, 17): 'ImDi', (-32, 4): 'ImDi', (-32, 5): 'ImDi', (-32, 6): 'ImDi', (-32, 7): 'ImDi',
                              (-32, 8): 'ImDi', (-32, 9): 'ImDi', (-32, 10): 'ImDi', (-32, 11): 'ImDi',
-                             (-32, 12): 'ImDi', (-32, 13): 'ImDi', (-32, 14): 'ImDi',(-32, 15): 'ImDi',
+                             (-32, 12): 'ImDi', (-32, 13): 'ImDi', (-32, 14): 'ImDi', (-32, 15): 'ImDi',
                              (-32, 16): 'ImDi', (-32, 17): 'ImDi', (-31, 4): 'ImDi', (-31, 5): 'ImDi', (-31, 6): 'ImDi',
                              (-31, 7): 'ImDi', (-31, 8): 'ImDi', (-31, 9): 'ImDi', (-31, 10): 'ImDi', (-31, 11): 'ImDi',
                              (-31, 12): 'ImDi', (-31, 13): 'ImDi', (-31, 14): 'ImDi', (-31, 15): 'ImDi',
@@ -166,7 +165,7 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
                              (-24, 4): 'ImDi', (-24, 5): 'ImDi', (-24, 6): 'ImDi', (-24, 7): 'ImDi', (-24, 8): 'ImDi',
                              (-24, 9): 'ImDi', (-24, 10): 'ImDi', (-24, 11): 'ImDi', (-24, 12): 'ImDi',
                              (-23, 4): 'ImDi', (-23, 5): 'ImDi', (-23, 6): 'ImDi', (-23, 7): 'ImDi', (-23, 8): 'ImDi',
-                             (-23, 9): 'ImDi', (-23, 10): 'ImDi', (-23, 11): 'ImDi' }
+                             (-23, 9): 'ImDi', (-23, 10): 'ImDi', (-23, 11): 'ImDi'}
         expected_borders = {(-34, 5): ['white', 'white', None], (-34, 6): [None, 'white', 'white'], (-34, 7): [None, 'white', 'white'],
                             (-34, 8): [None, 'white', 'white'], (-34, 9): [None, 'white', 'white'], (-34, 10): [None, 'white', 'white'],
                             (-34, 11): [None, 'white', 'white'], (-34, 12): ['white', None, 'white'], (-34, 14): ['white', 'white', None],
@@ -195,7 +194,6 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         sourcefile = self.unpack_filename('BorderGeneration/Far Frontiers.sec')
         mapfile = self.unpack_filename('BorderGeneration/Far Frontiers-range-allymap.json')
         borderfile = self.unpack_filename('BorderGeneration/Far Frontiers-range-border.json')
-        bordermapfile = self.unpack_filename('BorderGeneration/Far Frontiers-range-bordermap.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
@@ -225,7 +223,6 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         sourcefile = self.unpack_filename('BorderGeneration/Vanguard Reaches.sec')
         mapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-range-allymap.json')
         borderfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-range-border.json')
-        bordermapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-range-bordermap.json')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()

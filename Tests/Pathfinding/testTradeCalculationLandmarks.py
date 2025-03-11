@@ -1,5 +1,4 @@
 import argparse
-import os
 import tempfile
 import unittest
 
@@ -55,7 +54,7 @@ class testTradeCalculationLandmarks(baseTest):
 
         self.assertEqual(7, len(galaxy.trade.components), "Unexpected number of components at J-1")
 
-        landmarks, components = galaxy.trade.get_landmarks()
+        landmarks, _ = galaxy.trade.get_landmarks()
         self.assertEqual(3, len(landmarks), 'Should have one landmark per component')
         self.assertEqual("Dorevann (Zarushagar 0708)", str(landmarks[0][0]), "Unexpected landmark choice")
         self.assertEqual("Shadishi (Zarushagar 0310)", str(landmarks[0][2]), "Unexpected landmark choice")
@@ -64,7 +63,6 @@ class testTradeCalculationLandmarks(baseTest):
         self.assertEqual("Norsec (Zarushagar 0110)", str(landmarks[1][2]), "Unexpected landmark choice")
         self.assertEqual("Madagast (Zarushagar 0806)", str(landmarks[1][5]), "Unexpected landmark choice")
         self.assertEqual("Point Zulu (Zarushagar 0302)", str(landmarks[2][0]), "Unexpected landmark choice")
-
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
@@ -89,6 +87,7 @@ class testTradeCalculationLandmarks(baseTest):
         args.debug_flag = False
         args.mp_threads = 1
         return args
+
 
 if __name__ == '__main__':
     unittest.main()

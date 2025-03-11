@@ -34,7 +34,7 @@ class Galaxy(AreaItem):
     """
     classdocs
     """
- 
+
     def __init__(self, min_btn, max_jump=4):
         """
        Constructor

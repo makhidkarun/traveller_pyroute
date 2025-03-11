@@ -93,7 +93,7 @@ class WikiStats(object):
         self.output_template('subsectors.wiki', 'subsectors.wiki',
                              {'sectors': self.galaxy.sectors,
                               'plural': self.plural})
-        
+
     def sector_data_template(self):
         for sector in self.galaxy.sectors.values():
             self.output_template('sector_data.wiki', sector.sector_name() + " Sector.sector.wiki",
@@ -127,7 +127,7 @@ class WikiStats(object):
         path = os.path.join(self.galaxy.output_path, 'stars.json')
         with open(path, "w+", encoding='utf8') as f:
             f.write(jsonpickle.encode(json_graph.node_link_data(self.galaxy.stars)))
-        
+
     def write_summary_lists(self):
         path = os.path.join(self.galaxy.output_path, 'sectors_list.txt')
         with open(path, 'w+') as f:
@@ -224,7 +224,7 @@ class WikiStats(object):
             f.write('|-\n')
             f.write('|Trade || {:,d} billion\n'.format(int(self.galaxy.stats.trade / 1e9)))
             f.write('\n|}\n')
-            
+
             f.write('===Summary Report===\n')
             self.write_uwp_counts(f)
             f.write('|-\n|colspan=20 align=center|Percent by Population\n')

@@ -28,7 +28,7 @@ def get_url(url, sector, suffix, output_dir):
         ucontent = str(content, 'utf-8').replace('\r\n', '\n')
     else:
         ucontent = str(content, encoding).replace('\r\n', '\n')
-    
+
     path = os.path.join(output_dir, '%s.%s' % (sector, suffix))
 
     with codecs.open(path, 'wb', 'utf-8') as out:
@@ -62,7 +62,7 @@ if __name__ == '__main__':
         if not success:
             print("Retrying " + sector)
             get_url(url, sector, 'sec', args.output_dir)
-        
+
         params = urllib.parse.urlencode({'sector': sector, 'accept': 'text/xml'})
         url = 'http://travellermap.com/api/metadata?%s' % params
         success = get_url(url, sector, 'xml', args.output_dir)

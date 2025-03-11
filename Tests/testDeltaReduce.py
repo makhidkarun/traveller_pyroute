@@ -11,9 +11,6 @@ except ModuleNotFoundError:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
 except ImportError:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
-from PyRoute.SpeculativeTrade import SpeculativeTrade
-from PyRoute.StatCalculation import StatCalculation
-from PyRoute.route import set_logging
 from Tests.baseTest import baseTest
 
 

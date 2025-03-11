@@ -27,11 +27,11 @@ jobs:
       - name: Lint with ruff - syntax errors & undefined names
         run: |
           # stop the build if there are Python syntax errors or undefined names
-          ruff check --select=E9,F63,F7,F82 --preview PyRoute
+          ruff check --select=E9,F63,F7,F82 --preview PyRoute Tests
       - name: Lint with ruff - configured options
         run: |
           # now run configured options
-          ruff check --preview PyRoute
+          ruff check --preview PyRoute Tests
       - name: Run non-cython tests
         run: |
           pytest -k testAstarOverSubsector

@@ -3,8 +3,8 @@ import re
 import unittest
 from datetime import timedelta
 
-from hypothesis import given, assume, example, HealthCheck, settings, reproduce_failure
-from hypothesis.strategies import text, from_regex, composite, booleans, none
+from hypothesis import given, assume, example, HealthCheck, settings
+from hypothesis.strategies import from_regex, composite, booleans, none
 
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
@@ -13,6 +13,7 @@ from PyRoute.Star import Star
 from PyRoute.SystemData.StarList import StarList
 from PyRoute.SystemData.UWP import UWP
 from PyRoute.TradeCodes import TradeCodes
+
 
 @composite
 def importance_starline(draw):
@@ -50,6 +51,7 @@ def importance_starline(draw):
         rawline = '01' + rawline[2:]
 
     return rawline
+
 
 @composite
 def canonical_check(draw):
@@ -370,6 +372,7 @@ class testStar(unittest.TestCase):
         foo.check_ex()
         foo.check_cx()
         foo.calculate_ru('fixed')
+
 
 if __name__ == '__main__':
     unittest.main()
