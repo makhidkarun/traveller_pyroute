@@ -28,6 +28,7 @@ class SingleLineReducer(object):
         short_msg = None
         best_sectors = self.reducer.sectors
         singleton_run = singleton_only
+        old_length = len(segment)
 
         while num_chunks <= len(segment):
             chunks = self.reducer.chunk_lines(segment, num_chunks)
@@ -111,3 +112,10 @@ class SingleLineReducer(object):
         self.reducer.sectors = best_sectors
         if short_msg is not None:
             self.reducer.logger.error("Shortest error message: " + short_msg)
+
+        # At least one line was shown to be irrelevant, write out the intermediate result
+        if old_length > len(segment):
+            self.write_files()
+
+    def write_files(self):
+        self.reducer.sectors.write_files(self.reducer.args.mindir)

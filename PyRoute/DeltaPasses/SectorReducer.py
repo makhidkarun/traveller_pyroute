@@ -76,4 +76,7 @@ class SectorReducer(object):
 
         # At least one sector was shown to be irrelevant, write out the intermediate result
         if old_length > len(segment):
-            self.reducer.sectors.write_files(self.reducer.args.mindir)
+            self.write_files()
+
+    def write_files(self):
+        self.reducer.sectors.write_files(self.reducer.args.mindir)
