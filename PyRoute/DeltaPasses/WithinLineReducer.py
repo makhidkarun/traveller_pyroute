@@ -3,6 +3,8 @@ Created on Jun 13, 2023
 
 @author: CyberiaResurrection
 """
+from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
+from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
 
 
 class WithinLineReducer(object):
@@ -10,7 +12,7 @@ class WithinLineReducer(object):
     full_msg = None
     start_msg = None
 
-    def __init__(self, reducer):
+    def __init__(self, reducer: DeltaReduce):
         self.reducer = reducer
 
     def preflight(self):
@@ -36,6 +38,7 @@ class WithinLineReducer(object):
         if interesting:
             self.reducer.sectors = best_sectors
             self.reducer.logger.error(self.full_msg)
+            self.write_files()
             return
         else:
             best_sectors = self.reducer.sectors
@@ -78,6 +81,7 @@ class WithinLineReducer(object):
 
             if 0 < len(remove):
                 num_chunks -= len(remove)
+                self.write_files(best_sectors)
 
             num_chunks *= 2
 
@@ -96,6 +100,7 @@ class WithinLineReducer(object):
                 num_chunks = len(segment)
 
         self.reducer.sectors = best_sectors
+        self.write_files()
         if short_msg is not None:
             self.reducer.logger.error("Shortest error message: " + short_msg)
 
@@ -111,3 +116,9 @@ class WithinLineReducer(object):
             nu_list.append((line[0], line[1]))
 
         return nu_list
+
+    def write_files(self, sectors=None):
+        if isinstance(sectors, DeltaDictionary):
+            sectors.write_files(self.reducer.args.mindir)
+        else:
+            self.reducer.sectors.write_files(self.reducer.args.mindir)
