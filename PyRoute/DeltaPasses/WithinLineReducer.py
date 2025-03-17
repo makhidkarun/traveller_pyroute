@@ -4,7 +4,6 @@ Created on Jun 13, 2023
 @author: CyberiaResurrection
 """
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
-from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
 
 
 class WithinLineReducer(object):
@@ -12,7 +11,7 @@ class WithinLineReducer(object):
     full_msg = None
     start_msg = None
 
-    def __init__(self, reducer: DeltaReduce):
+    def __init__(self, reducer):
         self.reducer = reducer
 
     def preflight(self):

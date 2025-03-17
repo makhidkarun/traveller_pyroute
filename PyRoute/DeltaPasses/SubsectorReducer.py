@@ -3,6 +3,7 @@ Created on Oct 03, 2023
 
 @author: CyberiaResurrection
 """
+from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
 
 
@@ -91,6 +92,7 @@ class SubsectorReducer(object):
 
             if 0 < len(remove):
                 num_chunks -= len(remove)
+                self.write_files(best_sectors)
 
             num_chunks *= 2
             segment = best_sectors.subsector_list()
@@ -104,5 +106,8 @@ class SubsectorReducer(object):
         if old_length > len(segment):
             self.write_files()
 
-    def write_files(self):
-        self.reducer.sectors.write_files(self.reducer.args.mindir)
+    def write_files(self, sectors=None):
+        if isinstance(sectors, DeltaDictionary):
+            sectors.write_files(self.reducer.args.mindir)
+        else:
+            self.reducer.sectors.write_files(self.reducer.args.mindir)
