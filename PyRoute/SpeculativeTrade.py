@@ -8,6 +8,8 @@ import logging
 
 
 class SpeculativeTrade(object):
+    __slots__ = 'logger', 'trade_table', 'stars', 'trade_version'
+
     t5_trade_table = {
         "Ag": {"Ag": 1, "As": 1, "De": 1, "Hi": 1, "In": 1, "Ri": 1, "Va": 1},
         "As": {"As": 1, "In": 1, "Ri": 1, "Va": 1},

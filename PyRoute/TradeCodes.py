@@ -71,7 +71,8 @@ class TradeCodes(object):
     sophont = re.compile(r"[A-Za-z\'!]{1}[\w\'!]{2,4}(\d|W|\?)")
     dieback = re.compile(r"[Di]*\([^)]+\)\d?")
 
-    __slots__ = '__dict__', 'codeset', 'pcode', 'dcode', 'xcode'
+    __slots__ = '__dict__', 'codeset', 'pcode', 'dcode', 'xcode', 'logger', 'codes', 'owned', 'homeworld_list',\
+                'sophont_list', 'owner', 'colony', 'ownedBy'
 
     def __init__(self, initial_codes):
         """
