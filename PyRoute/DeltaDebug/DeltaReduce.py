@@ -198,13 +198,6 @@ class DeltaReduce:
 
             del stats
         except Exception as e:
-            galaxy.trade = None
-            galaxy.ranges = None
-            galaxy.stars = None
-            galaxy.star_mapping = None
-            galaxy.sectors = None
-            del galaxy
-
             # special-case DeltaLogicError - that means something's gone sideways in the delta debugger itself
             if isinstance(e, DeltaLogicError):
                 raise e
