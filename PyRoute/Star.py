@@ -128,14 +128,19 @@ class Star(object):
 
     def __deepcopy__(self, memodict={}):
         state = self.__dict__.copy()
+        for item in Star.__slots__:
+            if item in state:
+                continue
+            if item.startswith('_'):
+                continue
+            state[item] = self[item]
 
         foo = Star()
         for key in state:
             item = state[key]
             setattr(foo, key, item)
-        foo.index = self.index
-        foo.calc_hash()
         foo.hex = copy.deepcopy(self.hex)
+        foo.calc_hash()
 
         return foo
 
