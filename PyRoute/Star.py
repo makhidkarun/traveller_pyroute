@@ -9,6 +9,8 @@ import logging
 import bisect
 import random
 import math
+from typing import Tuple
+from typing_extensions import TypeAlias
 
 from PyRoute.Position.Hex import Hex
 
@@ -18,6 +20,8 @@ from PyRoute.SystemData.Utilities import Utilities
 from collections import OrderedDict
 
 from PyRoute.SystemData.StarList import StarList
+
+HexPos: TypeAlias = Tuple[int, int]
 
 
 class UWPCodes(object):
@@ -317,7 +321,7 @@ class Star(object):
         return self.uwp.oldskool is True
 
     @functools.cached_property
-    def hex_position(self):
+    def hex_position(self) -> HexPos:
         return self.hex.hex_position()
 
     def distance(self, star):
