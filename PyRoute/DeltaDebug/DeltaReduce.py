@@ -165,6 +165,7 @@ class DeltaReduce:
                 galaxy.process_eti()
                 spectrade = SpeculativeTrade(args.speculative_version, galaxy.stars)
                 spectrade.process_tradegoods()
+                del spectrade
 
             if args.routes:
                 galaxy.write_routes(args.routes)
@@ -186,6 +187,16 @@ class DeltaReduce:
                 if args.subsectors:
                     graphMap = SubsectorMap(galaxy, args.routes, galaxy.output_path)
                     graphMap.write_maps()
+
+            galaxy.trade = None
+            galaxy.ranges = None
+            galaxy.stars = None
+            galaxy.star_mapping = None
+            galaxy.sectors = None
+            galaxy = None
+            del galaxy
+
+            del stats
         except Exception as e:
             # special-case DeltaLogicError - that means something's gone sideways in the delta debugger itself
             if isinstance(e, DeltaLogicError):

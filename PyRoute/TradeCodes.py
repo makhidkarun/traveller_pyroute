@@ -71,7 +71,8 @@ class TradeCodes(object):
     sophont = re.compile(r"[A-Za-z\'!]{1}[\w\'!]{2,4}(\d|W|\?)")
     dieback = re.compile(r"[Di]*\([^)]+\)\d?")
 
-    __slots__ = '__dict__', 'codeset', 'pcode', 'dcode', 'xcode'
+    __slots__ = '__dict__', 'codeset', 'pcode', 'dcode', 'xcode', 'logger', 'codes', 'owned', 'homeworld_list',\
+                'sophont_list', 'owner', 'colony', 'ownedBy'
 
     def __init__(self, initial_codes):
         """
@@ -79,15 +80,16 @@ class TradeCodes(object):
         """
         self.logger = logging.getLogger('PyRoute.TradeCodes')
         self.codes, initial_codes = self._preprocess_initial_codes(initial_codes.strip())
-        self.pcode = set(TradeCodes.pcodes) & set(self.codes)
-        self.dcode = set(TradeCodes.dcodes) & set(self.codes)
-        self.xcode = TradeCodes.ext_codes & set(self.codes)
+        code_set = set(self.codes)
+        self.pcode = set(TradeCodes.pcodes) & code_set
+        self.dcode = set(TradeCodes.dcodes) & code_set
+        self.xcode = TradeCodes.ext_codes & code_set
 
         self.owned = [code for code in self.codes if code.startswith('O:') or code.startswith('C:')]
 
         homeworlds_found = self._process_sophonts_and_homeworlds(initial_codes)
 
-        self.codeset = set(self.codes) - self.dcode - set(self.owned) - set(self.sophont_list)\
+        self.codeset = code_set - self.dcode - set(self.owned) - set(self.sophont_list)\
             - set(homeworlds_found) - self.xcode
         self.codeset = sorted(list(self.codeset))
 

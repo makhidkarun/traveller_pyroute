@@ -3,6 +3,7 @@ Created on Oct 03, 2023
 
 @author: CyberiaResurrection
 """
+from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 
 
 class TwoLineReducer(object):
@@ -24,6 +25,8 @@ class TwoLineReducer(object):
 
         best_sectors = self.reducer.sectors
         gap = 1
+        old_length = len(segment)
+
         while gap < len(segment):
             msg = "# of lines: " + str(len(best_sectors.lines)) + f", gap {gap}"
             self.reducer.logger.error(msg)
@@ -47,7 +50,21 @@ class TwoLineReducer(object):
                     i += 1
                 j = i + gap
 
+            if old_length > len(segment):
+                self.write_files(best_sectors)
+                old_length = len(segment)
+
             gap += 1
 
         # now that the pass is done, update self.sectors with best reduction found
         self.reducer.sectors = best_sectors
+
+        # At least one sector was shown to be irrelevant, write out the intermediate result
+        if old_length > len(segment):
+            self.write_files()
+
+    def write_files(self, sectors=None):
+        if isinstance(sectors, DeltaDictionary):
+            sectors.write_files(self.reducer.args.mindir)
+        else:
+            self.reducer.sectors.write_files(self.reducer.args.mindir)

@@ -6,6 +6,8 @@ Created on Nov 29, 2023
 
 
 class Nobles(object):
+    __slots__ = 'nobles', 'codes'
+
     def __init__(self):
         self.nobles = {'Knights': 0,
                        'Baronets': 0,

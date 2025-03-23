@@ -9,6 +9,8 @@ import logging
 import bisect
 import random
 import math
+from typing import Tuple
+from typing_extensions import TypeAlias
 
 from PyRoute.Position.Hex import Hex
 
@@ -18,6 +20,8 @@ from PyRoute.SystemData.Utilities import Utilities
 from collections import OrderedDict
 
 from PyRoute.SystemData.StarList import StarList
+
+HexPos: TypeAlias = Tuple[int, int]
 
 
 class UWPCodes(object):
@@ -42,8 +46,14 @@ class UWPCodes(object):
 
 
 class Star(object):
-    __slots__ = '__dict__', '_hash', '_key', 'index', 'zone', 'tradeCode', 'wtn', 'alg_code', 'hex',\
-                'deep_space_station', 'is_redzone'
+    __slots__ = '__dict__', 'worlds', 'ggCount', 'belts', 'nobles', 'logger', '_hash', '_key', 'component', 'index',\
+                'gwp', 'population', 'perCapita', 'mspr', 'wtn', 'ru', 'ownedBy', 'name', 'sector', 'position', 'uwp',\
+                'popM', 'uwpCodes', 'tradeCode', 'economics', 'social', 'baseCode', 'zone', 'alg_code',\
+                'allegiance_base', 'ship_capacity', 'tcs_gwp', 'budget', 'importance', 'eti_cargo', 'eti_passenger',\
+                'raw_be', 'im_be', 'col_be', 'star_list_object', 'routes', 'stars', 'is_enqueued', 'is_target',\
+                'is_landmark', '_pax_btn_mod', 'suppress_soph_percent_warning', 'is_redzone', 'hex',\
+                'deep_space_station', '_oldskool', 'tradeIn', 'tradeOver', 'tradeCount', 'passIn', 'passOver',\
+                'starportSize', 'starportBudget', 'starportPop', 'index',
 
     def __init__(self):
         self.worlds = None
@@ -118,14 +128,19 @@ class Star(object):
 
     def __deepcopy__(self, memodict={}):
         state = self.__dict__.copy()
+        for item in Star.__slots__:
+            if item in state:
+                continue
+            if item.startswith('_'):
+                continue
+            state[item] = self[item]
 
         foo = Star()
         for key in state:
             item = state[key]
             setattr(foo, key, item)
-        foo.index = self.index
-        foo.calc_hash()
         foo.hex = copy.deepcopy(self.hex)
+        foo.calc_hash()
 
         return foo
 
@@ -311,7 +326,7 @@ class Star(object):
         return self.uwp.oldskool is True
 
     @functools.cached_property
-    def hex_position(self):
+    def hex_position(self) -> HexPos:
         return self.hex.hex_position()
 
     def distance(self, star):
