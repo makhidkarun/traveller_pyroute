@@ -80,6 +80,16 @@ class WithinLineReducer(object):
 
             if 0 < len(remove):
                 num_chunks -= len(remove)
+                new_hex = 'Hex  Name                 UWP       Remarks                               {Ix}   (Ex)    [Cx]   N    B  Z PBG W  A    Stellar         Routes                                   \n'
+                new_dash = '---- -------------------- --------- ------------------------------------- ------ ------- ------ ---- -- - --- -- ---- --------------- -----------------------------------------\n'
+                for sec_name in best_sectors:
+                    num_headers = len(best_sectors[sec_name].headers)
+                    for i in range(0, num_headers):
+                        raw_line = best_sectors[sec_name].headers[i]
+                        if raw_line.startswith('Hex  '):
+                            best_sectors[sec_name].headers[i] = new_hex
+                        elif raw_line.startswith('---- --'):
+                            best_sectors[sec_name].headers[i] = new_dash
                 self.write_files(best_sectors)
 
             num_chunks *= 2
