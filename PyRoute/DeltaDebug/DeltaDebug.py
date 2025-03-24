@@ -184,14 +184,14 @@ def process():
         reducer.reduce_line_pass()
         reducer.is_initial_state_interesting()
 
+    if args.run_within:
+        logger.error("Reducing within lines")
+        reducer.reduce_within_line()
+
     # enforce 2-minimality
     if args.two_min:
         logger.error("Reducing by two-line")
         reducer.reduce_line_two_minimal()
-
-    if args.run_within:
-        logger.error("Reducing within lines")
-        reducer.reduce_within_line()
 
     # check final input is _still_ interesting
     reducer.is_initial_state_interesting()
