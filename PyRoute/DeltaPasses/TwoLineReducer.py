@@ -16,7 +16,7 @@ class TwoLineReducer(object):
             return True
         return False
 
-    def run(self, singleton_only=False):
+    def run(self, singleton_only=False, first_segment=True):
         segment = self.reducer.sectors.lines
 
         # An interesting less-than-4-element list is 2-minimal by definition
@@ -24,10 +24,12 @@ class TwoLineReducer(object):
             return
 
         best_sectors = self.reducer.sectors
-        gap = 1
         old_length = len(segment)
+        sqrt = max(2, round(old_length ** 0.5))
+        gap = 1 if first_segment else sqrt
+        maxgap = sqrt + 1 if first_segment else len(segment)
 
-        while gap < len(segment):
+        while gap < min(maxgap, len(segment)):
             msg = "# of lines: " + str(len(best_sectors.lines)) + f", gap {gap}"
             self.reducer.logger.error(msg)
 

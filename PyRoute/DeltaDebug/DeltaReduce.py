@@ -87,7 +87,8 @@ class DeltaReduce:
         self.single_line_reducer.run(singleton_only)
 
     def reduce_line_two_minimal(self):
-        self.two_line_reducer.run(False)
+        self.two_line_reducer.run(False, first_segment=True)
+        self.two_line_reducer.run(False, first_segment=False)
 
     def reduce_within_line(self):
         # we're going to be deliberately mangling lines in the process of reducing them, so shut up loggers,
