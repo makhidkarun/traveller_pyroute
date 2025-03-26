@@ -33,6 +33,7 @@ class SingleLineReducer(object):
 
         while num_chunks <= len(segment):
             chunks = self.reducer.chunk_lines(segment, num_chunks)
+            num_chunks = len(chunks)
             remove = []
             msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks)
             self.reducer.logger.error(msg)

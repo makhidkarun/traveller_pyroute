@@ -223,4 +223,6 @@ class DeltaReduce:
     @staticmethod
     def chunk_lines(lines, num_chunks):
         n = math.ceil(len(lines) / num_chunks)
-        return [lines[i:i + n] for i in range(0, len(lines), n)]
+        chunks = [lines[i:i + n] for i in range(0, len(lines), n)]
+        chunks = [item for item in chunks if 0 < len(item)]
+        return chunks
