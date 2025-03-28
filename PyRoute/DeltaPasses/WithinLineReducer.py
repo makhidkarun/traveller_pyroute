@@ -78,6 +78,7 @@ class WithinLineReducer(object):
                     best_sectors = temp_sectors
                     msg = "Reduction found: new input has " + str(len(raw_lines)) + " unreduced lines"
                     self.reducer.logger.error(msg)
+                del temp_sectors
 
             if 0 < len(remove):
                 num_chunks -= len(remove)

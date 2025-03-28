@@ -519,7 +519,7 @@ class TradeCodes(object):
     def homeworld(self):
         return sorted(self.homeworld_list)
 
-    @functools.cached_property
+    @property
     def sophonts(self):
         return sorted(self.sophont_list)
 

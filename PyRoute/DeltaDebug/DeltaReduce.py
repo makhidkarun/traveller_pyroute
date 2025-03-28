@@ -134,10 +134,11 @@ class DeltaReduce:
         return short_msg
 
     @staticmethod
-    def _check_interesting(args, sectors):
+    def _check_interesting(args, raw_sectors):
         interesting = False
         msg = None
         q = None
+        sectors = copy.deepcopy(raw_sectors)
 
         try:
             galaxy = DeltaGalaxy(args.btn, args.max_jump)
@@ -217,6 +218,7 @@ class DeltaReduce:
                     interesting = True
                 else:
                     interesting = False
+        del sectors
 
         return interesting, msg, q
 
