@@ -28,6 +28,17 @@ class Populations(object):
     def __lt__(self, other):
         return self.population < other.population
 
+    def __eq__(self, other):
+        if self.code != other.code:
+            return False
+        if self.count != other.count:
+            return False
+        if self.population != other.population:
+            return False
+        if self.homeworlds != other.homeworlds:
+            return False
+        return True
+
 
 class ObjectStatistics(object):
     base_mapping = {'C': 'Corsair base', 'D': 'Naval depot', 'E': 'Embassy', 'K': 'Naval base', 'M': 'Military base',
