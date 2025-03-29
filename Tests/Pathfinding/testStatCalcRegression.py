@@ -72,7 +72,8 @@ class testStatCalcRegression(baseTest):
                     'population': 80481, 'populations': NoNoneDefaultDict(Populations), 'port_size': NoNoneDefaultDict(int),
                     'primary_count': NoNoneDefaultDict(int), 'shipyards': 81, 'spa_people': 23705,
                     'star_count': NoNoneDefaultDict(int), 'stars': 172, 'sum_ru': 121636, 'trade': 143514760000,
-                    'tradeDton': 3273603, 'tradeDtonExt': 0, 'tradeExt': 0, 'tradeVol': 144540860000, 'worlds': 1272}
+                    'tradeDton': 3273603, 'tradeDtonExt': 0, 'tradeExt': 0, 'tradeVol': 144540860000, 'worlds': 1272,
+                    '__dict__': {}}
         expected['bases']['Military base'] = 18
         expected['bases']['Naval base'] = 23
         expected['bases']['Scout base'] = 9

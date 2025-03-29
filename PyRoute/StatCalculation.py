@@ -3,6 +3,7 @@ Created on Mar 17, 2014
 
 @author: tjoneslo
 """
+import copy
 import logging
 import math
 from PyRoute.wikistats import WikiStats
@@ -41,6 +42,13 @@ class Populations(object):
 
 
 class ObjectStatistics(object):
+
+    __slots__ = 'population', 'populations', 'economy', 'trade', 'tradeExt', 'tradeVol', 'tradeDton', 'tradeDtonExt',\
+                'percapita', 'number', 'milBudget', 'maxTL', 'maxPort', 'maxPop', 'sum_ru', 'shipyards', 'col_be',\
+                'im_be', 'passengers', 'spa_people', 'port_size', 'code_counts', 'bases', 'eti_worlds', 'eti_cargo',\
+                'eti_pass', 'homeworlds', 'high_pop_worlds', 'high_tech_worlds', 'TLmean', 'TLstddev', 'subsectorCp',\
+                'sectorCp', 'otherCp', 'gg_count', 'worlds', 'stars', 'star_count', 'primary_count', '__dict__'
+
     base_mapping = {'C': 'Corsair base', 'D': 'Naval depot', 'E': 'Embassy', 'K': 'Naval base', 'M': 'Military base',
                     'N': 'Naval base', 'O': 'Naval outpost',
                     'R': 'Clan base', 'S': 'Scout base', 'T': 'Tlaukhu base', 'V': 'Scout base', 'W': 'Way station',
@@ -95,6 +103,9 @@ class ObjectStatistics(object):
     # For the JSONPickel work
     def __getstate__(self):
         state = self.__dict__.copy()
+        for key in ObjectStatistics.__slots__:
+            if key not in state:
+                state[key] = self[key]
         del state['high_pop_worlds']
         del state['high_tech_worlds']
         del state['subsectorCp']
@@ -107,6 +118,9 @@ class ObjectStatistics(object):
         state = self.__dict__.copy()
         foo = ObjectStatistics()
         foo.__dict__.update(state)
+        for key in ObjectStatistics.__slots__:
+            if key not in foo:
+                foo[key] = copy.deepcopy(self[key])
 
         return foo
 
