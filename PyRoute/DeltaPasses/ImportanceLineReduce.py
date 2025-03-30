@@ -16,11 +16,11 @@ class ImportanceLineReduce(WithinLineReducer):
         subs_list = []
         segment = []
         for line in self.reducer.sectors.lines:
-            canon = DeltaStar.reduce_importance(line.strip())
+            canon = DeltaStar.reduce_importance(line)
             assert isinstance(canon,
                               str), "Candidate line " + line + " was not reduced to a string.  Got " + canon + " instead."
             # Skip already-reduced lines
-            if line == canon:
+            if line.startswith(canon):
                 continue
             subs_list.append((line, canon))
             segment.append(line)

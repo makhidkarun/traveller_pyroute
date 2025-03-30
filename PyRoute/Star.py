@@ -53,7 +53,7 @@ class Star(object):
                 'raw_be', 'im_be', 'col_be', 'star_list_object', 'routes', 'stars', 'is_enqueued', 'is_target',\
                 'is_landmark', '_pax_btn_mod', 'suppress_soph_percent_warning', 'is_redzone', 'hex',\
                 'deep_space_station', '_oldskool', 'tradeIn', 'tradeOver', 'tradeCount', 'passIn', 'passOver',\
-                'starportSize', 'starportBudget', 'starportPop', 'index',
+                'starportSize', 'starportBudget', 'starportPop', 'index', 'trade_cost', 'trade_id'
 
     def __init__(self):
         self.worlds = None
@@ -111,6 +111,8 @@ class Star(object):
         self.tradeIn = None
         self.tradeOver = None
         self.tradeCount = None
+        self.trade_cost = 0.0
+        self.trade_id = ""
         self.passIn = None
         self.passOver = None
         self.starportSize = None

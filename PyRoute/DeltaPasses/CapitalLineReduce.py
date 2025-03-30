@@ -21,7 +21,7 @@ class CapitalLineReduce(WithinLineReducer):
             assert isinstance(canon,
                               str), "Candidate line " + line + " was not reduced to a string.  Got " + canon + " instead."
             # Skip already-reduced lines
-            if 2 < num_lines and line == canon:
+            if 2 < num_lines and line.startswith(canon):
                 continue
             subs_list.append((line, canon))
             segment.append(line)

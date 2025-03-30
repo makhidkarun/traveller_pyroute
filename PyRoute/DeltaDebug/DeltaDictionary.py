@@ -332,7 +332,7 @@ class SectorDictionary(dict):
             handle.write(line)
 
         for line in self.lines:
-            line = line.strip() + '\n'
+            line = line + '\n'
             handle.write(line)
 
         handle.close()
@@ -421,7 +421,7 @@ class SectorDictionary(dict):
                 if line.startswith('----'):
                     isheader = False
             else:
-                starlines.append(line.strip())
+                starlines.append(line.rstrip('\n'))
         return headers, starlines
 
 

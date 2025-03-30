@@ -49,6 +49,7 @@ class WithinLineReducer(object):
 
         while num_chunks <= len(segment):
             chunks = self.reducer.chunk_lines(segment, num_chunks)
+            num_chunks = len(chunks)
             remove = []
             msg = "# of unreduced lines: " + str(len(segment)) + ", # of chunks: " + str(num_chunks)
             self.reducer.logger.error(msg)
@@ -77,9 +78,20 @@ class WithinLineReducer(object):
                     best_sectors = temp_sectors
                     msg = "Reduction found: new input has " + str(len(raw_lines)) + " unreduced lines"
                     self.reducer.logger.error(msg)
+                del temp_sectors
 
             if 0 < len(remove):
                 num_chunks -= len(remove)
+                new_hex = 'Hex  Name                 UWP       Remarks                               {Ix}   (Ex)    [Cx]   N    B  Z PBG W  A    Stellar         Routes                                   \n'
+                new_dash = '---- -------------------- --------- ------------------------------------- ------ ------- ------ ---- -- - --- -- ---- --------------- -----------------------------------------\n'
+                for sec_name in best_sectors:
+                    num_headers = len(best_sectors[sec_name].headers)
+                    for i in range(0, num_headers):
+                        raw_line = best_sectors[sec_name].headers[i]
+                        if raw_line.startswith('Hex  '):
+                            best_sectors[sec_name].headers[i] = new_hex
+                        elif raw_line.startswith('---- --'):
+                            best_sectors[sec_name].headers[i] = new_dash
                 self.write_files(best_sectors)
 
             num_chunks *= 2

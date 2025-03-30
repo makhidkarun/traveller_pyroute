@@ -28,10 +28,12 @@ class SubsectorReducer(object):
         num_chunks = len(segment) if singleton_only else 2
         short_msg = None
         best_sectors = self.reducer.sectors
+        singleton_run = singleton_only
         old_length = len(segment)
 
         while num_chunks <= len(segment):
             chunks = self.reducer.chunk_lines(segment, num_chunks)
+            num_chunks = len(chunks)
             remove = []
             msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(
                 num_chunks) + ", # of subsectors: " + str(len(segment))
@@ -95,6 +97,10 @@ class SubsectorReducer(object):
                 self.write_files(best_sectors)
 
             num_chunks *= 2
+            # if we're about to bust our loop condition, make sure we verify 1-minimality as our last hurrah
+            if num_chunks > len(segment) and not singleton_run:
+                singleton_run = True
+                num_chunks = len(segment)
             segment = best_sectors.subsector_list()
 
         # now that the pass is done, update self.sectors with best reduction found

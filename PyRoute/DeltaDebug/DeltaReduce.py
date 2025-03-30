@@ -87,7 +87,8 @@ class DeltaReduce:
         self.single_line_reducer.run(singleton_only)
 
     def reduce_line_two_minimal(self):
-        self.two_line_reducer.run(False)
+        self.two_line_reducer.run(False, first_segment=True)
+        self.two_line_reducer.run(False, first_segment=False)
 
     def reduce_within_line(self):
         # we're going to be deliberately mangling lines in the process of reducing them, so shut up loggers,
@@ -133,10 +134,11 @@ class DeltaReduce:
         return short_msg
 
     @staticmethod
-    def _check_interesting(args, sectors):
+    def _check_interesting(args, raw_sectors):
         interesting = False
         msg = None
         q = None
+        sectors = copy.deepcopy(raw_sectors)
 
         try:
             galaxy = DeltaGalaxy(args.btn, args.max_jump)
@@ -216,10 +218,13 @@ class DeltaReduce:
                     interesting = True
                 else:
                     interesting = False
+        del sectors
 
         return interesting, msg, q
 
     @staticmethod
     def chunk_lines(lines, num_chunks):
         n = math.ceil(len(lines) / num_chunks)
-        return [lines[i:i + n] for i in range(0, len(lines), n)]
+        chunks = [lines[i:i + n] for i in range(0, len(lines), n)]
+        chunks = [item for item in chunks if 0 < len(item)]
+        return chunks
