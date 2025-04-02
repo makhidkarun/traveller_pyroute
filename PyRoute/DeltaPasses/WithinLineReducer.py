@@ -4,7 +4,7 @@ Created on Jun 13, 2023
 @author: CyberiaResurrection
 """
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
-
+from PyRoute.DeltaStar import DeltaStar
 
 class WithinLineReducer(object):
 
@@ -111,12 +111,29 @@ class WithinLineReducer(object):
                 num_chunks = len(segment)
 
         self.reducer.sectors = best_sectors
+        _, subs_list = self._build_fill_list()
+        if 0 != len(subs_list):
+            self.reducer.sectors = self.reducer.sectors.switch_lines(subs_list)
+
         self.write_files()
         if short_msg is not None:
             self.reducer.logger.error("Shortest error message: " + short_msg)
 
     def _build_subs_list(self):
         raise NotImplementedError
+
+    def _build_fill_list(self):
+        subs_list = []
+        segment = []
+        for line in self.reducer.sectors.lines:
+            canon = DeltaStar.reduce(line)
+            if line.startswith(canon):
+                continue
+
+            subs_list.append((line, canon))
+            segment.append(line)
+
+        return segment, subs_list
 
     def _assemble_segment(self, unreduced_lines, subs_list):
         nu_list = []
