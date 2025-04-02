@@ -126,16 +126,10 @@ class DeltaDictionary(dict):
         for sector_name in self:
             self[sector_name].write_file(output_dir)
 
-    def skip_void_subsectors_if_half(self):
-        # if at least half of read-in subsectors are void, assume this is a follow-up on a previous reduction run
-        # and mark all void subsectors as skipped
-        void_subsec = 0
+    def skip_void_subsectors(self):
+        # skip void subsectors unconditionally - all they do is take up space in subsector reduction
         for secname in self:
-            void_subsec += self[secname].void_subsectors
-
-        if void_subsec * 2 >= 16 * len(self):
-            for secname in self:
-                self[secname].skip_void_subsectors()
+            self[secname].skip_void_subsectors()
 
 
 class SectorDictionary(dict):

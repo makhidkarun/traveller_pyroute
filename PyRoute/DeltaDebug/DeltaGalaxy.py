@@ -21,7 +21,7 @@ class DeltaGalaxy(Galaxy):
         star_counter = 0
         sector: SectorDictionary
 
-        sectors.skip_void_subsectors_if_half()
+        sectors.skip_void_subsectors()
         for sector_name in sectors:
             sector = sectors[sector_name]
             sec = Sector("# " + sector.name, sector.position)
