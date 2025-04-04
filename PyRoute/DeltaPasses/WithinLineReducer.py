@@ -6,6 +6,7 @@ Created on Jun 13, 2023
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 from PyRoute.DeltaStar import DeltaStar
 
+
 class WithinLineReducer(object):
 
     full_msg = None
