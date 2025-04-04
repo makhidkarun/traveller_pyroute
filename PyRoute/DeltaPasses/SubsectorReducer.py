@@ -3,20 +3,10 @@ Created on Oct 03, 2023
 
 @author: CyberiaResurrection
 """
-from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
-from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
+from PyRoute.DeltaPasses.BeyondLineReducer import BeyondLineReducer
 
 
-class SubsectorReducer(object):
-
-    def __init__(self, reducer):
-        self.reducer = reducer
-        self.breacher = WidenHoleReducer(reducer)
-
-    def preflight(self):
-        if self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines):
-            return True
-        return False
+class SubsectorReducer(BeyondLineReducer):
 
     def run(self, singleton_only=False):
         segment = self.reducer.sectors.subsector_list()
@@ -111,9 +101,3 @@ class SubsectorReducer(object):
         # At least one subsector was shown to be irrelevant, write out the intermediate result
         if old_length > len(segment):
             self.write_files()
-
-    def write_files(self, sectors=None):
-        if isinstance(sectors, DeltaDictionary):
-            sectors.write_files(self.reducer.args.mindir)
-        else:
-            self.reducer.sectors.write_files(self.reducer.args.mindir)
