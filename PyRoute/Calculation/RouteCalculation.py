@@ -136,8 +136,8 @@ class RouteCalculation(object):
         if not AllyGen.are_allies(star1.alg_code, star2.alg_code):
             btn -= 1
 
-        if star1.alg_code == 'Wild' or star2.alg_code == 'Wild':
-            btn -= 1
+            if star1.alg_code == 'Wild' or star2.alg_code == 'Wild':
+                btn -= 1
 
         if not distance:
             distance = star1.distance(star2)
