@@ -3,18 +3,10 @@ Created on Oct 03, 2023
 
 @author: CyberiaResurrection
 """
-from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
+from PyRoute.DeltaPasses.BeyondLineReducer import BeyondLineReducer
 
 
-class TwoLineReducer(object):
-
-    def __init__(self, reducer):
-        self.reducer = reducer
-
-    def preflight(self):
-        if self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines):
-            return True
-        return False
+class TwoLineReducer(BeyondLineReducer):
 
     def run(self, singleton_only=False, first_segment=True):
         segment = self.reducer.sectors.lines
@@ -70,9 +62,3 @@ class TwoLineReducer(object):
         # At least one sector was shown to be irrelevant, write out the intermediate result
         if old_length > len(segment):
             self.write_files()
-
-    def write_files(self, sectors=None):
-        if isinstance(sectors, DeltaDictionary):
-            sectors.write_files(self.reducer.args.mindir)
-        else:
-            self.reducer.sectors.write_files(self.reducer.args.mindir)
