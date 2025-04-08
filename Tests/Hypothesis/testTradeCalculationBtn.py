@@ -144,3 +144,37 @@ class testTradeCalculationBtn(unittest.TestCase):
 
                 self.assertEqual(forward_btn, reverse_btn, "Get_btn shouldn't be sensitive to argument ordering")
                 self.assertEqual(expected, forward_btn, "Unexpected get-btn value")
+
+    def test_get_max_btn_pairwise(self):
+        cases = [
+            (0, 0, 1),
+            (0, 1, 1),
+            (0, 2, 1),
+            (0, 3, 1),
+            (0, 4, 1),
+            (0, 5, 1),
+            (1, 1, 3),
+            (1, 2, 3),
+            (1, 3, 3),
+            (1, 4, 3),
+            (1, 5, 3),
+            (2, 2, 5),
+            (2, 3, 5),
+            (2, 4, 5),
+            (2, 5, 5),
+            (3, 3, 7),
+            (3, 4, 7),
+            (3, 5, 7),
+            (4, 4, 9),
+            (4, 5, 9),
+            (5, 5, 11)
+        ]
+
+        counter = 0
+        for star1_wtn, star2_wtn, expected in cases:
+            counter += 1
+            with self.subTest(msg="Subtest " + str(counter)):
+                actual = RouteCalculation.get_max_btn(star1_wtn, star2_wtn)
+                self.assertEqual(expected, actual)
+                actual = RouteCalculation.get_max_btn(star2_wtn, star1_wtn)
+                self.assertEqual(expected, actual)
