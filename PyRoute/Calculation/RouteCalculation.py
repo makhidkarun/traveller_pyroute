@@ -195,7 +195,7 @@ class RouteCalculation(object):
     def get_max_btn(star_wtn, neighbour_wtn):
         if neighbour_wtn > star_wtn:
             return RouteCalculation.get_max_btn(neighbour_wtn, star_wtn)
-        return (min(star_wtn, neighbour_wtn) * 2) + 1
+        return (neighbour_wtn * 2) + 1
 
     @staticmethod
     @functools.cache
