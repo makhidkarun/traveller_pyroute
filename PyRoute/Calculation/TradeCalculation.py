@@ -152,12 +152,23 @@ class TradeCalculation(RouteCalculation):
         max_route_dist = max(self.btn_range)
         max_range = self.galaxy.max_jump_range
         min_btn = self.min_btn
+        min_wtn = self.min_route_wtn
 
-        ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(self.galaxy.ranges, 2)
-                  if not star.is_redzone and not neighbour.is_redzone
-                  and (dist := star.distance(neighbour)) <= self._max_dist(star.wtn, neighbour.wtn, True)
+        hiball = [item for item in self.galaxy.ranges if item.wtn >= min_wtn and not item.is_redzone]
+        loball = [item for item in self.galaxy.ranges if item.wtn < min_wtn and not item.is_redzone]
+
+        ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(hiball, 2)
+                  if (dist := star.distance(neighbour)) <= self._max_dist(star.wtn, neighbour.wtn, True)
                   and self._get_btn_upper_bound(star, neighbour, max_range, min_btn, distance=dist) >= min_btn
                   ]
+        lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(loball, 2)
+                     if (star.distance(neighbour)) <= max_range
+                     ]
+        mid_ranges = [(star, neighbour) for (star, neighbour) in itertools.product(hiball, loball)
+                      if (star.distance(neighbour)) <= max_range
+                      ]
+        ranges.extend(lo_ranges)
+        ranges.extend(mid_ranges)
         self.logger.info("Routes with endpoints more than " + str(max_route_dist) + " pc apart, trimmed")
 
         return ranges
