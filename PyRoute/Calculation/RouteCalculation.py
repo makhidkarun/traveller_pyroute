@@ -162,8 +162,8 @@ class RouteCalculation(object):
             distance = star1.distance(star2)
 
         btn += RouteCalculation.get_btn_offset(distance)
-        if distance <= max_range:
-            return max(btn, min_btn)
+        if min_btn > btn and distance <= max_range:
+            return min_btn
         return btn
 
     @staticmethod
