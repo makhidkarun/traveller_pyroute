@@ -137,6 +137,9 @@ class TradeCalculation(RouteCalculation):
                 self.galaxy.ranges.add_edge(star, neighbor, distance=dist,
                                             btn=btn,
                                             passenger_btn=passBTN)
+
+        if dist > self.galaxy.max_jump_range:
+            return None
         return dist
 
     @functools.cache
