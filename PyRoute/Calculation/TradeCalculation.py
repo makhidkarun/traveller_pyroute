@@ -143,7 +143,7 @@ class TradeCalculation(RouteCalculation):
     def _max_dist(self, star_wtn, neighbour_wtn, maxjump=False):
         if neighbour_wtn < star_wtn:
             return self._max_dist(neighbour_wtn, star_wtn, maxjump)
-        max_dist = self.btn_range[min(max(0, max(star_wtn, neighbour_wtn) - self.min_wtn), 6)]
+        max_dist = self.btn_range[min(max(0, neighbour_wtn - self.min_wtn), 6)]
         if maxjump:
             return max(max_dist, self.galaxy.max_jump_range)
         return max_dist
