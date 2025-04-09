@@ -4,10 +4,13 @@ from hypothesis import given, assume
 from hypothesis.strategies import composite, sampled_from, integers
 
 from Position.Hex import Hex
+from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
+from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.TradeCodes import TradeCodes
 from PyRoute.Star import Star
+
 
 btn_param_list = [
     (2, 'In', '1620', 'Im', 2, 'In', '3240', 'Im', -1),
@@ -178,3 +181,39 @@ class testTradeCalculationBtn(unittest.TestCase):
                 self.assertEqual(expected, actual)
                 actual = RouteCalculation.get_max_btn(star2_wtn, star1_wtn)
                 self.assertEqual(expected, actual)
+
+    def test_get_max_dist_pairwise(self):
+        cases = [
+            (4, 4, 2),
+            (4, 6, 2),
+            (4, 8, 2),
+            (4, 10, 29),
+            (4, 12, 99),
+            (6, 6, 2),
+            (6, 8, 2),
+            (6, 10, 29),
+            (6, 12, 99),
+            (8, 8, 2),
+            (8, 10, 29),
+            (8, 12, 99),
+            (10, 10, 29),
+            (10, 12, 99),
+            (12, 12, 99),
+            (12, 13, 299),
+            (12, 14, 599),
+            (12, 16, 599),
+            (12, 18, 599),
+            ]
+
+        galaxy = Galaxy(min_btn=11, max_jump=4)
+        trade = TradeCalculation(galaxy, min_btn=11)
+        self.assertEqual(8, trade.min_wtn)
+
+        counter = 0
+        for star1_wtn, star2_wtn, expected in cases:
+            counter += 1
+            with self.subTest(msg="Subtest " + str(counter)):
+                actual1 = trade._max_dist(star1_wtn, star2_wtn)
+                actual2 = trade._max_dist(star2_wtn, star1_wtn)
+                self.assertEqual(actual1, actual2, "Max dist should not be sensitive to argument order")
+                self.assertEqual(expected, actual1)
