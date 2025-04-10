@@ -149,9 +149,9 @@ class RouteCalculation(object):
     @staticmethod
     def _get_btn_upper_bound(star1, star2, max_range, min_btn, distance=None):
         """
-        Return an _upper bound_ on the BTN between star1 and star2.  If the upper bound on BTn
-        doesn't meet/beat the minimum_btn, then the _actual_ BTN, which also doesn't meet/beet
-        the minimum_btn, doesn't need to be calculated.  If star1 and star2 are less than the supplied
+        Return an _upper bound_ on the BTN between star1 and star2.  If the upper bound on BTN
+        doesn't meet/beat the minimum BTN, then the _actual_ BTN, which also doesn't meet/beat
+        the minimum, doesn't need to be calculated.  If star1 and star2 are less than the supplied
         max_range apart in pc, set the returned BTN upper bound to greater of upper-bounded BTN and
         supplied min_btn.
         """
@@ -162,6 +162,7 @@ class RouteCalculation(object):
             distance = star1.distance(star2)
 
         btn += RouteCalculation.get_btn_offset(distance)
+        btn = min(btn, RouteCalculation.get_max_btn(star1.wtn, star2.wtn))
         if min_btn > btn and distance <= max_range:
             return min_btn
         return btn
