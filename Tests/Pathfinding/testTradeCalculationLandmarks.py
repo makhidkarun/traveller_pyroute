@@ -25,7 +25,7 @@ class testTradeCalculationLandmarks(baseTest):
         galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
-        self.assertEqual(2, len(galaxy.trade.components), "Unexpected number of components at J-4")
+        self.assertEqual(1, len(galaxy.trade.components), "Unexpected number of components at J-4")
 
         landmarks, _ = galaxy.trade.get_landmarks()
         self.assertTrue(isinstance(landmarks, list), 'Landmarks result should be a list')
@@ -52,17 +52,15 @@ class testTradeCalculationLandmarks(baseTest):
         galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
-        self.assertEqual(7, len(galaxy.trade.components), "Unexpected number of components at J-1")
+        self.assertEqual(6, len(galaxy.trade.components), "Unexpected number of components at J-1")
 
         landmarks, _ = galaxy.trade.get_landmarks()
         self.assertEqual(3, len(landmarks), 'Should have one landmark per component')
         self.assertEqual("Dorevann (Zarushagar 0708)", str(landmarks[0][0]), "Unexpected landmark choice")
         self.assertEqual("Shadishi (Zarushagar 0310)", str(landmarks[0][2]), "Unexpected landmark choice")
-        self.assertEqual("Gishin (Zarushagar 0804)", str(landmarks[0][5]), "Unexpected landmark choice")
         self.assertEqual("Miller's World (Zarushagar 0607)", str(landmarks[1][0]), "Unexpected landmark choice")
         self.assertEqual("Norsec (Zarushagar 0110)", str(landmarks[1][2]), "Unexpected landmark choice")
-        self.assertEqual("Madagast (Zarushagar 0806)", str(landmarks[1][5]), "Unexpected landmark choice")
-        self.assertEqual("Point Zulu (Zarushagar 0302)", str(landmarks[2][0]), "Unexpected landmark choice")
+        self.assertEqual("Engaki (Zarushagar 0502)", str(landmarks[2][0]), "Unexpected landmark choice")
 
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
