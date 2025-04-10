@@ -117,8 +117,8 @@ class TradeCalculation(RouteCalculation):
             # Don't filter if, despite the route being too small, it's within the max jump range.  Such stars can still
             # have trade routes flowing _through_ them, just not _from_ or _to_ them.
             if self.galaxy.max_jump_range < star.distance(neighbor):
-                return False
-            return True
+                return True
+            return False
         return False
 
     def base_range_routes(self, star, neighbor):
@@ -137,23 +137,41 @@ class TradeCalculation(RouteCalculation):
                 self.galaxy.ranges.add_edge(star, neighbor, distance=dist,
                                             btn=btn,
                                             passenger_btn=passBTN)
+
+        if dist > self.galaxy.max_jump_range:
+            return None
         return dist
 
     @functools.cache
     def _max_dist(self, star_wtn, neighbour_wtn, maxjump=False):
         if neighbour_wtn < star_wtn:
             return self._max_dist(neighbour_wtn, star_wtn, maxjump)
-        max_dist = self.btn_range[min(max(0, max(star_wtn, neighbour_wtn) - self.min_wtn), 6)]
+        max_dist = self.btn_range[min(max(0, neighbour_wtn - self.min_wtn), 6)]
         if maxjump:
             return max(max_dist, self.galaxy.max_jump_range)
         return max_dist
 
     def _raw_ranges(self):
         max_route_dist = max(self.btn_range)
+        max_range = self.galaxy.max_jump_range
+        min_btn = self.min_btn
+        min_wtn = self.min_route_wtn
 
-        ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(self.galaxy.ranges, 2)
-                  if not star.is_redzone and not neighbour.is_redzone
-                  and star.distance(neighbour) <= self._max_dist(star.wtn, neighbour.wtn, True)]
+        hiball = [item for item in self.galaxy.ranges if item.wtn >= min_wtn and not item.is_redzone]
+        loball = [item for item in self.galaxy.ranges if item.wtn < min_wtn and not item.is_redzone]
+
+        ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(hiball, 2)
+                  if (dist := star.distance(neighbour)) <= self._max_dist(star.wtn, neighbour.wtn, True)
+                  and self._get_btn_upper_bound(star, neighbour, max_range, min_btn, distance=dist) >= min_btn
+                  ]
+        lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(loball, 2)
+                     if (star.distance(neighbour)) <= max_range
+                     ]
+        mid_ranges = [(star, neighbour) for (star, neighbour) in itertools.product(hiball, loball)
+                      if (star.distance(neighbour)) <= max_range
+                      ]
+        ranges.extend(lo_ranges)
+        ranges.extend(mid_ranges)
         self.logger.info("Routes with endpoints more than " + str(max_route_dist) + " pc apart, trimmed")
 
         return ranges

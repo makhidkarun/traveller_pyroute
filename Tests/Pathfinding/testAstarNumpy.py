@@ -56,12 +56,12 @@ class testAStarNumpy(baseTest):
 
         exp_route = [0, 8, 9, 15, 24, 36]
         if goodimport:
-            exp_diagnostics = {'branch_factor': 1.789, 'f_exhausted': 0, 'g_exhausted': 6, 'neighbour_bound': 19,
-                            'new_upbounds': 1, 'nodes_expanded': 22, 'nodes_queued': 21, 'nodes_revisited': 2,
+            exp_diagnostics = {'branch_factor': 1.816, 'f_exhausted': 0, 'g_exhausted': 7, 'neighbour_bound': 20,
+                            'new_upbounds': 1, 'nodes_expanded': 23, 'nodes_queued': 22, 'nodes_revisited': 2,
                             'num_jumps': 5, 'un_exhausted': 11, 'targ_exhausted': 2}
         else:
-            exp_diagnostics = {'branch_factor': 1.762, 'f_exhausted': 0, 'g_exhausted': 3, 'neighbour_bound': 14,
-                               'new_upbounds': 1, 'nodes_expanded': 16, 'nodes_queued': 20, 'nodes_revisited': 1,
+            exp_diagnostics = {'branch_factor': 1.789, 'f_exhausted': 0, 'g_exhausted': 4, 'neighbour_bound': 15,
+                               'new_upbounds': 1, 'nodes_expanded': 17, 'nodes_queued': 21, 'nodes_revisited': 1,
                                'num_jumps': 5, 'targ_exhausted': 1, 'un_exhausted': 10}
 
         upbound = galaxy.trade.shortest_path_tree.triangle_upbound(source.index, target.index) * 1.005
