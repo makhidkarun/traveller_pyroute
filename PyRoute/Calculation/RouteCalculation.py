@@ -136,8 +136,8 @@ class RouteCalculation(object):
         if not AllyGen.are_allies(star1.alg_code, star2.alg_code):
             btn -= 1
 
-        if star1.alg_code == 'Wild' or star2.alg_code == 'Wild':
-            btn -= 1
+            if star1.alg_code == 'Wild' or star2.alg_code == 'Wild':
+                btn -= 1
 
         if not distance:
             distance = star1.distance(star2)
@@ -145,6 +145,27 @@ class RouteCalculation(object):
         btn += RouteCalculation.get_btn_offset(distance)
 
         return min(btn, RouteCalculation.get_max_btn(star1.wtn, star2.wtn))
+
+    @staticmethod
+    def _get_btn_upper_bound(star1, star2, max_range, min_btn, distance=None):
+        """
+        Return an _upper bound_ on the BTN between star1 and star2.  If the upper bound on BTN
+        doesn't meet/beat the minimum BTN, then the _actual_ BTN, which also doesn't meet/beat
+        the minimum, doesn't need to be calculated.  If star1 and star2 are less than the supplied
+        max_range apart in pc, set the returned BTN upper bound to greater of upper-bounded BTN and
+        supplied min_btn.
+        """
+        # Assuming BTN, as per self.get_btn, is boosted by both agricultural and industrial matches
+        btn = star1.wtn + star2.wtn + 2
+
+        if not distance:
+            distance = star1.distance(star2)
+
+        btn += RouteCalculation.get_btn_offset(distance)
+        btn = min(btn, RouteCalculation.get_max_btn(star1.wtn, star2.wtn))
+        if min_btn > btn and distance <= max_range:
+            return min_btn
+        return btn
 
     @staticmethod
     def get_passenger_btn(btn, star, neighbor):
@@ -175,7 +196,7 @@ class RouteCalculation(object):
     def get_max_btn(star_wtn, neighbour_wtn):
         if neighbour_wtn > star_wtn:
             return RouteCalculation.get_max_btn(neighbour_wtn, star_wtn)
-        return (min(star_wtn, neighbour_wtn) * 2) + 1
+        return (neighbour_wtn * 2) + 1
 
     @staticmethod
     @functools.cache
