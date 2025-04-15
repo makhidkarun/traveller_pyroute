@@ -24,3 +24,4 @@ class testAllegiance(unittest.TestCase):
         alleg = Allegiance(code, name, False, pop)
 
         foo = copy.deepcopy(alleg)
+        self.assertTrue(isinstance(foo, Allegiance))
