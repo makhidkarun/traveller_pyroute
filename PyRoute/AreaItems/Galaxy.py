@@ -123,23 +123,7 @@ class Galaxy(AreaItem):
             for line in starlines:
                 star = Star.parse_line_into_star(line, sec, pop_code, ru_calc, fix_pop=fix_pop)
                 if star:
-                    assert star not in sec.worlds, "Star " + str(star) + " duplicated in sector " + str(sec)
-                    star.index = star_counter
-                    star_counter += 1
-                    self.star_mapping[star.index] = star
-
-                    sec.worlds.append(star)
-                    sec.subsectors[star.subsector()].worlds.append(star)
-                    star.alg_base_code = AllyGen.same_align(star.alg_code)
-
-                    self.set_area_alg(star, self, self.alg)
-                    self.set_area_alg(star, sec, self.alg)
-                    self.set_area_alg(star, sec.subsectors[star.subsector()], self.alg)
-
-                    star.tradeCode.sophont_list.append("{}A".format(self.alg[star.alg_code].population))
-                    star.is_redzone = self.trade.unilateral_filter(star)
-                    star.allegiance_base = self.alg[star.alg_base_code]
-                    star.is_well_formed()
+                    star_counter = self.add_star_to_galaxy(star, star_counter, sec)
 
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds)))
