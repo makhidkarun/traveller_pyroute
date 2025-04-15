@@ -119,8 +119,11 @@ class ObjectStatistics(object):
         foo = ObjectStatistics()
         foo.__dict__.update(state)
         for key in ObjectStatistics.__slots__:
-            if key not in foo:
-                foo[key] = copy.deepcopy(self[key])
+            if '__dict__' != key:
+                try:
+                    foo[key] = copy.deepcopy(self[key])
+                except AttributeError:
+                    pass
 
         return foo
 
