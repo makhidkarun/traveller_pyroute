@@ -6,6 +6,9 @@ Created on 12 Jan, 2025
 import codecs
 from logging import Logger
 
+from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.AreaItems.Allegiance import Allegiance
+
 
 class ParseSectorInput:
 
@@ -46,3 +49,18 @@ class ParseSectorInput:
             logger.error("sector file %s not found" % filename)
 
         return lines
+
+    @staticmethod
+    def parse_allegiance(line: str, alg_object: dict[str, Allegiance]) -> None:
+        alg_code = line[8:].split(':', 1)[0].strip()
+        alg_name = line[8:].split(':', 1)[1].strip().strip('"')
+
+        # A work around for the base Na codes which may be empire dependent.
+        alg_race = AllyGen.population_align(alg_code, alg_name)
+
+        base = AllyGen.same_align(alg_code)
+        if base not in alg_object:
+            alg_object[base] = Allegiance(base, AllyGen.same_align_name(base, alg_name), base=True,
+                                          population=alg_race)
+        if alg_code not in alg_object:
+            alg_object[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)

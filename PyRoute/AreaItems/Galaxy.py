@@ -106,20 +106,10 @@ class Galaxy(AreaItem):
 
             # dig out allegiances
             allegiances = [line for line in headers if line.startswith('# Alleg:')]
+            alg_object = self.alg
 
             for line in allegiances:
-                alg_code = line[8:].split(':', 1)[0].strip()
-                alg_name = line[8:].split(':', 1)[1].strip().strip('"')
-
-                # A work around for the base Na codes which may be empire dependent.
-                alg_race = AllyGen.population_align(alg_code, alg_name)
-
-                base = AllyGen.same_align(alg_code)
-                if base not in self.alg:
-                    self.alg[base] = Allegiance(base, AllyGen.same_align_name(base, alg_name), base=True,
-                                                population=alg_race)
-                if alg_code not in self.alg:
-                    self.alg[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)
+                ParseSectorInput.parse_allegiance(line, alg_object)
 
             # dig out subsector names, and use them to seed the dict entries
             sublines = [line for line in headers if line.startswith('# Subsector ')]
