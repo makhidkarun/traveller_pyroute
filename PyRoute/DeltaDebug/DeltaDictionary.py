@@ -263,8 +263,9 @@ class SectorDictionary(dict):
         new_dict = SectorDictionary(self.name, self.filename)
         new_dict.position = self.position
         new_dict.headers = self.headers
-        new_dict.allegiances = self.allegiances
-        for alg in new_dict.allegiances:
+        new_dict.allegiances = dict()
+        for alg in self.allegiances:
+            new_dict.allegiances[alg] = copy.deepcopy(self.allegiances[alg])
             new_dict.allegiances[alg].homeworlds = []
             stats = new_dict.allegiances[alg].stats
             stats.homeworlds = []
