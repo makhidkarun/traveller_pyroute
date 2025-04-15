@@ -336,6 +336,7 @@ class SectorDictionary(dict):
     @staticmethod
     def load_traveller_map_file(filename):
         basename = os.path.basename(filename)
+        logger = logging.getLogger('PyRoute.DeltaDictionary')
         lines = None
 
         # read travellermap file in, line by line
@@ -344,7 +345,6 @@ class SectorDictionary(dict):
                 try:
                     lines = [line for line in infile]
                 except (OSError, IOError):
-                    logger = logging.getLogger('PyRoute.DeltaDictionary')
                     logger.error("sector file %s can not be read", filename, exc_info=True)
                     return None
         except FileNotFoundError:

@@ -85,6 +85,7 @@ class Galaxy(AreaItem):
         loaded_sectors = set()
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
         ParseStarInput.deep_space = {} if (options.deep_space is None or not isinstance(options.deep_space, dict)) else options.deep_space
+        logger = self.logger
         for sector in sectors:
             lines = []
             try:
@@ -92,10 +93,10 @@ class Galaxy(AreaItem):
                     try:
                         lines = [line for line in infile]
                     except (OSError, IOError):
-                        self.logger.error("sector file %s can not be read", sector, exc_info=True)
+                        logger.error("sector file %s can not be read", sector, exc_info=True)
                         continue
             except FileNotFoundError:
-                self.logger.error("sector file %s not found" % sector)
+                logger.error("sector file %s not found" % sector)
                 continue
 
             if 0 == len(lines):
