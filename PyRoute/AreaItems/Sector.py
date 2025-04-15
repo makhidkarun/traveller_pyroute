@@ -128,4 +128,29 @@ class Sector(AreaItem):
                 msg = "Trailing sector y co-ord mismatch for " + self.name
                 return False, msg
 
+        result, tempmsg = self._check_allegiance_counts_well_formed()
+        if not result:
+            return False, tempmsg
+
         return True, msg
+
+    def _check_allegiance_counts_well_formed(self):
+        sector_count = dict()
+        subsector_count = dict()
+
+        for alg in self.alg:
+            sector_count[alg] = len(self.alg[alg].worlds)
+            subsector_count[alg] = 0
+
+        for position in self.subsectors:
+            for alg in self.subsectors[position].alg:
+                if alg not in sector_count:
+                    return False, "Allegiance " + alg + " found in subsector " + position + " but not sector"
+                subsector_count[alg] += len(self.subsectors[position].alg[alg].worlds)
+
+        for alg in sector_count:
+            if sector_count[alg] != subsector_count[alg]:
+                return False, "Allegiance " + alg + " has " + str(sector_count[alg]) + " worlds at sector, and "\
+                       + str(subsector_count[alg]) + " totalled across subsectors"
+
+        return True, ""
