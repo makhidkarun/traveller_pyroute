@@ -87,17 +87,7 @@ class Galaxy(AreaItem):
         ParseStarInput.deep_space = {} if (options.deep_space is None or not isinstance(options.deep_space, dict)) else options.deep_space
         logger = self.logger
         for sector in sectors:
-            lines = []
-            try:
-                with codecs.open(sector, 'r', 'utf-8') as infile:
-                    try:
-                        lines = [line for line in infile]
-                    except (OSError, IOError):
-                        logger.error("sector file %s can not be read", sector, exc_info=True)
-                        continue
-            except FileNotFoundError:
-                logger.error("sector file %s not found" % sector)
-                continue
+            lines = ParseSectorInput.read_sector_file(sector, logger)
 
             if 0 == len(lines):
                 continue

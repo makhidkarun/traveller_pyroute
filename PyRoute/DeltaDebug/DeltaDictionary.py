@@ -337,17 +337,9 @@ class SectorDictionary(dict):
     def load_traveller_map_file(filename):
         basename = os.path.basename(filename)
         logger = logging.getLogger('PyRoute.DeltaDictionary')
-        lines = None
+        lines = ParseSectorInput.read_sector_file(filename, logger)
 
-        # read travellermap file in, line by line
-        try:
-            with codecs.open(filename, 'r', 'utf-8') as infile:
-                try:
-                    lines = [line for line in infile]
-                except (OSError, IOError):
-                    logger.error("sector file %s can not be read", filename, exc_info=True)
-                    return None
-        except FileNotFoundError:
+        if 0 == len(lines):
             return None
 
         nameline = lines[3]  # assuming the definitive name line is the 4th line in what got read in
