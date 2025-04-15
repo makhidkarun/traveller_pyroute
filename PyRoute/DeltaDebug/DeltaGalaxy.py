@@ -5,7 +5,6 @@ Created on May 21, 2023
 """
 import copy
 
-from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Subsector import Subsector
