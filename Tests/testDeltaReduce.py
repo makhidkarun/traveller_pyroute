@@ -383,6 +383,28 @@ class testDeltaReduce(baseTest):
         reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
         reducer.is_initial_state_uninteresting(reraise=True)
 
+    def test_allegiance_reduction(self):
+        sourcefile = self.unpack_filename('DeltaFiles/Passes/Dagudashaag-subsector-full-reduce.sec')
+
+        args = self._make_args()
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        reducer = DeltaReduce(delta, args)
+
+        reducer.is_initial_state_interesting()
+
+        reducer.reduce_allegiance_pass()
+        self.assertEqual(1, len(reducer.sectors['Dagudashaag'].allegiances), "Unexpected allegiance count after reduction")
+        for alg_name in reducer.sectors['Dagudashaag'].allegiances:
+            expected = 0
+            self.assertEqual(expected, len(reducer.sectors['Dagudashaag'].allegiances[alg_name].worlds))
+
+        self.assertEqual(4, len(reducer.sectors.lines), "Unexpected line count after allegiance pass")
+
     def _make_args(self):
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
