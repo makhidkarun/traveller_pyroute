@@ -382,13 +382,17 @@ class TradeCodes(object):
     def calculate_pcode(self):
         return self.pcode
 
-    def _check_planet_code(self, star, code, size, atmo, hydro, listmsg=None):
+    def _check_planet_code(self, star, code, size, atmo, hydro, listmsg=None, implied=None):
         size = '0123456789ABCDEF' if size is None else size
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
         star_match = star.size in size and star.atmo in atmo and star.hydro in hydro
         code_match = code in self.codeset
         if star_match == code_match:
+            if star_match and implied is not None and implied not in self.codes:
+                self.codes.append(implied)
+                if implied not in self.codeset:
+                    self.codeset.append(implied)
             return True
         msg = None
         if star_match and not code_match:
@@ -447,7 +451,7 @@ class TradeCodes(object):
         if fix_pop is True:
             self._fix_all_pop_codes(star)
 
-        check = self._check_planet_code(star, 'As', '0', '0', '0', msg) and check
+        check = self._check_planet_code(star, 'As', '0', '0', '0', msg, 'Va') and check
         check = self._check_planet_code(star, 'De', None, '23456789', '0', msg) and check
         check = self._check_planet_code(star, 'Fl', None, 'ABC', '123456789A', msg) and check
         check = self._check_planet_code(star, 'Ga', '678', '568', '567', msg) and check
