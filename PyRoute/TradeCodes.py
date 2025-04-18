@@ -423,13 +423,17 @@ class TradeCodes(object):
             self.logger.error(msg)
         return False
 
-    def _check_econ_code(self, star, code, atmo, hydro, pop, listmsg=None):
+    def _check_econ_code(self, star, code, atmo, hydro, pop, listmsg=None, implied=None):
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
         pop = '0123456789ABCD' if pop is None else pop
         star_match = star.atmo in atmo and star.hydro in hydro and star.pop in pop
         code_match = code in self.codeset
         if star_match == code_match:
+            if star_match and implied is not None and implied not in self.codes:
+                self.codes.append(implied)
+                if implied not in self.codeset:
+                    self.codeset.append(implied)
             return True
         msg = None
         if star_match and not code_match:
@@ -462,16 +466,17 @@ class TradeCodes(object):
         check = self._check_planet_code(star, 'Va', None, '0', None, msg) and check
         check = self._check_planet_code(star, 'Wa', '3456789', '3456789DEF', 'A', msg) and check
 
-        if fix_pop is not True:
-            check = self._check_all_pop_codes(check, msg, star)
-
         check = self._check_econ_code(star, 'Pa', '456789', '45678', '48', msg) and check
         check = self._check_econ_code(star, 'Ag', '456789', '45678', '567', msg) and check
         check = self._check_econ_code(star, 'Na', '0123', '0123', '6789ABCD', msg) and check
         check = self._check_econ_code(star, 'Pi', '012479', None, '78', msg) and check
-        check = self._check_econ_code(star, 'In', '012479ABC', None, '9ABCD', msg) and check
+        check = self._check_econ_code(star, 'In', '012479ABC', None, '9ABCD', msg, "Hi") and check
         check = self._check_econ_code(star, 'Pr', '68', None, '59', msg) and check
         check = self._check_econ_code(star, 'Ri', '68', None, '678', msg) and check
+
+        if fix_pop is not True:
+            check = self._check_all_pop_codes(check, msg, star)
+
         if is_list:
             return msg
         return check
