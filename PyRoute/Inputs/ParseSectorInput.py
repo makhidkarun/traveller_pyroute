@@ -51,6 +51,13 @@ class ParseSectorInput:
         return lines
 
     @staticmethod
+    def parse_allegiance(headers: list[str], alg_object) -> None:
+        allegiances = [line for line in headers if line.startswith('# Alleg:')]
+
+        for line in allegiances:
+            ParseSectorInput._parse_allegiance_core(line, alg_object)
+
+    @staticmethod
     def _parse_allegiance_core(line: str, alg_object: dict[str, Allegiance]) -> None:
         alg_code = line[8:].split(':', 1)[0].strip()
         alg_name = line[8:].split(':', 1)[1].strip().strip('"')

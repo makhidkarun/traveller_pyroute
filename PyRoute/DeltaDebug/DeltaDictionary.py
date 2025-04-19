@@ -350,10 +350,7 @@ class SectorDictionary(dict):
         sector.position = position.strip()
 
         # dig out allegiances
-        allegiances = [line for line in headers if '# Alleg:' in line]
-        alg_object = sector.allegiances
-        for line in allegiances:
-            ParseSectorInput._parse_allegiance_core(line, alg_object)
+        ParseSectorInput.parse_allegiance(headers, sector.allegiances)
 
         # dig out subsector names, and use them to seed the dict entries
         sublines = [line for line in headers if '# Subsector ' in line]
