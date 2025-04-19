@@ -23,6 +23,12 @@ class testTradeCalculation(baseTest):
         galaxy.read_sectors(readparms)
         galaxy.output_path = args.output
 
+        self.assertEqual(1, len(galaxy.sectors))
+        sector = galaxy.sectors['Trojan Reach']
+        self.assertEqual(16, len(sector.subsectors))
+        self.assertEqual(11, len(sector.alg))
+        self.assertEqual(16, len(sector.worlds))
+
         galaxy.generate_routes()
         galaxy.trade.calculate_components()
 
@@ -41,6 +47,12 @@ class testTradeCalculation(baseTest):
         galaxy = Galaxy(min_btn=15, max_jump=4)
         galaxy.read_sectors(readparms)
         galaxy.output_path = args.output
+
+        self.assertEqual(1, len(galaxy.sectors))
+        sector = galaxy.sectors['Verge']
+        self.assertEqual(16, len(sector.subsectors))
+        self.assertEqual(2, len(sector.alg))
+        self.assertEqual(13, len(sector.worlds))
 
         galaxy.generate_routes()
         galaxy.trade.calculate_components()
