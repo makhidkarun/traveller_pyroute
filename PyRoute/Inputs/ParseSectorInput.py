@@ -8,6 +8,7 @@ from logging import Logger
 
 from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.AreaItems.Allegiance import Allegiance
+from PyRoute.AreaItems.Subsector import Subsector
 
 
 class ParseSectorInput:
@@ -71,3 +72,12 @@ class ParseSectorInput:
                                           population=alg_race)
         if alg_code not in alg_object:
             alg_object[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)
+
+    @staticmethod
+    def parse_subsectors(headers, sec):
+        sublines = [line for line in headers if line.startswith('# Subsector ')]
+        for line in sublines:
+            data = line[11:].split(':', 1)
+            pos = data[0].strip()
+            name = data[1].strip()
+            sec.subsectors[pos] = Subsector(name, pos, sec)
