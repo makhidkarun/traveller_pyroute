@@ -8,8 +8,9 @@ from logging import Logger
 
 from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.AreaItems.Allegiance import Allegiance
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.AreaItems.Subsector import Subsector
-from PyRoute.DeltaDebug.DeltaDictionary import SubsectorDictionary
+from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, SubsectorDictionary
 
 
 class ParseSectorInput:
@@ -75,7 +76,7 @@ class ParseSectorInput:
             alg_object[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)
 
     @staticmethod
-    def parse_subsectors(headers, sec):
+    def parse_subsectors(headers: list[str], sec: Sector) -> None:
         sublines = [line for line in headers if line.startswith('# Subsector ')]
         for line in sublines:
             data = line[11:].split(':', 1)
@@ -84,7 +85,7 @@ class ParseSectorInput:
             sec.subsectors[pos] = Subsector(name, pos, sec)
 
     @staticmethod
-    def parse_subsectors_delta(headers, name, sector) -> dict[str, SubsectorDictionary]:
+    def parse_subsectors_delta(headers: list[str], name: str, sector: SectorDictionary) -> dict[str, str]:
         sublines = [line for line in headers if '# Subsector ' in line]
         subsector_names = dict()
         for line in sublines:
