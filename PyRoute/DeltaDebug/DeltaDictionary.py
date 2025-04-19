@@ -216,7 +216,7 @@ class SectorDictionary(dict):
             raw_lines = [line for line in raw_lines if ' ' + alg + ' ' not in line]
 
         result = self.drop_lines(raw_lines)
-        result.allegiances = {key: alg for (key, alg) in self.allegiances.items() if key in allegiances}
+        result.allegiances = {key: copy.deepcopy(alg) for (key, alg) in self.allegiances.items() if key in allegiances}
 
         nu_headers = []
         processed = set()
@@ -263,8 +263,9 @@ class SectorDictionary(dict):
         new_dict = SectorDictionary(self.name, self.filename)
         new_dict.position = self.position
         new_dict.headers = self.headers
-        new_dict.allegiances = self.allegiances
-        for alg in new_dict.allegiances:
+        new_dict.allegiances = dict()
+        for alg in self.allegiances:
+            new_dict.allegiances[alg] = copy.deepcopy(self.allegiances[alg])
             new_dict.allegiances[alg].homeworlds = []
             stats = new_dict.allegiances[alg].stats
             stats.homeworlds = []

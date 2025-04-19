@@ -392,6 +392,9 @@ class Galaxy(AreaItem):
             result, msg = allegiance.is_well_formed()
             assert result, msg
 
+        result, msg = self._check_allegiance_counts_well_formed()
+        assert result, msg
+
         for item in self.stars.nodes:
             assert isinstance(item, int), "Star nodes must be integers"
             assert 'star' in self.stars.nodes[item], "Star attribute not set for item " + str(item)
@@ -438,3 +441,24 @@ class Galaxy(AreaItem):
             visited.add(name)
 
         return True
+
+    def _check_allegiance_counts_well_formed(self):
+        galaxy_count = dict()
+        sector_count = dict()
+
+        for alg in self.alg:
+            galaxy_count[alg] = len(self.alg[alg].worlds)
+            sector_count[alg] = 0
+
+        for position in self.sectors:
+            for alg in self.sectors[position].alg:
+                if alg not in galaxy_count:
+                    return False, "Allegiance " + alg + " found in sector " + position + " but not galaxy"
+                sector_count[alg] += len(self.sectors[position].alg[alg].worlds)
+
+        for alg in galaxy_count:
+            if galaxy_count[alg] != sector_count[alg]:
+                return False, "Allegiance " + alg + " has " + str(galaxy_count[alg]) + " worlds at galaxy, and "\
+                       + str(sector_count[alg]) + " totalled across sectors"
+
+        return True, ""

@@ -3,6 +3,7 @@ Created on May 21, 2023
 
 @author: CyberiaResurrection
 """
+import copy
 
 from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.AreaItems.Allegiance import Allegiance
@@ -35,7 +36,7 @@ class DeltaGalaxy(Galaxy):
 
             # load up allegiances
             for allegiance_name in sector.allegiances:
-                allegiance: Allegiance = sector.allegiances[allegiance_name]
+                allegiance: Allegiance = copy.deepcopy(sector.allegiances[allegiance_name])
 
                 if allegiance_name not in self.alg:
                     self.alg[allegiance_name] = allegiance
