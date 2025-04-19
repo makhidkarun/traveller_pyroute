@@ -10,7 +10,6 @@ import os
 
 from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
 from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Inputs.ParseSectorInput import ParseSectorInput
 from PyRoute.Star import Star
 
 
@@ -333,6 +332,7 @@ class SectorDictionary(dict):
 
     @staticmethod
     def load_traveller_map_file(filename):
+        from PyRoute.Inputs.ParseSectorInput import ParseSectorInput
         basename = os.path.basename(filename)
         logger = logging.getLogger('PyRoute.DeltaDictionary')
         lines = ParseSectorInput.read_sector_file(filename, logger)
@@ -353,18 +353,7 @@ class SectorDictionary(dict):
         ParseSectorInput.parse_allegiance(headers, sector.allegiances)
 
         # dig out subsector names, and use them to seed the dict entries
-        sublines = [line for line in headers if '# Subsector ' in line]
-        subsector_names = dict()
-
-        for line in sublines:
-            bitz = line.split(':')
-            alpha = bitz[0][-1]
-            subname = bitz[1].strip()
-            if '' == subname:
-                subname = name.strip() + ' ' + bitz[0][2:]
-            subsector_names[alpha] = subname
-            subsec = SubsectorDictionary(subname, alpha)
-            sector[subname] = subsec
+        subsector_names = ParseSectorInput.parse_subsectors_delta(headers, name, sector)
 
         # now subsectors are seeded, run thru the elements of starlines and deal them out to their respective subsector
         # dicts
