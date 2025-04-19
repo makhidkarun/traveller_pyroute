@@ -18,7 +18,6 @@ from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.Allies.Borders import Borders
 from PyRoute.AreaItems.AreaItem import AreaItem
 from PyRoute.AreaItems.Allegiance import Allegiance
-from PyRoute.AreaItems.Subsector import Subsector
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Inputs.ParseSectorInput import ParseSectorInput
 from PyRoute.Star import Star
