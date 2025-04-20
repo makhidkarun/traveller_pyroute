@@ -320,6 +320,10 @@ class SectorDictionary(dict):
                 self[sub_name].items = None
 
     def write_file(self, output_dir):
+        result, msg = self.is_well_formed()
+        if not result:
+            raise DeltaLogicError(msg)
+
         exists = os.path.exists(output_dir)
         if not exists:
             os.makedirs(output_dir)
@@ -355,6 +359,15 @@ class SectorDictionary(dict):
             result, msg = self[subsec].is_well_formed()
             if not result:
                 return False, msg
+
+        allegiances = [item[9:] for item in self.headers if "Alleg: " in item]
+        allegiances = [item[0:4] if ":" == item[4] else item[0:2] for item in allegiances]
+        raw_lines = self.lines
+        for alg in allegiances:
+            raw_lines = [line for line in raw_lines if ' ' + alg + ' ' not in line]
+
+        if 0 < len(raw_lines):
+            return False, str(len(raw_lines)) + " starlines not belonging to listed allegiances for " + self.name
 
         return True, ""
 
