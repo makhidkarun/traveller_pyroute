@@ -47,7 +47,7 @@ class ParseSectorInput:
 
         # read travellermap file in, line by line
         try:
-            with codecs.open(filename, 'r', 'utf-8') as infile:
+            with codecs.open(filename, 'r', encoding='utf-8') as infile:
                 try:
                     lines = [line for line in infile]
                     headers, lines = ParseSectorInput.partition_lines(lines)

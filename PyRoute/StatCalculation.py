@@ -30,6 +30,8 @@ class Populations(object):
         return self.population < other.population
 
     def __eq__(self, other):
+        if self.__hash__() != other.__hash__():
+            return False
         if self.code != other.code:
             return False
         if self.count != other.count:
@@ -39,6 +41,10 @@ class Populations(object):
         if self.homeworlds != other.homeworlds:
             return False
         return True
+
+    def __hash__(self):
+        key = (self.code, self.count, self.population)
+        return hash(key)
 
 
 class ObjectStatistics(object):

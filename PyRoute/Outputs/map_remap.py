@@ -123,5 +123,5 @@ if __name__ == '__main__':
         routes.extend(sectors[sector])
         pretty = prettify(tree.getroot())
         outPath = os.path.join(args.output_dir, '%s.xml' % sector)
-        with codecs.open(outPath, 'wb', 'utf-8') as f:
+        with codecs.open(outPath, 'wb', encoding='utf-8') as f:
             f.write(pretty)

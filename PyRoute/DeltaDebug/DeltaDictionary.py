@@ -359,8 +359,8 @@ class SectorDictionary(dict):
         for line in self.headers:
             handle.write(line)
 
-        for line in self.lines:
-            line = line.strip('\n') + '\n'
+        for raw_line in self.lines:
+            line = raw_line.strip('\n') + '\n'
             handle.write(line)
 
         handle.close()
