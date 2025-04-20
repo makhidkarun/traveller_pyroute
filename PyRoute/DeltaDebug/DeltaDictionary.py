@@ -222,6 +222,7 @@ class SectorDictionary(dict):
         result = self.drop_lines(raw_lines)
         result.allegiances = {key: copy.deepcopy(alg) for (key, alg) in self.allegiances.items() if key in allegiances}
 
+        nu_allegiances = result.allegiances.keys()
         nu_headers = []
         processed = set()
 
@@ -229,7 +230,7 @@ class SectorDictionary(dict):
             if 'Alleg:' not in line:
                 nu_headers.append(line)
                 continue
-            for alg in allegiances:
+            for alg in nu_allegiances:
                 if alg in line:
                     if alg in processed:
                         continue
