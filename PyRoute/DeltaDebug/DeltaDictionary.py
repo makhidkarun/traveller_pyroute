@@ -127,6 +127,14 @@ class DeltaDictionary(dict):
         for secname in self:
             self[secname].skip_void_subsectors()
 
+    def is_well_formed(self):
+        for sector in self:
+            result, msg = self[sector].is_well_formed()
+            if not result:
+                return False, msg
+
+        return True, ""
+
 
 class SectorDictionary(dict):
 
@@ -342,6 +350,14 @@ class SectorDictionary(dict):
 
         return sector
 
+    def is_well_formed(self):
+        for subsec in self:
+            result, msg = self[subsec].is_well_formed()
+            if not result:
+                return False, msg
+
+        return True, ""
+
 
 class SubsectorDictionary(dict):
 
@@ -416,3 +432,6 @@ class SubsectorDictionary(dict):
             foo.items.append(line)
 
         return foo
+
+    def is_well_formed(self):
+        return True, ""
