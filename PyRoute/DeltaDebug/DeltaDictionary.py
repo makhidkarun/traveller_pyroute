@@ -338,6 +338,10 @@ class SectorDictionary(dict):
                 self[sub_name].items = None
 
     def write_file(self, output_dir):
+        result, msg = self.is_well_formed()
+        if not result:
+            raise DeltaLogicError(msg)
+
         exists = os.path.exists(output_dir)
         if not exists:
             os.makedirs(output_dir)
