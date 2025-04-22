@@ -5,6 +5,7 @@ Created on 12 Jan, 2025
 """
 import codecs
 import logging
+import os
 from logging import Logger
 
 from PyRoute.Allies.AllyGen import AllyGen
@@ -131,3 +132,29 @@ class ParseSectorInput:
             sector[subname].items.append(line)
 
         return sector
+
+    @staticmethod
+    def read_parsed_sector_to_sector_object(fix_pop, headers, loaded_sectors, logger, pop_code, ru_calc, sector,
+                                            star_counter, starlines, galaxy):
+        logger.debug('reading %s ' % sector)
+
+        sec = Sector(headers[3], headers[4])
+        sec.filename = os.path.basename(sector)
+        if str(sec) not in loaded_sectors:
+            loaded_sectors.add(str(sec))
+        else:
+            logger.error("sector file %s loads duplicate sector %s" % (sector, str(sec)))
+            return None, None
+
+        # dig out allegiances
+        ParseSectorInput.parse_allegiance(headers, galaxy.alg)
+
+        # dig out subsector names, and use them to seed the dict entries
+        ParseSectorInput.parse_subsectors(headers, sec.name, sec)
+
+        for line in starlines:
+            star = Star.parse_line_into_star(line, sec, pop_code, ru_calc, fix_pop=fix_pop)
+            if star:
+                star_counter = galaxy.add_star_to_galaxy(star, star_counter, sec)
+
+        return sec, star_counter

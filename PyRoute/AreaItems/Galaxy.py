@@ -91,9 +91,9 @@ class Galaxy(AreaItem):
             if 0 == len(headers):
                 continue
 
-            sec, raw_counter = self.read_parsed_sector_to_sector_object(fix_pop, headers, loaded_sectors, logger,
-                                                                        pop_code, ru_calc, sector, star_counter,
-                                                                        starlines, self)
+            sec, raw_counter = ParseSectorInput.read_parsed_sector_to_sector_object(fix_pop, headers, loaded_sectors,
+                                                                                    logger, pop_code, ru_calc, sector,
+                                                                                    star_counter, starlines, self)
             if sec is None:
                 continue
             star_counter = raw_counter
@@ -104,32 +104,6 @@ class Galaxy(AreaItem):
         self.set_bounding_subsectors()
         self.set_positions()
         self.logger.debug("Allegiances: {}".format(self.alg))
-
-    @staticmethod
-    def read_parsed_sector_to_sector_object(fix_pop, headers, loaded_sectors, logger, pop_code, ru_calc, sector,
-                                            star_counter, starlines, galaxy):
-        logger.debug('reading %s ' % sector)
-
-        sec = Sector(headers[3], headers[4])
-        sec.filename = os.path.basename(sector)
-        if str(sec) not in loaded_sectors:
-            loaded_sectors.add(str(sec))
-        else:
-            logger.error("sector file %s loads duplicate sector %s" % (sector, str(sec)))
-            return None, None
-
-        # dig out allegiances
-        ParseSectorInput.parse_allegiance(headers, galaxy.alg)
-
-        # dig out subsector names, and use them to seed the dict entries
-        ParseSectorInput.parse_subsectors(headers, sec.name, sec)
-
-        for line in starlines:
-            star = Star.parse_line_into_star(line, sec, pop_code, ru_calc, fix_pop=fix_pop)
-            if star:
-                star_counter = galaxy.add_star_to_galaxy(star, star_counter, sec)
-
-        return sec, star_counter
 
     def add_star_to_galaxy(self, star: Star, star_counter: int, sec: Sector):
         assert star not in sec.worlds, "Star " + str(star) + " duplicated in sector " + str(sec)
