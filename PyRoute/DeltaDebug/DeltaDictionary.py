@@ -370,24 +370,6 @@ class SectorDictionary(dict):
 
         return sector
 
-    @staticmethod
-    def _partition_file(lines):
-        """
-            Break lines out into headers section, which is retained, and starlines, which gets minimised later on
-            - this assumes downloaded-from-TravellerMap sector file
-        """
-        headers = []
-        starlines = []
-        isheader = True
-        for line in lines:
-            if isheader:
-                headers.append(line)
-                if line.startswith('----'):
-                    isheader = False
-            else:
-                starlines.append(line.rstrip('\n'))
-        return headers, starlines
-
 
 class SubsectorDictionary(dict):
 
