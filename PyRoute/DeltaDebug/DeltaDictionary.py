@@ -9,8 +9,6 @@ import logging
 import os
 
 from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Star import Star
 
 
 class DeltaDictionary(dict):
@@ -340,33 +338,7 @@ class SectorDictionary(dict):
         if 0 == len(headers):
             return None
 
-        nameline = headers[3]  # assuming the definitive name line is the 4th line in what got read in
-        name = nameline.strip('#')
-        position = headers[4]
-
-        sector = SectorDictionary(name.strip(), basename)
-        sector.headers = headers
-        sector.position = position.strip()
-
-        # dig out allegiances
-        ParseSectorInput.parse_allegiance(headers, sector.allegiances)
-
-        # dig out subsector names, and use them to seed the dict entries
-        subsector_names = ParseSectorInput.parse_subsectors(headers, name, sector)
-
-        # now subsectors are seeded, run thru the elements of starlines and deal them out to their respective subsector
-        # dicts
-        dummy = Sector('# dummy', '# 0,0')
-        logging.disable(logging.WARNING)
-
-        for line in starlines:
-            # Re-use the existing, battle-tested, validation logic rather than scraping something new and buggy together
-            star = Star.parse_line_into_star(line, dummy, 'scaled', 'scaled')
-            if not star:
-                continue
-            subsec = star.subsector()
-            subname = subsector_names[subsec]
-            sector[subname].items.append(line)
+        sector = ParseSectorInput.read_parsed_sector_to_sector_dict(basename, headers, starlines)
 
         return sector
 
