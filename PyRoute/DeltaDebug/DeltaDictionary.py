@@ -335,17 +335,16 @@ class SectorDictionary(dict):
         from PyRoute.Inputs.ParseSectorInput import ParseSectorInput
         basename = os.path.basename(filename)
         logger = logging.getLogger('PyRoute.DeltaDictionary')
-        lines = ParseSectorInput.read_sector_file(filename, logger)
+        headers, starlines = ParseSectorInput.read_sector_file(filename, logger)
 
-        if 0 == len(lines):
+        if 0 == len(headers):
             return None
 
-        nameline = lines[3]  # assuming the definitive name line is the 4th line in what got read in
+        nameline = headers[3]  # assuming the definitive name line is the 4th line in what got read in
         name = nameline.strip('#')
-        position = lines[4]
+        position = headers[4]
 
         sector = SectorDictionary(name.strip(), basename)
-        headers, starlines = ParseSectorInput.partition_lines(lines)
         sector.headers = headers
         sector.position = position.strip()
 

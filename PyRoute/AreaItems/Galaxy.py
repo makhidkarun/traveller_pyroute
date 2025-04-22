@@ -86,22 +86,20 @@ class Galaxy(AreaItem):
         ParseStarInput.deep_space = {} if (options.deep_space is None or not isinstance(options.deep_space, dict)) else options.deep_space
         logger = self.logger
         for sector in sectors:
-            lines = ParseSectorInput.read_sector_file(sector, logger)
+            headers, starlines = ParseSectorInput.read_sector_file(sector, logger)
 
-            if 0 == len(lines):
+            if 0 == len(headers):
                 continue
 
             self.logger.debug('reading %s ' % sector)
 
-            sec = Sector(lines[3], lines[4])
+            sec = Sector(headers[3], headers[4])
             sec.filename = os.path.basename(sector)
             if str(sec) not in loaded_sectors:
                 loaded_sectors.add(str(sec))
             else:
                 self.logger.error("sector file %s loads duplicate sector %s" % (sector, str(sec)))
                 continue
-
-            headers, starlines = ParseSectorInput.partition_lines(lines)
 
             # dig out allegiances
             ParseSectorInput.parse_allegiance(headers, self.alg)

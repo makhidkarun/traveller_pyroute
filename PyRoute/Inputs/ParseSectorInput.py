@@ -38,7 +38,8 @@ class ParseSectorInput:
         return headers, starlines
 
     @staticmethod
-    def read_sector_file(filename: str, logger: Logger) -> list[str]:
+    def read_sector_file(filename: str, logger: Logger) -> (list[str], list[str]):
+        headers = []
         lines = []
 
         # read travellermap file in, line by line
@@ -46,12 +47,13 @@ class ParseSectorInput:
             with codecs.open(filename, 'r', 'utf-8') as infile:
                 try:
                     lines = [line for line in infile]
+                    headers, lines = ParseSectorInput.partition_lines(lines)
                 except (OSError, IOError):
                     logger.error("sector file %s can not be read", filename, exc_info=True)
         except FileNotFoundError:
             logger.error("sector file %s not found" % filename)
 
-        return lines
+        return headers, lines
 
     @staticmethod
     def parse_allegiance(headers: list[str], alg_object) -> None:
