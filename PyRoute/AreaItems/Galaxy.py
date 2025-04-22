@@ -91,14 +91,14 @@ class Galaxy(AreaItem):
             if 0 == len(headers):
                 continue
 
-            self.logger.debug('reading %s ' % sector)
+            logger.debug('reading %s ' % sector)
 
             sec = Sector(headers[3], headers[4])
             sec.filename = os.path.basename(sector)
             if str(sec) not in loaded_sectors:
                 loaded_sectors.add(str(sec))
             else:
-                self.logger.error("sector file %s loads duplicate sector %s" % (sector, str(sec)))
+                logger.error("sector file %s loads duplicate sector %s" % (sector, str(sec)))
                 continue
 
             # dig out allegiances
