@@ -105,7 +105,7 @@ class Galaxy(AreaItem):
             ParseSectorInput.parse_allegiance(headers, self.alg)
 
             # dig out subsector names, and use them to seed the dict entries
-            ParseSectorInput.parse_subsectors(headers, sec)
+            ParseSectorInput.parse_subsectors(headers, sec.name, sec)
 
             for line in starlines:
                 star = Star.parse_line_into_star(line, sec, pop_code, ru_calc, fix_pop=fix_pop)
