@@ -352,7 +352,7 @@ class SectorDictionary(dict):
         ParseSectorInput.parse_allegiance(headers, sector.allegiances)
 
         # dig out subsector names, and use them to seed the dict entries
-        subsector_names = ParseSectorInput.parse_subsectors_delta(headers, name, sector)
+        subsector_names = ParseSectorInput.parse_subsectors(headers, name, sector)
 
         # now subsectors are seeded, run thru the elements of starlines and deal them out to their respective subsector
         # dicts

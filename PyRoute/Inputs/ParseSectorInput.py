@@ -78,26 +78,22 @@ class ParseSectorInput:
             alg_object[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)
 
     @staticmethod
-    def parse_subsectors(headers: list[str], name: str, sec: Sector) -> None:
+    def parse_subsectors(headers: list[str], name: str, sector: [Sector, SectorDictionary]) -> dict[str, str]:
+        if not (isinstance(sector, Sector) or isinstance(sector, SectorDictionary)):
+            raise ValueError("Supplied sector must be instance of Sector or SectorDictionary")
+        is_dict = isinstance(sector, SectorDictionary)
+
         sublines = [line for line in headers if line.startswith('# Subsector ')]
+        subsector_names = dict()
         for line in sublines:
             data = line[11:].split(':', 1)
             pos = data[0].strip()
             subname = data[1].strip()
             if '' == subname:
                 subname = name.strip() + ' ' + pos
-            sec.subsectors[pos] = Subsector(subname, pos, sec)
-
-    @staticmethod
-    def parse_subsectors_delta(headers: list[str], name: str, sector: SectorDictionary) -> dict[str, str]:
-        sublines = [line for line in headers if line.startswith('# Subsector ')]
-        subsector_names = dict()
-        for line in sublines:
-            bitz = line.split(':')
-            pos = bitz[0][-1]
-            subname = bitz[1].strip()
-            if '' == subname:
-                subname = name.strip() + ' ' + bitz[0][2:]
             subsector_names[pos] = subname
-            sector[subname] = SubsectorDictionary(subname, pos)
+            if is_dict:
+                sector[subname] = SubsectorDictionary(subname, pos)
+            else:
+                sector.subsectors[pos] = Subsector(subname, pos, sector)
         return subsector_names
