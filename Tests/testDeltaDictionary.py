@@ -252,6 +252,8 @@ class testDeltaDictionary(baseTest):
 
         foo = DeltaDictionary()
         foo[zaru_sec.name] = zaru_sec
+        result, msg = foo.is_well_formed()
+        self.assertTrue(result, msg)
 
         rawlines = foo.lines
         keep_alg = ' CsIm '
@@ -263,6 +265,8 @@ class testDeltaDictionary(baseTest):
         nuFoo = foo.allegiance_subset(subset)
         self.assertEqual(set(subset), nuFoo.allegiance_list(), "Unexpected allegiance set after allegiance reduction")
         self.assertEqual(expected_count, len(nuFoo.lines), "Unexpected line count after allegiance reduction")
+        result, msg = foo.is_well_formed()
+        self.assertTrue(result, msg)
 
     def test_allegiance_subset_drops_sector(self):
         zarushagar = self.unpack_filename('DeltaFiles/Zarushagar.sec')
@@ -276,10 +280,14 @@ class testDeltaDictionary(baseTest):
         foo = DeltaDictionary()
         foo[zaru_sec.name] = zaru_sec
         foo[dagu_sec.name] = dagu_sec
+        result, msg = foo.is_well_formed()
+        self.assertTrue(result, msg)
 
         nuFoo = foo.allegiance_subset(subset)
         self.assertEqual(set(subset), nuFoo.allegiance_list(), "Unexpected allegiance set after allegiance reduction")
         self.assertEqual(['Dagudashaag'], nuFoo.sector_list(), "Unexpected sector list after allegiance reduction")
+        result, msg = foo.is_well_formed()
+        self.assertTrue(result, msg)
 
 
 class testSectorDictionary(baseTest):
