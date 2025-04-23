@@ -314,6 +314,8 @@ class testDeltaPasses(baseTest):
         self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
         delta = DeltaDictionary()
         delta[sector.name] = sector
+        result, msg = delta.is_well_formed()
+        self.assertTrue(result, msg)
 
         reducer = DeltaReduce(delta, args)
         reducer.is_initial_state_interesting()
@@ -325,7 +327,7 @@ class testDeltaPasses(baseTest):
 
         reducer.is_initial_state_interesting()
         # verify final-state summary
-        expected_allegiances = set(["ImDv"])
+        expected_allegiances = {"ImDv"}
         actual_allegiances = reducer.sectors.allegiance_list()
         self.assertEqual(expected_allegiances, actual_allegiances, "Unexpected allegiance set after reduction")
         self.assertEqual(508, len(reducer.sectors.lines), "Unexpected number of lines after reduction")
@@ -334,6 +336,10 @@ class testDeltaPasses(baseTest):
         allegiance_lines = [line for line in headers if "Alleg:" in line]
         self.assertEqual(len(actual_allegiances), len(allegiance_lines), "Allegiance-list length mismatch")
         self.assertTrue("ImDv" in allegiance_lines[0], "Unexpected remaining allegiance")
+        # Verify dictionary is still well-formed
+        result, msg = delta.is_well_formed()
+        self.assertTrue(result, msg)
+
 
     def test_allegiance_reduction_deduplicates_allegiance_lines(self):
         headers = [
