@@ -10,6 +10,7 @@ import os
 import ast
 import itertools
 import math
+
 import networkx as nx
 import numpy as np
 
@@ -17,8 +18,8 @@ from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.Allies.Borders import Borders
 from PyRoute.AreaItems.AreaItem import AreaItem
 from PyRoute.AreaItems.Allegiance import Allegiance
-from PyRoute.AreaItems.Subsector import Subsector
 from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Inputs.ParseSectorInput import ParseSectorInput
 from PyRoute.Star import Star
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Calculation.TradeMPCalculation import TradeMPCalculation
@@ -83,71 +84,19 @@ class Galaxy(AreaItem):
         loaded_sectors = set()
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
         ParseStarInput.deep_space = {} if (options.deep_space is None or not isinstance(options.deep_space, dict)) else options.deep_space
+        logger = self.logger
         for sector in sectors:
-            try:
-                with codecs.open(sector, 'r', 'utf-8') as infile:
-                    try:
-                        lines = [line for line in infile]
-                    except (OSError, IOError):
-                        self.logger.error("sector file %s can not be read", sector, exc_info=True)
-                        continue
-            except FileNotFoundError:
-                self.logger.error("sector file %s not found" % sector)
-                continue
-            self.logger.debug('reading %s ' % sector)
+            headers, starlines = ParseSectorInput.read_sector_file(sector, logger)
 
-            sec = Sector(lines[3], lines[4])
-            sec.filename = os.path.basename(sector)
-            if str(sec) not in loaded_sectors:
-                loaded_sectors.add(str(sec))
-            else:
-                self.logger.error("sector file %s loads duplicate sector %s" % (sector, str(sec)))
+            if 0 == len(headers):
                 continue
 
-            for lineno, line in enumerate(lines):
-                if line.startswith('Hex'):
-                    break
-                if line.startswith('# Subsector'):
-                    data = line[11:].split(':', 1)
-                    pos = data[0].strip()
-                    name = data[1].strip()
-                    sec.subsectors[pos] = Subsector(name, pos, sec)
-                if line.startswith('# Alleg:'):
-                    alg_code = line[8:].split(':', 1)[0].strip()
-                    alg_name = line[8:].split(':', 1)[1].strip().strip('"')
-
-                    # A work around for the base Na codes which may be empire dependent.
-                    alg_race = AllyGen.population_align(alg_code, alg_name)
-
-                    base = AllyGen.same_align(alg_code)
-                    if base not in self.alg:
-                        self.alg[base] = Allegiance(base, AllyGen.same_align_name(base, alg_name), base=True, population=alg_race)
-                    if alg_code not in self.alg:
-                        self.alg[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)
-
-            for line in lines[lineno + 2:]:
-                if line.startswith('#') or len(line) < 20:
-                    continue
-                star = Star.parse_line_into_star(line, sec, pop_code, ru_calc, fix_pop=fix_pop)
-                if star:
-                    assert star not in sec.worlds, "Star " + str(star) + " duplicated in sector " + str(sec)
-                    star.index = star_counter
-                    star_counter += 1
-                    self.star_mapping[star.index] = star
-
-                    sec.worlds.append(star)
-                    sec.subsectors[star.subsector()].worlds.append(star)
-                    star.alg_base_code = AllyGen.same_align(star.alg_code)
-
-                    self.set_area_alg(star, self, self.alg)
-                    self.set_area_alg(star, sec, self.alg)
-                    self.set_area_alg(star, sec.subsectors[star.subsector()], self.alg)
-
-                    star.tradeCode.sophont_list.append("{}A".format(self.alg[star.alg_code].population))
-                    star.is_redzone = self.trade.unilateral_filter(star)
-                    star.allegiance_base = self.alg[star.alg_base_code]
-                    star.is_well_formed()
-
+            sec, raw_counter = ParseSectorInput.read_parsed_sector_to_sector_object(fix_pop, headers, loaded_sectors,
+                                                                                    logger, pop_code, ru_calc, sector,
+                                                                                    star_counter, starlines, self)
+            if sec is None:
+                continue
+            star_counter = raw_counter
             self.sectors[sec.name] = sec
             self.logger.info("Sector {} loaded {} worlds".format(sec, len(sec.worlds)))
 

@@ -9,10 +9,6 @@ import logging
 import os
 
 from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
-from PyRoute.Allies.AllyGen import AllyGen
-from PyRoute.AreaItems.Allegiance import Allegiance
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Star import Star
 
 
 class DeltaDictionary(dict):
@@ -334,90 +330,17 @@ class SectorDictionary(dict):
 
     @staticmethod
     def load_traveller_map_file(filename):
+        from PyRoute.Inputs.ParseSectorInput import ParseSectorInput
         basename = os.path.basename(filename)
-        lines = None
+        logger = logging.getLogger('PyRoute.DeltaDictionary')
+        headers, starlines = ParseSectorInput.read_sector_file(filename, logger)
 
-        # read travellermap file in, line by line
-        try:
-            with codecs.open(filename, 'r', 'utf-8') as infile:
-                try:
-                    lines = [line for line in infile]
-                except (OSError, IOError):
-                    logger = logging.getLogger('PyRoute.DeltaDictionary')
-                    logger.error("sector file %s can not be read", filename, exc_info=True)
-                    return None
-        except FileNotFoundError:
+        if 0 == len(headers):
             return None
 
-        nameline = lines[3]  # assuming the definitive name line is the 4th line in what got read in
-        name = nameline.strip('#')
-        position = lines[4]
-
-        sector = SectorDictionary(name.strip(), basename)
-        headers, starlines = SectorDictionary._partition_file(lines)
-        sector.headers = headers
-        sector.position = position.strip()
-
-        # dig out allegiances
-        allegiances = [line for line in headers if '# Alleg:' in line]
-        for line in allegiances:
-            alg_code = line[8:].split(':', 1)[0].strip()
-            alg_name = line[8:].split(':', 1)[1].strip().strip('"')
-            alg_race = AllyGen.population_align(alg_code, alg_name)
-            base = AllyGen.same_align(alg_code)
-            if base not in sector.allegiances:
-                sector.allegiances[base] = Allegiance(base, AllyGen.same_align_name(base, alg_name), base=True,
-                                                      population=alg_race)
-            if alg_code not in sector.allegiances:
-                sector.allegiances[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)
-
-        # dig out subsector names, and use them to seed the dict entries
-        sublines = [line for line in headers if '# Subsector ' in line]
-        subsector_names = dict()
-
-        for line in sublines:
-            bitz = line.split(':')
-            alpha = bitz[0][-1]
-            subname = bitz[1].strip()
-            if '' == subname:
-                subname = name.strip() + ' ' + bitz[0][2:]
-            subsector_names[alpha] = subname
-            subsec = SubsectorDictionary(subname, alpha)
-            sector[subname] = subsec
-
-        # now subsectors are seeded, run thru the elements of starlines and deal them out to their respective subsector
-        # dicts
-        dummy = Sector('# dummy', '# 0,0')
-        logging.disable(logging.WARNING)
-
-        for line in starlines:
-            # Re-use the existing, battle-tested, validation logic rather than scraping something new and buggy together
-            star = Star.parse_line_into_star(line, dummy, 'scaled', 'scaled')
-            if not star:
-                continue
-            subsec = star.subsector()
-            subname = subsector_names[subsec]
-            sector[subname].items.append(line)
+        sector = ParseSectorInput.read_parsed_sector_to_sector_dict(basename, headers, starlines)
 
         return sector
-
-    @staticmethod
-    def _partition_file(lines):
-        """
-            Break lines out into headers section, which is retained, and starlines, which gets minimised later on
-            - this assumes downloaded-from-TravellerMap sector file
-        """
-        headers = []
-        starlines = []
-        isheader = True
-        for line in lines:
-            if isheader:
-                headers.append(line)
-                if line.startswith('----'):
-                    isheader = False
-            else:
-                starlines.append(line.rstrip('\n'))
-        return headers, starlines
 
 
 class SubsectorDictionary(dict):
