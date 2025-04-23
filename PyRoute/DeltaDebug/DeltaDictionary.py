@@ -221,7 +221,12 @@ class SectorDictionary(dict):
         raw_lines = self.lines
 
         for alg in allegiances:
-            raw_lines = [line for line in raw_lines if ' ' + alg + ' ' not in line]
+            # Cases like "Va", "As" can be ambiguous as trade codes or allegiances, so only exclude them
+            # if the substring occurs in the rightmost half of the line
+            if 2 == len(alg):
+                raw_lines = [line for line in raw_lines if line.rfind(' ' + alg + ' ') < len(line) / 2]
+            else:
+                raw_lines = [line for line in raw_lines if ' ' + alg + ' ' not in line]
 
         result = self.drop_lines(raw_lines)
         result.allegiances = {key: copy.deepcopy(alg) for (key, alg) in self.allegiances.items() if key in allegiances}
@@ -235,7 +240,7 @@ class SectorDictionary(dict):
                 nu_headers.append(line)
                 continue
             for alg in nu_allegiances:
-                if alg in line:
+                if alg + ":" in line:
                     if alg in processed:
                         continue
                     nu_headers.append(line)
