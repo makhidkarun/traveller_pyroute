@@ -124,6 +124,8 @@ class DeltaDictionary(dict):
             raise DeltaLogicError(msg)
 
         for sector_name in self:
+            if 0 == len(self[sector_name].lines):
+                continue
             self[sector_name].write_file(output_dir)
 
     def skip_void_subsectors(self):
