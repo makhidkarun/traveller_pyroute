@@ -2,6 +2,7 @@ import argparse
 import tempfile
 import unittest.main
 
+from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.DeltaPasses.AllegianceReducer import AllegianceReducer
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
@@ -340,7 +341,6 @@ class testDeltaPasses(baseTest):
         result, msg = delta.is_well_formed()
         self.assertTrue(result, msg)
 
-
     def test_allegiance_reduction_deduplicates_allegiance_lines(self):
         headers = [
             '# Alleg: ImAp: "Third Imperium, Amec Protectorate"',
@@ -352,6 +352,10 @@ class testDeltaPasses(baseTest):
 
         sector = SectorDictionary('Dagudashaag', '')
         sector.headers = headers
+        sector.allegiances['ImAp'] = Allegiance("ImAp", "Third Imperium, Amec Protectorate")
+        sector.allegiances['ImDv'] = Allegiance("ImDv", "Third Imperium, Domain of Vland")
+        sector.allegiances['ImLc'] = Allegiance("ImLc", "Third Imperium, Lancian Cultural Region")
+        sector.allegiances['ImAp'] = Allegiance("ImAp", "Third Imperium, Amec Protectorate")
 
         allegiance_set = ["ImAp", "ImDv"]
 

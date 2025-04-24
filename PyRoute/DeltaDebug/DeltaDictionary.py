@@ -234,6 +234,7 @@ class SectorDictionary(dict):
         nu_allegiances = result.allegiances.keys()
         nu_headers = []
         processed = set()
+        header_lines = set()
 
         for line in self.headers:
             if 'Alleg:' not in line:
@@ -243,8 +244,11 @@ class SectorDictionary(dict):
                 if alg + ":" in line:
                     if alg in processed:
                         continue
+                    if line in header_lines:
+                        continue
                     nu_headers.append(line)
                     processed.add(alg)
+                    header_lines.add(line)
                     continue
 
         result.headers = nu_headers
