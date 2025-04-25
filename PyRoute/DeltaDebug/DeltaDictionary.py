@@ -206,7 +206,8 @@ class SectorDictionary(dict):
         missed = list()
         for subsector_name in subsectors:
             if subsector_name in self:
-                overlap.append(subsector_name)
+                if not 0 == self[subsector_name].num_lines:
+                    overlap.append(subsector_name)
 
         for subsector_name in self:
             if subsector_name not in overlap:
