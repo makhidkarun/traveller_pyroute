@@ -30,7 +30,10 @@ class DeltaDictionary(dict):
 
         new_dict = DeltaDictionary()
         for sector_name in overlap:
-            new_dict[sector_name] = copy.deepcopy(self[sector_name])
+            subset_sector = copy.deepcopy(self[sector_name])
+            if 0 == len(subset_sector.lines):
+                continue
+            new_dict[sector_name] = subset_sector
             pass
 
         return new_dict
@@ -50,7 +53,10 @@ class DeltaDictionary(dict):
 
         new_dict = DeltaDictionary()
         for sector_name in overlap:
-            new_dict[sector_name] = self[sector_name].subsector_subset(overlap[sector_name])
+            subset_sector = self[sector_name].subsector_subset(overlap[sector_name])
+            if 0 == len(subset_sector.lines):
+                continue
+            new_dict[sector_name] = subset_sector
 
         return new_dict
 
@@ -59,6 +65,8 @@ class DeltaDictionary(dict):
         for sector_name in self:
             subset_sector = self[sector_name].allegiance_subset(allegiances)
             if 0 == len(subset_sector.allegiances):
+                continue
+            if 0 == len(subset_sector.lines):
                 continue
             new_dict[sector_name] = subset_sector
 
