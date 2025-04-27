@@ -273,7 +273,7 @@ class SectorDictionary(dict):
     def subsector_list(self):
         result = list()
         for subsector_name in self:
-            if not self[subsector_name].skipped:
+            if 0 < self[subsector_name].num_lines:
                 result.append(subsector_name)
 
         return result
