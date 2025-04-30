@@ -3,6 +3,7 @@ Created on Jun 13, 2023
 
 @author: CyberiaResurrection
 """
+from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 from PyRoute.DeltaStar import DeltaStar
 
@@ -27,6 +28,7 @@ class WithinLineReducer(object):
             return
 
         self.reducer.logger.error(self.start_msg)
+        self.reducer.is_initial_state_interesting()
 
         msg = "start - # of unreduced lines: " + str(len(segment))
         self.reducer.logger.error(msg)
@@ -43,6 +45,7 @@ class WithinLineReducer(object):
             return
         else:
             best_sectors = self.reducer.sectors
+
 
         # trying everything didn't work, now we need to minimise the number of un-reduced lines
         num_chunks = 2
@@ -113,12 +116,20 @@ class WithinLineReducer(object):
                 singleton_run = True
                 num_chunks = len(segment)
 
+        interesting, msg, _ = self.reducer._check_interesting(self.reducer.args, best_sectors)
+        if not interesting:
+            raise DeltaLogicError("Intermediate output not interesting")
+
         self.reducer.sectors = best_sectors
         _, subs_list = self._build_fill_list()
         if 0 != len(subs_list):
             self.reducer.sectors = self.reducer.sectors.switch_lines(subs_list)
 
         self.reducer.sectors.trim_empty_allegiances()
+        interesting, msg, _ = self.reducer._check_interesting(self.reducer.args, self.reducer.sectors)
+        if not interesting:
+            raise DeltaLogicError("Final output not interesting")
+
         self.write_files()
         if short_msg is not None:
             self.reducer.logger.error("Shortest error message: " + short_msg)
