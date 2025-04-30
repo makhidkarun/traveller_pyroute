@@ -121,9 +121,6 @@ class WithinLineReducer(object):
             raise DeltaLogicError("Intermediate output not interesting")
 
         self.reducer.sectors = best_sectors
-        _, subs_list = self._build_fill_list()
-        if 0 != len(subs_list):
-            self.reducer.sectors = self.reducer.sectors.switch_lines(subs_list)
 
         self.reducer.sectors.trim_empty_allegiances()
         interesting, msg, _ = self.reducer._check_interesting(self.reducer.args, self.reducer.sectors)
