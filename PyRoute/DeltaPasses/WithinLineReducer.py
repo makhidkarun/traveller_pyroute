@@ -127,6 +127,7 @@ class WithinLineReducer(object):
         if not interesting:
             raise DeltaLogicError("Final output not interesting")
 
+        self.reducer.sectors.trim_empty_allegiances()
         self.write_files()
         if short_msg is not None:
             self.reducer.logger.error("Shortest error message: " + short_msg)
