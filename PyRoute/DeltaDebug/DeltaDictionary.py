@@ -379,6 +379,11 @@ class SectorDictionary(dict):
         if 0 < len(raw_lines):
             return False, str(len(raw_lines)) + " starlines not belonging to listed allegiances for " + self.name
 
+        for alg in allegiances:
+            matches = [line for line in raw_lines if line.rfind(' ' + alg + ' ') > len(line) / 2]
+            if 0 == len(matches):
+                return False, "Allegiance " + alg + " lacks matching starlines"
+
         return True, ""
 
 
