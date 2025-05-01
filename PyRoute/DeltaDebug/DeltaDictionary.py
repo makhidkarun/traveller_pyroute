@@ -131,6 +131,10 @@ class DeltaDictionary(dict):
         for secname in self:
             self[secname].skip_void_subsectors()
 
+    def trim_empty_allegiances(self):
+        for sector in self:
+            self[sector].trim_empty_allegiances()
+
     def is_well_formed(self):
         for sector in self:
             result, msg = self[sector].is_well_formed()
@@ -364,6 +368,37 @@ class SectorDictionary(dict):
 
         return sector
 
+    def trim_empty_allegiances(self):
+        raw_lines = self.lines
+        discard = []
+
+        for alg in self.allegiances:
+            matches = [line for line in raw_lines if line.rfind(' ' + alg + ' ') > len(line) / 2]
+            if 0 == len(matches):
+                discard.append(alg)
+
+        if 0 == len(discard):
+            return
+
+        self.allegiances = {key: copy.deepcopy(alg) for (key, alg) in self.allegiances.items() if key not in discard}
+
+        nu_headers = []
+        processed = set()
+
+        for line in self.headers:
+            if 'Alleg:' not in line:
+                nu_headers.append(line)
+                continue
+            for alg in self.allegiances:
+                if alg + ":" in line:
+                    if alg in processed:
+                        continue
+                    nu_headers.append(line)
+                    processed.add(alg)
+                    continue
+
+        self.headers = nu_headers
+
     def is_well_formed(self):
         for subsec in self:
             result, msg = self[subsec].is_well_formed()
@@ -379,6 +414,7 @@ class SectorDictionary(dict):
         if 0 < len(raw_lines):
             return False, str(len(raw_lines)) + " starlines not belonging to listed allegiances for " + self.name
 
+        raw_lines = self.lines
         for alg in allegiances:
             matches = [line for line in raw_lines if line.rfind(' ' + alg + ' ') > len(line) / 2]
             if 0 == len(matches):
