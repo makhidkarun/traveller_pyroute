@@ -45,12 +45,14 @@ class TwoLineReducer(BeyondLineReducer):
                     interim_counter += 1
                     if interim_write == interim_counter:
                         interim_counter = 0
+                        best_sectors.trim_empty_allegiances()
                         self.write_files(best_sectors)
                 else:
                     i += 1
                 j = i + gap
 
             if old_length > len(segment):
+                best_sectors.trim_empty_allegiances()
                 self.write_files(best_sectors)
                 old_length = len(segment)
 
@@ -61,4 +63,5 @@ class TwoLineReducer(BeyondLineReducer):
 
         # At least one sector was shown to be irrelevant, write out the intermediate result
         if old_length > len(segment):
+            self.reducer.sectors.trim_empty_allegiances()
             self.write_files()

@@ -84,6 +84,7 @@ class SubsectorReducer(BeyondLineReducer):
 
             if 0 < len(remove):
                 num_chunks -= len(remove)
+                best_sectors.trim_empty_allegiances()
                 self.write_files(best_sectors)
 
             num_chunks *= 2
@@ -100,4 +101,5 @@ class SubsectorReducer(BeyondLineReducer):
 
         # At least one subsector was shown to be irrelevant, write out the intermediate result
         if old_length > len(segment):
+            self.reducer.sectors.trim_empty_allegiances()
             self.write_files()
