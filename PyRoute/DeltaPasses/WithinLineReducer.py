@@ -38,6 +38,7 @@ class WithinLineReducer(object):
         if interesting:
             self.reducer.sectors = best_sectors
             self.reducer.logger.error(self.full_msg)
+            self.reducer.sectors.trim_empty_allegiances()
             self.write_files()
             return
         else:
