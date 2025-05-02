@@ -365,6 +365,7 @@ class SectorDictionary(dict):
             return None
 
         sector = ParseSectorInput.read_parsed_sector_to_sector_dict(basename, headers, starlines)
+        sector.trim_empty_allegiances()
 
         return sector
 

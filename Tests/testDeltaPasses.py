@@ -60,8 +60,8 @@ class testDeltaPasses(baseTest):
         expected_dash_line = '---- -------------------- --------- ------------------------------------- ------ ------- ------ ---- -- - --- -- ---- --------------- -----------------------------------------\n'
 
         headers = reducer.sectors['Zarushagar'].headers
-        self.assertEqual(expected_hex_line, headers[38])
-        self.assertEqual(expected_dash_line, headers[39])
+        self.assertEqual(expected_hex_line, headers[36])
+        self.assertEqual(expected_dash_line, headers[37])
 
     def test_full_line_reduction_of_subsector(self):
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')

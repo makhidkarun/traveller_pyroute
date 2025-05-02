@@ -44,7 +44,7 @@ class testDeltaReduce(baseTest):
         self.assertEqual(len(sector.headers) - 2, len(reducer.sectors['Dagudashaag'].headers), "Unexpected headers length")
         # verify sector allegiances got taken across
         self.assertEqual(
-            len(sector.allegiances) - 3,
+            len(sector.allegiances) - 2,
             len(reducer.sectors['Dagudashaag'].allegiances),
             "Unexpected allegiances length"
         )
@@ -114,10 +114,10 @@ class testDeltaReduce(baseTest):
             self.assertEqual(expected, reducer.sectors['Dagudashaag'][subsector_name].num_lines, subsector_name + " not empty")
 
         # verify sector headers got taken across
-        self.assertEqual(len(sector.headers) - 2, len(reducer.sectors['Dagudashaag'].headers), "Unexpected headers length")
+        self.assertEqual(len(sector.headers), len(reducer.sectors['Dagudashaag'].headers), "Unexpected headers length")
         # verify sector allegiances got taken across
         self.assertEqual(
-            len(sector.allegiances) - 3,
+            len(sector.allegiances),
             len(reducer.sectors['Dagudashaag'].allegiances),
             "Unexpected allegiances length"
         )
