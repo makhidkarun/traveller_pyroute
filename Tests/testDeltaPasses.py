@@ -2,6 +2,7 @@ import argparse
 import tempfile
 import unittest.main
 
+from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.DeltaPasses.AllegianceReducer import AllegianceReducer
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
@@ -59,8 +60,8 @@ class testDeltaPasses(baseTest):
         expected_dash_line = '---- -------------------- --------- ------------------------------------- ------ ------- ------ ---- -- - --- -- ---- --------------- -----------------------------------------\n'
 
         headers = reducer.sectors['Zarushagar'].headers
-        self.assertEqual(expected_hex_line, headers[38])
-        self.assertEqual(expected_dash_line, headers[39])
+        self.assertEqual(expected_hex_line, headers[36])
+        self.assertEqual(expected_dash_line, headers[37])
 
     def test_full_line_reduction_of_subsector(self):
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
@@ -314,6 +315,8 @@ class testDeltaPasses(baseTest):
         self.assertEqual('# -1,0', sector.position, "Unexpected position value for Dagudashaag")
         delta = DeltaDictionary()
         delta[sector.name] = sector
+        result, msg = delta.is_well_formed()
+        self.assertTrue(result, msg)
 
         reducer = DeltaReduce(delta, args)
         reducer.is_initial_state_interesting()
@@ -325,7 +328,7 @@ class testDeltaPasses(baseTest):
 
         reducer.is_initial_state_interesting()
         # verify final-state summary
-        expected_allegiances = set(["ImDv"])
+        expected_allegiances = {"ImDv"}
         actual_allegiances = reducer.sectors.allegiance_list()
         self.assertEqual(expected_allegiances, actual_allegiances, "Unexpected allegiance set after reduction")
         self.assertEqual(508, len(reducer.sectors.lines), "Unexpected number of lines after reduction")
@@ -334,6 +337,9 @@ class testDeltaPasses(baseTest):
         allegiance_lines = [line for line in headers if "Alleg:" in line]
         self.assertEqual(len(actual_allegiances), len(allegiance_lines), "Allegiance-list length mismatch")
         self.assertTrue("ImDv" in allegiance_lines[0], "Unexpected remaining allegiance")
+        # Verify dictionary is still well-formed
+        result, msg = delta.is_well_formed()
+        self.assertTrue(result, msg)
 
     def test_allegiance_reduction_deduplicates_allegiance_lines(self):
         headers = [
@@ -346,6 +352,10 @@ class testDeltaPasses(baseTest):
 
         sector = SectorDictionary('Dagudashaag', '')
         sector.headers = headers
+        sector.allegiances['ImAp'] = Allegiance("ImAp", "Third Imperium, Amec Protectorate")
+        sector.allegiances['ImDv'] = Allegiance("ImDv", "Third Imperium, Domain of Vland")
+        sector.allegiances['ImLc'] = Allegiance("ImLc", "Third Imperium, Lancian Cultural Region")
+        sector.allegiances['ImAp'] = Allegiance("ImAp", "Third Imperium, Amec Protectorate")
 
         allegiance_set = ["ImAp", "ImDv"]
 

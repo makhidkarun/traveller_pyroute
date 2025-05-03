@@ -38,6 +38,7 @@ class WithinLineReducer(object):
         if interesting:
             self.reducer.sectors = best_sectors
             self.reducer.logger.error(self.full_msg)
+            self.reducer.sectors.trim_empty_allegiances()
             self.write_files()
             return
         else:
@@ -93,6 +94,7 @@ class WithinLineReducer(object):
                             best_sectors[sec_name].headers[i] = new_hex
                         elif raw_line.startswith('---- --'):
                             best_sectors[sec_name].headers[i] = new_dash
+                best_sectors.trim_empty_allegiances()
                 self.write_files(best_sectors)
 
             num_chunks *= 2
@@ -116,6 +118,7 @@ class WithinLineReducer(object):
         if 0 != len(subs_list):
             self.reducer.sectors = self.reducer.sectors.switch_lines(subs_list)
 
+        self.reducer.sectors.trim_empty_allegiances()
         self.write_files()
         if short_msg is not None:
             self.reducer.logger.error("Shortest error message: " + short_msg)

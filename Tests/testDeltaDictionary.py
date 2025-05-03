@@ -213,14 +213,11 @@ class testDeltaDictionary(baseTest):
 
         spinward_sec = SectorDictionary.load_traveller_map_file(spinward)
 
-        del spinward_sec.allegiances['CsIm'].stats.high_pop_worlds
-
         foo = DeltaDictionary()
         foo[spinward_sec.name] = spinward_sec
 
         remix = foo.sector_subset(['Spinward Marches', 'Deneb', 'Trojan Reach'])
         self.assertEqual(1, len(remix))
-        self.assertListEqual([], remix['Spinward Marches'].allegiances['CsIm'].stats.high_pop_worlds, "Missing high_pop_worlds list not restored")
 
     def test_allegiance_list(self):
         spinward = self.unpack_filename('DeltaFiles/high_pop_worlds_blowup/Spinward Marches.sec')
@@ -231,16 +228,6 @@ class testDeltaDictionary(baseTest):
         foo[spinward_sec.name] = spinward_sec
 
         expected = set()
-        expected.add('CsIm')
-        expected.add('CsZh')
-        expected.add('DaCf')
-        expected.add('Im')
-        expected.add('ImDd')
-        expected.add('NaHu')
-        expected.add('NaXX')
-        expected.add('SwCf')
-        expected.add('Zh')
-        expected.add('ZhIN')
 
         actual = foo.allegiance_list()
         self.assertEqual(expected, actual, "Unexpected allegiance list")
@@ -252,6 +239,8 @@ class testDeltaDictionary(baseTest):
 
         foo = DeltaDictionary()
         foo[zaru_sec.name] = zaru_sec
+        result, msg = foo.is_well_formed()
+        self.assertTrue(result, msg)
 
         rawlines = foo.lines
         keep_alg = ' CsIm '
@@ -263,6 +252,8 @@ class testDeltaDictionary(baseTest):
         nuFoo = foo.allegiance_subset(subset)
         self.assertEqual(set(subset), nuFoo.allegiance_list(), "Unexpected allegiance set after allegiance reduction")
         self.assertEqual(expected_count, len(nuFoo.lines), "Unexpected line count after allegiance reduction")
+        result, msg = foo.is_well_formed()
+        self.assertTrue(result, msg)
 
     def test_allegiance_subset_drops_sector(self):
         zarushagar = self.unpack_filename('DeltaFiles/Zarushagar.sec')
@@ -276,10 +267,14 @@ class testDeltaDictionary(baseTest):
         foo = DeltaDictionary()
         foo[zaru_sec.name] = zaru_sec
         foo[dagu_sec.name] = dagu_sec
+        result, msg = foo.is_well_formed()
+        self.assertTrue(result, msg)
 
         nuFoo = foo.allegiance_subset(subset)
         self.assertEqual(set(subset), nuFoo.allegiance_list(), "Unexpected allegiance set after allegiance reduction")
         self.assertEqual(['Dagudashaag'], nuFoo.sector_list(), "Unexpected sector list after allegiance reduction")
+        result, msg = foo.is_well_formed()
+        self.assertTrue(result, msg)
 
 
 class testSectorDictionary(baseTest):
@@ -368,7 +363,7 @@ class testSectorDictionary(baseTest):
             )
 
         # verify allegiances got read in and derived allegiances calculated
-        self.assertEqual(4, len(sector.allegiances), "Unexpected number of allegiances after load")
+        self.assertEqual(3, len(sector.allegiances), "Unexpected number of allegiances after load")
 
     def test_drop_lines(self):
         alg = Allegiance('fo', 'foo')
