@@ -50,7 +50,7 @@ class WithinLineReducer(object):
         # trying everything didn't work, now we need to minimise the number of un-reduced lines
         num_chunks = 2
         short_msg = None
-        singleton_run = True
+        singleton_run = False
 
         while num_chunks <= len(segment):
             chunks = self.reducer.chunk_lines(segment, num_chunks)
