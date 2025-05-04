@@ -18,6 +18,7 @@ from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
 from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
 from PyRoute.DeltaPasses.CapitalLineReduce import CapitalLineReduce
 from PyRoute.DeltaPasses.FullLineReduce import FullLineReduce
+from PyRoute.DeltaPasses.IdentityLineReduce import IdentityLineReduce
 from PyRoute.DeltaPasses.ImportanceLineReduce import ImportanceLineReduce
 from PyRoute.DeltaPasses.NBZLineReduce import NBZLineReduce
 from PyRoute.DeltaPasses.SectorReducer import SectorReducer
@@ -48,7 +49,7 @@ class DeltaReduce:
         self.interesting_type = interesting_type
         self.logger = logging.getLogger('PyRoute.Star')
         logging.disable(logging.WARNING)
-        self.withinline = [Canonicalisation(self), FullLineReduce(self), ImportanceLineReduce(self), CapitalLineReduce(self), AuxiliaryLineReduce(self), TradeCodeLineReduce(self), NBZLineReduce(self)]
+        self.withinline = [IdentityLineReduce(self), Canonicalisation(self), FullLineReduce(self), ImportanceLineReduce(self), CapitalLineReduce(self), AuxiliaryLineReduce(self), TradeCodeLineReduce(self), NBZLineReduce(self)]
         self.sector_reducer = SectorReducer(self)
         self.allegiance_reducer = AllegianceReducer(self)
         self.subsector_reducer = SubsectorReducer(self)
