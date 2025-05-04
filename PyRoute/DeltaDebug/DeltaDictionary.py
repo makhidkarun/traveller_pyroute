@@ -464,7 +464,7 @@ class SubsectorDictionary(dict):
             return foo
 
         for item in self.items:
-            foo.items.append(copy.deepcopy(item))
+            foo.items.append(copy.deepcopy(item.strip('\n')))
         return foo
 
     def drop_lines(self, lines_to_drop):
