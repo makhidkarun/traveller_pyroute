@@ -13,7 +13,9 @@ from PyRoute.TradeCodes import TradeCodes
 class DeltaStar(Star):
 
     @staticmethod
-    def reduce(starline, drop_routes=False, drop_trade_codes=False, drop_noble_codes=False, drop_base_codes=False, drop_trade_zone=False, drop_extra_stars=False, reset_pbg=False, reset_worlds=False, reset_port=False, reset_tl=False, reset_sophont=False, reset_capitals=False, canonicalise=False):
+    def reduce(starline, drop_routes=False, drop_trade_codes=False, drop_noble_codes=False, drop_base_codes=False,
+               drop_trade_zone=False, drop_extra_stars=False, reset_pbg=False, reset_worlds=False, reset_port=False,
+               reset_tl=False, reset_sophont=False, reset_capitals=False, canonicalise=False, trim_noble_codes=False):
         sector = Sector("# dummy", "# 0, 0")
         star = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
         if not isinstance(star, DeltaStar):
@@ -27,6 +29,8 @@ class DeltaStar(Star):
             star.reduce_trade_codes()
         if drop_noble_codes:
             star.reduce_noble_codes()
+        elif trim_noble_codes:
+            star.trim_noble_codes()
         if drop_base_codes:
             star.reduce_base_codes()
         if drop_trade_zone:
@@ -78,6 +82,14 @@ class DeltaStar(Star):
 
     def reduce_noble_codes(self):
         self.nobles = Nobles()
+
+    def trim_noble_codes(self):
+        noble_code = str(self.nobles)
+        if 2 > len(noble_code):
+            return
+
+        self.nobles = Nobles()
+        self.nobles.count(noble_code[0])
 
     def reduce_base_codes(self):
         self.baseCode = '-'
