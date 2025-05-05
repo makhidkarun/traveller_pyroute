@@ -15,7 +15,8 @@ class DeltaStar(Star):
     @staticmethod
     def reduce(starline, drop_routes=False, drop_trade_codes=False, drop_noble_codes=False, drop_base_codes=False,
                drop_trade_zone=False, drop_extra_stars=False, reset_pbg=False, reset_worlds=False, reset_port=False,
-               reset_tl=False, reset_sophont=False, reset_capitals=False, canonicalise=False, trim_noble_codes=False):
+               reset_tl=False, reset_sophont=False, reset_capitals=False, canonicalise=False, trim_noble_codes=False,
+               trim_trade_codes=False):
         sector = Sector("# dummy", "# 0, 0")
         star = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
         if not isinstance(star, DeltaStar):
@@ -27,6 +28,8 @@ class DeltaStar(Star):
             star.reduce_routes()
         if drop_trade_codes:
             star.reduce_trade_codes()
+        elif trim_trade_codes:
+            star.trim_trade_codes()
         if drop_noble_codes:
             star.reduce_noble_codes()
         elif trim_noble_codes:
@@ -79,6 +82,17 @@ class DeltaStar(Star):
 
     def reduce_trade_codes(self):
         self.tradeCode = TradeCodes('')
+
+    def trim_trade_codes(self):
+        matches = {"In", "Ni", "Ag", "Na", "Ex", "Hi", "Ri", "Cp", "Cs", "Cx"}
+        if '' == str(self.tradeCode):
+            return
+        trade_string = ""
+        for codes in self.tradeCode.codes:
+            if codes in matches:
+                trade_string += " " + str(codes)
+
+        self.tradeCode = TradeCodes(trade_string)
 
     def reduce_noble_codes(self):
         self.nobles = Nobles()

@@ -26,6 +26,7 @@ from PyRoute.DeltaPasses.SectorReducer import SectorReducer
 from PyRoute.DeltaPasses.SingleLineReducer import SingleLineReducer
 from PyRoute.DeltaPasses.SubsectorReducer import SubsectorReducer
 from PyRoute.DeltaPasses.TradeCodeLineReduce import TradeCodeLineReduce
+from PyRoute.DeltaPasses.TradeCodeTrimLineReduce import TradeCodeTrimLineReduce
 from PyRoute.DeltaPasses.TwoLineReducer import TwoLineReducer
 from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
@@ -52,7 +53,8 @@ class DeltaReduce:
         logging.disable(logging.WARNING)
         self.withinline = [IdentityLineReduce(self), Canonicalisation(self), FullLineReduce(self),
                            ImportanceLineReduce(self), CapitalLineReduce(self), AuxiliaryLineReduce(self),
-                           TradeCodeLineReduce(self), NBZLineReduce(self), NoblesTrimLineReduce(self)]
+                           TradeCodeLineReduce(self), TradeCodeTrimLineReduce(self), NBZLineReduce(self),
+                           NoblesTrimLineReduce(self)]
         self.sector_reducer = SectorReducer(self)
         self.allegiance_reducer = AllegianceReducer(self)
         self.subsector_reducer = SubsectorReducer(self)
