@@ -49,7 +49,9 @@ class DeltaReduce:
         self.interesting_type = interesting_type
         self.logger = logging.getLogger('PyRoute.Star')
         logging.disable(logging.WARNING)
-        self.withinline = [IdentityLineReduce(self), Canonicalisation(self), FullLineReduce(self), ImportanceLineReduce(self), CapitalLineReduce(self), AuxiliaryLineReduce(self), TradeCodeLineReduce(self), NBZLineReduce(self)]
+        self.withinline = [IdentityLineReduce(self), Canonicalisation(self), FullLineReduce(self),
+                           ImportanceLineReduce(self), CapitalLineReduce(self), AuxiliaryLineReduce(self),
+                           TradeCodeLineReduce(self), NBZLineReduce(self)]
         self.sector_reducer = SectorReducer(self)
         self.allegiance_reducer = AllegianceReducer(self)
         self.subsector_reducer = SubsectorReducer(self)
