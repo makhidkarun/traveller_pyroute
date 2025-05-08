@@ -32,6 +32,7 @@ from PyRoute.DeltaPasses.TradeCodeTrimLineReduce import TradeCodeTrimLineReduce
 from PyRoute.DeltaPasses.TwoLineReducer import TwoLineReducer
 from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
 from PyRoute.DeltaPasses.ZoneLineReduce import ZoneLineReduce
+from PyRoute.DeltaPasses.ZoneTrimLineReduce import ZoneTrimLineReduce
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
 from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
 from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
@@ -58,7 +59,7 @@ class DeltaReduce:
                            ImportanceLineReduce(self), CapitalLineReduce(self), AuxiliaryLineReduce(self),
                            TradeCodeLineReduce(self), TradeCodeTrimLineReduce(self), NBZLineReduce(self),
                            BaseLineReduce(self), ZoneLineReduce(self), NoblesTrimLineReduce(self),
-                           BaseTrimLineReduce(self)]
+                           BaseTrimLineReduce(self), ZoneTrimLineReduce(self)]
         self.sector_reducer = SectorReducer(self)
         self.allegiance_reducer = AllegianceReducer(self)
         self.subsector_reducer = SubsectorReducer(self)
