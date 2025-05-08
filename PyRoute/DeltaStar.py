@@ -86,9 +86,10 @@ class DeltaStar(Star):
         self.tradeCode = TradeCodes('')
 
     def trim_trade_codes(self):
-        matches = {"In", "Ni", "Ag", "Na", "Ex", "Hi", "Ri", "Cp", "Cs", "Cx"}
         if '' == str(self.tradeCode):
             return
+
+        matches = {"In", "Ni", "Ag", "Na", "Ex", "Hi", "Ri", "Cp", "Cs", "Cx"}.union(TradeCodes.ex_codes)
         trade_string = ""
         for codes in self.tradeCode.codes:
             if codes in matches:
