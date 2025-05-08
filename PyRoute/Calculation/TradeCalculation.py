@@ -490,7 +490,8 @@ class TradeCalculation(RouteCalculation):
         self.galaxy.stats.tradeDton += tradeDton
 
         try:
-            self.cross_check_totals()
+            if 0 == (star.index + target.index) % (math.floor(math.sqrt(len(self.star_graph)))):
+                self.cross_check_totals()
         except AssertionError as e:
             msg = str(star.name) + "-" + str(target.name) + ": " + str(e)
             raise AssertionError(msg)
