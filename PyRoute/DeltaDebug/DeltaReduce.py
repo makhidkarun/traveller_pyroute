@@ -16,6 +16,7 @@ from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.DeltaPasses.AllegianceReducer import AllegianceReducer
 from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
 from PyRoute.DeltaPasses.BaseLineReduce import BaseLineReduce
+from PyRoute.DeltaPasses.BaseTrimLineReduce import BaseTrimLineReduce
 from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
 from PyRoute.DeltaPasses.CapitalLineReduce import CapitalLineReduce
 from PyRoute.DeltaPasses.FullLineReduce import FullLineReduce
@@ -56,7 +57,8 @@ class DeltaReduce:
         self.withinline = [IdentityLineReduce(self), Canonicalisation(self), FullLineReduce(self),
                            ImportanceLineReduce(self), CapitalLineReduce(self), AuxiliaryLineReduce(self),
                            TradeCodeLineReduce(self), TradeCodeTrimLineReduce(self), NBZLineReduce(self),
-                           BaseLineReduce(self), ZoneLineReduce(self), NoblesTrimLineReduce(self)]
+                           BaseLineReduce(self), ZoneLineReduce(self), NoblesTrimLineReduce(self),
+                           BaseTrimLineReduce(self)]
         self.sector_reducer = SectorReducer(self)
         self.allegiance_reducer = AllegianceReducer(self)
         self.subsector_reducer = SubsectorReducer(self)

@@ -16,7 +16,7 @@ class DeltaStar(Star):
     def reduce(starline, drop_routes=False, drop_trade_codes=False, drop_noble_codes=False, drop_base_codes=False,
                drop_trade_zone=False, drop_extra_stars=False, reset_pbg=False, reset_worlds=False, reset_port=False,
                reset_tl=False, reset_sophont=False, reset_capitals=False, canonicalise=False, trim_noble_codes=False,
-               trim_trade_codes=False):
+               trim_trade_codes=False, trim_base_codes=False):
         sector = Sector("# dummy", "# 0, 0")
         star = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
         if not isinstance(star, DeltaStar):
@@ -36,6 +36,8 @@ class DeltaStar(Star):
             star.trim_noble_codes()
         if drop_base_codes:
             star.reduce_base_codes()
+        elif trim_base_codes:
+            star.trim_base_codes()
         if drop_trade_zone:
             star.reduce_trade_zone()
         if drop_extra_stars:
@@ -107,6 +109,13 @@ class DeltaStar(Star):
 
     def reduce_base_codes(self):
         self.baseCode = '-'
+
+    def trim_base_codes(self):
+        base_code = str(self.baseCode)
+        if 2 > len(base_code):
+            return
+
+        self.baseCode = base_code[0]
 
     def reduce_trade_zone(self):
         self.zone = '-'
