@@ -43,9 +43,12 @@ class WithinLineReducer(object):
             self.reducer.sectors.trim_empty_allegiances()
             self.write_files()
             return
+        # By the time we've gotten here, if segment is 1 element long, switching it in _can't_ be interesting,
+        # otherwise it would have tripped the original if statement, so bail out early
+        elif 1 == len(segment):
+            return
         else:
             best_sectors = self.reducer.sectors
-
 
         # trying everything didn't work, now we need to minimise the number of un-reduced lines
         num_chunks = 2
