@@ -203,8 +203,10 @@ class TradeMPCalculation(TradeCalculation):
 
                 assert is_path(self.galaxy.stars, route_list), f"Route returned by mp process is not a correct path: {route}"
 
-                btn = self.get_btn(route)
+                distance = self.route_distance(route)
+                btn = self.get_btn(route[0], route[-1], distance)
                 if self.min_btn > btn:
+                    self.penumbra_routes += 1
                     continue
 
                 # Using the route found by the child process update the stars / routes graphs in the parent process
@@ -249,8 +251,10 @@ class TradeMPCalculation(TradeCalculation):
                 route = [self.galaxy.star_mapping[item] for item in route_list]
                 assert is_path(self.galaxy.stars, route_list), f"Route returned by mp process is not a correct path: {route}"
 
-                btn = self.get_btn(route)
+                distance = self.route_distance(route)
+                btn = self.get_btn(route[0], route[-1], distance)
                 if self.min_btn > btn:
+                    self.penumbra_routes += 1
                     continue
 
                 if total > 100 and processed % (total // 20) == 0:
@@ -324,8 +328,10 @@ class TradeMPCalculation(TradeCalculation):
         assert self.galaxy.route_no_revisit(route), \
             f"Route between {star}  and {target} revisits at least one star"
 
-        btn = self.get_btn(route)
+        distance = self.route_distance(route)
+        btn = self.get_btn(star, target, distance)
         if self.min_btn > btn:
+            self.penumbra_routes += 1
             return
 
         if self.debug_flag:
