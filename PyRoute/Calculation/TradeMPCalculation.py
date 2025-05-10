@@ -125,6 +125,7 @@ class TradeMPCalculation(TradeCalculation):
 
         self.btn = []
         self.mp_threads = mp_threads
+        self.total_processed = 0
 
     def calculate_routes(self):
         """
@@ -205,6 +206,7 @@ class TradeMPCalculation(TradeCalculation):
 
                 distance = self.route_distance(route)
                 btn = self.get_btn(route[0], route[-1], distance)
+                count += 1
                 if self.min_btn > btn:
                     self.penumbra_routes += 1
                     continue
@@ -214,8 +216,9 @@ class TradeMPCalculation(TradeCalculation):
                 target = route[-1]
                 tradeCr, tradePass, tradeDton = self.route_update_simple(route, True)
                 self.update_statistics(start, target, tradeCr, tradePass, tradeDton)
-                count += 1
+
         self.logger.info(f"Intra-sector route processing completed. Processed {count} routes")
+        self.total_processed += count
 
     def process_long_routes(self, btn):
 
@@ -253,6 +256,7 @@ class TradeMPCalculation(TradeCalculation):
 
                 distance = self.route_distance(route)
                 btn = self.get_btn(route[0], route[-1], distance)
+                processed += 1
                 if self.min_btn > btn:
                     self.penumbra_routes += 1
                     continue
@@ -265,8 +269,10 @@ class TradeMPCalculation(TradeCalculation):
                 target = route[-1]
                 tradeCr, tradePass, tradeDton = self.route_update_simple(route, False)
                 self.update_statistics(start, target, tradeCr, tradePass, tradeDton)
-                processed += 1
+
         self.logger.info(f"Long route processing completed. process {processed} routes")
+        self.total_processed += processed
+        self.logger.info('{} penumbra routes included out of {}'.format(self.penumbra_routes, self.total_processed))
 
     def process_routes(self, btn):
         """
@@ -298,6 +304,7 @@ class TradeMPCalculation(TradeCalculation):
             counter += 1
             processed += 1
         self.logger.info(f'processed {counter} routes at BTN {base_btn}')
+        self.total_processed += processed
 
     def get_trade_between(self, star, target):
         """
