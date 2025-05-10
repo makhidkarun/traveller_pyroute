@@ -401,24 +401,24 @@ class TradeCalculation(RouteCalculation):
                         reheat_list.add((stardex, common[maxdex]))
                         reheat_list.add((targdex, common[maxdex]))
 
-        if reheat and 0 < len(reheat_list):
-            for pair in reheat_list:
-                start = pair[0]
-                end = pair[1]
-                if start in self.galaxy.stars and end in self.galaxy.stars[start]:
-                    edge = self.galaxy.stars[start][end]
-                else:
-                    continue
-                route = edge.get('route', False)
-                if route is not False:
-                    rawroute = [item.index for item in route]
-                    # The 0.5% bump is to _ensure_ the newcost remains an _upper_ bound on the historic-route cost
-                    newcost = self.galaxy.route_cost(rawroute) * 1.005
-                    if edge['weight'] > newcost:
-                        self.galaxy.stars[start][end]['weight'] = newcost
-                        self.galaxy.historic_costs.lighten_edge(start, end, newcost)
-            reheated_upbound = self._preheat_upper_bound(stardex, targdex, allow_reheat=False)
-            upbound = min(reheated_upbound, upbound)
+                    for pair in reheat_list:
+                        start = pair[0]
+                        end = pair[1]
+                        if start in self.galaxy.stars and end in self.galaxy.stars[start]:
+                            edge = self.galaxy.stars[start][end]
+                        else:
+                            continue
+                        route = edge.get('route', False)
+                        if route is not False:
+                            rawroute = [item.index for item in route]
+                            # The 0.5% bump is to _ensure_ the newcost remains an _upper_ bound
+                            # on the historic-route cost
+                            newcost = self.galaxy.route_cost(rawroute) * 1.005
+                            if edge['weight'] > newcost:
+                                self.galaxy.stars[start][end]['weight'] = newcost
+                                self.galaxy.historic_costs.lighten_edge(start, end, newcost)
+                    reheated_upbound = self._preheat_upper_bound(stardex, targdex, allow_reheat=False)
+                    upbound = min(reheated_upbound, upbound)
 
         return upbound
 
