@@ -386,7 +386,8 @@ class TradeCalculation(RouteCalculation):
         if 0 < len(hist_src[0]) and 0 < len(hist_targ[0]):
             # Dig out the common neighbours, _and_ their indexes in the respective adjacency lists
             common, src, trg = np.intersect1d(hist_src[0], hist_targ[0], assume_unique=True, return_indices=True)
-            if 0 < len(common):
+            common_len = len(common)
+            if 0 < common_len:
                 midleft = hist_src[1][src]
                 midright = hist_targ[1][trg]
                 midbound = midleft + midright
@@ -396,8 +397,8 @@ class TradeCalculation(RouteCalculation):
                 if reheat:
                     reheat_list.add((stardex, common[mindex]))
                     reheat_list.add((targdex, common[mindex]))
-                    maxdex = np.argmax(midbound)
-                    if maxdex != mindex:
+                    if 1 < common_len:
+                        maxdex = np.argmax(midbound)
                         reheat_list.add((stardex, common[maxdex]))
                         reheat_list.add((targdex, common[maxdex]))
 
