@@ -42,8 +42,8 @@ def process():
                        help='Allegiance matching for borders, default [collapse]')
 
     route = parser.add_argument_group('Routes', 'Route generation options')
-    route.add_argument('--routes', dest='routes', choices=['trade', 'comm', 'xroute', 'owned', 'none'], default='trade',
-                       help='Route type to be generated, default [trade]')
+    route.add_argument('--routes', dest='routes', choices=['trade', 'comm', 'xroute', 'owned', 'none', 'trade-mp'],
+                       default='trade', help='Route type to be generated, default [trade]')
     route.add_argument('--min-btn', dest='btn', default=13, type=int,
                        help='Minimum BTN used for route calculation, default [13]')
     route.add_argument('--min-route-btn', dest='route_btn', default=8, type=int,
