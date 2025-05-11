@@ -157,7 +157,9 @@ class TradeMPCalculation(TradeCalculation):
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
         self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
 
-        large_btn_index = next(i for i, v in enumerate(self.btn) if v[2]['btn'] == 18)
+        large_btn_index = 0
+        if self.btn[0][2]['btn'] >= 18:
+            large_btn_index = next(i for i, v in enumerate(self.btn) if v[2]['btn'] == 18)
 
         # Do the large routes (btn 19 - 26) first. These are short and take only a short amount of time.
         self.process_routes(self.btn[0:(large_btn_index - 1)])
