@@ -44,7 +44,7 @@ class ApproximateShortestPathForestUnified:
         self._distances = np.ones((self._graph_len, self._num_trees), dtype=float, order='F') * float('+inf')
         self._max_labels = np.ones((self._graph_len, self._num_trees), dtype=float) * float('+inf')
 
-        min_cost = self._graph.min_cost(list(range(self._graph_len)), 0)
+        min_cost = self._graph._min_cost
         # spin up initial distances
         for i in range(self._num_trees):
             raw_seeds = self._seeds[i] if isinstance(self._seeds[i], list) else list(self._seeds[i].values())
@@ -163,7 +163,7 @@ class ApproximateShortestPathForestUnified:
             return
 
         # Now we're updating at least one tree, grab the current min-cost vector to feed into implicit-dijkstra
-        min_cost = self._graph.min_cost(list(range(self._graph_len)), 0)
+        min_cost = self._graph._min_cost
 
         # Now we have the nodes incident to edges that bust the (1+eps) approximation bound, feed them into restarted
         # dijkstra to update the approx-SP tree/forest.  Some nodes in dropnodes may well be SP descendants of others,
