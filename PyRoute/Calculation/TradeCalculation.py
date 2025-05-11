@@ -89,6 +89,9 @@ class TradeCalculation(RouteCalculation):
         self.debug_flag = debug_flag
         self.pathfinding_data = None
 
+        # Count routes that get trimmed by as-found route length
+        self.penumbra_routes = 0
+
         self.shortest_path_tree = None
         # Track inter-sector passenger imbalances
         self.sector_passenger_balance = TradeBalance(stat_field="passengers", region=galaxy)
@@ -282,6 +285,7 @@ class TradeCalculation(RouteCalculation):
             processed += 1
         self.multilateral_balance_pass()
         self.logger.info('processed {} routes at BTN {}'.format(counter, base_btn))
+        self.logger.info('{} penumbra routes included out of {}'.format(self.penumbra_routes, processed))
         if self.debug_flag:
             num_stars = len(self.galaxy.stars)
             self.logger.info('Pathfinding diagnostic data for route reuse {}, {} stars, {} routes'.
@@ -362,6 +366,7 @@ class TradeCalculation(RouteCalculation):
         btn = self.get_btn(star, target, distance)
 
         if self.min_btn > btn:
+            self.penumbra_routes += 1
             return
 
         if self.debug_flag:

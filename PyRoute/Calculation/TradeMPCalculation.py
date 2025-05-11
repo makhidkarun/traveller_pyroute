@@ -125,6 +125,7 @@ class TradeMPCalculation(TradeCalculation):
 
         self.btn = []
         self.mp_threads = mp_threads
+        self.total_processed = 0
 
     def calculate_routes(self):
         """
@@ -203,13 +204,21 @@ class TradeMPCalculation(TradeCalculation):
 
                 assert is_path(self.galaxy.stars, route_list), f"Route returned by mp process is not a correct path: {route}"
 
+                distance = self.route_distance(route)
+                btn = self.get_btn(route[0], route[-1], distance)
+                count += 1
+                if self.min_btn > btn:
+                    self.penumbra_routes += 1
+                    continue
+
                 # Using the route found by the child process update the stars / routes graphs in the parent process
                 start = route[0]
                 target = route[-1]
                 tradeCr, tradePass, tradeDton = self.route_update_simple(route, True)
                 self.update_statistics(start, target, tradeCr, tradePass, tradeDton)
-                count += 1
+
         self.logger.info(f"Intra-sector route processing completed. Processed {count} routes")
+        self.total_processed += count
 
     def process_long_routes(self, btn):
 
@@ -245,6 +254,13 @@ class TradeMPCalculation(TradeCalculation):
                 route = [self.galaxy.star_mapping[item] for item in route_list]
                 assert is_path(self.galaxy.stars, route_list), f"Route returned by mp process is not a correct path: {route}"
 
+                distance = self.route_distance(route)
+                btn = self.get_btn(route[0], route[-1], distance)
+                processed += 1
+                if self.min_btn > btn:
+                    self.penumbra_routes += 1
+                    continue
+
                 if total > 100 and processed % (total // 20) == 0:
                     self.logger.info(f'processed {processed} routes, at {processed // (total // 100)}%')
 
@@ -253,8 +269,10 @@ class TradeMPCalculation(TradeCalculation):
                 target = route[-1]
                 tradeCr, tradePass, tradeDton = self.route_update_simple(route, False)
                 self.update_statistics(start, target, tradeCr, tradePass, tradeDton)
-                processed += 1
+
         self.logger.info(f"Long route processing completed. process {processed} routes")
+        self.total_processed += processed
+        self.logger.info('{} penumbra routes included out of {}'.format(self.penumbra_routes, self.total_processed))
 
     def process_routes(self, btn):
         """
@@ -286,6 +304,7 @@ class TradeMPCalculation(TradeCalculation):
             counter += 1
             processed += 1
         self.logger.info(f'processed {counter} routes at BTN {base_btn}')
+        self.total_processed += processed
 
     def get_trade_between(self, star, target):
         """
@@ -315,6 +334,12 @@ class TradeMPCalculation(TradeCalculation):
 
         assert self.galaxy.route_no_revisit(route), \
             f"Route between {star}  and {target} revisits at least one star"
+
+        distance = self.route_distance(route)
+        btn = self.get_btn(star, target, distance)
+        if self.min_btn > btn:
+            self.penumbra_routes += 1
+            return
 
         if self.debug_flag:
             fwd_weight = self.route_cost(route)
