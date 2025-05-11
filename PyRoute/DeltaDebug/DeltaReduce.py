@@ -58,7 +58,7 @@ class DeltaReduce:
         logging.disable(logging.WARNING)
         self.withinline = [IdentityLineReduce(self), Canonicalisation(self), FullLineReduce(self),
                            ImportanceLineReduce(self), CapitalLineReduce(self), AuxiliaryLineReduce(self),
-                           PortAndTlLineReduce(self),  TradeCodeLineReduce(self), TradeCodeTrimLineReduce(self),
+                           PortAndTlLineReduce(self), TradeCodeLineReduce(self), TradeCodeTrimLineReduce(self),
                            NBZLineReduce(self), BaseLineReduce(self), ZoneLineReduce(self), NoblesTrimLineReduce(self),
                            BaseTrimLineReduce(self), ZoneTrimLineReduce(self)]
         self.sector_reducer = SectorReducer(self)

@@ -84,7 +84,7 @@ class WithinLineReducer(object):
                     chunks[i] = []
                     remove.append(i)
                     best_sectors = temp_sectors
-                    step = '(' + str(i+1) + "/" + str(num_chunks) + ')'
+                    step = '(' + str(i + 1) + "/" + str(num_chunks) + ')'
                     msg = "Reduction found " + step + ": new input has " + str(len(raw_lines)) + " unreduced lines"
                     self.reducer.logger.error(msg)
                 del temp_sectors
