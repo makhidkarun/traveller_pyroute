@@ -15,6 +15,7 @@ class testTradeMPCalculation(baseTest):
         args = self._make_args()
         args.route_reuse = 30
         args.route_btn = 8
+        args.mp_threads = 2
         args.routes = "trade-mp"
 
         readparms = ReadSectorOptions(sectors=[sourcefile], pop_code=args.pop_code, ru_calc=args.ru_calc,
@@ -36,6 +37,7 @@ class testTradeMPCalculation(baseTest):
         args = self._make_args()
         args.route_reuse = 30
         args.min_btn = 15
+        args.mp_threads = 2
         args.routes = "trade-mp"
 
         readparms = ReadSectorOptions(sectors=[sourcefile], pop_code=args.pop_code, ru_calc=args.ru_calc,

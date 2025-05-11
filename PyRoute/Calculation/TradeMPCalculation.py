@@ -9,6 +9,7 @@ from multiprocessing import Queue, Pool
 from queue import Empty
 
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
+from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
@@ -156,6 +157,7 @@ class TradeMPCalculation(TradeCalculation):
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
         self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
+        self.star_graph = DistanceGraph(self.galaxy.stars)
 
         large_btn_index = 0
         if self.btn[0][2]['btn'] >= 18:
