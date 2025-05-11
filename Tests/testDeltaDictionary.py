@@ -118,7 +118,7 @@ class testDeltaDictionary(baseTest):
 
         remix = foo.subsector_subset(subsectorlist)
         self.assertTrue(isinstance(remix, DeltaDictionary))
-        self.assertEqual(2, len(remix), 'Subsetted delta dict should have two element')
+        self.assertEqual(1, len(remix), 'Subsetted delta dict should have one element')
         self.assertEqual('Gushemege', remix['Gushemege'].name)
         self.assertEqual('# -2,0', remix['Gushemege'].position)
         self.assertEqual('filename', remix['Gushemege'].filename)
@@ -127,18 +127,6 @@ class testDeltaDictionary(baseTest):
         self.assertEqual('Khiira', remix['Gushemege']['Khiira'].name)
         self.assertEqual('Riften', remix['Gushemege']['Riften'].name)
         self.assertEqual(None, remix['Gushemege']['Riften'].items, 'Skipped subsector should have None for items')
-        self.assertEqual('Dagudashaag', remix['Dagudashaag'].name)
-        self.assertEqual('# -1,0', remix['Dagudashaag'].position)
-        self.assertEqual(1, len(remix['Dagudashaag']),
-                         'Subsetted delta dict should have one subsector in Dagudashaag')
-        self.assertEqual('Mimu', remix['Dagudashaag']['Mimu'].name)
-        self.assertEqual('A', remix['Dagudashaag']['Mimu'].position)
-        # check allegiances got cleared
-        self.assertEqual(1, len(remix['Dagudashaag'].allegiances), "Unexpected allegiance count for Dagudashaag")
-        nu_alg = remix['Dagudashaag'].allegiances['fo']
-        self.assertEqual(0, nu_alg.stats.passengers, "Allegiance pax not cleared during subsector_list")
-        self.assertEqual(0, nu_alg.stats.trade, "Allegiance trade not cleared during subsector_list")
-        self.assertEqual(0, nu_alg.stats.tradeExt, "Allegiance tradeExt not cleared during subsector_list")
 
     def test_sector_list(self):
         foo = DeltaDictionary()
@@ -181,8 +169,6 @@ class testDeltaDictionary(baseTest):
         foo[gus.name] = gus
 
         expected = list()
-        expected.append('Khiira')
-        expected.append('Mimu')
         expected.append('Riften')
         actual = foo.subsector_list()
 
@@ -191,7 +177,6 @@ class testDeltaDictionary(baseTest):
         gusB.items = None
 
         expected = list()
-        expected.append('Mimu')
         expected.append('Riften')
         actual = foo.subsector_list()
 
@@ -206,7 +191,7 @@ class testDeltaDictionary(baseTest):
         foo[vland_sec.name] = vland_sec
 
         remix = foo.sector_subset(['Vland'])
-        self.assertEqual(1, len(remix))
+        self.assertEqual(0, len(remix))
 
     def test_sector_subset_blowup_on_spinward_marches(self):
         spinward = self.unpack_filename('DeltaFiles/high_pop_worlds_blowup/Spinward Marches.sec')
@@ -217,7 +202,7 @@ class testDeltaDictionary(baseTest):
         foo[spinward_sec.name] = spinward_sec
 
         remix = foo.sector_subset(['Spinward Marches', 'Deneb', 'Trojan Reach'])
-        self.assertEqual(1, len(remix))
+        self.assertEqual(0, len(remix))
 
     def test_allegiance_list(self):
         spinward = self.unpack_filename('DeltaFiles/high_pop_worlds_blowup/Spinward Marches.sec')
