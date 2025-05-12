@@ -579,17 +579,12 @@ class TradeCalculation(RouteCalculation):
 
     def route_cost(self, route):
         """
-        Given a route, return its total cost via _compensated_ summation
+        Given a route, return its total cost _at the moment_
         """
         total_weight = 0
-        c = 0
         start = route[0]
         for end in route[1:]:
-            y = float(self.galaxy.stars[start.index][end.index]['weight']) - c
-            t = total_weight + y
-            c = (t - total_weight) - y
-
-            total_weight = t
+            total_weight += self.galaxy.stars[start.index][end.index]['weight']
 
             start = end
         return total_weight
