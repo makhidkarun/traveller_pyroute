@@ -113,11 +113,12 @@ class ApproximateShortestPathForestUnified:
     def update_edges(self, edges: list[tuple[cython.int, cython.int]]):
         dropnodes = set()
         dropspecific = []
-        tree_dex = np.array(list(range(self._num_trees)), dtype=int)
+        tree_dex = list(range(self._num_trees))
         targdex: cython.int = -1
         i: cython.int
         min_cost: cnp.ndarray[cython.float]
         shelf: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
+        floatinf = float('+inf')
 
         for _ in range(self._num_trees):
             dropspecific.append(set())
@@ -126,7 +127,10 @@ class ApproximateShortestPathForestUnified:
             right = item[1]
             leftdist = self._distances[left, :]
             rightdist = self._distances[right, :]
-            rightdist[np.isinf(rightdist)] = 0
+            for j in range(self._num_trees):
+                if floatinf == rightdist[j]:
+                    rightdist[j] = 0
+
             shelf = self._graph._arcs[left]
             for i in range(len(shelf)):
                 if shelf[i][0] == right:
@@ -153,10 +157,10 @@ class ApproximateShortestPathForestUnified:
             if maxdelta >= weight:
                 dropnodes.add(left)
                 dropnodes.add(right)
-                overdrive = tree_dex[delta >= weight]
-                for i in overdrive:
-                    dropspecific[i].add(left)
-                    dropspecific[i].add(right)
+                for i in tree_dex:
+                    if delta[i] >= weight:
+                        dropspecific[i].add(left)
+                        dropspecific[i].add(right)
 
         # if no nodes are to be dropped, nothing to do - bail out
         if 0 == len(dropnodes):
