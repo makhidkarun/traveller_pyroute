@@ -405,18 +405,17 @@ class TradeCalculation(RouteCalculation):
                     for pair in reheat_list:
                         start = pair[0]
                         end = pair[1]
-                        if start in self.galaxy.stars and end in self.galaxy.stars[start]:
-                            edge = self.galaxy.stars[start][end]
+                        if start in self.galaxy.stars and end in self.galaxy.stars._adj[start]:
+                            edge = self.galaxy.stars._adj[start][end]
                         else:
                             continue
                         route = edge.get('route', False)
                         if route is not False:
-                            rawroute = [item.index for item in route]
                             # The 0.5% bump is to _ensure_ the newcost remains an _upper_ bound
                             # on the historic-route cost
-                            newcost = self.galaxy.route_cost(rawroute) * 1.005
+                            newcost = self.galaxy.route_cost(route) * 1.005
                             if edge['weight'] > newcost:
-                                self.galaxy.stars[start][end]['weight'] = newcost
+                                edge['weight'] = newcost
                                 self.galaxy.historic_costs.lighten_edge(start, end, newcost)
                     reheated_upbound = self._preheat_upper_bound(stardex, targdex, allow_reheat=False)
                     upbound = min(reheated_upbound, upbound)
@@ -581,13 +580,7 @@ class TradeCalculation(RouteCalculation):
         """
         Given a route, return its total cost _at the moment_
         """
-        total_weight = 0
-        start = route[0]
-        for end in route[1:]:
-            total_weight += self.galaxy.stars._adj[start.index][end.index]['weight']
-
-            start = end
-        return total_weight
+        return self.galaxy.route_cost(route)
 
     def route_weight(self, star, target):
         dist = star.distance(target)
