@@ -547,7 +547,7 @@ class TradeCalculation(RouteCalculation):
             end.passOver += tradePass
 
         for end in route[1:]:
-            data = self.galaxy.stars[start.index][end.index]
+            data = self.galaxy.stars._adj[start.index][end.index]
             # exhausted = data['count'] >= data['exhaust']
             if reweight and not (data['count'] >= data['exhaust']):
                 data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
@@ -584,7 +584,7 @@ class TradeCalculation(RouteCalculation):
         total_weight = 0
         start = route[0]
         for end in route[1:]:
-            total_weight += self.galaxy.stars[start.index][end.index]['weight']
+            total_weight += self.galaxy.stars._adj[start.index][end.index]['weight']
 
             start = end
         return total_weight
