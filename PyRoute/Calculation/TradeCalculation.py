@@ -305,7 +305,7 @@ class TradeCalculation(RouteCalculation):
         If we can't find a route (no Jump 4 (or N) path), skip this pair
         otherwise update the trade information.
         """
-        assert 'actual distance' not in self.galaxy.ranges[target][star],\
+        assert 'actual distance' not in self.galaxy.ranges._adj[target][star],\
             "This route from " + str(star) + " to " + str(target) + " has already been processed in reverse"
 
         try:
@@ -516,7 +516,7 @@ class TradeCalculation(RouteCalculation):
         target = route[-1]
 
         # Internal statistics
-        rangedata = self.galaxy.ranges[source][target]
+        rangedata = self.galaxy.ranges._adj[source][target]
         rangedata['actual distance'] = distance
         rangedata['jumps'] = len(route) - 1
 
