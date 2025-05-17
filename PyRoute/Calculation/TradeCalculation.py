@@ -390,8 +390,7 @@ class TradeCalculation(RouteCalculation):
             if 0 < common_len:
                 midbound = hist_src[1][src] + hist_targ[1][trg]
                 mindex = np.argmin(midbound)
-                nubound = midbound[mindex]
-                upbound = min(upbound, nubound)
+                upbound = min(upbound, midbound[mindex])
                 if reheat:
                     reheat_list = set()
                     reheat_list.add((stardex, common[mindex]))
