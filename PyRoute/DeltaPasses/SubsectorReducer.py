@@ -89,7 +89,7 @@ class SubsectorReducer(BeyondLineReducer):
 
             num_chunks *= 2
             # if we're about to bust our loop condition, make sure we verify 1-minimality as our last hurrah
-            if num_chunks > len(segment) and not singleton_run:
+            if num_chunks >= len(segment) and not singleton_run:
                 singleton_run = True
                 num_chunks = len(segment)
             segment = best_sectors.subsector_list()

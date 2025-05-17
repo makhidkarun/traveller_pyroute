@@ -13,7 +13,10 @@ from PyRoute.TradeCodes import TradeCodes
 class DeltaStar(Star):
 
     @staticmethod
-    def reduce(starline, drop_routes=False, drop_trade_codes=False, drop_noble_codes=False, drop_base_codes=False, drop_trade_zone=False, drop_extra_stars=False, reset_pbg=False, reset_worlds=False, reset_port=False, reset_tl=False, reset_sophont=False, reset_capitals=False, canonicalise=False):
+    def reduce(starline, drop_routes=False, drop_trade_codes=False, drop_noble_codes=False, drop_base_codes=False,
+               drop_trade_zone=False, drop_extra_stars=False, reset_pbg=False, reset_worlds=False, reset_port=False,
+               reset_tl=False, reset_sophont=False, reset_capitals=False, canonicalise=False, trim_noble_codes=False,
+               trim_trade_codes=False, trim_base_codes=False, trim_trade_zone=False):
         sector = Sector("# dummy", "# 0, 0")
         star = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
         if not isinstance(star, DeltaStar):
@@ -25,12 +28,20 @@ class DeltaStar(Star):
             star.reduce_routes()
         if drop_trade_codes:
             star.reduce_trade_codes()
+        elif trim_trade_codes:
+            star.trim_trade_codes()
         if drop_noble_codes:
             star.reduce_noble_codes()
+        elif trim_noble_codes:
+            star.trim_noble_codes()
         if drop_base_codes:
             star.reduce_base_codes()
+        elif trim_base_codes:
+            star.trim_base_codes()
         if drop_trade_zone:
             star.reduce_trade_zone()
+        elif trim_trade_zone:
+            star.trim_trade_zone()
         if drop_extra_stars:
             star.reduce_extra_stars()
         if reset_pbg:
@@ -76,14 +87,51 @@ class DeltaStar(Star):
     def reduce_trade_codes(self):
         self.tradeCode = TradeCodes('')
 
+    def trim_trade_codes(self):
+        if '' == str(self.tradeCode):
+            return
+
+        matches = {"In", "Ni", "Ag", "Na", "Ex", "Hi", "Ri", "Cp", "Cs", "Cx"}.union(TradeCodes.ex_codes)
+        trade_string = ""
+        for codes in self.tradeCode.codes:
+            if codes in matches:
+                trade_string += " " + str(codes)
+
+        self.tradeCode = TradeCodes(trade_string)
+
     def reduce_noble_codes(self):
         self.nobles = Nobles()
+
+    def trim_noble_codes(self):
+        noble_code = str(self.nobles)
+        if 2 > len(noble_code):
+            return
+
+        self.nobles = Nobles()
+        self.nobles.count(noble_code[0])
 
     def reduce_base_codes(self):
         self.baseCode = '-'
 
+    def trim_base_codes(self):
+        base_code = str(self.baseCode)
+        if 2 > len(base_code):
+            return
+
+        self.baseCode = base_code[0]
+
     def reduce_trade_zone(self):
         self.zone = '-'
+
+    def trim_trade_zone(self):
+        if '-' == self.zone:
+            return
+        if 'R' == self.zone.upper():
+            self.zone = 'A'
+        elif 'F' == self.zone.upper():
+            self.zone = 'U'
+        else:
+            self.zone = '-'
 
     def reduce_extra_stars(self):
         if 0 < len(self.star_list):

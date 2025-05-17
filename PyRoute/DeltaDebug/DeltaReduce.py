@@ -15,16 +15,25 @@ from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.DeltaPasses.AllegianceReducer import AllegianceReducer
 from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
+from PyRoute.DeltaPasses.BaseLineReduce import BaseLineReduce
+from PyRoute.DeltaPasses.BaseTrimLineReduce import BaseTrimLineReduce
 from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
 from PyRoute.DeltaPasses.CapitalLineReduce import CapitalLineReduce
 from PyRoute.DeltaPasses.FullLineReduce import FullLineReduce
+from PyRoute.DeltaPasses.IdentityLineReduce import IdentityLineReduce
 from PyRoute.DeltaPasses.ImportanceLineReduce import ImportanceLineReduce
 from PyRoute.DeltaPasses.NBZLineReduce import NBZLineReduce
+from PyRoute.DeltaPasses.NoblesTrimLineReduce import NoblesTrimLineReduce
+from PyRoute.DeltaPasses.PortAndTlLineReduce import PortAndTlLineReduce
 from PyRoute.DeltaPasses.SectorReducer import SectorReducer
 from PyRoute.DeltaPasses.SingleLineReducer import SingleLineReducer
 from PyRoute.DeltaPasses.SubsectorReducer import SubsectorReducer
+from PyRoute.DeltaPasses.TradeCodeLineReduce import TradeCodeLineReduce
+from PyRoute.DeltaPasses.TradeCodeTrimLineReduce import TradeCodeTrimLineReduce
 from PyRoute.DeltaPasses.TwoLineReducer import TwoLineReducer
 from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
+from PyRoute.DeltaPasses.ZoneLineReduce import ZoneLineReduce
+from PyRoute.DeltaPasses.ZoneTrimLineReduce import ZoneTrimLineReduce
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
 from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
 from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
@@ -47,7 +56,11 @@ class DeltaReduce:
         self.interesting_type = interesting_type
         self.logger = logging.getLogger('PyRoute.Star')
         logging.disable(logging.WARNING)
-        self.withinline = [Canonicalisation(self), FullLineReduce(self), ImportanceLineReduce(self), CapitalLineReduce(self), AuxiliaryLineReduce(self), NBZLineReduce(self)]
+        self.withinline = [IdentityLineReduce(self), Canonicalisation(self), FullLineReduce(self),
+                           ImportanceLineReduce(self), CapitalLineReduce(self), AuxiliaryLineReduce(self),
+                           PortAndTlLineReduce(self), TradeCodeLineReduce(self), TradeCodeTrimLineReduce(self),
+                           NBZLineReduce(self), BaseLineReduce(self), ZoneLineReduce(self), NoblesTrimLineReduce(self),
+                           BaseTrimLineReduce(self), ZoneTrimLineReduce(self)]
         self.sector_reducer = SectorReducer(self)
         self.allegiance_reducer = AllegianceReducer(self)
         self.subsector_reducer = SubsectorReducer(self)

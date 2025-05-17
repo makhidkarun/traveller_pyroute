@@ -129,7 +129,7 @@ class ParseSectorInput:
                 continue
             subsec = star.subsector()
             subname = subsector_names[subsec]
-            sector[subname].items.append(line)
+            sector[subname].items.append(line.strip('\n'))
 
         return sector
 

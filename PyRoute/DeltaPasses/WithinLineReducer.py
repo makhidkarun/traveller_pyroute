@@ -3,6 +3,7 @@ Created on Jun 13, 2023
 
 @author: CyberiaResurrection
 """
+from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 from PyRoute.DeltaStar import DeltaStar
 
@@ -27,6 +28,7 @@ class WithinLineReducer(object):
             return
 
         self.reducer.logger.error(self.start_msg)
+        self.reducer.is_initial_state_interesting()
 
         msg = "start - # of unreduced lines: " + str(len(segment))
         self.reducer.logger.error(msg)
@@ -41,13 +43,17 @@ class WithinLineReducer(object):
             self.reducer.sectors.trim_empty_allegiances()
             self.write_files()
             return
+        # By the time we've gotten here, if segment is 1 element long, switching it in _can't_ be interesting,
+        # otherwise it would have tripped the original if statement, so bail out early
+        elif 1 == len(segment):
+            return
         else:
             best_sectors = self.reducer.sectors
 
         # trying everything didn't work, now we need to minimise the number of un-reduced lines
         num_chunks = 2
         short_msg = None
-        singleton_run = True
+        singleton_run = False
 
         while num_chunks <= len(segment):
             chunks = self.reducer.chunk_lines(segment, num_chunks)
@@ -78,7 +84,8 @@ class WithinLineReducer(object):
                     chunks[i] = []
                     remove.append(i)
                     best_sectors = temp_sectors
-                    msg = "Reduction found: new input has " + str(len(raw_lines)) + " unreduced lines"
+                    step = '(' + str(i + 1) + "/" + str(num_chunks) + ')'
+                    msg = "Reduction found " + step + ": new input has " + str(len(raw_lines)) + " unreduced lines"
                     self.reducer.logger.error(msg)
                 del temp_sectors
 
@@ -109,14 +116,20 @@ class WithinLineReducer(object):
                 break
 
             # if we're about to bust our loop condition, make sure we verify 1-minimality as our last hurrah
-            if num_chunks > len(segment) and not singleton_run:
+            if num_chunks >= len(segment) and not singleton_run:
                 singleton_run = True
                 num_chunks = len(segment)
 
+        interesting, msg, _ = self.reducer._check_interesting(self.reducer.args, best_sectors)
+        if not interesting:
+            raise DeltaLogicError("Intermediate output not interesting")
+
         self.reducer.sectors = best_sectors
-        _, subs_list = self._build_fill_list()
-        if 0 != len(subs_list):
-            self.reducer.sectors = self.reducer.sectors.switch_lines(subs_list)
+
+        self.reducer.sectors.trim_empty_allegiances()
+        interesting, msg, _ = self.reducer._check_interesting(self.reducer.args, self.reducer.sectors)
+        if not interesting:
+            raise DeltaLogicError("Final output not interesting")
 
         self.reducer.sectors.trim_empty_allegiances()
         self.write_files()

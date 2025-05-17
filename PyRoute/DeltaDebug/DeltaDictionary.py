@@ -30,7 +30,10 @@ class DeltaDictionary(dict):
 
         new_dict = DeltaDictionary()
         for sector_name in overlap:
-            new_dict[sector_name] = copy.deepcopy(self[sector_name])
+            subset_sector = copy.deepcopy(self[sector_name])
+            if 0 == len(subset_sector.lines):
+                continue
+            new_dict[sector_name] = subset_sector
             pass
 
         return new_dict
@@ -50,7 +53,10 @@ class DeltaDictionary(dict):
 
         new_dict = DeltaDictionary()
         for sector_name in overlap:
-            new_dict[sector_name] = self[sector_name].subsector_subset(overlap[sector_name])
+            subset_sector = self[sector_name].subsector_subset(overlap[sector_name])
+            if 0 == len(subset_sector.lines):
+                continue
+            new_dict[sector_name] = subset_sector
 
         return new_dict
 
@@ -59,6 +65,8 @@ class DeltaDictionary(dict):
         for sector_name in self:
             subset_sector = self[sector_name].allegiance_subset(allegiances)
             if 0 == len(subset_sector.allegiances):
+                continue
+            if 0 == len(subset_sector.lines):
                 continue
             new_dict[sector_name] = subset_sector
 
@@ -124,6 +132,8 @@ class DeltaDictionary(dict):
             raise DeltaLogicError(msg)
 
         for sector_name in self:
+            if 0 == len(self[sector_name].lines):
+                continue
             self[sector_name].write_file(output_dir)
 
     def skip_void_subsectors(self):
@@ -204,7 +214,8 @@ class SectorDictionary(dict):
         missed = list()
         for subsector_name in subsectors:
             if subsector_name in self:
-                overlap.append(subsector_name)
+                if not 0 == self[subsector_name].num_lines:
+                    overlap.append(subsector_name)
 
         for subsector_name in self:
             if subsector_name not in overlap:
@@ -262,7 +273,7 @@ class SectorDictionary(dict):
     def subsector_list(self):
         result = list()
         for subsector_name in self:
-            if not self[subsector_name].skipped:
+            if 0 < self[subsector_name].num_lines:
                 result.append(subsector_name)
 
         return result
@@ -349,7 +360,7 @@ class SectorDictionary(dict):
             handle.write(line)
 
         for line in self.lines:
-            line = line + '\n'
+            line = line.strip('\n') + '\n'
             handle.write(line)
 
         handle.close()
@@ -453,7 +464,7 @@ class SubsectorDictionary(dict):
             return foo
 
         for item in self.items:
-            foo.items.append(copy.deepcopy(item))
+            foo.items.append(copy.deepcopy(item.strip('\n')))
         return foo
 
     def drop_lines(self, lines_to_drop):
