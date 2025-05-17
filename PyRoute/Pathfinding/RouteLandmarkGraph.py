@@ -32,8 +32,8 @@ class RouteLandmarkGraph(DistanceBase):
         u_first = self._arcs[u][0]
         u_last = self._arcs[u][1]
         if v not in u_first:
-            u_first = np.append(u_first, [v])
-            u_last = np.append(u_last, [weight])
+            u_first = np.append(u_first, [v], 0)
+            u_last = np.append(u_last, [weight], 0)
             self._arcs[u] = (u_first, u_last)
         else:
             self._lighten_arc(u, v, weight)
