@@ -388,9 +388,7 @@ class TradeCalculation(RouteCalculation):
             common, src, trg = np.intersect1d(hist_src[0], hist_targ[0], assume_unique=True, return_indices=True)
             common_len = len(common)
             if 0 < common_len:
-                midleft = hist_src[1][src]
-                midright = hist_targ[1][trg]
-                midbound = midleft + midright
+                midbound = hist_src[1][src] + hist_targ[1][trg]
                 mindex = np.argmin(midbound)
                 nubound = midbound[mindex]
                 upbound = min(upbound, nubound)
