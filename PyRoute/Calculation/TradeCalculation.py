@@ -369,7 +369,6 @@ class TradeCalculation(RouteCalculation):
         reheat = allow_reheat and ((stardex + targdex) % (self.star_len_root) == 0)
 
         upbound = self.shortest_path_tree.triangle_upbound(stardex, targdex)
-        reheat_list = set()
 
         src_adj = self.star_graph._arcs[stardex]
 
@@ -394,6 +393,7 @@ class TradeCalculation(RouteCalculation):
                 nubound = midbound[mindex]
                 upbound = min(upbound, nubound)
                 if reheat:
+                    reheat_list = set()
                     reheat_list.add((stardex, common[mindex]))
                     reheat_list.add((targdex, common[mindex]))
                     if 1 < common_len:
