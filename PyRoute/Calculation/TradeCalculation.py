@@ -546,7 +546,7 @@ class TradeCalculation(RouteCalculation):
         for end in route[1:]:
             data = self.galaxy.stars._adj[start.index][end.index]
             # exhausted = data['count'] >= data['exhaust']
-            if reweight and not (data['count'] >= data['exhaust']):
+            if reweight and (data['count'] < data['exhaust']):
                 data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
                 self.star_graph.lighten_edge(start.index, end.index, data['weight'])
                 self.shortest_path_tree.lighten_edge(start.index, end.index, data['weight'])
