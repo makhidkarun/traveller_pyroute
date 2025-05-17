@@ -247,6 +247,7 @@ class TradeCalculation(RouteCalculation):
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
         self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars,
                                                                              self.epsilon, sources=landmarks)
+        self.star_len_root = math.floor(math.sqrt(len(self.star_graph)))
 
         base_btn = 0
         counter = 0
@@ -365,7 +366,7 @@ class TradeCalculation(RouteCalculation):
     def _preheat_upper_bound(self, stardex, targdex, allow_reheat=True):
         # Don't reheat on _every_ route, but reheat frequently enough to keep historic costs sort-of firm.
         # Keeping this deterministic helps keep input reduction straight, as there's less state to track.
-        reheat = allow_reheat and ((stardex + targdex) % (math.floor(math.sqrt(len(self.star_graph)))) == 0)
+        reheat = allow_reheat and ((stardex + targdex) % (self.star_len_root) == 0)
 
         upbound = self.shortest_path_tree.triangle_upbound(stardex, targdex)
         reheat_list = set()
@@ -488,7 +489,7 @@ class TradeCalculation(RouteCalculation):
         self.galaxy.stats.tradeDton += tradeDton
 
         try:
-            if 0 == (star.index + target.index) % (math.floor(math.sqrt(len(self.star_graph)))):
+            if 0 == (star.index + target.index) % (self.star_len_root):
                 self.cross_check_totals()
         except AssertionError as e:
             msg = str(star.name) + "-" + str(target.name) + ": " + str(e)
