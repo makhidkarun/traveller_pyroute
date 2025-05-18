@@ -578,6 +578,13 @@ class TestStar(unittest.TestCase):
         self.assertIsNotNone(star, "Starline should parse cleanly")
         self.assertFalse(star.oldskool, "Zero extensions present should not result in oldskool")
 
+    def testParseStarKilongSector0104AsKkree(self):
+        sector = Sector('# Kilong', '# 6,0')
+
+        starline = '0104 Ombia                B2424QK-D Ni Po                      { 1 }  (C34+1) [455D] - K - 314 15 Kk G3 V               '
+        star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        self.assertIsNotNone(star, "Starline should parse cleanly")
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
