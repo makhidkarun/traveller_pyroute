@@ -7,6 +7,7 @@ import re
 
 from lark import UnexpectedCharacters, UnexpectedEOF
 
+from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.Errors.MultipleWPopError import MultipleWPopError
 from PyRoute.Inputs.StarlineStationParser import StarlineStationParser
 from PyRoute.Inputs.StarlineStationTransformer import StarlineStationTransformer
@@ -22,7 +23,7 @@ class ParseStarInput:
     regex = """
 ^((?:0[1-9]|[1-2]\d|3[0-2])(?:0[1-9]|40|[1-3]\d)) +
 (.{15,}) +
-([A-HXYa-hxy][0-9A-Fa-f]\w\w[0-9A-Fa-f][0-9A-Xa-x][0-9A-Ja-j]-\w|\?\?\?\?\?\?\?-\?|[A-HXYa-hxy\?][0-9A-Fa-f\?][\w\?]{2,2}[0-9A-Fa-f\?][0-9A-Xa-x\?][0-9A-Ja-j\?]-[\w\?]) +
+([A-HXYa-hxy][0-9A-Fa-f]\w\w[0-9A-Fa-f][0-9A-Xa-x][0-9A-Ka-k]-\w|\?\?\?\?\?\?\?-\?|[A-HXYa-hxy\?][0-9A-Fa-f\?][\w\?]{2,2}[0-9A-Fa-f\?][0-9A-Xa-x\?][0-9A-Ka-k\?]-[\w\?]) +
 (.{15,}) +
 ((\{ *[ +-]?[0-6] ?\}|-) +(\([0-9A-Za-z]{3}[+-]\d\)|- ) +(\[[0-9A-Za-z]{4}\]|- )|( ) ( ) ( )) +
 ([BcCDeEfFGH]{1,5}|-| ) +
@@ -105,6 +106,11 @@ class ParseStarInput:
 
         star.alg_code = data[16].strip()
         star.alg_base_code = star.alg_code
+        # Cap non-K'kree systems to max law level J
+        if star.uwp.law.upper() in "KLMNOPQRSTUVWXYZ":
+            samecode = AllyGen.same_align(star.alg_code)
+            if not "Kk" == samecode:
+                star.uwp.law = "J"
 
         star.stars = data[17].strip()
         star.extract_routes()
