@@ -584,6 +584,23 @@ class TestStar(unittest.TestCase):
         starline = '0104 Ombia                B2424QK-D Ni Po                      { 1 }  (C34+1) [455D] - K - 314 15 Kk G3 V               '
         star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
         self.assertIsNotNone(star, "Starline should parse cleanly")
+        self.assertEqual('B2424QK-D', str(star.uwp))
+
+    def testParseStarKilongSector0104AsKkreeOutpost(self):
+        sector = Sector('# Kilong', '# 6,0')
+
+        starline = '0104 Ombia                B2424QK-D Ni Po                      { 1 }  (C34+1) [455D] - K - 314 15 KO G3 V               '
+        star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        self.assertIsNotNone(star, "Starline should parse cleanly")
+        self.assertEqual('B2424QK-D', str(star.uwp))
+
+    def testParseStarKilongSector0104AsNonKkree(self):
+        sector = Sector('# Kilong', '# 6,0')
+
+        starline = '0104 Ombia                B2424QK-D Ni Po                      { 1 }  (C34+1) [455D] - K - 314 15 Im G3 V               '
+        star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
+        self.assertIsNotNone(star, "Starline should parse cleanly")
+        self.assertEqual('B2424QJ-D', str(star.uwp))
 
 
 if __name__ == "__main__":
