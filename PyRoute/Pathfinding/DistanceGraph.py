@@ -21,7 +21,8 @@ class DistanceGraph(DistanceBase):
         self._arcs = [
             (
                 np.array(graph.adj[u], dtype=int),
-                np.array([data['weight'] for data in list(graph.adj[u].values())], dtype=float)
+                np.array([data['weight'] for data in list(graph.adj[u].values())], dtype=float),
+                {v: k for (k, v) in enumerate(list(graph.adj[u].keys()))}
             )
             for u in self._nodes
         ]
