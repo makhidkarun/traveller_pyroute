@@ -62,6 +62,6 @@ class DistanceGraph(DistanceBase):
         self._min_cost[u] = min(self._min_cost[u], weight)
         self._min_cost[v] = min(self._min_cost[v], weight)
 
-        self._min_indirect[neighbours] = np.minimum(self._min_indirect[neighbours], weight)
+        self._min_indirect[neighbours] = np.fmin(self._min_indirect[neighbours], weight)
         neighbours = self._arcs[v][0]
-        self._min_indirect[neighbours] = np.minimum(self._min_indirect[neighbours], weight)
+        self._min_indirect[neighbours] = np.fmin(self._min_indirect[neighbours], weight)
