@@ -93,7 +93,7 @@ class ApproximateShortestPathForestUnified:
             rightdist[np.isinf(rightdist)] = 0
             shelf = self._graph._arcs[left]
             for i in range(len(shelf)):
-                if shelf[i][0] == right:
+                if shelf[0][i] == right:
                     targdex = i
                     break
             weight = shelf[1][targdex]
