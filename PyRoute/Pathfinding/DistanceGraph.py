@@ -55,7 +55,7 @@ class DistanceGraph(DistanceBase):
 
     def lighten_edge(self, u, v, weight):
         neighbours = self._arcs[u][0]
-        if not (neighbours == v).any():
+        if v not in self._arcs[u][2]:
             assert False
 
         self._lighten_arc(u, v, weight)
