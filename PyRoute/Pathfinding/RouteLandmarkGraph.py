@@ -14,7 +14,7 @@ class RouteLandmarkGraph(DistanceBase):
     def __init__(self, graph):
         super().__init__(graph)
         self._arcs = [
-            (np.array([], dtype=int), np.array([], dtype=float))
+            (np.array([], dtype=int), np.array([], dtype=float), dict())
             for u in self._nodes
         ]
 
@@ -32,10 +32,12 @@ class RouteLandmarkGraph(DistanceBase):
         arcs = self._arcs[u]
         u_first = arcs[0]
         u_last = arcs[1]
-        if v not in u_first:
+        u_dict = arcs[2]
+        if v not in u_dict:
+            u_dict[v] = len(u_first)
             u_first = np.append(u_first, [v], 0)
             u_last = np.append(u_last, [weight], 0)
-            self._arcs[u] = (u_first, u_last)
+            self._arcs[u] = (u_first, u_last, u_dict)
         else:
             self._lighten_arc(u, v, weight)
 
