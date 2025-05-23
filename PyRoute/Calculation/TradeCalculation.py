@@ -247,7 +247,7 @@ class TradeCalculation(RouteCalculation):
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
         self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars,
                                                                              self.epsilon, sources=landmarks)
-        self.star_len_root = math.floor(math.sqrt(len(self.star_graph)))
+        self.star_len_root = math.floor(math.sqrt(len(self.star_graph))) // 2
 
         base_btn = 0
         counter = 0
