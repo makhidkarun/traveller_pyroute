@@ -124,9 +124,7 @@ class TradeCalculation(RouteCalculation):
             btn = self.get_btn(star, neighbor, dist)
             if btn >= self.min_btn:
                 passBTN = self.get_passenger_btn(btn, star, neighbor)
-                self.galaxy.ranges.add_edge(star, neighbor, distance=dist,
-                                            btn=btn,
-                                            passenger_btn=passBTN)
+                self.galaxy.ranges.add_edge(star, neighbor, distance=dist, btn=btn, passenger_btn=passBTN)
 
         return None if dist > self.galaxy.max_jump_range else dist
 
