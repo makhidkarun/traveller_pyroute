@@ -163,9 +163,7 @@ class RouteCalculation(object):
 
         btn += RouteCalculation.get_btn_offset(distance)
         btn = min(btn, RouteCalculation.get_max_btn(star1.wtn, star2.wtn))
-        if min_btn > btn and distance <= max_range:
-            return min_btn
-        return btn
+        return min_btn if min_btn > btn and distance <= max_range else btn
 
     @staticmethod
     def get_passenger_btn(btn, star, neighbor):
