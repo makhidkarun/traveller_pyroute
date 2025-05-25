@@ -128,9 +128,7 @@ class TradeCalculation(RouteCalculation):
                                             btn=btn,
                                             passenger_btn=passBTN)
 
-        if dist > self.galaxy.max_jump_range:
-            return None
-        return dist
+        return None if dist > self.galaxy.max_jump_range else dist
 
     @functools.cache
     def _max_dist(self, star_wtn, neighbour_wtn, maxjump=False):
