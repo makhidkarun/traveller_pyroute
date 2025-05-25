@@ -119,9 +119,6 @@ class TradeCalculation(RouteCalculation):
         max_dist = self._max_dist(star.wtn, neighbor.wtn)
         # add all the stars in the BTN range, but skip this pair
         # if there there isn't enough trade to warrant a trade check
-        if dist > max_dist and dist > self.galaxy.max_jump_range:
-            return None
-
         if dist <= max_dist:
             # Only bother getting btn if the route is inside max length
             btn = self.get_btn(star, neighbor, dist)
