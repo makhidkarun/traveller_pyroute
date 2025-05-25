@@ -112,16 +112,6 @@ class TradeCalculation(RouteCalculation):
     def base_route_filter(self, star, neighbor):
         # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
         # - in this case, red/forbidden zones and barren systems - so only bilateral filtering remains.
-        # TODO: Bilateral filtering
-        # This would ordinarily be a unilateral filter, but, for hysterical raisins, route and edge filtering are
-        # convolved.  Rather than untangle that, filter out routes with at least one endpoint too small to support the
-        # minimum WTN route here.
-        if self.min_route_wtn > star.wtn or self.min_route_wtn > neighbor.wtn:
-            # Don't filter if, despite the route being too small, it's within the max jump range.  Such stars can still
-            # have trade routes flowing _through_ them, just not _from_ or _to_ them.
-            if self.galaxy.max_jump_range < star.distance(neighbor):
-                return True
-            return False
         return False
 
     def base_range_routes(self, star, neighbor):
