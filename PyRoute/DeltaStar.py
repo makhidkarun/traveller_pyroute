@@ -339,13 +339,18 @@ class DeltaStar(Star):
             check = False
         return check
 
-    def _check_econ_code(self, msg, code, atmo, hydro, pop):
+    def _check_econ_code(self, msg, code, atmo, hydro, pop, implied=None):
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
         pop = '0123456789ABCD' if pop is None else pop
 
         code_match = code in self.tradeCode.codeset
         phys_match = self.atmo in atmo and self.hydro in hydro and self.pop in pop
+        if phys_match == code_match:
+            if phys_match and implied is not None and implied not in self.tradeCode.codes:
+                self.tradeCode.codes.append(implied)
+                if implied not in self.tradeCode.codeset:
+                    self.tradeCode.codeset.append(implied)
 
         if phys_match and not code_match:
             line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)
