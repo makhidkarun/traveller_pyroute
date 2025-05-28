@@ -116,15 +116,12 @@ class TradeCalculation(RouteCalculation):
 
     def base_range_routes(self, star, neighbor):
         dist = star.distance(neighbor)
-        # max_dist = self._max_dist(star.wtn, neighbor.wtn)
         # add all the stars in the BTN range, but skip this pair
         # if there there isn't enough trade to warrant a trade check
-        if dist <= self._max_dist(star.wtn, neighbor.wtn):
-            # Only bother getting btn if the route is inside max length
-            btn = self.get_btn(star, neighbor, dist)
-            if btn >= self.min_btn:
-                passBTN = self.get_passenger_btn(btn, star, neighbor)
-                self.galaxy.ranges.add_edge(star, neighbor, distance=dist, btn=btn, passenger_btn=passBTN)
+        btn = self.get_btn(star, neighbor, dist)
+        if btn >= self.min_btn:
+            passBTN = self.get_passenger_btn(btn, star, neighbor)
+            self.galaxy.ranges.add_edge(star, neighbor, distance=dist, btn=btn, passenger_btn=passBTN)
 
         return None if dist > self.galaxy.max_jump_range else dist
 
