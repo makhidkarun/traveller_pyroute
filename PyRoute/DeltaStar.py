@@ -285,7 +285,7 @@ class DeltaStar(Star):
 
         self._check_econ_code(msg, 'Na', '0123', '0123', '6789ABCDEF')
         self._check_econ_code(msg, 'Pi', '012479', None, '78')
-        self._check_econ_code(msg, 'In', '012479ABC', None, '9ABCDEF')
+        self._check_econ_code(msg, 'In', '012479ABC', None, '9ABCDEF', 'Hi')
         self._check_econ_code(msg, 'Pr', '68', None, '59')
         self._check_econ_code(msg, 'Pa', '456789', '45678', '48')
         self._check_econ_code(msg, 'Ri', '68', None, '678')
