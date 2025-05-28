@@ -767,12 +767,12 @@ class TradeCodes(object):
         self._fix_trade_code(star, 'Oc', 'ABCDEF', '3456789DEF', 'A')
         self._fix_trade_code(star, 'Va', None, '0', None)
 
-        self._fix_econ_code(star, 'Na', '0123', '0123', '6789ABCD')
+        self._fix_econ_code(star, 'Na', '0123', '0123', '6789ABCDEF')
         self._fix_econ_code(star, 'Pi', '012479', None, '78')
         self._fix_econ_code(star, 'Pa', '456789', '45678', '48')
         self._fix_econ_code(star, 'Ag', '456789', '45678', '567')
         self._fix_econ_code(star, 'Pr', '68', None, '59')
-        self._fix_econ_code(star, 'In', '012479ABC', None, '9ABCD')
+        self._fix_econ_code(star, 'In', '012479ABC', None, '9ABCDEF')
         self._fix_econ_code(star, 'Ri', '68', None, '678')
 
         self._fix_all_pop_codes(star)
