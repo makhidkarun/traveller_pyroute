@@ -252,7 +252,7 @@ class DeltaStar(Star):
                                                                                    pop + 5)
                 msg.append(line)
 
-        self._check_trade_code(msg, 'As', '0', '0', '0')
+        self._check_trade_code(msg, 'As', '0', '0', '0', 'Va')
         self._check_trade_code(msg, 'De', None, '23456789', '0')
         self._check_trade_code(msg, 'Ga', '678', '568', '567')
         self._check_trade_code(msg, 'Fl', None, 'ABC', '123456789A')
@@ -262,6 +262,14 @@ class DeltaStar(Star):
         self._check_trade_code(msg, 'Wa', '3456789', '3456789DEF', 'A')
         self._check_trade_code(msg, 'Oc', 'ABCDEF', '3456789DEF', 'A')
         self._check_trade_code(msg, 'Va', None, '0', None)
+
+        self._check_econ_code(msg, 'Na', '0123', '0123', '6789ABCDEF')
+        self._check_econ_code(msg, 'Pi', '012479', None, '78')
+        self._check_econ_code(msg, 'In', '012479ABC', None, '9ABCDEF', 'Hi')
+        self._check_econ_code(msg, 'Pr', '68', None, '59')
+        self._check_econ_code(msg, 'Pa', '456789', '45678', '48')
+        self._check_econ_code(msg, 'Ri', '68', None, '678')
+        self._check_econ_code(msg, 'Ag', '456789', '45678', '567')
 
         code = 'Ba'
         pop = '0'
@@ -283,13 +291,6 @@ class DeltaStar(Star):
         pop = '9ABCDEF'
         self._check_pop_code(msg, code, pop)
 
-        self._check_econ_code(msg, 'Na', '0123', '0123', '6789ABCDEF')
-        self._check_econ_code(msg, 'Pi', '012479', None, '78')
-        self._check_econ_code(msg, 'In', '012479ABC', None, '9ABCDEF', 'Hi')
-        self._check_econ_code(msg, 'Pr', '68', None, '59')
-        self._check_econ_code(msg, 'Pa', '456789', '45678', '48')
-        self._check_econ_code(msg, 'Ri', '68', None, '678')
-        self._check_econ_code(msg, 'Ag', '456789', '45678', '567')
         ParseStarInput.check_tl(self, fullmsg=msg)
 
         return 0 == len(msg), msg
@@ -307,13 +308,18 @@ class DeltaStar(Star):
                 '{}-{} Calculated government code "{}" out of range - should be {}'.
                     format(self, self.uwp, 'X', '0'))
 
-    def _check_trade_code(self, msg, code, size, atmo, hydro):
+    def _check_trade_code(self, msg, code, size, atmo, hydro, implied=None):
         size = '0123456789ABCDEF' if size is None else size
         atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
 
         code_match = code in self.tradeCode.codeset
         system_match = self.size in size and self.atmo in atmo and self.hydro in hydro
+        if system_match == code_match:
+            if system_match and implied is not None and implied not in self.tradeCode.codes:
+                self.tradeCode.codes.append(implied)
+                if implied not in self.tradeCode.codeset:
+                    self.tradeCode.codeset.append(implied)
 
         if code_match and not system_match:
             line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode.codeset)
