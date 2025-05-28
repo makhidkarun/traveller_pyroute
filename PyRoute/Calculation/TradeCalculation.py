@@ -112,38 +112,18 @@ class TradeCalculation(RouteCalculation):
     def base_route_filter(self, star, neighbor):
         # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
         # - in this case, red/forbidden zones and barren systems - so only bilateral filtering remains.
-        # TODO: Bilateral filtering
-        # This would ordinarily be a unilateral filter, but, for hysterical raisins, route and edge filtering are
-        # convolved.  Rather than untangle that, filter out routes with at least one endpoint too small to support the
-        # minimum WTN route here.
-        if self.min_route_wtn > star.wtn or self.min_route_wtn > neighbor.wtn:
-            # Don't filter if, despite the route being too small, it's within the max jump range.  Such stars can still
-            # have trade routes flowing _through_ them, just not _from_ or _to_ them.
-            if self.galaxy.max_jump_range < star.distance(neighbor):
-                return True
-            return False
         return False
 
     def base_range_routes(self, star, neighbor):
         dist = star.distance(neighbor)
-        max_dist = self._max_dist(star.wtn, neighbor.wtn)
         # add all the stars in the BTN range, but skip this pair
         # if there there isn't enough trade to warrant a trade check
-        if dist > max_dist and dist > self.galaxy.max_jump_range:
-            return None
+        btn = self.get_btn(star, neighbor, dist)
+        if btn >= self.min_btn:
+            passBTN = self.get_passenger_btn(btn, star, neighbor)
+            self.galaxy.ranges.add_edge(star, neighbor, distance=dist, btn=btn, passenger_btn=passBTN)
 
-        if dist <= max_dist:
-            # Only bother getting btn if the route is inside max length
-            btn = self.get_btn(star, neighbor, dist)
-            if btn >= self.min_btn:
-                passBTN = self.get_passenger_btn(btn, star, neighbor)
-                self.galaxy.ranges.add_edge(star, neighbor, distance=dist,
-                                            btn=btn,
-                                            passenger_btn=passBTN)
-
-        if dist > self.galaxy.max_jump_range:
-            return None
-        return dist
+        return None if dist > self.galaxy.max_jump_range else dist
 
     @functools.cache
     def _max_dist(self, star_wtn, neighbour_wtn, maxjump=False):
