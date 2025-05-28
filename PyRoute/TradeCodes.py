@@ -399,10 +399,9 @@ class TradeCodes(object):
             msg = '{}-{} Calculated "{}" not in trade codes {}'.format(star, str(star.uwp), code, self.codeset)
         if code_match and not star_match:
             msg = '{}-{} Found invalid "{}" in trade codes: {}'.format(star, str(star.uwp), code, self.codeset)
+        self.logger.error(msg)
         if isinstance(listmsg, list):
             listmsg.append(msg)
-        else:
-            self.logger.error(msg)
         return False
 
     def _check_pop_code(self, star, code, pop, listmsg=None):
@@ -417,10 +416,9 @@ class TradeCodes(object):
         if code_match and not star_match:
             msg = '{}-{} Found invalid "{}" code on world with {} population: {}'.format(star, str(star.uwp), code,
                                                                                          star.pop, self.codeset)
+        self.logger.error(msg)
         if isinstance(listmsg, list):
             listmsg.append(msg)
-        else:
-            self.logger.error(msg)
         return False
 
     def _check_econ_code(self, star, code, atmo, hydro, pop, listmsg=None, implied=None):
@@ -443,8 +441,6 @@ class TradeCodes(object):
         self.logger.error(msg)
         if isinstance(listmsg, list):
             listmsg.append(msg)
-        else:
-            self.logger.error(msg)
         return False
 
     def check_world_codes(self, star, msg=None, fix_pop=False):
