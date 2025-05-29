@@ -60,8 +60,10 @@ class DistanceGraph(DistanceBase):
 
         self._lighten_arc(u, v, weight)
         self._lighten_arc(v, u, weight)
-        self._min_cost[u] = min(self._min_cost[u], weight)
-        self._min_cost[v] = min(self._min_cost[v], weight)
+        if weight < self._min_cost[u]:
+            self._min_cost[u] = weight
+        if weight < self._min_cost[v]:
+            self._min_cost[v] = weight
 
         self._min_indirect[neighbours] = np.fmin(self._min_indirect[neighbours], weight)
         neighbours = self._arcs[v][0]
