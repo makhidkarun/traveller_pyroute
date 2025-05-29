@@ -54,7 +54,6 @@ class DistanceGraph(DistanceBase):
         return min_cost
 
     def lighten_edge(self, u, v, weight):
-        neighbours = self._arcs[u][0]
         if v not in self._arcs[u][2]:
             assert False
 
@@ -65,6 +64,5 @@ class DistanceGraph(DistanceBase):
         if weight < self._min_cost[v]:
             self._min_cost[v] = weight
 
-        self._min_indirect[neighbours] = np.fmin(self._min_indirect[neighbours], weight)
-        neighbours = self._arcs[v][0]
-        self._min_indirect[neighbours] = np.fmin(self._min_indirect[neighbours], weight)
+        self._min_indirect[self._arcs[u][0]] = np.fmin(self._min_indirect[self._arcs[u][0]], weight)
+        self._min_indirect[self._arcs[v][0]] = np.fmin(self._min_indirect[self._arcs[v][0]], weight)
