@@ -264,6 +264,7 @@ class TradeCalculation(RouteCalculation):
             self.get_trade_between(star, neighbor)
             counter += 1
             processed += 1
+        self.multilateral_balance_trade()
         self.multilateral_balance_pass()
         self.logger.info('processed {} routes at BTN {}'.format(counter, base_btn))
         self.logger.info('{} penumbra routes included out of {}'.format(self.penumbra_routes, processed))
