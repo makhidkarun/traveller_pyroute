@@ -30,13 +30,11 @@ class RouteLandmarkGraph(DistanceBase):
 
     def _extend_arc(self, u, v, weight):
         arcs = self._arcs[u]
-        u_first = arcs[0]
-        u_last = arcs[1]
         u_dict = arcs[2]
         if v not in u_dict:
-            u_dict[v] = len(u_first)
-            u_first = np.append(u_first, [v], 0)
-            u_last = np.append(u_last, [weight], 0)
+            u_dict[v] = len(u_dict)
+            u_first = np.append(arcs[0], [v], 0)
+            u_last = np.append(arcs[1], [weight], 0)
             self._arcs[u] = (u_first, u_last, u_dict)
         else:
             self._lighten_arc(u, v, weight)
