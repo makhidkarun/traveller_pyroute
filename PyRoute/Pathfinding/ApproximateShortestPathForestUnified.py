@@ -121,7 +121,7 @@ class ApproximateShortestPathForestUnified:
         floatinf = float('+inf')
 
         for _ in range(self._num_trees):
-            dropspecific.append(set())
+            dropspecific.append([])
         for item in edges:
             left = item[0]
             right = item[1]
@@ -163,8 +163,8 @@ class ApproximateShortestPathForestUnified:
                 dropnodes.add(right)
                 for i in tree_dex:
                     if delta[i] >= weight:
-                        dropspecific[i].add(left)
-                        dropspecific[i].add(right)
+                        dropspecific[i].append(left)
+                        dropspecific[i].append(right)
 
         # if no nodes are to be dropped, nothing to do - bail out
         if 0 == len(dropnodes):
