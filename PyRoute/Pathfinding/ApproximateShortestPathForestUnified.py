@@ -152,7 +152,8 @@ class ApproximateShortestPathForestUnified:
             # Tag each incident node as needing updates.
             maxdelta = delta[0]
             for i in range(1, len(delta)):
-                maxdelta = max(maxdelta, delta[i])
+                if delta[i] > maxdelta:
+                    maxdelta = delta[i]
 
             if maxdelta >= weight:
                 dropnodes.add(left)
