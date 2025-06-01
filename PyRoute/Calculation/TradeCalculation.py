@@ -553,8 +553,8 @@ class TradeCalculation(RouteCalculation):
                 self.shortest_path_tree.lighten_edge(start.index, end.index, data['weight'])
                 # Edge can only trip an update if it's not exhausted
                 edges.append((start.index, end.index))
+                data['count'] += 1
             data['trade'] += tradeCr
-            data['count'] += 1
             start = end
 
         # Feed the list of touched edges into the approximate-shortest-path machinery, so it can update whatever
