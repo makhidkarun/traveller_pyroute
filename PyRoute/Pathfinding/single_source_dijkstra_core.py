@@ -46,8 +46,10 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     heap.reserve(1000)
     for index in range(len(seeds)):
         act_nod = seeds[index]
-        heap.insert({'act_wt': distance_labels_view[act_nod], 'act_nod': act_nod})
         parents_view[act_nod] = -1  # Using -1 to flag "root node of tree"
+        if 0 == len(arcs[act_nod][0]):
+            continue
+        heap.insert({'act_wt': distance_labels_view[act_nod], 'act_nod': act_nod})
 
     while 0 < heap.size():
         result = heap.popmin()
@@ -65,13 +67,12 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
         active_nodes = neighbours[0]
         active_nodes_view = active_nodes
         num_nodes = len(active_nodes_view)
-        if 0 == num_nodes:
-            continue
+
         active_labels = distance_labels[active_nodes]
         active_costs_view = neighbours[1]
         active_labels_view = active_labels
         # update max label
-        max_neighbour_labels_view[tail] = max(active_labels)
+        max_neighbour_labels_view[tail] = max(active_labels_view)
 
         for index in range(0, num_nodes):
             raw_wt = dist_tail + active_costs_view[index]
