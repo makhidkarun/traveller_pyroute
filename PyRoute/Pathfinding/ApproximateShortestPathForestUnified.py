@@ -120,14 +120,14 @@ class ApproximateShortestPathForestUnified:
         shelf: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
         floatinf = float('+inf')
 
-        for _ in range(self._num_trees):
+        for _ in tree_dex:
             dropspecific.append([])
         for item in edges:
             left = item[0]
             right = item[1]
             leftdist = self._distances[left, :]
             rightdist = self._distances[right, :]
-            for j in range(self._num_trees):
+            for j in tree_dex:
                 if floatinf == rightdist[j]:
                     rightdist[j] = 0
 
@@ -176,7 +176,7 @@ class ApproximateShortestPathForestUnified:
         # Now we have the nodes incident to edges that bust the (1+eps) approximation bound, feed them into restarted
         # dijkstra to update the approx-SP tree/forest.  Some nodes in dropnodes may well be SP descendants of others,
         # but it wasn't worth the time or complexity cost to filter them out here.
-        for i in range(self._num_trees):
+        for i in tree_dex:
             if 0 == len(dropspecific[i]):
                 continue
             self._distances[:, i], _, self._max_labels[:, i] = explicit_shortest_path_dijkstra_distance_graph(
