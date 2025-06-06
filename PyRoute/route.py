@@ -164,7 +164,6 @@ def process():
         else:
             pdfmap = ClassicModePDFSectorMap(galaxy, args.routes, args.output, "dense")
         pdfmap.write_maps()
-        pdfmap.write_maps()
 
         if args.subsectors:
             graphMap = SubsectorMap(galaxy, args.routes, galaxy.output_path)
