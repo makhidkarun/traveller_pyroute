@@ -240,7 +240,7 @@ the process takes. Experimentation has shown:
 * Full sectors (400-600 stars) take 5-10 seconds.
 * Multi-sector areas (around 2000 stars) take 25-50 seconds.
 * The T5 Second survey area (32 sectors, 13370 stars) takes 10-15 minutes.
-* The entire of charted space (164 sectors, 60,002 stars) takes 1.5 to 2 hours.
+* The entirety of charted space (164 sectors, 60,002 stars) takes 1.5 to 2 hours.
 
 Map Borders
 ===========
