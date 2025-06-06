@@ -236,11 +236,11 @@ Performance
 The process takes between O(n^2) and O(n^3) processing time, meaning the more stars (and hence routes), the longer
 the process takes. Experimentation has shown:
 
-* Small areas (100-200 stars) take a few seconds.
-* Full sectors (400-600 stars) take 20-30 seconds.
-* Multi-sector areas (around 2000 stars) take 1-2 minutes.
-* The T5 Second survey area (32 sectors, 13370 stars) takes 40-45 minutes.
-* The entire of charted space (164 sectors, 58,608 stars) takes 4.5 to 5 hours.
+* Small areas (100-200 stars) take 1-3 seconds.
+* Full sectors (400-600 stars) take 5-10 seconds.
+* Multi-sector areas (around 2000 stars) take 25-50 seconds.
+* The T5 Second survey area (32 sectors, 13370 stars) takes 10-15 minutes.
+* The entirety of charted space (164 sectors, 60,002 stars) takes 1.5 to 2 hours.
 
 Map Borders
 ===========
