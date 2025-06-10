@@ -45,9 +45,11 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     heap.reserve(1000)
     for index in range(len(seeds)):
         act_nod = seeds[index]
-        parents_view[act_nod] = -1  # Using -1 to flag "root node of tree"
         if 0 == len(arcs[act_nod][0]):
             continue
+        if -1 == parents_view[act_nod]:
+            continue
+        parents_view[act_nod] = -1  # Using -1 to flag "root node of tree"
         heap.insert({'act_wt': distance_labels_view[act_nod], 'act_nod': act_nod})
 
     while 0 < heap.size():
