@@ -11,7 +11,8 @@ import functools
 import numpy as np
 from PyRoute.Star import Star
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
-from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph, explicit_shortest_path_dijkstra_distance_graph
+from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph
+from single_source_dijkstra_core import dijkstra_core
 
 cnp.import_array()
 
@@ -179,11 +180,13 @@ class ApproximateShortestPathForestUnified:
         for i in tree_dex:
             if 0 == len(dropspecific[i]):
                 continue
-            self._distances[:, i], _, self._max_labels[:, i] = explicit_shortest_path_dijkstra_distance_graph(
-                                                                self._graph, self._source,
-                                                                distance_labels=self._distances[:, i],
-                                                                seeds=dropspecific[i], divisor=self._divisor,
-                                                                min_cost=min_cost, max_labels=self._max_labels[:, i])
+            self._distances[:, i], _, self._max_labels[:, i] = dijkstra_core(
+                                                                self._graph._arcs,
+                                                                self._distances[:, i],
+                                                                self._divisor,
+                                                                dropspecific[i],
+                                                                self._max_labels[:, i],
+                                                                min_cost)
 
     def expand_forest(self, nu_seeds):
         raw_seeds = nu_seeds if isinstance(nu_seeds, list) else list(nu_seeds.values())
