@@ -21,7 +21,8 @@ class DistanceGraph(DistanceBase):
         self._arcs = [
             (
                 np.array(graph.adj[u], dtype=int),
-                np.array([data['weight'] for data in list(graph.adj[u].values())], dtype=float)
+                np.array([data['weight'] for data in list(graph.adj[u].values())], dtype=float),
+                {v: k for (k, v) in enumerate(list(graph.adj[u].keys()))}
             )
             for u in self._nodes
         ]
@@ -53,13 +54,15 @@ class DistanceGraph(DistanceBase):
         return min_cost
 
     def lighten_edge(self, u, v, weight):
+        if v not in self._arcs[u][2]:
+            assert False
+
         self._lighten_arc(u, v, weight)
         self._lighten_arc(v, u, weight)
-        self._min_cost[u] = min(self._min_cost[u], weight)
-        self._min_cost[v] = min(self._min_cost[v], weight)
-        neighbours = self._arcs[u][0]
-        if 0 < len(neighbours):
-            self._min_indirect[neighbours] = np.minimum(self._min_indirect[neighbours], weight)
-        neighbours = self._arcs[v][0]
-        if 0 < len(neighbours):
-            self._min_indirect[neighbours] = np.minimum(self._min_indirect[neighbours], weight)
+        if weight < self._min_cost[u]:
+            self._min_cost[u] = weight
+        if weight < self._min_cost[v]:
+            self._min_cost[v] = weight
+
+        self._min_indirect[self._arcs[u][0]] = np.fmin(self._min_indirect[self._arcs[u][0]], weight)
+        self._min_indirect[self._arcs[v][0]] = np.fmin(self._min_indirect[self._arcs[v][0]], weight)

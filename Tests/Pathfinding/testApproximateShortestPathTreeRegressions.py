@@ -1,4 +1,5 @@
 import argparse
+import math
 import tempfile
 import unittest
 
@@ -30,6 +31,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
 
         galaxy.generate_routes()
         galaxy.trade.calculate_components()
+        galaxy.trade.star_len_root = math.floor(math.sqrt(len(galaxy.trade.star_graph))) // 2
 
         btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
@@ -60,6 +62,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
 
         galaxy.generate_routes()
         galaxy.trade.calculate_components()
+        galaxy.trade.star_len_root = math.floor(math.sqrt(len(galaxy.trade.star_graph))) // 2
 
         btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
@@ -90,6 +93,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
 
         galaxy.generate_routes()
         galaxy.trade.calculate_components()
+        galaxy.trade.star_len_root = math.floor(math.sqrt(len(galaxy.trade.star_graph))) // 2
 
         btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
@@ -120,6 +124,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
 
         galaxy.generate_routes()
         galaxy.trade.calculate_components()
+        galaxy.trade.star_len_root = 1
 
         btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)

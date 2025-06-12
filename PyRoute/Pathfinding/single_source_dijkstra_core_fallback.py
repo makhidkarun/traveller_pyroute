@@ -35,8 +35,6 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
         active_nodes = neighbours[0]
         active_costs = neighbours[1]
         active_labels = distance_labels[active_nodes]
-        # update max label
-        max_neighbour_labels[tail] = max(active_labels)
         # It's not worth (time wise) being cute and trying to break this up, forcing jumps in and out of numpy
         keep = active_costs < (active_labels - dist_tail)
         active_nodes = active_nodes[keep]
@@ -48,6 +46,9 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
         distance_labels[active_nodes] = active_weights
 
         parents[active_nodes] = tail
+
+        # update max label _after_ neighbours are processed, to minimise the max_label as far as possible
+        max_neighbour_labels[tail] = max(distance_labels[neighbours[0]])
 
         if 1 == num_nodes:
             heapq.heappush(heap, (active_weights[0], active_nodes[0]))

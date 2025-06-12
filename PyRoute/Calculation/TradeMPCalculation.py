@@ -1,6 +1,7 @@
 """
 @author: tjoneslo
 """
+import math
 import os
 
 import networkx as nx
@@ -158,6 +159,7 @@ class TradeMPCalculation(TradeCalculation):
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
         self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
         self.star_graph = DistanceGraph(self.galaxy.stars)
+        self.star_len_root = max(1, math.floor(math.sqrt(len(self.star_graph))) // 2)
 
         large_btn_index = 0
         if self.btn[0][2]['btn'] >= 18:
