@@ -106,6 +106,7 @@ class ApproximateShortestPathForestUnified:
         result = self._distances[target_node, :] != float('+inf')
         return result, result.all(), result.any()
 
+    @cython.ccall
     @cython.infer_types(True)
     @cython.boundscheck(False)
     @cython.initializedcheck(False)
