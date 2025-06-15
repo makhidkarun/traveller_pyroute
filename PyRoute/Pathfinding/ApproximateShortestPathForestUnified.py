@@ -120,6 +120,7 @@ class ApproximateShortestPathForestUnified:
         min_cost: cnp.ndarray[cython.float]
         shelf: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
         floatinf = float('+inf')
+        arcs = self._graph._arcs
 
         for _ in tree_dex:
             dropspecific.append([])
@@ -132,7 +133,7 @@ class ApproximateShortestPathForestUnified:
                 if floatinf == rightdist[j]:
                     rightdist[j] = 0
 
-            shelf = self._graph._arcs[left]
+            shelf = arcs[left]
             for i in range(len(shelf)):
                 if shelf[0][i] == right:
                     targdex = i
@@ -181,7 +182,7 @@ class ApproximateShortestPathForestUnified:
             if 0 == len(dropspecific[i]):
                 continue
             self._distances[:, i], _, self._max_labels[:, i] = dijkstra_core(
-                                                                self._graph._arcs,
+                                                                arcs,
                                                                 self._distances[:, i],
                                                                 self._divisor,
                                                                 dropspecific[i],
