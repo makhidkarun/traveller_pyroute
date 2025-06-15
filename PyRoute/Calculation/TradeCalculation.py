@@ -393,6 +393,7 @@ class TradeCalculation(RouteCalculation):
                 mindex = np.argmin(midbound)
                 upbound = min(upbound, midbound[mindex])
                 if reheat:
+                    adj = self.galaxy.stars._adj
                     reheat_list = set()
                     reheat_list.add((stardex, common[mindex]))
                     reheat_list.add((targdex, common[mindex]))
@@ -404,7 +405,7 @@ class TradeCalculation(RouteCalculation):
                     for pair in reheat_list:
                         start = pair[0]
                         end = pair[1]
-                        edge = self.galaxy.stars._adj[start][end]
+                        edge = adj[start][end]
 
                         route = edge.get('route', False)
                         # The 0.5% bump is to _ensure_ the newcost remains an _upper_ bound
