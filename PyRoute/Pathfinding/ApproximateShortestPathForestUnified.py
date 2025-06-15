@@ -140,7 +140,7 @@ class ApproximateShortestPathForestUnified:
                     targdex = i
                     break
             weight = shelf[1][targdex]
-            delta = abs(leftdist - rightdist)
+            delta = np.fabs(leftdist - rightdist)
             # Given distance labels, L, on nodes u and v, assuming u's label being smaller,
             # and edge cost between u and v of d(u, v):
             # L(u) + d(u, v) <= L(v)
