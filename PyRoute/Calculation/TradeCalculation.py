@@ -407,10 +407,9 @@ class TradeCalculation(RouteCalculation):
                         end = pair[1]
                         edge = adj[start][end]
 
-                        route = edge.get('route', False)
                         # The 0.5% bump is to _ensure_ the newcost remains an _upper_ bound
                         # on the historic-route cost
-                        newcost = self.galaxy.route_cost(route) * 1.005
+                        newcost = self.galaxy.route_cost(edge['route']) * 1.005
                         if edge['weight'] > newcost:
                             edge['weight'] = newcost
                             self.galaxy.historic_costs.lighten_edge(start, end, newcost)
