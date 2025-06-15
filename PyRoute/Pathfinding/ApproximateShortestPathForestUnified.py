@@ -153,21 +153,16 @@ class ApproximateShortestPathForestUnified:
 
             # If that bound no longer holds, it's due to the edge (u, v) having its weight decreased during pathfinding.
             # Tag each incident node as needing updates.
-            maxdelta = delta[0]
-            if maxdelta < weight:
-                for i in range(1, len(delta)):
-                    if delta[i] > maxdelta:
-                        maxdelta = delta[i]
-                        if maxdelta >= weight:
-                            break
+            dropped: cython.bint = False
+            for i in tree_dex:
+                if delta[i] >= weight:
+                    dropspecific[i].append(left)
+                    dropspecific[i].append(right)
+                    dropped = True
 
-            if maxdelta >= weight:
+            if dropped:
                 dropnodes.add(left)
                 dropnodes.add(right)
-                for i in tree_dex:
-                    if delta[i] >= weight:
-                        dropspecific[i].append(left)
-                        dropspecific[i].append(right)
 
         # if no nodes are to be dropped, nothing to do - bail out
         if 0 == len(dropnodes):
