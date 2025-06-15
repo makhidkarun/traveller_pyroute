@@ -403,16 +403,14 @@ class TradeCalculation(RouteCalculation):
                         reheat_list.add((targdex, common[maxdex]))
 
                     for pair in reheat_list:
-                        start = pair[0]
-                        end = pair[1]
-                        edge = adj[start][end]
+                        edge = adj[pair[0]][pair[1]]
 
                         # The 0.5% bump is to _ensure_ the newcost remains an _upper_ bound
                         # on the historic-route cost
                         newcost = self.galaxy.route_cost(edge['route']) * 1.005
                         if edge['weight'] > newcost:
                             edge['weight'] = newcost
-                            self.galaxy.historic_costs.lighten_edge(start, end, newcost)
+                            self.galaxy.historic_costs.lighten_edge(pair[0], pair[1], newcost)
                     reheated_upbound = self._preheat_upper_bound(stardex, targdex, allow_reheat=False)
                     upbound = min(reheated_upbound, upbound)
 
