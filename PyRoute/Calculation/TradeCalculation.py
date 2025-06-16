@@ -371,12 +371,10 @@ class TradeCalculation(RouteCalculation):
 
         upbound = self.shortest_path_tree.triangle_upbound(stardex, targdex)
 
-        src_adj = self.star_graph._arcs[stardex]
-
         # Case 0 - Source and target are directly connected
-        keep = src_adj[0] == targdex
+        keep = self.star_graph._arcs[stardex][0] == targdex
         if keep.any():
-            flip = src_adj[1][keep]
+            flip = self.star_graph._arcs[stardex][1][keep]
             return min(upbound, flip[0])
 
         # Grab arrays to support Case 1
