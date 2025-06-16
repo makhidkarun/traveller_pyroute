@@ -377,7 +377,7 @@ class TradeCalculation(RouteCalculation):
         keep = src_adj[0] == targdex
         if keep.any():
             flip = src_adj[1][keep]
-            upbound = min(upbound, flip[0])
+            return min(upbound, flip[0])
 
         # Grab arrays to support Case 1
         hist_targ = self.galaxy.historic_costs._arcs[targdex]
