@@ -73,8 +73,7 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
         active_costs_view = neighbours[1]
 
         for index in range(0, num_nodes):
-            raw_wt = dist_tail + active_costs_view[index]
-            if raw_wt >= active_labels_view[index]:
+            if dist_tail + active_costs_view[index] >= active_labels_view[index]:
                 continue
             act_wt = dist_tail + divisor * active_costs_view[index]
             act_nod = active_nodes_view[index]
