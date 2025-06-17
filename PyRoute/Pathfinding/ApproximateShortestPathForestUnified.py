@@ -130,9 +130,6 @@ class ApproximateShortestPathForestUnified:
             right = item[1]
             leftdist = self._distances[left, :]
             rightdist = self._distances[right, :]
-            for j in tree_dex:
-                if floatinf == rightdist[j]:
-                    rightdist[j] = 0
 
             shelf = arcs[left]
             for i in range(len(shelf)):
@@ -140,7 +137,7 @@ class ApproximateShortestPathForestUnified:
                     targdex = i
                     break
             weight = shelf[1][targdex]
-            delta = np.fabs(leftdist - rightdist)
+            weight_sq = weight * weight
             # Given distance labels, L, on nodes u and v, assuming u's label being smaller,
             # and edge cost between u and v of d(u, v):
             # L(u) + d(u, v) <= L(v)
@@ -154,10 +151,13 @@ class ApproximateShortestPathForestUnified:
             # If that bound no longer holds, it's due to the edge (u, v) having its weight decreased during pathfinding.
             # Tag each incident node as needing updates.
             dropped: cython.bint = False
-            for i in tree_dex:
-                if delta[i] >= weight:
-                    dropspecific[i].append(left)
-                    dropspecific[i].append(right)
+            for j in tree_dex:
+                if floatinf == rightdist[j]:
+                    rightdist[j] = 0
+                delta = leftdist[j] - rightdist[j]
+                if delta * delta >= weight_sq:
+                    dropspecific[j].append(left)
+                    dropspecific[j].append(right)
                     dropped = True
 
             if dropped:
