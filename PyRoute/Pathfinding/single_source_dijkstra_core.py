@@ -69,20 +69,19 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
         active_nodes_view = active_nodes
         num_nodes = len(active_nodes_view)
 
-        active_labels_view = distance_labels[active_nodes]
         active_costs_view = neighbours[1]
 
         for index in range(0, num_nodes):
-            if dist_tail + active_costs_view[index] >= active_labels_view[index]:
+            act_nod = active_nodes_view[index]
+            if dist_tail + active_costs_view[index] >= distance_labels_view[act_nod]:
                 continue
             act_wt = dist_tail + divisor * active_costs_view[index]
-            act_nod = active_nodes_view[index]
 
             distance_labels_view[act_nod] = act_wt
             parents_view[act_nod] = tail
             heap.insert({'act_wt': act_wt, 'act_nod': act_nod})
 
         # update max label _after_ neighbours are processed, to minimise the max_label as far as possible
-        max_neighbour_labels_view[tail] = max(active_labels_view)
+        max_neighbour_labels_view[tail] = max(distance_labels[active_nodes])
 
     return distance_labels, parents, max_neighbour_labels
