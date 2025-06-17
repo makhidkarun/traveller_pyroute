@@ -23,7 +23,6 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
                   seeds: cython.list[cython.int],
                   max_neighbour_labels: cnp.ndarray[cython.float], min_cost: cnp.ndarray[cython.float]):
     neighbours: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
-    active_nodes: cnp.ndarray[cython.int]
     act_wt: cython.float
     raw_wt: cython.float
     act_nod: cython.int
@@ -65,8 +64,7 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
         # cannot _possibly_ result in smaller distance labels.  By a similar argument, filter the remaining edges
         # when the sum of dist_tail and that edge's weight equals or exceeds the corresponding node's distance label.
         neighbours = arcs[tail]
-        active_nodes = neighbours[0]
-        active_nodes_view = active_nodes
+        active_nodes_view = neighbours[0]
         num_nodes = len(active_nodes_view)
 
         active_costs_view = neighbours[1]
@@ -82,6 +80,6 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
             heap.insert({'act_wt': act_wt, 'act_nod': act_nod})
 
         # update max label _after_ neighbours are processed, to minimise the max_label as far as possible
-        max_neighbour_labels_view[tail] = max(distance_labels[active_nodes])
+        max_neighbour_labels_view[tail] = max(distance_labels[neighbours[0]])
 
     return distance_labels, parents, max_neighbour_labels
