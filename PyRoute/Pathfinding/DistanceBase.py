@@ -37,5 +37,4 @@ class DistanceBase:
         return (abs(dq) + abs(dr) + abs(dq + dr)) // 2
 
     def _lighten_arc(self, u, v, weight):
-        arcs = self._arcs[u]
-        arcs[1][arcs[0] == v] = weight
+        self._arcs[u][1][self._arcs[u][0] == v] = weight
