@@ -1,4 +1,5 @@
 import argparse
+import math
 import tempfile
 import unittest
 
@@ -278,6 +279,7 @@ class testDeltaReduce(baseTest):
 
         galaxy.generate_routes()
         galaxy.trade.calculate_components()
+        galaxy.trade.star_len_root = max(1, math.floor(math.sqrt(len(galaxy.trade.star_graph))) // 2)
 
         stars = list(galaxy.stars.nodes)
 

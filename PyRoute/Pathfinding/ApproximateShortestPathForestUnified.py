@@ -11,7 +11,8 @@ import functools
 import numpy as np
 from PyRoute.Star import Star
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
-from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph, explicit_shortest_path_dijkstra_distance_graph
+from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph
+from single_source_dijkstra_core import dijkstra_core
 
 cnp.import_array()
 
@@ -44,7 +45,7 @@ class ApproximateShortestPathForestUnified:
         self._distances = np.ones((self._graph_len, self._num_trees), dtype=float, order='F') * float('+inf')
         self._max_labels = np.ones((self._graph_len, self._num_trees), dtype=float) * float('+inf')
 
-        min_cost = self._graph.min_cost(list(range(self._graph_len)), 0)
+        min_cost = self._graph._min_cost
         # spin up initial distances
         for i in range(self._num_trees):
             raw_seeds = self._seeds[i] if isinstance(self._seeds[i], list) else list(self._seeds[i].values())
@@ -105,6 +106,7 @@ class ApproximateShortestPathForestUnified:
         result = self._distances[target_node, :] != float('+inf')
         return result, result.all(), result.any()
 
+    @cython.ccall
     @cython.infer_types(True)
     @cython.boundscheck(False)
     @cython.initializedcheck(False)
@@ -113,27 +115,29 @@ class ApproximateShortestPathForestUnified:
     def update_edges(self, edges: list[tuple[cython.int, cython.int]]):
         dropnodes = set()
         dropspecific = []
-        tree_dex = np.array(list(range(self._num_trees)), dtype=int)
+        tree_dex = list(range(self._num_trees))
         targdex: cython.int = -1
         i: cython.int
         min_cost: cnp.ndarray[cython.float]
         shelf: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
+        floatinf = float('+inf')
+        arcs = self._graph._arcs
 
-        for _ in range(self._num_trees):
-            dropspecific.append(set())
+        for _ in tree_dex:
+            dropspecific.append([])
         for item in edges:
             left = item[0]
             right = item[1]
             leftdist = self._distances[left, :]
             rightdist = self._distances[right, :]
-            rightdist[np.isinf(rightdist)] = 0
-            shelf = self._graph._arcs[left]
+
+            shelf = arcs[left]
             for i in range(len(shelf)):
-                if shelf[i][0] == right:
+                if shelf[0][i] == right:
                     targdex = i
                     break
             weight = shelf[1][targdex]
-            delta = abs(leftdist - rightdist)
+            weight_sq = weight * weight
             # Given distance labels, L, on nodes u and v, assuming u's label being smaller,
             # and edge cost between u and v of d(u, v):
             # L(u) + d(u, v) <= L(v)
@@ -146,36 +150,40 @@ class ApproximateShortestPathForestUnified:
 
             # If that bound no longer holds, it's due to the edge (u, v) having its weight decreased during pathfinding.
             # Tag each incident node as needing updates.
-            maxdelta = delta[0]
-            for i in range(1, len(delta)):
-                maxdelta = max(maxdelta, delta[i])
+            dropped: cython.bint = False
+            for j in tree_dex:
+                if floatinf == rightdist[j]:
+                    rightdist[j] = 0
+                delta = leftdist[j] - rightdist[j]
+                if delta * delta >= weight_sq:
+                    dropspecific[j].append(left)
+                    dropspecific[j].append(right)
+                    dropped = True
 
-            if maxdelta >= weight:
+            if dropped:
                 dropnodes.add(left)
                 dropnodes.add(right)
-                overdrive = tree_dex[delta >= weight]
-                for i in overdrive:
-                    dropspecific[i].add(left)
-                    dropspecific[i].add(right)
 
         # if no nodes are to be dropped, nothing to do - bail out
         if 0 == len(dropnodes):
             return
 
         # Now we're updating at least one tree, grab the current min-cost vector to feed into implicit-dijkstra
-        min_cost = self._graph.min_cost(list(range(self._graph_len)), 0)
+        min_cost = self._graph._min_cost
 
         # Now we have the nodes incident to edges that bust the (1+eps) approximation bound, feed them into restarted
         # dijkstra to update the approx-SP tree/forest.  Some nodes in dropnodes may well be SP descendants of others,
         # but it wasn't worth the time or complexity cost to filter them out here.
-        for i in range(self._num_trees):
+        for i in tree_dex:
             if 0 == len(dropspecific[i]):
                 continue
-            self._distances[:, i], _, self._max_labels[:, i] = explicit_shortest_path_dijkstra_distance_graph(
-                                                                self._graph, self._source,
-                                                                distance_labels=self._distances[:, i],
-                                                                seeds=dropspecific[i], divisor=self._divisor,
-                                                                min_cost=min_cost, max_labels=self._max_labels[:, i])
+            self._distances[:, i], _, self._max_labels[:, i] = dijkstra_core(
+                                                                arcs,
+                                                                self._distances[:, i],
+                                                                self._divisor,
+                                                                dropspecific[i],
+                                                                self._max_labels[:, i],
+                                                                min_cost)
 
     def expand_forest(self, nu_seeds):
         raw_seeds = nu_seeds if isinstance(nu_seeds, list) else list(nu_seeds.values())

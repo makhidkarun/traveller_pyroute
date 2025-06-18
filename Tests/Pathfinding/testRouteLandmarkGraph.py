@@ -44,13 +44,15 @@ class testRouteLandmarkGraph(baseTest):
         actual = rlg[1]
 
         self.assertTrue(isinstance(actual, tuple), "Subscript call should return tuple")
-        self.assertEqual(2, len(actual), "Subscript call should return 2-tuple")
+        self.assertEqual(3, len(actual), "Subscript call should return 3-tuple")
         self.assertTrue(isinstance(actual[0], np.ndarray), "First tuple element should be ndarray")
         self.assertTrue(isinstance(actual[1], np.ndarray), "Second tuple element should be ndarray")
+        self.assertTrue(isinstance(actual[2], dict), "Third tuple element should be ndarray")
         self.assertEqual(np.dtype('int64'), actual[0].dtype, "First tuple element type should be int64")
         self.assertEqual(np.dtype('float64'), actual[1].dtype, "Second tuple element type should be int64")
         self.assertEqual(0, len(actual[0]), "First tuple element should be empty")
         self.assertEqual(0, len(actual[1]), "Second tuple element should be empty")
+        self.assertEqual(0, len(actual[2]), "Third tuple element should be empty")
 
     def test_add_single_then_subscript_nonempty(self):
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
