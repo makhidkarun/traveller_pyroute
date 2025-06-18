@@ -24,7 +24,6 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
                   max_neighbour_labels: cnp.ndarray[cython.float], min_cost: cnp.ndarray[cython.float]):
     neighbours: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
     act_wt: cython.float
-    raw_wt: cython.float
     act_nod: cython.int
     num_nodes: cython.size_t
     index: cython.size_t
@@ -35,7 +34,6 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     parents_view: cython.long[:] = parents
     active_nodes_view: cython.long[:]
     active_costs_view: cython.double[:]
-    active_labels_view: cython.double[:]
     tail: cython.int
     dist_tail: cython.float
     heap: MinMaxHeap[dijkstra_t]
