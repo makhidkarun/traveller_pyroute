@@ -82,7 +82,7 @@ class ParseSectorInput:
 
     @staticmethod
     def parse_subsectors(headers: list[str], name: str, sector: [Sector, SectorDictionary]) -> dict[str, str]:
-        if not (isinstance(sector, Sector) or isinstance(sector, SectorDictionary)):
+        if not (isinstance(sector, (Sector, SectorDictionary))):
             raise ValueError("Supplied sector must be instance of Sector or SectorDictionary")
         is_dict = isinstance(sector, SectorDictionary)
 
