@@ -19,10 +19,7 @@ from PyRoute.TradeCodes import TradeCodes
 def importance_starline(draw):
     keep_econ = draw(booleans())
     keep_imp = draw(booleans())
-    if not keep_econ and not keep_imp:
-        keep_social = True
-    else:
-        keep_social = draw(booleans())
+    keep_social = True if not keep_econ and not keep_imp else draw(booleans())
     assume(keep_imp or keep_econ or keep_social)
 
     rawline = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]\'+*?'))

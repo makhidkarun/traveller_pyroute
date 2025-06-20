@@ -252,10 +252,7 @@ class TradeCodes(object):
                     codes.append(raw)
                     continue
                 elif 1 < len(raw) and raw[-2] in ')]':
-                    if raw[-1] in 'W?' or raw[-1].isdigit():
-                        pop = raw[-1]
-                    else:
-                        pop = ''
+                    pop = raw[-1] if raw[-1] in 'W?' or raw[-1].isdigit() else ''
                     raw = raw[:-1]
                     raw = self._trim_overlong_homeworld_code(raw)
                     codes.append(raw + pop)

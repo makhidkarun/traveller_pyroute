@@ -92,10 +92,7 @@ class DrawArcsTest(GraphicSubsectorMap):
 
     def centerpoint(self, row, col):
         xcol = self.xm * 3 * col
-        if (col & 1):
-            xrow = (self.y_start - self.ym * 2) + (row * self.ym * 2)
-        else:
-            xrow = (self.y_start - self.ym) + (row * self.ym * 2)
+        xrow = self.y_start - self.ym * 2 + row * self.ym * 2 if col & 1 else self.y_start - self.ym + row * self.ym * 2
 
         point = self.cursor(xcol, xrow)
         # Put the point in the center of the hex

@@ -195,10 +195,7 @@ No information yet available.
         return comments
 
     def get_bases(self, star):
-        if star.baseCode != '-':
-            bases = '\n{{{{World summary bases|bases={} }}}}'.format(star.baseCode)
-        else:
-            bases = ' '
+        bases = '\n{{{{World summary bases|bases={} }}}}'.format(star.baseCode) if star.baseCode != '-' else ' '
         return bases
 
     def get_nobility(self, star):

@@ -474,15 +474,9 @@ class Star(object):
         elif self.tradeCode.low and infrastructure != max(self.importance, 0):
             nu_infrastructure = self._int_to_ehex(max(self.importance, 0))
         elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= 6 + self.importance:
-            if 0 > infrastructure:
-                nu_infrastructure = '0'
-            else:
-                nu_infrastructure = self._int_to_ehex(6 + self.importance)
+            nu_infrastructure = '0' if 0 > infrastructure else self._int_to_ehex(6 + self.importance)
         elif not 0 <= infrastructure <= 12 + self.importance:
-            if 0 > infrastructure:
-                nu_infrastructure = '0'
-            else:
-                nu_infrastructure = self._int_to_ehex(12 + self.importance)
+            nu_infrastructure = '0' if 0 > infrastructure else self._int_to_ehex(12 + self.importance)
 
         if nu_infrastructure is not None:
             self.economics = self.economics[0:3] + nu_infrastructure + self.economics[4:]

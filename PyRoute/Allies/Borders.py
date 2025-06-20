@@ -202,10 +202,7 @@ class Borders(object):
             cand_hex = (star.q, star.r)
             alg = star_map[cand_hex]
 
-            if star.port in ['E', 'X']:
-                max_range = 1
-            else:
-                max_range = ['D', 'C', 'B', 'A'].index(star.port) + 2
+            max_range = 1 if star.port in ['E', 'X'] else ['D', 'C', 'B', 'A'].index(star.port) + 2
             if AllyGen.is_nonaligned(alg, True):
                 max_range = 2
             for dist in range(max_range):

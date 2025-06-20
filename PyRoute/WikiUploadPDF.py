@@ -177,10 +177,7 @@ No information yet available.
 
         codeset = set(codes) - dcode - set(owned) - set(sophCodes) - set(homeworlds)
 
-        if len(pcode) > 0:
-            pcode = sorted(list(pcode))[0]
-        else:
-            pcode = ''
+        pcode = sorted(list(pcode))[0] if len(pcode) > 0 else ''
 
         colony = [code if len(code) > 6 else 'O:' + sectorName[0:4] + '-' + code[2:]
                   for code in owned if code.startswith('O:')]
