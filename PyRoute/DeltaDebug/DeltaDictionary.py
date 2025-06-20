@@ -355,15 +355,13 @@ class SectorDictionary(dict):
 
         out_name = os.path.join(output_dir, self.filename) + "-min"
 
-        handle = codecs.open(out_name, 'w', encoding="utf-8")
-        for line in self.headers:
-            handle.write(line)
+        with codecs.open(out_name, 'w', encoding="utf-8") as handle:
+            for line in self.headers:
+                handle.write(line)
 
-        for raw_line in self.lines:
-            line = raw_line.strip('\n') + '\n'
-            handle.write(line)
-
-        handle.close()
+            for raw_line in self.lines:
+                line = raw_line.strip('\n') + '\n'
+                handle.write(line)
 
     @staticmethod
     def load_traveller_map_file(filename):

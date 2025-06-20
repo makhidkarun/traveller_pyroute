@@ -129,7 +129,8 @@ No information yet available.
 {{{{LEN}}}}
 '''
     try:
-        sectorLines = [line for line in codecs.open(sectorFile, 'r', encoding="utf-8")]
+        with codecs.open(sectorFile, 'r', encoding="utf-8") as f:
+            sectorLines = [line for line in f]
     except (OSError, IOError):
         logger.error("Sector file not found: {}".format(sectorFile))
         return
@@ -139,7 +140,8 @@ No information yet available.
                           or line.startswith('|}') or line.startswith('[[Category:'))]
 
     try:
-        economicLines = [line for line in codecs.open(economicFile, 'r', encoding="utf-8")]
+        with codecs.open(economicFile, 'r', encoding="utf-8") as f:
+            economicLines = [line for line in f]
     except (OSError, IOError):
         logger.error("Economic file not found: {}".format(economicFile))
         return
