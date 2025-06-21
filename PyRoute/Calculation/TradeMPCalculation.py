@@ -185,7 +185,7 @@ class TradeMPCalculation(TradeCalculation):
         routes_queue = Queue()
         count = 0
         # write sector names to the queue
-        for sector in self.galaxy.sectors.keys():
+        for sector in self.galaxy.sectors:
             sector_queue.put(sector)
 
         # This starts the child processes.

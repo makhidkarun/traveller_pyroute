@@ -107,7 +107,7 @@ if __name__ == '__main__':
             if outEnd is not None:
                 sectors[sectorEnd].append(outEnd)
 
-    for sector in sectors.keys():
+    for sector in sectors:
         tree = ET.ElementTree()
         path = os.path.join(args.metadata_source, '%s.xml' % sector)
         tree.parse(path)
