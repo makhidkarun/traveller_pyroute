@@ -22,9 +22,7 @@ class NoneCalculation(RouteCalculation):
         pass
 
     def base_route_filter(self, star, neighbor):
-        if not AllyGen.are_owned_allies(star.alg_code, neighbor.alg_code):
-            return True
-        return False
+        return not AllyGen.are_owned_allies(star.alg_code, neighbor.alg_code)
 
     def base_range_routes(self, star, neighbor):
         return star.distance(neighbor)

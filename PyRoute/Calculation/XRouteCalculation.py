@@ -35,10 +35,7 @@ class XRouteCalculation(RouteCalculation):
         return star.distance(neighbor)
 
     def base_route_filter(self, star, neighbor):
-        if not AllyGen.are_allies(star.alg_code, neighbor.alg_code):
-            return True
-
-        return False
+        return not AllyGen.are_allies(star.alg_code, neighbor.alg_code)
 
     def generate_routes(self):
         self.distance_weight = self.capSec_weight
@@ -270,6 +267,4 @@ class XRouteCalculation(RouteCalculation):
     def unilateral_filter(self, star):
         if star.zone in ['R', 'F']:
             return True
-        if not AllyGen.imperial_align(star.alg_code):
-            return True
-        return False
+        return not AllyGen.imperial_align(star.alg_code)

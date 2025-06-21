@@ -23,7 +23,7 @@ class Allegiance(AreaItem):
         del state['alg_sorted']
         return state
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict: dict = {}):
         foo = Allegiance(self.code, self.name, self.base, self.population)
         foo._wiki_name = self._wiki_name
         foo.alg_sorted = []

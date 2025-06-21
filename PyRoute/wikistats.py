@@ -130,12 +130,12 @@ class WikiStats(object):
 
     def write_summary_lists(self):
         path = os.path.join(self.galaxy.output_path, 'sectors_list.txt')
-        with open(path, 'w+') as f:
+        with open(path, 'w+', encoding="utf-8") as f:
             for sector in self.galaxy.sectors.values():
                 f.write('[[{} Sector/summary]]\n'.format(sector.sector_name()))
 
         path = os.path.join(self.galaxy.output_path, 'subsector_list.txt')
-        with codecs.open(path, 'w+', 'utf-8') as f:
+        with codecs.open(path, 'w+', encoding="utf-8") as f:
             for sector in self.galaxy.sectors.values():
                 for subsector in sector.subsectors.values():
                     f.write('[[{} Subsector/summary]]\n'.format(subsector.name))
@@ -146,7 +146,7 @@ class WikiStats(object):
 #########################################################################################################
     def summary_statistics(self):
         path = os.path.join(self.galaxy.output_path, 'summary.wiki')
-        with codecs.open(path, 'w+', 'utf-8') as f:
+        with codecs.open(path, 'w+', encoding="utf-8") as f:
             f.write('==Economic Summary==\n')
             f.write('===Statistical Analysis===\n')
             f.write(self.stat_header)
@@ -182,12 +182,12 @@ class WikiStats(object):
                     self.text_alg_statistics(f, "Allegiance", allegiance, sector)
 
         path = os.path.join(self.galaxy.output_path, 'sectors_list.txt')
-        with open(path, 'w+') as f:
+        with open(path, 'w+', encoding="utf-8") as f:
             for sector in self.galaxy.sectors.values():
                 f.write('[[{} Sector/summary]]\n'.format(sector.sector_name()))
 
         path = os.path.join(self.galaxy.output_path, 'subsector_list.txt')
-        with codecs.open(path, 'w+', 'utf-8') as f:
+        with codecs.open(path, 'w+', encoding="utf-8") as f:
             for sector in self.galaxy.sectors.values():
                 for subsector in sector.subsectors.values():
                     f.write('[[{} Subsector/summary]]\n'.format(subsector.name))
@@ -211,7 +211,7 @@ class WikiStats(object):
 
     def top_summary(self):
         path = os.path.join(self.galaxy.output_path, 'top_summary.wiki')
-        with codecs.open(path, 'w+', 'utf-8') as f:
+        with codecs.open(path, 'w+', encoding="utf-8") as f:
             f.write('==Top level Summary==\n')
             f.write('{|\n')
             f.write('|Systems || {}\n'.format(self.galaxy.stats.number))
@@ -232,7 +232,7 @@ class WikiStats(object):
 
     def write_allegiances(self, alg):
         path = os.path.join(self.galaxy.output_path, 'alleg_summary.wiki')
-        with codecs.open(path, "wb", 'utf_8') as f:
+        with codecs.open(path, "wb", encoding="utf-8") as f:
             f.write('===Allegiance Information===\n')
             allegiances_sorted = AllyGen.sort_allegiances(alg, self.match_alg)
             self.logger.debug("Allegiances:  {}".format(allegiances_sorted))
@@ -318,7 +318,7 @@ class WikiStats(object):
 
     def tcs_statistics(self):
         path = os.path.join(self.galaxy.output_path, 'tcs_summary.wiki')
-        with codecs.open(path, 'w+', 'utf-8') as f:
+        with codecs.open(path, 'w+', encoding="utf-8") as f:
             f.write('=== TCS Military budgets by sector ===\n')
             f.write('budgets in BCr, capacity in MegaTons\n')
             f.write(
@@ -340,7 +340,7 @@ class WikiStats(object):
 
     def subsector_statistics(self):
         path = os.path.join(self.galaxy.output_path, 'subsector_summary.wiki')
-        with codecs.open(path, 'w+', 'utf-8') as f:
+        with codecs.open(path, 'w+', encoding="utf-8") as f:
             f.write('=== Economic Summary by Subsector ===\n')
             f.write(self.stat_header)
             for sector in self.galaxy.sectors.values():
@@ -577,7 +577,7 @@ class WikiStats(object):
     def write_sector_wiki(self):
         for sector in self.galaxy.sectors.values():
             path = os.path.join(self.galaxy.output_path, sector.sector_name() + " Sector.sector.wiki")
-            with codecs.open(path, 'w+', 'utf-8') as f:
+            with codecs.open(path, 'w+', encoding="utf-8") as f:
                 f.write('<section begin="header"/>\n')
                 f.write('{| class="wikitable sortable" width="90%"\n')
                 f.write('|+ {} sector data\n'.format(sector.sector_name()))
@@ -608,7 +608,7 @@ class WikiStats(object):
     def write_worlds_wiki_stats(self):
         for sector in self.galaxy.sectors.values():
             path = os.path.join(self.galaxy.output_path, sector.sector_name() + " Sector.economic.wiki")
-            with codecs.open(path, 'w+', 'utf-8') as f:
+            with codecs.open(path, 'w+', encoding="utf-8") as f:
                 f.write('<section begin="header"/>\n')
                 f.write('{| class="wikitable sortable" width="90%"\n')
                 f.write('|+ {} economic data\n'.format(sector.sector_name()))
@@ -655,7 +655,7 @@ class WikiStats(object):
         for sector in self.galaxy.sectors.values():
 
             path = os.path.join(self.galaxy.output_path, sector.sector_name() + " Sector.sec")
-            with codecs.open(path, 'w+', 'utf-8') as f:
+            with codecs.open(path, 'w+', encoding="utf-8") as f:
                 f.write('{{pre|scroll|\n')
                 f.write('2=# Generated by traveller-pyroute\n')
                 f.write('# {}\n\n'.format(datetime.datetime.now()))

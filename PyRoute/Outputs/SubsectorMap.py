@@ -350,10 +350,7 @@ class SubsectorMap(GraphicMap):
         xm = self.hex_size.x
         ym = self.hex_size.y
         col = xm * 3 * x
-        if (x & 1):
-            row = (self.start.y - ym * 2) + (y * ym * 2)
-        else:
-            row = (self.start.y - ym) + (y * ym * 2)
+        row = self.start.y - ym * 2 + y * ym * 2 if (x & 1) else self.start.y - ym + y * ym * 2
         point = Cursor(col, row)
         point.x_plus(xm)
         # point.y_plus(ym)
@@ -486,10 +483,7 @@ class SubsectorMap(GraphicMap):
         xm = self.hex_size.x
         ym = self.hex_size.y
         col = xm * 3 * hex_col
-        if (hex_col & 1):
-            row = (self.start.y - ym * 2) + (hex_row * ym * 2)
-        else:
-            row = (self.start.y - ym) + (hex_row * ym * 2)
+        row = self.start.y - ym * 2 + hex_row * ym * 2 if (hex_col & 1) else self.start.y - ym + hex_row * ym * 2
         return Cursor(col, row)
 
     # Get the centre of the hex for writing a world

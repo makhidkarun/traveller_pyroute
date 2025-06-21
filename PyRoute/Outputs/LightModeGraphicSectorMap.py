@@ -11,4 +11,3 @@ class LightModeGraphicSectorMap(GraphicMap, SectorMap):
         self.output_scale = 1
 
         super(LightModeGraphicSectorMap, self).__init__(galaxy, routes, output_path, writer)
-

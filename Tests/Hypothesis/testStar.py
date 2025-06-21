@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import re
 import unittest
@@ -19,10 +20,7 @@ from PyRoute.TradeCodes import TradeCodes
 def importance_starline(draw):
     keep_econ = draw(booleans())
     keep_imp = draw(booleans())
-    if not keep_econ and not keep_imp:
-        keep_social = True
-    else:
-        keep_social = draw(booleans())
+    keep_social = True if not keep_econ and not keep_imp else draw(booleans())
     assume(keep_imp or keep_econ or keep_social)
 
     rawline = draw(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]\'+*?'))
@@ -253,12 +251,10 @@ class testStar(unittest.TestCase):
                 raw_uwp = ' X' + raw_uwp[2:]
                 s = s.replace(uwp_m[0], raw_uwp)
 
-        if econ_m:
-            if '-' != econ_m[0].strip():
-                keep_econ = True
-        if soc_m:
-            if '-' != soc_m[0].strip():
-                keep_social = True
+        if econ_m and '-' != econ_m[0].strip():
+            keep_econ = True
+        if soc_m and '-' != soc_m[0].strip():
+            keep_social = True
         if imp_m:
             keep_imp = True
 
@@ -337,10 +333,8 @@ class testStar(unittest.TestCase):
         assume('?' not in uwp)
         uwp_obj = None
 
-        try:
+        with contextlib.suppress(ValueError):
             uwp_obj = UWP(uwp)
-        except ValueError:
-            pass
         assume(uwp_obj is not None)
 
         if well_formed_kaboom is None:

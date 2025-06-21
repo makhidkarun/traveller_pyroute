@@ -14,9 +14,7 @@ class BeyondLineReducer(object):
         self.breacher = WidenHoleReducer(reducer)
 
     def preflight(self):
-        if self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines):
-            return True
-        return False
+        return self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines)
 
     def write_files(self, sectors=None):
         if isinstance(sectors, DeltaDictionary):

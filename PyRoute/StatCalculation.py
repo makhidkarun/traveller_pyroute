@@ -3,6 +3,7 @@ Created on Mar 17, 2014
 
 @author: tjoneslo
 """
+import contextlib
 import copy
 import logging
 import math
@@ -30,15 +31,19 @@ class Populations(object):
         return self.population < other.population
 
     def __eq__(self, other):
+        if self.__hash__() != other.__hash__():
+            return False
         if self.code != other.code:
             return False
         if self.count != other.count:
             return False
         if self.population != other.population:
             return False
-        if self.homeworlds != other.homeworlds:
-            return False
-        return True
+        return self.homeworlds == other.homeworlds
+
+    def __hash__(self):
+        key = (self.code, self.count, self.population)
+        return hash(key)
 
 
 class ObjectStatistics(object):
@@ -114,16 +119,14 @@ class ObjectStatistics(object):
         del state['homeworlds']
         return state
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict: dict = {}):
         state = self.__dict__.copy()
         foo = ObjectStatistics()
         foo.__dict__.update(state)
         for key in ObjectStatistics.__slots__:
             if '__dict__' != key:
-                try:
+                with contextlib.suppress(AttributeError):
                     foo[key] = copy.deepcopy(self[key])
-                except AttributeError:
-                    pass
 
         return foo
 

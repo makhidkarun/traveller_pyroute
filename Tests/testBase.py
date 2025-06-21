@@ -31,4 +31,3 @@ class testBase(unittest.TestCase):
         args.interestingline = None
 
         return args
-

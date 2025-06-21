@@ -12,9 +12,7 @@ class AllegianceReducer(object):
         self.reducer = reducer
 
     def preflight(self):
-        if self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines):
-            return True
-        return False
+        return self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines)
 
     def run(self, singleton_only=False):
         segment = list(self.reducer.sectors.allegiance_list())

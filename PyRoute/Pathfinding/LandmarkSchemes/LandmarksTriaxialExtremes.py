@@ -44,7 +44,7 @@ class LandmarksTriaxialExtremes:
         component_landmarks = defaultdict(set)
         all_nodes = list(range(len(self.galaxy.star_mapping)))
 
-        for i in range(num_slots):
+        for _ in range(num_slots):
             result.append(dict())
 
         for component_id in self.galaxy.trade.components:

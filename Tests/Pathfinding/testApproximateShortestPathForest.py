@@ -116,7 +116,7 @@ class testApproximateShortestPathForest(baseTest):
         right = paths[leafnode][1]
 
         # seed expected distances
-        with open(jsonfile, 'r') as file:
+        with open(jsonfile, 'r', encoding="utf-8") as file:
             expected_string = json.load(file)
 
         expected_distances = dict()

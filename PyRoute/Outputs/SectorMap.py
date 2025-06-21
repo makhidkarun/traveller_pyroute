@@ -165,7 +165,7 @@ class SectorMap(Map):
         sector_indexes = [star.index for star in area.worlds]
         comm_routes = [star for star in self.galaxy.stars.edges(sector_indexes, True)
                        if star[2].get('xboat', False) or star[2].get('comm', False)]
-        for (star, neighbor, data) in comm_routes:
+        for (star, neighbor, _) in comm_routes:
             star_actual = self.galaxy.star_mapping[star]
             neighbor_actual = self.galaxy.star_mapping[neighbor]
             self.comm_line(star_actual, neighbor_actual, area)

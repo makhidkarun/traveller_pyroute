@@ -109,10 +109,7 @@ class RouteCalculation(object):
 
     def check_existing_routes(self, star, neighbor):
         for route in star.routes:
-            if len(route) == 7:
-                route_des = route[3:]
-            else:
-                route_des = route[8:]
+            route_des = route[3:] if len(route) == 7 else route[8:]
             if neighbor.position == route_des:
                 if route.startswith('Xb'):
                     self.galaxy.stars[star.index][neighbor.index]['xboat'] = True
@@ -202,10 +199,7 @@ class RouteCalculation(object):
         """
         Convert the BTN trade number to a credit value.
         """
-        if btn & 1:
-            trade = (10 ** ((btn - 1) // 2)) * 5
-        else:
-            trade = 10 ** (btn // 2)
+        trade = 10 ** ((btn - 1) // 2) * 5 if btn & 1 else 10 ** (btn // 2)
 
         return trade
 

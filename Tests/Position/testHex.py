@@ -20,12 +20,7 @@ class testHex(unittest.TestCase):
         self.antaresSector = Sector('# Antares', '# 1, 1')
 
     def testCoreSector(self):
-        pos = [
-            Hex(self.coreSector, "0101"),
-            Hex(self.coreSector, "0140"),
-            Hex(self.coreSector, "3201"),
-            Hex(self.coreSector, "3240"),
-            Hex(self.coreSector, "1620")]
+        pos = self._generate_corner_hexes(self.coreSector)
 
         self.assertEqual(pos[0].hex_position(), (0, 39))
         self.assertEqual(pos[1].hex_position(), (0, 0))
@@ -33,18 +28,10 @@ class testHex(unittest.TestCase):
         self.assertEqual(pos[3].hex_position(), (31, -16))
         self.assertEqual(pos[4].hex_position(), (15, 12))
 
-        for idx, (x, y) in enumerate([(1, 1), (1, 40), (32, 1), (32, 40), (16, 20)]):
-            offset = Hex.dy_offset(y, (self.coreSector.dy // 40))
-            q, r = Hex.hex_to_axial(x + self.coreSector.dx - 1, offset)
-            self.assertEqual(pos[idx].hex_position(), (q, r))
+        self._check_corner_hexes(pos, self.coreSector)
 
     def testAntaresSector(self):
-        pos = [
-            Hex(self.antaresSector, "0101"),
-            Hex(self.antaresSector, "0140"),
-            Hex(self.antaresSector, "3201"),
-            Hex(self.antaresSector, "3240"),
-            Hex(self.antaresSector, "1620")]
+        pos = self._generate_corner_hexes(self.antaresSector)
 
         self.assertEqual(pos[0].hex_position(), (32, 63))
         self.assertEqual(pos[1].hex_position(), (32, 24))
@@ -52,18 +39,10 @@ class testHex(unittest.TestCase):
         self.assertEqual(pos[3].hex_position(), (63, 8))
         self.assertEqual(pos[4].hex_position(), (47, 36))
 
-        for idx, (x, y) in enumerate([(1, 1), (1, 40), (32, 1), (32, 40), (16, 20)]):
-            offset = Hex.dy_offset(y, (self.antaresSector.dy // 40))
-            q, r = Hex.hex_to_axial(x + self.antaresSector.dx - 1, offset)
-            self.assertEqual(pos[idx].hex_position(), (q, r))
+        self._check_corner_hexes(pos, self.antaresSector)
 
     def testFornast(self):
-        pos = [
-            Hex(self.fornastSector, "0101"),
-            Hex(self.fornastSector, "0140"),
-            Hex(self.fornastSector, "3201"),
-            Hex(self.fornastSector, "3240"),
-            Hex(self.fornastSector, "1620")]
+        pos = self._generate_corner_hexes(self.fornastSector)
 
         self.assertEqual(pos[0].hex_position(), (32, 23))
         self.assertEqual(pos[1].hex_position(), (32, -16))
@@ -71,10 +50,7 @@ class testHex(unittest.TestCase):
         self.assertEqual(pos[3].hex_position(), (63, -32))
         self.assertEqual(pos[4].hex_position(), (47, -4))
 
-        for idx, (x, y) in enumerate([(1, 1), (1, 40), (32, 1), (32, 40), (16, 20)]):
-            offset = Hex.dy_offset(y, (self.fornastSector.dy // 40))
-            q, r = Hex.hex_to_axial(x + self.fornastSector.dx - 1, offset)
-            self.assertEqual(pos[idx].hex_position(), (q, r))
+        self._check_corner_hexes(pos, self.fornastSector)
 
     def testSetupOddColEvenRow(self):
         pos = Hex(self.coreSector, "0140")
@@ -121,12 +97,7 @@ class testHex(unittest.TestCase):
         self.assertEqual((1, 18), pos.hex_position())
 
     def testLishun(self):
-        pos = [
-            Hex(self.lishunSector, "0101"),
-            Hex(self.lishunSector, "0140"),
-            Hex(self.lishunSector, "3201"),
-            Hex(self.lishunSector, "3240"),
-            Hex(self.lishunSector, "1620")]
+        pos = self._generate_corner_hexes(self.lishunSector)
 
         self.assertEqual(pos[0].hex_position(), (0, 79))
         self.assertEqual(pos[1].hex_position(), (0, 40))
@@ -134,18 +105,10 @@ class testHex(unittest.TestCase):
         self.assertEqual(pos[3].hex_position(), (31, 24))
         self.assertEqual(pos[4].hex_position(), (15, 52))
 
-        for idx, (x, y) in enumerate([(1, 1), (1, 40), (32, 1), (32, 40), (16, 20)]):
-            offset = Hex.dy_offset(y, (self.lishunSector.dy // 40))
-            q, r = Hex.hex_to_axial(x + self.lishunSector.dx - 1, offset)
-            self.assertEqual(pos[idx].hex_position(), (q, r))
+        self._check_corner_hexes(pos, self.lishunSector)
 
     def testDaguSector(self):
-        pos = [
-            Hex(self.daguSector, "0101"),
-            Hex(self.daguSector, "0140"),
-            Hex(self.daguSector, "3201"),
-            Hex(self.daguSector, "3240"),
-            Hex(self.daguSector, "1620")]
+        pos = self._generate_corner_hexes(self.daguSector)
 
         self.assertEqual(pos[0].hex_position(), (-32, 55))
         self.assertEqual(pos[1].hex_position(), (-32, 16))
@@ -153,19 +116,10 @@ class testHex(unittest.TestCase):
         self.assertEqual(pos[3].hex_position(), (-1, 0))
         self.assertEqual(pos[4].hex_position(), (-17, 28))
 
-        for idx, (x, y) in enumerate([(1, 1), (1, 40), (32, 1), (32, 40), (16, 20)]):
-            offset = Hex.dy_offset(y, (self.daguSector.dy // 40))
-            q, r = Hex.hex_to_axial(x + self.daguSector.dx - 1, offset)
-            self.assertEqual(pos[idx].hex_position(), (q, r))
+        self._check_corner_hexes(pos, self.daguSector)
 
     def testCoreSector2(self):
-        pos = [
-            Hex(self.coreSector, "0101"),
-            Hex(self.coreSector, "0140"),
-            Hex(self.coreSector, "3201"),
-            Hex(self.coreSector, "3240"),
-            Hex(self.coreSector, "1620")
-        ]
+        pos = self._generate_corner_hexes(self.coreSector)
 
         self.assertEqual(pos[0].hex_position(), (0, 39))
         self.assertEqual(pos[1].hex_position(), (0, 0))
@@ -173,10 +127,7 @@ class testHex(unittest.TestCase):
         self.assertEqual(pos[3].hex_position(), (31, -16))
         self.assertEqual(pos[4].hex_position(), (15, 12))
 
-        for idx, (x, y) in enumerate([(1, 1), (1, 40), (32, 1), (32, 40), (16, 20)]):
-            offset = Hex.dy_offset(y, (self.coreSector.dy // 40))
-            q, r = Hex.hex_to_axial(x + self.coreSector.dx - 1, offset)
-            self.assertEqual(pos[idx].hex_position(), (q, r))
+        self._check_corner_hexes(pos, self.coreSector)
 
     def testSectorDistances(self):
         pos1 = Hex(self.coreSector, "0140")
@@ -312,6 +263,22 @@ class testHex(unittest.TestCase):
         self.assertEqual(exp_distance, heu_distance)
         hex_distance = star1.hex.hex_distance(star2.hex)
         self.assertEqual(exp_distance, hex_distance)
+
+    def _generate_corner_hexes(self, sector: Sector) -> list[Hex]:
+        pos = [
+            Hex(sector, "0101"),
+            Hex(sector, "0140"),
+            Hex(sector, "3201"),
+            Hex(sector, "3240"),
+            Hex(sector, "1620")
+        ]
+        return pos
+
+    def _check_corner_hexes(self, pos: list[Hex], sector: Sector) -> None:
+        for idx, (x, y) in enumerate([(1, 1), (1, 40), (32, 1), (32, 40), (16, 20)]):
+            offset = Hex.dy_offset(y, (sector.dy // 40))
+            q, r = Hex.hex_to_axial(x + sector.dx - 1, offset)
+            self.assertEqual(pos[idx].hex_position(), (q, r))
 
 
 if __name__ == "__main__":

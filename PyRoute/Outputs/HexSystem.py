@@ -31,13 +31,7 @@ class HexSystem(object):
             star_col = star_hex.col
             star_row = star_hex.row
         elif isinstance(star_hex, str):
-            if 4 == len(star_hex) and '-' not in star_hex:
-                star_col = int(star_hex[0:2])
-                star_row = int(star_hex[2:4])
-            elif 4 == len(star_hex) and '-' == star_hex[0]:
-                star_col = int(star_hex[0:2])
-                star_row = int(star_hex[2:4])
-            elif 4 == len(star_hex) and '-' == star_hex[2]:
+            if 4 == len(star_hex) and ('-' not in star_hex or '-' == star_hex[0] or '-' == star_hex[2]):
                 star_col = int(star_hex[0:2])
                 star_row = int(star_hex[2:4])
 

@@ -61,7 +61,7 @@ class SectorHexMap(OldMap):
         return comm_routes, pdf_doc, worlds
 
     def _sector_map_comm_and_trade_routes(self, comm_routes, pdf_doc, worlds):
-        for (star, neighbor, data) in comm_routes:
+        for (star, neighbor, _) in comm_routes:
             src_star = self.galaxy.star_mapping[star]
             trg_star = self.galaxy.star_mapping[neighbor]
             self.comm_line(pdf_doc, [src_star, trg_star])

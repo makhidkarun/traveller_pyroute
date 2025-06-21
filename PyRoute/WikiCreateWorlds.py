@@ -195,10 +195,7 @@ No information yet available.
         return comments
 
     def get_bases(self, star):
-        if star.baseCode != '-':
-            bases = '\n{{{{World summary bases|bases={} }}}}'.format(star.baseCode)
-        else:
-            bases = ' '
+        bases = '\n{{{{World summary bases|bases={} }}}}'.format(star.baseCode) if star.baseCode != '-' else ' '
         return bases
 
     def get_nobility(self, star):
@@ -279,13 +276,13 @@ def get_sources_list(sources_files):
 
 
 def get_skip_list(name):
-    with open(name) as f:
+    with open(name, encoding="utf-8") as f:
         skip_list = f.read().splitlines()
     return skip_list
 
 
 def get_max_list():
-    with open('Zar_max_present.txt') as f:
+    with open('Zar_max_present.txt', encoding="utf-8") as f:
         max_list = f.read().splitlines()
 
     return max_list
@@ -344,8 +341,8 @@ def process():
         title = wiki_page.title[:-8]
         logger.info("Processing {} -> {}".format(star.name, wiki_page.title))
 
-        categories = category_list[star.name] if star.name in category_list else None
-        sources = sources_list[star.name] if star.name in sources_list else []
+        categories = category_list.get(star.name, None)
+        sources = sources_list.get(star.name, [])
 
         new_page = worlds.create_page(star, categories, sources, title)
 

@@ -54,13 +54,13 @@ class TestAllyGenBase(baseTest):
     def dump_dict_to_json(targ_dict, rawfile):
         raw = {str(k): v for (k, v) in targ_dict.items()}
         raw = json.dumps(raw)
-        with open(rawfile, 'w+') as outfile:
+        with open(rawfile, 'w+', encoding="utf-8") as outfile:
             outfile.write(raw)
 
     @staticmethod
     def load_dict_from_json(rawfile):
         raw = None
-        with open(rawfile, 'r') as infile:
+        with open(rawfile, 'r', encoding="utf-8") as infile:
             raw = json.load(infile)
         assert isinstance(raw, dict), "Loaded file could not be restored to python dict"
         mid = dict()

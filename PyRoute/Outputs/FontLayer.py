@@ -50,8 +50,7 @@ class FontLayer(object):
 
         for item in filelist:
             # for moment, don't care whether is a hard or softlinked file
-            if os.path.exists(item):
-                if not os.path.isdir(item):
-                    return item
+            if os.path.exists(item) and not os.path.isdir(item):
+                return item
 
         assert False, "Font mapping for " + filename + " not found.  Tried " + " ".join(filelist)

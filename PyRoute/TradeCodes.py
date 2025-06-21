@@ -174,11 +174,8 @@ class TradeCodes(object):
                 raw = '[' + raw.lstrip('[')
             if raw.startswith('(('):
                 raw = '(' + raw.lstrip('(')
-            if 2 < len(raw):
-                if raw.startswith('[]'):
-                    raw = raw[2:]
-                elif raw.startswith('()'):
-                    raw = raw[2:]
+            if 2 < len(raw) and (raw.startswith('[]') or raw.startswith('()')):
+                raw = raw[2:]
             if raw.startswith('Di('):
                 if not raw.endswith(')') and i < num_codes - 1:
                     next = raw_codes[i + 1]
@@ -229,20 +226,21 @@ class TradeCodes(object):
                 continue
             if not raw.startswith('(') and '(' in raw and raw.endswith(')'):
                 continue
-            if not raw.endswith(')') and ')' in raw and raw.startswith('(') and 7 > len(raw):
-                if not (')' == raw[-2] and (raw[-1] in 'WX?' or raw[-1].isdigit())):
-                    continue
-            if not raw.startswith('(') and not raw.endswith(')') and '(' in raw and ')' in raw:
-                if not raw.startswith('[') and not raw.endswith(']'):
-                    continue
+            if not raw.endswith(')') and ')' in raw and raw.startswith('(') and 7 > len(raw) and \
+                    not (')' == raw[-2] and (raw[-1] in 'WX?' or raw[-1].isdigit())):
+                continue
+            if not raw.startswith('(') and not raw.endswith(')') and '(' in raw and ')' in raw and \
+                    not raw.startswith('[') and not raw.endswith(']'):
+                continue
             if 7 <= len(raw) and '(' == raw[0] and ')' == raw[5]:  # Let preprocessed sophont codes through
                 raw = raw[0:7]
                 codes.append(raw)
                 continue
-            if not raw.startswith('(') and not raw.startswith('['):  # this isn't a sophont code
-                if not raw.endswith(')') and not raw.endswith(']'):
-                    codes.append(raw)
-                    continue
+            # this isn't a sophont code
+            if not raw.startswith('(') and not raw.startswith('[') and \
+                    not raw.endswith(')') and not raw.endswith(']'):
+                codes.append(raw)
+                continue
             if raw.startswith('(') or raw.startswith('['):  # this _is_ a sophont code
                 if raw.endswith(')') or raw.endswith(']'):
                     if raw.startswith('[') and raw.endswith(']'):
@@ -252,10 +250,7 @@ class TradeCodes(object):
                     codes.append(raw)
                     continue
                 elif 1 < len(raw) and raw[-2] in ')]':
-                    if raw[-1] in 'W?' or raw[-1].isdigit():
-                        pop = raw[-1]
-                    else:
-                        pop = ''
+                    pop = raw[-1] if raw[-1] in 'W?' or raw[-1].isdigit() else ''
                     raw = raw[:-1]
                     raw = self._trim_overlong_homeworld_code(raw)
                     codes.append(raw + pop)
@@ -366,7 +361,7 @@ class TradeCodes(object):
         del state['ownedBy']
         return state
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict: dict = {}):
         state = self.__dict__.copy()
 
         foo = TradeCodes('')
@@ -706,22 +701,16 @@ class TradeCodes(object):
                 return False
 
             if code.startswith('['):
-                if len(code) > max_sophont_len:
-                    return False
-                return True
+                return len(code) > max_sophont_len
             elif len(code) > max_code_len:
                 return False
 
             if len(code) > max_code_len or (code.startswith('[') and len(code) > max_sophont_len):
                 return False
             if code.startswith('Di(') or code.startswith('(') or code.endswith(')') or code.endswith(')?'):  # minor race homeworld
-                if ')' not in code:
-                    return False
-                return True
+                return ')' in code
             if code.startswith('[') and (code.endswith(']') or ']' == code[-2]):  # major race homeworld
-                if ']' not in code:
-                    return False
-                return True
+                return ']' in code
             if code not in TradeCodes.allowed_residual_codes:
                 return False
         return True

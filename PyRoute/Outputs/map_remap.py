@@ -77,12 +77,12 @@ if __name__ == '__main__':
 
     tradeColors = ['#99FF0000', '#BFFFFF00', '#8000BF00', '#9900FFFF', '#990000FF', '#BF800080', 'violet']
 
-    regex = ".*\((.*) (\d\d\d\d)\).*\((.*) (\d\d\d\d)\) .* 'trade': ([0-9]*[L]?)"
+    regex = r".*\((.*) (\d\d\d\d)\).*\((.*) (\d\d\d\d)\) .* 'trade': ([0-9]*[L]?)"
     match = re.compile(regex)
     # Kuunaa (Core 0304) Irkigkhan (Core 0103) {'distance': 2, 'btn': 13, 'weight': 41, 'trade': 1000000000}
     sectors = defaultdict(list)
 
-    with open(args.route_file) as f:
+    with open(args.route_file, encoding="utf-8") as f:
         for entry in f:
             data = match.match(entry).groups()
             sectorStart = data[0]
@@ -107,7 +107,7 @@ if __name__ == '__main__':
             if outEnd is not None:
                 sectors[sectorEnd].append(outEnd)
 
-    for sector in sectors.keys():
+    for sector in sectors:
         tree = ET.ElementTree()
         path = os.path.join(args.metadata_source, '%s.xml' % sector)
         tree.parse(path)
@@ -123,5 +123,5 @@ if __name__ == '__main__':
         routes.extend(sectors[sector])
         pretty = prettify(tree.getroot())
         outPath = os.path.join(args.output_dir, '%s.xml' % sector)
-        with codecs.open(outPath, 'wb', 'utf-8') as f:
+        with codecs.open(outPath, 'wb', encoding='utf-8') as f:
             f.write(pretty)

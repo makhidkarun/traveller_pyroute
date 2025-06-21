@@ -33,9 +33,7 @@ class CommCalculation(RouteCalculation):
         self.min_importance = 4
 
     def base_route_filter(self, star, neighbor):
-        if not AllyGen.are_allies(star.alg_code, neighbor.alg_code):
-            return True
-        return False
+        return not AllyGen.are_allies(star.alg_code, neighbor.alg_code)
 
     def base_range_routes(self, star, neighbor):
         if not getattr(self.galaxy.alg[star.alg_base_code], 'min_importance', False):
@@ -147,7 +145,7 @@ class CommCalculation(RouteCalculation):
         total = len(routes)
         processed = 0
         self.logger.info('Routes: {}'.format(total))
-        for (star, neighbor, data) in routes:
+        for (star, neighbor, _) in routes:
             if total > 100 and processed % (total // 20) == 0:
                 self.logger.info('processed {} routes, at {}%'.format(processed, processed // (total // 100)))
             self.get_route_between(star, neighbor)
@@ -236,6 +234,4 @@ class CommCalculation(RouteCalculation):
         self.shortest_path_tree.update_edges(edges)
 
     def unilateral_filter(self, star):
-        if star.zone in ['R', 'F']:
-            return True
-        return False
+        return star.zone in ['R', 'F']

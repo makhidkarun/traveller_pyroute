@@ -239,7 +239,7 @@ class DeltaStar(Star):
             if pop == 0 and acceptance != 0:
                 line = '{} - CX Calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance)
                 msg.append(line)
-            elif pop != 0 and not pop_plus_imp == acceptance:
+            elif pop != 0 and pop_plus_imp != acceptance:
                 line = '{} - CX Calculated acceptance {} does not match generated acceptance {}'.format(self, acceptance,
                                                                                                     max(1,
                                                                                                         pop + self.importance))
@@ -315,11 +315,10 @@ class DeltaStar(Star):
 
         code_match = code in self.tradeCode.codeset
         system_match = self.size in size and self.atmo in atmo and self.hydro in hydro
-        if system_match == code_match:
-            if system_match and implied is not None and implied not in self.tradeCode.codes:
-                self.tradeCode.codes.append(implied)
-                if implied not in self.tradeCode.codeset:
-                    self.tradeCode.codeset.append(implied)
+        if system_match == code_match and system_match and implied is not None and implied not in self.tradeCode.codes:
+            self.tradeCode.codes.append(implied)
+            if implied not in self.tradeCode.codeset:
+                self.tradeCode.codeset.append(implied)
 
         if code_match and not system_match:
             line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, code, self.tradeCode.codeset)
@@ -352,11 +351,10 @@ class DeltaStar(Star):
 
         code_match = code in self.tradeCode.codeset
         phys_match = self.atmo in atmo and self.hydro in hydro and self.pop in pop
-        if phys_match == code_match:
-            if phys_match and implied is not None and implied not in self.tradeCode.codes:
-                self.tradeCode.codes.append(implied)
-                if implied not in self.tradeCode.codeset:
-                    self.tradeCode.codeset.append(implied)
+        if phys_match == code_match and phys_match and implied is not None and implied not in self.tradeCode.codes:
+            self.tradeCode.codes.append(implied)
+            if implied not in self.tradeCode.codeset:
+                self.tradeCode.codeset.append(implied)
 
         if phys_match and not code_match:
             line = '{}-{} Calculated "{}" not in trade codes {}'.format(self, self.uwp, code, self.tradeCode.codeset)

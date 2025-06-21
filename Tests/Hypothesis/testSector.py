@@ -130,10 +130,10 @@ class testSector(unittest.TestCase):
             ('Zarushagar', '# Zarushagar', '# -1,-1')
         ]
 
-        for msg, name, position in cases:
-            with self.subTest(msg):
+        for sec_name, name, position in cases:
+            with self.subTest(sec_name):
                 sector = Sector(name, position)
-                result, msg = sector.is_well_formed()
+                result, _ = sector.is_well_formed()
                 self.assertTrue(result)
 
 

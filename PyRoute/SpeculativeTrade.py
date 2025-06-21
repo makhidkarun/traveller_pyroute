@@ -88,10 +88,7 @@ class SpeculativeTrade(object):
         return price
 
     def get_source_tradegoods(self, star):
-        if self.trade_version == "T5":
-            cost = self.T5_calculate_tradegoods(star)
-        else:
-            cost = self.CT_calculate_tradegoods(star)
+        cost = self.T5_calculate_tradegoods(star) if self.trade_version == 'T5' else self.CT_calculate_tradegoods(star)
         star.trade_cost = cost
         star.trade_id = "{}-{} {} Cr{}".format(star.port, star.uwpCodes['Tech Level'],
                                                 star.tradeCode.planet_codes(), int(cost * 1000))
