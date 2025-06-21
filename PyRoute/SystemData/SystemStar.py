@@ -44,18 +44,18 @@ class SystemStar(object):
         return self.spectral + str(self.digit) + ' ' + self.size
 
     @property
-    def is_stellar(self):
+    def is_stellar(self) -> bool:
         return self.size in SystemStar.starsizes
 
     @property
-    def is_stellar_not_dwarf(self):
+    def is_stellar_not_dwarf(self) -> bool:
         return self.is_stellar and self.size != 'D'
 
     @property
-    def is_supergiant(self):
+    def is_supergiant(self) -> bool:
         return self.size in SystemStar.supersizes
 
-    def is_bigger(self, other):
+    def is_bigger(self, other) -> bool:
         if self.size != other.size:
             return SystemStar.sizes.index(self.size) < SystemStar.sizes.index(other.size)
         if self.spectral is None or other.spectral is None:
@@ -68,7 +68,7 @@ class SystemStar(object):
             return self.digit < other.digit
         return True
 
-    def check_canonical(self):
+    def check_canonical(self) -> tuple[bool, list[str]]:
         msg = []
 
         # Most of these checks are implied by the "Spectral Type And Size" table on p28 of T5.10 Book 3
@@ -93,7 +93,7 @@ class SystemStar(object):
 
         return 0 == len(msg), msg
 
-    def canonicalise(self):
+    def canonicalise(self) -> None:
         if self.is_stellar_not_dwarf and (self.spectral not in 'OBA' and self.size in ['Ia', 'Ib']):
             self.size = 'II'
 
@@ -113,7 +113,7 @@ class SystemStar(object):
             self.size = 'V'
 
     @property
-    def flux_choice(self):
+    def flux_choice(self) -> str:
         if 'F' != self.spectral:
             return self.spectral
         else:
@@ -122,7 +122,7 @@ class SystemStar(object):
             else:
                 return 'F5-9'
 
-    def check_canonical_size(self, max_flux, min_flux):
+    def check_canonical_size(self, max_flux, min_flux) -> str:
         choice = self.flux_choice
         flux_line = SystemStar.star_fluxen[choice]
         trim_line = {v for (k, v) in flux_line.items() if max_flux >= k >= min_flux}
@@ -132,7 +132,7 @@ class SystemStar(object):
 
         return msg
 
-    def fix_canonical_size(self, max_flux, min_flux):
+    def fix_canonical_size(self, max_flux, min_flux) -> None:
         choice = self.flux_choice
         flux_line = SystemStar.star_fluxen[choice]
         current_flux = [k for (k, v) in flux_line.items() if v == self.size]

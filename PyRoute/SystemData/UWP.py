@@ -49,10 +49,10 @@ class UWP(object):
         return self.line
 
     @property
-    def line(self):
+    def line(self) -> str:
         return str(self.port) + str(self.size) + str(self.atmo) + str(self.hydro) + str(self.pop) + str(self.gov) + str(self.law) + '-' + str(self.tl)
 
-    def is_well_formed(self):
+    def is_well_formed(self) -> tuple[bool, str]:
         msg = ""
         rep = str(self)
         if 9 != len(rep):
@@ -65,134 +65,134 @@ class UWP(object):
         return True, msg
 
     @property
-    def size_is_zero(self):
+    def size_is_zero(self) -> bool:
         return '?' != self.size and 0 == self.size_code
 
     @property
-    def port(self):
+    def port(self) -> str:
         return self._port
 
     @port.setter
-    def port(self, value):
+    def port(self, value) -> None:
         self._port = value
 
     @property
-    def size(self):
+    def size(self) -> str:
         return self._size
 
     @size.setter
-    def size(self, value):
+    def size(self, value) -> None:
         self._size = str(value)
 
     @property
-    def size_code(self):
+    def size_code(self) -> int:
         return self._ehex_to_int(self._size)
 
     @size_code.setter
-    def size_code(self, value):
+    def size_code(self, value) -> str:
         self._size = self._int_to_ehex(value)
 
     @property
-    def atmo(self):
+    def atmo(self) -> str:
         return self._atmo
 
     @atmo.setter
-    def atmo(self, value):
+    def atmo(self, value) -> None:
         self._atmo = str(value)
 
     @property
-    def atmo_code(self):
+    def atmo_code(self) -> int:
         return self._ehex_to_int(self._atmo)
 
     @atmo_code.setter
-    def atmo_code(self, value):
+    def atmo_code(self, value) -> None:
         self._atmo = self._int_to_ehex(value)
 
     @property
-    def hydro(self):
+    def hydro(self) -> str:
         return self._hydro
 
     @hydro.setter
-    def hydro(self, value):
+    def hydro(self, value) -> None:
         self._hydro = str(value)
 
     @property
-    def hydro_code(self):
+    def hydro_code(self) -> int:
         return self._ehex_to_int(self._hydro)
 
     @hydro_code.setter
-    def hydro_code(self, value):
+    def hydro_code(self, value) -> None:
         self._hydro = self._int_to_ehex(value)
 
     @property
-    def pop(self):
+    def pop(self) -> str:
         return self._pop
 
     @pop.setter
-    def pop(self, value):
+    def pop(self, value) -> None:
         self._pop = str(value)
 
     @property
-    def pop_code(self):
+    def pop_code(self) -> int:
         return self._ehex_to_int(self._pop)
 
     @pop_code.setter
-    def pop_code(self, value):
+    def pop_code(self, value) -> None:
         self._pop = self._int_to_ehex(value)
 
     @property
-    def gov(self):
+    def gov(self) -> str:
         return self._gov
 
     @gov.setter
-    def gov(self, value):
+    def gov(self, value) -> None:
         self._gov = str(value)
 
     @property
-    def gov_code(self):
+    def gov_code(self) -> int:
         return self._ehex_to_int(self._gov)
 
     @gov_code.setter
-    def gov_code(self, value):
+    def gov_code(self, value) -> None:
         self._gov = self._int_to_ehex(value)
 
     @property
-    def law(self):
+    def law(self) -> str:
         return self._law
 
     @law.setter
-    def law(self, value):
+    def law(self, value) -> None:
         self._law = str(value)
 
     @property
-    def law_code(self):
+    def law_code(self) -> int:
         return self._ehex_to_int(self._law)
 
     @law_code.setter
-    def law_code(self, value):
+    def law_code(self, value) -> None:
         self._law = self._int_to_ehex(value)
 
     @property
-    def tl(self):
+    def tl(self) -> str:
         return self._tl
 
     @tl.setter
-    def tl(self, value):
+    def tl(self, value) -> None:
         self._tl = str(value)
 
     @property
-    def tl_code(self):
+    def tl_code(self) -> int:
         return self._ehex_to_int(self._tl)
 
     @tl_code.setter
-    def tl_code(self, value):
+    def tl_code(self, value) -> None:
         self._tl = self._int_to_ehex(value)
 
     @property
-    def oldskool(self):
+    def oldskool(self) -> bool:
         return '?' in self.line
 
-    def check_canonical(self):
+    def check_canonical(self) -> tuple[bool, list[str]]:
         msg = []
         self._check_canonical_physicals(msg)
         self._check_canonical_socials(msg)
@@ -311,7 +311,7 @@ class UWP(object):
 
         return max_tl, min_tl
 
-    def canonicalise(self):
+    def canonicalise(self) -> None:
         self._canonicalise_physicals()
         self._canonicalise_socials()
         self._canonicalise_tl()
