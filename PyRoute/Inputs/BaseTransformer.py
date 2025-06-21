@@ -40,21 +40,22 @@ class BaseTransformer(Transformer):
         allegiance = args[5][2][0] if 2 < len(args[5]) else Token('__ANON__12', ' ')
 
         tradelen = sum([len(item) for item in trade]) + len(trade) - 1
-        if 16 < tradelen and 3 <= len(trade) and 1 == len(extensions) and '' == extensions[0].value.strip():  # Square up overspilled trade codes
-            if '' == nobles.value and '' != base.value and '' == zone.value:
-                move_fwd = 3 == len(base.value) and base.value.isdigit()  # Will base code still make sense as PBG?
-                move_rev = 3 == len(allegiance.value)  # Will allegiance code still make sense as PBG?
-                if move_fwd and not move_rev:
-                    last = trade[-1]
-                    mid = trade[-2]
-                    zone.value = base.value
-                    base.value = last
-                    nobles.value = mid
-                    trade = trade[:-2]
-                elif move_rev and not move_fwd:
-                    pass
-                elif move_fwd and move_rev:
-                    pass
+        # Square up overspilled trade codes
+        if 16 < tradelen and 3 <= len(trade) and 1 == len(extensions) and '' == extensions[0].value.strip() and \
+                '' == nobles.value and '' != base.value and '' == zone.value:
+            move_fwd = 3 == len(base.value) and base.value.isdigit()  # Will base code still make sense as PBG?
+            move_rev = 3 == len(allegiance.value)  # Will allegiance code still make sense as PBG?
+            if move_fwd and not move_rev:
+                last = trade[-1]
+                mid = trade[-2]
+                zone.value = base.value
+                base.value = last
+                nobles.value = mid
+                trade = trade[:-2]
+            elif move_rev and not move_fwd:
+                pass
+            elif move_fwd and move_rev:
+                pass
 
         if '*' != base.value and '' != base.value and 3 != len(extensions):
             if not self.crankshaft and zone.value.upper() not in self.zone_active:
@@ -65,33 +66,32 @@ class BaseTransformer(Transformer):
                     zone.value = base.value
                     base.value = nobles.value
                     nobles.value = ''
-        elif '*' != base.value and 3 == len(extensions):
-            if '' == nobles.value and '' != base.value and '' == zone.value:
-                if pbg.value == allegiance.value:
-                    nobles.value = base.value
-                    base.value = pbg.value
-                    zone.value = worlds.value
-                    pbg.value = allegiance.value
-                    worlds.value = ' '
-                    if 7 == len(args):
-                        allegiance.value = args[6][0].value
-                        args[6][0].value = ''
-                    else:
-                        allegiance.value = ''
-        if 8 == len(args):  # If there's no residual argument
-            if 1 < len(args[7]):
-                tailend = args[7][2][0].value
-                lenlast = min(4, len(tailend))
-                counter = 0
-                while counter < lenlast and (tailend[counter].isalnum() or '-' == tailend[counter] or '?' == tailend[counter]):
-                    if counter < lenlast:
-                        counter += 1
-                if counter < min(4, lenlast):  # if the allegiance overspills, move the overspill into the residual
-                    overrun = tailend[counter:]
-                    tailend = tailend[:counter]
-                    args[7][2][0].value = tailend
-                    newbie = Token('__ANON_14', overrun)
-                    args.append([newbie])
+        elif '*' != base.value and 3 == len(extensions) and '' == nobles.value and '' != base.value and \
+                '' == zone.value and pbg.value == allegiance.value:
+            nobles.value = base.value
+            base.value = pbg.value
+            zone.value = worlds.value
+            pbg.value = allegiance.value
+            worlds.value = ' '
+            if 7 == len(args):
+                allegiance.value = args[6][0].value
+                args[6][0].value = ''
+            else:
+                allegiance.value = ''
+        # If there's no residual argument
+        if 8 == len(args) and 1 < len(args[7]):
+            tailend = args[7][2][0].value
+            lenlast = min(4, len(tailend))
+            counter = 0
+            while counter < lenlast and (tailend[counter].isalnum() or '-' == tailend[counter] or '?' == tailend[counter]):
+                if counter < lenlast:
+                    counter += 1
+            if counter < min(4, lenlast):  # if the allegiance overspills, move the overspill into the residual
+                overrun = tailend[counter:]
+                tailend = tailend[:counter]
+                args[7][2][0].value = tailend
+                newbie = Token('__ANON_14', overrun)
+                args.append([newbie])
         return args
 
     def position(self, args):
@@ -308,9 +308,8 @@ class BaseTransformer(Transformer):
         nobles = [item for item in gubbinz if ParseStarInput.can_be_nobles(item)]
         if 0 == len(nobles):
             return 0
-        if 1 < len(gubbinz):
-            if ParseStarInput.can_be_nobles(gubbinz[-2]) and ParseStarInput.can_be_base(gubbinz[-1]):
-                return 2
+        if 1 < len(gubbinz) and ParseStarInput.can_be_nobles(gubbinz[-2]) and ParseStarInput.can_be_base(gubbinz[-1]):
+            return 2
 
         for k in range(num_child, 1, -1):
             trade_bar = " ".join(gubbinz[:k])
@@ -342,14 +341,14 @@ class BaseTransformer(Transformer):
         return overrun
 
     def _square_up_parsed(self, parsed):
-        if ' ' != parsed['nobles'] and 0 < len(parsed['nobles']) and '' == parsed['base'] and '' == parsed['zone']:
-            if 3 == len(parsed['allegiance']) and parsed['allegiance'][0].isdigit():
-                parsed['base'] = parsed['pbg']
-                parsed['zone'] = parsed['worlds']
-                parsed['pbg'] = parsed['allegiance']
-                parsed['worlds'] = ' '
-                parsed['allegiance'] = parsed['residual']
-                parsed['residual'] = ''
+        if ' ' != parsed['nobles'] and 0 < len(parsed['nobles']) and '' == parsed['base'] and '' == parsed['zone'] and \
+                3 == len(parsed['allegiance']) and parsed['allegiance'][0].isdigit():
+            parsed['base'] = parsed['pbg']
+            parsed['zone'] = parsed['worlds']
+            parsed['pbg'] = parsed['allegiance']
+            parsed['worlds'] = ' '
+            parsed['allegiance'] = parsed['residual']
+            parsed['residual'] = ''
 
         return parsed
 
@@ -416,12 +415,11 @@ class BaseTransformer(Transformer):
                 parsed['base'] = bitz[1]
                 parsed['zone'] = ''
                 return parsed
-            if not rawstring.endswith('   '):
-                if 4 > len(bitz[0]):
-                    parsed['nobles'] = ''
-                    parsed['base'] = bitz[0]
-                    parsed['zone'] = bitz[1]
-                    return parsed
+            if not rawstring.endswith('   ') and 4 > len(bitz[0]):
+                parsed['nobles'] = ''
+                parsed['base'] = bitz[0]
+                parsed['zone'] = bitz[1]
+                return parsed
             if rawstring.startswith('   '):
                 if 4 > len(bitz[0]):
                     parsed['nobles'] = ''

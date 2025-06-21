@@ -229,20 +229,21 @@ class TradeCodes(object):
                 continue
             if not raw.startswith('(') and '(' in raw and raw.endswith(')'):
                 continue
-            if not raw.endswith(')') and ')' in raw and raw.startswith('(') and 7 > len(raw):
-                if not (')' == raw[-2] and (raw[-1] in 'WX?' or raw[-1].isdigit())):
-                    continue
-            if not raw.startswith('(') and not raw.endswith(')') and '(' in raw and ')' in raw:
-                if not raw.startswith('[') and not raw.endswith(']'):
-                    continue
+            if not raw.endswith(')') and ')' in raw and raw.startswith('(') and 7 > len(raw) and \
+                    not (')' == raw[-2] and (raw[-1] in 'WX?' or raw[-1].isdigit())):
+                continue
+            if not raw.startswith('(') and not raw.endswith(')') and '(' in raw and ')' in raw and \
+                    not raw.startswith('[') and not raw.endswith(']'):
+                continue
             if 7 <= len(raw) and '(' == raw[0] and ')' == raw[5]:  # Let preprocessed sophont codes through
                 raw = raw[0:7]
                 codes.append(raw)
                 continue
-            if not raw.startswith('(') and not raw.startswith('['):  # this isn't a sophont code
-                if not raw.endswith(')') and not raw.endswith(']'):
-                    codes.append(raw)
-                    continue
+            # this isn't a sophont code
+            if not raw.startswith('(') and not raw.startswith('[') and \
+                    not raw.endswith(')') and not raw.endswith(']'):
+                codes.append(raw)
+                continue
             if raw.startswith('(') or raw.startswith('['):  # this _is_ a sophont code
                 if raw.endswith(')') or raw.endswith(']'):
                     if raw.startswith('[') and raw.endswith(']'):

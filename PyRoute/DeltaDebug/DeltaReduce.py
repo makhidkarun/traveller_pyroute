@@ -220,7 +220,8 @@ class DeltaReduce:
             q = e
             # check e's message and/or stack trace for interestingness line
             msg = str(e)
-            interesting = True if msg.__contains__(args.interestingline) else False
+            iline = '' if args.interestingline is None else args.interestingline
+            interesting = True if msg is not None and msg.__contains__(iline) else False
             if args.interestingtype and interesting:
                 strtype = str(type(e))
                 interesting = True if strtype.__contains__(args.interestingtype) else False

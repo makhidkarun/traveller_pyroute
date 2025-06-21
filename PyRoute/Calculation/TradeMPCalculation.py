@@ -327,9 +327,9 @@ class TradeMPCalculation(TradeCalculation):
             if float('+inf') != upbound:
                 comp_id = star.component
                 upbound = round(upbound * 1.005 + 0.0005, 3)
-                if star.index in self.component_landmarks[comp_id]:
-                    if target.index not in self.component_landmarks[comp_id]:
-                        target, star = star, target
+                if star.index in self.component_landmarks[comp_id] and \
+                    target.index not in self.component_landmarks[comp_id]:
+                    target, star = star, target
 
             rawroute, _ = astar_path_numpy(self.star_graph, star.index, target.index,
                                            self.galaxy.heuristic_distance_bulk, upbound=upbound)

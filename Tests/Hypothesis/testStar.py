@@ -250,12 +250,10 @@ class testStar(unittest.TestCase):
                 raw_uwp = ' X' + raw_uwp[2:]
                 s = s.replace(uwp_m[0], raw_uwp)
 
-        if econ_m:
-            if '-' != econ_m[0].strip():
-                keep_econ = True
-        if soc_m:
-            if '-' != soc_m[0].strip():
-                keep_social = True
+        if econ_m and '-' != econ_m[0].strip():
+            keep_econ = True
+        if soc_m and '-' != soc_m[0].strip():
+            keep_social = True
         if imp_m:
             keep_imp = True
 
