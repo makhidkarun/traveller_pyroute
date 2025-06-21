@@ -19,7 +19,7 @@ class testGalaxy(unittest.TestCase):
     A very simple, barebones test to check that Verge and Reft end up in their correct relative positions
     - Verge being immediately rimward of Reft
     """
-    def testVerticalOrdering(self):
+    def testVerticalOrdering(self) -> None:
         galaxy = Galaxy(0)
 
         reft = Sector("# Reft", "# -3, 0")
@@ -61,7 +61,7 @@ class testGalaxy(unittest.TestCase):
     A very simple, barebones test to check that Dagudashaag and Core end up in their correct relative positions
     - Dagudashaag being immediately spinward of Core
     """
-    def testHorizontalOrdering(self):
+    def testHorizontalOrdering(self) -> None:
         galaxy = Galaxy(0)
 
         core = Sector("# Core", "# 0, 0")

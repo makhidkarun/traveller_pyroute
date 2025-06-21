@@ -30,7 +30,7 @@ param_list = [
 
 
 class testTradeCalculationPassengerBtn(unittest.TestCase):
-    def test_passenger_btn(self):
+    def test_passenger_btn(self) -> None:
         for blurb, a_rich, a_subsec, a_sector, a_other, b_rich, b_subsec, b_sector, b_other, expected in param_list:
             with self.subTest(msg=blurb):
                 a_string = ''

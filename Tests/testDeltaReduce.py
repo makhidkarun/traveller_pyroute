@@ -16,7 +16,7 @@ from Tests.baseTest import baseTest
 
 
 class testDeltaReduce(baseTest):
-    def test_subsector_reduction(self):
+    def test_subsector_reduction(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-spiked.sec')
 
         args = self._make_args_no_line()
@@ -50,7 +50,7 @@ class testDeltaReduce(baseTest):
             "Unexpected allegiances length"
         )
 
-    def test_subsector_reduction_allegiance_balance(self):
+    def test_subsector_reduction_allegiance_balance(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/dagudashaag-allegiance-pax-balance/Dagudashaag.sec')
 
         args = self._make_args_no_line()
@@ -65,7 +65,7 @@ class testDeltaReduce(baseTest):
         reducer.reduce_line_pass()
         reducer.is_initial_state_uninteresting()
 
-    def test_line_reduction_throws_delta_logic_error(self):
+    def test_line_reduction_throws_delta_logic_error(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/dagudashaag-allegiance-pax-balance/Dagudashaag-delta-error.sec')
 
         args = self._make_args_no_line()
@@ -91,7 +91,7 @@ class testDeltaReduce(baseTest):
         # as input should be un-interesting, the is-not-interesting check should not blow up
         reducer.is_initial_state_uninteresting()
 
-    def test_line_reduction(self):
+    def test_line_reduction(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
 
         args = self._make_args()
@@ -123,7 +123,7 @@ class testDeltaReduce(baseTest):
             "Unexpected allegiances length"
         )
 
-    def test_line_reduction_singleton_only(self):
+    def test_line_reduction_singleton_only(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-reduced.sec')
 
         args = self._make_args()
@@ -147,7 +147,7 @@ class testDeltaReduce(baseTest):
             self.assertEqual(expected, reducer.sectors['Dagudashaag'][subsector_name].num_lines, subsector_name + " not empty")
         self.assertEqual(2, len(reducer.sectors.lines), "Unexpected line count after singleton pass")
 
-    def test_line_reduction_two_minimality(self):
+    def test_line_reduction_two_minimality(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-reduced.sec')
 
         args = self._make_args()
@@ -171,7 +171,7 @@ class testDeltaReduce(baseTest):
             self.assertEqual(expected, reducer.sectors['Dagudashaag'][subsector_name].num_lines, subsector_name + " not empty")
         self.assertEqual(3, len(reducer.sectors.lines), "Unexpected line count after doubleton pass")
 
-    def test_sector_reduction(self):
+    def test_sector_reduction(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-spiked.sec')
 
         args = self._make_args()
@@ -196,7 +196,7 @@ class testDeltaReduce(baseTest):
         self.assertEqual(1, len(reducer.sectors))
         self.assertEqual('Dagudashaag', reducer.sectors['Dagudashaag'].name)
 
-    def test_line_reduction_can_skip_sectors(self):
+    def test_line_reduction_can_skip_sectors(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
 
         args = self._make_args()
@@ -222,7 +222,7 @@ class testDeltaReduce(baseTest):
         self.assertEqual(1, len(reducer.sectors), 'Unexpected post-reduction sector count')
         self.assertEqual('Dagudashaag', reducer.sectors['Dagudashaag'].name)
 
-    def test_route_costs_balanced_should_be_uninteresting(self):
+    def test_route_costs_balanced_should_be_uninteresting(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-imbalanced-routes.sec')
 
         args = self._make_args_no_line()
@@ -235,7 +235,7 @@ class testDeltaReduce(baseTest):
         reducer = DeltaReduce(delta, args)
         reducer.is_initial_state_uninteresting()
 
-    def test_verify_stars_and_shadow_bijection(self):
+    def test_verify_stars_and_shadow_bijection(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/final_result_should_be_independently_interesting/Gushemege.sec')
 
         args = self._make_args()
@@ -296,7 +296,7 @@ class testDeltaReduce(baseTest):
 
         galaxy.trade.get_trade_between(line[0], line[1])
 
-    def test_verify_sector_without_subsector_names_and_generating_maps_is_not_interesting(self):
+    def test_verify_sector_without_subsector_names_and_generating_maps_is_not_interesting(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
 
         args = self._make_args()
@@ -314,7 +314,7 @@ class testDeltaReduce(baseTest):
 
         reducer.is_initial_state_uninteresting(reraise=True)
 
-    def test_verify_sector_without_subsector_names_allegiance_balances(self):
+    def test_verify_sector_without_subsector_names_allegiance_balances(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P - trimmed.sec')
 
         args = self._make_args()
@@ -332,7 +332,7 @@ class testDeltaReduce(baseTest):
 
         reducer.is_initial_state_uninteresting(reraise=True)
 
-    def test_star_having_no_sector_attribute(self):
+    def test_star_having_no_sector_attribute(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-star-object-no-sector-attribute.sec')
 
         args = self._make_args_no_line()
@@ -345,7 +345,7 @@ class testDeltaReduce(baseTest):
         reducer = DeltaReduce(delta, args)
         reducer.is_initial_state_uninteresting(reraise=True)
 
-    def test_population_balance_over_two_sectors(self):
+    def test_population_balance_over_two_sectors(self) -> None:
         args = self._make_args_no_line()
         sourcefile = self.unpack_filename('DeltaFiles/two-sector-pop-balance/Dagudashaag.sec')
 
@@ -362,7 +362,7 @@ class testDeltaReduce(baseTest):
         reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
         reducer.is_initial_state_uninteresting(reraise=True)
 
-    def test_pax_and_trade_balance_over_reft_sector(self):
+    def test_pax_and_trade_balance_over_reft_sector(self) -> None:
         args = self._make_args_no_line()
         sourcefile = self.unpack_filename('DeltaFiles/reft-allegiance-pax-balance/Reft Sector.sec')
 
@@ -373,7 +373,7 @@ class testDeltaReduce(baseTest):
         reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
         reducer.is_initial_state_uninteresting(reraise=True)
 
-    def test_zao_kfeng_jump_4_template_blowup(self):
+    def test_zao_kfeng_jump_4_template_blowup(self) -> None:
         args = self._make_args_no_line()
         args.max_jump = 4
         sourcefile = self.unpack_filename('DeltaFiles/zao_kfeng_jump_4_template_blowup/Zao Kfeng Ig Grilokh.sec')
@@ -385,7 +385,7 @@ class testDeltaReduce(baseTest):
         reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
         reducer.is_initial_state_uninteresting(reraise=True)
 
-    def test_allegiance_reduction(self):
+    def test_allegiance_reduction(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Passes/Dagudashaag-subsector-full-reduce.sec')
 
         args = self._make_args()
@@ -407,7 +407,7 @@ class testDeltaReduce(baseTest):
 
         self.assertEqual(4, len(reducer.sectors.lines), "Unexpected line count after allegiance pass")
 
-    def _make_args(self):
+    def _make_args(self) -> argparse.ArgumentParser:
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
         args.max_jump = 2
@@ -433,7 +433,7 @@ class testDeltaReduce(baseTest):
         args.map_type = "classic"
         return args
 
-    def _make_args_no_line(self):
+    def _make_args_no_line(self) -> argparse.ArgumentParser:
         args = self._make_args()
         args.interestingline = None
 

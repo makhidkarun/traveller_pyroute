@@ -13,7 +13,7 @@ from Tests.baseTest import baseTest
 
 class testStarParsingImpliedTradeCodes(baseTest):
 
-    def testParseImpliedVaGivenAsTradeCode(self):
+    def testParseImpliedVaGivenAsTradeCode(self) -> None:
         outer_logger = logging.getLogger("PyRoute.Star")
         inner_logger = logging.getLogger("PyRoute.TradeCodes")
 
@@ -51,7 +51,7 @@ class testStarParsingImpliedTradeCodes(baseTest):
                 for line in output:
                     self.assertTrue(no_match not in line, "Va trade code not added during parsing")
 
-    def testParseImpliedHiGivenInTradeCode(self):
+    def testParseImpliedHiGivenInTradeCode(self) -> None:
         outer_logger = logging.getLogger("PyRoute.Star")
         inner_logger = logging.getLogger("PyRoute.TradeCodes")
 
@@ -89,7 +89,7 @@ class testStarParsingImpliedTradeCodes(baseTest):
                 for line in output:
                     self.assertTrue(no_match not in line, "Hi trade code not added during parsing")
 
-    def testParsePresentVaGivenAsTradeCode(self):
+    def testParsePresentVaGivenAsTradeCode(self) -> None:
         outer_logger = logging.getLogger("PyRoute.Star")
         inner_logger = logging.getLogger("PyRoute.TradeCodes")
 
@@ -127,7 +127,7 @@ class testStarParsingImpliedTradeCodes(baseTest):
                 for line in output:
                     self.assertTrue(no_match not in line, "Va trade code not added during parsing")
 
-    def testParsePresentHiGivenInTradeCode(self):
+    def testParsePresentHiGivenInTradeCode(self) -> None:
         outer_logger = logging.getLogger("PyRoute.Star")
         inner_logger = logging.getLogger("PyRoute.TradeCodes")
 
@@ -165,7 +165,7 @@ class testStarParsingImpliedTradeCodes(baseTest):
                 for line in output:
                     self.assertTrue(no_match not in line, "Hi trade code not added during parsing")
 
-    def test_dont_double_missing_trade_code_warnings(self):
+    def test_dont_double_missing_trade_code_warnings(self) -> None:
         outer_logger = logging.getLogger("PyRoute.Star")
         inner_logger = logging.getLogger("PyRoute.TradeCodes")
 

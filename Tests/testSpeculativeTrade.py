@@ -13,7 +13,7 @@ import unittest
 
 
 class testSpeculativeTrade(baseTest):
-    def test_spec_trade_across_TL(self):
+    def test_spec_trade_across_TL(self) -> None:
         s = '0101 000000000000000 {} {}  - - A 000   0000D'
         t = '0102 000000000000000 {} {}  - - A 000   0000D'
         pop_code = 'scaled'
@@ -56,7 +56,7 @@ class testSpeculativeTrade(baseTest):
                 self.assertEqual(expSrcPrice, edge['SourceMarketPrice'])
                 self.assertEqual(expTrgPrice, edge['TargetMarketPrice'])
 
-    def test_spec_trade_same_TL_no_codes(self):
+    def test_spec_trade_same_TL_no_codes(self) -> None:
         s = '0101 000000000000000 {} {}  - - A 000   0000D'
         t = '0102 000000000000000 {} {}  - - A 000   0000D'
         pop_code = 'scaled'
@@ -111,7 +111,7 @@ class testSpeculativeTrade(baseTest):
                 self.assertEqual(expSrcPrice, edge['SourceMarketPrice'])
                 self.assertEqual(expTrgPrice, edge['TargetMarketPrice'])
 
-    def test_spec_trade_same_TL_with_codes(self):
+    def test_spec_trade_same_TL_with_codes(self) -> None:
         s = '0101 000000000000000 {} {}  - - A 000   0000D'
         t = '0102 000000000000000 {} {}  - - A 000   0000D'
         pop_code = 'scaled'

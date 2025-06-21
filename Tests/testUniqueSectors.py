@@ -13,7 +13,7 @@ from pytest_console_scripts import ScriptRunner
 
 class testUniqueSectors(baseTest):
 
-    def testSectorListIsUnique(self):
+    def testSectorListIsUnique(self) -> None:
         fullpath = self.unpack_filename('../PyRoute/unique_sectors.py')
 
         cases = [

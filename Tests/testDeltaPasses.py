@@ -17,7 +17,7 @@ from Tests.baseTest import baseTest
 
 
 class testDeltaPasses(baseTest):
-    def test_canonicalisation_of_subsector(self):
+    def test_canonicalisation_of_subsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
         args = self._make_args()
 
@@ -40,7 +40,7 @@ class testDeltaPasses(baseTest):
             reduced = DeltaStar.reduce(line, canonicalise=True)
             self.assertEqual(line, reduced, "Line not canonicalised")
 
-    def test_canonicalisation_resets_hex_block(self):
+    def test_canonicalisation_resets_hex_block(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-imbalanced-routes.sec')
         args = self._make_args_no_line()
 
@@ -63,7 +63,7 @@ class testDeltaPasses(baseTest):
         self.assertEqual(expected_hex_line, headers[36])
         self.assertEqual(expected_dash_line, headers[37])
 
-    def test_full_line_reduction_of_subsector(self):
+    def test_full_line_reduction_of_subsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
         args = self._make_args_no_line()
 
@@ -89,7 +89,7 @@ class testDeltaPasses(baseTest):
             if not line.startswith('2123 Medurma'):
                 self.assertEqual(line, DeltaStar.reduce_all(line), "Line not full-line-reduced")
 
-    def test_auxiliary_line_reduction_of_subsector(self):
+    def test_auxiliary_line_reduction_of_subsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Passes/Dagudashaag-subsector-full-reduce.sec')
         args = self._make_args_no_line()
 
@@ -114,7 +114,7 @@ class testDeltaPasses(baseTest):
         for line in reducer.sectors.lines:
             self.assertEqual(line, DeltaStar.reduce_auxiliary(line), "Line not auxiliary-line-reduced")
 
-    def test_importance_line_reduction_of_subsector(self):
+    def test_importance_line_reduction_of_subsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Passes/Dagudashaag-subsector-full-reduce.sec')
         args = self._make_args_no_line()
 
@@ -140,7 +140,7 @@ class testDeltaPasses(baseTest):
             if not line.startswith('2123 Medurma'):
                 self.assertEqual(line, DeltaStar.reduce_importance(line), "Line not importance-line-reduced")
 
-    def test_full_and_auxiliary_line_reduction_of_pre_reduced_lines(self):
+    def test_full_and_auxiliary_line_reduction_of_pre_reduced_lines(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Passes/Dagudashaag-auxiliary-reduction-two-lines.sec')
         args = self._make_args_no_line()
 
@@ -166,7 +166,7 @@ class testDeltaPasses(baseTest):
         for line in reducer.sectors.lines:
             self.assertEqual(line, DeltaStar.reduce_auxiliary(line), "Line not auxiliary-line-reduced")
 
-    def test_widen_hole_reducer_on_start_of_spiked_subsector(self):
+    def test_widen_hole_reducer_on_start_of_spiked_subsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
         args = self._make_args_no_line()
 
@@ -185,7 +185,7 @@ class testDeltaPasses(baseTest):
         new_count = len(reducer.sectors.lines)
         self.assertEqual(37, new_count, "Unexpected number of lines after widen-hole reduction")
 
-    def test_widen_hole_reducer_near_far_end_of_spiked_subsector(self):
+    def test_widen_hole_reducer_near_far_end_of_spiked_subsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
         args = self._make_args_no_line()
 
@@ -204,7 +204,7 @@ class testDeltaPasses(baseTest):
         new_count = len(reducer.sectors.lines)
         self.assertEqual(38, new_count, "Unexpected number of lines after widen-hole reduction")
 
-    def test_widen_hole_reducer_on_end_of_spiked_subsector(self):
+    def test_widen_hole_reducer_on_end_of_spiked_subsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
         args = self._make_args_no_line()
 
@@ -223,7 +223,7 @@ class testDeltaPasses(baseTest):
         new_count = len(reducer.sectors.lines)
         self.assertEqual(33, new_count, "Unexpected number of lines after widen-hole-at-end reduction")
 
-    def test_widen_hole_reducer_near_start_of_spiked_subsector(self):
+    def test_widen_hole_reducer_near_start_of_spiked_subsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
         args = self._make_args_no_line()
 
@@ -242,7 +242,7 @@ class testDeltaPasses(baseTest):
         new_count = len(reducer.sectors.lines)
         self.assertEqual(39, new_count, "Unexpected number of lines after widen-hole-at-end reduction")
 
-    def test_widen_hole_reducer_reversing_from_positive_location_in_spiked_subsector(self):
+    def test_widen_hole_reducer_reversing_from_positive_location_in_spiked_subsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
         args = self._make_args_no_line()
 
@@ -261,7 +261,7 @@ class testDeltaPasses(baseTest):
         new_count = len(reducer.sectors.lines)
         self.assertEqual(33, new_count, "Unexpected number of lines after widen-hole-reverse-from-positive reduction")
 
-    def test_widen_hole_reducer_forward_from_negative_location_in_spiked_subsector(self):
+    def test_widen_hole_reducer_forward_from_negative_location_in_spiked_subsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
         args = self._make_args_no_line()
 
@@ -280,7 +280,7 @@ class testDeltaPasses(baseTest):
         new_count = len(reducer.sectors.lines)
         self.assertEqual(33, new_count, "Unexpected number of lines after widen-hole-reverse-from-positive reduction")
 
-    def test_widen_hole_reducer_near_middle_of_spiked_subsector(self):
+    def test_widen_hole_reducer_near_middle_of_spiked_subsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
         args = self._make_args_no_line()
 
@@ -305,7 +305,7 @@ class testDeltaPasses(baseTest):
         new_count = len(reducer.sectors.lines)
         self.assertEqual(22, new_count, "Unexpected number of lines after widen-middle-hole-reverse reduction")
 
-    def test_allegiance_reduction_of_sector(self):
+    def test_allegiance_reduction_of_sector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-spiked.sec')
         args = self._make_args_no_line()
         args.interesting_line = 'duplicated'
@@ -341,7 +341,7 @@ class testDeltaPasses(baseTest):
         result, msg = delta.is_well_formed()
         self.assertTrue(result, msg)
 
-    def test_allegiance_reduction_deduplicates_allegiance_lines(self):
+    def test_allegiance_reduction_deduplicates_allegiance_lines(self) -> None:
         headers = [
             '# Alleg: ImAp: "Third Imperium, Amec Protectorate"',
             '# Alleg: ImDv: "Third Imperium, Domain of Vland"',
@@ -367,7 +367,7 @@ class testDeltaPasses(baseTest):
         ]
         self.assertEqual(expected_headers, nu_sector.headers)
 
-    def _make_args(self):
+    def _make_args(self) -> argparse.ArgumentParser:
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
         args.max_jump = 2
@@ -392,7 +392,7 @@ class testDeltaPasses(baseTest):
         args.mindir = tempfile.gettempdir()
         return args
 
-    def _make_args_no_line(self):
+    def _make_args_no_line(self) -> argparse.ArgumentParser:
         args = self._make_args()
         args.interestingline = None
 
