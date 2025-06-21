@@ -175,7 +175,7 @@ class Borders(object):
             for key, value in ally_map.items():
                 f.write("{}-{}: border: {}\n".format(key[0], key[1], value))
 
-    def create_ally_map(self, match: str, enforce=True):
+    def create_ally_map(self, match: str, enforce=True) -> None:
         """
             Create borders around various allegiances, Algorithm Two.
             From the AllyGen http://dotclue.org/t20/ code created by J. Greely.
@@ -270,7 +270,7 @@ class Borders(object):
 
         return ally_map
 
-    def create_erode_border(self, match: str, enforce=True):
+    def create_erode_border(self, match: str, enforce=True) -> None:
         """
         Create borders around various allegiances, Algorithm Three.
         From TravellerMap http://travellermap.com/borders/doc.htm
