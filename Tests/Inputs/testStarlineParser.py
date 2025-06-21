@@ -11,7 +11,7 @@ from PyRoute.Inputs.StarlineTransformer import StarlineTransformer
 
 
 class testStarlineParser(unittest.TestCase):
-    def test_parser(self):
+    def test_parser(self) -> None:
         txt = '0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           '
         foo = StarlineParser()
         result, txt = foo.parse(txt)
@@ -35,7 +35,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('Im', transformed[16])
         self.assertEqual('M2 V', transformed[17])
 
-    def test_parser_missing_extensions(self):
+    def test_parser_missing_extensions(self) -> None:
         txt = '2332 Akarrtoog            E300000-0 Ba Na Va                            - K - 013   Kk M1 V                '
 
         foo = StarlineParser()
@@ -60,7 +60,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('Kk', transformed[16])
         self.assertEqual('M1 V', transformed[17])
 
-    def test_parser_no_name_and_no_residual(self):
+    def test_parser_no_name_and_no_residual(self) -> None:
         txt = '0104                      X110000-6 Ba Lo Ni                            - -  - 004   Na'
 
         foo = StarlineParser()
@@ -85,7 +85,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('Na', transformed[16])
         self.assertEqual('', transformed[17])
 
-    def test_parser_screwball_synthetic_starline_3(self):
+    def test_parser_screwball_synthetic_starline_3(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000       - - - 000 00 00'
 
         foo = StarlineParser()
@@ -110,7 +110,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_4(self):
+    def test_parser_screwball_synthetic_starline_4(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000         - Q   000   00'
 
         foo = StarlineParser()
@@ -135,7 +135,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_5(self):
+    def test_parser_screwball_synthetic_starline_5(self) -> None:
         txt = '0101 000000000000000 ???????-? 0000000-0000000       - - a 000   00'
 
         foo = StarlineParser()
@@ -160,7 +160,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_6(self):
+    def test_parser_screwball_synthetic_starline_6(self) -> None:
         txt = '0101 000000000000000 ?000000-0 000000000000000       - - R 000   000000'
 
         foo = StarlineParser()
@@ -185,7 +185,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('0000', transformed[16], 'Unexpected allegiance')
         self.assertEqual('00', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_7(self):
+    def test_parser_screwball_synthetic_starline_7(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000         - F 000   00'
 
         foo = StarlineParser()
@@ -210,7 +210,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_8(self):
+    def test_parser_screwball_synthetic_starline_8(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000 {   0} -  [0000] - - F 000   00'
 
         foo = StarlineParser()
@@ -235,7 +235,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_9(self):
+    def test_parser_screwball_synthetic_starline_9(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000       - - -   000   00'
 
         foo = StarlineParser()
@@ -260,7 +260,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_10(self):
+    def test_parser_screwball_synthetic_starline_10(self) -> None:
         txt = '0101 000000000000000 ?000000-0 000000000000000       - -      - 000   00'
 
         foo = StarlineParser()
@@ -285,7 +285,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_11(self):
+    def test_parser_screwball_synthetic_starline_11(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000       - - A 000   00000 '
 
         foo = StarlineParser()
@@ -310,7 +310,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('0000', transformed[16], 'Unexpected allegiance')
         self.assertEqual('0', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_12(self):
+    def test_parser_screwball_synthetic_starline_12(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000       - -  R   000   00'
 
         foo = StarlineParser()
@@ -335,7 +335,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_13(self):
+    def test_parser_screwball_synthetic_starline_13(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000       - - g 000  0 00000'
 
         foo = StarlineParser()
@@ -360,7 +360,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('0000', transformed[16], 'Unexpected allegiance')
         self.assertEqual('0', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_14(self):
+    def test_parser_screwball_synthetic_starline_14(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000       - -      f 000 0010 00+'
 
         foo = StarlineParser()
@@ -385,7 +385,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('+', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_15(self):
+    def test_parser_screwball_synthetic_starline_15(self) -> None:
         txt = '0101 000000000000000 ???????-? 000 0000000BCDEFG       - - u 000   00'
 
         foo = StarlineParser()
@@ -410,7 +410,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_16(self):
+    def test_parser_screwball_synthetic_starline_16(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000       - - r 000   10 +'
 
         foo = StarlineParser()
@@ -435,7 +435,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('10', transformed[16], 'Unexpected allegiance')
         self.assertEqual('+', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_17(self):
+    def test_parser_screwball_synthetic_starline_17(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000         -   000   A00'
 
         foo = StarlineParser()
@@ -460,7 +460,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('A00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_18(self):
+    def test_parser_screwball_synthetic_starline_18(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000         -   001   000'
 
         foo = StarlineParser()
@@ -485,7 +485,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('000', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_19(self):
+    def test_parser_screwball_synthetic_starline_19(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000 {0} - -  - AAA U 000   00'
 
         foo = StarlineParser()
@@ -510,7 +510,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_20(self):
+    def test_parser_screwball_synthetic_starline_20(self) -> None:
         txt = '0101 000000000000000      ???????-?                                       { -2 } -       -      -       - 000 0  ?00                                                          '
 
         foo = StarlineParser()
@@ -535,7 +535,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('?00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_21(self):
+    def test_parser_screwball_synthetic_starline_21(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000 {0} (000-0) [0000]   - a   000   00'
 
         foo = StarlineParser()
@@ -560,7 +560,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_22(self):
+    def test_parser_screwball_synthetic_starline_22(self) -> None:
         txt = '0101 000000000000000 ???????-? 000000000000000       c -   000   00'
 
         foo = StarlineParser()
@@ -586,7 +586,7 @@ class testStarlineParser(unittest.TestCase):
         self.assertEqual('00', transformed[16], 'Unexpected allegiance')
         self.assertEqual('', transformed[17], 'Unexpected residual')
 
-    def test_parser_screwball_synthetic_starline_23(self):
+    def test_parser_screwball_synthetic_starline_23(self) -> None:
         txt = '0101 000000000000000 ???????-? 00000000+  0000         -   000   00'
 
         foo = StarlineParser()
