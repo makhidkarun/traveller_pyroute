@@ -424,9 +424,7 @@ class PDFHexMap(SectorHexMap):
     def compression(self):
         if self.writer is None:
             return True
-        if 'string' == self.writer._filename:
-            return False
-        return True
+        return 'string' != self.writer._filename
 
     def _save_font(self, pdf):
         font_name = pdf._fontname

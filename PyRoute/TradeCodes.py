@@ -704,22 +704,16 @@ class TradeCodes(object):
                 return False
 
             if code.startswith('['):
-                if len(code) > max_sophont_len:
-                    return False
-                return True
+                return len(code) > max_sophont_len
             elif len(code) > max_code_len:
                 return False
 
             if len(code) > max_code_len or (code.startswith('[') and len(code) > max_sophont_len):
                 return False
             if code.startswith('Di(') or code.startswith('(') or code.endswith(')') or code.endswith(')?'):  # minor race homeworld
-                if ')' not in code:
-                    return False
-                return True
+                return ')' in code
             if code.startswith('[') and (code.endswith(']') or ']' == code[-2]):  # major race homeworld
-                if ']' not in code:
-                    return False
-                return True
+                return ']' in code
             if code not in TradeCodes.allowed_residual_codes:
                 return False
         return True

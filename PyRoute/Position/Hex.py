@@ -55,9 +55,7 @@ class Hex(object):
             return False
         if self.dx != other.dx:
             return False
-        if self.dy != other.dy:
-            return False
-        return True
+        return not self.dy != other.dy
 
     def distance(self, other):
         return Hex.axial_distance((self.q, self.r), (other.q, other.r))

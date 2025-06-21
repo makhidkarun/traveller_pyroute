@@ -551,9 +551,7 @@ class BaseTransformer(Transformer):
             return True
         if parsed['pbg'] == parsed['allegiance']:
             return True
-        if parsed['pbg'] == parsed['residual']:
-            return True
-        return False
+        return parsed['pbg'] == parsed['residual']
 
     @staticmethod
     def boil_down_double_spaces(dubbel):

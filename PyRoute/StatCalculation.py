@@ -38,9 +38,7 @@ class Populations(object):
             return False
         if self.population != other.population:
             return False
-        if self.homeworlds != other.homeworlds:
-            return False
-        return True
+        return self.homeworlds == other.homeworlds
 
     def __hash__(self):
         key = (self.code, self.count, self.population)

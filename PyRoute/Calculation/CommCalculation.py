@@ -33,9 +33,7 @@ class CommCalculation(RouteCalculation):
         self.min_importance = 4
 
     def base_route_filter(self, star, neighbor):
-        if not AllyGen.are_allies(star.alg_code, neighbor.alg_code):
-            return True
-        return False
+        return not AllyGen.are_allies(star.alg_code, neighbor.alg_code)
 
     def base_range_routes(self, star, neighbor):
         if not getattr(self.galaxy.alg[star.alg_base_code], 'min_importance', False):
@@ -236,6 +234,4 @@ class CommCalculation(RouteCalculation):
         self.shortest_path_tree.update_edges(edges)
 
     def unilateral_filter(self, star):
-        if star.zone in ['R', 'F']:
-            return True
-        return False
+        return star.zone in ['R', 'F']

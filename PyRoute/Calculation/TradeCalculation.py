@@ -595,9 +595,7 @@ class TradeCalculation(RouteCalculation):
     def unilateral_filter(self, star: Star):
         if star.zone in ['R', 'F']:
             return True
-        if star.tradeCode.barren:
-            return True
-        return False
+        return star.tradeCode.barren
 
     def is_sector_trade_balanced(self):
         self.sector_trade_balance.is_balanced()
