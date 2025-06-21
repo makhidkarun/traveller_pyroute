@@ -25,7 +25,7 @@ class testHexMap(baseTest):
     timeline = re.compile(timestamp_regex)
     md5line = re.compile(md5_regex)
 
-    def test_document_object(self):
+    def test_document_object(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
 
         args = self._make_args()
@@ -60,7 +60,7 @@ class testHexMap(baseTest):
                 self.assertEqual('ReportLab', doc_info.creator)
                 self.assertEqual(expected_path, document._filename)
 
-    def test_document_object_pdf(self):
+    def test_document_object_pdf(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
 
         args = self._make_args()
@@ -95,7 +95,7 @@ class testHexMap(baseTest):
                 self.assertEqual('ReportLab', doc_info.creator)
                 self.assertEqual(expected_path, document._filename)
 
-    def test_verify_empty_sector_write_pdf(self):
+    def test_verify_empty_sector_write_pdf(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
         srcpdf = self.unpack_filename(
             'OutputFiles/verify_empty_sector_write/Zao Kfeng Ig Grilokh empty.pdf')
@@ -144,7 +144,7 @@ class testHexMap(baseTest):
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
 
-    def test_verify_subsector_trade_write_pdf(self):
+    def test_verify_subsector_trade_write_pdf(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
         srcpdf = self.unpack_filename('OutputFiles/verify_subsector_trade_write/Zao Kfeng Ig Grilokh - subsector P - trade.pdf')
 
@@ -211,7 +211,7 @@ class testHexMap(baseTest):
         graphMap = SubsectorMap(galaxy, args.routes, galaxy.output_path)
         graphMap.write_maps()
 
-    def test_verify_subsector_trade_write_pdf_nonclassic(self):
+    def test_verify_subsector_trade_write_pdf_nonclassic(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
 
         args = self._make_args()
@@ -251,7 +251,7 @@ class testHexMap(baseTest):
 
                 hexmap.write_sector_map(galaxy.sectors[secname])
 
-    def test_verify_subsector_comm_write_pdf(self):
+    def test_verify_subsector_comm_write_pdf(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
         srcpdf = self.unpack_filename(
             'OutputFiles/verify_subsector_comm_write/Zao Kfeng Ig Grilokh - subsector P - comm.pdf')
@@ -316,7 +316,7 @@ class testHexMap(baseTest):
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Zao Kfeng Ig Grilokh sector")
 
-    def test_verify_coreward_rimward_sector(self):
+    def test_verify_coreward_rimward_sector(self) -> None:
         source1file = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
         source2file = self.unpack_filename('DeltaFiles/no_subsectors_named/Ngathksirz empty.sec')
 
@@ -399,7 +399,7 @@ class testHexMap(baseTest):
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Ngathksirz sector")
 
-    def test_verify_spinward_trailing_sector(self):
+    def test_verify_spinward_trailing_sector(self) -> None:
         source1file = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
         source2file = self.unpack_filename('DeltaFiles/no_subsectors_named/Knaeleng empty.sec')
 
@@ -482,7 +482,7 @@ class testHexMap(baseTest):
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.2 > mse, "Image difference " + str(mse) + " above threshold for Knaeleng sector")
 
-    def test_verify_xboat_write_pdf(self):
+    def test_verify_xboat_write_pdf(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         srcpdf = self.unpack_filename(
             'OutputFiles/verify_subsector_xroute_write/Zarushagar Sector.pdf')
@@ -533,7 +533,7 @@ class testHexMap(baseTest):
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.1 > mse, "Image difference " + str(mse) + " above threshold for Zarushagar sector")
 
-    def test_verify_quadripoint_trade_write(self):
+    def test_verify_quadripoint_trade_write(self) -> None:
         source1file = self.unpack_filename('DeltaFiles/quadripoint_trade_write/Tuglikki.sec')
         source2file = self.unpack_filename('DeltaFiles/quadripoint_trade_write/Provence.sec')
         source3file = self.unpack_filename('DeltaFiles/quadripoint_trade_write/Deneb.sec')
@@ -608,7 +608,7 @@ class testHexMap(baseTest):
             graphMap = SubsectorMap(galaxy, args.routes, galaxy.output_path)
             graphMap.write_maps()
 
-    def test_verify_single_system_border_write(self):
+    def test_verify_single_system_border_write(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/single_system_border/Deneb.sec')
         srcpdf = self.unpack_filename(
             'OutputFiles/verify_single_system_border_write/Deneb Sector.pdf')
@@ -703,7 +703,7 @@ class testHexMap(baseTest):
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.11 > mse, "Image difference " + str(mse) + " above threshold for Deneb sector")
 
-    def test_verify_subsector_trade_lines_on_map(self):
+    def test_verify_subsector_trade_lines_on_map(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/verify_subsector_trade_lines_on_map/Trojan Reach.sec')
 
         args = self._make_args()
@@ -733,7 +733,7 @@ class testHexMap(baseTest):
         graphMap = SubsectorMap(galaxy, args.routes, galaxy.output_path)
         graphMap.write_maps()
 
-    def test_verify_subsector_xroute_lines_on_map(self):
+    def test_verify_subsector_xroute_lines_on_map(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/verify_subsector_trade_lines_on_map/Trojan Reach.sec')
 
         args = self._make_args()
@@ -763,7 +763,7 @@ class testHexMap(baseTest):
         graphMap = SubsectorMap(galaxy, args.routes, galaxy.output_path)
         graphMap.write_maps()
 
-    def _load_ranges(self, galaxy, sourcefile):
+    def _load_ranges(self, galaxy, sourcefile) -> None:
         with open(sourcefile, "rb") as f:
             lines = f.readlines()
             for rawline in lines:
