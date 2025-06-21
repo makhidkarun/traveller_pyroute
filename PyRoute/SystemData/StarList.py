@@ -201,13 +201,9 @@ class StarList(object):
             # around to make those removals confusing, so we're only canonicalising star size
             for i in range(1, num_stars):
                 current = self.stars_list[i]
-                if current.is_supergiant:
-                    if 'A' == current.spectral:
-                        current.size = 'II'
-                    elif 'B' == current.spectral:
-                        current.size = 'II'
-                    elif 'O' == current.spectral:
-                        current.size = 'II'
+                if current.is_supergiant and \
+                        ('A' == current.spectral or 'B' == current.spectral or 'O' == current.spectral):
+                    current.size = 'II'
                 if primary_supergiant:
                     if 'F' == current.spectral and current.size in ['II', 'III']:
                         current.size = 'IV'

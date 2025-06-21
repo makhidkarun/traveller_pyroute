@@ -140,11 +140,8 @@ class DeltaReduce:
 
     @staticmethod
     def update_short_msg(msg, short_msg):
-        if msg is not None:
-            if short_msg is None:
-                short_msg = msg
-            elif len(msg) < len(short_msg):
-                short_msg = msg
+        if msg is not None and (short_msg is None or len(msg) < len(short_msg)):
+            short_msg = msg
         return short_msg
 
     @staticmethod

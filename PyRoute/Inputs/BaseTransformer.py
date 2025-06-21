@@ -52,9 +52,7 @@ class BaseTransformer(Transformer):
                 base.value = last
                 nobles.value = mid
                 trade = trade[:-2]
-            elif move_rev and not move_fwd:
-                pass
-            elif move_fwd and move_rev:
+            elif (move_rev and not move_fwd) or (move_fwd and move_rev):
                 pass
 
         if '*' != base.value and '' != base.value and 3 != len(extensions):

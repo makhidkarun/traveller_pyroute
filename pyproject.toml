@@ -3,7 +3,7 @@
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
 lint.select = ["E", "F", "TID252", "NPY201", "W", "PLE", "PLW", "B007", "SIM115", "SIM108", "SIM101", "SIM102",
-    "SIM103", "SIM105", "SIM107", "SIM108", "SIM109", "SIM110"]
+    "SIM103", "SIM105", "SIM107", "SIM108", "SIM109", "SIM110", "SIM112", "SIM114"]
 lint.ignore = ["E501", "SIM300"]
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
@@ -37,7 +37,7 @@ exclude = [
     "node_modules",
     "venv",
 ]
-lint.per-file-ignores = { '__init__.py' = ['F822'], 'PyRoute/Calculation/TradeMPCalculation.py' = ['PLW0602', 'PLW0603']}
+lint.per-file-ignores = {'__init__.py' = ['F822'], 'PyRoute/Calculation/TradeMPCalculation.py' = ['PLW0602', 'PLW0603']}
 
 # Same as Black.
 line-length = 120

@@ -174,11 +174,8 @@ class TradeCodes(object):
                 raw = '[' + raw.lstrip('[')
             if raw.startswith('(('):
                 raw = '(' + raw.lstrip('(')
-            if 2 < len(raw):
-                if raw.startswith('[]'):
-                    raw = raw[2:]
-                elif raw.startswith('()'):
-                    raw = raw[2:]
+            if 2 < len(raw) and (raw.startswith('[]') or raw.startswith('()')):
+                raw = raw[2:]
             if raw.startswith('Di('):
                 if not raw.endswith(')') and i < num_codes - 1:
                     next = raw_codes[i + 1]
