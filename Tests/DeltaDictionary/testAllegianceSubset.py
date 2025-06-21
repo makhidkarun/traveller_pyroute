@@ -9,7 +9,7 @@ from Tests.baseTest import baseTest
 
 class testAllegianceSubset(baseTest):
 
-    def test_blowup_1(self):
+    def test_blowup_1(self) -> None:
         source = self.unpack_filename('DeltaFiles/allegiance_subset_blowup_1/Reaver\'s Deep.sec')
 
         delta = DeltaDictionary()

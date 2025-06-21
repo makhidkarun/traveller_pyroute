@@ -15,7 +15,7 @@ from Tests.baseTest import baseTest
 
 class testAllegiance(baseTest):
 
-    def testAslanAllegianceNotBeginningWithAs(self):
+    def testAslanAllegianceNotBeginningWithAs(self) -> None:
         code = "A8"
         name = "Aslan Hierate, Tlaukhu control, Seieakh (9), Akatoiloh (18), We'okurir (29)"
         pop = "Asla"
@@ -25,7 +25,7 @@ class testAllegiance(baseTest):
         result, msg = alleg.is_well_formed()
         self.assertTrue(result, msg)
 
-    def test_deep_copy_of_new_allegiance(self):
+    def test_deep_copy_of_new_allegiance(self) -> None:
         code = "A8"
         name = "Aslan Hierate, Tlaukhu control, Seieakh (9), Akatoiloh (18), We'okurir (29)"
         pop = "Asla"
@@ -35,7 +35,7 @@ class testAllegiance(baseTest):
         foo = copy.deepcopy(alleg)
         self.assertTrue(isinstance(foo, Allegiance))
 
-    def test_allegiance_list_on_galaxy_read(self):
+    def test_allegiance_list_on_galaxy_read(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/duplicate_node_blowup/Trojan Reach.sec')
 
         args = self._make_args()
@@ -65,7 +65,7 @@ class testAllegiance(baseTest):
             else:
                 self.assertNotIn(alg_name, galaxy.sectors['Trojan Reach'].alg, "Unexpected allegiance " + alg_name)
 
-    def test_allegiance_list_on_sector_dictionary_read(self):
+    def test_allegiance_list_on_sector_dictionary_read(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/duplicate_node_blowup/Trojan Reach.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -77,7 +77,7 @@ class testAllegiance(baseTest):
 
         self.assertEqual(expected_allegiances, actual_allegiances, "Allegiance name list unexpected")
 
-    def test_allegiance_list_on_delta_galaxy_read(self):
+    def test_allegiance_list_on_delta_galaxy_read(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/duplicate_node_blowup/Trojan Reach.sec')
 
         args = self._make_args()

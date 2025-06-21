@@ -22,11 +22,11 @@ from PyRoute.Star import Star
 
 class TestStar(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         ParseStarInput.deep_space = {}
         pass
 
-    def testParseIrkigkhan(self):
+    def testParseIrkigkhan(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
@@ -54,7 +54,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(3, star1.row)
         self.assertEqual(1, star1.col)
 
-    def testParseIrkigkhanRUCollapse(self):
+    def testParseIrkigkhanRUCollapse(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
@@ -65,7 +65,7 @@ class TestStar(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    def testParseIrkigkhanRUScaled(self):
+    def testParseIrkigkhanRUScaled(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
@@ -76,7 +76,7 @@ class TestStar(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    def testParseShanaMa(self):
+    def testParseShanaMa(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
@@ -105,7 +105,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(4, star1.row)
         self.assertEqual(1, star1.col)
 
-    def testParseSyss(self):
+    def testParseSyss(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
             "2323 Syss                 C400746-8 Na Va Pi                   { -1 } (A67-2) [6647] BD   S  - 510 5  ImDv M9 III D M5 V",
@@ -125,7 +125,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(23, star1.row)
         self.assertEqual(23, star1.col)
 
-    def testParseZhdant(self):
+    def testParseZhdant(self) -> None:
         sector = Sector('# Zhdant', '# -7, 2')
         star1 = Star.parse_line_into_star(
             "2719 Zhdant               A6547C8-F Ag An Cx                            - KM - 811   Zh K0 V                        ",
@@ -139,7 +139,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(19, star1.row)
         self.assertEqual(27, star1.col)
 
-    def testParseVlazzhden(self):
+    def testParseVlazzhden(self) -> None:
         sector = Sector('# Zhdant', '# -7, 2')
         star1 = Star.parse_line_into_star(
             "2720 Vlazzhden            C210143-8 Lo Ni                               - -  - 303   Zh G1 IV                       ",
@@ -153,7 +153,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(20, star1.row)
         self.assertEqual(27, star1.col)
 
-    def testParseTlapinsh(self):
+    def testParseTlapinsh(self) -> None:
         sector = Sector('# Zhdant', '# -7, 2')
         star1 = Star.parse_line_into_star(
             "2819 Tlapinsh             B569854-C Ri                                  - -  - 622   Zh F7 V                        ",
@@ -167,7 +167,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(19, star1.row)
         self.assertEqual(28, star1.col)
 
-    def testParseEzevrtlad(self):
+    def testParseEzevrtlad(self) -> None:
         sector = Sector('# Zhdant', '# -7, 2')
         star1 = Star.parse_line_into_star(
             "2820 Ezevrtlad            C120000-B De Ba Po                            - -  - 900   Zh K2 III                      ",
@@ -181,52 +181,52 @@ class TestStar(unittest.TestCase):
         self.assertEqual(20, star1.row)
         self.assertEqual(28, star1.col)
 
-    def testParseUnchin(self):
+    def testParseUnchin(self) -> None:
         sector = Sector('# Zarushagar', '# -1, -1')
         line = '0522 Unchin               A437743-E                            { 2 }  (B6D-1) [492B] B     N  - 620 9  ImDi K0 III                                                       '
         star1 = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
         self.assertIsInstance(star1, Star)
 
-    def testAPortModifier(self):
+    def testAPortModifier(self) -> None:
         # cwtn =[3,4,4,5,6,7,7,8,9,10,10,11,12,13,14,15]
         cwtn = [3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11, 12, 13, 13, 14]
         for uwtn in range(15):
             wtn = int(round(max(0, (uwtn * 3 + 13) // 4)))
             self.assertEqual(cwtn[uwtn], wtn, "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
-    def testBPortModifier(self):
+    def testBPortModifier(self) -> None:
         # cwtn =[2,3,4,5,5,6,7,8,8,9,10,11,11,12,12,13]
         cwtn = [2, 3, 4, 5, 5, 6, 7, 8, 8, 9, 10, 11, 11, 12, 13, 14]
         for uwtn in range(15):
             wtn = int(round(max(0, (uwtn * 3 + 11) // 4)))
             self.assertEqual(cwtn[uwtn], wtn, "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
-    def testCPortModifier(self):
+    def testCPortModifier(self) -> None:
         cwtn = [2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 10, 11, 11, 12]
         for uwtn in range(15):
             wtn = int(round(max(0, (uwtn + 9) // 2))) if (uwtn > 9) else int(round(max(0, (uwtn * 3 + 9) // 4)))
             self.assertEqual(cwtn[uwtn], wtn, "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
-    def testDPortModifier(self):
+    def testDPortModifier(self) -> None:
         cwtn = [1, 2, 3, 4, 4, 5, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11]
         for uwtn in range(15):
             wtn = int(round(max(0, (uwtn + 7) // 2))) if (uwtn > 7) else int(round(max(0, (uwtn * 3 + 7) // 4)))
             self.assertEqual(cwtn[uwtn], wtn, "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
-    def testEPortModifier(self):
+    def testEPortModifier(self) -> None:
         cwtn = [1, 2, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10]
         for uwtn in range(15):
             wtn = int(round(max(0, (uwtn + 5) // 2))) if (uwtn > 5) else int(round(max(0, (uwtn * 3 + 5) // 4)))
             self.assertEqual(cwtn[uwtn], wtn, "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
-    def testXPortModifier(self):
+    def testXPortModifier(self) -> None:
         # cwtn =[0,1,2,3,0,0,0,1,1,2,2,3,3,4,4,5]
         cwtn = [0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5]
         for uwtn in range(15):
             wtn = int(round(max(0, (uwtn - 5) // 2)))
             self.assertEqual(cwtn[uwtn], wtn, "at %s: %s vs %s" % (uwtn, wtn, cwtn[uwtn]))
 
-    def testCalcTrade(self):
+    def testCalcTrade(self) -> None:
         self.assertEqual(TradeCalculation.calc_trade(0), 1)
         self.assertEqual(TradeCalculation.calc_trade(1), 5)
         self.assertEqual(TradeCalculation.calc_trade(2), 10)
@@ -235,7 +235,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(TradeCalculation.calc_trade(5), 500)
         self.assertEqual(TradeCalculation.calc_trade(6), 1000)
 
-    def testPassengerBTN(self):
+    def testPassengerBTN(self) -> None:
         self.assertEqual(TradeCalculation.calc_passengers(10), 0)
         self.assertEqual(TradeCalculation.calc_passengers(11), 5)
         self.assertEqual(TradeCalculation.calc_passengers(12), 10)
@@ -243,7 +243,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(TradeCalculation.calc_passengers(14), 100)
         self.assertEqual(TradeCalculation.calc_passengers(15), 500)
 
-    def testCalcTradeTonnage(self):
+    def testCalcTradeTonnage(self) -> None:
         self.assertEqual(TradeCalculation.calc_trade_tonnage(0, 0), 0)
         self.assertEqual(TradeCalculation.calc_trade_tonnage(9, 0), 1)
         self.assertEqual(TradeCalculation.calc_trade_tonnage(9, 49), 1)
@@ -261,7 +261,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(TradeCalculation.calc_trade_tonnage(13, 999), 5)
         self.assertEqual(TradeCalculation.calc_trade_tonnage(13, 1000), 1)
 
-    def testHashValueSameAfterCaching(self):
+    def testHashValueSameAfterCaching(self) -> None:
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V  ",
             Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
@@ -271,7 +271,7 @@ class TestStar(unittest.TestCase):
         newHash = star1.__hash__()
         self.assertEqual(oldHash, newHash)
 
-    def testEquals(self):
+    def testEquals(self) -> None:
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
             Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
@@ -286,7 +286,7 @@ class TestStar(unittest.TestCase):
         self.assertNotEqual(star1, star3)
         self.assertNotEqual(star2, star3)
 
-    def testParseBespin(self):
+    def testParseBespin(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         line = '0615 Bespin II            EAA19AC-4 Fl Hi He In          {+0} (98b-1) [a935] - - - 223 9  Na G1 V           '
         star1 = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
@@ -295,12 +295,12 @@ class TestStar(unittest.TestCase):
         self.assertEqual('(98B-1)', star1.economics)
         self.assertEqual('[A935]', star1.social)
 
-    def testStarSize(self):
+    def testStarSize(self) -> None:
         _ = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
             Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
 
-    def test_deep_copy(self):
+    def test_deep_copy(self) -> None:
         alg = Allegiance("am", "name")
         star1 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
@@ -314,7 +314,7 @@ class TestStar(unittest.TestCase):
 
         self.assertEqual(star1, starcopy)
 
-    def test_ehex_to_numeric_mapping_for_TL_A_and_up(self):
+    def test_ehex_to_numeric_mapping_for_TL_A_and_up(self) -> None:
         # shut up log output - is completely irrelevant
         logger = logging.getLogger('PyRoute.Star')
         logger.setLevel(logging.CRITICAL)
@@ -337,7 +337,7 @@ class TestStar(unittest.TestCase):
 
                 self.assertEqual(target, star1.tl, "Unexpected mapping for TL " + letter)
 
-    def test_document_ehex_to_numeric_mapping_for_TL_I_and_O(self):
+    def test_document_ehex_to_numeric_mapping_for_TL_I_and_O(self) -> None:
         # shut up log output - is completely irrelevant
         logger = logging.getLogger('PyRoute.Star')
         logger.setLevel(logging.CRITICAL)
@@ -357,7 +357,7 @@ class TestStar(unittest.TestCase):
 
                 self.assertEqual(target, star1.tl, "Unexpected mapping for TL " + letter)
 
-    def testCompareHexDistanceToAxialDistance(self):
+    def testCompareHexDistanceToAxialDistance(self) -> None:
         star1 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
             Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
@@ -373,7 +373,7 @@ class TestStar(unittest.TestCase):
         distance = star1.distance(star2)
         self.assertEqual(hex_dist, distance, "Unexpected distance")
 
-    def test_ehex_to_int_and_back(self):
+    def test_ehex_to_int_and_back(self) -> None:
         tech_list = [
             (0, 0),
             (1, 1),
@@ -419,7 +419,7 @@ class TestStar(unittest.TestCase):
                 act_ehex = star._int_to_ehex(act_int)
                 self.assertEqual(str(ehex), act_ehex, "Int-to-ehex mapping failed for TL " + str(ehex))
 
-    def test_parse_to_line(self):
+    def test_parse_to_line(self) -> None:
         line_list = [
             ("0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ", "K"),
             ("3030 Khaammumlar          E430761-6 De Na Po O:3032                       { -2 } (965-5) [3512] B    -  - 520 6  ImDv M0 V M5 V                                                ", "M"),
@@ -445,7 +445,7 @@ class TestStar(unittest.TestCase):
                 self.assertEqual(mid_line, nu_line, "Regenerated star line does not match round-trip star line")
                 self.assertEqual(expected_primary_type, star2.primary_type, "Unexpected primary type")
 
-    def testShortSophontCodeIntoStatsCalculation(self):
+    def testShortSophontCodeIntoStatsCalculation(self) -> None:
         line = '2926                      B8B2613-C He Fl Ni HakW Pz             {  1 } (735+3) [458B] - M  A 514 16 HvFd G4 V M1 V     '
         sector = Sector('# Phlask', '# 3,-3')
 
@@ -465,7 +465,7 @@ class TestStar(unittest.TestCase):
         self.assertEqual(5, stats.populations['Hak'].population)
         self.assertEqual(0, stats.populations['Huma'].population)
 
-    def testParseStarlineWithSomeUnknownUWPValues(self):
+    def testParseStarlineWithSomeUnknownUWPValues(self) -> None:
         # Unknown-socials lLifted from Kruse 0709 in Travmap M1105 data as at 12 Dec 2023
         # Port-known lifted from Kruse 1001 in Travmap M1105 data as at 12 Dec 2023
         # Port + size known lifted from Kruse 0302 in Travmap M1105 data as at 12 Dec 2023
@@ -486,14 +486,14 @@ class TestStar(unittest.TestCase):
                 self.assertIsNotNone(star, "Starline should parse cleanly")
                 self.assertFalse(star.deep_space_station)
 
-    def testParseAnomalyWithNoDSS(self):
+    def testParseAnomalyWithNoDSS(self) -> None:
         line = '0618 Chandler Station          ???????-? {Anomaly}                                        -   -  - ???                       '
         sector = Sector('# Reft', '# -3,0')
 
         star = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
         self.assertIsNone(star)
 
-    def testParseAnomalyWithDSS(self):
+    def testParseAnomalyWithDSS(self) -> None:
         ParseStarInput.deep_space = {'Reft': ['0618']}
         line = '0618 Chandler Station          ???????-? {Anomaly}                                        -   -  - ???                       '
         sector = Sector('# Reft', '# -3,0')
@@ -502,7 +502,7 @@ class TestStar(unittest.TestCase):
         self.assertIsNotNone(star)
         self.assertTrue(star.deep_space_station)
 
-    def testParseAnomalySansDSS(self):
+    def testParseAnomalySansDSS(self) -> None:
         ParseStarInput.deep_space = {'Reft': ['0618']}
         line = '3103 Ishlagu Calibration Point ???????-? {Anomaly}                                        -   -  - ???                       '
         sector = Sector('# Reft', '# -3,0')
@@ -510,7 +510,7 @@ class TestStar(unittest.TestCase):
         star = Star.parse_line_into_star(line, sector, 'fixed', 'fixed')
         self.assertIsNone(star)
 
-    def testParseStarlineWithoutExtensionsAndPresentUWP(self):
+    def testParseStarlineWithoutExtensionsAndPresentUWP(self) -> None:
         sector = Sector('# Phlask', '# 3,-3')
 
         starline = '2618 Horden 2618          D54A367-D Ht Lo Wa O:2915                     - - - 401   So       D '
@@ -527,7 +527,7 @@ class TestStar(unittest.TestCase):
         reactual = star.parse_to_line()
         self.assertEqual(expected, reactual)
 
-    def testParseStarlineWithoutExtensionsAndOldskoolUWP(self):
+    def testParseStarlineWithoutExtensionsAndOldskoolUWP(self) -> None:
         sector = Sector('# Phlask', '# 3,-3')
 
         starline = '2618 Horden 2618          ?54A367-D Ht Lo Wa O:2915                     - - - 401   So       D '
@@ -544,7 +544,7 @@ class TestStar(unittest.TestCase):
         reactual = star.parse_to_line()
         self.assertEqual(expected, reactual)
 
-    def testParseStarlineWithExtensionsAndOldskoolUWP(self):
+    def testParseStarlineWithExtensionsAndOldskoolUWP(self) -> None:
         sector = Sector('# Phlask', '# 3,-3')
 
         starline = '0406 Abrpriabr            X7820?0-0 Ba                          {-3} (600-5) [0000] - -  - 001 11 NaXX K0 V'
@@ -561,7 +561,7 @@ class TestStar(unittest.TestCase):
         reactual = star.parse_to_line()
         self.assertEqual(expected, reactual)
 
-    def testParseStarlineWithAllDashExtensions(self):
+    def testParseStarlineWithAllDashExtensions(self) -> None:
         sector = Sector('# Phlask', '# 3,-3')
 
         starline = '2618 Horden 2618          D54A367-D Ht Lo Wa O:2915       - - -         - - - 401   So       D '
@@ -569,7 +569,7 @@ class TestStar(unittest.TestCase):
         self.assertIsNotNone(star, "Starline should parse cleanly")
         self.assertFalse(star.oldskool, "Zero extensions present should not result in oldskool")
 
-    def testParseStarKilongSector0104AsKkree(self):
+    def testParseStarKilongSector0104AsKkree(self) -> None:
         sector = Sector('# Kilong', '# 6,0')
 
         starline = '0104 Ombia                B2424QK-D Ni Po                      { 1 }  (C34+1) [455D] - K - 314 15 Kk G3 V               '
@@ -577,7 +577,7 @@ class TestStar(unittest.TestCase):
         self.assertIsNotNone(star, "Starline should parse cleanly")
         self.assertEqual('B2424QK-D', str(star.uwp))
 
-    def testParseStarKilongSector0104AsKkreeOutpost(self):
+    def testParseStarKilongSector0104AsKkreeOutpost(self) -> None:
         sector = Sector('# Kilong', '# 6,0')
 
         starline = '0104 Ombia                B2424QK-D Ni Po                      { 1 }  (C34+1) [455D] - K - 314 15 KO G3 V               '
@@ -585,7 +585,7 @@ class TestStar(unittest.TestCase):
         self.assertIsNotNone(star, "Starline should parse cleanly")
         self.assertEqual('B2424QK-D', str(star.uwp))
 
-    def testParseStarKilongSector0104AsNonKkree(self):
+    def testParseStarKilongSector0104AsNonKkree(self) -> None:
         sector = Sector('# Kilong', '# 6,0')
 
         starline = '0104 Ombia                B2424QK-D Ni Po                      { 1 }  (C34+1) [455D] - K - 314 15 Im G3 V               '

@@ -16,7 +16,7 @@ class baseTest(unittest.TestCase):
     def unpack_filename(self, filename: str) -> str:
         return UnpackFilename.unpack_filename(filename)
 
-    def unpack_workdir(self, dirname):
+    def unpack_workdir(self, dirname) -> str:
         # try unpacked directory directly
         workdir = os.path.abspath(dirname)
 
@@ -26,7 +26,7 @@ class baseTest(unittest.TestCase):
 
         return workdir
 
-    def _make_args(self):
+    def _make_args(self) -> argparse.ArgumentParser:
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
         args.max_jump = 2
@@ -51,7 +51,7 @@ class baseTest(unittest.TestCase):
         args.map_type = "classic"
         return args
 
-    def _make_args_no_line(self):
+    def _make_args_no_line(self) -> argparse.ArgumentParser:
         args = self._make_args()
         args.interestingline = None
 
