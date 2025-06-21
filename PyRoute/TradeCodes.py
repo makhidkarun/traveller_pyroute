@@ -8,6 +8,7 @@ import itertools
 import re
 import logging
 import sys
+from typing import Union
 
 from PyRoute.Errors.MultipleWPopError import MultipleWPopError
 
@@ -371,10 +372,10 @@ class TradeCodes(object):
 
         return foo
 
-    def planet_codes(self):
+    def planet_codes(self) -> str:
         return " ".join(self.codeset)
 
-    def calculate_pcode(self):
+    def calculate_pcode(self) -> Union[None, list]:
         return self.pcode
 
     def _check_planet_code(self, star, code, size, atmo, hydro, listmsg=None, implied=None):
@@ -438,7 +439,7 @@ class TradeCodes(object):
             listmsg.append(msg)
         return False
 
-    def check_world_codes(self, star, msg=None, fix_pop=False):
+    def check_world_codes(self, star, msg=None, fix_pop=False) -> Union[bool, list]:
         is_list = isinstance(msg, list)
         msg = msg if is_list else None
 
@@ -480,7 +481,7 @@ class TradeCodes(object):
         check = self._check_pop_code(star, 'Hi', '9ABCDEF', msg) and check
         return check
 
-    def owned_by(self, star):
+    def owned_by(self, star) -> Union[str, None]:
         self.ownedBy = star
         if star.gov == '6':
             self.ownedBy = None
@@ -501,14 +502,14 @@ class TradeCodes(object):
             self.logger.debug("{} has incorrect government code {} - {}".format(star, star.gov, self.dcode))
         return self.ownedBy
 
-    def owners(self, sector_name):
+    def owners(self, sector_name) -> list[str]:
         if not sector_name:
             return [code for code in self.owned if code.startswith('O:')]
         else:
             return [code if len(code) > 6 else 'O:' + sector_name[0:4] + '-' + code[2:]
                     for code in self.owned if code.startswith('O:')]
 
-    def colonies(self, sector_name):
+    def colonies(self, sector_name) -> list[str]:
         if not sector_name:
             return [code for code in self.owned if code.startswith('C:')]
         else:
@@ -516,59 +517,59 @@ class TradeCodes(object):
                     for code in self.owned if code.startswith('C:')]
 
     @functools.cached_property
-    def homeworld(self):
+    def homeworld(self) -> list[str]:
         return sorted(self.homeworld_list)
 
     @property
-    def sophonts(self):
+    def sophonts(self) -> list[str]:
         return sorted(self.sophont_list)
 
     @functools.cached_property
-    def rich(self):
+    def rich(self) -> bool:
         return 'Ri' in self.codeset
 
     @functools.cached_property
-    def industrial(self):
+    def industrial(self) -> bool:
         return 'In' in self.codeset
 
     @functools.cached_property
-    def agricultural(self):
+    def agricultural(self) -> bool:
         return 'Ag' in self.codeset
 
     @functools.cached_property
-    def needs_agricultural(self):
+    def needs_agricultural(self) -> bool:
         return self.nonagricultural or self.extreme
 
     @functools.cached_property
-    def poor(self):
+    def poor(self) -> bool:
         return 'Po' in self.codeset
 
     @functools.cached_property
-    def nonagricultural(self):
+    def nonagricultural(self) -> bool:
         return 'Na' in self.codeset
 
     @functools.cached_property
-    def barren(self):
+    def barren(self) -> bool:
         return 'Ba' in self.codeset or 'Di' in self.codeset
 
     @functools.cached_property
-    def low(self):
+    def low(self) -> bool:
         return 'Lo' in self.codeset
 
     @functools.cached_property
-    def nonindustrial(self):
+    def nonindustrial(self) -> bool:
         return 'Ni' in self.codeset
 
     @functools.cached_property
-    def high(self):
+    def high(self) -> bool:
         return 'Hi' in self.codeset
 
     @functools.cached_property
-    def asteroid(self):
+    def asteroid(self) -> bool:
         return 'As' in self.codeset
 
     @functools.cached_property
-    def desert(self):
+    def desert(self) -> bool:
         return 'De' in self.codeset
 
     @functools.cached_property
@@ -576,43 +577,43 @@ class TradeCodes(object):
         return 'Ic' in self.codeset
 
     @functools.cached_property
-    def fluid(self):
+    def fluid(self) -> bool:
         return 'Fl' in self.codeset
 
     @functools.cached_property
-    def vacuum(self):
+    def vacuum(self) -> bool:
         return 'Va' in self.codeset and 'As' not in self.codeset
 
     @functools.cached_property
-    def waterworld(self):
+    def waterworld(self) -> bool:
         return 'Wa' in self.codeset or 'Oc' in self.codeset
 
     @functools.cached_property
-    def extreme(self):
+    def extreme(self) -> bool:
         return len(self.ex_codes & set(self.codeset)) > 0
 
     @functools.cached_property
-    def capital(self):
+    def capital(self) -> bool:
         return 'Cp' in self.dcode or 'Cx' in self.dcode or 'Cs' in self.dcode
 
     @functools.cached_property
-    def subsector_capital(self):
+    def subsector_capital(self) -> bool:
         return 'Cp' in self.dcode
 
     @functools.cached_property
-    def sector_capital(self):
+    def sector_capital(self) -> bool:
         return 'Cs' in self.dcode
 
     @functools.cached_property
-    def other_capital(self):
+    def other_capital(self) -> bool:
         return 'Cx' in self.dcode
 
     @functools.cached_property
-    def research_station(self):
+    def research_station(self) -> set:
         return set(self.research.keys()).intersection(self.dcode)
 
     @functools.cached_property
-    def research_station_char(self):
+    def research_station_char(self) -> Union[str, None]:
         stations = self.research_station
         if len(stations) == 1:
             station = next(iter(self.research_station))
@@ -621,20 +622,20 @@ class TradeCodes(object):
             return None
 
     @functools.cached_property
-    def pcode_color(self):
+    def pcode_color(self) -> str:
         return self.pcolor.get(self.pcode, '#44ff44')
 
     @functools.cached_property
-    def low_per_capita_gwp(self):
+    def low_per_capita_gwp(self) -> bool:
         return self.extreme or self.poor or self.nonindustrial or self.low
 
-    def match_ag_codes(self, code):
+    def match_ag_codes(self, code) -> bool:
         return (self.agricultural and code.needs_agricultural) or (self.needs_agricultural and code.agricultural)
 
-    def match_in_codes(self, code):
+    def match_in_codes(self, code) -> bool:
         return (self.industrial and code.nonindustrial) or (self.nonindustrial and code.industrial)
 
-    def is_well_formed(self):
+    def is_well_formed(self) -> tuple[bool, str]:
         msg = ""
         for code in self.codeset:
             if not self._check_residual_code_well_formed(code):
@@ -669,7 +670,7 @@ class TradeCodes(object):
 
         return result, msg
 
-    def trim_ill_formed_residual_codes(self):
+    def trim_ill_formed_residual_codes(self) -> None:
         nu_set = set()
         for code in self.codeset:
             if not self._check_residual_code_well_formed(code):
@@ -715,7 +716,7 @@ class TradeCodes(object):
                 return False
         return True
 
-    def _check_code_pairs_allowed(self):
+    def _check_code_pairs_allowed(self) -> tuple[bool, str]:
         msg = ""
 
         # Exclude weird codes, sophont codes and military rule straight-up
@@ -738,13 +739,13 @@ class TradeCodes(object):
 
         return True, msg
 
-    def check_canonical(self, star):
+    def check_canonical(self, star) -> tuple[bool, list]:
         msg = []
         self.check_world_codes(star, msg)
 
         return 0 == len(msg), msg
 
-    def canonicalise(self, star):
+    def canonicalise(self, star) -> None:
         self._fix_trade_code(star, 'As', '0', '0', '0')
         self._fix_trade_code(star, 'Ic', None, '01', '123456789A')
         self._fix_trade_code(star, 'De', None, '23456789', '0')

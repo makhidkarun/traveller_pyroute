@@ -22,7 +22,7 @@ from PyRoute.StatCalculation import StatCalculation
 logger = logging.getLogger('PyRoute')
 
 
-def process():
+def process() -> None:
     parser = argparse.ArgumentParser(description='Traveller trade route generator.', fromfile_prefix_chars='@')
 
     alleg = parser.add_argument_group('Allegiance', 'Alter processing of allegiances')
@@ -173,7 +173,7 @@ def process():
     logger.info("process complete")
 
 
-def get_sectors(sector, input_dir):
+def get_sectors(sector, input_dir) -> list[str]:
     try:
         with codecs.open(sector, 'r', encoding="utf-8") as f:
             lines = [line for line in f]
@@ -186,7 +186,7 @@ def get_sectors(sector, input_dir):
     return sector_list
 
 
-def set_logging(level):
+def set_logging(level) -> None:
     logger.setLevel(level)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     # create console handler and set level to debug

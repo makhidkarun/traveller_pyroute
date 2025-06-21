@@ -25,7 +25,7 @@ import re
 logger = logging.getLogger('WikiUpload')
 
 
-def uploadSummaryText(site, summaryFile, era, area_name):
+def uploadSummaryText(site, summaryFile, era, area_name) -> None:
     with codecs.open(summaryFile, 'r', encoding="utf-8") as f:
         lines = f.readlines()
 
@@ -54,7 +54,7 @@ def uploadSummaryText(site, summaryFile, era, area_name):
         site.save_page(target_page, text, 'Trade Map update summary')
 
 
-def uploadSec(site, filename, place, era):
+def uploadSec(site, filename, place, era) -> None:
     with codecs.open(filename, "r", encoding="utf-8") as f:
         text = f.read()
     targetTitle = os.path.basename(filename).split('.')[0] + place
@@ -69,7 +69,7 @@ def uploadSec(site, filename, place, era):
     site.save_page(target_page, text, 'Trade Map update sector data')
 
 
-def pairwise(iterable):
+def pairwise(iterable) -> list:
     """
     s -> (s0, s1), (s2, s3), (s4, s5), ...
     """
@@ -77,7 +77,7 @@ def pairwise(iterable):
     return list(zip(a, a))
 
 
-def uploadWorlds(site, sectorFile, economicFile, era):
+def uploadWorlds(site, sectorFile, economicFile, era) -> None:
     data_template = '''
 {{{{StellarData
  |world     = {0}
@@ -312,7 +312,7 @@ shortNames = {'Dagudashaag': 'Da', 'Deneb': 'De',
               'Knoellighz': 'Kn'}
 
 
-def set_logging(level):
+def set_logging(level) -> None:
     logger.setLevel(level)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     # create console handler and set level to debug
@@ -322,7 +322,7 @@ def set_logging(level):
     logger.addHandler(ch)
 
 
-def process():
+def process() -> None:
     warnings.simplefilter("always")
 
     parser = argparse.ArgumentParser(description='Trade map generator wiki upload.')

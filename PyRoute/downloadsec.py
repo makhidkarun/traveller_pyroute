@@ -12,7 +12,7 @@ import urllib.parse
 import urllib.request
 
 
-def get_url(url, sector, suffix, output_dir):
+def get_url(url, sector, suffix, output_dir) -> bool:
     try:
         f = urllib.request.urlopen(url)
     except urllib.error.HTTPError as ex:
