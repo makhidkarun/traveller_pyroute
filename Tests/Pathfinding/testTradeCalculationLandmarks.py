@@ -8,7 +8,7 @@ from Tests.baseTest import baseTest
 
 
 class testTradeCalculationLandmarks(baseTest):
-    def test_landmarks_on_ibara_subsector_single_component(self):
+    def test_landmarks_on_ibara_subsector_single_component(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -34,7 +34,7 @@ class testTradeCalculationLandmarks(baseTest):
         self.assertEqual("Nedadzia (Zarushagar 0701)", str(landmarks[2][0]), "Unexpected landmark choice")
         self.assertEqual("Didraga (Zarushagar 0101)", str(landmarks[3][0]), "Unexpected landmark choice")
 
-    def test_landmarks_on_ibara_subsector_multiple_components(self):
+    def test_landmarks_on_ibara_subsector_multiple_components(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -62,7 +62,7 @@ class testTradeCalculationLandmarks(baseTest):
         self.assertEqual("Norsec (Zarushagar 0110)", str(landmarks[1][2]), "Unexpected landmark choice")
         self.assertEqual("Engaki (Zarushagar 0502)", str(landmarks[2][0]), "Unexpected landmark choice")
 
-    def _make_args(self):
+    def _make_args(self) -> argparse.ArgumentParser:
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
         args.max_jump = 2

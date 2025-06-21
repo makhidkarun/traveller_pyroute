@@ -15,7 +15,7 @@ from PyRoute.Pathfinding.single_source_dijkstra import explicit_shortest_path_di
 
 class testLandmarkAvoidHelper(baseTest):
 
-    def testLandmarkSelectFromScratch(self):
+    def testLandmarkSelectFromScratch(self) -> None:
         sourcefile = self.unpack_filename('../DeltaFiles/Zarushagar-Ibara.sec')
         graph, source, stars = self._setup_graph(sourcefile)
         distgraph = DistanceGraph(graph)

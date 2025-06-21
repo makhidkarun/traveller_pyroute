@@ -12,7 +12,7 @@ import numpy as np
 
 class testShortestPathCalc(baseTest):
 
-    def test_shortest_path_by_distance_graph(self):
+    def test_shortest_path_by_distance_graph(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         jsonfile = self.unpack_filename('PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
 
@@ -39,7 +39,7 @@ class testShortestPathCalc(baseTest):
 
         self.assertEqual(list(expected_distances.values()), list(actual_distances), "Unexpected distances after SPT creation")
 
-    def test_shortest_explicit_path_by_distance_graph(self):
+    def test_shortest_explicit_path_by_distance_graph(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         jsonfile = self.unpack_filename('PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
 
@@ -104,7 +104,7 @@ class testShortestPathCalc(baseTest):
         self.assertEqual(list(expected_distances.values()), list(actual_distances), "Unexpected distances after SPT creation")
         self.assertEqual(list(expected_parents), list(actual_parents), "Unexpected parent relations")
 
-    def test_masked_gubbins(self):
+    def test_masked_gubbins(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         graph, _, _ = self._setup_graph(sourcefile)
 

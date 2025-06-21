@@ -9,7 +9,7 @@ from Tests.baseTest import baseTest
 
 
 class testTradeMPCalculation(baseTest):
-    def test_direct_route_doesnt_blow_up(self):
+    def test_direct_route_doesnt_blow_up(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/direct_routes_on_trade_mp/Lishun.sec')
 
         args = self._make_args()
@@ -31,7 +31,7 @@ class testTradeMPCalculation(baseTest):
         galaxy.set_borders(args.borders, args.ally_match)
         galaxy.trade.calculate_routes()
 
-    def test_direct_route_doesnt_blow_up_2(self):
+    def test_direct_route_doesnt_blow_up_2(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/direct_routes_on_trade_mp/Lishun.sec')
 
         args = self._make_args()
