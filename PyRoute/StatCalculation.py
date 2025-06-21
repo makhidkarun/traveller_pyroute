@@ -21,7 +21,7 @@ class Populations(object):
         self.count = 0
         self.population = 0
 
-    def add_population(self, population, homeworld):
+    def add_population(self, population, homeworld) -> None:
         self.count += 1
         self.population += population
         if homeworld:
@@ -136,22 +136,22 @@ class ObjectStatistics(object):
     def __setitem__(self, key, value):
         setattr(self, key, value)
 
-    def homeworld_count(self):
+    def homeworld_count(self) -> int:
         return len(self.homeworlds)
 
-    def high_pop_worlds_count(self):
+    def high_pop_worlds_count(self) -> int:
         return len(self.high_pop_worlds)
 
-    def high_pop_worlds_list(self):
+    def high_pop_worlds_list(self) -> list[str]:
         return [world.wiki_name() for world in self.high_pop_worlds[0:6]]
 
-    def high_tech_worlds_count(self):
+    def high_tech_worlds_count(self) -> int:
         return len(self.high_tech_worlds)
 
-    def high_tech_worlds_list(self):
+    def high_tech_worlds_list(self) -> list[str]:
         return [world.wiki_name() for world in self.high_tech_worlds[0:6]]
 
-    def populations_count(self):
+    def populations_count(self) -> int:
         return len(self.populations)
 
 
@@ -161,7 +161,7 @@ class UWPCollection(object):
         for uwpCode in UWPCodes.uwpCodes:
             self.uwp[uwpCode] = {}
 
-    def stats(self, code, value):
+    def stats(self, code, value) -> ObjectStatistics:
         return self.uwp[code].setdefault(value, ObjectStatistics())
 
     def __getitem__(self, index):
@@ -183,7 +183,7 @@ class StatCalculation(object):
         self.all_uwp = UWPCollection()
         self.imp_uwp = UWPCollection()
 
-    def calculate_statistics(self, ally_match):
+    def calculate_statistics(self, ally_match) -> None:
         self.galaxy.trade.is_sector_trade_balanced()
         self.galaxy.trade.is_sector_pass_balanced()
         self.galaxy.trade.is_sector_trade_volume_balanced()
@@ -259,12 +259,12 @@ class StatCalculation(object):
         self.galaxy.trade.is_sector_pass_balanced()
         self.galaxy.trade.is_sector_trade_volume_balanced()
 
-    def add_alg_stats(self, area, star, alg):
+    def add_alg_stats(self, area, star, alg) -> None:
         algStats = area.alg[alg].stats
         self.add_stats(algStats, star)
         self.max_tl(algStats, star)
 
-    def add_pop_to_sophont(self, stats, star):
+    def add_pop_to_sophont(self, stats, star) -> None:
         total_pct = 100
         default_soph = 'Huma'
         home = None
@@ -307,7 +307,7 @@ class StatCalculation(object):
         elif not star.tradeCode.barren:
             stats.populations[default_soph].add_population(int(star.population * (total_pct / 100.0)), None)
 
-    def add_stats(self, stats, star):
+    def add_stats(self, stats, star) -> None:
         stats.population += star.population
 
         if star.tradeCode.homeworld:
@@ -370,12 +370,12 @@ class StatCalculation(object):
         stats.eti_cargo += star.eti_cargo_volume
         stats.eti_pass += star.eti_pass_volume
 
-    def max_tl(self, stats, star):
+    def max_tl(self, stats, star) -> None:
         stats.maxTL = max(stats.maxTL, star.tl)
         stats.maxPort = 'ABCDEX?'[min('ABCDEX?'.index(star.uwpCodes['Starport']), 'ABCDEX?'.index(stats.maxPort))]
         stats.maxPop = max(stats.maxPop, star.popCode)
 
-    def per_capita(self, worlds, stats):
+    def per_capita(self, worlds, stats) -> None:
         if stats.population > 100000:
             stats.percapita = stats.economy // (stats.population // 1000)
         elif stats.population > 0:
@@ -401,13 +401,13 @@ class StatCalculation(object):
                 TLVar = [math.pow(tl - stats.TLmean, 2) for tl in TLList]
                 stats.TLstddev = math.sqrt(sum(TLVar) / len(TLVar))
 
-    def find_colonizer(self, world, owner_hex):
+    def find_colonizer(self, world, owner_hex) -> None:
         for target in self.galaxy.ranges.neighbors_iter(world):
             if target.position == owner_hex:
                 target.tradeCode.append("C:{}-{}".format(world.sector[0:4], world.position))
                 pass
 
-    def write_statistics(self, ally_count, ally_match, json_data):
+    def write_statistics(self, ally_count, ally_match, json_data) -> None:
         self.logger.info('Charted star count: ' + str(self.galaxy.stats.number))
         self.logger.info('Charted population {:,d}'.format(self.galaxy.stats.population))
 
@@ -430,7 +430,7 @@ class StatCalculation(object):
         wiki.write_statistics()
 
     @staticmethod
-    def trade_to_btn(trade):
+    def trade_to_btn(trade) -> int:
         if trade == 0:
             return 0
         return int(math.log(trade, 10))

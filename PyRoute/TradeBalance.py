@@ -21,7 +21,7 @@ class TradeBalance(dict):
         self.star_field = star_field
         self.target_property = target_property
 
-    def update(self, __m, **kwargs):
+    def update(self, __m, **kwargs) -> None:
         for key in __m:
             self._check(key, __m[key])
         super().update(__m, **kwargs)
@@ -30,7 +30,7 @@ class TradeBalance(dict):
         self._check(item, value)
         super().__setitem__(item, value)
 
-    def log_odd_unit(self, star: Star, target: Star):
+    def log_odd_unit(self, star: Star, target: Star) -> None:
         sector_tuple = self._balance_tuple(
             star[self.star_field][self.target_property],
             target[self.star_field][self.target_property]
@@ -43,7 +43,7 @@ class TradeBalance(dict):
             target[self.star_field].stats[self.stat_field] += 1
             self[sector_tuple] -= 2
 
-    def single_unit_imbalance(self):
+    def single_unit_imbalance(self) -> dict[str, int]:
         sector_balance = dict()
 
         for key in self:
@@ -60,7 +60,7 @@ class TradeBalance(dict):
 
         return sector_balance
 
-    def multilateral_balance(self):
+    def multilateral_balance(self) -> None:
         if 0 == len(self):
             return
 
@@ -93,7 +93,7 @@ class TradeBalance(dict):
 
             sector_balance = self.single_unit_imbalance()
 
-    def is_balanced(self):
+    def is_balanced(self) -> None:
         num_sector = len(self.region[self.field])
 
         assert 2 > self.maximum, "Uncompensated " + str(self.target) + " imbalance present"
@@ -101,13 +101,13 @@ class TradeBalance(dict):
         assert self.sum <= ceil(num_sector / 2), f"Uncompensated multilateral {self.target} imbalance present in {self.field}"
 
     @property
-    def maximum(self):
+    def maximum(self) -> int:
         if 0 == len(self):
             return 0
         return max(self.values())
 
     @property
-    def sum(self):
+    def sum(self) -> int:
         if 0 == len(self):
             return 0
         return sum(self.values())

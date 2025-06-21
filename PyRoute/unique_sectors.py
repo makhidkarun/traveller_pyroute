@@ -12,7 +12,7 @@ import codecs
 logger = logging.getLogger('PyRoute')
 
 
-def process():
+def process() -> None:
     parser = argparse.ArgumentParser(
         description='Traveller trade route sector list deduplicator.'
     )
@@ -62,7 +62,7 @@ def process():
     logger.info("process complete")
 
 
-def set_logging(level):
+def set_logging(level) -> None:
     logger.setLevel(level)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     # create console handler and set level to debug

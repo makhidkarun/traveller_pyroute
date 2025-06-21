@@ -47,7 +47,7 @@ class SpeculativeTrade(object):
         self.stars = stars
         self.trade_version = trade_version
 
-    def process_tradegoods(self):
+    def process_tradegoods(self) -> None:
         self.logger.info("Processing TradeGoods for worlds")
         for world in self.stars:
             worldstar = self.stars.nodes[world]['star']
@@ -63,7 +63,7 @@ class SpeculativeTrade(object):
             self.stars[world][neighbor]['SourceMarketPrice'] = int(source_market * 1000)
             self.stars[world][neighbor]['TargetMarketPrice'] = int(target_market * 1000)
 
-    def get_market_price(self, source, market):
+    def get_market_price(self, source, market) -> float:
         price = 5.0
         actives_codes = ["Ag", "As", "Ba", "De", "Fl", "Hi", "Ic", "In", "Lo",
                          "Na", "Ni", "Po", "Ri", "Va", "Wa", "Oc"]
@@ -87,13 +87,13 @@ class SpeculativeTrade(object):
         price -= source.trade_cost
         return price
 
-    def get_source_tradegoods(self, star):
+    def get_source_tradegoods(self, star) -> None:
         cost = self.T5_calculate_tradegoods(star) if self.trade_version == 'T5' else self.CT_calculate_tradegoods(star)
         star.trade_cost = cost
         star.trade_id = "{}-{} {} Cr{}".format(star.port, star.uwpCodes['Tech Level'],
                                                 star.tradeCode.planet_codes(), int(cost * 1000))
 
-    def T5_calculate_tradegoods(self, star):
+    def T5_calculate_tradegoods(self, star) -> float:
         cost = 3.0
         cost += SpeculativeTrade._calc_tradegoods_core(star)
         cost += 1 if star.tradeCode.barren else 0
@@ -103,7 +103,7 @@ class SpeculativeTrade(object):
 
         return cost
 
-    def CT_calculate_tradegoods(self, star):
+    def CT_calculate_tradegoods(self, star) -> float:
         cost = 4.0
         cost += SpeculativeTrade._calc_tradegoods_core(star)
         cost -= 1 if star.tradeCode else 0

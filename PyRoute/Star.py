@@ -9,7 +9,7 @@ import logging
 import bisect
 import random
 import math
-from typing import Tuple
+from typing import Tuple, Optional
 from typing_extensions import TypeAlias
 
 from PyRoute.Position.Hex import Hex
@@ -158,7 +158,7 @@ class Star(object):
         star = Star()
         return ParseStarInput.parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=fix_pop)
 
-    def parse_to_line(self):
+    def parse_to_line(self) -> str:
         result = str(self.position) + " "
         result += self.name.ljust(20) + " "
 
@@ -211,109 +211,109 @@ class Star(object):
     def __hash__(self):
         return self._hash
 
-    def calc_hash(self):
+    def calc_hash(self) -> None:
         self._key = (self.position, self.name, str(self.uwp), self.sector.name)
         self._hash = hash(self._key)
 
-    def wiki_name(self):
+    def wiki_name(self) -> str:
         # name = u" ".join(w.capitalize() for w in self.name.lower().split())
         return '{{WorldS|' + self.name + '|' + self.sector.sector_name() + '|' + self.position + '}}'
 
-    def wiki_short_name(self):
+    def wiki_short_name(self) -> str:
         # name = u" ".join(w.capitalize() for w in self.name.lower().split())
         return '{} (world)'.format(self.name)
 
-    def sec_pos(self, sector):
+    def sec_pos(self, sector) -> str:
         if self.sector == sector:
             return self.position
         else:
             return self.sector.name[0:4] + '-' + self.position
 
-    def set_location(self):
+    def set_location(self) -> None:
         self.hex = Hex(self.sector, self.position)
 
     @property
-    def x(self):
+    def x(self) -> int:
         return self.hex.x
 
     @property
-    def y(self):
+    def y(self) -> int:
         return self.hex.y
 
     @property
-    def z(self):
+    def z(self) -> int:
         return self.hex.z
 
     @property
-    def q(self):
+    def q(self) -> int:
         return self.hex.q
 
     @property
-    def r(self):
+    def r(self) -> int:
         return self.hex.r
 
     @property
-    def col(self):
+    def col(self) -> int:
         return self.hex.col
 
     @property
-    def row(self):
+    def row(self) -> int:
         return self.hex.row
 
     @property
-    def port(self):
+    def port(self) -> str:
         return str(self.uwp.port)
 
     @port.setter
-    def port(self, value):
+    def port(self, value) -> None:
         self.uwp.port = str(value)
 
     @property
-    def size(self):
+    def size(self) -> str:
         return self.uwp.size
 
     @property
-    def atmo(self):
+    def atmo(self) -> str:
         return self.uwp.atmo
 
     @property
-    def hydro(self):
+    def hydro(self) -> str:
         return self.uwp.hydro
 
     @property
-    def pop(self):
+    def pop(self) -> str:
         return self.uwp.pop
 
     @property
-    def gov(self):
+    def gov(self) -> str:
         return self.uwp.gov
 
     @property
-    def law(self):
+    def law(self) -> str:
         return self.uwp.law
 
     @property
-    def popCode(self):
+    def popCode(self) -> int:
         return int(self.uwp.pop_code)
 
     @property
-    def tl(self):
+    def tl(self) -> int:
         return int(self.uwp.tl_code)
 
     @tl.setter
-    def tl(self, value):
+    def tl(self, value) -> None:
         self.uwp.tl = value
 
     @property
-    def tl_unknown(self):
+    def tl_unknown(self) -> bool:
         return '?' == self.uwp.tl
 
     @property
-    def star_list(self):
+    def star_list(self) -> list:
         return self.star_list_object.stars_list
 
     @property
-    def primary_type(self):
+    def primary_type(self) -> Optional[str]:
         if 0 == len(self.star_list):
             return None
         if self.star_list[0].spectral is not None:
@@ -321,17 +321,17 @@ class Star(object):
         return self.star_list[0].size
 
     @property
-    def oldskool(self):
+    def oldskool(self) -> bool:
         return self.uwp.oldskool is True
 
     @functools.cached_property
     def hex_position(self) -> HexPos:
         return self.hex.hex_position()
 
-    def distance(self, star):
+    def distance(self, star) -> int:
         return Hex.axial_distance(self.hex_position, star.hex_position)
 
-    def subsector(self):
+    def subsector(self) -> str:
         subsector = ["ABCD", "EFGH", "IJKL", "MNOP"]
         index_y = (self.col - 1) // 8
         index_x = (self.row - 1) // 10
@@ -340,7 +340,7 @@ class Star(object):
     def wilderness_refuel(self) -> bool:
         return self.uwpCodes['Hydrographics'] in '23456789A' and self.uwpCodes['Atmosphere'] not in 'ABC'
 
-    def calculate_gwp(self, pop_code):
+    def calculate_gwp(self, pop_code) -> None:
         calcGWP = [220, 350, 560, 560, 560, 895, 895, 1430, 2289, 3660, 3660, 3660, 5860, 5860, 9375, 15000, 24400,
                    24400, 39000, 39000]
         # flatGWP = [229, 301, 396, 521, 685, 902, 1186, 1560, 2051, 2698, 3548, 4667, 6138, 8072, 10617, 13964, 18365,
@@ -374,7 +374,7 @@ class Star(object):
         self.population = int(self.population)
         self.perCapita = int(self.perCapita)
 
-    def calculate_mspr(self):
+    def calculate_mspr(self) -> None:
         self.mspr = 9
 
         if self.atmo in ['0', '1', '2', '3', 'A', 'B', 'C']:
@@ -387,7 +387,7 @@ class Star(object):
             self.mspr -= 1 if self.atmo in ['4', '5', '8', '9'] else 0  # thin or dense
             self.mspr -= 1 if self.atmo in ['4', '7', '9'] else 0  # polluted
 
-    def calculate_wtn(self):
+    def calculate_wtn(self) -> None:
         self.wtn = self.popCode
         self.wtn -= 1 if self.tl == 0 else 0
         self.wtn += 1 if self.tl >= 5 else 0
@@ -420,7 +420,7 @@ class Star(object):
 
         self.wtn = math.trunc(max(0, self.wtn))
 
-    def check_ex(self):
+    def check_ex(self) -> None:
         if not self.economics:
             return
 
@@ -447,7 +447,7 @@ class Star(object):
             self.logger.warning('{} - EX Calculated infrastructure {} not in range 0 - {}'.
                                 format(self, infrastructure, 12 + self.importance))
 
-    def fix_ex(self):
+    def fix_ex(self) -> None:
         if not self.economics:
             return
 
@@ -490,7 +490,7 @@ class Star(object):
         if nu_efficiency is not None:
             self.economics = self.economics[0:5] + nu_efficiency + self.economics[6:]
 
-    def check_cx(self):
+    def check_cx(self) -> None:
         if not self.social:
             return
         pop = self.popCode
@@ -529,7 +529,7 @@ class Star(object):
                 '{} - CX Calculated symbols {} not in range {} - {}'.
                 format(self, symbols, max(1, self.tl - 5), self.tl + 5))
 
-    def fix_cx(self):
+    def fix_cx(self) -> None:
         if not self.social:
             return
         pop = self.popCode
@@ -580,7 +580,7 @@ class Star(object):
         if nu_symbols is not None:
             self.social = self.social[0:4] + nu_symbols + self.social[5:]
 
-    def fix_tl(self):
+    def fix_tl(self) -> None:
         if self.tl_unknown:  # if TL is unknown, no point canonicalising it
             return
 
@@ -588,7 +588,7 @@ class Star(object):
         new_tl = max(min_tl, min(max_tl, self.tl))
         self.tl = Utilities.int_to_ehex(new_tl)
 
-    def calculate_ru(self, ru_calc):
+    def calculate_ru(self, ru_calc) -> None:
         if not self.economics:
             self.ru = 0
             return
@@ -624,7 +624,7 @@ class Star(object):
         self.logger.debug(
             "RU = {0} * {1} * {2} * {3} = {4}".format(resources, labor, infrastructure, efficiency, self.ru))
 
-    def calculate_TCS(self):
+    def calculate_TCS(self) -> None:
         self.ship_capacity = int(self.population * Utilities.tax_rate[self.uwpCodes['Government']] * 1000)
         gwp_base = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 28, 32]
         if self.tl >= 5:
@@ -667,7 +667,7 @@ class Star(object):
 
         self.budget = int(budget * access)
 
-    def calculate_importance(self):
+    def calculate_importance(self) -> None:
         imp = 0
         imp += 1 if self.port in 'AB' else 0
         imp -= 1 if self.port in 'DEX' else 0
@@ -682,7 +682,7 @@ class Star(object):
         imp += 1 if self.baseCode in ['NS', 'NW', 'W', 'D', 'X', 'KV', 'RT', 'CK', 'KM'] else 0
         self.importance = imp
 
-    def calculate_eti(self):
+    def calculate_eti(self) -> None:
         eti = 0
         eti += 1 if self.port in 'AB' else 0
         eti -= 1 if self.port in 'DEX' else 0
@@ -705,7 +705,7 @@ class Star(object):
         eti -= 1 if self.zone in ['A', 'U'] else 0
         self.eti_passenger = eti
 
-    def calculate_army(self):
+    def calculate_army(self) -> None:
         #       3, 4, 5, 6, 7, 8, 9, A
 
         BE = [[0, 0, 0, 0, 1, 10, 100, 1000],  # TL 0
@@ -751,11 +751,11 @@ class Star(object):
     def _int_to_ehex(self, value):
         return Utilities.int_to_ehex(value)
 
-    def split_stellar_data(self):
+    def split_stellar_data(self) -> None:
         self.star_list_object = StarList(self.stars)
         self.star_list_object.move_biggest_to_primary()
 
-    def extract_routes(self):
+    def extract_routes(self) -> None:
         str_split = self.stars.split()
         self.routes = [route for route in str_split if route.startswith('Xb:') or route.startswith('Tr:')]
 
@@ -771,7 +771,7 @@ class Star(object):
         if len(self.routes) > 0:
             self.logger.debug("{} - routes: {}".format(self, self.routes))
 
-    def is_well_formed(self):
+    def is_well_formed(self) -> bool:
         assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
         assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
         assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
@@ -797,10 +797,10 @@ class Star(object):
         return True
 
     @property
-    def passenger_btn_mod(self):
+    def passenger_btn_mod(self) -> int:
         return self._pax_btn_mod
 
-    def calc_passenger_btn_mod(self):
+    def calc_passenger_btn_mod(self) -> None:
         rich = 1 if self.tradeCode.rich else 0
         # Only apply the modifier corresponding to the highest-level capital - other_capital beats sector_capital,
         # which in turn beats subsector_capital.  The current approach makes adding a different value for other_capital
@@ -809,7 +809,7 @@ class Star(object):
             self.tradeCode.subsector_capital else 0
         self._pax_btn_mod = rich + capital
 
-    def canonicalise(self):
+    def canonicalise(self) -> None:
         self.uwp.canonicalise()
         self.tradeCode.canonicalise(self)
         self.fix_tl()
