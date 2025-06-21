@@ -22,7 +22,7 @@ class RouteLandmarkGraph(DistanceBase):
         self._check_index(item)
         return self._arcs[item]
 
-    def add_edge(self, u, v, weight):
+    def add_edge(self, u, v, weight) -> None:
         self._check_index(u)
         self._check_index(v)
         self._extend_arc(u, v, weight)
@@ -48,6 +48,6 @@ class RouteLandmarkGraph(DistanceBase):
         if len(self) <= item:
             raise IndexError("Index must be integer between 0 and " + str(len(self) - 1))
 
-    def lighten_edge(self, u, v, weight):
+    def lighten_edge(self, u, v, weight) -> None:
         self._lighten_arc(u, v, weight)
         self._lighten_arc(v, u, weight)

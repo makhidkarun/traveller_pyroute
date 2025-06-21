@@ -4,6 +4,7 @@ Created on Sep 15, 2024
 @author: CyberiaResurrection
 """
 import functools
+from typing import Any
 
 import numpy as np
 from PyRoute.Star import Star
@@ -39,14 +40,14 @@ class ApproximateShortestPathForestUnified:
                                                                                    divisor=self._divisor)
             self._distances[:, i], self._max_labels[:, i] = result
 
-    def lower_bound(self, source, target):
+    def lower_bound(self, source, target) -> float:
         raw = np.abs(self._distances[source, :] - self._distances[target, :])
         raw = raw[~np.isinf(raw)]
         if 0 == len(raw):
             return 0
         return np.max(raw)
 
-    def lower_bound_bulk(self, target_node: int):
+    def lower_bound_bulk(self, target_node: int) -> np.ndarray:
         overdrive, fastpath, anypath = self._mona_lisa_overdrive(target_node)
 
         if fastpath:  # Fastpath - all overdrive elements are _finite_, so all rows are retrieved
@@ -62,7 +63,7 @@ class ApproximateShortestPathForestUnified:
 
         return np.max(np.abs(raw), axis=1)
 
-    def triangle_upbound(self, source: int, target: int):
+    def triangle_upbound(self, source: int, target: int) -> float:
         raw = self._distances[source, :] + self._distances[target, :]
         raw = raw[raw != float('+inf')]
 
@@ -74,7 +75,7 @@ class ApproximateShortestPathForestUnified:
         result = self._distances[target_node, :] != float('+inf')
         return result, result.all(), result.any()
 
-    def update_edges(self, edges: list[tuple[int, int]]):
+    def update_edges(self, edges: list[tuple[int, int]]) -> None:
         dropnodes = set()
         dropspecific = []
         tree_dex = np.array(list(range(self._num_trees)), dtype=int)
@@ -141,7 +142,7 @@ class ApproximateShortestPathForestUnified:
                                                                 seeds=dropspecific[i], divisor=self._divisor,
                                                                 min_cost=min_cost, max_labels=self._max_labels[:, i])
 
-    def expand_forest(self, nu_seeds):
+    def expand_forest(self, nu_seeds) -> None:
         raw_seeds = nu_seeds if isinstance(nu_seeds, list) else list(nu_seeds.values())
         nu_distances = np.ones((self._graph_len)) * float('+inf')
         nu_distances[raw_seeds] = 0
@@ -190,21 +191,21 @@ class ApproximateShortestPathForestUnified:
                 num_trees = len(sources)
         return seeds, source, num_trees
 
-    def lighten_edge(self, u, v, weight):
+    def lighten_edge(self, u, v, weight) -> None:
         self._graph.lighten_edge(u, v, weight)
 
     @property
-    def num_trees(self):
+    def num_trees(self) -> int:
         return self._num_trees
 
     @property
-    def distances(self):
+    def distances(self) -> np.ndarray:
         return self._distances
 
     @property
-    def graph(self):
+    def graph(self) -> DistanceGraph:
         return self._graph
 
     @property
-    def sources(self):
+    def sources(self) -> Any:
         return self._sources
