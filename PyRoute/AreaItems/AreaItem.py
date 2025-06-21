@@ -16,16 +16,16 @@ class AreaItem(object):
         self._wiki_name = '[[{}]]'.format(name)
         self.debug_flag = False
 
-    def wiki_title(self):
+    def wiki_title(self) -> str:
         return self.wiki_name()
 
-    def wiki_name(self):
+    def wiki_name(self) -> str:
         return self._wiki_name
 
     def __str__(self):
         return self.name
 
-    def world_count(self):
+    def world_count(self) -> int:
         return len(self.worlds)
 
     def __getitem__(self, item):
@@ -34,5 +34,5 @@ class AreaItem(object):
     def __setitem__(self, key, value):
         setattr(self, key, value)
 
-    def is_well_formed(self):
-        return True
+    def is_well_formed(self) -> tuple[bool, str]:
+        return True, ""
