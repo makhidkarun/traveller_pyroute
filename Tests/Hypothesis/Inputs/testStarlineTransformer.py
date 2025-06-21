@@ -10,7 +10,7 @@ from PyRoute.Inputs.StarlineTransformer import StarlineTransformer
 
 
 class testStarlineTransformer(unittest.TestCase):
-    def test_boil_down_double_spaces(self):
+    def test_boil_down_double_spaces(self) -> None:
         original = '{   2}'
         expected = '{ 2}'
         actual = StarlineTransformer.boil_down_double_spaces(original)

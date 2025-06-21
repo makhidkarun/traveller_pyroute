@@ -14,7 +14,7 @@ class testHexHypothesis(unittest.TestCase):
     """
     @given(integers(), integers())
     @example(1, 0)
-    def test_axial_to_hex_and_hex_to_axial_round_trip(self, row, col):
+    def test_axial_to_hex_and_hex_to_axial_round_trip(self, row, col) -> None:
         hyp_line = "Hypothesis input: " + str(row) + ", " + str(col)
         (q, r) = Hex.hex_to_axial(row, col)
 
@@ -37,7 +37,7 @@ class testHexHypothesis(unittest.TestCase):
     @example(0, 0, 32, 40)
     @example(0, 0, 16, 20)
     @example(1, 0, 1, 1)
-    def test_axial_to_sector_co_ords(self, sec_x, sec_y, x, y):
+    def test_axial_to_sector_co_ords(self, sec_x, sec_y, x, y) -> None:
         hyp_line = "Hypothesis input: " + str(sec_x) + ", " + str(sec_y) + ', ' + str(x) + ', ' + str(y)
         sec_co_ords = '# ' + str(sec_x) + ', ' + str(sec_y)
         sector = Sector('# dummy', sec_co_ords)
@@ -53,7 +53,7 @@ class testHexHypothesis(unittest.TestCase):
 
     @given(integers(), integers(min_value=1, max_value=40))
     @example(0, 1)
-    def test_dy_offset_and_reverse(self, sector_y, row):
+    def test_dy_offset_and_reverse(self, sector_y, row) -> None:
         hyp_line = "Hypothesis input: " + str(sector_y) + ", " + str(row)
         dy_offset = Hex.dy_offset(row, sector_y)
         nu_row, nu_sector_y = Hex.dy_reverse(dy_offset)
