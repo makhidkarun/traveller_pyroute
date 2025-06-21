@@ -15,7 +15,7 @@ from Tests.baseTest import baseTest
 
 
 class testApproximateShortestPathTreeRegressions(baseTest):
-    def test_restart_blowup(self):
+    def test_restart_blowup(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/dijkstra_restart_blowup/Lishun.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -45,7 +45,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
         for (star, neighbour, _) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
-    def test_restart_blowup_on_jump_4(self):
+    def test_restart_blowup_on_jump_4(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/dijkstra_restart_blowup/Lishun-jump4.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -76,7 +76,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
         for (star, neighbour, _) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
-    def test_restart_blowup_on_jump_4_1(self):
+    def test_restart_blowup_on_jump_4_1(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/dijkstra_restart_blowup/Lishun-jump4-1.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -107,7 +107,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
         for (star, neighbour, _) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
-    def test_stars_node_types(self):
+    def test_stars_node_types(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/stars_node_types/Antares.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -139,7 +139,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
 
         galaxy.process_owned_worlds()
 
-    def test_stars_node_types_comm(self):
+    def test_stars_node_types_comm(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/stars_node_types/Antares.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -161,7 +161,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
 
         galaxy.process_owned_worlds()
 
-    def test_stars_comm_dont_change_iterator_in_flight(self):
+    def test_stars_comm_dont_change_iterator_in_flight(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/comm_route_blowups/Lishun-Masionia.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -183,7 +183,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
 
         galaxy.process_owned_worlds()
 
-    def test_stars_node_types_xroute(self):
+    def test_stars_node_types_xroute(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/stars_node_types/Antares.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -205,7 +205,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
 
         galaxy.process_owned_worlds()
 
-    def test_stars_node_types_xroute_subsector(self):
+    def test_stars_node_types_xroute_subsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/xroute_calculation_blowups/Antares-Urunishu.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -227,7 +227,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
 
         galaxy.process_owned_worlds()
 
-    def test_stars_node_types_xroute_two_subsectors(self):
+    def test_stars_node_types_xroute_two_subsectors(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/xroute_calculation_blowups/Antares-Sakhag-Celebes.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -249,7 +249,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
 
         galaxy.process_owned_worlds()
 
-    def test_stars_node_types_owned(self):
+    def test_stars_node_types_owned(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/stars_node_types/Antares.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -281,7 +281,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
 
         galaxy.process_owned_worlds()
 
-    def test_stars_node_types_none(self):
+    def test_stars_node_types_none(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/stars_node_types/Antares.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -313,7 +313,7 @@ class testApproximateShortestPathTreeRegressions(baseTest):
 
         galaxy.process_owned_worlds()
 
-    def _make_args(self):
+    def _make_args(self) -> argparse.ArgumentParser:
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
         args.max_jump = 2

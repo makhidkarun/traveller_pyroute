@@ -28,7 +28,7 @@ except ImportError:
 
 class testAStarNumpy(baseTest):
 
-    def testAStarOverSubsector(self):
+    def testAStarOverSubsector(self) -> None:
         self.maxDiff = None
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
 

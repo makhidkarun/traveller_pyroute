@@ -14,7 +14,7 @@ from Tests.baseTest import baseTest
 
 class testLandmarksExtremes(baseTest):
 
-    def test_q_extremes_of_zarushagar(self):
+    def test_q_extremes_of_zarushagar(self) -> None:
         sourcefile = self.unpack_filename('../DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -41,7 +41,7 @@ class testLandmarksExtremes(baseTest):
         actual = foo.get_landmarks(index=True)
         self.assertEqual(expected, actual)
 
-    def test_r_extremes_of_zarushagar(self):
+    def test_r_extremes_of_zarushagar(self) -> None:
         sourcefile = self.unpack_filename('../DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -68,7 +68,7 @@ class testLandmarksExtremes(baseTest):
         actual = foo.get_landmarks(index=True)
         self.assertEqual(expected, actual)
 
-    def test_s_extremes_of_zarushagar(self):
+    def test_s_extremes_of_zarushagar(self) -> None:
         sourcefile = self.unpack_filename('../DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -95,7 +95,7 @@ class testLandmarksExtremes(baseTest):
         actual = foo.get_landmarks(index=True)
         self.assertEqual(expected, actual)
 
-    def test_axial_extremes_of_zarushagar(self):
+    def test_axial_extremes_of_zarushagar(self) -> None:
         sourcefile = self.unpack_filename('../DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
