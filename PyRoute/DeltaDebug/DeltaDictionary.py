@@ -328,10 +328,7 @@ class SectorDictionary(dict):
 
     @property
     def skipped(self):
-        for sub_name in self.keys():
-            if self[sub_name].skipped is False:
-                return False
-        return True
+        return all(self[sub_name].skipped is not False for sub_name in self.keys())
 
     @property
     def void_subsectors(self):
