@@ -341,8 +341,8 @@ def process():
         title = wiki_page.title[:-8]
         logger.info("Processing {} -> {}".format(star.name, wiki_page.title))
 
-        categories = category_list[star.name] if star.name in category_list else None
-        sources = sources_list[star.name] if star.name in sources_list else []
+        categories = category_list.get(star.name, None)
+        sources = sources_list.get(star.name, [])
 
         new_page = worlds.create_page(star, categories, sources, title)
 

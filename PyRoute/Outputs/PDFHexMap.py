@@ -417,7 +417,7 @@ class PDFHexMap(SectorHexMap):
     def string_width(font, string):
         w = 0
         for i in string:
-            w += font.character_widths[i] if i in font.character_widths else 600
+            w += font.character_widths.get(i, 600)
         return w * font.font_size / 1000.0
 
     @property
