@@ -1,6 +1,7 @@
 import contextlib
 import unittest
 from datetime import timedelta
+from typing import Union
 
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, from_regex, composite, sampled_from, lists, floats, booleans
@@ -16,7 +17,7 @@ tradecodes = []
 
 
 @composite
-def trade_code(draw, unique=False, min_size=2, max_size=12):
+def trade_code(draw, unique=False, min_size=2, max_size=12) -> lists:
     if 0 == len(tradecodes):
         tradecodes.extend(TradeCodes.pcodes)
         tradecodes.extend(TradeCodes.dcodes)
@@ -29,7 +30,7 @@ def trade_code(draw, unique=False, min_size=2, max_size=12):
 
 
 @composite
-def trade_line(draw):
+def trade_line(draw) -> Union[lists, text]:
     choice = draw(floats(min_value=0.0, max_value=1.0))
 
     if 0.5 > choice:
@@ -104,7 +105,7 @@ class testTradeCodes(unittest.TestCase):
     @example('(00000000) [0]W')
     @example('(00000000)W [0]')
     @example('(00000000)W [0]W')
-    def test_parse_text_to_trade_code(self, s):
+    def test_parse_text_to_trade_code(self, s) -> None:
         trade = None
         try:
             trade = TradeCodes(s)
@@ -151,7 +152,7 @@ class testTradeCodes(unittest.TestCase):
     @example('?d20000-0', 'An Cw')
     @example('A000000-0', 'Ba Va')
     @example('?000E00-0', 'Mr Na')
-    def test_verify_canonicalisation_is_idempotent(self, s, trade_line):
+    def test_verify_canonicalisation_is_idempotent(self, s, trade_line) -> None:
         s = s[0:9]
         if isinstance(trade_line, list):
             trade_line = ' '.join(trade_line)
@@ -180,7 +181,7 @@ class testTradeCodes(unittest.TestCase):
         self.assertEqual(0, len(msg), "Canonicalisation failed.  " + badline + '\n' + hyp_input)
 
     @given(trade_code(unique=True))
-    def test_verify_trade_codes_from_direct_selection(self, trade_line):
+    def test_verify_trade_codes_from_direct_selection(self, trade_line) -> None:
         if isinstance(trade_line, list):
             trade_line = ' '.join(trade_line)
 
@@ -203,7 +204,7 @@ class testTradeCodes(unittest.TestCase):
            trade_code(max_size=1, min_size=1),
            booleans())
     @example('?000000-0', ['De'], False)
-    def test_has_code_but_not_uwp(self, s, trade_line, forward):
+    def test_has_code_but_not_uwp(self, s, trade_line, forward) -> None:
         s = s[0:9]
         if isinstance(trade_line, list):
             trade_line = ' '.join(trade_line)
