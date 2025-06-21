@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import re
 import unittest
@@ -332,10 +333,8 @@ class testStar(unittest.TestCase):
         assume('?' not in uwp)
         uwp_obj = None
 
-        try:
+        with contextlib.suppress(ValueError):
             uwp_obj = UWP(uwp)
-        except ValueError:
-            pass
         assume(uwp_obj is not None)
 
         if well_formed_kaboom is None:

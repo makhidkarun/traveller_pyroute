@@ -1,3 +1,4 @@
+import contextlib
 import copy
 from datetime import timedelta
 import logging
@@ -537,10 +538,8 @@ class testDeltaStar(unittest.TestCase):
         sector = Sector('# Core', '# 0, 0')
         foo = None
 
-        try:
+        with contextlib.suppress(ValueError):
             foo = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
-        except ValueError:
-            pass
 
         assume(foo is not None)
 

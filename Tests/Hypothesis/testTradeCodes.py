@@ -1,3 +1,4 @@
+import contextlib
 import unittest
 from datetime import timedelta
 
@@ -162,10 +163,8 @@ class testTradeCodes(unittest.TestCase):
 
         foo = None
 
-        try:
+        with contextlib.suppress(KeyError):
             foo = Star.parse_line_into_star(starline, sector, pop_code, ru_calc)
-        except KeyError:
-            pass
         assume(foo is not None)
         # filter out malformed tradeCode objects while we're at it
         result, _ = foo.tradeCode.is_well_formed()
@@ -216,10 +215,8 @@ class testTradeCodes(unittest.TestCase):
 
         foo = None
 
-        try:
+        with contextlib.suppress(KeyError):
             foo = Star.parse_line_into_star(starline, sector, pop_code, ru_calc)
-        except KeyError:
-            pass
         assume(foo is not None)
 
         # filter out malformed tradeCode objects while we're at it

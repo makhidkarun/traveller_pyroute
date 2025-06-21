@@ -3,6 +3,7 @@ Created on Mar 17, 2014
 
 @author: tjoneslo
 """
+import contextlib
 import copy
 import logging
 import math
@@ -124,10 +125,8 @@ class ObjectStatistics(object):
         foo.__dict__.update(state)
         for key in ObjectStatistics.__slots__:
             if '__dict__' != key:
-                try:
+                with contextlib.suppress(AttributeError):
                     foo[key] = copy.deepcopy(self[key])
-                except AttributeError:
-                    pass
 
         return foo
 
