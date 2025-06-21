@@ -109,7 +109,7 @@ class ParseStarInput:
         # Cap non-K'kree systems to max law level J
         if star.uwp.law.upper() in "KLMNOPQRSTUVWXYZ":
             samecode = AllyGen.same_align(star.alg_code)
-            if not "Kk" == samecode:
+            if "Kk" != samecode:
                 star.uwp.law = "J"
 
         star.stars = data[17].strip()

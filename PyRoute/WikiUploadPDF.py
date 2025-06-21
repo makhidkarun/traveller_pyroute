@@ -153,7 +153,7 @@ No information yet available.
     logger.info("Uploading {}".format(sectorName))
     for sec, eco in zip(sectorData, economicData):
 
-        if not sec[0] == eco[0]:
+        if sec[0] != eco[0]:
             logger.error("{} is not equal to {}".format(sec[0], eco[0]))
             break
         subsectorName = eco[14].split('|')[1].strip('\n').strip(']')

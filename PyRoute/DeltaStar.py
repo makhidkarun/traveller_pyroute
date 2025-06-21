@@ -239,7 +239,7 @@ class DeltaStar(Star):
             if pop == 0 and acceptance != 0:
                 line = '{} - CX Calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance)
                 msg.append(line)
-            elif pop != 0 and not pop_plus_imp == acceptance:
+            elif pop != 0 and pop_plus_imp != acceptance:
                 line = '{} - CX Calculated acceptance {} does not match generated acceptance {}'.format(self, acceptance,
                                                                                                     max(1,
                                                                                                         pop + self.importance))

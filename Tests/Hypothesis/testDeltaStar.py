@@ -444,7 +444,7 @@ class testDeltaStar(unittest.TestCase):
         star1.index = 0
         star1.allegiance_base = 'NaHu'
 
-        assume(not '0' == str(star1.pop) and 'Ba' not in star1.tradeCode.codes)
+        assume('0' != str(star1.pop) and 'Ba' not in star1.tradeCode.codes)
 
         _, canonical_messages = star1.check_canonical()
 
@@ -487,7 +487,7 @@ class testDeltaStar(unittest.TestCase):
         star1.index = 0
         star1.allegiance_base = 'NaHu'
 
-        assume(not '0' == str(star1.pop) and 'Ba' not in star1.tradeCode.codes)
+        assume('0' != str(star1.pop) and 'Ba' not in star1.tradeCode.codes)
 
         _, canonical_messages = star1.check_canonical()
 

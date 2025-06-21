@@ -508,7 +508,7 @@ class Star(object):
         if pop == 0 and acceptance != 0:
             self.logger.warning(
                 '{} - CX Calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
-        elif pop != 0 and not max(1, pop + self.importance) == acceptance:
+        elif pop != 0 and max(1, pop + self.importance) != acceptance:
             self.logger.warning(
                 '{} - CX Calculated acceptance {} does not match generated acceptance {}'.
                 format(self, acceptance, max(1, pop + self.importance)))
