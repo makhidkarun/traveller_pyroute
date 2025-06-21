@@ -4,7 +4,7 @@
 # McCabe complexity (`C901`) by default.
 lint.select = ["E", "F", "TID252", "NPY201", "W", "PLE", "PLW", "B007", "SIM115", "SIM108", "SIM101", "SIM102",
     "SIM103", "SIM105", "SIM107", "SIM109", "SIM110", "SIM112", "SIM114", "SIM116", "SIM117", "SIM118", "SIM201",
-    "SIM202"]
+    "SIM202", "SIM208", "SIM210", "SIM211"]
 lint.ignore = ["E501", "SIM113", "SIM300"]
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
