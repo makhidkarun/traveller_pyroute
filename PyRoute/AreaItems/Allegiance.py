@@ -33,7 +33,7 @@ class Allegiance(AreaItem):
         return foo
 
     @staticmethod
-    def allegiance_name(name, code, base):
+    def allegiance_name(name, code, base) -> str:
         if not isinstance(name, str):
             raise ValueError("Name must be string - received " + str(name))
         if not isinstance(code, str):
@@ -67,7 +67,7 @@ class Allegiance(AreaItem):
         return '{}'.format(name.strip())
 
     @staticmethod
-    def set_wiki_name(name, code, base):
+    def set_wiki_name(name, code, base) -> str:
         if not isinstance(name, str):
             raise ValueError("Name must be string - received " + str(name))
         if not isinstance(code, str):
@@ -102,19 +102,19 @@ class Allegiance(AreaItem):
     def __str__(self):
         return '{} ({})'.format(self.name, self.code)
 
-    def is_unclaimed(self):
+    def is_unclaimed(self) -> bool:
         return AllyGen.is_unclaimed(self.code)
 
-    def is_wilds(self):
+    def is_wilds(self) -> bool:
         return AllyGen.is_wilds(self.code)
 
-    def is_client_state(self):
+    def is_client_state(self) -> bool:
         return AllyGen.is_client_state(self.code)
 
-    def are_allies(self, other):
+    def are_allies(self, other) -> bool:
         return AllyGen.are_allies(self.code, other.code)
 
-    def is_well_formed(self):
+    def is_well_formed(self) -> tuple[bool, str]:
         msg = ''
         if '' == self.name.strip():
             msg = "Allegiance name should not be empty"

@@ -68,7 +68,7 @@ class Galaxy(AreaItem):
 
     # def read_sectors(self, sectors, pop_code, ru_calc,
     #                 route_reuse, trade_choice, route_btn, mp_threads, debug_flag, fix_pop=False):
-    def read_sectors(self, options):
+    def read_sectors(self, options) -> None:
         assert isinstance(options, ReadSectorOptions), "options parm not ReadSectorOptions, is " + type(options).__name__
         route_reuse = options.route_reuse
         trade_choice = options.trade_choice
@@ -105,7 +105,7 @@ class Galaxy(AreaItem):
         self.set_positions()
         self.logger.debug("Allegiances: {}".format(self.alg))
 
-    def add_star_to_galaxy(self, star: Star, star_counter: int, sec: Sector):
+    def add_star_to_galaxy(self, star: Star, star_counter: int, sec: Sector) -> int:
         assert star not in sec.worlds, "Star " + str(star) + " duplicated in sector " + str(sec)
         star.index = star_counter
         self.star_mapping[star.index] = star
@@ -124,7 +124,7 @@ class Galaxy(AreaItem):
         star.is_well_formed()
         return star_counter + 1
 
-    def set_area_alg(self, star, area, algs: dict):
+    def set_area_alg(self, star, area, algs: dict) -> None:
         full_alg = algs.get(star.alg_code, Allegiance(star.alg_code, 'Unknown Allegiance', base=False))
         base_alg = algs.get(star.alg_base_code, Allegiance(star.alg_base_code, 'Unknown Allegiance', base=True))
 
@@ -132,7 +132,7 @@ class Galaxy(AreaItem):
         if star.alg_code != star.alg_base_code:
             area.alg.setdefault(star.alg_code, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
 
-    def set_positions(self):
+    def set_positions(self) -> None:
         shadow_len = self.stars.number_of_nodes()
         for sector in self.sectors.values():
             for star in sector.worlds:
@@ -147,7 +147,7 @@ class Galaxy(AreaItem):
             assert 'star' in self.stars.nodes[item], "Star attribute not set for item " + str(item)
         self.historic_costs = RouteLandmarkGraph(self.stars)
 
-    def set_bounding_sectors(self):
+    def set_bounding_sectors(self) -> None:
         for sector, neighbor in itertools.combinations(self.sectors.values(), 2):
             if sector.x - 1 == neighbor.x and sector.y == neighbor.y:
                 sector.spinward = neighbor
@@ -164,12 +164,12 @@ class Galaxy(AreaItem):
             elif sector.x == neighbor.x and sector.y == neighbor.y:
                 self.logger.error("Duplicate sector %s and %s" % (sector.name, neighbor.name))
 
-    def set_bounding_subsectors(self):
+    def set_bounding_subsectors(self) -> None:
         for sector in self.sectors.values():
             for subsector in sector.subsectors.values():
                 subsector.set_bounding_subsectors()
 
-    def generate_routes(self):
+    def generate_routes(self) -> None:
         self.trade.generate_routes()
 
     def _set_trade_object(self, reuse, routes, route_btn, mp_threads, debug_flag):
@@ -190,7 +190,7 @@ class Galaxy(AreaItem):
         elif routes == 'none':
             self.trade = NoneCalculation(self)
 
-    def set_borders(self, border_gen, match):
+    def set_borders(self, border_gen, match) -> None:
         self.logger.info('setting borders...')
         if border_gen == 'range':
             self.borders.create_borders(match)
@@ -201,7 +201,7 @@ class Galaxy(AreaItem):
         else:
             pass
 
-    def write_routes(self, routes=None):
+    def write_routes(self, routes=None) -> None:
         path = os.path.join(self.output_path, 'ranges.txt')
         with open(path, "wb") as f:
             nx.write_edgelist(self.ranges, f, data=True)
@@ -220,7 +220,7 @@ class Galaxy(AreaItem):
                 for star in stars:
                     f.write("{} - {}\n".format(star, star.tradeCount))
 
-    def process_eti(self):
+    def process_eti(self) -> None:
         self.logger.info("Processing ETI for worlds")
         for (world, neighbor) in self.stars.edges():
             worldstar = self.star_mapping[world]
@@ -244,7 +244,7 @@ class Galaxy(AreaItem):
                 worldstar.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
                 neighborstar.eti_pass_volume += math.pow(10, PassTradeIndex) * 2.5
 
-    def read_routes(self, routes=None):
+    def read_routes(self, routes=None) -> None:
         route_regex = r"^({1,}) \(({3,}) (\d\d\d\d)\) ({1,}) \(({3,}) (\d\d\d\d)\) (\{.*\})"
         routeline = re.compile(route_regex)
         path = os.path.join(self.output_path, 'ranges.txt')
@@ -262,7 +262,7 @@ class Galaxy(AreaItem):
 
                 self.ranges.add_edge_from([world1, world2, routeData])
 
-    def process_owned_worlds(self):
+    def process_owned_worlds(self) -> None:
         ow_names = os.path.join(self.output_path, 'owned-worlds-names.csv')
         ow_list = os.path.join(self.output_path, 'owned-worlds-list.csv')
         with codecs.open(ow_names, 'w+', encoding="utf-8") as f, codecs.open(ow_list, 'w+', encoding="utf-8") as g:
@@ -329,7 +329,7 @@ class Galaxy(AreaItem):
 
                 worldstar.ownedBy = (owner, ownedBy[0:4])
 
-    def is_well_formed(self):
+    def is_well_formed(self) -> None:
         for item in self.sectors:
             sector = self.sectors[item]
             assert isinstance(sector, Sector), "Galaxy sectors must be instance of Sector object"
@@ -350,7 +350,7 @@ class Galaxy(AreaItem):
             star = self.star_mapping[item]
             star.is_well_formed()
 
-    def heuristic_distance_bulk(self, target):
+    def heuristic_distance_bulk(self, target) -> float:
         active_nodes = self.stars.nodes.values()
         raw = self.trade.shortest_path_tree.lower_bound_bulk(target)
         distances = self.trade.star_graph.distances_from_target(active_nodes, target)
@@ -360,7 +360,7 @@ class Galaxy(AreaItem):
 
         return raw
 
-    def route_cost(self, route):
+    def route_cost(self, route) -> float:
         """
         Given a route, return its total cost _at the moment_
         """
@@ -375,7 +375,7 @@ class Galaxy(AreaItem):
     '''
     Check that route doesn't revisit any stars
     '''
-    def route_no_revisit(self, route):
+    def route_no_revisit(self, route) -> bool:
         visited = set()
 
         for item in route:

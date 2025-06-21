@@ -4,7 +4,9 @@ Created on 21 Jul, 2024
 @author: CyberiaResurrection
 """
 import re
+from typing import Optional
 
+from PyRoute.Star import Star
 from PyRoute.AreaItems.AreaItem import AreaItem
 
 
@@ -62,16 +64,16 @@ class Sector(AreaItem):
     def __str__(self):
         return '{} ({},{})'.format(self.name, str(self.x), str(self.y))
 
-    def sector_name(self):
+    def sector_name(self) -> str:
         return self.name[:-7] if self.name.endswith('Sector') else self.name
 
-    def find_world_by_pos(self, pos):
+    def find_world_by_pos(self, pos) -> Optional[Star]:
         for world in self.worlds:
             if world.position == pos:
                 return world
         return None
 
-    def is_well_formed(self):
+    def is_well_formed(self) -> tuple[bool, str]:
         msg = ""
         # check name
         if self.name is None or '' == self.name.strip():

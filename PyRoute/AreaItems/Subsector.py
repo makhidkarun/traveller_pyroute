@@ -33,7 +33,7 @@ class Subsector(AreaItem):
         return state
 
     @staticmethod
-    def set_wiki_name(name, sector_name, position):
+    def set_wiki_name(name, sector_name, position) -> str:
         if len(name) == 0:
             return "{0} location {1}".format(sector_name, position)
         else:
@@ -42,16 +42,16 @@ class Subsector(AreaItem):
             else:
                 return '[[{0} Subsector|{0}]]'.format(name)
 
-    def wiki_title(self):
+    def wiki_title(self) -> str:
         return '{0} - {1}'.format(self.wiki_name(), self.sector.wiki_name())
 
-    def subsector_name(self):
+    def subsector_name(self) -> str:
         if len(self.name) == 0:
             return "Location {}".format(self.position)
         else:
             return self.name[:-9] if self.name.endswith('Subsector') else self.name
 
-    def set_bounding_subsectors(self):
+    def set_bounding_subsectors(self) -> None:
         posrow = 0
         for row in self.positions:
             if self.position in row:
