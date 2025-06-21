@@ -16,7 +16,7 @@ tradecodes = []
 
 
 @composite
-def trade_code(draw):
+def trade_code(draw) -> composite:
     if 0 == len(tradecodes):
         tradecodes.extend(TradeCodes.pcodes)
         tradecodes.extend(TradeCodes.dcodes)
@@ -29,7 +29,7 @@ def trade_code(draw):
 
 
 @composite
-def starline(draw, barren_world=False):
+def starline(draw, barren_world=False) -> composite:
     col = draw(integers(min_value=1, max_value=32))
     row = draw(integers(min_value=1, max_value=40))
     posn = str(col).rjust(2, '0') + str(row).rjust(2, '0')
@@ -85,7 +85,7 @@ def starline(draw, barren_world=False):
 
 
 @composite
-def mixed_starline(draw):
+def mixed_starline(draw) -> composite:
     choice = draw(floats(min_value=0.0, max_value=1.0))
     if 0.5 < choice:
         res = from_regex(regex=ParseStarInput.starline,
@@ -97,7 +97,7 @@ def mixed_starline(draw):
 
 class testDeltaStar(unittest.TestCase):
 
-    def test_plain_canonicalisation(self):
+    def test_plain_canonicalisation(self) -> None:
         cases = [
             # Commented out for the moment - Barren/Dieback is a bit more intricate than other pop codes, and don't want
             # perfect to be the enemy of good
@@ -188,7 +188,7 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    AD01000-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
     @example('0101 0                    AD20000-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
     @example('0101 0                    A000900-0 As In                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
-    def test_check_canonicalisation(self, starline):
+    def test_check_canonicalisation(self, starline) -> None:
         outer_logger = logging.getLogger("PyRoute.Star")
         inner_logger = logging.getLogger("PyRoute.TradeCodes")
 
@@ -276,7 +276,7 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A000000-0 As Ni                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000000-0 As Hi                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    AE0A000-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
-    def test_canonicalise_invalid_trade_codes(self, starline):
+    def test_canonicalise_invalid_trade_codes(self, starline) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = None
         allowed_errors = [
@@ -338,7 +338,7 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A000E00-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
     @example('0101 0                    AD00000-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
     @example('0101 0                    AD20000-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
-    def test_canonicalise_missing_trade_codes(self, starline):
+    def test_canonicalise_missing_trade_codes(self, starline) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = None
         allowed_errors = [
@@ -382,7 +382,7 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A000000-0 As Ba                                  { 0 } (010+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A00B000-0 As Ba                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
     @example('0101 0                    A0G0000-0 As Ba                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
-    def test_canonicalise_barren_worlds(self, starline):
+    def test_canonicalise_barren_worlds(self, starline) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = None
         allowed_errors = [
@@ -425,7 +425,7 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A000400-0 As As                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000400-0 As As                                  { 0 } (006+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000700-0 As As                                  { 0 } (00D+0) [0000] - - A 000 0 NaHu G5 V')
-    def test_canonicalise_ex_on_non_barren_worlds(self, starline):
+    def test_canonicalise_ex_on_non_barren_worlds(self, starline) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = None
         allowed_errors = [
@@ -468,7 +468,7 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 0                    A000100-0 As As                                  { 0 } (000+0) [7000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000100-0 As As                                  { 0 } (000+0) [00F0] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A140620-9 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
-    def test_canonicalise_cx_on_non_barren_worlds(self, starline):
+    def test_canonicalise_cx_on_non_barren_worlds(self, starline) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = None
         allowed_errors = [
@@ -531,7 +531,7 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 000000000000000       - - A 000 0 00')
     @example('0101 000000000000000 ???????-? 000000000000000 - -  [0001] B - A 000   00')
     @example('0101 0                    A201000-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
-    def test_canonicalise_from_regex_match_and_verify_idempotency(self, starline):
+    def test_canonicalise_from_regex_match_and_verify_idempotency(self, starline) -> None:
         assume('00' != starline[0:2] and '00' != starline[2:4])
         assume(33 > int(starline[0:2]) and 41 > int(starline[2:4]))
 

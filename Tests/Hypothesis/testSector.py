@@ -8,7 +8,7 @@ from PyRoute.AreaItems.Sector import Sector
 
 
 @composite
-def position_string(draw):
+def position_string(draw) -> composite:
     left = draw(text(min_size=2, alphabet='+- 0123456789'))
     right = draw(text(min_size=1, alphabet='+- 0123456789'))
 
@@ -16,7 +16,7 @@ def position_string(draw):
 
 
 @composite
-def sector_name(draw):
+def sector_name(draw) -> composite:
     stem = '#' + draw(text(min_size=1))
     flip = draw(floats(min_value=0.0, max_value=1.0))
 
@@ -26,7 +26,7 @@ def sector_name(draw):
 
 
 @composite
-def two_sectors(draw):
+def two_sectors(draw) -> composite:
     sx = draw(integers(min_value=-9999, max_value=9999))
     sy = draw(integers(min_value=-9999, max_value=9999))
 
@@ -67,7 +67,7 @@ class testSector(unittest.TestCase):
     @example('#00', '# 00, ')
     @example('#0 ', '# 00,0')
     @example('# Woop Woop Sector', '# 864+,059 -')
-    def test_create_sector(self, s, t):
+    def test_create_sector(self, s, t) -> None:
         sector = None
         allowed_value_errors = ["Name string too short", "Position string too short", "Position string malformed",
                                 "Name string should start with #", "Position string should start with #"]
@@ -93,7 +93,7 @@ class testSector(unittest.TestCase):
 
     @given(two_sectors())
     @example({'sx': -2316, 'sy': 117, 'tx': 107, 'ty': 3057, 'direction': 1})
-    def test_non_adjacent_sectors_hooked_together_are_not_ok(self, payload):
+    def test_non_adjacent_sectors_hooked_together_are_not_ok(self, payload) -> None:
         source_pos = '# ' + str(payload['sx']) + ", " + str(payload['sy'])
         target_pos = '# ' + str(payload['tx']) + ", " + str(payload['ty'])
 
@@ -125,7 +125,7 @@ class testSector(unittest.TestCase):
         result, msg = target.is_well_formed()
         self.assertFalse(result, msg)
 
-    def testSectorPositionRegressions(self):
+    def testSectorPositionRegressions(self) -> None:
         cases = [
             ('Zarushagar', '# Zarushagar', '# -1,-1')
         ]
