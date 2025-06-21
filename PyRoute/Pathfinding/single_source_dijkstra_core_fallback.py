@@ -7,7 +7,7 @@ import heapq
 import numpy as np
 
 
-def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, min_cost):
+def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, min_cost) -> tuple:
     heap = [(distance_labels[seed], seed) for seed in seeds if 0 < len(arcs[seed][0])]
     heapq.heapify(heap)
 
