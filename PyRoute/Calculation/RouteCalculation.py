@@ -9,6 +9,7 @@ import itertools
 import logging
 import math
 from collections import defaultdict
+from typing import Any
 
 import networkx as nx
 
@@ -46,16 +47,16 @@ class RouteCalculation(object):
         self.shortest_path_tree = None
         self.star_graph = None
 
-    def generate_routes(self):
+    def generate_routes(self) -> None:
         raise NotImplementedError("Base Class")
 
-    def calculate_routes(self):
+    def calculate_routes(self) -> None:
         raise NotImplementedError("Base Class")
 
-    def route_weight(self, star, target):
+    def route_weight(self, star, target) -> None:
         raise NotImplementedError("Base Class")
 
-    def base_route_filter(self, star, neighbor):
+    def base_route_filter(self, star, neighbor) -> None:
         """
             Used in the generate_base_routes to filter (i.e. skip making a route)
             between the star and neighbor. Used to remove un-helpful world links,
@@ -65,7 +66,7 @@ class RouteCalculation(object):
         """
         raise NotImplementedError("Base Class")
 
-    def base_range_routes(self, star, neighbor):
+    def base_range_routes(self, star, neighbor) -> None:
         """
             Add the route between the pair to the range collection
             Called prior to the setting of the routes/stars based upon
@@ -73,7 +74,7 @@ class RouteCalculation(object):
         """
         raise NotImplementedError("Base Class")
 
-    def generate_base_routes(self):
+    def generate_base_routes(self) -> None:
         self.logger.info('generating jumps...')
         self.galaxy.is_well_formed()
         raw_ranges = self._raw_ranges()
@@ -107,7 +108,7 @@ class RouteCalculation(object):
                       not star.is_redzone and not neighbour.is_redzone)
         return raw_ranges
 
-    def check_existing_routes(self, star, neighbor):
+    def check_existing_routes(self, star, neighbor) -> None:
         for route in star.routes:
             route_des = route[3:] if len(route) == 7 else route[8:]
             if neighbor.position == route_des:
@@ -117,7 +118,7 @@ class RouteCalculation(object):
                     self.galaxy.stars[star.index][neighbor.index]['comm'] = True
 
     @staticmethod
-    def get_btn(star1, star2, distance=None):
+    def get_btn(star1, star2, distance=None) -> int:
         """
         Calculate the BTN between two stars, which is the sum of the worlds
         WTNs plus a modifier for types, minus a modifier for distance.
@@ -163,19 +164,19 @@ class RouteCalculation(object):
         return min_btn if min_btn > btn and distance <= max_range else btn
 
     @staticmethod
-    def get_passenger_btn(btn, star, neighbor):
+    def get_passenger_btn(btn, star, neighbor) -> int:
         passBTN = btn + star.passenger_btn_mod + neighbor.passenger_btn_mod
         return passBTN
 
     @staticmethod
     @functools.cache
-    def get_btn_offset(distance):
+    def get_btn_offset(distance) -> int:
         jump_index = bisect.bisect_left(RouteCalculation.btn_jump_range, distance)
         return RouteCalculation.btn_jump_mod[jump_index]
 
     @staticmethod
     @functools.cache
-    def get_vol_offset(distance):
+    def get_vol_offset(distance) -> int:
         if distance < 50:
             return 0
         elif distance < 100:
@@ -188,14 +189,14 @@ class RouteCalculation(object):
 
     @staticmethod
     @functools.cache
-    def get_max_btn(star_wtn, neighbour_wtn):
+    def get_max_btn(star_wtn, neighbour_wtn) -> int:
         if neighbour_wtn > star_wtn:
             return RouteCalculation.get_max_btn(neighbour_wtn, star_wtn)
         return (neighbour_wtn * 2) + 1
 
     @staticmethod
     @functools.cache
-    def calc_trade(btn):
+    def calc_trade(btn) -> int:
         """
         Convert the BTN trade number to a credit value.
         """
@@ -204,7 +205,7 @@ class RouteCalculation(object):
         return trade
 
     @staticmethod
-    def calc_trade_tonnage(btn, distance):
+    def calc_trade_tonnage(btn, distance) -> int:
         offset = RouteCalculation.get_vol_offset(distance)
         dton = btn + offset - 9
 
@@ -214,7 +215,7 @@ class RouteCalculation(object):
 
     @staticmethod
     @functools.cache
-    def calc_passengers(btn):
+    def calc_passengers(btn) -> int:
         trade = 0
         if (btn <= 10):
             trade = 0
@@ -224,7 +225,7 @@ class RouteCalculation(object):
             trade = 10 ** ((btn - 10) // 2)
         return trade
 
-    def calculate_components(self):
+    def calculate_components(self) -> None:
         bitz = nx.connected_components(self.galaxy.stars)
         counter = -1
 
@@ -235,11 +236,11 @@ class RouteCalculation(object):
                 self.galaxy.star_mapping[star].component = counter
         return
 
-    def get_landmarks(self, index=False, btn=None):
+    def get_landmarks(self, index=False, btn=None) -> tuple[list[dict], defaultdict[Any, set]]:
         schema = LandmarksTriaxialExtremes(self.galaxy)
         return schema.get_landmarks(index, btn=btn)
 
-    def unilateral_filter(self, star):
+    def unilateral_filter(self, star) -> bool:
         """
         Routes can be filtered either bilaterally (some combination of the endpoints means the route needs filtering)
         or unilaterally, where at least one of the endpoints requires the route to be filtered (eg red trade zone in
@@ -251,29 +252,29 @@ class RouteCalculation(object):
         """
         return False
 
-    def is_sector_trade_balanced(self):
+    def is_sector_trade_balanced(self) -> None:
         pass
 
-    def is_sector_pass_balanced(self):
+    def is_sector_pass_balanced(self) -> None:
         pass
 
-    def is_sector_trade_volume_balanced(self):
+    def is_sector_trade_volume_balanced(self) -> None:
         pass
 
-    def is_allegiance_trade_balanced(self):
+    def is_allegiance_trade_balanced(self) -> None:
         pass
 
-    def is_allegiance_pass_balanced(self):
+    def is_allegiance_pass_balanced(self) -> None:
         pass
 
-    def is_allegiance_trade_volume_balanced(self):
+    def is_allegiance_trade_volume_balanced(self) -> None:
         pass
 
-    def multilateral_balance_trade(self):
+    def multilateral_balance_trade(self) -> None:
         pass
 
-    def multilateral_balance_pass(self):
+    def multilateral_balance_pass(self) -> None:
         pass
 
-    def multilateral_balance_trade_volume(self):
+    def multilateral_balance_trade_volume(self) -> None:
         pass
