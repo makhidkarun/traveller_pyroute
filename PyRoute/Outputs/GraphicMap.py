@@ -66,30 +66,30 @@ class GraphicMap(Map):
 
         self.logger.debug("Completed GraphicMap init")
 
-    def document(self, area_name: str, is_live=True):
+    def document(self, area_name: str, is_live=True) -> ImageDraw:
         background = self.colours['background']
         size = (int(self.image_size.x * self.input_scale), int(self.image_size.y * self.input_scale))
         self.image = Image.new("RGBA", size, background if background else "white")
         self.area_name = area_name
         return ImageDraw.Draw(self.image)
 
-    def close(self):
+    def close(self) -> None:
         path = os.path.join(self.output_path, self.area_name + ".png")
         resize = self.image_size.scaled_tuple(self.input_scale * self.output_scale, True)
         self.image = self.image.resize(resize, Image.BICUBIC)
         self.image.save(path)
 
-    def add_line(self, start: Cursor, end: Cursor, colour: Colour, stroke='solid', width: float = 1):
+    def add_line(self, start: Cursor, end: Cursor, colour: Colour, stroke='solid', width: float = 1) -> None:
         origin = start.scaled_tuple(self.input_scale, False)
         termin = end.scaled_tuple(self.input_scale, False)
         self.doc.line([origin, termin], self._get_colour(colour), width=width * self.input_scale)
 
-    def add_rectangle(self, start: Cursor, end: Cursor, border_colour: Colour, fill_colour: Colour, width: int):
+    def add_rectangle(self, start: Cursor, end: Cursor, border_colour: Colour, fill_colour: Colour, width: int) -> None:
         origin = start.scaled_tuple(self.input_scale, False)
         termin = end.scaled_tuple(self.input_scale, False)
         self.doc.rectangle([origin, termin], self._get_colour(fill_colour), self._get_colour(border_colour), width)
 
-    def add_circle(self, centre: Cursor, radius: int, line_width: int, fill: bool, scheme: Scheme):
+    def add_circle(self, centre: Cursor, radius: int, line_width: int, fill: bool, scheme: Scheme) -> None:
         if self.colours[scheme] is None:
             return
         colour = self._get_colour(self.colours[scheme])
@@ -198,7 +198,7 @@ class DashedImageDraw(ImageDraw.ImageDraw):
             self.line([(x3, y3), (x4, y4)], fill=fill, width=1)
         return
 
-    def dashed_line(self, xy, dash=(2, 2), fill=None, width=0):
+    def dashed_line(self, xy, dash=(2, 2), fill=None, width=0) -> None:
         # xy – Sequence of 2-tuples like [(x, y), (x, y), ...]
         for i in range(len(xy) - 1):
             x1, y1 = xy[i]

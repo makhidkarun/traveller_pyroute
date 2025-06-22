@@ -266,7 +266,7 @@ class SubsectorMap(GraphicMap):
                 pos, point, _ = self._set_pos(x, y)
                 self.draw_border(pos, point)
 
-    def fill_aleg_hex(self, pos, point):
+    def fill_aleg_hex(self, pos, point) -> None:
         if pos in self.galaxy.borders.allyMap:
             point = point.copy()
             xm = self.hex_size.x
@@ -282,7 +282,7 @@ class SubsectorMap(GraphicMap):
                              (point.x - xm * 2, point.y)],
                              outline=None, fill=colour)
 
-    def draw_border(self, pos, point):
+    def draw_border(self, pos, point) -> None:
         start = Cursor(25, 25)
         end = Cursor(385, 538)
         if pos in self.galaxy.borders.allyMap:
@@ -545,7 +545,7 @@ class SubsectorMap(GraphicMap):
 
         return Cursor(round(cx), round(cy))
 
-    def draw_arc(self, centre, start, end, colour):
+    def draw_arc(self, centre, start, end, colour) -> None:
         r = math.sqrt((start.x - centre.x) ** 2 + (start.y - centre.y) ** 2)
         x1 = centre.x - r
         y1 = centre.y - r

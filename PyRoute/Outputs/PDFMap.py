@@ -63,7 +63,7 @@ class PDFMap(MapOutput):
         }
         self.logger.debug("Completed PDFMap init")
 
-    def document(self, area_name: str, is_live=True):
+    def document(self, area_name: str, is_live=True) -> canvas.Canvas:
         path = os.path.join(self.output_path, f"{area_name}.pdf")
         self.logger.info(f"writing PDF to {path}")
 
@@ -76,7 +76,7 @@ class PDFMap(MapOutput):
         # self.doc.set_margins(4)
         return self.doc
 
-    def close(self):
+    def close(self) -> None:
         self.doc.showPage()
         self.doc.save()
 
@@ -109,13 +109,13 @@ class PDFMap(MapOutput):
             self.doc.setFillColor(self.colours[scheme])
         self.doc.circle(center.x, center.y, radius, 1, 1 if fill else 0)
 
-    def add_text(self, text: str, start: Cursor, scheme: Scheme):
+    def add_text(self, text: str, start: Cursor, scheme: Scheme) -> None:
         font_info = self.get_font(scheme)
         self.doc.setFont(font_info[0], size=font_info[1])
         self.doc.setFillColor(self.colours[scheme])
         self.doc.drawString(start.x, start.y, text)
 
-    def add_text_centred(self, text: str, start: Cursor, scheme: Scheme, max_width: int = -1, offset: bool = False):
+    def add_text_centred(self, text: str, start: Cursor, scheme: Scheme, max_width: int = -1, offset: bool = False) -> None:
         font_info = self.get_font(scheme)
         self.doc.setFont(font_info[0], size=font_info[1])
         self.doc.setFillColor(self.colours[scheme])
@@ -136,7 +136,7 @@ class PDFMap(MapOutput):
 
         self.doc.drawCentredString(start.x + offset_x, start.y + font_info[1], out_text)
 
-    def add_text_centred_legacy(self, text: str, start: Cursor, scheme: Scheme, max_width: int = -1):
+    def add_text_centred_legacy(self, text: str, start: Cursor, scheme: Scheme, max_width: int = -1) -> None:
         font_info = self.get_font(scheme)
         self.doc.setFont(font_info[0], size=font_info[1])
         self.doc.setFillColor(self.colours[scheme])
