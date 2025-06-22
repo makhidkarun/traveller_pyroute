@@ -16,10 +16,10 @@ class WithinLineReducer(object):
     def __init__(self, reducer):
         self.reducer = reducer
 
-    def preflight(self):
+    def preflight(self) -> bool:
         return self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines)
 
-    def run(self):
+    def run(self) -> None:
         segment, subs_list = self._build_subs_list()
         if 0 == len(subs_list):
             # nothing to do, bail out early
@@ -160,7 +160,7 @@ class WithinLineReducer(object):
 
         return nu_list
 
-    def write_files(self, sectors=None):
+    def write_files(self, sectors=None) -> None:
         if isinstance(sectors, DeltaDictionary):
             sectors.write_files(self.reducer.args.mindir)
         else:

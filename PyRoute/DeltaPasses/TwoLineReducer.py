@@ -8,7 +8,7 @@ from PyRoute.DeltaPasses.BeyondLineReducer import BeyondLineReducer
 
 class TwoLineReducer(BeyondLineReducer):
 
-    def run(self, singleton_only=False, first_segment=True):
+    def run(self, singleton_only=False, first_segment=True) -> None:
         segment = self.reducer.sectors.lines
 
         # An interesting less-than-4-element list is 2-minimal by definition

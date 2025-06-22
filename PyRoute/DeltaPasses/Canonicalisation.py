@@ -11,10 +11,10 @@ class Canonicalisation(object):
     def __init__(self, reducer):
         self.reducer = reducer
 
-    def preflight(self):
+    def preflight(self) -> bool:
         return self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines)
 
-    def run(self):
+    def run(self) -> None:
         # build substitution list - canonicalise _everything_
         subs_list = []
         for line in self.reducer.sectors.lines:

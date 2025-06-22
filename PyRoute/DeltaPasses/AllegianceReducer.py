@@ -11,10 +11,10 @@ class AllegianceReducer(object):
     def __init__(self, reducer):
         self.reducer = reducer
 
-    def preflight(self):
+    def preflight(self) -> bool:
         return self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines)
 
-    def run(self, singleton_only=False):
+    def run(self, singleton_only=False) -> None:
         segment = list(self.reducer.sectors.allegiance_list())
 
         # An interesting single-element list is 1-minimal by definition
@@ -83,7 +83,7 @@ class AllegianceReducer(object):
             self.reducer.sectors.trim_empty_allegiances()
             self.write_files()
 
-    def write_files(self, sectors=None):
+    def write_files(self, sectors=None) -> None:
         if isinstance(sectors, DeltaDictionary):
             sectors.write_files(self.reducer.args.mindir)
         else:
