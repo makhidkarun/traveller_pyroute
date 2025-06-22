@@ -6,6 +6,7 @@ Created on Mar 15, 2014
 import functools
 import itertools
 import math
+from typing import Optional
 
 import numpy as np
 import networkx as nx
@@ -109,12 +110,12 @@ class TradeCalculation(RouteCalculation):
         self.allegiance_trade_volume_balance = TradeBalance(stat_field="tradeDtonExt", region=galaxy, field="alg",
                                                      star_field="allegiance_base", target_property="code")
 
-    def base_route_filter(self, star, neighbor):
+    def base_route_filter(self, star, neighbor) -> bool:
         # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
         # - in this case, red/forbidden zones and barren systems - so only bilateral filtering remains.
         return False
 
-    def base_range_routes(self, star, neighbor):
+    def base_range_routes(self, star, neighbor) -> Optional[int]:
         dist = star.distance(neighbor)
         # add all the stars in the BTN range, but skip this pair
         # if there there isn't enough trade to warrant a trade check
@@ -159,7 +160,7 @@ class TradeCalculation(RouteCalculation):
 
         return ranges
 
-    def generate_routes(self):
+    def generate_routes(self) -> None:
         """
         Generate the basic routes between all the stars. This creates two sets
         of routes.
@@ -200,7 +201,7 @@ class TradeCalculation(RouteCalculation):
 
         self.logger.info('Final route count {}'.format(self.galaxy.stars.number_of_edges()))
 
-    def calculate_routes(self):
+    def calculate_routes(self) -> None:
         """
         The base calculate routes. Read through all the stars in WTN order.
         Do this order to allow the higher trade routes establish the basic routes
@@ -301,7 +302,7 @@ class TradeCalculation(RouteCalculation):
             self.logger.info('Total target-exhausted nodes {}'.format(total_targ_exhausted))
             self.logger.info('Total un-exhausted nodes {}'.format(total_un_exhausted))
 
-    def get_trade_between(self, star, target):
+    def get_trade_between(self, star, target) -> None:
         """
         Calculate the route between star and target
         If we can't find a route (no Jump 4 (or N) path), skip this pair
@@ -364,7 +365,7 @@ class TradeCalculation(RouteCalculation):
         tradeCr, tradePass, tradeDton = self.route_update_simple(route, True, distance=distance)
         self.update_statistics(star, target, tradeCr, tradePass, tradeDton)
 
-    def _preheat_upper_bound(self, stardex, targdex, allow_reheat=True):
+    def _preheat_upper_bound(self, stardex, targdex, allow_reheat=True) -> float:
         # Don't reheat on _every_ route, but reheat frequently enough to keep historic costs sort-of firm.
         # Keeping this deterministic helps keep input reduction straight, as there's less state to track.
         reheat = allow_reheat and ((stardex + targdex) % (self.star_len_root) == 0)
@@ -414,7 +415,7 @@ class TradeCalculation(RouteCalculation):
 
         return upbound
 
-    def update_statistics(self, star, target, tradeCr, tradePass, tradeDton=0):
+    def update_statistics(self, star, target, tradeCr, tradePass, tradeDton=0) -> None:
         if star.sector != target.sector:
             star.sector.stats.tradeExt += tradeCr // 2
             target.sector.stats.tradeExt += tradeCr // 2
@@ -495,7 +496,7 @@ class TradeCalculation(RouteCalculation):
             return (name_from, name_to)
         return (name_to, name_from)
 
-    def route_update_simple(self, route, reweight=True, distance=None):
+    def route_update_simple(self, route, reweight=True, distance=None) -> tuple[int, int, int]:
         """
         Update the trade calculations based upon the route selected.
         - add the trade values for the worlds, and edges
@@ -558,7 +559,7 @@ class TradeCalculation(RouteCalculation):
         return (tradeCr, tradePass, tradeDton)
 
     @staticmethod
-    def route_distance(route):
+    def route_distance(route) -> int:
         """
         Given a route, return its line length in parsec
         """
@@ -568,13 +569,13 @@ class TradeCalculation(RouteCalculation):
             distance += item[0].distance(item[1])
         return distance
 
-    def route_cost(self, route):
+    def route_cost(self, route) -> float:
         """
         Given a route, return its total cost _at the moment_
         """
         return self.galaxy.route_cost(route)
 
-    def route_weight(self, star, target):
+    def route_weight(self, star, target) -> float:
         dist = star.distance(target)
         weight = self.distance_weight[dist]
         if target.alg_code != star.alg_code:
@@ -592,42 +593,42 @@ class TradeCalculation(RouteCalculation):
             target) + " must be positive"
         return weight
 
-    def unilateral_filter(self, star: Star):
+    def unilateral_filter(self, star: Star) -> bool:
         if star.zone in ['R', 'F']:
             return True
         return star.tradeCode.barren
 
-    def is_sector_trade_balanced(self):
+    def is_sector_trade_balanced(self) -> None:
         self.sector_trade_balance.is_balanced()
 
-    def is_sector_pass_balanced(self):
+    def is_sector_pass_balanced(self) -> None:
         self.sector_passenger_balance.is_balanced()
 
-    def is_sector_trade_volume_balanced(self):
+    def is_sector_trade_volume_balanced(self) -> None:
         self.sector_trade_volume_balance.is_balanced()
 
-    def is_allegiance_trade_balanced(self):
+    def is_allegiance_trade_balanced(self) -> None:
         self.allegiance_trade_balance.is_balanced()
 
-    def is_allegiance_pass_balanced(self):
+    def is_allegiance_pass_balanced(self) -> None:
         self.allegiance_passenger_balance.is_balanced()
 
-    def is_allegiance_trade_volume_balanced(self):
+    def is_allegiance_trade_volume_balanced(self) -> None:
         self.allegiance_trade_volume_balance.is_balanced()
 
-    def multilateral_balance_trade(self):
+    def multilateral_balance_trade(self) -> None:
         self.sector_trade_balance.multilateral_balance()
         self.allegiance_trade_balance.multilateral_balance()
 
-    def multilateral_balance_pass(self):
+    def multilateral_balance_pass(self) -> None:
         self.sector_passenger_balance.multilateral_balance()
         self.allegiance_passenger_balance.multilateral_balance()
 
-    def multilateral_balance_trade_volume(self):
+    def multilateral_balance_trade_volume(self) -> None:
         self.sector_trade_volume_balance.multilateral_balance()
         self.allegiance_trade_volume_balance.multilateral_balance()
 
-    def cross_check_totals(self):
+    def cross_check_totals(self) -> None:
         grand_total_pax = self.galaxy.stats.passengers
         grand_total_trade = self.galaxy.stats.trade
         grand_total_volume = self.galaxy.stats.tradeDton
