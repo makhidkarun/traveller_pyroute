@@ -4,6 +4,7 @@ Created on Nov 07, 2024
 @author: CyberiaResurrection
 """
 import re
+from typing import Optional
 
 from lark import Transformer, Token
 
@@ -28,7 +29,7 @@ class BaseTransformer(Transformer):
         self.raw = raw.strip('\n')
         self.crankshaft = False
 
-    def starline(self, args):
+    def starline(self, args) -> list[list]:
         # These are the as-parsed values, and we're confirming the values as needed
         trade = args[2]
         extensions = args[3]
@@ -92,73 +93,73 @@ class BaseTransformer(Transformer):
                 args.append([newbie])
         return args
 
-    def position(self, args):
+    def position(self, args) -> list[list]:
         args[0].value = args[0].value.strip()
         return args
 
-    def starname(self, args):
+    def starname(self, args) -> list[list]:
         args[0].value = args[0].value.strip()
         return args
 
-    def trade(self, args):
+    def trade(self, args) -> list[str]:
         trimmed = []
         for item in args:
             rawval = BaseTransformer.boil_down_double_spaces(item.value.strip())
             trimmed.append(rawval)
         return trimmed
 
-    def extensions(self, args):
+    def extensions(self, args) -> list[list]:
         if 1 == len(args):
             return args
         return args
 
-    def nobles(self, args):
+    def nobles(self, args) -> list[list]:
         args[0].value = args[0].value.strip()
         if '' == args[0].value:
             args[0].value = '-'
         return args
 
-    def base(self, args):
+    def base(self, args) -> list[list]:
         args[0].value = args[0].value.strip()
         if '' == args[0].value:
             args[0].value = '-'
         return args
 
-    def zone(self, args):
+    def zone(self, args) -> list[list]:
         args[0].value = args[0].value.strip()
         if '' == args[0].value:
             args[0].value = '-'
         return args
 
-    def pbg(self, args):
+    def pbg(self, args) -> list[list]:
         args[0].value = args[0].value.strip()
         return args
 
-    def worlds(self, args):
+    def worlds(self, args) -> list[list]:
         raw = args[0].value
         if 1 < len(raw):
             raw = raw.strip()
         args[0].value = raw
         return args
 
-    def allegiance(self, args):
+    def allegiance(self, args) -> list[list]:
         args[0].value = args[0].value.strip()
         return args
 
-    def world_alg(self, args):
+    def world_alg(self, args) -> list[list]:
         return args
 
-    def residual(self, args):
+    def residual(self, args) -> list[list]:
         args[0].value = args[0].value.strip()
         return args
 
-    def starname_transform(self, starname):
+    def starname_transform(self, starname: str) -> (str, str):
         bitz = [item for item in starname.split(' ') if 0 < len(item)]
         uwp = bitz[-1]
         bitz = bitz[:-1]
         return ' '.join(bitz), uwp
 
-    def trade_transform(self, trade):
+    def trade_transform(self, trade) -> str:
         codes = []
 
         for kid in trade:
@@ -166,7 +167,7 @@ class BaseTransformer(Transformer):
 
         return ' '.join(codes)
 
-    def extensions_transform(self, extensions):
+    def extensions_transform(self, extensions) -> (Optional[str], Optional[str], Optional[str]):
         if 1 == len(extensions):  # Fallback no-extensions
             return None, None, None
         data = {'ix': '', 'ex': '', 'cx': ''}
@@ -181,14 +182,14 @@ class BaseTransformer(Transformer):
 
         return data['ix'], data['ex'], data['cx']
 
-    def world_alg_transform(self, world_alg):
+    def world_alg_transform(self, world_alg) -> (str, str, str):
         if 1 == len(world_alg):
             return world_alg[0][0], world_alg[0][1], world_alg[0][2]
         if '' == world_alg[1][0].value.strip():
             world_alg[1][0].value = '0'
         return world_alg[0][0].value, world_alg[1][0].value, world_alg[2][0].value
 
-    def transform(self, tree):
+    def transform(self, tree) -> list[Optional[str]]:
         self.crankshaft = '' == tree.children[4].children[0].children[0].value.strip() and '-' == tree.children[4].children[
             1].children[0].value and '' == tree.children[4].children[2].children[0].value.strip() and 1 == self.raw.count(' -')\
                           and 1 == self.raw.count('-   ')
@@ -350,7 +351,7 @@ class BaseTransformer(Transformer):
 
         return parsed
 
-    def trim_raw_string(self, tree):
+    def trim_raw_string(self, tree) -> None:
         assert self.raw is not None, "Raw string not supplied before trimming"
         strip_list = ['position', 'name', 'uwp', 'trade', 'ix', 'ex', 'cx']
 
@@ -552,5 +553,5 @@ class BaseTransformer(Transformer):
         return parsed['pbg'] == parsed['residual']
 
     @staticmethod
-    def boil_down_double_spaces(dubbel):
+    def boil_down_double_spaces(dubbel: str) -> str:
         return " ".join(dubbel.split())

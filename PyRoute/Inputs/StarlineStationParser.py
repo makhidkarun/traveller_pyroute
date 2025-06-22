@@ -4,11 +4,11 @@ Created on May 20, 2024
 @author: CyberiaResurrection
 """
 
-from lark import Lark
+from lark import Lark, Tree, Token
 import re
 
 
-def dashrepl(m):
+def dashrepl(m) -> str:
     group = m.group().replace('  ', ' ')
     return group
 
@@ -67,7 +67,7 @@ class StarlineStationParser:
     def __init__(self):
         self.parser = Lark(self.starline_grammar, start='starline')
 
-    def parse(self, text):
+    def parse(self, text: str) -> tuple[Tree[Token], str]:
         text = re.sub(r'[\w\-]  [\w\-]', dashrepl, text)
 
         return self.parser.parse(text), text
