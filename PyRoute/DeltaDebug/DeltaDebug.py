@@ -31,7 +31,7 @@ logger = logging.getLogger('PyRoute')
 tradelogger = logging.getLogger('PyRoute.TradeCodes')
 
 
-def process():
+def process() -> None:
     parser = argparse.ArgumentParser(description='PyRoute input minimiser.')
     logger.setLevel(logging.ERROR)
 
@@ -203,7 +203,7 @@ def process():
     logger.info("reduction complete")
 
 
-def get_sectors(sector, input_dir):
+def get_sectors(sector, input_dir) -> list[str]:
     try:
         with codecs.open(sector, 'r', encoding="utf-8") as file:
             lines = [line for line in file]

@@ -16,7 +16,7 @@ from PyRoute.Star import Star
 class DeltaGalaxy(Galaxy):
 
     def read_sectors(self, sectors, pop_code, ru_calc,
-                     route_reuse, trade_choice, route_btn, mp_threads, debug_flag):
+                     route_reuse, trade_choice, route_btn, mp_threads, debug_flag) -> None:
         self._set_trade_object(route_reuse, trade_choice, route_btn, mp_threads, debug_flag)
         star_counter = 0
         sector: SectorDictionary
