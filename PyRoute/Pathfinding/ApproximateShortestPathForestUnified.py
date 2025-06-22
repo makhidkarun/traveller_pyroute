@@ -113,7 +113,7 @@ class ApproximateShortestPathForestUnified:
     @cython.initializedcheck(False)
     @cython.nonecheck(False)
     @cython.wraparound(False)
-    def update_edges(self, edges: list[tuple[cython.int, cython.int]]) -> None:
+    def update_edges(self, edges: list[tuple[cython.int, cython.int]]):  # noqa: ANN201
         dropnodes = set()
         dropspecific = []
         tree_dex = list(range(self._num_trees))
