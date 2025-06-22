@@ -46,3 +46,13 @@ lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 # Assume Python 3.9
 target-version = "py39"
+
+[tool.mypy]
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+follow_imports = "silent"
+
+# Assume Python 3.9
+python_version = "3.9"
