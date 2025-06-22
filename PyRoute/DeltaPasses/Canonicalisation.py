@@ -12,9 +12,7 @@ class Canonicalisation(object):
         self.reducer = reducer
 
     def preflight(self):
-        if self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines):
-            return True
-        return False
+        return self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines)
 
     def run(self):
         # build substitution list - canonicalise _everything_

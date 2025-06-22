@@ -74,7 +74,7 @@ class Borders(object):
         This is a bit of a mess because the line drawing in HexMap is a little strange,
         So the complexity is here to make the draw portion quick.
         """
-        for system in allyMap.keys():
+        for system in allyMap:
             if self.galaxy.debug_flag:
                 # This list is random colours used to debug the map drawing process. You can change these, but it's best
                 # to keep them each unique. Note these are used by both the PDF and Graph map, so not all colours are possible
@@ -157,7 +157,7 @@ class Borders(object):
     @staticmethod
     def step_map(ally_map: AllyMap) -> AllyMap:
         new_map = {}
-        for cand_hex in ally_map.keys():
+        for cand_hex in ally_map:
             Borders._check_direction(ally_map, cand_hex, new_map)
         return new_map
 
@@ -202,10 +202,7 @@ class Borders(object):
             cand_hex = (star.q, star.r)
             alg = star_map[cand_hex]
 
-            if star.port in ['E', 'X']:
-                max_range = 1
-            else:
-                max_range = ['D', 'C', 'B', 'A'].index(star.port) + 2
+            max_range = 1 if star.port in ['E', 'X'] else ['D', 'C', 'B', 'A'].index(star.port) + 2
             if AllyGen.is_nonaligned(alg, True):
                 max_range = 2
             for dist in range(max_range):
@@ -225,7 +222,7 @@ class Borders(object):
         # 3: hexes claimed by two (or more) allies are pushed to the closest world
         # 4: hexes claimed by two (or more) allies at the same distance
         #    are claimed by the larger empire.
-        for cand_hex in ally_map.keys():
+        for cand_hex in ally_map:
             if len(ally_map[cand_hex]) == 1:
                 ally_map[cand_hex] = ally_map[cand_hex].pop()[0]
             else:
@@ -241,7 +238,7 @@ class Borders(object):
                     else:
                         max_count = -1
                         max_ally = None
-                        for alg, dist in ally_dist:
+                        for alg, _ in ally_dist:
                             if AllyGen.is_nonaligned(alg, True):
                                 max_ally = alg
                                 break
@@ -255,7 +252,7 @@ class Borders(object):
         # Pass 3: find lonely claimed hexes and remove them
         # Do two passes through the data
         for _ in range(2):
-            for cand_hex in ally_map.keys():
+            for cand_hex in ally_map:
                 if cand_hex in star_map:
                     continue
                 neighbor_algs = defaultdict(int)
@@ -307,7 +304,7 @@ class Borders(object):
         # Erode, remove empty hex from polity
         # if three contiguous hexes are not aligned
 
-        for cand_hex in ally_map.keys():
+        for cand_hex in ally_map:
             # Worlds keep their allegiances.
             if cand_hex in star_map:
                 new_map[cand_hex] = star_map[cand_hex]
@@ -352,7 +349,7 @@ class Borders(object):
         edge_map = {}
         changed = False
         # Create the edge map, of hexes on the border
-        for cand_hex in ally_map.keys():
+        for cand_hex in ally_map:
             cand_ally = ally_map[cand_hex]
             for direction in range(6):
                 check_hex = Hex.get_neighbor(cand_hex, direction)
@@ -360,7 +357,7 @@ class Borders(object):
                 if not AllyGen.are_allies(cand_ally, neighborAlg):
                     edge_map[cand_hex] = cand_ally
 
-        for cand_hex in edge_map.keys():
+        for cand_hex in edge_map:
             if cand_hex in star_map:
                 continue
             for direction in range(6):
@@ -389,7 +386,7 @@ class Borders(object):
         Build a bridge between two worlds one hex apart as to avoid
         disrupting contiguous empires.
         """
-        for cand_hex in star_map.keys():
+        for cand_hex in star_map:
             self._search_range(cand_hex, ally_map, star_map)
 
     def _search_range(self, cand_hex: HexPos, ally_map: AllyMap, star_map: AllyMap) -> None:
@@ -463,7 +460,7 @@ class Borders(object):
         # 3: hexes claimed by two (or more) allies are pushed to the closest world
         # 4: hexes claimed by two (or more) allies at the same distance
         #    are claimed by the larger empire.
-        for cand_hex in ally_map.keys():
+        for cand_hex in ally_map:
             if len(ally_map[cand_hex]) == 1:
                 ally_map[cand_hex] = ally_map[cand_hex].pop()[0]
             else:
@@ -478,7 +475,7 @@ class Borders(object):
                     else:
                         max_count = -1
                         max_ally = None
-                        for alg, dist in ally_dist:
+                        for alg, _ in ally_dist:
                             if not AllyGen.is_nonaligned(alg, True) and \
                                     self.galaxy.alg[alg].stats.number > max_count:
                                 max_ally = alg

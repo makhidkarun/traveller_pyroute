@@ -291,7 +291,7 @@ class testDeltaReduce(baseTest):
         line = btn[switch]
         btn = btn[0:switch]
 
-        for (star, neighbour, data) in btn:
+        for (star, neighbour, _) in btn:
             galaxy.trade.get_trade_between(star, neighbour)
 
         galaxy.trade.get_trade_between(line[0], line[1])

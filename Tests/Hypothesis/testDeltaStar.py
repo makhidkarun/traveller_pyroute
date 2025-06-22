@@ -1,3 +1,4 @@
+import contextlib
 import copy
 from datetime import timedelta
 import logging
@@ -54,10 +55,7 @@ def starline(draw, barren_world=False):
 
     # ex
     ex_tail = draw(integers(min_value=-5, max_value=5))
-    if 0 > ex_tail:
-        stub = str(ex_tail)
-    else:
-        stub = '+' + str(ex_tail)
+    stub = str(ex_tail) if 0 > ex_tail else '+' + str(ex_tail)
 
     ex = '(' + draw(text(min_size=3, max_size=3, alphabet=extension_alphabet)) + stub + ')'
 
@@ -67,10 +65,7 @@ def starline(draw, barren_world=False):
     flip = draw(floats(min_value=0.0, max_value=1.0))
 
     noble_alphabet = 'BcCDeEfFGH'
-    if 0.7 < flip:
-        nobles = '-'
-    else:
-        nobles = draw(text(min_size=1, max_size=5, alphabet=noble_alphabet))
+    nobles = '-' if 0.7 < flip else draw(text(min_size=1, max_size=5, alphabet=noble_alphabet))
 
     base = '-'
     tradezone = draw(text(min_size=1, max_size=1, alphabet='-ARUF--'))
@@ -449,7 +444,7 @@ class testDeltaStar(unittest.TestCase):
         star1.index = 0
         star1.allegiance_base = 'NaHu'
 
-        assume(not '0' == str(star1.pop) and 'Ba' not in star1.tradeCode.codes)
+        assume('0' != str(star1.pop) and 'Ba' not in star1.tradeCode.codes)
 
         _, canonical_messages = star1.check_canonical()
 
@@ -492,7 +487,7 @@ class testDeltaStar(unittest.TestCase):
         star1.index = 0
         star1.allegiance_base = 'NaHu'
 
-        assume(not '0' == str(star1.pop) and 'Ba' not in star1.tradeCode.codes)
+        assume('0' != str(star1.pop) and 'Ba' not in star1.tradeCode.codes)
 
         _, canonical_messages = star1.check_canonical()
 
@@ -543,10 +538,8 @@ class testDeltaStar(unittest.TestCase):
         sector = Sector('# Core', '# 0, 0')
         foo = None
 
-        try:
+        with contextlib.suppress(ValueError):
             foo = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
-        except ValueError:
-            pass
 
         assume(foo is not None)
 

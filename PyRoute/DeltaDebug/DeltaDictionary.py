@@ -173,7 +173,7 @@ class SectorDictionary(dict):
         assert isinstance(value, SubsectorDictionary), "Values must be SubsectorDictionary objects"
         super().__setitem__(item, value)
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict: dict = {}):
         foo = self._setup_clone_sector_dict()
 
         foo.headers = copy.deepcopy(self.headers)
@@ -213,9 +213,8 @@ class SectorDictionary(dict):
         overlap = list()
         missed = list()
         for subsector_name in subsectors:
-            if subsector_name in self:
-                if not 0 == self[subsector_name].num_lines:
-                    overlap.append(subsector_name)
+            if subsector_name in self and 0 != self[subsector_name].num_lines:
+                overlap.append(subsector_name)
 
         for subsector_name in self:
             if subsector_name not in overlap:
@@ -329,10 +328,7 @@ class SectorDictionary(dict):
 
     @property
     def skipped(self):
-        for sub_name in self.keys():
-            if self[sub_name].skipped is False:
-                return False
-        return True
+        return all(self[sub_name].skipped is not False for sub_name in self.keys())
 
     @property
     def void_subsectors(self):
@@ -355,15 +351,13 @@ class SectorDictionary(dict):
 
         out_name = os.path.join(output_dir, self.filename) + "-min"
 
-        handle = codecs.open(out_name, 'w', 'utf-8')
-        for line in self.headers:
-            handle.write(line)
+        with codecs.open(out_name, 'w', encoding="utf-8") as handle:
+            for line in self.headers:
+                handle.write(line)
 
-        for line in self.lines:
-            line = line.strip('\n') + '\n'
-            handle.write(line)
-
-        handle.close()
+            for raw_line in self.lines:
+                line = raw_line.strip('\n') + '\n'
+                handle.write(line)
 
     @staticmethod
     def load_traveller_map_file(filename):
@@ -457,7 +451,7 @@ class SubsectorDictionary(dict):
             return 0
         return len(self.items)
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict: dict = {}):
         foo = SubsectorDictionary(self.name, self.position)
         if self.skipped:
             foo.items = None

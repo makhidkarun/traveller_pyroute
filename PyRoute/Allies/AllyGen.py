@@ -248,10 +248,7 @@ class AllyGen(object):
             return False
         if alg1 == alg2:
             return True
-        for sameAlg in AllyGen.sameAligned:
-            if alg1 in sameAlg and alg2 in sameAlg:
-                return True
-        return False
+        return any(alg1 in sameAlg and alg2 in sameAlg for sameAlg in AllyGen.sameAligned)
 
     @staticmethod
     @functools.cache
@@ -268,7 +265,4 @@ class AllyGen(object):
             return False
         if alg1 == alg2:
             return True
-        for sameAlg in AllyGen.sameAligned:
-            if alg1 in sameAlg and alg2 in sameAlg:
-                return True
-        return False
+        return any(alg1 in sameAlg and alg2 in sameAlg for sameAlg in AllyGen.sameAligned)

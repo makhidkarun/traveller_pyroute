@@ -140,11 +140,8 @@ class DeltaReduce:
 
     @staticmethod
     def update_short_msg(msg, short_msg):
-        if msg is not None:
-            if short_msg is None:
-                short_msg = msg
-            elif len(msg) < len(short_msg):
-                short_msg = msg
+        if msg is not None and (short_msg is None or len(msg) < len(short_msg)):
+            short_msg = msg
         return short_msg
 
     @staticmethod
@@ -220,18 +217,11 @@ class DeltaReduce:
             q = e
             # check e's message and/or stack trace for interestingness line
             msg = str(e)
-            interesting = True
-            if args.interestingline:
-                if msg.__contains__(args.interestingline):
-                    interesting = True
-                else:
-                    interesting = False
+            iline = '' if args.interestingline is None else args.interestingline
+            interesting = bool(msg is not None and msg.__contains__(iline))
             if args.interestingtype and interesting:
                 strtype = str(type(e))
-                if strtype.__contains__(args.interestingtype):
-                    interesting = True
-                else:
-                    interesting = False
+                interesting = bool(strtype.__contains__(args.interestingtype))
         del sectors
 
         return interesting, msg, q

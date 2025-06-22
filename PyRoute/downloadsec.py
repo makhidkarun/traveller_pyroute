@@ -47,10 +47,11 @@ if __name__ == '__main__':
     parser.add_argument('--milieu', default="M1105", help="Milieu of data to download")
     args = parser.parse_args()
 
-    sectorsList = [line for line in codecs.open(args.sector_list, 'r', 'utf-8')]
+    with codecs.open(args.sector_list, 'r', encoding="utf-8") as f:
+        sectorsList = [line for line in f]
 
-    for sector in sectorsList:
-        sector = sector.rstrip()
+    for raw_sector in sectorsList:
+        sector = raw_sector.rstrip()
         print('Downloading %s' % sector)
         params = {'sector': sector, 'type': 'SecondSurvey', "milieu": args.milieu}
         if args.routes:

@@ -47,7 +47,7 @@ class ParseSectorInput:
 
         # read travellermap file in, line by line
         try:
-            with codecs.open(filename, 'r', 'utf-8') as infile:
+            with codecs.open(filename, 'r', encoding='utf-8') as infile:
                 try:
                     lines = [line for line in infile]
                     headers, lines = ParseSectorInput.partition_lines(lines)
@@ -82,7 +82,7 @@ class ParseSectorInput:
 
     @staticmethod
     def parse_subsectors(headers: list[str], name: str, sector: [Sector, SectorDictionary]) -> dict[str, str]:
-        if not (isinstance(sector, Sector) or isinstance(sector, SectorDictionary)):
+        if not (isinstance(sector, (Sector, SectorDictionary))):
             raise ValueError("Supplied sector must be instance of Sector or SectorDictionary")
         is_dict = isinstance(sector, SectorDictionary)
 

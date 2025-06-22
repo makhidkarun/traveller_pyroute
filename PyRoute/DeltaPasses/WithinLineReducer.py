@@ -17,9 +17,7 @@ class WithinLineReducer(object):
         self.reducer = reducer
 
     def preflight(self):
-        if self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines):
-            return True
-        return False
+        return self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines)
 
     def run(self):
         segment, subs_list = self._build_subs_list()

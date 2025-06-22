@@ -77,10 +77,7 @@ class StarList(object):
             if s == "D" or s == "NS" or s == "PSR" or s == "BH" or s == "BD":
                 item = SystemStar(s)
             else:
-                if ' ' in s:
-                    bitz = s.split(' ')
-                else:
-                    bitz = [s[0:2], s[2:]]
+                bitz = s.split(' ') if ' ' in s else [s[0:2], s[2:]]
                 item = SystemStar(bitz[1], bitz[0][0], int(bitz[0][1]))
             self.stars_list.append(item)
 
@@ -204,13 +201,9 @@ class StarList(object):
             # around to make those removals confusing, so we're only canonicalising star size
             for i in range(1, num_stars):
                 current = self.stars_list[i]
-                if current.is_supergiant:
-                    if 'A' == current.spectral:
-                        current.size = 'II'
-                    elif 'B' == current.spectral:
-                        current.size = 'II'
-                    elif 'O' == current.spectral:
-                        current.size = 'II'
+                if current.is_supergiant and \
+                        ('A' == current.spectral or 'B' == current.spectral or 'O' == current.spectral):
+                    current.size = 'II'
                 if primary_supergiant:
                     if 'F' == current.spectral and current.size in ['II', 'III']:
                         current.size = 'IV'

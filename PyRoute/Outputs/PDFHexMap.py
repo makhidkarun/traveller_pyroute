@@ -417,16 +417,14 @@ class PDFHexMap(SectorHexMap):
     def string_width(font, string):
         w = 0
         for i in string:
-            w += font.character_widths[i] if i in font.character_widths else 600
+            w += font.character_widths.get(i, 600)
         return w * font.font_size / 1000.0
 
     @property
     def compression(self):
         if self.writer is None:
             return True
-        if 'string' == self.writer._filename:
-            return False
-        return True
+        return 'string' != self.writer._filename
 
     def _save_font(self, pdf):
         font_name = pdf._fontname

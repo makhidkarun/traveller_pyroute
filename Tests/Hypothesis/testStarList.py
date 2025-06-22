@@ -25,7 +25,7 @@ def star_list(draw, min_stars=1, max_stars=10, cleanup=False):
                     headroom = max_stars - i
                     match = match[:headroom]
                     extra_matches = len(match) - 1
-                    i += extra_matches
+                    i += extra_matches  # noqa
                     starchunk = ' '.join(match)
 
         starline += starchunk + ' '

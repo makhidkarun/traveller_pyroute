@@ -20,7 +20,7 @@ from PyRoute.TradeCodes import TradeCodes
 
 
 class ParseStarInput:
-    regex = """
+    regex = r"""
 ^((?:0[1-9]|[1-2]\d|3[0-2])(?:0[1-9]|40|[1-3]\d)) +
 (.{15,}) +
 ([A-HXYa-hxy][0-9A-Fa-f]\w\w[0-9A-Fa-f][0-9A-Xa-x][0-9A-Ka-k]-\w|\?\?\?\?\?\?\?-\?|[A-HXYa-hxy\?][0-9A-Fa-f\?][\w\?]{2,2}[0-9A-Fa-f\?][0-9A-Xa-x\?][0-9A-Ka-k\?]-[\w\?]) +
@@ -109,7 +109,7 @@ class ParseStarInput:
         # Cap non-K'kree systems to max law level J
         if star.uwp.law.upper() in "KLMNOPQRSTUVWXYZ":
             samecode = AllyGen.same_align(star.alg_code)
-            if not "Kk" == samecode:
+            if "Kk" != samecode:
                 star.uwp.law = "J"
 
         star.stars = data[17].strip()
@@ -287,10 +287,9 @@ class ParseStarInput:
     @staticmethod
     def _unpack_starline_tweak(data):
         data[1] = data[1].replace('  ', ' ')
-        if data[16].startswith('--') and '----' != data[16]:
-            if 2 < len(data[16]):
-                data[17] = data[16][2:] + " " + data[17]
-                data[16] = '--'
+        if data[16].startswith('--') and '----' != data[16] and 2 < len(data[16]):
+            data[17] = data[16][2:] + " " + data[17]
+            data[16] = '--'
 
         return data
 

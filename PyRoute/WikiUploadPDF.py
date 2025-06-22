@@ -26,7 +26,7 @@ logger = logging.getLogger('WikiUpload')
 
 
 def uploadSummaryText(site, summaryFile, era, area_name):
-    with codecs.open(summaryFile, 'r', 'utf-8') as f:
+    with codecs.open(summaryFile, 'r', encoding="utf-8") as f:
         lines = f.readlines()
 
     name = 'initial table'
@@ -55,7 +55,7 @@ def uploadSummaryText(site, summaryFile, era, area_name):
 
 
 def uploadSec(site, filename, place, era):
-    with codecs.open(filename, "r", 'utf-8') as f:
+    with codecs.open(filename, "r", encoding="utf-8") as f:
         text = f.read()
     targetTitle = os.path.basename(filename).split('.')[0] + place
     target_page = site.get_page(targetTitle)
@@ -129,7 +129,8 @@ No information yet available.
 {{{{LEN}}}}
 '''
     try:
-        sectorLines = [line for line in codecs.open(sectorFile, 'r', 'utf-8')]
+        with codecs.open(sectorFile, 'r', encoding="utf-8") as f:
+            sectorLines = [line for line in f]
     except (OSError, IOError):
         logger.error("Sector file not found: {}".format(sectorFile))
         return
@@ -139,7 +140,8 @@ No information yet available.
                           or line.startswith('|}') or line.startswith('[[Category:'))]
 
     try:
-        economicLines = [line for line in codecs.open(economicFile, 'r', 'utf-8')]
+        with codecs.open(economicFile, 'r', encoding="utf-8") as f:
+            economicLines = [line for line in f]
     except (OSError, IOError):
         logger.error("Economic file not found: {}".format(economicFile))
         return
@@ -151,7 +153,7 @@ No information yet available.
     logger.info("Uploading {}".format(sectorName))
     for sec, eco in zip(sectorData, economicData):
 
-        if not sec[0] == eco[0]:
+        if sec[0] != eco[0]:
             logger.error("{} is not equal to {}".format(sec[0], eco[0]))
             break
         subsectorName = eco[14].split('|')[1].strip('\n').strip(']')
@@ -175,10 +177,7 @@ No information yet available.
 
         codeset = set(codes) - dcode - set(owned) - set(sophCodes) - set(homeworlds)
 
-        if len(pcode) > 0:
-            pcode = sorted(list(pcode))[0]
-        else:
-            pcode = ''
+        pcode = sorted(list(pcode))[0] if len(pcode) > 0 else ''
 
         colony = [code if len(code) > 6 else 'O:' + sectorName[0:4] + '-' + code[2:]
                   for code in owned if code.startswith('O:')]
@@ -210,7 +209,7 @@ No information yet available.
 
         pages = [target_page] if not isinstance(target_page, (list, tuple)) else target_page
 
-        for page in pages:
+        for _ in pages:
             pass
 
         try:

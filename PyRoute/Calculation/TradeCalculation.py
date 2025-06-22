@@ -315,9 +315,9 @@ class TradeCalculation(RouteCalculation):
             upbound = self._preheat_upper_bound(star.index, target.index, allow_reheat=True) * 1.005
 
             comp_id = star.component
-            if star.index in self.component_landmarks[comp_id]:
-                if target.index not in self.component_landmarks[comp_id]:
-                    target, star = star, target
+            if star.index in self.component_landmarks[comp_id] and \
+                    target.index not in self.component_landmarks[comp_id]:
+                target, star = star, target
 
             rawroute, diag = astar_path_numpy(self.star_graph, star.index, target.index,
                                               self.shortest_path_tree.lower_bound_bulk, upbound=upbound,
@@ -595,9 +595,7 @@ class TradeCalculation(RouteCalculation):
     def unilateral_filter(self, star: Star):
         if star.zone in ['R', 'F']:
             return True
-        if star.tradeCode.barren:
-            return True
-        return False
+        return star.tradeCode.barren
 
     def is_sector_trade_balanced(self):
         self.sector_trade_balance.is_balanced()

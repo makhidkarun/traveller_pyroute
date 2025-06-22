@@ -20,6 +20,9 @@ class Cursor(object):
     def __str__(self):
         return f"{self._x}, {self._y}"
 
+    def __hash__(self):
+        return hash((self.x, self.y))
+
     def set_deltas(self, dx=2, dy=2):
         self.dx = dx
         self.dy = dy
