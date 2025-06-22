@@ -49,9 +49,9 @@ class Star(object):
     __slots__ = '__dict__', 'worlds', 'ggCount', 'belts', 'nobles', 'logger', '_hash', '_key', 'component', 'index',\
                 'gwp', 'population', 'perCapita', 'mspr', 'wtn', 'ru', 'ownedBy', 'name', 'sector', 'position', 'uwp',\
                 'popM', 'uwpCodes', 'tradeCode', 'economics', 'social', 'baseCode', 'zone', 'alg_code',\
-                'allegiance_base', 'ship_capacity', 'tcs_gwp', 'budget', 'importance', 'eti_cargo', 'eti_passenger',\
-                'raw_be', 'im_be', 'col_be', 'star_list_object', 'routes', 'stars', 'is_enqueued', 'is_target',\
-                'is_landmark', '_pax_btn_mod', 'suppress_soph_percent_warning', 'is_redzone', 'hex',\
+                'allegiance_base', 'alg_base_code', 'ship_capacity', 'tcs_gwp', 'budget', 'importance', 'eti_cargo',\
+                'eti_passenger', 'raw_be', 'im_be', 'col_be', 'star_list_object', 'routes', 'stars', 'is_enqueued',\
+                'is_target', 'is_landmark', '_pax_btn_mod', 'suppress_soph_percent_warning', 'is_redzone', 'hex',\
                 'deep_space_station', '_oldskool', 'tradeIn', 'tradeOver', 'tradeCount', 'passIn', 'passOver',\
                 'starportSize', 'starportBudget', 'starportPop', 'index', 'trade_cost', 'trade_id'
 
@@ -85,6 +85,7 @@ class Star(object):
         self.zone = None
         self.alg_code = None
         self.allegiance_base = None
+        self.alg_base_code = None
         self.ship_capacity = None
         self.tcs_gwp = None
         self.budget = None
