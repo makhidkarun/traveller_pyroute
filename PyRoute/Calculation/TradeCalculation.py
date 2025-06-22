@@ -17,9 +17,9 @@ from PyRoute.Calculation.RouteCalculation import RouteCalculation
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 except ImportError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 from PyRoute.TradeBalance import TradeBalance
 try:
     from PyRoute.Pathfinding.astar_numpy import astar_path_numpy

@@ -12,9 +12,9 @@ from PyRoute.Calculation.RouteCalculation import RouteCalculation
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 except ImportError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 try:
     from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
@@ -40,7 +40,7 @@ class CommCalculation(RouteCalculation):
 
     def base_range_routes(self, star, neighbor) -> Optional[int]:
         if not getattr(self.galaxy.alg[star.alg_base_code], 'min_importance', False):
-            return
+            return None
         min_importance = self.galaxy.alg[star.alg_base_code].min_importance
         if self.endpoint_selection(star, min_importance) and self.endpoint_selection(neighbor, min_importance):
             dist = star.distance(neighbor)
@@ -55,6 +55,7 @@ class CommCalculation(RouteCalculation):
                          self.is_rich(star) or self.is_rich(neighbor)]
                 self.galaxy.ranges.add_edge(star, neighbor, distance=dist, flags=flags)
             return dist
+        return None
 
     def capitals(self, star) -> bool:
         # Capital of sector, subsector, or empire are in the list
@@ -134,12 +135,12 @@ class CommCalculation(RouteCalculation):
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
         landmarks, _ = self.get_landmarks(index=True)
-        landmarks = None if 0 == len(landmarks) else landmarks
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon,
+                                                                       sources=None if 0 == len(landmarks) else landmarks)
 
         self.logger.info('sorting routes...')
         routes = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
@@ -155,7 +156,7 @@ class CommCalculation(RouteCalculation):
             processed += 1
 
         active = [(s, n, d) for (s, n, d) in self.galaxy.stars.edges(data=True) if d['count'] > 0]
-        active_graph = nx.Graph()
+        active_graph: nx.Graph = nx.Graph()
 
         active_graph.add_edges_from(active)
         # for (star, neighbor, data) in self.galaxy.stars.edges(data=True):
