@@ -24,7 +24,7 @@ class AllyGen(object):
                   'VaEx',
                   'CsCa', 'CsHv', 'CsIm', 'CsMP', 'CsVa', 'CsZh', 'CsRe', 'CsMo', 'CsRr', "CsTw",
                   'Wild']
-    sameAligned: list[tuple[Alg]] = [('Im', 'ImAp', 'ImDa', 'ImDc', 'ImDd', 'ImDg', 'ImDi', 'ImDs', 'ImDv',
+    sameAligned: list[tuple[Alg, ...]] = [('Im', 'ImAp', 'ImDa', 'ImDc', 'ImDd', 'ImDg', 'ImDi', 'ImDs', 'ImDv',
                     'ImLa', 'ImLc', 'ImLu', 'ImSy', 'ImVd',
                     'I0', 'I1', 'I2', 'I3', 'I4', 'I5'),  # Testing values,
                    ('As', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8',
@@ -167,7 +167,7 @@ class AllyGen(object):
 
     @staticmethod
     @functools.cache
-    def same_align(alg: Alg) -> str:
+    def same_align(alg: Alg) -> Alg:
         for sameAlg in AllyGen.sameAligned:
             if alg in sameAlg:
                 return sameAlg[0]
@@ -178,19 +178,19 @@ class AllyGen(object):
         return AllyGen.same_align(alg) == 'Im'
 
     @staticmethod
-    def same_align_name(alg: Alg, alg_name: typing.Optional[str]) -> str:
-        if alg in AllyGen.nonAligned:
+    def same_align_name(alg: Alg, alg_name: typing.Optional[str]) -> Alg:
+        if alg in AllyGen.nonAligned or alg_name is None:
             return alg_name
         else:
             return alg_name.split(',')[0].strip()
 
     @staticmethod
-    def population_align(alg: Alg, name: str) -> str:
+    def population_align(alg: Alg, name: str) -> Alg:
         # Try getting the default cases
         code = AllyGen.default_population.get(alg, AllyGen.default_population.get(AllyGen.same_align(alg), None))
 
         # Handle the special cases.
-        if code is None:
+        if code is None and alg is not None:
             if alg[0] == 'V':
                 code = "Varg"
             elif alg == 'Na':
@@ -229,7 +229,7 @@ class AllyGen(object):
             for alg in detail_algs:
                 base_alg = alg_list[AllyGen.same_align(alg.code)]
                 if base_algs and base_alg in base_algs:
-                    base_algs = base_algs.remove(base_alg)
+                    base_algs.remove(base_alg)
 
             algs = detail_algs
             algs += base_algs if base_algs else []
