@@ -9,7 +9,7 @@ import itertools
 import logging
 import math
 from collections import defaultdict
-from typing import Any
+from typing import Any, Optional
 
 import networkx as nx
 
@@ -36,8 +36,9 @@ class RouteCalculation(object):
     btn_jump_mod = [0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10]
 
     def __init__(self, galaxy):
+        from PyRoute.AreaItems.Galaxy import Galaxy
         self.logger = logging.getLogger('PyRoute.TradeCalculation')
-        self.galaxy = galaxy
+        self.galaxy: Galaxy = galaxy
         self.epsilon = 0.2
 
         # component level tracking
@@ -53,10 +54,10 @@ class RouteCalculation(object):
     def calculate_routes(self) -> None:
         raise NotImplementedError("Base Class")
 
-    def route_weight(self, star, target) -> None:
+    def route_weight(self, star, target) -> float:
         raise NotImplementedError("Base Class")
 
-    def base_route_filter(self, star, neighbor) -> None:
+    def base_route_filter(self, star, neighbor) -> bool:
         """
             Used in the generate_base_routes to filter (i.e. skip making a route)
             between the star and neighbor. Used to remove un-helpful world links,
@@ -66,7 +67,7 @@ class RouteCalculation(object):
         """
         raise NotImplementedError("Base Class")
 
-    def base_range_routes(self, star, neighbor) -> None:
+    def base_range_routes(self, star, neighbor) -> Optional[int]:
         """
             Add the route between the pair to the range collection
             Called prior to the setting of the routes/stars based upon

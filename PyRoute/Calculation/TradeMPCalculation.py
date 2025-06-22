@@ -14,9 +14,9 @@ from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 except ImportError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 try:
     from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
@@ -36,6 +36,7 @@ def intrasector_process(working_queue, processed_queue) -> None:
     :return: None
     """
     global tradeCalculation
+    assert isinstance(tradeCalculation, TradeMPCalculation), "Global tradeCalculation instance not TradeMPCalculation"
     while True:
         # Read the sector names from the queue created by parent process.
         # When the queue is empty we're done and can complete the process
@@ -88,6 +89,7 @@ def intrasector_process(working_queue, processed_queue) -> None:
 
 def long_route_process(working_queue, processed_queue) -> None:
     global tradeCalculation
+    assert isinstance(tradeCalculation, TradeMPCalculation), "Global tradeCalculation instance not TradeMPCalculation"
     processed = 0
     total = working_queue.qsize()
 
@@ -181,8 +183,8 @@ class TradeMPCalculation(TradeCalculation):
         tradeCalculation = self
 
         # Create the Queues for sending data between processes.
-        sector_queue = Queue()
-        routes_queue = Queue()
+        sector_queue = Queue()  # type: ignore
+        routes_queue = Queue()  # type: ignore
         count = 0
         # write sector names to the queue
         for sector in self.galaxy.sectors:
@@ -232,8 +234,8 @@ class TradeMPCalculation(TradeCalculation):
                                              0, sources=self.shortest_path_tree.sources)
 
         # Create the Queues for sending data between processes.
-        find_queue = Queue()
-        routes_queue = Queue()
+        find_queue: Queue[tuple[int, int]] = Queue()
+        routes_queue: Queue[tuple[int, int]] = Queue()
         processed = 0
 
         for (start, target, data) in btn:
