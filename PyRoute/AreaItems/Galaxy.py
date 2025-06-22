@@ -81,7 +81,7 @@ class Galaxy(AreaItem):
         fix_pop = options.fix_pop
         self._set_trade_object(route_reuse, trade_choice, route_btn, mp_threads, debug_flag)
         star_counter = 0
-        loaded_sectors = set()
+        loaded_sectors: set[str] = set()
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
         ParseStarInput.deep_space = {} if (options.deep_space is None or not isinstance(options.deep_space, dict)) else options.deep_space
         logger = self.logger
@@ -250,7 +250,10 @@ class Galaxy(AreaItem):
         path = os.path.join(self.output_path, 'ranges.txt')
         with open(path, "wb") as f:
             for line in f:
-                data = routeline.match(line).group()
+                route_match = routeline.match(str(line))
+                if route_match is None:
+                    continue
+                data = route_match.group()
                 sec1 = data[2].strip()
                 hex1 = data[3]
                 sec2 = data[4].strip()
@@ -329,7 +332,7 @@ class Galaxy(AreaItem):
 
                 worldstar.ownedBy = (owner, ownedBy[0:4])
 
-    def is_well_formed(self) -> None:
+    def is_well_formed(self) -> None:  # type: ignore
         for item in self.sectors:
             sector = self.sectors[item]
             assert isinstance(sector, Sector), "Galaxy sectors must be instance of Sector object"
