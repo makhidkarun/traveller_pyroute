@@ -10,10 +10,10 @@ class WidenHoleReducer(object):
     def __init__(self, reducer):
         self.reducer = reducer
 
-    def preflight(self):
+    def preflight(self) -> bool:
         return self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines)
 
-    def run(self, start_pos, reverse=False, best_sectors=None):
+    def run(self, start_pos, reverse=False, best_sectors=None) -> bool:
         found_reduction = True
         chunk_size = 1
 

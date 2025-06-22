@@ -8,7 +8,7 @@ from PyRoute.DeltaPasses.BeyondLineReducer import BeyondLineReducer
 
 class SectorReducer(BeyondLineReducer):
 
-    def run(self, singleton_only=False):
+    def run(self, singleton_only=False) -> None:
         segment = self.reducer.sectors.sector_list()
 
         # An interesting single-element list is 1-minimal by definition
