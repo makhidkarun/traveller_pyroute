@@ -4,6 +4,7 @@ Created on Sep 12, 2023
 @author: CyberiaResurrection
 """
 import os
+from typing import Union
 
 from reportlab.pdfgen.canvas import Canvas
 
@@ -19,7 +20,7 @@ class PDFHexMap(SectorHexMap):
     def __init__(self, galaxy, routes, min_btn=8):
         super(PDFHexMap, self).__init__(galaxy, routes, min_btn)
 
-    def write_sector_pdf_map(self, gal_sector, is_live=True):
+    def write_sector_pdf_map(self, gal_sector, is_live=True) -> Union[None, bytes]:
         comm_routes, pdf_doc, worlds = self._setup_sector_pdf_map(gal_sector, is_live)
         pdf_doc.setLineWidth(1)
         self._sector_map_comm_and_trade_routes(comm_routes, pdf_doc, worlds)
@@ -30,12 +31,12 @@ class PDFHexMap(SectorHexMap):
             return self.writer.save()
         return self.writer.getpdfdata()
 
-    def write_base_map(self, pdf, sector):
+    def write_base_map(self, pdf, sector) -> None:
         self.sector_name(pdf, sector.name)
         self.subsector_grid(pdf)
         self.hex_grid(pdf, self._draw_all, 0.5)
 
-    def sector_name(self, doc: Canvas, name: str):
+    def sector_name(self, doc: Canvas, name: str) -> None:
         """
         Write name at the top of the document
         """
@@ -53,7 +54,7 @@ class PDFHexMap(SectorHexMap):
         # Restore saved font
         doc.setFont(font_name, font_size, font_leading)
 
-    def coreward_sector(self, pdf, name):
+    def coreward_sector(self, pdf, name) -> None:
         # Save out whatever font is currently set
         font_leading, font_name, font_size = self._save_font(pdf)
 
@@ -70,7 +71,7 @@ class PDFHexMap(SectorHexMap):
         # Restore saved font
         pdf.setFont(font_name, font_size, font_leading)
 
-    def rimward_sector(self, pdf, name):
+    def rimward_sector(self, pdf, name) -> None:
         # Save out whatever font is currently set
         font_leading, font_name, font_size = self._save_font(pdf)
 
@@ -87,7 +88,7 @@ class PDFHexMap(SectorHexMap):
         # Restore saved font
         pdf.setFont(font_name, font_size, font_leading)
 
-    def spinward_sector(self, pdf, name):
+    def spinward_sector(self, pdf, name) -> None:
         # Save out whatever font is currently set
         font_leading, font_name, font_size = self._save_font(pdf)
 
@@ -107,7 +108,7 @@ class PDFHexMap(SectorHexMap):
         # Restore saved font
         pdf.setFont(font_name, font_size, font_leading)
 
-    def trailing_sector(self, pdf, name):
+    def trailing_sector(self, pdf, name) -> None:
         # Save out whatever font is currently set
         font_leading, font_name, font_size = self._save_font(pdf)
 
@@ -127,7 +128,7 @@ class PDFHexMap(SectorHexMap):
         # Restore saved font
         pdf.setFont(font_name, font_size, font_leading)
 
-    def zone(self, doc, star, point):
+    def zone(self, doc, star, point) -> None:
         offset = 3
         point[0] += self.xm + offset
         point[1] += self.xm + offset
@@ -139,7 +140,7 @@ class PDFHexMap(SectorHexMap):
         else:  # no zone -> do nothing
             return
 
-    def subsector_grid(self, pdf: Canvas):
+    def subsector_grid(self, pdf: Canvas) -> None:
         pdf.setStrokeColorRGB(211 / 255.0, 211 / 255.0, 211 / 255.0)
         vlineStart = [0, self.y_start + self.xm]
         vlineEnd = [0, self.y_start + self.xm + (180 * 4)]
@@ -155,7 +156,7 @@ class PDFHexMap(SectorHexMap):
             hlineEnd[1] = y
             pdf.line(hlineStart[0], hlineStart[1], hlineEnd[0], hlineEnd[1])
 
-    def hex_grid(self, doc, draw, width, colorname='gray'):
+    def hex_grid(self, doc, draw, width, colorname='gray') -> None:
 
         hlineStart, hlineEnd, hlineStartStep, hlineEndStep, colour = self._hline(doc, width, colorname)
         llineStart, llineEnd, llineStartStep, llineEndStep, colour = self._lline(doc, width, colorname)
@@ -268,7 +269,7 @@ class PDFHexMap(SectorHexMap):
             rlineStart[1] = self.y_start - 2 * self.ym
             rlineEnd[1] = self.y_start - 3 * self.ym
 
-    def system(self, pdf, star):
+    def system(self, pdf, star) -> None:
         font_leading, font_name, font_size = self._save_font(pdf)
 
         new_font = 'Times-Roman'
@@ -331,7 +332,7 @@ class PDFHexMap(SectorHexMap):
         # Restore saved font
         pdf.setFont(font_name, font_size, font_leading)
 
-    def trade_line(self, pdf, edge, data):
+    def trade_line(self, pdf, edge, data) -> None:
 
         end, start, tradeColor = self._trade_line_setup(data, edge)
         if tradeColor is None:
@@ -350,7 +351,7 @@ class PDFHexMap(SectorHexMap):
             pdf.ellipse(endx - 3, endy - 3, endx + 3, endy + 3, fill=1)
         pdf.setFillColorRGB(0, 0, 0)
 
-    def comm_line(self, pdf, edge):
+    def comm_line(self, pdf, edge) -> None:
         start = edge[0]
         end = edge[1]
 
@@ -361,7 +362,7 @@ class PDFHexMap(SectorHexMap):
 
         pdf.line(startx, starty, endx, endy)
 
-    def document(self, sector, is_live: bool = True):
+    def document(self, sector, is_live: bool = True) -> Canvas:
         """
         Generated by the type of document
         """
@@ -382,20 +383,20 @@ class PDFHexMap(SectorHexMap):
         self.writer.setCreator(creator)
         return self.writer
 
-    def close(self):
+    def close(self) -> None:
         self.writer.showPage()
         self.writer.save()
 
-    def cursor(self, x=0, y=0):
+    def cursor(self, x=0, y=0) -> None:
         raise NotImplementedError
 
-    def add_line(self, pdf, start, end, colorname):
+    def add_line(self, pdf, start, end, colorname) -> None:
         """
         Add a line to the document, from start to end, in color
         """
         raise NotImplementedError
 
-    def add_circle(self, pdf, center, radius, colorname):
+    def add_circle(self, pdf, center, radius, colorname) -> None:
         colour = PDFHexMap.colourmap[colorname]
         pdf.setStrokeColorRGB(colour[0] / 255.0, colour[1] / 255.0, colour[2] / 255.0)
         pdf.setLineWidth(2)
@@ -404,24 +405,24 @@ class PDFHexMap(SectorHexMap):
         starty = center[1]
         pdf.ellipse(startx - radius, starty - radius, startx + radius, starty + radius, fill=0)
 
-    def get_line(self, doc, start, end, colorname, width):
+    def get_line(self, doc, start, end, colorname, width) -> None:
         """
         Get a line draw method processor
         """
         raise NotImplementedError
 
-    def place_system(self, pdf, star):
+    def place_system(self, pdf, star) -> None:
         raise NotImplementedError
 
     @staticmethod
-    def string_width(font, string):
+    def string_width(font, string) -> float:
         w = 0
         for i in string:
             w += font.character_widths.get(i, 600)
         return w * font.font_size / 1000.0
 
     @property
-    def compression(self):
+    def compression(self) -> bool:
         if self.writer is None:
             return True
         return 'string' != self.writer._filename

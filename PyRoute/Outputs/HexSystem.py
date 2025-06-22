@@ -1,3 +1,5 @@
+from typing_extensions import Self
+
 from PyRoute.Outputs.Map import MapOutput
 from PyRoute.Outputs.HexGrid import HexGrid
 from PyRoute.Outputs.Cursor import Cursor
@@ -42,7 +44,7 @@ class HexSystem(object):
             row = (self.start.y - self.hex_size.y) + (star_row * self.hex_size.y * 2)
         return Cursor(col, row)
 
-    def clear_hex(self, center: Cursor):
+    def clear_hex(self, center: Cursor) -> None:
         center.x_plus(0)
         center.y_plus(self.hex_size.y)
         radius = int(self.hex_size.x * 1.25)
@@ -59,7 +61,7 @@ class HexSystem(object):
             return
 
     @staticmethod
-    def set_system_writer(writer: str, doc: MapOutput, start: Cursor, hex_size: Cursor, routes: str = "trade"):
+    def set_system_writer(writer: str, doc: MapOutput, start: Cursor, hex_size: Cursor, routes: str = "trade") -> Self:
         writers = {
             'light': HexSystemClassicLayout,
             'medium': HexSystem3Lines,
@@ -67,7 +69,7 @@ class HexSystem(object):
         }
         return writers[writer](doc, start, hex_size, routes)
 
-    def map_key_base(self, start: Cursor, end: Cursor):
+    def map_key_base(self, start: Cursor, end: Cursor) -> Cursor:
         background = self.doc.colours['background']
         if background:
             self.doc.add_rectangle(start, end, background, background, 1)
@@ -142,7 +144,7 @@ class HexSystem3Lines(HexSystem):
             center.x_plus(1.5)
             self.doc.add_circle(center, radius=1, line_width=2, fill=True, scheme='wild refuel')
 
-    def map_key(self, start: Cursor, end: Cursor):
+    def map_key(self, start: Cursor, end: Cursor) -> Cursor:
         _ = self.map_key_base(start, end)
 
 
@@ -188,7 +190,7 @@ class HexSystem4Lines(HexSystem):
             added += " {}".format(star.importance)
         return added
 
-    def map_key(self, start: Cursor, end: Cursor):
+    def map_key(self, start: Cursor, end: Cursor) -> Cursor:
         _ = self.map_key_base(start, end)
 
     def zone(self, star: Star, center: Cursor) -> None:
@@ -269,7 +271,7 @@ class HexSystemClassicLayout(HexSystem):
         # if star.ggCount > 0:
         #     self.doc.add_circle(center, radius=1, line_width=1, fill=True, scheme='gg refuel')
 
-    def map_key(self, start: Cursor, end: Cursor):
+    def map_key(self, start: Cursor, end: Cursor) -> Cursor:
         point = self.map_key_base(start, end)
         # point = Cursor(start.x + self.hex_size.x * 6, start.y + 3)
 

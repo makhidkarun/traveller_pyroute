@@ -21,11 +21,11 @@ import codecs
 from xml.dom import minidom
 
 
-def sort_key(aString):
+def sort_key(aString) -> str:
     return aString[-8:-3]
 
 
-def prettify(elem):
+def prettify(elem) -> str:
     """
     Return a pretty-printed XML string for the Element.
     """
@@ -38,7 +38,7 @@ def prettify(elem):
     return reparsed.toprettyxml(indent="  ")
 
 
-def output_link(route_start, route_end, route_color, route_type, sector_start, sector_end):
+def output_link(route_start, route_end, route_color, route_type, sector_start, sector_end) -> tuple:
     output = ET.Element('Route', {'Start': route_start, 'End': route_end, 'Color': route_color, 'Type': route_type})
 
     if sector_start == sector_end:

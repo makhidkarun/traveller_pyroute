@@ -43,7 +43,7 @@ class FontLayer(object):
         ]
 
     @functools.cache
-    def getpath(self, filename):
+    def getpath(self, filename) -> str:
         # Deliberately lean on dictionaries blowing up on accessing absent keys to make it obvious
         # that we don't know how to handle what's being asked for
         filelist = self.fontdict[filename]
