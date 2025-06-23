@@ -1,6 +1,6 @@
 import math
 
-from PIL import ImageDraw, ImageFont, ImageColor
+from PIL import ImageDraw, ImageFont, ImageColor  # type: ignore[import-untyped]
 
 from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.Position.Hex import Hex
@@ -87,7 +87,7 @@ class SubsectorMap(GraphicMap):
         self.write_base_map(subsector)
         self.close()
 
-    def write_base_map(self, area: Subsector) -> None:
+    def write_base_map(self, area: Subsector) -> None:  # type:ignore[override]
         self.fill_background()
         self.subsector_grid()
         self.hex_locations()
@@ -168,9 +168,9 @@ class SubsectorMap(GraphicMap):
             startline.y_plus()
             endline.y_plus()
 
-        pos = self.positions[self.subsector.position]
-        x = 704 + ((-pos[0] / 8) * 22)
-        y = 1120 + ((-pos[1] / 10) * 34)
+        posn = self.positions[self.subsector.position]
+        x = 704 + ((-posn[0] / 8) * 22)
+        y = 1120 + ((-posn[1] / 10) * 34)
         startrec = Cursor(x, y)
         endrec = Cursor(x + 22, y + 34)
         self.add_rectangle(startrec, endrec, colour, colour, 1)
@@ -337,7 +337,7 @@ class SubsectorMap(GraphicMap):
                     end.y = point.y
                 self.add_line(start, end, b_colour, width=3)
 
-    def _set_pos(self, x: int, y: int) -> (tuple, Cursor, tuple):
+    def _set_pos(self, x: int, y: int) -> tuple[tuple, Cursor, tuple]:
         location = (-self.positions[self.subsector.position][0] + x, -self.positions[self.subsector.position][1] + y)
 
         raw_x = location[0] + self.subsector.sector.dx - 1

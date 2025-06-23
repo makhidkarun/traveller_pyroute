@@ -6,7 +6,7 @@ Created on Sep 12, 2023
 import os
 import math
 
-from PIL import Image, ImageDraw, ImageColor, ImageFont
+from PIL import Image, ImageDraw, ImageColor, ImageFont  # type:ignore[import-untyped]
 
 from PyRoute.Outputs.Colour import Colour
 from PyRoute.Outputs.Cursor import Cursor
@@ -31,7 +31,7 @@ class GraphicMap(Map):
         self.image: Image = None
         self.doc: ImageDraw = None
 
-        self.area_name: str = None
+        self.area_name: str
 
         self.font_layer = FontLayer()
         self.fonts: dict[str, ImageFont] = {
@@ -95,7 +95,7 @@ class GraphicMap(Map):
         colour = self._get_colour(self.colours[scheme])
         origin = (centre.x - radius) * self.input_scale, (centre.y - radius) * self.input_scale
         termin = (centre.x + radius) * self.input_scale, (centre.y + radius) * self.input_scale
-        fill = colour if fill else None
+        fill = colour if fill else None  # type:ignore[assignment]
         self.doc.ellipse([origin, termin], outline=colour, width=line_width * self.input_scale, fill=fill)
 
         # for offset in range(-3, 3):
@@ -108,7 +108,7 @@ class GraphicMap(Map):
         position = start.scaled_tuple(self.input_scale, False)
         self.doc.text(position, text, font=font, fill=colour)
 
-    def add_text_centred(self, text: str, start: Cursor, scheme: Scheme, max_width: int = -1) -> None:
+    def add_text_centred(self, text: str, start: Cursor, scheme: Scheme, max_width: int = -1, offset: bool = False) -> None:
         font = self.get_font(scheme)
         colour = self.get_colour(scheme)
         out_text = text

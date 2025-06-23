@@ -15,7 +15,7 @@ from PyRoute.Utilities.UnpackFilename import UnpackFilename
 
 
 class FontLayer(object):
-    fontdict = {}
+    fontdict: dict[str, list[str]] = {}
 
     def __init__(self):
         self.fontdict['DejaVuSerifCondensed.ttf'] = [
