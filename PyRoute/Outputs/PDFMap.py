@@ -4,6 +4,7 @@ Created on Jan 19, 2025
 @author: CyberiaResurrection
 """
 import os
+from typing import Union
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import LETTER
@@ -32,7 +33,7 @@ class PDFMap(MapOutput):
         zapf_path = self.font_layer.getpath('ZapfDingbats-Regular.ttf')
         pdfmetrics.registerFont(TTFont('Zapf', zapf_path))
 
-        self.fonts: dict[str, [str, float]] = {
+        self.fonts: dict[str, tuple[str, float]] = {
             'title': ('Times-Bold', 25),
             'info': ('Times-Roman', 7),
             'sector': ('Times-Roman', 10),
@@ -42,7 +43,7 @@ class PDFMap(MapOutput):
             'base code': ('Zapf', 5)
         }
 
-        self.colours: dict[str, Colour] = {
+        self.colours: dict[str, Union[str, Colour]] = {
             'background': 'white',
             'title': 'black',
             'info': 'black',
@@ -58,7 +59,7 @@ class PDFMap(MapOutput):
             'amber zone': 'goldenrod',
             'gg refuel': 'goldenrod',
             'wild refuel': 'lightblue',
-            'comm': toColor('rgb(83, 204, 106)'),
+            'comm': toColor('rgb(83, 204, 106)'),  # type: ignore
             'trade': 'red'
         }
         self.logger.debug("Completed PDFMap init")
@@ -81,7 +82,7 @@ class PDFMap(MapOutput):
         self.doc.save()
 
     def add_line(self, start: Cursor, end: Cursor, colour: Colour, stroke: str = 'solid', width: float = 1) -> None:
-        self.doc.setStrokeColor(colour)
+        self.doc.setStrokeColor(colour)  # type: ignore[arg-type]
         self.doc.setLineWidth(width)
         if stroke != 'solid':
             self.doc.setDash()
@@ -102,25 +103,25 @@ class PDFMap(MapOutput):
     def add_circle(self, center: Cursor, radius: int, line_width: int, fill: bool, scheme: Scheme) -> None:
         if self.colours[scheme] is None:
             return
-        self.doc.setStrokeColor(self.colours[scheme])
+        self.doc.setStrokeColor(self.colours[scheme])  # type: ignore[arg-type]
         self.doc.setLineWidth(line_width)
 
         if fill:
-            self.doc.setFillColor(self.colours[scheme])
+            self.doc.setFillColor(self.colours[scheme])  # type: ignore[arg-type]
         self.doc.circle(center.x, center.y, radius, 1, 1 if fill else 0)
 
     def add_text(self, text: str, start: Cursor, scheme: Scheme) -> None:
         font_info = self.get_font(scheme)
         self.doc.setFont(font_info[0], size=font_info[1])
-        self.doc.setFillColor(self.colours[scheme])
+        self.doc.setFillColor(self.colours[scheme])  # type: ignore[arg-type]
         self.doc.drawString(start.x, start.y, text)
 
     def add_text_centred(self, text: str, start: Cursor, scheme: Scheme, max_width: int = -1, offset: bool = False) -> None:
         font_info = self.get_font(scheme)
         self.doc.setFont(font_info[0], size=font_info[1])
-        self.doc.setFillColor(self.colours[scheme])
+        self.doc.setFillColor(self.colours[scheme])  # type: ignore[arg-type]
         out_text = text
-        offset_x = 0
+        offset_x = 0.0
         if max_width > 0 and len(text) > 0:
             for chars in range(len(text), 0, -1):
                 width = self.doc.stringWidth(text[:chars], font_info[0], font_info[1])
@@ -136,10 +137,10 @@ class PDFMap(MapOutput):
 
         self.doc.drawCentredString(start.x + offset_x, start.y + font_info[1], out_text)
 
-    def add_text_centred_legacy(self, text: str, start: Cursor, scheme: Scheme, max_width: int = -1) -> None:
+    def add_text_centred_legacy(self, text: str, start: Cursor, scheme: Scheme, max_width: float = -1.0) -> None:
         font_info = self.get_font(scheme)
         self.doc.setFont(font_info[0], size=font_info[1])
-        self.doc.setFillColor(self.colours[scheme])
+        self.doc.setFillColor(self.colours[scheme])  # type: ignore[arg-type]
         out_text = text
 
         if max_width > 0 and len(text) > 0:
@@ -159,7 +160,7 @@ class PDFMap(MapOutput):
         self.doc.saveState()
         font_info = self.get_font(scheme)
         self.doc.setFont(font_info[0], size=font_info[1])
-        self.doc.setFillColor(self.colours[scheme])
+        self.doc.setFillColor(self.colours[scheme])  # type: ignore[arg-type]
         self.doc.rotate(-rotation)
 
         if rotation > 0:
@@ -174,7 +175,7 @@ class PDFMap(MapOutput):
     def add_text_right_aligned(self, text: str, start: Cursor, scheme: Scheme) -> None:
         font_info = self.get_font(scheme)
         self.doc.setFont(font_info[0], size=font_info[1])
-        self.doc.setFillColor(self.colours[scheme])
+        self.doc.setFillColor(self.colours[scheme])  # type: ignore[arg-type]
         width = self.doc.stringWidth(text, font_info[0], font_info[1])
         self.doc.drawString(start.x - width, start.y, text)
 

@@ -2,7 +2,6 @@
 from PyRoute.Allies.Borders import Borders
 from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Outputs.Colour import Colour
-from PyRoute.Outputs.Map import MapOutput
 from PyRoute.Position.Hex import Hex
 
 
@@ -33,7 +32,8 @@ class HexGrid(object):
     rows/cols : number of rows and columns of hexes to draw
     size x/y determine the width and height of each hex.
     """
-    def __init__(self, doc: MapOutput, start: Cursor, size: Cursor, rows: int, cols: int, legacy: bool = False):
+    def __init__(self, doc: "MapOutput", start: Cursor, size: Cursor, rows: int, cols: int, legacy: bool = False):  # noqa
+        from PyRoute.Outputs.Map import MapOutput
         self.hex_grid_colour: Colour = 'gray'
         self.doc: MapOutput = doc
 
@@ -41,12 +41,12 @@ class HexGrid(object):
         self.size = size   # 6, 9
         self.x_count = rows + 1  # 33
         self.y_count = cols + 1  # 41
-        self.borders: Borders = None
+        self.borders: Borders
         self.sector_dx: int = 0
         self.sector_dy: int = 0
         self.legacy = legacy
 
-    def hex_grid(self, draw, width: int, colour: Colour) -> None:
+    def hex_grid(self, draw, width: float, colour: Colour) -> None:
         hline = HLine(self.doc, self, width, colour)
         lline = LLine(self.doc, self, width, colour)
         rline = RLine(self.doc, self, width, colour)
@@ -98,7 +98,7 @@ class HexGrid(object):
 
 
 class LineDraw(object):
-    def __init__(self, doc: MapOutput, grid: HexGrid, width: int, colour: Colour):
+    def __init__(self, doc: "MapOutput", grid: HexGrid, width: float, colour: Colour):  # noqa
         self.doc = doc
         self.width = width
         self.colour = colour
@@ -128,7 +128,7 @@ class LineDraw(object):
 
 
 class HLine(LineDraw):
-    def __init__(self, doc: MapOutput, grid: HexGrid, width: int, colour: Colour):
+    def __init__(self, doc: "MapOutput", grid: HexGrid, width: float, colour: Colour):  # noqa
         super(HLine, self).__init__(doc, grid, width, colour)
 
     def _start_cursor(self, grid: HexGrid):
@@ -155,7 +155,7 @@ class HLine(LineDraw):
 
 
 class LLine(LineDraw):
-    def __init__(self, doc: MapOutput, grid: HexGrid, width: int, colour: Colour):
+    def __init__(self, doc: "MapOutput", grid: HexGrid, width: float, colour: Colour):  # noqa
         super(LLine, self).__init__(doc, grid, width, colour)
 
     def _start_cursor(self, grid: HexGrid):
@@ -180,7 +180,7 @@ class LLine(LineDraw):
 
 
 class RLine(LineDraw):
-    def __init__(self, doc: MapOutput, grid: HexGrid, width: int, colour: Colour):
+    def __init__(self, doc: "MapOutput", grid: HexGrid, width: float, colour: Colour):  # noqa
         super(RLine, self).__init__(doc, grid, width, colour)
 
     def _start_cursor(self, grid: HexGrid):

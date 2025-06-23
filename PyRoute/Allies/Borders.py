@@ -152,7 +152,7 @@ class Borders(object):
         if self.borders.get(system, False):
             self.borders[system][index] = colour
         else:
-            colours: list[Union[str, tuple[int, int, int], None]] = [None, None, None]
+            colours: list[Union[str, tuple[float, float, float], tuple[float, float, float, float], None]] = [None, None, None]
             colours[index] = colour
             self.borders[system] = colours
 

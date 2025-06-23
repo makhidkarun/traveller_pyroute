@@ -36,7 +36,8 @@ class SectorMap(Map):
 
     def write_sector_map(self, sector: Sector) -> None:
         self.doc = self.document(sector.name + " Sector", False)
-        self.system_writer = HexSystem.set_system_writer(self.system_writer_type, self, self.start, self.hex_size, self.routes)
+        self.system_writer = HexSystem.set_system_writer(self.system_writer_type, self, self.start, self.hex_size,
+                                                         self.routes)
         self.write_base_map(sector)
         self.draw_borders(sector)
 
@@ -57,12 +58,12 @@ class SectorMap(Map):
 
         self.close()
 
-    def draw_borders(self, sector: Sector) -> None:
+    def draw_borders(self, sector: Sector) -> None:  # type:ignore[override]
         grid = HexGrid(self, self.start, self.hex_size, 32, 40)
         grid.set_borders(self.galaxy.borders, sector.dx, sector.dy)
         grid.hex_grid(grid.draw_borders, 1, colour=self.colours['hexes'])
 
-    def write_base_map(self, area: Sector) -> None:
+    def write_base_map(self, area: Sector) -> None:  # type:ignore[override]
         self.fill_background()
         self.area_name_title(area.name)
         self.subsector_grid()
@@ -159,6 +160,7 @@ class SectorMap(Map):
     def map_key(self, area: Sector) -> None:
         start_cursor = Cursor(self.start.x + (self.subsector_width * 3), 2)
         end_cursor = Cursor(self.start.x + (self.subsector_width * 4), self.start.y - 13)
+        assert self.system_writer is not None
         self.system_writer.map_key(start_cursor, end_cursor)
 
     def draw_comm_routes(self, area: Sector) -> None:
@@ -172,6 +174,7 @@ class SectorMap(Map):
 
     def comm_line(self, start: Star, end: Star, sector: Sector) -> None:
         colour = self.colours['comm']
+        assert self.system_writer is not None
 
         start_cursor = self.system_writer.location(start.hex)
         start_cursor.y_plus(self.hex_size.y)
@@ -207,6 +210,7 @@ class SectorMap(Map):
 
     def trade_line(self, start: Star, end: Star, sector: Sector, data: dict) -> None:
         colour = self.colours['trade']
+        assert self.system_writer is not None
 
         start_cursor = self.system_writer.location(start.hex)
         start_cursor.y_plus(self.hex_size.y)
@@ -230,6 +234,7 @@ class SectorMap(Map):
         clip_start, clip_end = self.line_clipping(start_cursor, end_cursor)
         self.add_line(clip_start, clip_end, colour, stroke='solid', width=2)
 
-    def line_clipping(self, start_cursor, end_cursor) -> (Cursor, Cursor):
+    def line_clipping(self, start_cursor, end_cursor) -> tuple[Cursor, Cursor]:
         clip_start, clip_end = Map.clipping(self.start, self.image_size, start_cursor, end_cursor)
+        assert isinstance(clip_start, Cursor) and isinstance(clip_end, Cursor)
         return clip_start, clip_end
