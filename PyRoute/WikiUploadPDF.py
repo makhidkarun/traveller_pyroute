@@ -10,9 +10,9 @@ Created on Apr 26, 2015
 # pip install poster
 #
 #
-from wikitools_py3.exceptions import WikiError, NoPage
-from wikitools_py3.page import Page
-from WikiReview import WikiReview
+from wikitools_py3.exceptions import WikiError, NoPage  # type:ignore[import-not-found]
+from wikitools_py3.page import Page  # type:ignore[import-not-found]
+from .WikiReview import WikiReview
 
 import logging
 import argparse
@@ -30,7 +30,7 @@ def uploadSummaryText(site, summaryFile, era, area_name) -> None:
         lines = f.readlines()
 
     name = 'initial table'
-    stats_text = {name: []}
+    stats_text: dict[str, list[str]] = {name: []}
 
     for line in lines:
         if "statistics ==" in line:
@@ -177,13 +177,13 @@ No information yet available.
 
         codeset = set(codes) - dcode - set(owned) - set(sophCodes) - set(homeworlds)
 
-        pcode = sorted(list(pcode))[0] if len(pcode) > 0 else ''
+        pcode_str = sorted(list(pcode))[0] if len(pcode) > 0 else ''
 
         colony = [code if len(code) > 6 else 'O:' + sectorName[0:4] + '-' + code[2:]
                   for code in owned if code.startswith('O:')]
         parent = [code if len(code) > 6 else 'C:' + sectorName[0:4] + '-' + code[2:]
                   for code in owned if code.startswith('C:')]
-        dcode = list(dcode) + colony + parent
+        dcode_list = list(dcode) + colony + parent
 
         starparts = sec[13].split()
         stars = []
@@ -248,10 +248,10 @@ No information yet available.
                                     hexNo,  # hex
                                     worldPage,  # Name
                                     sec[2].strip(),  # UWP
-                                    pcode,  # pcode
+                                    pcode_str,  # pcode
                                     ','.join(sorted(list(codeset))),  # codes
                                     ','.join(sophonts),  # sophonts
-                                    ','.join(sorted(list(dcode))),  # details
+                                    ','.join(sorted(list(dcode_list))),  # details
                                     sec[4].strip('{}'),  # ix (important)
                                     sec[5].strip('()'),  # ex (economic)
                                     sec[6].strip('[]'),  # cx (cultural)

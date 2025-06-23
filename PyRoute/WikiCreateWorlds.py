@@ -9,10 +9,10 @@ import argparse
 import os
 from typing import Union
 
-from DataClasses.ReadSectorOptions import ReadSectorOptions
-from .Galaxy import Galaxy
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
+from PyRoute.AreaItems.Galaxy import Galaxy
 from .WikiReview import WikiReview
-from wikitools.page import Page
+from wikitools.page import Page  # type:ignore[import-not-found]
 
 logger = logging.getLogger('WikiCreateWorlds')
 
@@ -192,8 +192,7 @@ No information yet available.
             comments.append('{{{{World summary comment|trade={} }}}}'.format(code))
         for code in star.tradeCode.xcode:
             comments.append('{{{{World summary comment|trade={} }}}}'.format(code))
-        comments = '\n' + '\n'.join(comments) if len(comments) > 0 else ' '
-        return comments
+        return '\n' + '\n'.join(comments) if len(comments) > 0 else ' '
 
     def get_bases(self, star) -> str:
         bases = '\n{{{{World summary bases|bases={} }}}}'.format(star.baseCode) if star.baseCode != '-' else ' '
@@ -247,7 +246,7 @@ No information yet available.
 
 
 def get_category_list(category_files) -> dict[str, list[str]]:
-    category_list = {}
+    category_list: dict[str, list[str]] = {}
     for cat in category_files:
         cat_name = '[[Category: {}]]'.format(os.path.splitext(os.path.basename(cat))[0].replace('_', ' '))
         cat_worlds = get_skip_list(cat)
@@ -263,7 +262,7 @@ def get_category_list(category_files) -> dict[str, list[str]]:
 
 
 def get_sources_list(sources_files) -> dict[str, list[str]]:
-    sources_list = {}
+    sources_list: dict[str, list[str]] = {}
 
     for src in sources_files:
         src_worlds = get_skip_list(src)

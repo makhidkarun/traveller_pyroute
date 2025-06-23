@@ -21,7 +21,7 @@ class TradeBalance(dict):
         self.star_field = star_field
         self.target_property = target_property
 
-    def update(self, __m, **kwargs) -> None:
+    def update(self, __m, **kwargs) -> None:  # type:ignore[override]
         for key in __m:
             self._check(key, __m[key])
         super().update(__m, **kwargs)

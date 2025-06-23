@@ -154,6 +154,10 @@ class ObjectStatistics(object):
     def populations_count(self) -> int:
         return len(self.populations)
 
+    @property
+    def sum_ru_int(self) -> int:
+        return int(self.sum_ru)
+
 
 class UWPCollection(object):
     def __init__(self):
@@ -265,7 +269,7 @@ class StatCalculation(object):
         self.max_tl(algStats, star)
 
     def add_pop_to_sophont(self, stats, star) -> None:
-        total_pct = 100
+        total_pct = 100.0
         default_soph = 'Huma'
         home = None
         for sophont in star.tradeCode.sophonts:

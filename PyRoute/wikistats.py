@@ -11,7 +11,7 @@ import datetime
 import urllib.parse
 import math
 import inflect
-import jsonpickle
+import jsonpickle  # type:ignore[import-untyped]
 from networkx.readwrite import json_graph
 from PyRoute.Nobles import Nobles
 from PyRoute.Allies.AllyGen import AllyGen
@@ -265,7 +265,7 @@ class WikiStats(object):
                 f.write('\n')
 
     def write_uwp_counts(self, f) -> None:
-        from StatCalculation import ObjectStatistics
+        from PyRoute.StatCalculation import ObjectStatistics
         default_stats = ObjectStatistics()
         f.write('{|\n!Component')
         for x in range(18):
@@ -289,7 +289,7 @@ class WikiStats(object):
         f.write('\n')
 
     def write_uwp_populations(self, f) -> None:
-        from StatCalculation import ObjectStatistics
+        from PyRoute.StatCalculation import ObjectStatistics
         population = self.galaxy.stats.population
         default_stats = ObjectStatistics()
         f.write('|-\n!Component')

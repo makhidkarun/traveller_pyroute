@@ -598,10 +598,10 @@ class Star(object):
         labor = self._ehex_to_int(self.economics[2])
         if self.economics[3] == '-':
             infrastructure = self._ehex_to_int(self.economics[3:5])
-            efficiency = int(self.economics[5:7])
+            efficiency = float(self.economics[5:7])
         else:
             infrastructure = self._ehex_to_int(self.economics[3])
-            efficiency = int(self.economics[4:6])
+            efficiency = float(self.economics[4:6])
 
         resources = resources if resources != 0 else 1
         # No I in eHex, so J,K,L all -1
@@ -616,7 +616,7 @@ class Star(object):
         efficiency = efficiency if efficiency != 0 else 1
         if efficiency < 0:
             if ru_calc == 'scaled':
-                efficiency = 1 + (efficiency * 0.1)
+                efficiency = 1.0 + (efficiency * 0.1)
             # else ru_calc == 'negative' -> use efficiency as written
             self.ru = int(round(resources * labor * infrastructure * efficiency))
         else:
@@ -800,6 +800,10 @@ class Star(object):
     @property
     def passenger_btn_mod(self) -> int:
         return self._pax_btn_mod
+
+    @property
+    def ru_int(self) -> int:
+        return int(self.ru)
 
     def calc_passenger_btn_mod(self) -> None:
         rich = 1 if self.tradeCode.rich else 0

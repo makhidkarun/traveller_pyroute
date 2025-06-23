@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
-from wikitools_py3 import wiki
-from wikitools_py3.api import APIRequest
-from wikitools_py3.exceptions import WikiError, NoPage
-from wikitools_py3.wikifile import File
-from wikitools_py3.page import Page
+from wikitools_py3 import wiki  # type:ignore[import-not-found]
+from wikitools_py3.api import APIRequest  # type:ignore[import-not-found]
+from wikitools_py3.exceptions import WikiError, NoPage  # type:ignore[import-not-found]
+from wikitools_py3.wikifile import File  # type:ignore[import-not-found]
+from wikitools_py3.page import Page  # type:ignore[import-not-found]
 import logging
 import traceback
 import re

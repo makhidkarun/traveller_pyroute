@@ -56,16 +56,16 @@ if __name__ == '__main__':
         params = {'sector': sector, 'type': 'SecondSurvey', "milieu": args.milieu}
         if args.routes:
             params['routes'] = '1'
-        params = urllib.parse.urlencode(params)
-        url = 'http://www.travellermap.com/api/sec?%s' % params
+        url_params = urllib.parse.urlencode(params)
+        url = 'http://www.travellermap.com/api/sec?%s' % url_params
 
         success = get_url(url, sector, 'sec', args.output_dir)
         if not success:
             print("Retrying " + sector)
             get_url(url, sector, 'sec', args.output_dir)
 
-        params = urllib.parse.urlencode({'sector': sector, 'accept': 'text/xml'})
-        url = 'http://travellermap.com/api/metadata?%s' % params
+        url_params = urllib.parse.urlencode({'sector': sector, 'accept': 'text/xml'})
+        url = 'http://travellermap.com/api/metadata?%s' % url_params
         success = get_url(url, sector, 'xml', args.output_dir)
         if not success:
             print("Retrying XML for " + sector)

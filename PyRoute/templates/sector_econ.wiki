@@ -15,7 +15,7 @@
 | { {{world.importance}} }
 | {{world.wtn}}
 | {{world.mspr}}
-| {{"{:,d}".format(world.ru)}}
+| {{"{:,d}".format(world.ru_int)}}
 | {{"{:,d}".format(world.perCapita)}}
 | {{"{:,d}".format(world.gwp)}}
 | {{"{:,d}".format(world.tradeIn // 10000000) }}

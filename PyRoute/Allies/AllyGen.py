@@ -7,6 +7,7 @@ import functools
 import typing
 
 from typing_extensions import TypeAlias
+
 from PyRoute.Outputs.Colour import Colour
 from PyRoute.Position.Hex import HexPos
 
@@ -213,7 +214,7 @@ class AllyGen(object):
         return code
 
     @staticmethod
-    def sort_allegiances(alg_list: dict, base_match_only: bool) -> list[Alg]:
+    def sort_allegiances(alg_list: dict, base_match_only: bool) -> list["Allegiance"]: # type:ignore[name-defined] # noqa
         # The logic:
         # base_match_only == true -> --ally-match=collapse
         # only what matches the base allegiances

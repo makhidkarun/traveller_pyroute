@@ -5,7 +5,7 @@
 |align="right"|{{"{:5.2f}".format(stats.population / ([global_stats.population, 1]|max / 100.0)) }}%
 |align="right"|{{'{:,d}'.format(stats.economy)}}
 |align="right"|{{'{:,d}'.format(stats.percapita)}}
-|align="right"|{{'{:,d}'.format(stats.sum_ru)}}
+|align="right"|{{'{:,d}'.format(stats.sum_ru_int)}}
 |align="right"|{{'{:,d}'.format(stats.tradeVol // (10**9))}}
 |align="right"|{{'{:,d}'.format(stats.trade // (10**9))}}
 |align="right"|{{'{:,d}'.format(stats.tradeDton // (10**6))}}
