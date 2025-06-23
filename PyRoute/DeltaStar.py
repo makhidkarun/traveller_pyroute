@@ -274,24 +274,24 @@ class DeltaStar(Star):
         self._check_econ_code(msg, 'Ag', '456789', '45678', '567')
 
         code = 'Ba'
-        pop = '0'
-        self._check_pop_code(msg, code, pop)
+        pop_code = '0'
+        self._check_pop_code(msg, code, pop_code)
 
         code = 'Lo'
-        pop = '123'
-        self._check_pop_code(msg, code, pop)
+        pop_code = '123'
+        self._check_pop_code(msg, code, pop_code)
 
         code = 'Ni'
-        pop = '456'
-        self._check_pop_code(msg, code, pop)
+        pop_code = '456'
+        self._check_pop_code(msg, code, pop_code)
 
         code = 'Ph'
-        pop = '8'
-        self._check_pop_code(msg, code, pop)
+        pop_code = '8'
+        self._check_pop_code(msg, code, pop_code)
 
         code = 'Hi'
-        pop = '9ABCDEF'
-        self._check_pop_code(msg, code, pop)
+        pop_code = '9ABCDEF'
+        self._check_pop_code(msg, code, pop_code)
 
         ParseStarInput.check_tl(self, fullmsg=msg)
 

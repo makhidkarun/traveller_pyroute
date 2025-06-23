@@ -2,10 +2,11 @@ import os
 import logging
 import math
 import itertools
+from typing import Any
 
-from DataClasses.ReadSectorOptions import ReadSectorOptions
-from .SubsectorMap2 import GraphicSubsectorMap
-from .Galaxy import Galaxy
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
+from .SubsectorMap2 import GraphicSubsectorMap  # type:ignore[import-not-found]
+from PyRoute.AreaItems.Galaxy import Galaxy
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -40,14 +41,14 @@ class DrawArcsTest(GraphicSubsectorMap):
         self.hexFont5 = ImageFont.truetype("/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf", 36)
         self.logger = logging.getLogger('PyRoute.DrawArcsTest')
 
-    def document(self, sector) -> ImageDraw:
+    def document(self, sector) -> Any:
         self.sector = sector
         self.image = Image.new("RGB", self.image_size, "black")
         return ImageDraw.Draw(self.image)
 
     def close(self, subsector_name) -> None:
         path = os.path.join(self.galaxy.output_path, subsector_name + ".png")
-        self.image = self.image.resize((413, 636), Image.BICUBIC)
+        self.image = self.image.resize((413, 636), Image.BICUBIC)  # type:ignore[attr-defined]
         self.image.save(path)
 
     def write_maps(self) -> None:
@@ -170,8 +171,8 @@ def set_logging(level) -> None:
 
 if __name__ == '__main__':
     set_logging('INFO')
-    options = ReadSectorOptions(sectors=['./sectors/TNE/SpinwardMarches.sec'], pop_code='fixed', ru_calc='collapse')
-    galaxy = Galaxy(15, 4, 8)
+    options = ReadSectorOptions(sectors=['./sectors/TNE/SpinwardMarches.sec'], pop_code='fixed', ru_calc='collapse',)
+    galaxy = Galaxy(15, 4)
     galaxy.output_path = '.'
     # galaxy.read_sectors(['./sectors/TNE/SpinwardMarches.sec'], 'fixed', 'collapse')
     galaxy.read_sectors(options)

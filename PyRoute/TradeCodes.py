@@ -740,7 +740,7 @@ class TradeCodes(object):
         return True, msg
 
     def check_canonical(self, star) -> tuple[bool, list]:
-        msg = []
+        msg: list[str] = []
         self.check_world_codes(star, msg)
 
         return 0 == len(msg), msg
