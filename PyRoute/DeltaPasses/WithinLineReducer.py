@@ -56,7 +56,7 @@ class WithinLineReducer(object):
         while num_chunks <= len(segment):
             chunks = self.reducer.chunk_lines(segment, num_chunks)
             num_chunks = len(chunks)
-            remove = []
+            remove: list[int] = []
             msg = "# of unreduced lines: " + str(len(segment)) + ", # of chunks: " + str(num_chunks)
             self.reducer.logger.error(msg)
             short_msg = None
