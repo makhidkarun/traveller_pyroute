@@ -21,8 +21,10 @@ import argparse
 import logging
 import codecs
 import os
+from typing import Optional
 
 from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
 
@@ -41,6 +43,7 @@ def process() -> None:
     alleg.add_argument('--ally-match', choices=['collapse', 'separate'], default='collapse',
                        help='Allegiance matching for borders, default [collapse]')
 
+    cpu_count = 1 if os.cpu_count() is None else os.cpu_count() - 1  # type: ignore
     route = parser.add_argument_group('Routes', 'Route generation options')
     route.add_argument('--routes', dest='routes', choices=['trade', 'comm', 'xroute', 'owned', 'none', 'trade-mp'],
                        default='trade', help='Route type to be generated, default [trade]')
@@ -58,8 +61,8 @@ def process() -> None:
                        help='RU calculation, default [scaled]')
     route.add_argument('--speculative-version', choices=['CT', 'T5', 'None'], default='CT',
                        help='version of the speculative trade calculations, default [CT]')
-    route.add_argument('--mp-threads', default=os.cpu_count() - 1, type=int,
-                       help=f"Number of processes to use for trade-mp processing, default {os.cpu_count() - 1}")
+    route.add_argument('--mp-threads', default=cpu_count, type=int,
+                       help=f"Number of processes to use for trade-mp processing, default {cpu_count}")
 
     output = parser.add_argument_group('Output', 'Output options')
 
@@ -135,7 +138,7 @@ def process() -> None:
         except (OSError, IOError):
             pass
 
-    deep_space = {}
+    deep_space: dict[str, list[str]] = {}
     for line in deep_space_lines:
         bitz = line.split(',')
         if 2 != len(bitz):
@@ -147,17 +150,17 @@ def process() -> None:
     from PyRoute.Inputs.ParseStarInput import ParseStarInput
     ParseStarInput.deep_space = {} if (deep_space is None or not isinstance(deep_space, dict)) else deep_space
 
-    delta = DeltaDictionary()
+    delta_dict = DeltaDictionary()
     for sector_file in sectors_list:
-        sector = SectorDictionary.load_traveller_map_file(sector_file)
+        sector: Optional[Sector] = SectorDictionary.load_traveller_map_file(sector_file)
         if sector is None:
             continue
-        delta[sector.name] = sector
+        delta_dict[sector.name] = sector
 
-    logger.error("%s sectors read" % len(delta))
+    logger.error("%s sectors read" % len(delta_dict))
 
     # spin up reducer
-    reducer = DeltaReduce(delta, args, args.interestingline, args.interestingtype)
+    reducer = DeltaReduce(delta_dict, args, args.interestingline, args.interestingtype)
 
     # check original input is interesting
     if args.run_init:

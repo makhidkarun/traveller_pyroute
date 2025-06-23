@@ -50,6 +50,7 @@ class Sector(AreaItem):
         self.trailing = None
         self.coreward = None
         self.rimward = None
+        self.filename = None
 
     # For the JSONPickel work
     def __getstate__(self):

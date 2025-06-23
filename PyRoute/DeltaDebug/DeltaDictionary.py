@@ -7,14 +7,16 @@ import codecs
 import copy
 import logging
 import os
+from typing import Optional
 from typing_extensions import Self
 
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
 
 
 class DeltaDictionary(dict):
 
-    def update(self, __m, **kwargs) -> None:
+    def update(self, __m, **kwargs) -> None:  # type: ignore
         for key in __m:
             assert isinstance(__m[key], SectorDictionary), "Values must be SectorDictionary objects"
         super().update(__m, **kwargs)
@@ -23,7 +25,7 @@ class DeltaDictionary(dict):
         assert isinstance(value, SectorDictionary), "Values must be SectorDictionary objects"
         super().__setitem__(item, value)
 
-    def sector_subset(self, sectors) -> Self:
+    def sector_subset(self, sectors) -> "DeltaDictionary":
         overlap = list()
         for sector_name in sectors:
             if sector_name in self:
@@ -39,8 +41,8 @@ class DeltaDictionary(dict):
 
         return new_dict
 
-    def subsector_subset(self, subsectors) -> Self:
-        overlap = dict()
+    def subsector_subset(self, subsectors) -> "DeltaDictionary":
+        overlap: dict[str, list[str]] = dict()
         # Not sure if duplicate subsector names are a real problem to worry about,
         # as a reducer doesn't have to be perfect.  If a same-named subsector is
         # redundantly picked up from another sector, so be it - it will get cleaned
@@ -61,7 +63,7 @@ class DeltaDictionary(dict):
 
         return new_dict
 
-    def allegiance_subset(self, allegiances) -> Self:
+    def allegiance_subset(self, allegiances) -> "DeltaDictionary":
         new_dict = DeltaDictionary()
         for sector_name in self:
             subset_sector = self[sector_name].allegiance_subset(allegiances)
@@ -107,7 +109,7 @@ class DeltaDictionary(dict):
 
         return result
 
-    def drop_lines(self, lines_to_drop) -> Self:
+    def drop_lines(self, lines_to_drop) -> "DeltaDictionary":
         foo = DeltaDictionary()
         for sector_name in self:
             if self[sector_name].skipped:
@@ -117,7 +119,7 @@ class DeltaDictionary(dict):
 
         return foo
 
-    def switch_lines(self, lines_to_drop) -> Self:
+    def switch_lines(self, lines_to_drop) -> "DeltaDictionary":
         foo = DeltaDictionary()
         for sector_name in self:
             if self[sector_name].skipped:
@@ -165,7 +167,7 @@ class SectorDictionary(dict):
         self.allegiances = dict()
         self.headers = list()
 
-    def update(self, __m, **kwargs) -> None:
+    def update(self, __m, **kwargs) -> None:  # type: ignore
         for key in __m:
             assert isinstance(__m[key], SubsectorDictionary), "Values must be SubsectorDictionary objects"
         super().update(__m, **kwargs)
@@ -361,7 +363,7 @@ class SectorDictionary(dict):
                 handle.write(line)
 
     @staticmethod
-    def load_traveller_map_file(filename) -> Self:
+    def load_traveller_map_file(filename) -> Optional[Sector]:
         from PyRoute.Inputs.ParseSectorInput import ParseSectorInput
         basename = os.path.basename(filename)
         logger = logging.getLogger('PyRoute.DeltaDictionary')
@@ -434,12 +436,12 @@ class SubsectorDictionary(dict):
 
     def __init__(self, name, position):
         self.name = name
-        self.items = list()
+        self.items: Optional[list[str]] = list()  # type: ignore
         self.position = position
         super().__init__()
 
     @property
-    def lines(self) -> list[str]:
+    def lines(self) -> Optional[list[str]]:
         return self.items
 
     @property
@@ -450,6 +452,7 @@ class SubsectorDictionary(dict):
     def num_lines(self) -> int:
         if self.skipped:
             return 0
+        assert self.items is not None
         return len(self.items)
 
     def __deepcopy__(self, memodict: dict = {}):
@@ -457,34 +460,36 @@ class SubsectorDictionary(dict):
         if self.skipped:
             foo.items = None
             return foo
+        assert foo.items is not None and self.items is not None
 
         for item in self.items:
             foo.items.append(copy.deepcopy(item.strip('\n')))
         return foo
 
-    def drop_lines(self, lines_to_drop) -> Self:
+    def drop_lines(self, lines_to_drop) -> "SubsectorDictionary":
         foo = SubsectorDictionary(self.name, self.position)
         if self.skipped:
             foo.items = None
             return foo
+        assert foo.items is not None and self.items is not None
 
-        nonempty = 0 < len(self.items)
+        nonempty = 0 < self.num_lines
 
         for item in self.items:
             if item in lines_to_drop:
                 continue
             foo.items.append(copy.deepcopy(item))
 
-        if nonempty and 0 == len(foo.items):
+        if nonempty and 0 == foo.num_lines:
             foo.items = None
 
         return foo
 
-    def switch_lines(self, lines_to_switch) -> Self:
+    def switch_lines(self, lines_to_switch) -> "SubsectorDictionary":
         foo = SubsectorDictionary(self.name, self.position)
         if self.skipped:
-            foo.items = None
             return foo
+        assert foo.items is not None and self.items is not None
 
         # assemble shortlist
         shortlist = []
