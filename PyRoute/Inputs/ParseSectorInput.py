@@ -7,6 +7,7 @@ import codecs
 import logging
 import os
 from logging import Logger
+from typing import Union
 
 from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.AreaItems.Allegiance import Allegiance
@@ -41,7 +42,7 @@ class ParseSectorInput:
         return headers, starlines
 
     @staticmethod
-    def read_sector_file(filename: str, logger: Logger) -> (list[str], list[str]):
+    def read_sector_file(filename: str, logger: Logger) -> tuple[list[str], list[str]]:
         headers = []
         lines = []
 
@@ -74,14 +75,14 @@ class ParseSectorInput:
         alg_race = AllyGen.population_align(alg_code, alg_name)
 
         base = AllyGen.same_align(alg_code)
-        if base not in alg_object:
+        if base is not None and base not in alg_object:
             alg_object[base] = Allegiance(base, AllyGen.same_align_name(base, alg_name), base=True,
                                           population=alg_race)
         if alg_code not in alg_object:
             alg_object[alg_code] = Allegiance(alg_code, alg_name, base=False, population=alg_race)
 
     @staticmethod
-    def parse_subsectors(headers: list[str], name: str, sector: [Sector, SectorDictionary]) -> dict[str, str]:
+    def parse_subsectors(headers: list[str], name: str, sector: Union[Sector, SectorDictionary]) -> dict[str, str]:
         if not (isinstance(sector, (Sector, SectorDictionary))):
             raise ValueError("Supplied sector must be instance of Sector or SectorDictionary")
         is_dict = isinstance(sector, SectorDictionary)
@@ -98,7 +99,7 @@ class ParseSectorInput:
             if is_dict:
                 sector[subname] = SubsectorDictionary(subname, pos)
             else:
-                sector.subsectors[pos] = Subsector(subname, pos, sector)
+                sector.subsectors[pos] = Subsector(subname, pos, sector)  # type: ignore
         return subsector_names
 
     @staticmethod

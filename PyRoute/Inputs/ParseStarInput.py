@@ -4,7 +4,7 @@ Created on Nov 27, 2023
 @author: CyberiaResurrection
 """
 import re
-from typing import Optional
+from typing import Optional, Union
 
 from lark import UnexpectedCharacters, UnexpectedEOF
 
@@ -52,7 +52,7 @@ class ParseStarInput:
     transformer: Optional[StarlineTransformer] = None
     station_parser: Optional[StarlineStationParser] = None
     station_transformer: Optional[StarlineStationTransformer] = None
-    deep_space = {}
+    deep_space: dict[str, list[str]] = {}
     valid_zone = 'arufgbARUFGB-'
     valid_nobles = 'BCcDEeFfGH-'
 
@@ -194,7 +194,7 @@ class ParseStarInput:
         return star
 
     @staticmethod
-    def _unpack_starline(star, line, sector) -> (Optional[list[str]], Optional[bool]):
+    def _unpack_starline(star, line, sector) -> Union[tuple[list[Optional[str]], bool], tuple[None, None]]:
         is_station = False
         if '{Anomaly}' in line and sector.name not in ParseStarInput.deep_space:
             star.logger.info("Found anomaly, skipping processing: {}".format(line))
@@ -217,12 +217,12 @@ class ParseStarInput:
             else:
                 result, line = ParseStarInput.parser.parse(line)
         except UnexpectedCharacters:
-            result = ParseStarInput._unpack_starline_fallback(line)
+            result = ParseStarInput._unpack_starline_fallback(line)  # type: ignore
             if result is None:
                 star.logger.error("Unmatched line: {}".format(line))
                 return None, None
         except UnexpectedEOF:
-            result = ParseStarInput._unpack_starline_fallback(line)
+            result = ParseStarInput._unpack_starline_fallback(line)  # type: ignore
             if result is None:
                 star.logger.error("Unmatched line: {}".format(line))
                 return None, None
@@ -251,7 +251,7 @@ class ParseStarInput:
     def _unpack_starline_fallback(line) -> Optional[list[str]]:
         matches = ParseStarInput.starline.match(line)
         if matches is None:
-            return
+            return None
         data = list(matches.groups())
         parsed = {'position': data[0], 'name': data[1], 'uwp': data[2], 'trade': data[3]}
         raw_extensions = data[4].replace('  ', ' ').replace('{ ', '{').replace(' }', '}')
@@ -312,7 +312,7 @@ class ParseStarInput:
             fullmsg.append(msg)
 
     @staticmethod
-    def check_tl_core(star) -> (int, int):
+    def check_tl_core(star) -> tuple[int, int]:
         mod = 0
         if star.size in '01':
             mod += 2

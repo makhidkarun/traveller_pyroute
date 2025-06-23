@@ -153,7 +153,7 @@ class BaseTransformer(Transformer):
         args[0].value = args[0].value.strip()
         return args
 
-    def starname_transform(self, starname: str) -> (str, str):
+    def starname_transform(self, starname: str) -> tuple[str, str]:
         bitz = [item for item in starname.split(' ') if 0 < len(item)]
         uwp = bitz[-1]
         bitz = bitz[:-1]
@@ -167,7 +167,7 @@ class BaseTransformer(Transformer):
 
         return ' '.join(codes)
 
-    def extensions_transform(self, extensions) -> (Optional[str], Optional[str], Optional[str]):
+    def extensions_transform(self, extensions) -> tuple[Optional[str], Optional[str], Optional[str]]:
         if 1 == len(extensions):  # Fallback no-extensions
             return None, None, None
         data = {'ix': '', 'ex': '', 'cx': ''}
@@ -182,7 +182,7 @@ class BaseTransformer(Transformer):
 
         return data['ix'], data['ex'], data['cx']
 
-    def world_alg_transform(self, world_alg) -> (str, str, str):
+    def world_alg_transform(self, world_alg) -> tuple[str, str, str]:
         if 1 == len(world_alg):
             return world_alg[0][0], world_alg[0][1], world_alg[0][2]
         if '' == world_alg[1][0].value.strip():
