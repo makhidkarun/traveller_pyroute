@@ -12,7 +12,7 @@ HexPos: TypeAlias = Tuple[int, int]
 
 class Hex(object):
 
-    position: str = None  # Hex location
+    position: str  # Hex location
     row: int = 0  # Location in the sector.
     col: int = 0
     dx: int = 0  # location in the whole space, row/column coordinate
@@ -67,7 +67,7 @@ class Hex(object):
 
     @staticmethod
     @functools.cache
-    def _axial_core(dq: int, dr: int):
+    def _axial_core(dq: int, dr: int) -> int:
         return (abs(dq) + abs(dr) + abs(dq + dr)) // 2
 
     # Used to calculate distances for the TradeCalculation via the Network Graph, which requires a function
@@ -80,7 +80,7 @@ class Hex(object):
 
     @staticmethod
     @functools.cache
-    def _hex_core(dx: int, dy: int, dz: int):
+    def _hex_core(dx: int, dy: int, dz: int) -> int:
         return max(abs(dx), abs(dy), abs(dz))
 
     @functools.cache
