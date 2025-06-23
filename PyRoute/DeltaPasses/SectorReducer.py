@@ -24,7 +24,7 @@ class SectorReducer(BeyondLineReducer):
         while num_chunks <= len(segment):
             chunks = self.reducer.chunk_lines(segment, num_chunks)
             num_chunks = len(chunks)
-            remove = []
+            remove: list[int] = []
             msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(num_chunks) + ", # of sectors: " + str(len(segment))
             self.reducer.logger.error(msg)
 

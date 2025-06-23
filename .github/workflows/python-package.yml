@@ -34,7 +34,7 @@ jobs:
           ruff check --preview PyRoute Tests
       - name: Check types with mypy
         run: |
-          mypy PyRoute/Allies/*.py PyRoute/AreaItems/*.py PyRoute/Calculation/*.py PyRoute/DeltaDebug/*.py
+          mypy PyRoute/Allies/*.py PyRoute/AreaItems/*.py PyRoute/Calculation/*.py PyRoute/DeltaDebug/*.py PyRoute/DeltaPasses/*.py
       - name: Run non-cython tests
         run: |
           pytest -k testAstarOverSubsector

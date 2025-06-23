@@ -10,7 +10,8 @@ from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
 class BeyondLineReducer(object):
 
     def __init__(self, reducer):
-        self.reducer = reducer
+        from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
+        self.reducer: DeltaReduce = reducer
         self.breacher = WidenHoleReducer(reducer)
 
     def preflight(self) -> bool:
