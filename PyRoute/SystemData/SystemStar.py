@@ -4,6 +4,7 @@ Created on Nov 23, 2023
 @author: CyberiaResurrection
 
 """
+from typing import Optional
 
 
 class SystemStar(object):
@@ -122,7 +123,7 @@ class SystemStar(object):
             else:
                 return 'F5-9'
 
-    def check_canonical_size(self, max_flux, min_flux) -> str:
+    def check_canonical_size(self, max_flux, min_flux) -> Optional[str]:
         choice = self.flux_choice
         flux_line = SystemStar.star_fluxen[choice]
         trim_line = {v for (k, v) in flux_line.items() if max_flux >= k >= min_flux}

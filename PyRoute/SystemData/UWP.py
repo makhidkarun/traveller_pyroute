@@ -89,7 +89,7 @@ class UWP(object):
         return self._ehex_to_int(self._size)
 
     @size_code.setter
-    def size_code(self, value) -> str:
+    def size_code(self, value) -> None:
         self._size = self._int_to_ehex(value)
 
     @property
@@ -193,7 +193,7 @@ class UWP(object):
         return '?' in self.line
 
     def check_canonical(self) -> tuple[bool, list[str]]:
-        msg = []
+        msg: list[str] = []
         self._check_canonical_physicals(msg)
         self._check_canonical_socials(msg)
         self._check_canonical_tl(msg)
