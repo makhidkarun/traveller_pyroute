@@ -447,7 +447,10 @@ class TradeCodes(object):
         if fix_pop is True:
             self._fix_all_pop_codes(star)
 
+        # Do the may-be-implied codes first, then everything else
+        check = self._check_econ_code(star, 'In', '012479ABC', None, '9ABCDEF', msg, "Hi") and check
         check = self._check_planet_code(star, 'As', '0', '0', '0', msg, 'Va') and check
+
         check = self._check_planet_code(star, 'De', None, '23456789', '0', msg) and check
         check = self._check_planet_code(star, 'Fl', None, 'ABC', '123456789A', msg) and check
         check = self._check_planet_code(star, 'Ga', '678', '568', '567', msg) and check
@@ -458,7 +461,6 @@ class TradeCodes(object):
         check = self._check_planet_code(star, 'Va', None, '0', None, msg) and check
         check = self._check_planet_code(star, 'Wa', '3456789', '3456789DEF', 'A', msg) and check
 
-        check = self._check_econ_code(star, 'In', '012479ABC', None, '9ABCDEF', msg, "Hi") and check
         check = self._check_econ_code(star, 'Pa', '456789', '45678', '48', msg) and check
         check = self._check_econ_code(star, 'Ag', '456789', '45678', '567', msg) and check
         check = self._check_econ_code(star, 'Na', '0123', '0123', '6789ABCDEF', msg) and check
