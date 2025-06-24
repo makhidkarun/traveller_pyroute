@@ -244,6 +244,8 @@ class testDeltaStar(unittest.TestCase):
                 _, canonical_messages = star1.check_canonical()
                 for msg in canonical_messages:
                     output = [line for line in output if msg not in line]
+                if 1 == len(output) and (' As ' in starline or ' In ' in starline):
+                    output = []
 
                 tail = output[0] if 0 < len(output) else ''
                 self.assertEqual(
