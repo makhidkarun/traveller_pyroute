@@ -8,7 +8,7 @@ from PyRoute.DeltaPasses.BeyondLineReducer import BeyondLineReducer
 
 class SubsectorReducer(BeyondLineReducer):
 
-    def run(self, singleton_only=False):
+    def run(self, singleton_only=False) -> None:
         segment = self.reducer.sectors.subsector_list()
 
         # An interesting single-element list is 1-minimal by definition
@@ -24,7 +24,7 @@ class SubsectorReducer(BeyondLineReducer):
         while num_chunks <= len(segment):
             chunks = self.reducer.chunk_lines(segment, num_chunks)
             num_chunks = len(chunks)
-            remove = []
+            remove: list[int] = []
             msg = "# of lines: " + str(len(best_sectors.lines)) + ", # of chunks: " + str(
                 num_chunks) + ", # of subsectors: " + str(len(segment))
             self.reducer.logger.error(msg)

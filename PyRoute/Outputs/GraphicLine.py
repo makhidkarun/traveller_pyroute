@@ -3,7 +3,7 @@ Created on Sep 12, 2023
 
 @author: CyberiaResurrection
 """
-from PIL import ImageColor
+from PIL import ImageColor  # type: ignore
 
 from PyRoute.Outputs.Cursor import Cursor
 

@@ -11,7 +11,7 @@ from Tests.baseTest import baseTest
 
 class testLandmarksExtremesRegression(baseTest):
 
-    def testZeroArgsInTransposeLandmarks(self):
+    def testZeroArgsInTransposeLandmarks(self) -> None:
         sourcefile = self.unpack_filename('../DeltaFiles/zero_arg_in_transpose_landmarks/Bar\'kakr.sec')
 
         args = self._make_args()

@@ -50,28 +50,28 @@ class Nobles(object):
         del state['codes']
         return state
 
-    def count(self, nobility):
+    def count(self, nobility) -> None:
         for code, rank in Nobles.codes.items():
             if code in nobility:
                 self.nobles[rank] += 1
 
-    def accumulate(self, nobles):
+    def accumulate(self, nobles) -> None:
         for rank, count in nobles.nobles.items():
             self.nobles[rank] += count
 
     @property
-    def max_value(self):
+    def max_value(self) -> int:
         return max(self.nobles.values())
 
     @property
-    def min_value(self):
+    def min_value(self) -> int:
         return min(self.nobles.values())
 
     @property
-    def sum_value(self):
+    def sum_value(self) -> int:
         return sum(self.nobles.values())
 
-    def is_well_formed(self):
+    def is_well_formed(self) -> tuple[bool, str]:
         msg = ''
         if 0 > self.max_value:
             msg = 'Noble count values cannot be negative'

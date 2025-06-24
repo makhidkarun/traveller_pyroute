@@ -16,10 +16,10 @@ class SectorHexMap(OldMap):
         self.min_btn = min_btn
         self.writer = None
 
-    def comm_line(self, pdf, edge):
+    def comm_line(self, pdf, edge) -> None:
         raise NotImplementedError("Base Class")
 
-    def clipping(self, start_x, start_y, end_x, end_y):
+    def clipping(self, start_x, start_y, end_x, end_y) -> tuple[tuple[float, float], tuple[float, float]]:
         points_t = [0.0, 1.0]
         line_pt_1 = [start_x, start_y]
         line_pt_2 = [end_x, end_y]

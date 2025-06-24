@@ -10,9 +10,9 @@ Created on Apr 26, 2015
 # pip install poster
 #
 #
-from wikitools_py3.exceptions import WikiError, NoPage
-from wikitools_py3.page import Page
-from WikiReview import WikiReview
+from wikitools_py3.exceptions import WikiError, NoPage  # type:ignore[import-not-found]
+from wikitools_py3.page import Page  # type:ignore[import-not-found]
+from .WikiReview import WikiReview
 
 import logging
 import argparse
@@ -25,12 +25,12 @@ import re
 logger = logging.getLogger('WikiUpload')
 
 
-def uploadSummaryText(site, summaryFile, era, area_name):
+def uploadSummaryText(site, summaryFile, era, area_name) -> None:
     with codecs.open(summaryFile, 'r', encoding="utf-8") as f:
         lines = f.readlines()
 
     name = 'initial table'
-    stats_text = {name: []}
+    stats_text: dict[str, list[str]] = {name: []}
 
     for line in lines:
         if "statistics ==" in line:
@@ -54,7 +54,7 @@ def uploadSummaryText(site, summaryFile, era, area_name):
         site.save_page(target_page, text, 'Trade Map update summary')
 
 
-def uploadSec(site, filename, place, era):
+def uploadSec(site, filename, place, era) -> None:
     with codecs.open(filename, "r", encoding="utf-8") as f:
         text = f.read()
     targetTitle = os.path.basename(filename).split('.')[0] + place
@@ -69,7 +69,7 @@ def uploadSec(site, filename, place, era):
     site.save_page(target_page, text, 'Trade Map update sector data')
 
 
-def pairwise(iterable):
+def pairwise(iterable) -> list:
     """
     s -> (s0, s1), (s2, s3), (s4, s5), ...
     """
@@ -77,7 +77,7 @@ def pairwise(iterable):
     return list(zip(a, a))
 
 
-def uploadWorlds(site, sectorFile, economicFile, era):
+def uploadWorlds(site, sectorFile, economicFile, era) -> None:
     data_template = '''
 {{{{StellarData
  |world     = {0}
@@ -177,13 +177,13 @@ No information yet available.
 
         codeset = set(codes) - dcode - set(owned) - set(sophCodes) - set(homeworlds)
 
-        pcode = sorted(list(pcode))[0] if len(pcode) > 0 else ''
+        pcode_str = sorted(list(pcode))[0] if len(pcode) > 0 else ''
 
         colony = [code if len(code) > 6 else 'O:' + sectorName[0:4] + '-' + code[2:]
                   for code in owned if code.startswith('O:')]
         parent = [code if len(code) > 6 else 'C:' + sectorName[0:4] + '-' + code[2:]
                   for code in owned if code.startswith('C:')]
-        dcode = list(dcode) + colony + parent
+        dcode_list = list(dcode) + colony + parent
 
         starparts = sec[13].split()
         stars = []
@@ -248,10 +248,10 @@ No information yet available.
                                     hexNo,  # hex
                                     worldPage,  # Name
                                     sec[2].strip(),  # UWP
-                                    pcode,  # pcode
+                                    pcode_str,  # pcode
                                     ','.join(sorted(list(codeset))),  # codes
                                     ','.join(sophonts),  # sophonts
-                                    ','.join(sorted(list(dcode))),  # details
+                                    ','.join(sorted(list(dcode_list))),  # details
                                     sec[4].strip('{}'),  # ix (important)
                                     sec[5].strip('()'),  # ex (economic)
                                     sec[6].strip('[]'),  # cx (cultural)
@@ -312,7 +312,7 @@ shortNames = {'Dagudashaag': 'Da', 'Deneb': 'De',
               'Knoellighz': 'Kn'}
 
 
-def set_logging(level):
+def set_logging(level) -> None:
     logger.setLevel(level)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     # create console handler and set level to debug
@@ -322,7 +322,7 @@ def set_logging(level):
     logger.addHandler(ch)
 
 
-def process():
+def process() -> None:
     warnings.simplefilter("always")
 
     parser = argparse.ArgumentParser(description='Trade map generator wiki upload.')

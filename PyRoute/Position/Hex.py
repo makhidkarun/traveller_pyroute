@@ -12,7 +12,7 @@ HexPos: TypeAlias = Tuple[int, int]
 
 class Hex(object):
 
-    position: str = None  # Hex location
+    position: str  # Hex location
     row: int = 0  # Location in the sector.
     col: int = 0
     dx: int = 0  # location in the whole space, row/column coordinate
@@ -57,37 +57,37 @@ class Hex(object):
             return False
         return not self.dy != other.dy
 
-    def distance(self, other):
+    def distance(self, other) -> int:
         return Hex.axial_distance((self.q, self.r), (other.q, other.r))
 
     # Used to calculate distances for the AllyGen, which keeps only the q/r (axial) coordinates.
     @staticmethod
-    def axial_distance(Hex1: HexPos, Hex2: HexPos):
+    def axial_distance(Hex1: HexPos, Hex2: HexPos) -> int:
         return Hex._axial_core(Hex1[0] - Hex2[0], Hex1[1] - Hex2[1])
 
     @staticmethod
     @functools.cache
-    def _axial_core(dq: int, dr: int):
+    def _axial_core(dq: int, dr: int) -> int:
         return (abs(dq) + abs(dr) + abs(dq + dr)) // 2
 
     # Used to calculate distances for the TradeCalculation via the Network Graph, which requires a function
     @staticmethod
-    def heuristicDistance(star1, star2):
+    def heuristicDistance(star1, star2) -> int:
         return star1.hex.distance(star2.hex)
 
-    def hex_distance(self, star):
+    def hex_distance(self, star) -> int:
         return Hex._hex_core(self.x - star.x, self.y - star.y, self.z - star.z)
 
     @staticmethod
     @functools.cache
-    def _hex_core(dx: int, dy: int, dz: int):
+    def _hex_core(dx: int, dy: int, dz: int) -> int:
         return max(abs(dx), abs(dy), abs(dz))
 
     @functools.cache
     def hex_position(self) -> HexPos:
         return self.q, self.r
 
-    def get_neighbour(self, direction: int, distance: int = 1):
+    def get_neighbour(self, direction: int, distance: int = 1) -> HexPos:
         return Hex.get_neighbor(self.hex_position(), direction, distance)
 
     @staticmethod
@@ -119,7 +119,7 @@ class Hex(object):
         return q, r
 
     @staticmethod
-    def axial_to_hex(q: int, r: int):
+    def axial_to_hex(q: int, r: int) -> HexPos:
         row = q
         q_offset = (q + (q & 1)) // 2
         col = r + q_offset
@@ -127,7 +127,7 @@ class Hex(object):
         return row, col
 
     @staticmethod
-    def axial_to_sector(q: int, r: int, flip: bool = False):
+    def axial_to_sector(q: int, r: int, flip: bool = False) -> tuple[int, int]:
         (raw_row, raw_col) = Hex.axial_to_hex(q, r)
 
         col, _ = Hex.dy_reverse(raw_col)
@@ -144,7 +144,7 @@ class Hex(object):
         return sector_y * 40 + offset
 
     @staticmethod
-    def dy_reverse(dy_offset: int):
+    def dy_reverse(dy_offset: int) -> tuple[int, int]:
         sector_y = dy_offset // 40
         offset = dy_offset % 40
 
@@ -152,18 +152,18 @@ class Hex(object):
         return row, sector_y
 
     @property
-    def x(self):
+    def x(self) -> int:
         return self.q
 
     @property
-    def y(self):
+    def y(self) -> int:
         return -self.q - self.r
 
     @property
-    def z(self):
+    def z(self) -> int:
         return self.r
 
-    def is_well_formed(self):
+    def is_well_formed(self) -> tuple[bool, str]:
         msg = ""
         if not (1 <= self.col <= 32):
             msg = "Column must be in range 1-32 - is " + str(self.col)

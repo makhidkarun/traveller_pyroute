@@ -10,7 +10,7 @@ sys.path.append('../PyRoute')
 
 
 class testDeltaDictionary(baseTest):
-    def test_add_bad_item_by_index(self):
+    def test_add_bad_item_by_index(self) -> None:
         expected = 'Values must be SectorDictionary objects'
         actual = None
 
@@ -23,7 +23,7 @@ class testDeltaDictionary(baseTest):
 
         self.assertEqual(expected, actual)
 
-    def test_add_bad_item_by_update(self):
+    def test_add_bad_item_by_update(self) -> None:
         expected = 'Values must be SectorDictionary objects'
         actual = None
 
@@ -36,21 +36,21 @@ class testDeltaDictionary(baseTest):
 
         self.assertEqual(expected, actual)
 
-    def test_add_good_item_by_index(self):
+    def test_add_good_item_by_index(self) -> None:
         foo = DeltaDictionary()
         sector = SectorDictionary('name', 'filename')
 
         foo['sector'] = sector
         self.assertEqual(1, len(foo.keys()), "Target delta dictionary should have one key")
 
-    def test_add_good_item_by_update(self):
+    def test_add_good_item_by_update(self) -> None:
         foo = DeltaDictionary()
         sector = SectorDictionary('name', 'filename')
 
         foo.update({'sector': sector})
         self.assertEqual(1, len(foo.keys()), "Target delta dictionary should have one key")
 
-    def test_sector_subset(self):
+    def test_sector_subset(self) -> None:
         foo = DeltaDictionary()
         dag = SectorDictionary('Dagudashaag', 'filename')
         alg = Allegiance('fo', 'foo')
@@ -90,7 +90,7 @@ class testDeltaDictionary(baseTest):
         self.assertEqual(0, nu_alg.stats.trade, "Allegiance trade not cleared during sector_list")
         self.assertEqual(0, nu_alg.stats.tradeExt, "Allegiance tradeExt not cleared during sector_list")
 
-    def test_subsector_subset(self):
+    def test_subsector_subset(self) -> None:
         foo = DeltaDictionary()
         dag = SectorDictionary('Dagudashaag', 'filename')
         alg = Allegiance('fo', 'foo')
@@ -128,7 +128,7 @@ class testDeltaDictionary(baseTest):
         self.assertEqual('Riften', remix['Gushemege']['Riften'].name)
         self.assertEqual(None, remix['Gushemege']['Riften'].items, 'Skipped subsector should have None for items')
 
-    def test_sector_list(self):
+    def test_sector_list(self) -> None:
         foo = DeltaDictionary()
         dag = SectorDictionary('Dagudashaag', 'filename')
         dagA = SubsectorDictionary('Mimu', 'A')
@@ -152,7 +152,7 @@ class testDeltaDictionary(baseTest):
 
         self.assertEqual(expected, actual, "Unexpected sector list")
 
-    def test_subsector_list(self):
+    def test_subsector_list(self) -> None:
         foo = DeltaDictionary()
         dag = SectorDictionary('Dagudashaag', 'filename')
         dagA = SubsectorDictionary('Mimu', 'A')
@@ -182,7 +182,7 @@ class testDeltaDictionary(baseTest):
 
         self.assertEqual(expected, actual, "Unexpected subsector list")
 
-    def test_sector_subset_blowup_on_vland_empty(self):
+    def test_sector_subset_blowup_on_vland_empty(self) -> None:
         vland = self.unpack_filename('DeltaFiles/sector_subset_blowup_on_vland_empty/Vland.sec')
 
         vland_sec = SectorDictionary.load_traveller_map_file(vland)
@@ -193,7 +193,7 @@ class testDeltaDictionary(baseTest):
         remix = foo.sector_subset(['Vland'])
         self.assertEqual(0, len(remix))
 
-    def test_sector_subset_blowup_on_spinward_marches(self):
+    def test_sector_subset_blowup_on_spinward_marches(self) -> None:
         spinward = self.unpack_filename('DeltaFiles/high_pop_worlds_blowup/Spinward Marches.sec')
 
         spinward_sec = SectorDictionary.load_traveller_map_file(spinward)
@@ -204,7 +204,7 @@ class testDeltaDictionary(baseTest):
         remix = foo.sector_subset(['Spinward Marches', 'Deneb', 'Trojan Reach'])
         self.assertEqual(0, len(remix))
 
-    def test_allegiance_list(self):
+    def test_allegiance_list(self) -> None:
         spinward = self.unpack_filename('DeltaFiles/high_pop_worlds_blowup/Spinward Marches.sec')
 
         spinward_sec = SectorDictionary.load_traveller_map_file(spinward)
@@ -217,7 +217,7 @@ class testDeltaDictionary(baseTest):
         actual = foo.allegiance_list()
         self.assertEqual(expected, actual, "Unexpected allegiance list")
 
-    def test_allegiance_subset(self):
+    def test_allegiance_subset(self) -> None:
         zarushagar = self.unpack_filename('DeltaFiles/Zarushagar.sec')
 
         zaru_sec = SectorDictionary.load_traveller_map_file(zarushagar)
@@ -240,7 +240,7 @@ class testDeltaDictionary(baseTest):
         result, msg = foo.is_well_formed()
         self.assertTrue(result, msg)
 
-    def test_allegiance_subset_drops_sector(self):
+    def test_allegiance_subset_drops_sector(self) -> None:
         zarushagar = self.unpack_filename('DeltaFiles/Zarushagar.sec')
         dagudashaag = self.unpack_filename('DeltaFiles/Dagudashaag.sec')
 
@@ -263,7 +263,7 @@ class testDeltaDictionary(baseTest):
 
 
 class testSectorDictionary(baseTest):
-    def test_add_bad_item_by_index(self):
+    def test_add_bad_item_by_index(self) -> None:
         expected = 'Values must be SubsectorDictionary objects'
         actual = None
 
@@ -276,7 +276,7 @@ class testSectorDictionary(baseTest):
 
         self.assertEqual(expected, actual)
 
-    def test_add_bad_item_by_update(self):
+    def test_add_bad_item_by_update(self) -> None:
         expected = 'Values must be SubsectorDictionary objects'
         actual = None
 
@@ -289,7 +289,7 @@ class testSectorDictionary(baseTest):
 
         self.assertEqual(expected, actual)
 
-    def test_add_good_item_by_index(self):
+    def test_add_good_item_by_index(self) -> None:
         foo = SectorDictionary('name', 'filename')
         subsector = SubsectorDictionary('name', 'A')
         self.assertEqual(0, len(subsector.keys()), 'Subsector dictionary should be empty')
@@ -300,7 +300,7 @@ class testSectorDictionary(baseTest):
         self.assertEqual('name', foo.name)
         self.assertEqual('filename', foo.filename)
 
-    def test_add_good_item_by_update(self):
+    def test_add_good_item_by_update(self) -> None:
         foo = SectorDictionary('name', 'filename')
         subsector = SubsectorDictionary('name', 'A')
         self.assertEqual(0, len(subsector.keys()), 'Subsector dictionary should be empty')
@@ -311,7 +311,7 @@ class testSectorDictionary(baseTest):
         self.assertEqual('name', foo.name)
         self.assertEqual('filename', foo.filename)
 
-    def test_load_from_traveller_map_file(self):
+    def test_load_from_traveller_map_file(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-spiked.sec')
 
         # load_traveller_map_file is a little slow as it uses Star's parse_line_into_star method
@@ -350,7 +350,7 @@ class testSectorDictionary(baseTest):
         # verify allegiances got read in and derived allegiances calculated
         self.assertEqual(3, len(sector.allegiances), "Unexpected number of allegiances after load")
 
-    def test_drop_lines(self):
+    def test_drop_lines(self) -> None:
         alg = Allegiance('fo', 'foo')
         alg.stats.passengers = 10
         alg.stats.trade = 11
@@ -397,14 +397,14 @@ class testSectorDictionary(baseTest):
         self.assertEqual(0, nu_alg.stats.trade, "Allegiance trade not cleared during drop_lines")
         self.assertEqual(0, nu_alg.stats.tradeExt, "Allegiance tradeExt not cleared during drop_lines")
 
-    def test_empty_sector_dictionary_is_skipped(self):
+    def test_empty_sector_dictionary_is_skipped(self) -> None:
         foo = SectorDictionary('name', 'filename')
         self.assertEqual(0, len(foo))
         self.assertEqual(0, len(foo.lines))
 
         self.assertTrue(foo.skipped)
 
-    def test_sector_dictionary_with_one_unskipped_subsector_is_not_skipped(self):
+    def test_sector_dictionary_with_one_unskipped_subsector_is_not_skipped(self) -> None:
         foo = SectorDictionary('name', 'filename')
         sub1 = SubsectorDictionary('Mimu', 'A')
         foo[sub1.name] = sub1
@@ -415,7 +415,7 @@ class testSectorDictionary(baseTest):
 
         self.assertFalse(foo.skipped)
 
-    def test_sector_dictionary_with_one_skipped_subsector_is_skipped(self):
+    def test_sector_dictionary_with_one_skipped_subsector_is_skipped(self) -> None:
         foo = SectorDictionary('name', 'filename')
         sub1 = SubsectorDictionary('Mimu', 'A')
         sub1.items = None
@@ -427,7 +427,7 @@ class testSectorDictionary(baseTest):
 
         self.assertTrue(foo.skipped)
 
-    def test_sector_file_load_with_no_named_subsectors_has_subsector_dictionaries(self):
+    def test_sector_file_load_with_no_named_subsectors_has_subsector_dictionaries(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')
 
         # load_traveller_map_file is a little slow as it uses Star's parse_line_into_star method
@@ -437,7 +437,7 @@ class testSectorDictionary(baseTest):
 
         self.assertEqual(16, len(sector), "Loaded sector file should have 16 subsector dicts")
 
-    def test_sector_file_load_with_no_named_subsectors_and_one_subsector_of_data(self):
+    def test_sector_file_load_with_no_named_subsectors_and_one_subsector_of_data(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh - subsector P.sec')
 
         # load_traveller_map_file is a little slow as it uses Star's parse_line_into_star method
@@ -450,7 +450,7 @@ class testSectorDictionary(baseTest):
 
 
 class testSubsectorDictionary(baseTest):
-    def test_drop_lines(self):
+    def test_drop_lines(self) -> None:
         foo = SubsectorDictionary('Mimu', 'A')
         foo.items.append('foo')
         foo.items.append('bar')
@@ -465,7 +465,7 @@ class testSubsectorDictionary(baseTest):
         self.assertEqual('Mimu', remix.name)
         self.assertEqual('A', remix.position)
 
-    def test_drop_all_lines_skips_subsector(self):
+    def test_drop_all_lines_skips_subsector(self) -> None:
         foo = SubsectorDictionary('Mimu', 'A')
         foo.items.append('foo')
         foo.items.append('bar')
@@ -477,7 +477,7 @@ class testSubsectorDictionary(baseTest):
         remix = foo.drop_lines(lines_to_drop)
         self.assertTrue(remix.skipped)
 
-    def test_replace_lines(self):
+    def test_replace_lines(self) -> None:
         star1 = "2123 Medurma              A9D7954-C Hi An Cs Di(Miyavine) Asla1 S'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V            Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322  "
         star2 = "2123 Kediiga              B778411-8 Ni Pa                                 { -1 } (832-5) [1314] Bc   -  - 920 9  ImDv G6 V                                                     "
         # star3 doesn't start in the dictionary, so it shouldn't be added

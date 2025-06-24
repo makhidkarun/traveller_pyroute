@@ -7,13 +7,16 @@ import codecs
 import copy
 import logging
 import os
+from typing import Optional
+from typing_extensions import Self
 
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
 
 
 class DeltaDictionary(dict):
 
-    def update(self, __m, **kwargs):
+    def update(self, __m, **kwargs) -> None:  # type: ignore
         for key in __m:
             assert isinstance(__m[key], SectorDictionary), "Values must be SectorDictionary objects"
         super().update(__m, **kwargs)
@@ -22,7 +25,7 @@ class DeltaDictionary(dict):
         assert isinstance(value, SectorDictionary), "Values must be SectorDictionary objects"
         super().__setitem__(item, value)
 
-    def sector_subset(self, sectors):
+    def sector_subset(self, sectors) -> "DeltaDictionary":
         overlap = list()
         for sector_name in sectors:
             if sector_name in self:
@@ -38,8 +41,8 @@ class DeltaDictionary(dict):
 
         return new_dict
 
-    def subsector_subset(self, subsectors):
-        overlap = dict()
+    def subsector_subset(self, subsectors) -> "DeltaDictionary":
+        overlap: dict[str, list[str]] = dict()
         # Not sure if duplicate subsector names are a real problem to worry about,
         # as a reducer doesn't have to be perfect.  If a same-named subsector is
         # redundantly picked up from another sector, so be it - it will get cleaned
@@ -60,7 +63,7 @@ class DeltaDictionary(dict):
 
         return new_dict
 
-    def allegiance_subset(self, allegiances):
+    def allegiance_subset(self, allegiances) -> "DeltaDictionary":
         new_dict = DeltaDictionary()
         for sector_name in self:
             subset_sector = self[sector_name].allegiance_subset(allegiances)
@@ -72,13 +75,13 @@ class DeltaDictionary(dict):
 
         return new_dict
 
-    def sector_list(self):
+    def sector_list(self) -> list[str]:
         result = list(self.keys())
         result.sort()
 
         return result
 
-    def subsector_list(self):
+    def subsector_list(self) -> list[str]:
         result = list()
 
         for sector_name in self:
@@ -89,7 +92,7 @@ class DeltaDictionary(dict):
 
         return result
 
-    def allegiance_list(self):
+    def allegiance_list(self) -> set[str]:
         result = set()
 
         for sector_name in self:
@@ -99,14 +102,14 @@ class DeltaDictionary(dict):
         return result
 
     @property
-    def lines(self):
+    def lines(self) -> list[str]:
         result = list()
         for sub_name in self.keys():
             result.extend(self[sub_name].lines)
 
         return result
 
-    def drop_lines(self, lines_to_drop):
+    def drop_lines(self, lines_to_drop) -> "DeltaDictionary":
         foo = DeltaDictionary()
         for sector_name in self:
             if self[sector_name].skipped:
@@ -116,7 +119,7 @@ class DeltaDictionary(dict):
 
         return foo
 
-    def switch_lines(self, lines_to_drop):
+    def switch_lines(self, lines_to_drop) -> "DeltaDictionary":
         foo = DeltaDictionary()
         for sector_name in self:
             if self[sector_name].skipped:
@@ -126,7 +129,7 @@ class DeltaDictionary(dict):
 
         return foo
 
-    def write_files(self, output_dir):
+    def write_files(self, output_dir) -> None:
         result, msg = self.is_well_formed()
         if not result:
             raise DeltaLogicError(msg)
@@ -136,16 +139,16 @@ class DeltaDictionary(dict):
                 continue
             self[sector_name].write_file(output_dir)
 
-    def skip_void_subsectors(self):
+    def skip_void_subsectors(self) -> None:
         # skip void subsectors unconditionally - all they do is take up space in subsector reduction
         for secname in self:
             self[secname].skip_void_subsectors()
 
-    def trim_empty_allegiances(self):
+    def trim_empty_allegiances(self) -> None:
         for sector in self:
             self[sector].trim_empty_allegiances()
 
-    def is_well_formed(self):
+    def is_well_formed(self) -> tuple[bool, str]:
         for sector in self:
             result, msg = self[sector].is_well_formed()
             if not result:
@@ -164,7 +167,7 @@ class SectorDictionary(dict):
         self.allegiances = dict()
         self.headers = list()
 
-    def update(self, __m, **kwargs):
+    def update(self, __m, **kwargs) -> None:  # type: ignore
         for key in __m:
             assert isinstance(__m[key], SubsectorDictionary), "Values must be SubsectorDictionary objects"
         super().update(__m, **kwargs)
@@ -209,7 +212,7 @@ class SectorDictionary(dict):
 
         return foo
 
-    def subsector_subset(self, subsectors):
+    def subsector_subset(self, subsectors) -> Self:
         overlap = list()
         missed = list()
         for subsector_name in subsectors:
@@ -231,7 +234,7 @@ class SectorDictionary(dict):
 
         return new_dict
 
-    def allegiance_subset(self, allegiances):
+    def allegiance_subset(self, allegiances) -> Self:
         raw_lines = self.lines
 
         for alg in allegiances:
@@ -269,7 +272,7 @@ class SectorDictionary(dict):
 
         return result
 
-    def subsector_list(self):
+    def subsector_list(self) -> list[str]:
         result = list()
         for subsector_name in self:
             if 0 < self[subsector_name].num_lines:
@@ -277,13 +280,13 @@ class SectorDictionary(dict):
 
         return result
 
-    def allegiance_list(self):
+    def allegiance_list(self) -> set[str]:
         result = set()
         for allegiance_name in self.allegiances:
             result.add(allegiance_name)
         return result
 
-    def drop_lines(self, lines_to_drop):
+    def drop_lines(self, lines_to_drop) -> Self:
         new_dict = self._setup_clone_sector_dict()
 
         for subsector_name in self:
@@ -309,7 +312,7 @@ class SectorDictionary(dict):
 
         return new_dict
 
-    def switch_lines(self, lines_to_switch):
+    def switch_lines(self, lines_to_switch) -> Self:
         new_dict = self._setup_clone_sector_dict()
 
         for subsector_name in self:
@@ -318,7 +321,7 @@ class SectorDictionary(dict):
         return new_dict
 
     @property
-    def lines(self):
+    def lines(self) -> list[str]:
         result = list()
         for sub_name in self.keys():
             if self[sub_name].items is not None:
@@ -327,11 +330,11 @@ class SectorDictionary(dict):
         return result
 
     @property
-    def skipped(self):
+    def skipped(self) -> bool:
         return all(self[sub_name].skipped is not False for sub_name in self.keys())
 
     @property
-    def void_subsectors(self):
+    def void_subsectors(self) -> int:
         counter = 0
         for sub_name in self.keys():
             if self[sub_name].skipped is False and 0 == len(self[sub_name].items):
@@ -339,12 +342,12 @@ class SectorDictionary(dict):
 
         return counter
 
-    def skip_void_subsectors(self):
+    def skip_void_subsectors(self) -> None:
         for sub_name in self.keys():
             if self[sub_name].skipped is False and 0 == len(self[sub_name].items):
                 self[sub_name].items = None
 
-    def write_file(self, output_dir):
+    def write_file(self, output_dir) -> None:
         exists = os.path.exists(output_dir)
         if not exists:
             os.makedirs(output_dir)
@@ -360,7 +363,7 @@ class SectorDictionary(dict):
                 handle.write(line)
 
     @staticmethod
-    def load_traveller_map_file(filename):
+    def load_traveller_map_file(filename) -> Optional[Sector]:
         from PyRoute.Inputs.ParseSectorInput import ParseSectorInput
         basename = os.path.basename(filename)
         logger = logging.getLogger('PyRoute.DeltaDictionary')
@@ -374,7 +377,7 @@ class SectorDictionary(dict):
 
         return sector
 
-    def trim_empty_allegiances(self):
+    def trim_empty_allegiances(self) -> None:
         raw_lines = self.lines
         discard = []
 
@@ -405,7 +408,7 @@ class SectorDictionary(dict):
 
         self.headers = nu_headers
 
-    def is_well_formed(self):
+    def is_well_formed(self) -> tuple[bool, str]:
         for subsec in self:
             result, msg = self[subsec].is_well_formed()
             if not result:
@@ -433,22 +436,23 @@ class SubsectorDictionary(dict):
 
     def __init__(self, name, position):
         self.name = name
-        self.items = list()
+        self.items: Optional[list[str]] = list()  # type: ignore
         self.position = position
         super().__init__()
 
     @property
-    def lines(self):
+    def lines(self) -> Optional[list[str]]:
         return self.items
 
     @property
-    def skipped(self):
+    def skipped(self) -> int:
         return self.items is None
 
     @property
-    def num_lines(self):
+    def num_lines(self) -> int:
         if self.skipped:
             return 0
+        assert self.items is not None
         return len(self.items)
 
     def __deepcopy__(self, memodict: dict = {}):
@@ -456,34 +460,36 @@ class SubsectorDictionary(dict):
         if self.skipped:
             foo.items = None
             return foo
+        assert foo.items is not None and self.items is not None
 
         for item in self.items:
             foo.items.append(copy.deepcopy(item.strip('\n')))
         return foo
 
-    def drop_lines(self, lines_to_drop):
+    def drop_lines(self, lines_to_drop) -> "SubsectorDictionary":
         foo = SubsectorDictionary(self.name, self.position)
         if self.skipped:
             foo.items = None
             return foo
+        assert foo.items is not None and self.items is not None
 
-        nonempty = 0 < len(self.items)
+        nonempty = 0 < self.num_lines
 
         for item in self.items:
             if item in lines_to_drop:
                 continue
             foo.items.append(copy.deepcopy(item))
 
-        if nonempty and 0 == len(foo.items):
+        if nonempty and 0 == foo.num_lines:
             foo.items = None
 
         return foo
 
-    def switch_lines(self, lines_to_switch):
+    def switch_lines(self, lines_to_switch) -> "SubsectorDictionary":
         foo = SubsectorDictionary(self.name, self.position)
         if self.skipped:
-            foo.items = None
             return foo
+        assert foo.items is not None and self.items is not None
 
         # assemble shortlist
         shortlist = []
@@ -503,5 +509,5 @@ class SubsectorDictionary(dict):
 
         return foo
 
-    def is_well_formed(self):
+    def is_well_formed(self) -> tuple[bool, str]:
         return True, ""

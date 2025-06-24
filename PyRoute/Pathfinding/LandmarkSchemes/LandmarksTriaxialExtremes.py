@@ -6,6 +6,7 @@ Created on Feb 19, 2024
 import math
 import numpy as np
 from collections import defaultdict
+from typing import Any
 
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
@@ -37,7 +38,7 @@ class LandmarksTriaxialExtremes:
         else:
             self.max_slots = 15
 
-    def get_landmarks(self, index=False, btn=None):
+    def get_landmarks(self, index=False, btn=None) -> tuple[list[dict], defaultdict[Any, set]]:
         max_size = max(self.galaxy.trade.components.values())
         num_slots = min(self.max_slots, self._size_to_landmarks(max_size))
         result = []

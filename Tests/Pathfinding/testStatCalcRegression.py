@@ -14,7 +14,7 @@ from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
 
 class testStatCalcRegression(baseTest):
 
-    def testStatsCalcWithZeroPopulation(self):
+    def testStatsCalcWithZeroPopulation(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/stat_calc_division_by_zero_population/Dagudashaag-zero.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -39,7 +39,7 @@ class testStatCalcRegression(baseTest):
         stats.calculate_statistics(args.ally_match)
         stats.write_statistics(args.ally_count, args.ally_match, args.json_data)
 
-    def testStatsCalcReftSector(self):
+    def testStatsCalcReftSector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/reft-allegiance-pax-balance/Reft Sector.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)

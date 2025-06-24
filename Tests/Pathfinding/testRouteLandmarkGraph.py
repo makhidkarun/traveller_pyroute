@@ -13,7 +13,7 @@ from Tests.baseTest import baseTest
 
 class testRouteLandmarkGraph(baseTest):
 
-    def test_subscript_bad(self):
+    def test_subscript_bad(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         graph, _, stars = self._setup_graph(sourcefile)
         num_stars = len(stars)
@@ -33,7 +33,7 @@ class testRouteLandmarkGraph(baseTest):
                     _ = rlg[input_val]
                 self.assertEqual('Index must be integer between 0 and 36', ex.exception.args[0])
 
-    def test_subscript_empty(self):
+    def test_subscript_empty(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         graph, _, stars = self._setup_graph(sourcefile)
         num_stars = len(stars)
@@ -54,7 +54,7 @@ class testRouteLandmarkGraph(baseTest):
         self.assertEqual(0, len(actual[1]), "Second tuple element should be empty")
         self.assertEqual(0, len(actual[2]), "Third tuple element should be empty")
 
-    def test_add_single_then_subscript_nonempty(self):
+    def test_add_single_then_subscript_nonempty(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         graph, _, stars = self._setup_graph(sourcefile)
         num_stars = len(stars)
@@ -76,7 +76,7 @@ class testRouteLandmarkGraph(baseTest):
         self.assertEqual([1], actual[0], "v - index nodelist not updated")
         self.assertEqual([11], actual[1], "v - value list not updated")
 
-    def test_add_single_edge_twice_should_update_in_place(self):
+    def test_add_single_edge_twice_should_update_in_place(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         graph, _, stars = self._setup_graph(sourcefile)
         num_stars = len(stars)
@@ -99,7 +99,7 @@ class testRouteLandmarkGraph(baseTest):
         self.assertEqual([1], actual[0], "v - index nodelist not updated")
         self.assertEqual([7.5], actual[1], "v - value list not updated")
 
-    def test_verify_position_creation(self):
+    def test_verify_position_creation(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         graph, _, stars = self._setup_graph(sourcefile)
         num_stars = len(stars)

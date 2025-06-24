@@ -23,7 +23,7 @@ from Tests.baseTest import baseTest
 
 class testApproximateShortestPathForest(baseTest):
 
-    def test_trixial_bounds_in_bulk_unified(self):
+    def test_trixial_bounds_in_bulk_unified(self) -> None:
         galaxy = self.set_up_zarushagar_sector()
 
         foo = LandmarksTriaxialExtremes(galaxy)
@@ -44,7 +44,7 @@ class testApproximateShortestPathForest(baseTest):
 
         np.testing.assert_array_almost_equal(expected, actual, 0.000001, "Unexpected bounds array")
 
-    def test_unified_can_handle_singleton_landmarks(self):
+    def test_unified_can_handle_singleton_landmarks(self) -> None:
         galaxy = self.set_up_zarushagar_sector()
 
         foo = LandmarksTriaxialExtremes(galaxy)
@@ -56,7 +56,7 @@ class testApproximateShortestPathForest(baseTest):
         approx = ApproximateShortestPathForestUnified(source, graph, 0.2, sources=landmarks)
         self.assertEqual(6, approx.num_trees)
 
-    def test_unified_can_handle_bulk_lobound_from_singleton_component(self):
+    def test_unified_can_handle_bulk_lobound_from_singleton_component(self) -> None:
         galaxy = self.set_up_zarushagar_sector()
 
         foo = LandmarksTriaxialExtremes(galaxy)
@@ -71,7 +71,7 @@ class testApproximateShortestPathForest(baseTest):
         # Approx-sp lower bounds to a singleton component should be zero, as they are irrelevant in actual pathfinding
         self.assertEqual(0, max(bulk_lo), "Unexpected lobound")
 
-    def test_unified_can_handle_bulk_lobound_to_singleton_component(self):
+    def test_unified_can_handle_bulk_lobound_to_singleton_component(self) -> None:
         galaxy = self.set_up_zarushagar_sector()
 
         foo = LandmarksTriaxialExtremes(galaxy)
@@ -86,7 +86,7 @@ class testApproximateShortestPathForest(baseTest):
         bulk_lo = approx.lower_bound_bulk(source)
         self.assertEqual(float('+inf'), bulk_lo[targ])
 
-    def test_verify_near_root_edge_propagates(self):
+    def test_verify_near_root_edge_propagates(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         jsonfile = self.unpack_filename('PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
 
@@ -149,7 +149,7 @@ class testApproximateShortestPathForest(baseTest):
         distance_check = list(expected_distances.values()) == approx.distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT restart")
 
-    def test_add_tree_to_unified_forest(self):
+    def test_add_tree_to_unified_forest(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -185,7 +185,7 @@ class testApproximateShortestPathForest(baseTest):
         delta = nubound - oldbound
         self.assertGreater(max(delta), 0, "At least one heuristic value should be improved by extra tree")
 
-    def set_up_zarushagar_sector(self):
+    def set_up_zarushagar_sector(self) -> DeltaGalaxy:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()

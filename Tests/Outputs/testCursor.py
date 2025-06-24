@@ -6,26 +6,26 @@ from PyRoute.Outputs.Cursor import Cursor
 
 class TestCursor(unittest.TestCase):
 
-    def testSimple(self):
+    def testSimple(self) -> None:
         cursor = Cursor(0, 0)
         self.assertEqual(cursor.x, 0)
         self.assertEqual(cursor.y, 0)
 
-    def testdx(self):
+    def testdx(self) -> None:
         cursor = Cursor(1, 1)
         cursor.x_plus()
         self.assertEqual(cursor.x, 1)
         cursor.x_plus(1)
         self.assertEqual(cursor.x, 2)
 
-    def testdy(self):
+    def testdy(self) -> None:
         cursor = Cursor(1, 1)
         cursor.y_plus()
         self.assertEqual(cursor.y, 1)
         cursor.y_plus(1)
         self.assertEqual(cursor.y, 2)
 
-    def testSetDeltas(self):
+    def testSetDeltas(self) -> None:
         cursor = Cursor(1, 1)
         cursor.set_deltas()
         cursor.x_plus()
@@ -35,7 +35,7 @@ class TestCursor(unittest.TestCase):
         self.assertEqual(cursor.x, 3)
         self.assertEqual(cursor.y, 3)
 
-    def testSetDeltaOverride(self):
+    def testSetDeltaOverride(self) -> None:
         cursor = Cursor(1, 1)
         cursor.set_deltas(4, 4)
         cursor.x_plus()
@@ -45,11 +45,11 @@ class TestCursor(unittest.TestCase):
         self.assertEqual(cursor.x, 5)
         self.assertEqual(cursor.y, 5)
 
-    def testString(self):
+    def testString(self) -> None:
         cursor = Cursor(1, 1)
         self.assertEqual(str(cursor), "1, 1")
 
-    def testEquals(self):
+    def testEquals(self) -> None:
         cursor1 = Cursor(1, 1)
         cursor2 = Cursor(3, 3)
         self.assertFalse(cursor2 == cursor1)
@@ -57,7 +57,7 @@ class TestCursor(unittest.TestCase):
         cursor1.y_plus(2)
         self.assertTrue(cursor2 == cursor1)
 
-    def testAssignValues(self):
+    def testAssignValues(self) -> None:
         cursor = Cursor(1, 1)
         cursor.x = -1
         self.assertEqual(cursor.x, -1)
@@ -66,7 +66,7 @@ class TestCursor(unittest.TestCase):
         self.assertEqual(cursor.x, -1)
         self.assertEqual(cursor.y, -3)
 
-    def testCopy(self):
+    def testCopy(self) -> None:
         cursor = Cursor(1, 1)
         cursor_new = cursor.copy()
 

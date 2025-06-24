@@ -17,7 +17,7 @@ from PyRoute.TradeCodes import TradeCodes
 
 
 @composite
-def importance_starline(draw):
+def importance_starline(draw) -> composite:
     keep_econ = draw(booleans())
     keep_imp = draw(booleans())
     keep_social = True if not keep_econ and not keep_imp else draw(booleans())
@@ -52,7 +52,7 @@ def importance_starline(draw):
 
 
 @composite
-def canonical_check(draw):
+def canonical_check(draw) -> composite:
     rawline = '1919 Khula                B575A77-E Hi In Pz Di(Khulans)      { 4 }  (D9G+4) [AE5E] BEf  N  A 510 10 ImDv M0 V'
     uwp_match = r'([A-HXYa-hxy\?][0-9A-Fa-f\?][0-9A-Xa-x\?]{2,2}[0-9A-Fa-f\?][0-9A-Xa-x\?][0-9A-Ja-j\?]-[0-9A-Xa-x\?])'
     imp_match = r'\{ *[+-]?[0-6] ?\}'
@@ -173,7 +173,7 @@ class testStar(unittest.TestCase):
     @example('0101 02111111111111) ???????-? [oPrh00011111GitpHqwhA{KRNf{rpjqI}7bj]A        - - B 000   100', '0101 02111111111111)      ???????-? [oPrh00011111GitpHqwhA{KRNf{rpjqI}7b]                       -    -  B 000 0  100                                                          ')
     @example('0101 000000000000000 ???????-? [0000000)(]X [        - - B 001   100', '0101 000000000000000      ???????-? [0000000)(]X                                                -    -  B 001 0  100                                                          ')
     @example('2931 Dinenruum            E432679-6 Na Ni Po Da                           { -3 } (851-2) [7367] B    -  A 122 10 ImDc K1 IV M3 V M4 V', '2931 Dinenruum            E432679-6 Da Na Ni Po                           { -3 } (851-2) [7367] B    -  A 122 10 ImDc K1 IV M3 V M4 V                                          ')
-    def test_parse_line_to_star(self, s, t):
+    def test_parse_line_to_star(self, s, t) -> None:
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
@@ -231,7 +231,7 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ?000000-0 0000000000000 B - (000-0)   [0000] - - A 000   00')
     @example('0101 000000000000000 ?000000-0 0000000000000 B {   0} (000-0) [0000] - - A 000 0 00')
     @example('0101 000000000000?-0 A000000-0 000000000000000 {0} -  [0000] - - A 000   00')
-    def test_star_line_extension_parsing(self, s):
+    def test_star_line_extension_parsing(self, s) -> None:
         econ_match = r'[ ]\([0-9A-Za-z]{3}[+-]\d\)[ ]'
         soc_match = r'[ ]\[[0-9A-Za-z]{4}\][ ]'
         imp_match = r'\{ *[+-]?[0-6] ?\}'
@@ -290,7 +290,7 @@ class testStar(unittest.TestCase):
     @given(canonical_check())
     @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(3000))
     @example('1919 Khula                ???????-? Hi In Pz Di(Khulans)      {0}  (000-0) [0000] BEf  N  A 510 10 ImDv M0 V')
-    def test_star_canonicalise(self, s):
+    def test_star_canonicalise(self, s) -> None:
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
@@ -329,7 +329,7 @@ class testStar(unittest.TestCase):
     @example('?000000-0', '(000-0)', '[0000]0', 'Star Sample social must be None or 6-char string')
     @example('?000000-0', '000-0)', '[0000]', 'Star Sample economics must be None or 7-char string')
     @example('?000000-0', '(000-0)', '[000]', 'Star Sample social must be None or 6-char string')
-    def test_check_economics_social_and_ru(self, uwp, ex, cx, well_formed_kaboom):
+    def test_check_economics_social_and_ru(self, uwp, ex, cx, well_formed_kaboom) -> None:
         assume('?' not in uwp)
         uwp_obj = None
 

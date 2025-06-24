@@ -8,6 +8,7 @@ stars, rather than the multi-concern mashup that is the Star class
 
 """
 import re
+from typing import Optional
 
 from PyRoute.SystemData.SystemStar import SystemStar
 
@@ -88,7 +89,7 @@ class StarList(object):
 
         return base.strip()
 
-    def move_biggest_to_primary(self):
+    def move_biggest_to_primary(self) -> None:
         num_stars = len(self.stars_list)
         if 2 > num_stars:  # nothing to do, bail out now
             return
@@ -102,7 +103,7 @@ class StarList(object):
         if 0 != bigdex:
             self.stars_list[0], self.stars_list[bigdex] = self.stars_list[bigdex], self.stars_list[0]
 
-    def is_well_formed(self):
+    def is_well_formed(self) -> tuple[bool, str]:
         msg = ""
         num_stars = len(self.stars_list)
         if 8 < num_stars:
@@ -120,22 +121,22 @@ class StarList(object):
         return True, msg
 
     @property
-    def primary(self):
+    def primary(self) -> SystemStar:
         return self.stars_list[0]
 
     @property
-    def preclude_brown_dwarfs(self):
+    def preclude_brown_dwarfs(self) -> bool:
         primary = self.primary
         return primary.spectral is not None and primary.spectral in 'OBAFG'
 
     @property
-    def primary_flux_bounds(self):
+    def primary_flux_bounds(self) -> tuple[Optional[int], Optional[int]]:
         primary = self.primary
         lookup = primary.spectral if primary.spectral is not None else primary.size
         line = StarList.primary_flux[lookup]
         return line[0], line[1]
 
-    def check_canonical(self):
+    def check_canonical(self) -> tuple[bool, list[str]]:
         msg = []
         num_stars = len(self.stars_list)
         for star in self.stars_list:
@@ -183,7 +184,7 @@ class StarList(object):
 
         return 0 == len(msg), msg
 
-    def canonicalise(self):
+    def canonicalise(self) -> None:
         for star in self.stars_list:
             star.canonicalise()
         self.move_biggest_to_primary()
@@ -231,7 +232,7 @@ class StarList(object):
             if primary_supergiant:  # Supergiant primary precludes D-class stars, so out the window they go
                 self.stars_list = [star for star in self.stars_list if 'D' != star.size]
 
-    def check_star_size_against_primary(self, current, msg):
+    def check_star_size_against_primary(self, current, msg) -> None:
         if not current.is_stellar_not_dwarf:
             return
 
@@ -244,7 +245,7 @@ class StarList(object):
         if line:
             msg.append(line)
 
-    def fix_star_size_against_primary(self, current):
+    def fix_star_size_against_primary(self, current) -> None:
         if not current.is_stellar_not_dwarf:
             return
 

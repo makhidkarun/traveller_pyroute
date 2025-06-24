@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
-from wikitools_py3 import wiki
-from wikitools_py3.api import APIRequest
-from wikitools_py3.exceptions import WikiError, NoPage
-from wikitools_py3.wikifile import File
-from wikitools_py3.page import Page
+from wikitools_py3 import wiki  # type:ignore[import-not-found]
+from wikitools_py3.api import APIRequest  # type:ignore[import-not-found]
+from wikitools_py3.exceptions import WikiError, NoPage  # type:ignore[import-not-found]
+from wikitools_py3.wikifile import File  # type:ignore[import-not-found]
+from wikitools_py3.page import Page  # type:ignore[import-not-found]
 import logging
 import traceback
 import re
@@ -21,10 +21,10 @@ class PageReview(object):
         self.text = text
         self.replace_count = replace_count
 
-    def review(self, page, formats):
+    def review(self, page, formats) -> str:
         raise NotImplementedError("Base Class")
 
-    def update_formats(self, formats):
+    def update_formats(self, formats) -> tuple:
         search = self.search.format(**formats)
         replace = self.replace.format(**formats) if self.replace else None
         text = self.text.format(**formats) if self.text else None
@@ -36,7 +36,7 @@ class PageReviewSearch(PageReview):
     def __init__(self, search, replace, text, replace_count):
         super(PageReviewSearch, self).__init__(search, replace, text, replace_count)
 
-    def review(self, page, formats):
+    def review(self, page, formats) -> str:
         (s, _, _) = self.update_formats(formats)
         logger.debug("searching for {} in {}".format(s, page.title))
         if re.search(s, page.getWikiText()):
@@ -49,7 +49,7 @@ class PageReviewReplace(PageReview):
     def __init__(self, search, replace, text, replace_count):
         super(PageReviewReplace, self).__init__(search, replace, text, replace_count)
 
-    def review(self, page, formats):
+    def review(self, page, formats) -> str:
         logger.debug('Searching for replacements in {}'.format(page.title))
         (s, r, _) = self.update_formats(formats)
         page_text = re.sub(s, r, page.getWikiText(), count=self.replace_count)
@@ -61,7 +61,7 @@ class PageReviewAddBefore(PageReview):
     def __init__(self, search, replace, text, replace_count):
         super(PageReviewAddBefore, self).__init__(search, replace, text, replace_count)
 
-    def review(self, page, formats):
+    def review(self, page, formats) -> str:
         (s, r, t) = self.update_formats(formats)
         s = "({})".format(s)
         r = "{}\1".format(t)
@@ -74,7 +74,7 @@ class PageReviewAddAfter(PageReview):
     def __init__(self, search, replace, text, replace_count):
         super(PageReviewAddAfter, self).__init__(search, replace, text, replace_count)
 
-    def review(self, page, formats):
+    def review(self, page, formats) -> str:
         (s, r, t) = self.update_formats(formats)
         s = "({})".format(s)
         r = "\1{}".format(t)
@@ -98,14 +98,14 @@ class WikiReview(object):
         self.logger = logging.getLogger('WikiReview')
 
     @staticmethod
-    def get_site(user='AB-101', api_site='http://wiki.travellerrpg.com/api.php', password=False):
+    def get_site(user='AB-101', api_site='http://wiki.travellerrpg.com/api.php', password=False) -> wiki.Wiki:
         site = wiki.Wiki(api_site)
         access = site.login(user, password=password)
         if not access:
             logger.error('Unable to log in')
         return site
 
-    def get_page(self, title):
+    def get_page(self, title) -> wiki.Page:
         try:
             target_page = Page(self.site, title)
         except NoPage:
@@ -133,7 +133,7 @@ class WikiReview(object):
 
         return target_page
 
-    def save_page(self, page, text, summary="Wiki review change", create=False):
+    def save_page(self, page, text, summary="Wiki review change", create=False) -> bool:
         try:
             if create:
                 result = page.edit(text=text, summary=summary,
@@ -159,7 +159,7 @@ class WikiReview(object):
                 self.logger.error("Save Page for page {} got exception {} ".format(page.title, e))
             return False
 
-    def upload_file(self, filename):
+    def upload_file(self, filename) -> None:
         with open(filename, "rb") as f:
             try:
                 page = File(self.site, os.path.basename(filename))
@@ -172,7 +172,7 @@ class WikiReview(object):
                 self.logger.error("UploadPDF for {} got exception: {}".format(filename, e))
                 traceback.print_exc()
 
-    def process_page_name(self, name, append_title, insert_mode, message):
+    def process_page_name(self, name, append_title, insert_mode, message) -> None:
         formatting = {'title': name}
         page_name = name + append_title if append_title else name
 
@@ -190,7 +190,7 @@ class WikiReview(object):
             elif insert_mode in ['search']:
                 self.review_count += 1
 
-    def search_disambiguation_page(self, title):
+    def search_disambiguation_page(self, title) -> list[str]:
         search_title = title + self.search_disambig
         args = {'action': 'query', 'list': 'search', 'srsearch': search_title, 'srprop': 'size|wordcount'}
         request = APIRequest(self.site, args)
@@ -201,7 +201,7 @@ class WikiReview(object):
                 titles.append(values['title'])
         return titles
 
-    def get_linked_here(self, page):
+    def get_linked_here(self, page) -> list[str]:
         args = {'action': 'query', 'prop': 'linkshere', 'titles': page}
         logger.debug("processing Links Here list")
         request = APIRequest(self.site, args)

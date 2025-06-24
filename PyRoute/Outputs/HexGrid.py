@@ -2,7 +2,6 @@
 from PyRoute.Allies.Borders import Borders
 from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Outputs.Colour import Colour
-from PyRoute.Outputs.Map import MapOutput
 from PyRoute.Position.Hex import Hex
 
 
@@ -33,7 +32,8 @@ class HexGrid(object):
     rows/cols : number of rows and columns of hexes to draw
     size x/y determine the width and height of each hex.
     """
-    def __init__(self, doc: MapOutput, start: Cursor, size: Cursor, rows: int, cols: int, legacy: bool = False):
+    def __init__(self, doc: "MapOutput", start: Cursor, size: Cursor, rows: int, cols: int, legacy: bool = False):  # noqa
+        from PyRoute.Outputs.Map import MapOutput
         self.hex_grid_colour: Colour = 'gray'
         self.doc: MapOutput = doc
 
@@ -41,12 +41,12 @@ class HexGrid(object):
         self.size = size   # 6, 9
         self.x_count = rows + 1  # 33
         self.y_count = cols + 1  # 41
-        self.borders: Borders = None
+        self.borders: Borders
         self.sector_dx: int = 0
         self.sector_dy: int = 0
         self.legacy = legacy
 
-    def hex_grid(self, draw, width: int, colour: Colour):
+    def hex_grid(self, draw, width: float, colour: Colour) -> None:
         hline = HLine(self.doc, self, width, colour)
         lline = LLine(self.doc, self, width, colour)
         rline = RLine(self.doc, self, width, colour)
@@ -67,7 +67,7 @@ class HexGrid(object):
             lline.x_plus()
             rline.x_plus()
 
-    def draw_all(self, x, y, hline, lline, rline):
+    def draw_all(self, x, y, hline, lline, rline) -> None:
         if x < self.x_count - 1:
             hline.draw()
         if self.y_count % 2 == 0 and y == self.y_count - 1:
@@ -77,7 +77,7 @@ class HexGrid(object):
         if y > 0:
             rline.draw()
 
-    def set_borders(self, borders: Borders, sector_dx: int, sector_dy: int):
+    def set_borders(self, borders: Borders, sector_dx: int, sector_dy: int) -> None:
         self.borders = borders
         self.sector_dx = sector_dx
         self.sector_dy = sector_dy
@@ -98,7 +98,7 @@ class HexGrid(object):
 
 
 class LineDraw(object):
-    def __init__(self, doc: MapOutput, grid: HexGrid, width: int, colour: Colour):
+    def __init__(self, doc: "MapOutput", grid: HexGrid, width: float, colour: Colour):  # noqa
         self.doc = doc
         self.width = width
         self.colour = colour
@@ -109,14 +109,14 @@ class LineDraw(object):
     def _start_cursor(self, grid: HexGrid):
         raise NotImplementedError("Base Class")
 
-    def restart_y(self, x: int):
+    def restart_y(self, x: int) -> None:
         raise NotImplementedError("Base Class")
 
-    def y_plus(self):
+    def y_plus(self) -> None:
         self.start.y_plus()
         self.end.y_plus()
 
-    def x_plus(self):
+    def x_plus(self) -> None:
         self.start.x_plus()
         self.end.x_plus()
 
@@ -128,7 +128,7 @@ class LineDraw(object):
 
 
 class HLine(LineDraw):
-    def __init__(self, doc: MapOutput, grid: HexGrid, width: int, colour: Colour):
+    def __init__(self, doc: "MapOutput", grid: HexGrid, width: float, colour: Colour):  # noqa
         super(HLine, self).__init__(doc, grid, width, colour)
 
     def _start_cursor(self, grid: HexGrid):
@@ -145,7 +145,7 @@ class HLine(LineDraw):
         self.odd_start_y = grid.start.y - grid.size.y
         self.even_start_y = grid.start.y - 2 * grid.size.y
 
-    def restart_y(self, x: int):
+    def restart_y(self, x: int) -> None:
         if x & 1:
             self.start.y = self.odd_start_y
             self.end.y = self.odd_start_y
@@ -155,7 +155,7 @@ class HLine(LineDraw):
 
 
 class LLine(LineDraw):
-    def __init__(self, doc: MapOutput, grid: HexGrid, width: int, colour: Colour):
+    def __init__(self, doc: "MapOutput", grid: HexGrid, width: float, colour: Colour):  # noqa
         super(LLine, self).__init__(doc, grid, width, colour)
 
     def _start_cursor(self, grid: HexGrid):
@@ -170,7 +170,7 @@ class LLine(LineDraw):
         self.odd_start_y = grid.start.y - 2 * grid.size.y
         self.even_start_y = grid.start.y - grid.size.y
 
-    def restart_y(self, x: int):
+    def restart_y(self, x: int) -> None:
         if x & 1:
             self.start.y = self.odd_start_y
             self.end.y = self.even_start_y
@@ -180,7 +180,7 @@ class LLine(LineDraw):
 
 
 class RLine(LineDraw):
-    def __init__(self, doc: MapOutput, grid: HexGrid, width: int, colour: Colour):
+    def __init__(self, doc: "MapOutput", grid: HexGrid, width: float, colour: Colour):  # noqa
         super(RLine, self).__init__(doc, grid, width, colour)
 
     def _start_cursor(self, grid: HexGrid):
@@ -193,7 +193,7 @@ class RLine(LineDraw):
         self.odd_start_y = grid.start.y - 3 * grid.size.y
         self.even_start_y = grid.start.y - 2 * grid.size.y
 
-    def restart_y(self, x: int):
+    def restart_y(self, x: int) -> None:
         if x & 1:
             self.start.y = self.odd_start_y
             self.end.y = self.even_start_y

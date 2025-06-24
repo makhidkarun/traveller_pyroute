@@ -7,11 +7,12 @@ Created on Dec 27, 2017
 import logging
 import argparse
 import os
+from typing import Union
 
-from DataClasses.ReadSectorOptions import ReadSectorOptions
-from .Galaxy import Galaxy
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
+from PyRoute.AreaItems.Galaxy import Galaxy
 from .WikiReview import WikiReview
-from wikitools.page import Page
+from wikitools.page import Page  # type:ignore[import-not-found]
 
 logger = logging.getLogger('WikiCreateWorlds')
 
@@ -146,7 +147,7 @@ No information yet available.
         Constructor
         """
 
-    def get_star_template(self, star):
+    def get_star_template(self, star) -> tuple[Union[str, None], Union[str, None]]:
         if len(star.star_list) == 1:
             star_template = self.monostellarTemplate.format(star.name, star.star_list[0])
             star_category = None
@@ -163,7 +164,7 @@ No information yet available.
 
         return (star_template, star_category)
 
-    def get_sources(self, star, sources):
+    def get_sources(self, star, sources) -> str:
         source_text = '{{Sources\n'
         index = 1
         for source in sources:
@@ -174,7 +175,7 @@ No information yet available.
 
         return source_text
 
-    def get_categories(self, star, categories):
+    def get_categories(self, star, categories) -> str:
         # base_categories = ['[[Category: First Imperium worlds]]', '[[Category: Humaniti worlds]]', '[[Category: Rule of Man worlds]]',
         #                   '[[Category: Second Imperium worlds]]','[[Category: Ziru Sirka worlds]]']
         base_categories = []
@@ -185,20 +186,19 @@ No information yet available.
         base_categories.sort()
         return '\n'.join(base_categories)
 
-    def get_comments(self, star):
+    def get_comments(self, star) -> str:
         comments = []
         for code in star.tradeCode.dcode:
             comments.append('{{{{World summary comment|trade={} }}}}'.format(code))
         for code in star.tradeCode.xcode:
             comments.append('{{{{World summary comment|trade={} }}}}'.format(code))
-        comments = '\n' + '\n'.join(comments) if len(comments) > 0 else ' '
-        return comments
+        return '\n' + '\n'.join(comments) if len(comments) > 0 else ' '
 
-    def get_bases(self, star):
+    def get_bases(self, star) -> str:
         bases = '\n{{{{World summary bases|bases={} }}}}'.format(star.baseCode) if star.baseCode != '-' else ' '
         return bases
 
-    def get_nobility(self, star):
+    def get_nobility(self, star) -> str:
         if len(str(star.nobles)):
             nobility = '''
 === Imperial High / Landed Nobility ===
@@ -208,7 +208,7 @@ No information yet available.
             nobility = '\n'
         return nobility
 
-    def create_page(self, star, categories, sources, full_name):
+    def create_page(self, star, categories, sources, full_name) -> str:
         star_template, star_category = self.get_star_template(star)
         sources = self.get_sources(star, sources)
         comments = self.get_comments(star)
@@ -237,7 +237,7 @@ No information yet available.
         page_text = self.page_template.format(**formatting)
         return page_text
 
-    def read_sector(self, sectors):
+    def read_sector(self, sectors) -> Galaxy:
         galaxy = Galaxy(12)
         options = ReadSectorOptions(sectors=sectors, pop_code='fixed', ru_calc='collapse')
         # galaxy.read_sectors(sectors, 'fixed', 'scaled')
@@ -245,8 +245,8 @@ No information yet available.
         return galaxy
 
 
-def get_category_list(category_files):
-    category_list = {}
+def get_category_list(category_files) -> dict[str, list[str]]:
+    category_list: dict[str, list[str]] = {}
     for cat in category_files:
         cat_name = '[[Category: {}]]'.format(os.path.splitext(os.path.basename(cat))[0].replace('_', ' '))
         cat_worlds = get_skip_list(cat)
@@ -261,8 +261,8 @@ def get_category_list(category_files):
     return category_list
 
 
-def get_sources_list(sources_files):
-    sources_list = {}
+def get_sources_list(sources_files) -> dict[str, list[str]]:
+    sources_list: dict[str, list[str]] = {}
 
     for src in sources_files:
         src_worlds = get_skip_list(src)
@@ -275,20 +275,20 @@ def get_sources_list(sources_files):
     return sources_list
 
 
-def get_skip_list(name):
+def get_skip_list(name) -> list[str]:
     with open(name, encoding="utf-8") as f:
         skip_list = f.read().splitlines()
     return skip_list
 
 
-def get_max_list():
+def get_max_list() -> list[str]:
     with open('Zar_max_present.txt', encoding="utf-8") as f:
         max_list = f.read().splitlines()
 
     return max_list
 
 
-def set_logging(level):
+def set_logging(level) -> None:
     log = logging.getLogger()
     log.setLevel(level)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -299,7 +299,7 @@ def set_logging(level):
     log.addHandler(ch)
 
 
-def process():
+def process() -> None:
     parser = argparse.ArgumentParser(description='Traveller Wiki create world articles.', fromfile_prefix_chars='@')
     parser.add_argument('--skip-list', help='file of worlds to skip adding/updating')
     parser.add_argument('-c', '--category', action='append', help='File with list of worlds to append different category')

@@ -61,7 +61,7 @@ btn_param_list = [
 
 
 @composite
-def star_set(draw):
+def star_set(draw) -> tuple[int, str, str, str, int, str, str, str]:
     star1_wtn = draw(integers(min_value=1, max_value=10))
     star2_wtn = draw(integers(min_value=1, max_value=10))
 
@@ -92,7 +92,7 @@ def star_set(draw):
 class testTradeCalculationBtn(unittest.TestCase):
 
     @given(star_set())
-    def test_get_btn(self, value):
+    def test_get_btn(self, value) -> None:
         star1_wtn, star1_trade, star1_alleg, star1_pos, star2_wtn, star2_trade, star2_alleg, star2_pos = value
         sector = Sector('# Core', '# 0, 0')
 
@@ -120,7 +120,7 @@ class testTradeCalculationBtn(unittest.TestCase):
 
         self.assertEqual(forward_btn, reverse_btn, "Get_btn shouldn't be sensitive to argument ordering")
 
-    def test_get_btn_pairwise(self):
+    def test_get_btn_pairwise(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         counter = 1
         for star1_wtn, star1_trade, star1_pos, star1_alleg, star2_wtn, star2_trade, star2_pos, star2_alleg, expected in btn_param_list:
@@ -148,7 +148,7 @@ class testTradeCalculationBtn(unittest.TestCase):
                 self.assertEqual(forward_btn, reverse_btn, "Get_btn shouldn't be sensitive to argument ordering")
                 self.assertEqual(expected, forward_btn, "Unexpected get-btn value")
 
-    def test_get_max_btn_pairwise(self):
+    def test_get_max_btn_pairwise(self) -> None:
         cases = [
             (0, 0, 1),
             (0, 1, 1),
@@ -182,7 +182,7 @@ class testTradeCalculationBtn(unittest.TestCase):
                 actual = RouteCalculation.get_max_btn(star2_wtn, star1_wtn)
                 self.assertEqual(expected, actual)
 
-    def test_get_max_dist_pairwise(self):
+    def test_get_max_dist_pairwise(self) -> None:
         cases = [
             (4, 4, 2),
             (4, 6, 2),

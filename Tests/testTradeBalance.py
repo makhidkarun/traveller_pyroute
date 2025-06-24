@@ -7,7 +7,7 @@ from PyRoute.TradeBalance import TradeBalance
 
 
 class testTradeBalance(unittest.TestCase):
-    def test_trade_balance_add_success(self):
+    def test_trade_balance_add_success(self) -> None:
         foo = TradeBalance(stat_field='passengers', region=AreaItem('name'))
         self.assertEqual(0, len(foo), "Empty TradeBalance should have zero elements")
         key = ('foo', 'bar')
@@ -15,7 +15,7 @@ class testTradeBalance(unittest.TestCase):
         self.assertEqual(1, len(foo), "TradeBalance should have 1 element")
         self.assertEqual(1, foo[key])
 
-    def test_log_odd_trade_unit(self):
+    def test_log_odd_trade_unit(self) -> None:
         core = Sector('# Core', '# 0, 0')
         dagu = Sector('# Dagudashaag', '# -1, 0')
 

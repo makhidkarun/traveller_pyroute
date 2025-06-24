@@ -66,7 +66,7 @@ def _calc_branching_factor(nodes_queued: cython.int, path_len: cython.int):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 def astar_path_numpy(G, source: cython.int, target: cython.int, bulk_heuristic,
-                     upbound: cython.float = float64max, diagnostics: cython.bint = False):
+                     upbound: cython.float = float64max, diagnostics: cython.bint = False) -> tuple[list, dict]:
     G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]]
     potentials: cnp.ndarray[cython.float]
     upbound: cython.float
@@ -95,7 +95,7 @@ def astar_path_numpy(G, source: cython.int, target: cython.int, bulk_heuristic,
 @cython.returns(tuple[list[cython.int], dict])
 def astar_numpy_core(G_succ: list[tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]], diagnostics: cython.bint,
                      distances: cnp.ndarray[cython.float], potentials: cnp.ndarray[cython.float], source: cython.int,
-                     target: cython.int, upbound: cython.float):
+                     target: cython.int, upbound: cython.float) -> tuple[list, dict]:
     distances_view: cython.double[:] = distances
     distances_view[source] = 0.0
     potentials_view: cython.double[:] = potentials

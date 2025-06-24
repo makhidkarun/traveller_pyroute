@@ -9,7 +9,7 @@ from Tests.baseTest import baseTest
 
 class testReadSector(baseTest):
 
-    def testReadKilongSector(self):
+    def testReadKilongSector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/read_kilong_sector/Kilong.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)

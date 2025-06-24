@@ -4,7 +4,7 @@ from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
 
 
 class testNoNoneDefaultDict(unittest.TestCase):
-    def test_reject_none_key(self):
+    def test_reject_none_key(self) -> None:
         foo = NoNoneDefaultDict(int)
         exc = None
 

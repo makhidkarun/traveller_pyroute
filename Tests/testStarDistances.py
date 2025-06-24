@@ -114,7 +114,7 @@ param_list = [
 
 class testStarDistances(unittest.TestCase):
 
-    def test_core_0101(self):
+    def test_core_0101(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         starline = '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V'
 
@@ -122,7 +122,7 @@ class testStarDistances(unittest.TestCase):
         self.assertEqual(0, star.q, "Origin should have zero q value")
         self.assertEqual(39, star.r, "Origin should have 39 r value")
 
-    def test_core_0140(self):
+    def test_core_0140(self) -> None:
         origin = Star.parse_line_into_star(
             '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
             Sector('# Core', '# 0, 0'), 'fixed', 'fixed'
@@ -136,7 +136,7 @@ class testStarDistances(unittest.TestCase):
         self.assertEqual(0, star.q, "Star should have zero q value")
         self.assertEqual(0, star.r, "Star should have 0 r value")
 
-    def test_lishun_0101(self):
+    def test_lishun_0101(self) -> None:
         origin = Star.parse_line_into_star(
             '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
             Sector('# Core', '# 0, 0'), 'fixed', 'fixed'
@@ -150,7 +150,7 @@ class testStarDistances(unittest.TestCase):
         self.assertEqual(0, star.q, "Star should have zero q value")
         self.assertEqual(79, star.r, "Star should have 79 r value")
 
-    def test_lishun_0140(self):
+    def test_lishun_0140(self) -> None:
         origin = Star.parse_line_into_star(
             '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
             Sector('# Core', '# 0, 0'), 'fixed', 'fixed'
@@ -164,7 +164,7 @@ class testStarDistances(unittest.TestCase):
         self.assertEqual(0, star.q, "Star should have zero q value")
         self.assertEqual(40, star.r, "Star should have 40 r value")
 
-    def test_massilia_0101(self):
+    def test_massilia_0101(self) -> None:
         origin = Star.parse_line_into_star(
             '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
             Sector('# Core', '# 0, 0'), 'fixed', 'fixed'
@@ -178,7 +178,7 @@ class testStarDistances(unittest.TestCase):
         self.assertEqual(0, star.q, "Star should have zero q value")
         self.assertEqual(-1, star.r, "Star should have -1 r value")
 
-    def test_massilia_0140(self):
+    def test_massilia_0140(self) -> None:
         origin = Star.parse_line_into_star(
             '0101 Irkigkhan            C9C4733-9 Fl                                   { 0 }  (E69-3) [4726] B     -  - 123 8  ImDc M2 V',
             Sector('# Core', '# 0, 0'), 'fixed', 'fixed'
@@ -192,7 +192,7 @@ class testStarDistances(unittest.TestCase):
         self.assertEqual(0, star.q, "Star should have zero q value")
         self.assertEqual(-40, star.r, "Star should have -40 r value")
 
-    def test_straight_distance(self):
+    def test_straight_distance(self) -> None:
         for blurb, sectorname, sectorloc, starthex, finhex, dx, dy, expected_straight_distance in distance_list:
             with self.subTest(msg=blurb):
                 sector = Sector('# ' + sectorname, '# ' + sectorloc)
@@ -221,7 +221,7 @@ class testStarDistances(unittest.TestCase):
                 msg = "Straight distance " + str(fwd_distance) + " not equal to hex distance " + str(hexdist)
                 self.assertEqual(hexdist, fwd_distance, msg)
 
-    def test_intersector_straight_distance(self):
+    def test_intersector_straight_distance(self) -> None:
         sector_dict = dict()
         sector_dict[(-2, 0)] = 'Pliabriebl'
         sector_dict[(-2, 1)] = 'Tsadra Davr'
@@ -301,7 +301,7 @@ class testStarDistances(unittest.TestCase):
                 msg = "Straight distance " + str(straight_dist) + " not equal to hex distance " + str(hexdist)
                 self.assertEqual(hexdist, straight_dist, msg)
 
-    def test_trans_sector_border_distances_spinward_marches_to_gvurrdon(self):
+    def test_trans_sector_border_distances_spinward_marches_to_gvurrdon(self) -> None:
         spin = Sector('# Spinward Marches', '# -4, 1')
         self.assertEqual(-128, spin.dx, "Unexpected sector dx")
         self.assertEqual(40, spin.dy, "Unexpected sector dy")
@@ -332,7 +332,7 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(1, star1.hex.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 between ' + str(star1) + ' and ' + str(star2))
                 self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
-    def test_trans_sector_border_distances_core_to_massilia(self):
+    def test_trans_sector_border_distances_core_to_massilia(self) -> None:
         core = Sector('# Core', '# 0, 0')
         self.assertEqual(0, core.dx, "Unexpected sector dx")
         self.assertEqual(0, core.dy, "Unexpected sector dy")
@@ -360,7 +360,7 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(1, star1.hex.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 ' + str(star1) + ' and ' + str(star2))
                 self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
-    def test_trans_sector_border_distances_massilia_to_diaspora(self):
+    def test_trans_sector_border_distances_massilia_to_diaspora(self) -> None:
         mass = Sector('# Massilia', '# 0, -1')
         self.assertEqual(0, mass.dx, "Unexpected sector dx")
         self.assertEqual(-40, mass.dy, "Unexpected sector dy")
@@ -388,7 +388,7 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(1, star1.hex.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 ' + str(star1) + ' and ' + str(star2))
                 self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
-    def test_trans_sector_border_distances_core_to_dagudashaag(self):
+    def test_trans_sector_border_distances_core_to_dagudashaag(self) -> None:
         core = Sector('# Core', '# 0, 0')
         self.assertEqual(0, core.dx, "Unexpected sector dx")
         self.assertEqual(0, core.dy, "Unexpected sector dy")
@@ -416,7 +416,7 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(1, star1.hex.hex_distance(star2), 'Hex distance at ' + str(i) + ' is not 1 ' + str(star1) + ' and ' + str(star2))
                 self.assertEqual(1, star1.distance(star2), 'Straight distance at ' + str(i) + ' is not 1')
 
-    def test_distance_from_core_0101(self):
+    def test_distance_from_core_0101(self) -> None:
         core = Sector('# Core', '# 0, 0')
         dagu = Sector('# Dagudashaag', '# -1, 0')
         vland = Sector('# Vland', '# -1, 1')
@@ -510,7 +510,7 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(distance, base.distance(targstar), "Forward straight distance unexpected")
                 self.assertEqual(distance, targstar.distance(base), "Reverse straight distance unexpected")
 
-    def test_hop_1_odd_column_offsets_and_hexagon_vertices_from_core_3240(self):
+    def test_hop_1_odd_column_offsets_and_hexagon_vertices_from_core_3240(self) -> None:
         core = Sector('# Core', '# 0, 0')
         massilia = Sector('# Massilia', '# 0, -1')
         fornast = Sector('# Fornast', '# 1, 0')
@@ -560,7 +560,7 @@ class testStarDistances(unittest.TestCase):
                 self.assertEqual(distance, base.distance(targstar), "Forward straight distance unexpected")
                 self.assertEqual(distance, targstar.distance(base), "Reverse straight distance unexpected")
 
-    def test_star_distances(self):
+    def test_star_distances(self) -> None:
         for blurb, x_sector, y_sector, expected_distance, expected_alt_distance in param_list:
             with self.subTest(msg=blurb):
                 sector1 = Sector('# Core', '# 0, 0')

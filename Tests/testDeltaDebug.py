@@ -7,7 +7,7 @@ from pytest_console_scripts import ScriptRunner
 
 class testDeltaDebug(baseTest):
 
-    def test_delta_debug_command_empty_args(self):
+    def test_delta_debug_command_empty_args(self) -> None:
         fullpath = self.unpack_filename('../PyRoute/DeltaDebug/DeltaDebug.py')
 
         cwd = os.getcwd()

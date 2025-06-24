@@ -6,7 +6,7 @@ from Tests.baseTest import baseTest
 
 
 class testDeltaGalaxy(baseTest):
-    def test_read_sectors(self):
+    def test_read_sectors(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-spiked.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)

@@ -16,10 +16,10 @@ class WithinLineReducer(object):
     def __init__(self, reducer):
         self.reducer = reducer
 
-    def preflight(self):
+    def preflight(self) -> bool:
         return self.reducer is not None and self.reducer.sectors is not None and 0 < len(self.reducer.sectors.lines)
 
-    def run(self):
+    def run(self) -> None:
         segment, subs_list = self._build_subs_list()
         if 0 == len(subs_list):
             # nothing to do, bail out early
@@ -56,7 +56,7 @@ class WithinLineReducer(object):
         while num_chunks <= len(segment):
             chunks = self.reducer.chunk_lines(segment, num_chunks)
             num_chunks = len(chunks)
-            remove = []
+            remove: list[int] = []
             msg = "# of unreduced lines: " + str(len(segment)) + ", # of chunks: " + str(num_chunks)
             self.reducer.logger.error(msg)
             short_msg = None
@@ -160,7 +160,7 @@ class WithinLineReducer(object):
 
         return nu_list
 
-    def write_files(self, sectors=None):
+    def write_files(self, sectors=None) -> None:
         if isinstance(sectors, DeltaDictionary):
             sectors.write_files(self.reducer.args.mindir)
         else:

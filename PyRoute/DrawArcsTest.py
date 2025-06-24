@@ -2,10 +2,11 @@ import os
 import logging
 import math
 import itertools
+from typing import Any
 
-from DataClasses.ReadSectorOptions import ReadSectorOptions
-from .SubsectorMap2 import GraphicSubsectorMap
-from .Galaxy import Galaxy
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
+from .SubsectorMap2 import GraphicSubsectorMap  # type:ignore[import-not-found]
+from PyRoute.AreaItems.Galaxy import Galaxy
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -40,17 +41,17 @@ class DrawArcsTest(GraphicSubsectorMap):
         self.hexFont5 = ImageFont.truetype("/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf", 36)
         self.logger = logging.getLogger('PyRoute.DrawArcsTest')
 
-    def document(self, sector):
+    def document(self, sector) -> Any:
         self.sector = sector
         self.image = Image.new("RGB", self.image_size, "black")
         return ImageDraw.Draw(self.image)
 
-    def close(self, subsector_name):
+    def close(self, subsector_name) -> None:
         path = os.path.join(self.galaxy.output_path, subsector_name + ".png")
-        self.image = self.image.resize((413, 636), Image.BICUBIC)
+        self.image = self.image.resize((413, 636), Image.BICUBIC)  # type:ignore[attr-defined]
         self.image.save(path)
 
-    def write_maps(self):
+    def write_maps(self) -> None:
         self.logger.info("writing test maps")
         sector = next(iter(self.galaxy.sectors.values()))
         self.logger.info("Processing sector %s" % sector.name)
@@ -61,7 +62,7 @@ class DrawArcsTest(GraphicSubsectorMap):
 
         self.close("TestMap")
 
-    def draw_arcs(self, doc):
+    def draw_arcs(self, doc) -> None:
         self.image = self.image.convert("RGBA")
         img = Image.new("RGBA", self.image_size, 0)
         draw = ImageDraw.Draw(img)
@@ -85,12 +86,12 @@ class DrawArcsTest(GraphicSubsectorMap):
 
         self.image = Image.alpha_composite(self.image, cropped)
 
-    def draw_one_arc(self, doc, start, end):
+    def draw_one_arc(self, doc, start, end) -> None:
         center = self.circle_center(start, end)
         # self.logger.info("Points are : start: {}, end: {}, and center {}".format(start,end,center))
         self.draw_arc(doc, center, start, end)
 
-    def centerpoint(self, row, col):
+    def centerpoint(self, row, col) -> tuple[int, int]:
         xcol = self.xm * 3 * col
         xrow = self.y_start - self.ym * 2 + row * self.ym * 2 if col & 1 else self.y_start - self.ym + row * self.ym * 2
 
@@ -101,7 +102,7 @@ class DrawArcsTest(GraphicSubsectorMap):
 
         return point
 
-    def circle_center(self, start, end):
+    def circle_center(self, start, end) -> tuple[int, int]:
         # Calculate the center of an equilateral triangle  from start and end
         # root3 = math.sqrt(3)
         root3 = 2
@@ -135,7 +136,7 @@ class DrawArcsTest(GraphicSubsectorMap):
 
         return self.cursor(round(cx), round(cy))
 
-    def draw_arc(self, doc, center, start, end):
+    def draw_arc(self, doc, center, start, end) -> None:
         r = math.sqrt((start.x - center.x) ** 2 + (start.y - center.y) ** 2)
         x1 = center.x - r
         y1 = center.y - r
@@ -158,7 +159,7 @@ class DrawArcsTest(GraphicSubsectorMap):
         # doc.ellipse([center.x-6, center.y-6, center.x+6, center.y+6], outline=self.fillBlue, fill=self.fillBlue)
 
 
-def set_logging(level):
+def set_logging(level) -> None:
     logging.getLogger('PyRoute').setLevel(level)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     # create console handler and set level to debug
@@ -170,8 +171,8 @@ def set_logging(level):
 
 if __name__ == '__main__':
     set_logging('INFO')
-    options = ReadSectorOptions(sectors=['./sectors/TNE/SpinwardMarches.sec'], pop_code='fixed', ru_calc='collapse')
-    galaxy = Galaxy(15, 4, 8)
+    options = ReadSectorOptions(sectors=['./sectors/TNE/SpinwardMarches.sec'], pop_code='fixed', ru_calc='collapse',)
+    galaxy = Galaxy(15, 4)
     galaxy.output_path = '.'
     # galaxy.read_sectors(['./sectors/TNE/SpinwardMarches.sec'], 'fixed', 'collapse')
     galaxy.read_sectors(options)
