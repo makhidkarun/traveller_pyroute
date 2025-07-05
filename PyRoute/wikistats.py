@@ -11,7 +11,7 @@ import datetime
 import urllib.parse
 import math
 import inflect
-import jsonpickle
+import jsonpickle  # type:ignore[import-untyped]
 from networkx.readwrite import json_graph
 from PyRoute.Nobles import Nobles
 from PyRoute.Allies.AllyGen import AllyGen
@@ -49,7 +49,7 @@ class WikiStats(object):
             autoescape=select_autoescape(['html', 'xml'])
             )
 
-    def write_statistics(self):
+    def write_statistics(self) -> None:
         self.summary_statistics_template()
         self.sector_statistics_template()
         self.subsector_statistics_template()
@@ -68,13 +68,13 @@ class WikiStats(object):
         if self.json_data:
             self.write_json()
 
-    def output_template(self, template, filename, parameters):
+    def output_template(self, template, filename, parameters) -> None:
         template = self.env.get_template(template)
         path = os.path.join(self.galaxy.output_path, filename)
         with open(path, 'w+', encoding='utf-8') as f:
             f.write(template.render(parameters))
 
-    def summary_statistics_template(self):
+    def summary_statistics_template(self) -> None:
         self.output_template('summary.wiki', 'summary.wiki',
                              {'global_stats': self.galaxy.stats,
                               'sectors': self.galaxy.sectors,
@@ -82,26 +82,26 @@ class WikiStats(object):
                               'plural': self.plural,
                               'global_alg': self.galaxy.alg_sorted})
 
-    def sector_statistics_template(self):
+    def sector_statistics_template(self) -> None:
         self.output_template('sectors.wiki', 'sectors.wiki',
                              {'sectors': self.galaxy.sectors,
                               'global_stats': self.galaxy.stats,
                               'im_stats': self.galaxy.alg.get('Im', None),
                               'plural': self.plural})
 
-    def subsector_statistics_template(self):
+    def subsector_statistics_template(self) -> None:
         self.output_template('subsectors.wiki', 'subsectors.wiki',
                              {'sectors': self.galaxy.sectors,
                               'plural': self.plural})
 
-    def sector_data_template(self):
+    def sector_data_template(self) -> None:
         for sector in self.galaxy.sectors.values():
             self.output_template('sector_data.wiki', sector.sector_name() + " Sector.sector.wiki",
                                   {"sector": sector})
             self.output_template('sector_econ.wiki', sector.sector_name() + " Sector.economic.wiki",
                                  {'sector': sector})
 
-    def allegiance_statistics_template(self):
+    def allegiance_statistics_template(self) -> None:
         self.output_template('allegiances.wiki', 'allegiances.wiki',
                              {"global_alg": self.galaxy.alg_sorted,
                               "global_stats": self.galaxy.stats,
@@ -109,7 +109,7 @@ class WikiStats(object):
                               "area": self.galaxy,
                               "min_alg_count": self.min_alg_count})
 
-    def write_json(self):
+    def write_json(self) -> None:
         path = os.path.join(self.galaxy.output_path, 'galaxy.json')
         jsonpickle.set_encoder_options('simplejson', sort_keys=True, indent=2)
         galaxy_json = jsonpickle.encode(self.galaxy, unpicklable=False, max_depth=14)
@@ -128,7 +128,7 @@ class WikiStats(object):
         with open(path, "w+", encoding='utf8') as f:
             f.write(jsonpickle.encode(json_graph.node_link_data(self.galaxy.stars)))
 
-    def write_summary_lists(self):
+    def write_summary_lists(self) -> None:
         path = os.path.join(self.galaxy.output_path, 'sectors_list.txt')
         with open(path, 'w+', encoding="utf-8") as f:
             for sector in self.galaxy.sectors.values():
@@ -144,7 +144,7 @@ class WikiStats(object):
 #########################################################################################################
 # Unused functions
 #########################################################################################################
-    def summary_statistics(self):
+    def summary_statistics(self) -> None:
         path = os.path.join(self.galaxy.output_path, 'summary.wiki')
         with codecs.open(path, 'w+', encoding="utf-8") as f:
             f.write('==Economic Summary==\n')
@@ -192,7 +192,7 @@ class WikiStats(object):
                 for subsector in sector.subsectors.values():
                     f.write('[[{} Subsector/summary]]\n'.format(subsector.name))
 
-    def write_stats(self, f, stats):
+    def write_stats(self, f, stats) -> None:
         f.write('|align="right"|{:d}\n'.format(stats.number))
         f.write('|align="right"|{:,d}\n'.format(stats.population))
         f.write('|align="right"|{:,d}\n'.format(stats.economy))
@@ -209,7 +209,7 @@ class WikiStats(object):
         f.write('|align="right"|{:,d}\n'.format(int(stats.eti_cargo * 50)))
         f.write('|align="right"|{:,d}\n'.format(int(stats.eti_pass * 50)))
 
-    def top_summary(self):
+    def top_summary(self) -> None:
         path = os.path.join(self.galaxy.output_path, 'top_summary.wiki')
         with codecs.open(path, 'w+', encoding="utf-8") as f:
             f.write('==Top level Summary==\n')
@@ -230,7 +230,7 @@ class WikiStats(object):
             f.write('|-\n|colspan=20 align=center|Percent by Population\n')
             self.write_uwp_populations(f)
 
-    def write_allegiances(self, alg):
+    def write_allegiances(self, alg) -> None:
         path = os.path.join(self.galaxy.output_path, 'alleg_summary.wiki')
         with codecs.open(path, "wb", encoding="utf-8") as f:
             f.write('===Allegiance Information===\n')
@@ -264,8 +264,8 @@ class WikiStats(object):
                 self.text_alg_statistics(f, area_type, allegiance)
                 f.write('\n')
 
-    def write_uwp_counts(self, f):
-        from StatCalculation import ObjectStatistics
+    def write_uwp_counts(self, f) -> None:
+        from PyRoute.StatCalculation import ObjectStatistics
         default_stats = ObjectStatistics()
         f.write('{|\n!Component')
         for x in range(18):
@@ -288,8 +288,8 @@ class WikiStats(object):
                 f.write('||0')
         f.write('\n')
 
-    def write_uwp_populations(self, f):
-        from StatCalculation import ObjectStatistics
+    def write_uwp_populations(self, f) -> None:
+        from PyRoute.StatCalculation import ObjectStatistics
         population = self.galaxy.stats.population
         default_stats = ObjectStatistics()
         f.write('|-\n!Component')
@@ -316,7 +316,7 @@ class WikiStats(object):
                 f.write('||0%')
         f.write('\n|}')
 
-    def tcs_statistics(self):
+    def tcs_statistics(self) -> None:
         path = os.path.join(self.galaxy.output_path, 'tcs_summary.wiki')
         with codecs.open(path, 'w+', encoding="utf-8") as f:
             f.write('=== TCS Military budgets by sector ===\n')
@@ -338,7 +338,7 @@ class WikiStats(object):
 
             f.write('|}\n')
 
-    def subsector_statistics(self):
+    def subsector_statistics(self) -> None:
         path = os.path.join(self.galaxy.output_path, 'subsector_summary.wiki')
         with codecs.open(path, 'w+', encoding="utf-8") as f:
             f.write('=== Economic Summary by Subsector ===\n')
@@ -381,7 +381,7 @@ class WikiStats(object):
     # The highest population world in the sector is {{WorldS|Saazi (Antares 0533)}}; the lowest population world is {{WorldS|Lampigas}}
     # The average tech level in the sector is 6 (most lie between 3 and 9).
 
-    def text_area_long(self, f, area_type, area):
+    def text_area_long(self, f, area_type, area) -> None:
         if area_type == 'subsector':
             f.write('{}, {} {} of {} '.format(area.wiki_name(), area_type,
                                                   area.position, area.sector.wiki_name()))
@@ -470,7 +470,7 @@ class WikiStats(object):
 
         self.text_area_pop_tl(f, area_type, area)
 
-    def text_area_populations(self, f, area):
+    def text_area_populations(self, f, area) -> None:
         f.write('estimated population of ')
         f.write(self.write_population(area.stats.population))
         sophonts = ["{}: {}".format(code, self.write_population(pop)) for (code, pop)
@@ -479,7 +479,7 @@ class WikiStats(object):
         f.write(", ".join(sophonts))
         f.write('). ')
 
-    def text_alg_statistics(self, f, area_type, area, contain=None):
+    def text_alg_statistics(self, f, area_type, area, contain=None) -> None:
         if AllyGen.is_unclaimed(area.code):
             outString = 'There '
             outString += self.get_count(area.stats.number, 'system', True, ' unclaimed or unexplored')
@@ -516,7 +516,7 @@ class WikiStats(object):
                 f.write(' no charted worlds.')
         f.write('\n')
 
-    def text_area_pop_tl(self, f, area_type, area):
+    def text_area_pop_tl(self, f, area_type, area) -> None:
         PopWorlds = [world for world in area.worlds if world.popCode == area.stats.maxPop]
         if len(PopWorlds) == 1:
             f.write('The highest population world is {}. '.format(PopWorlds[0].wiki_name()))
@@ -545,7 +545,7 @@ class WikiStats(object):
             f.write('The average technology level is {:d}'.format(int(mean)))
             f.write(' (with most between {:d} and {:d}). '.format(max(int(mean - stddev), 0), int(mean + stddev)))
 
-    def text_area_capitals(self, f, area_type, area):
+    def text_area_capitals(self, f, area_type, area) -> None:
         subsectorCp = [world for world in area.worlds if world.tradeCode.subsector_capital]
         sectorCp = [world for world in area.worlds if world.tradeCode.sector_capital]
         capital = [world for world in area.worlds if world.tradeCode.other_capital]
@@ -574,7 +574,7 @@ class WikiStats(object):
                 else:
                     f.write('{}The subsector capital is {}.'.format(lead, world.wiki_name()))
 
-    def write_sector_wiki(self):
+    def write_sector_wiki(self) -> None:
         for sector in self.galaxy.sectors.values():
             path = os.path.join(self.galaxy.output_path, sector.sector_name() + " Sector.sector.wiki")
             with codecs.open(path, 'w+', encoding="utf-8") as f:
@@ -605,7 +605,7 @@ class WikiStats(object):
                     f.write('<section end="{}"/>'.format(subsector.name))
                 f.write('\n|}\n[[Category:Sectors with sector data]]\n')
 
-    def write_worlds_wiki_stats(self):
+    def write_worlds_wiki_stats(self) -> None:
         for sector in self.galaxy.sectors.values():
             path = os.path.join(self.galaxy.output_path, sector.sector_name() + " Sector.economic.wiki")
             with codecs.open(path, 'w+', encoding="utf-8") as f:
@@ -649,7 +649,7 @@ class WikiStats(object):
                     f.write('<section end="{}"/>'.format(subsector.name))
                 f.write('\n|}\n[[Category:Sectors with sector economic data]]\n')
 
-    def write_world_statistics(self):
+    def write_world_statistics(self) -> None:
         onespace = ' '
         twospace = '  '
         for sector in self.galaxy.sectors.values():
@@ -696,7 +696,7 @@ class WikiStats(object):
                     f.write('\n')
                 f.write('}}\n[[Category:Sectors with sector data]]\n')
 
-    def get_count(self, count, text, is_are=True, lead_text=""):
+    def get_count(self, count, text, is_are=True, lead_text="") -> str:
         self.plural.num(count)
         c_text = self.plural.number_to_words(count, zero='no', threshold=10)
         if is_are:
@@ -707,10 +707,10 @@ class WikiStats(object):
         self.plural.num()
         return string
 
-    def write_count(self, f, count, text, is_are=True, lead_text=""):
+    def write_count(self, f, count, text, is_are=True, lead_text="") -> None:
         f.write(self.get_count(count, text, is_are, lead_text))
 
-    def write_population(self, population):
+    def write_population(self, population) -> str:
         if population >= 1000:
             return '{:,d} billion'.format(population // 1000)
         elif population >= 1:
@@ -719,5 +719,5 @@ class WikiStats(object):
             return 'less than 1 million'
 
 
-def baseN(num, b, numerals="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
+def baseN(num, b, numerals="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ") -> str:
     return ((num == 0) and numerals[0]) or (baseN(num // b, b, numerals).lstrip(numerals[0]) + numerals[num % b])

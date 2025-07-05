@@ -7,7 +7,7 @@ from PyRoute.SystemData.StarList import StarList
 
 
 @composite
-def star_list(draw, min_stars=1, max_stars=10, cleanup=False):
+def star_list(draw, min_stars=1, max_stars=10, cleanup=False) -> composite:
     num_stars = draw(integers(min_value=min_stars, max_value=max_stars))
     starline = ''
 
@@ -75,7 +75,7 @@ class testStarList(unittest.TestCase):
     @example('A0Ia D D D D D NSD0D0 ')
     @example('A0Ia D D D D D 0NSD0D0 ')
     @example('0 ')
-    def test_star_list_generation(self, star_line):
+    def test_star_list_generation(self, star_line) -> None:
         hyp_line = "Hypothesis input: " + star_line
         allowed_value_errors = [
             "No stars found",
@@ -138,7 +138,7 @@ class testStarList(unittest.TestCase):
     @example('F0Ib K0Ia ', 'F0 II K0 V')
     @example('F0III K0Ia', 'K0 II F0 V')
     @example('BH \U0008082aNS NS BD K9 IV BH PSR BH\U0008299e\xa0 ', 'K9 V NS NS BD BH BH PSR BH')
-    def test_star_list_canonical(self, star_line, expected):
+    def test_star_list_canonical(self, star_line, expected) -> None:
         hyp_line = "Hypothesis input: " + star_line
 
         list = None
@@ -160,7 +160,7 @@ class testStarList(unittest.TestCase):
         if expected is not None:
             self.assertEqual(expected, str(list), "Unexpected final starline.  " + hyp_line)
 
-    def test_stargen_class_ordering(self):
+    def test_stargen_class_ordering(self) -> None:
         cases = [
             ('O6 VI', 'O6 VI'),
             ('O6 VII', 'O6 D'),
@@ -186,7 +186,7 @@ class testStarList(unittest.TestCase):
     @example('G0Ia ')
     @example('K0Ia ')
     @example('M0Ia ')
-    def test_primary_flux_bounds(self, star_line):
+    def test_primary_flux_bounds(self, star_line) -> None:
         hyp_line = "Hypothesis input: " + star_line
 
         list = StarList(star_line)
@@ -229,7 +229,7 @@ class testStarList(unittest.TestCase):
     @example('K0Ia K0Ia ', 'K0 II K0 VI')
     @example('K0Ia M0Ia ', 'K0 II M0 VI')
     @example('M0Ia M0Ia ', 'M0 II M0 VI')
-    def test_check_star_size_against_primary(self, star_line, expected):
+    def test_check_star_size_against_primary(self, star_line, expected) -> None:
         hyp_line = "Hypothesis input: " + star_line
 
         list = StarList(star_line)
@@ -251,7 +251,7 @@ class testStarList(unittest.TestCase):
         if expected is not None:
             self.assertEqual(expected, str(list), "Unexpected final starline.  " + hyp_line)
 
-    def test_handle_missing_and_wonky_star_sizes(self):
+    def test_handle_missing_and_wonky_star_sizes(self) -> None:
         cases = [
             ('Wrenton 1901', 'G7 M4 V', 'G7 V M4 V'),
             ('Blaskon 2824', 'M5 IC', 'M5 IV'),

@@ -9,6 +9,7 @@ from operator import itemgetter
 import os
 
 from typing_extensions import TypeAlias
+from typing import Optional, Union
 
 from PyRoute.Allies.AllyGen import AllyGen
 import PyRoute.AreaItems.Galaxy as Galaxy
@@ -16,18 +17,18 @@ from PyRoute.Outputs.Colour import Colour
 from PyRoute.Position.Hex import Hex, HexPos
 from PyRoute.Star import Star
 
-Alg: TypeAlias = str
+Alg: TypeAlias = Optional[str]
 AllyMap: TypeAlias = dict[HexPos, Alg]
 
 
 class Borders(object):
 
-    def __init__(self, galaxy: Galaxy):
+    def __init__(self, galaxy: Galaxy):  # type: ignore
         """
         Constructor
         """
-        self.galaxy: Galaxy = galaxy
-        self.borders: dict[HexPos, list[Colour, Colour, Colour]] = {}
+        self.galaxy: Galaxy = galaxy  # type: ignore
+        self.borders: dict[HexPos, list[Optional[Colour]]] = {}
         self.borders_map: dict[tuple[int, int], int] = {}  # 2D array using (q,r) as key, with flags for data, linking borders and hex-map
         self.allyMap: AllyMap = {}
         self.logger = logging.getLogger('PyRoute.Borders')
@@ -40,7 +41,7 @@ class Borders(object):
             of control is contiguous. Every Non-aligned world is independent
         """
         self.logger.info('Processing worlds for border drawing')
-        for star in self.galaxy.star_mapping.values():
+        for star in self.galaxy.star_mapping.values():  # type: ignore
             alg = star.alg_code
             # Skip the non-entity worlds
             if AllyGen.is_unclaimed(alg):
@@ -75,13 +76,14 @@ class Borders(object):
         So the complexity is here to make the draw portion quick.
         """
         for system in allyMap:
-            if self.galaxy.debug_flag:
+            colours: list[Colour]
+            if self.galaxy.debug_flag:  # type: ignore
                 # This list is random colours used to debug the map drawing process. You can change these, but it's best
                 # to keep them each unique. Note these are used by both the PDF and Graph map, so not all colours are possible
-                colours: list[Colour] = ['green', 'blue', 'maroon', 'olive', 'pink', 'red', 'black', 'yellow', 'orange', 'purple']
+                colours = ['green', 'blue', 'maroon', 'olive', 'pink', 'red', 'black', 'yellow', 'orange', 'purple']
             else:
                 colour = AllyGen.alleg_border_colors.get(allyMap[system], 'white')  # Default to white for unknown borders
-                colours: list[Colour] = [colour, colour, colour, colour, colour, colour, colour, colour, colour, colour]
+                colours = [colour, colour, colour, colour, colour, colour, colour, colour, colour, colour]
 
             if self._set_border(allyMap, system, 5):  # down
                 neighbour = Hex.get_neighbor(system, 5)
@@ -150,13 +152,13 @@ class Borders(object):
         if self.borders.get(system, False):
             self.borders[system][index] = colour
         else:
-            colours = [None, None, None]
+            colours: list[Union[str, tuple[float, float, float], tuple[float, float, float, float], None]] = [None, None, None]
             colours[index] = colour
             self.borders[system] = colours
 
     @staticmethod
     def step_map(ally_map: AllyMap) -> AllyMap:
-        new_map = {}
+        new_map: AllyMap = {}
         for cand_hex in ally_map:
             Borders._check_direction(ally_map, cand_hex, new_map)
         return new_map
@@ -170,12 +172,12 @@ class Borders(object):
                 new_map[neighbour] = ally_map[cand_hex]
 
     def _output_map(self, ally_map: AllyMap, stage: int) -> None:
-        path = os.path.join(self.galaxy.output_path, 'allyMap%s.txt' % stage)
+        path = os.path.join(self.galaxy.output_path, 'allyMap%s.txt' % stage)  # type: ignore
         with open(path, "wb") as f:
             for key, value in ally_map.items():
-                f.write("{}-{}: border: {}\n".format(key[0], key[1], value))
+                f.write("{}-{}: border: {}\n".format(key[0], key[1], value))  # type: ignore
 
-    def create_ally_map(self, match: str, enforce=True):
+    def create_ally_map(self, match: str, enforce=True) -> None:
         """
             Create borders around various allegiances, Algorithm Two.
             From the AllyGen http://dotclue.org/t20/ code created by J. Greely.
@@ -237,15 +239,15 @@ class Borders(object):
                         ally_map[cand_hex] = ally_dist[0][0]
                     else:
                         max_count = -1
-                        max_ally = None
+                        max_ally: Union[str, None] = None
                         for alg, _ in ally_dist:
                             if AllyGen.is_nonaligned(alg, True):
                                 max_ally = alg
                                 break
-                            if self.galaxy.alg[alg].stats.number > max_count:
+                            if self.galaxy.alg[alg].stats.number > max_count:  # type: ignore
                                 max_ally = alg
-                                max_count = self.galaxy.alg[alg].stats.number
-                        ally_map[cand_hex] = max_ally
+                                max_count = self.galaxy.alg[alg].stats.number  # type: ignore
+                        ally_map[cand_hex] = max_ally  # type: ignore
 
         # self._output_map(allyMap, 2)
 
@@ -255,22 +257,22 @@ class Borders(object):
             for cand_hex in ally_map:
                 if cand_hex in star_map:
                     continue
-                neighbor_algs = defaultdict(int)
+                neighbor_algs = defaultdict(int)  # type: ignore
                 for direction in range(6):
                     neighbor_alg = ally_map.get(Hex.get_neighbor(cand_hex, direction), None)
                     neighbor_algs[neighbor_alg] += 1
 
                 alg_list = sorted(iter(neighbor_algs.items()), key=itemgetter(1), reverse=True)
                 if len(alg_list) == 0:
-                    ally_map[cand_hex] = None
+                    ally_map[cand_hex] = None  # type: ignore
                 elif alg_list[0][1] >= 1:
-                    ally_map[cand_hex] = alg_list[0][0]
+                    ally_map[cand_hex] = alg_list[0][0]  # type: ignore
                 else:
-                    ally_map[cand_hex] = AllyGen.nonAligned[0]
+                    ally_map[cand_hex] = AllyGen.nonAligned[0]  # type: ignore
 
-        return ally_map
+        return ally_map  # type: ignore
 
-    def create_erode_border(self, match: str, enforce=True):
+    def create_erode_border(self, match: str, enforce=True) -> None:
         """
         Create borders around various allegiances, Algorithm Three.
         From TravellerMap http://travellermap.com/borders/doc.htm
@@ -294,7 +296,7 @@ class Borders(object):
         self.allyMap = ally_map
         self._generate_borders(ally_map, enforce)
 
-    def _erode(self, ally_map: AllyMap, star_map: AllyMap) -> (bool, AllyMap):
+    def _erode(self, ally_map: AllyMap, star_map: AllyMap) -> tuple[bool, AllyMap]:
         """
         Remove edges.
         """
@@ -341,7 +343,7 @@ class Borders(object):
                 new_map[cand_hex] = ally_map_candidate
         return changed, new_map
 
-    def _break_spans(self, ally_map: AllyMap, star_map: AllyMap) -> (bool, AllyMap):
+    def _break_spans(self, ally_map: AllyMap, star_map: AllyMap) -> tuple[bool, AllyMap]:
         """'
         BreakSpans - Find a span of four empty (edge) hexes
         and break the span by setting one to not aligned.
@@ -420,7 +422,7 @@ class Borders(object):
         if new_bridge:
             ally_map[new_bridge] = star_candidate
 
-    def _erode_map(self, match: str) -> (AllyMap, AllyMap):
+    def _erode_map(self, match: str) -> tuple[AllyMap, AllyMap]:
         """
         Generate the initial map of allegiances for the erode map.
         Note: This does not match the original system.
@@ -477,16 +479,16 @@ class Borders(object):
                         max_ally = None
                         for alg, _ in ally_dist:
                             if not AllyGen.is_nonaligned(alg, True) and \
-                                    self.galaxy.alg[alg].stats.number > max_count:
+                                    self.galaxy.alg[alg].stats.number > max_count:  # type: ignore
                                 max_ally = alg
-                                max_count = self.galaxy.alg[alg].stats.number
-                        ally_map[cand_hex] = max_ally
+                                max_count = self.galaxy.alg[alg].stats.number  # type: ignore
+                        ally_map[cand_hex] = max_ally  # type: ignore
 
-        return ally_map, star_map
+        return ally_map, star_map  # type: ignore
 
-    def _unpack_stars_and_maps(self, match: str) -> (AllyMap, AllyMap, list[Star]):
-        stars = self.galaxy.star_mapping.values()
-        ally_map = defaultdict(set)
+    def _unpack_stars_and_maps(self, match: str) -> tuple[defaultdict[tuple[int, int], set], AllyMap, list[Star]]:
+        stars = self.galaxy.star_mapping.values()  # type: ignore
+        ally_map: defaultdict[tuple[int, int], set] = defaultdict(set)
         star_map = {}
         # Mark the map with all the stars
         for star in stars:
@@ -509,5 +511,5 @@ class Borders(object):
             pass
         return alg
 
-    def is_well_formed(self) -> (bool, str):
+    def is_well_formed(self) -> tuple[bool, str]:
         return True, ''

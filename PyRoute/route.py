@@ -16,13 +16,14 @@ from PyRoute.SpeculativeTrade import SpeculativeTrade
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
 from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
 from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
+from PyRoute.Outputs.SectorMap import SectorMap
 from PyRoute.Outputs.SubsectorMap import SubsectorMap
 from PyRoute.StatCalculation import StatCalculation
 
 logger = logging.getLogger('PyRoute')
 
 
-def process():
+def process() -> None:
     parser = argparse.ArgumentParser(description='Traveller trade route generator.', fromfile_prefix_chars='@')
 
     alleg = parser.add_argument_group('Allegiance', 'Alter processing of allegiances')
@@ -49,8 +50,9 @@ def process():
                        help='RU calculation, default [scaled]')
     route.add_argument('--speculative-version', choices=['CT', 'T5', 'None'], default='CT',
                        help='version of the speculative trade calculations, default [CT]')
-    route.add_argument('--mp-threads', default=os.cpu_count() - 1, type=int,
-                       help=f"Number of processes to use for trade-mp processing, default {os.cpu_count() - 1}")
+    cpucount: int = 1 if os.cpu_count() is None else max(1, os.cpu_count() - 1)  # type:ignore[operator]
+    route.add_argument('--mp-threads', default=cpucount, type=int,
+                       help=f"Number of processes to use for trade-mp processing, default {cpucount}")
 
     output = parser.add_argument_group('Output', 'Output options')
 
@@ -115,7 +117,7 @@ def process():
         except (OSError, IOError):
             pass
 
-    deep_space = {}
+    deep_space: dict[str, list[str]] = {}
     for line in deep_space_lines:
         bitz = line.split(',')
         if 2 != len(bitz):
@@ -158,6 +160,7 @@ def process():
 
     if args.maps:
         maptype = args.map_type
+        pdfmap: SectorMap
         if "dark" == maptype:
             pdfmap = DarkModePDFSectorMap(galaxy, args.routes, args.output, "dense")
         elif "light" == maptype:
@@ -173,7 +176,7 @@ def process():
     logger.info("process complete")
 
 
-def get_sectors(sector, input_dir):
+def get_sectors(sector, input_dir) -> list[str]:
     try:
         with codecs.open(sector, 'r', encoding="utf-8") as f:
             lines = [line for line in f]
@@ -186,7 +189,7 @@ def get_sectors(sector, input_dir):
     return sector_list
 
 
-def set_logging(level):
+def set_logging(level) -> None:
     logger.setLevel(level)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     # create console handler and set level to debug

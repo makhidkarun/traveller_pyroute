@@ -14,9 +14,9 @@ from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 except ImportError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 try:
     from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
@@ -28,7 +28,7 @@ except ImportError:
 tradeCalculation = None
 
 
-def intrasector_process(working_queue, processed_queue):
+def intrasector_process(working_queue, processed_queue) -> None:
     """
     This is the core working function used by the child processes spawned by the start_mp_services() functions.
     :param working_queue: List of sectors to process
@@ -36,6 +36,7 @@ def intrasector_process(working_queue, processed_queue):
     :return: None
     """
     global tradeCalculation
+    assert isinstance(tradeCalculation, TradeMPCalculation), "Global tradeCalculation instance not TradeMPCalculation"
     while True:
         # Read the sector names from the queue created by parent process.
         # When the queue is empty we're done and can complete the process
@@ -86,8 +87,9 @@ def intrasector_process(working_queue, processed_queue):
     tradeCalculation.logger.info(f"child process {os.getpid()} completed.")
 
 
-def long_route_process(working_queue, processed_queue):
+def long_route_process(working_queue, processed_queue) -> None:
     global tradeCalculation
+    assert isinstance(tradeCalculation, TradeMPCalculation), "Global tradeCalculation instance not TradeMPCalculation"
     processed = 0
     total = working_queue.qsize()
 
@@ -129,7 +131,7 @@ class TradeMPCalculation(TradeCalculation):
         self.mp_threads = mp_threads
         self.total_processed = 0
 
-    def calculate_routes(self):
+    def calculate_routes(self) -> None:
         """
         The base calculate routes. Read through all the stars in WTN order.
         Do this order to allow the higher trade routes establish the basic routes
@@ -176,13 +178,13 @@ class TradeMPCalculation(TradeCalculation):
 
     # This is the multiprocess method, which contains all the logic for using multi-process in the parent (core) process
     # When this is completed, all the child process should be completed.
-    def start_mp_services(self):
+    def start_mp_services(self) -> None:
         global tradeCalculation
         tradeCalculation = self
 
         # Create the Queues for sending data between processes.
-        sector_queue = Queue()
-        routes_queue = Queue()
+        sector_queue = Queue()  # type: ignore
+        routes_queue = Queue()  # type: ignore
         count = 0
         # write sector names to the queue
         for sector in self.galaxy.sectors:
@@ -226,14 +228,14 @@ class TradeMPCalculation(TradeCalculation):
         self.logger.info(f"Intra-sector route processing completed. Processed {count} routes")
         self.total_processed += count
 
-    def process_long_routes(self, btn):
+    def process_long_routes(self, btn) -> None:
 
         self.shortest_path_tree = ApproximateShortestPathForestUnified(0, self.galaxy.stars,
                                              0, sources=self.shortest_path_tree.sources)
 
         # Create the Queues for sending data between processes.
-        find_queue = Queue()
-        routes_queue = Queue()
+        find_queue: Queue[tuple[int, int]] = Queue()
+        routes_queue: Queue[tuple[int, int]] = Queue()
         processed = 0
 
         for (start, target, data) in btn:
@@ -280,7 +282,7 @@ class TradeMPCalculation(TradeCalculation):
         self.total_processed += processed
         self.logger.info('{} penumbra routes included out of {}'.format(self.penumbra_routes, self.total_processed))
 
-    def process_routes(self, btn):
+    def process_routes(self, btn) -> None:
         """
         Do the first "half" of the routes, the ones not performed by the child process.
         :return: None
@@ -312,7 +314,7 @@ class TradeMPCalculation(TradeCalculation):
         self.logger.info(f'processed {counter} routes at BTN {base_btn}')
         self.total_processed += processed
 
-    def get_trade_between(self, star, target):
+    def get_trade_between(self, star, target) -> None:
         """
         Calculate the route between star and target
         If we can't find a route (no Jump 4 (or N) path), skip this pair

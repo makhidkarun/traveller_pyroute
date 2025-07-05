@@ -11,7 +11,7 @@ from PyRoute.Star import Star
 
 
 class testHex(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.coreSector = Sector('# Core', '# 0, 0')
         self.lishunSector = Sector('# Lishun', '# 0, 1')
         self.daguSector = Sector('# Dagudashaag', '# -1, 0')
@@ -19,7 +19,7 @@ class testHex(unittest.TestCase):
         self.massiliaSector = Sector('# Massilia', '# 0, -1')
         self.antaresSector = Sector('# Antares', '# 1, 1')
 
-    def testCoreSector(self):
+    def testCoreSector(self) -> None:
         pos = self._generate_corner_hexes(self.coreSector)
 
         self.assertEqual(pos[0].hex_position(), (0, 39))
@@ -30,7 +30,7 @@ class testHex(unittest.TestCase):
 
         self._check_corner_hexes(pos, self.coreSector)
 
-    def testAntaresSector(self):
+    def testAntaresSector(self) -> None:
         pos = self._generate_corner_hexes(self.antaresSector)
 
         self.assertEqual(pos[0].hex_position(), (32, 63))
@@ -41,7 +41,7 @@ class testHex(unittest.TestCase):
 
         self._check_corner_hexes(pos, self.antaresSector)
 
-    def testFornast(self):
+    def testFornast(self) -> None:
         pos = self._generate_corner_hexes(self.fornastSector)
 
         self.assertEqual(pos[0].hex_position(), (32, 23))
@@ -52,7 +52,7 @@ class testHex(unittest.TestCase):
 
         self._check_corner_hexes(pos, self.fornastSector)
 
-    def testSetupOddColEvenRow(self):
+    def testSetupOddColEvenRow(self) -> None:
         pos = Hex(self.coreSector, "0140")
         self.assertEqual(40, pos.row)
         self.assertEqual(1, pos.col)
@@ -63,7 +63,7 @@ class testHex(unittest.TestCase):
         self.assertEqual(0, pos.z)
         self.assertEqual((0, 0), pos.hex_position())
 
-    def testSetupEvenColEvenRow(self):
+    def testSetupEvenColEvenRow(self) -> None:
         pos = Hex(self.coreSector, "0220")
         self.assertEqual(20, pos.row)
         self.assertEqual(2, pos.col)
@@ -74,7 +74,7 @@ class testHex(unittest.TestCase):
         self.assertEqual(19, pos.z)
         self.assertEqual((1, 19), pos.hex_position())
 
-    def testSetupOddColOddRow(self):
+    def testSetupOddColOddRow(self) -> None:
         pos = Hex(self.coreSector, "0137")
         self.assertEqual(37, pos.row)
         self.assertEqual(1, pos.col)
@@ -85,7 +85,7 @@ class testHex(unittest.TestCase):
         self.assertEqual(3, pos.z)
         self.assertEqual((0, 3), pos.hex_position())
 
-    def testSetupEvenColOddRow(self):
+    def testSetupEvenColOddRow(self) -> None:
         pos = Hex(self.coreSector, "0221")
         self.assertEqual(21, pos.row)
         self.assertEqual(2, pos.col)
@@ -96,7 +96,7 @@ class testHex(unittest.TestCase):
         self.assertEqual(18, pos.z)
         self.assertEqual((1, 18), pos.hex_position())
 
-    def testLishun(self):
+    def testLishun(self) -> None:
         pos = self._generate_corner_hexes(self.lishunSector)
 
         self.assertEqual(pos[0].hex_position(), (0, 79))
@@ -107,7 +107,7 @@ class testHex(unittest.TestCase):
 
         self._check_corner_hexes(pos, self.lishunSector)
 
-    def testDaguSector(self):
+    def testDaguSector(self) -> None:
         pos = self._generate_corner_hexes(self.daguSector)
 
         self.assertEqual(pos[0].hex_position(), (-32, 55))
@@ -118,7 +118,7 @@ class testHex(unittest.TestCase):
 
         self._check_corner_hexes(pos, self.daguSector)
 
-    def testCoreSector2(self):
+    def testCoreSector2(self) -> None:
         pos = self._generate_corner_hexes(self.coreSector)
 
         self.assertEqual(pos[0].hex_position(), (0, 39))
@@ -129,7 +129,7 @@ class testHex(unittest.TestCase):
 
         self._check_corner_hexes(pos, self.coreSector)
 
-    def testSectorDistances(self):
+    def testSectorDistances(self) -> None:
         pos1 = Hex(self.coreSector, "0140")
         pos2 = Hex(self.coreSector, "0220")
         pos3 = Hex(self.coreSector, "0137")
@@ -145,7 +145,7 @@ class testHex(unittest.TestCase):
         self.assertEqual(17, pos3.distance(pos2))
         self.assertEqual(16, pos3.distance(pos4))
 
-    def testSectorCoreward(self):
+    def testSectorCoreward(self) -> None:
         pos1 = Hex(self.coreSector, "0101")
         pos2 = Hex(self.lishunSector, "0140")
         self.assertEqual(pos1.hex_position(), (0, 39))
@@ -153,7 +153,7 @@ class testHex(unittest.TestCase):
         self.assertEqual(1, pos1.distance(pos2))
         self.assertEqual(1, pos2.distance(pos1))
 
-    def testSectorSpinward(self):
+    def testSectorSpinward(self) -> None:
         pos1 = Hex(self.coreSector, "0110")
         pos2 = Hex(self.daguSector, "3210")
 
@@ -163,7 +163,7 @@ class testHex(unittest.TestCase):
         self.assertEqual(1, pos1.distance(pos2))
         self.assertEqual(1, pos2.distance(pos1))
 
-    def testSectorTrailing(self):
+    def testSectorTrailing(self) -> None:
         pos1 = Hex(self.coreSector, "3220")
         pos2 = Hex(self.fornastSector, "0220")
         pos3 = Hex(self.fornastSector, "0219")
@@ -173,24 +173,24 @@ class testHex(unittest.TestCase):
         self.assertEqual(2, pos1.distance(pos3))
         self.assertEqual(2, pos1.distance(pos4))
 
-    def testSectorRimward(self):
+    def testSectorRimward(self) -> None:
         pos1 = Hex(self.coreSector, "1040")
         pos2 = Hex(self.massiliaSector, "1001")
 
         self.assertEqual(1, pos1.distance(pos2))
 
-    def testSectorWideCoreward(self):
+    def testSectorWideCoreward(self) -> None:
         pos1 = Hex(self.massiliaSector, "2101")
         pos2 = Hex(self.lishunSector, "2140")
         self.assertEqual(41, pos1.distance(pos2))
 
-    def testFormatString(self):
+    def testFormatString(self) -> None:
         pos1 = Hex(self.coreSector, "2101")
         self.assertEqual("2101", str(pos1))
         pos2 = Hex(self.lishunSector, "0140")
         self.assertEqual("0140", str(pos2))
 
-    def testNeighbors(self):
+    def testNeighbors(self) -> None:
         pos1 = Hex(self.coreSector, "0505")
 
         base_pos = pos1.hex_position()
@@ -211,7 +211,7 @@ class testHex(unittest.TestCase):
                 self.assertEqual(expected_hex, Hex.get_neighbor(base_pos, direction), msg)
                 self.assertEqual(expected_sector, Hex.axial_to_sector(expected_hex[0], expected_hex[1]), msg + " sector")
 
-    def testFindNeighborOdd(self):
+    def testFindNeighborOdd(self) -> None:
         center = Hex(self.coreSector, "0505")
         up = Hex(self.coreSector, "0504")
         down = Hex(self.coreSector, "0506")
@@ -227,7 +227,7 @@ class testHex(unittest.TestCase):
         self.assertEqual(Hex.get_neighbor(center.hex_position(), 1), upRight.hex_position())
         self.assertEqual(Hex.get_neighbor(center.hex_position(), 0), downRight.hex_position())
 
-    def testFindNeighborEven(self):
+    def testFindNeighborEven(self) -> None:
         center = Hex(self.coreSector, "0202")
         down = Hex(self.coreSector, "0203")
         up = Hex(self.coreSector, "0201")
@@ -249,7 +249,7 @@ class testHex(unittest.TestCase):
         self.assertEqual(Hex.get_neighbor(center.hex_position(), 3), upLeft.hex_position())
         self.assertEqual(Hex.get_neighbor(upLeft.hex_position(), 0), center.hex_position())
 
-    def test_auxiliary_distances(self):
+    def test_auxiliary_distances(self) -> None:
         star1 = Star.parse_line_into_star(
             "2820 Ezevrtlad            C120000-B De Ba Po                            - -  - 900   Zh K2 III                      ",
             self.coreSector, 'fixed', 'fixed')

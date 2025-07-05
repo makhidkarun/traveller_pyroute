@@ -25,7 +25,7 @@ class testUWP(unittest.TestCase):
     @example('?000000-a', True)
     @example('?0000O0-0', True)
     @example('?0000Y0-0', True)
-    def test_initial_parsing(self, uwp_line, expected_oldskool):
+    def test_initial_parsing(self, uwp_line, expected_oldskool) -> None:
         uwp = self.parse_uwp(uwp_line)
 
         result, msg = uwp.is_well_formed()
@@ -70,7 +70,7 @@ class testUWP(unittest.TestCase):
     @example('?000?F0-0', '?000?FA-4')
     @example('?000?Q0-0', '?000?FA-4')
     @example('?0000y0-0', None)
-    def test_check_canonicalisation_and_verify_canonicalisation(self, uwp_line, expected):
+    def test_check_canonicalisation_and_verify_canonicalisation(self, uwp_line, expected) -> None:
         uwp = self.parse_uwp(uwp_line)
 
         old_rep = str(uwp)
@@ -100,7 +100,7 @@ class testUWP(unittest.TestCase):
         if expected is not None:
             self.assertEqual(expected, new_rep)
 
-    def parse_uwp(self, uwp_line):
+    def parse_uwp(self, uwp_line) -> UWP:
         allowed = [
             'Input UWP malformed'
         ]

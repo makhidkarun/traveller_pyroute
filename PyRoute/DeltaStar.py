@@ -3,6 +3,8 @@ Created on Jun 13, 2023
 
 @author: CyberiaResurrection
 """
+from typing import Optional
+
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Nobles import Nobles
@@ -16,7 +18,7 @@ class DeltaStar(Star):
     def reduce(starline, drop_routes=False, drop_trade_codes=False, drop_noble_codes=False, drop_base_codes=False,
                drop_trade_zone=False, drop_extra_stars=False, reset_pbg=False, reset_worlds=False, reset_port=False,
                reset_tl=False, reset_sophont=False, reset_capitals=False, canonicalise=False, trim_noble_codes=False,
-               trim_trade_codes=False, trim_base_codes=False, trim_trade_zone=False):
+               trim_trade_codes=False, trim_base_codes=False, trim_trade_zone=False) -> Optional[str]:
         sector = Sector("# dummy", "# 0, 0")
         star = DeltaStar.parse_line_into_star(starline, sector, 'fixed', 'fixed')
         if not isinstance(star, DeltaStar):
@@ -61,19 +63,19 @@ class DeltaStar(Star):
         return star.parse_to_line()
 
     @staticmethod
-    def reduce_all(original):
+    def reduce_all(original) -> Optional[str]:
         return DeltaStar.reduce(original, drop_routes=True, drop_trade_codes=True, drop_noble_codes=True, drop_base_codes=True, drop_trade_zone=True, drop_extra_stars=True, reset_pbg=True, reset_worlds=True, reset_port=True, reset_tl=True, reset_sophont=True, canonicalise=False)
 
     @staticmethod
-    def reduce_auxiliary(original):
+    def reduce_auxiliary(original) -> Optional[str]:
         return DeltaStar.reduce(original, drop_routes=True, drop_noble_codes=True, drop_trade_zone=True, drop_extra_stars=True, reset_pbg=True, reset_worlds=True, reset_sophont=True)
 
     @staticmethod
-    def reduce_importance(original):
+    def reduce_importance(original) -> Optional[str]:
         return DeltaStar.reduce(original, drop_trade_codes=True, drop_base_codes=True, reset_port=True, reset_tl=True)
 
     @staticmethod
-    def reduce_nbz(original):
+    def reduce_nbz(original) -> Optional[str]:
         return DeltaStar.reduce(original, drop_noble_codes=True, drop_base_codes=True, drop_trade_zone=True)
 
     @staticmethod
@@ -81,13 +83,13 @@ class DeltaStar(Star):
         star = DeltaStar()
         return ParseStarInput.parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=fix_pop)
 
-    def reduce_routes(self):
+    def reduce_routes(self) -> None:
         self.routes = []
 
-    def reduce_trade_codes(self):
+    def reduce_trade_codes(self) -> None:
         self.tradeCode = TradeCodes('')
 
-    def trim_trade_codes(self):
+    def trim_trade_codes(self) -> None:
         if '' == str(self.tradeCode):
             return
 
@@ -99,10 +101,10 @@ class DeltaStar(Star):
 
         self.tradeCode = TradeCodes(trade_string)
 
-    def reduce_noble_codes(self):
+    def reduce_noble_codes(self) -> None:
         self.nobles = Nobles()
 
-    def trim_noble_codes(self):
+    def trim_noble_codes(self) -> None:
         noble_code = str(self.nobles)
         if 2 > len(noble_code):
             return
@@ -110,20 +112,20 @@ class DeltaStar(Star):
         self.nobles = Nobles()
         self.nobles.count(noble_code[0])
 
-    def reduce_base_codes(self):
+    def reduce_base_codes(self) -> None:
         self.baseCode = '-'
 
-    def trim_base_codes(self):
+    def trim_base_codes(self) -> None:
         base_code = str(self.baseCode)
         if 2 > len(base_code):
             return
 
         self.baseCode = base_code[0]
 
-    def reduce_trade_zone(self):
+    def reduce_trade_zone(self) -> None:
         self.zone = '-'
 
-    def trim_trade_zone(self):
+    def trim_trade_zone(self) -> None:
         if '-' == self.zone:
             return
         if 'R' == self.zone.upper():
@@ -133,25 +135,25 @@ class DeltaStar(Star):
         else:
             self.zone = '-'
 
-    def reduce_extra_stars(self):
+    def reduce_extra_stars(self) -> None:
         if 0 < len(self.star_list):
             self.star_list_object.stars_list = [self.star_list_object.stars_list[0]]
 
-    def reduce_pbg(self):
+    def reduce_pbg(self) -> None:
         self.popM = 1
         self.ggCount = 0
         self.belts = 0
 
-    def reduce_worlds(self):
+    def reduce_worlds(self) -> None:
         self.worlds = 1
 
-    def reduce_port(self):
+    def reduce_port(self) -> None:
         self.port = 'C'
 
-    def reduce_tl(self):
+    def reduce_tl(self) -> None:
         self.tl = 8
 
-    def reduce_sophonts(self):
+    def reduce_sophonts(self) -> None:
         nu_codes = []
 
         for code in self.tradeCode.codes:
@@ -160,7 +162,7 @@ class DeltaStar(Star):
 
         self.tradeCode = TradeCodes(' '.join(nu_codes))
 
-    def reduce_capitals(self):
+    def reduce_capitals(self) -> None:
         cap_codes = ['Cs', 'Cp', 'Cx']
 
         nu_codes = []
@@ -170,7 +172,7 @@ class DeltaStar(Star):
 
         self.tradeCode = TradeCodes(' '.join(nu_codes))
 
-    def check_canonical(self):
+    def check_canonical(self) -> tuple[bool, list[str]]:
         msg = list()
 
         self._check_uwp()
@@ -272,24 +274,24 @@ class DeltaStar(Star):
         self._check_econ_code(msg, 'Ag', '456789', '45678', '567')
 
         code = 'Ba'
-        pop = '0'
-        self._check_pop_code(msg, code, pop)
+        pop_code = '0'
+        self._check_pop_code(msg, code, pop_code)
 
         code = 'Lo'
-        pop = '123'
-        self._check_pop_code(msg, code, pop)
+        pop_code = '123'
+        self._check_pop_code(msg, code, pop_code)
 
         code = 'Ni'
-        pop = '456'
-        self._check_pop_code(msg, code, pop)
+        pop_code = '456'
+        self._check_pop_code(msg, code, pop_code)
 
         code = 'Ph'
-        pop = '8'
-        self._check_pop_code(msg, code, pop)
+        pop_code = '8'
+        self._check_pop_code(msg, code, pop_code)
 
         code = 'Hi'
-        pop = '9ABCDEF'
-        self._check_pop_code(msg, code, pop)
+        pop_code = '9ABCDEF'
+        self._check_pop_code(msg, code, pop_code)
 
         ParseStarInput.check_tl(self, fullmsg=msg)
 

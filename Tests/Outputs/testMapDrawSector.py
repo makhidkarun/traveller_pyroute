@@ -23,7 +23,7 @@ class TestMapDrawSector(baseTest):
     review the maps and see what they look like. This test was used extensively during the development of the updated
     map drawing classes to ensure they were correct and were not missing any bits or creating bad drawing.
     """
-    def setUp(self):
+    def setUp(self) -> None:
         self.set_logging('INFO')
         self.galaxy = Galaxy(15, 6)
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag.sec')

@@ -10,7 +10,7 @@ from Tests.baseTest import baseTest
 
 
 class testDistanceGraph(baseTest):
-    def test_min_cost_in_single_component(self):
+    def test_min_cost_in_single_component(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         galaxy, graph, _, _ = self._setup_graph(sourcefile)
         components = galaxy.trade.components
@@ -43,7 +43,7 @@ class testDistanceGraph(baseTest):
         extended = distgraph.min_cost(0, indirect=True)
         self.assertEqual(expected_extended, list(extended), 'Unexpected indirect min-cost vector after update')
 
-    def test_min_cost_in_multiple_components(self):
+    def test_min_cost_in_multiple_components(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
         galaxy, graph, _, _ = self._setup_graph(sourcefile)
         components = galaxy.trade.components

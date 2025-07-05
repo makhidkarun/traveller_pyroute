@@ -10,7 +10,7 @@ from PyRoute.Star import Star
 
 
 class testTradeCalculation(unittest.TestCase):
-    def test_negative_route_weight_trips_assertion(self):
+    def test_negative_route_weight_trips_assertion(self) -> None:
         expected = 'Weight of edge between Irkigkhan (Core 0103) and Irkigkhan (Core 0103) must be positive'
         actual = None
         try:
@@ -29,7 +29,7 @@ class testTradeCalculation(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_zero_route_weight_trips_assertion(self):
+    def test_zero_route_weight_trips_assertion(self) -> None:
         expected = 'Weight of edge between Irkigkhan (Core 0103) and Irkigkhan (Core 0103) must be positive'
         actual = None
         try:
@@ -49,7 +49,7 @@ class testTradeCalculation(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_positive_route_weight_doesnt_trip_assertion(self):
+    def test_positive_route_weight_doesnt_trip_assertion(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            B9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
@@ -61,7 +61,7 @@ class testTradeCalculation(unittest.TestCase):
 
         self.assertEqual(2, tradecalc.route_weight(star1, star1))
 
-    def test_single_link_route_weight(self):
+    def test_single_link_route_weight(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            B9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
@@ -87,7 +87,7 @@ class testTradeCalculation(unittest.TestCase):
         actual_weight = tradecalc.route_cost(route)
         self.assertEqual(expected_weight, actual_weight, "Route cost unexpected")
 
-    def test_passenger_balance_over_multiple_sectors(self):
+    def test_passenger_balance_over_multiple_sectors(self) -> None:
         core = Sector('# Core', '# 0, 0')
         dagu = Sector('# Dagudashaag', '# -1, 0')
         gush = Sector('# Gushemege', '# -2, 0')
@@ -116,7 +116,7 @@ class testTradeCalculation(unittest.TestCase):
         tradecalc.multilateral_balance_pass()
         tradecalc.is_sector_pass_balanced()
 
-    def test_trade_balance_over_multiple_sectors(self):
+    def test_trade_balance_over_multiple_sectors(self) -> None:
         core = Sector('# Core', '# 0, 0')
         dagu = Sector('# Dagudashaag', '# -1, 0')
         gush = Sector('# Gushemege', '# -2, 0')
@@ -145,7 +145,7 @@ class testTradeCalculation(unittest.TestCase):
         tradecalc.multilateral_balance_trade()
         tradecalc.is_sector_trade_balanced()
 
-    def test_max_dist(self):
+    def test_max_dist(self) -> None:
         galaxy = Galaxy(min_btn=13)
         tradecalc = TradeCalculation(galaxy)
         self.assertEqual(8, tradecalc.min_wtn)

@@ -10,7 +10,7 @@ class LandmarksWTNExtremes:
     def __init__(self, galaxy):
         self.galaxy = galaxy
 
-    def get_landmarks(self, index=False):
+    def get_landmarks(self, index=False) -> list[dict]:
         result = []
 
         result.append(dict())

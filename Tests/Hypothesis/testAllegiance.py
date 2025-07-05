@@ -7,7 +7,7 @@ from PyRoute.AreaItems.Allegiance import Allegiance
 
 
 @composite
-def text_or_none(draw, alphabet=None):
+def text_or_none(draw, alphabet=None) -> composite:
     choice = draw(floats(min_value=0.0, max_value=1.0))
 
     if 0.8 < choice:
@@ -19,7 +19,7 @@ def text_or_none(draw, alphabet=None):
 
 
 @composite
-def text_starts_with(draw, starts="Na", min_size=2, max_size=4):
+def text_starts_with(draw, starts="Na", min_size=2, max_size=4) -> composite:
     min_size = max(2, min_size)
     max_size = min(4, max_size)
     max_size = max(max_size, min_size)
@@ -31,7 +31,7 @@ def text_starts_with(draw, starts="Na", min_size=2, max_size=4):
 
 
 @composite
-def text_flanking_comma(draw):
+def text_flanking_comma(draw) -> composite:
     before = draw(text(min_size=1, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
     after = draw(text(min_size=1, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
 
@@ -53,7 +53,7 @@ class testAllegiance(unittest.TestCase):
     @example('0,,', '00', True)
     @example('0,,', '00', False)
     @example('[', '', False)
-    def test_allegiance_creation_without_specified_population(self, name, code, base):
+    def test_allegiance_creation_without_specified_population(self, name, code, base) -> None:
         alg = None
         allowed = [
             "Name must be string - received",
@@ -96,7 +96,7 @@ class testAllegiance(unittest.TestCase):
         booleans()
     )
     @example('00 ', 'Na', False)
-    def test_allegiance_creation_with_nonaligned_code(self, name, code, base):
+    def test_allegiance_creation_with_nonaligned_code(self, name, code, base) -> None:
         assume('' != name.strip())
         alg = None
         allowed = [
@@ -136,7 +136,7 @@ class testAllegiance(unittest.TestCase):
     @example('0   0', 'Cs', False)
     @example('00[', 'Cs', False)
     @example('0,,', 'Cs', False)
-    def test_allegiance_creation_with_client_state_code(self, name, code, base):
+    def test_allegiance_creation_with_client_state_code(self, name, code, base) -> None:
         assume('' != name.strip())
         alg = None
 
@@ -171,7 +171,7 @@ class testAllegiance(unittest.TestCase):
         text(min_size=2, max_size=4),
         booleans()
     )
-    def test_allegiance_creation_with_comma_in_name(self, name, code, base):
+    def test_allegiance_creation_with_comma_in_name(self, name, code, base) -> None:
         assume('' != name.strip())
         alg = None
 
@@ -216,7 +216,7 @@ class testAllegiance(unittest.TestCase):
     @example(',0', '', False)
     @example('[,0', 'Na', False)
     @example('],0', 'Na', False)
-    def test_set_wiki_name(self, name, code, base):
+    def test_set_wiki_name(self, name, code, base) -> None:
         allowed = [
             "Name must be string - received",
             "Code must be string - received",
@@ -247,7 +247,7 @@ class testAllegiance(unittest.TestCase):
         assume(wiki_name is not None)
         self.assertNotIn('[]', wiki_name, "Empty square brackets not allowed in wiki name")
 
-    def test_string_representation(self):
+    def test_string_representation(self) -> None:
         alg = Allegiance("Test", "Test Allegiance Plz Ignore")
 
         expected = 'Test Allegiance Plz Ignore (Test)'
@@ -255,7 +255,7 @@ class testAllegiance(unittest.TestCase):
         result, msg = alg.is_well_formed()
         self.assertTrue(result, msg)
 
-    def test_long_aslan_allegiance(self):
+    def test_long_aslan_allegiance(self) -> None:
         code = 'AsT0'
         name = 'Aslan Hierate, Tlaukhu control, Yerlyaruiwo (1), Hrawoao (13), Eisohiyw (14), Ferekhearl (19)'
 

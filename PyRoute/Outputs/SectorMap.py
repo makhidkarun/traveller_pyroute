@@ -36,7 +36,8 @@ class SectorMap(Map):
 
     def write_sector_map(self, sector: Sector) -> None:
         self.doc = self.document(sector.name + " Sector", False)
-        self.system_writer = HexSystem.set_system_writer(self.system_writer_type, self, self.start, self.hex_size, self.routes)
+        self.system_writer = HexSystem.set_system_writer(self.system_writer_type, self, self.start, self.hex_size,
+                                                         self.routes)
         self.write_base_map(sector)
         self.draw_borders(sector)
 
@@ -57,12 +58,12 @@ class SectorMap(Map):
 
         self.close()
 
-    def draw_borders(self, sector: Sector):
+    def draw_borders(self, sector: Sector) -> None:  # type:ignore[override]
         grid = HexGrid(self, self.start, self.hex_size, 32, 40)
         grid.set_borders(self.galaxy.borders, sector.dx, sector.dy)
         grid.hex_grid(grid.draw_borders, 1, colour=self.colours['hexes'])
 
-    def write_base_map(self, area: Sector):
+    def write_base_map(self, area: Sector) -> None:  # type:ignore[override]
         self.fill_background()
         self.area_name_title(area.name)
         self.subsector_grid()
@@ -71,7 +72,7 @@ class SectorMap(Map):
         self.statistics(area)
         self.map_key(area)
 
-    def fill_background(self):
+    def fill_background(self) -> None:
         background = self.colours['background']
         if background:
             start_cursor = Cursor(self.start.x - 14, self.start.y - 12)
@@ -93,7 +94,7 @@ class SectorMap(Map):
             hlineEnd.y = y
             self.add_line(start=hlineStart, end=hlineEnd, colour=self.colours['grid'])
 
-    def statistics(self, sector: Sector):
+    def statistics(self, sector: Sector) -> None:
         cursor = Cursor(self.start.x, 0)
 
         # Column 1
@@ -146,22 +147,23 @@ class SectorMap(Map):
         cursor = Cursor(self.image_size.x // 2, self.image_size.y - 18)
         self.add_text_centred(name, cursor, 'sector')
 
-    def spinward_name(self, name: str):
+    def spinward_name(self, name: str) -> None:
         y = self.start.y + self.hex_size.x + self.subsector_height + self.subsector_height
         cursor = Cursor(self.start.x - 7, y)
         self.add_text_rotated(name, cursor, 'sector', 90)
 
-    def trailing_name(self, name: str):
+    def trailing_name(self, name: str) -> None:
         y = self.start.y + self.hex_size.x + self.subsector_height + self.subsector_height
         cursor = Cursor(self.image_size.x - 10, y)
         self.add_text_rotated(name, cursor, 'sector', -90)
 
-    def map_key(self, area: Sector):
+    def map_key(self, area: Sector) -> None:
         start_cursor = Cursor(self.start.x + (self.subsector_width * 3), 2)
         end_cursor = Cursor(self.start.x + (self.subsector_width * 4), self.start.y - 13)
+        assert self.system_writer is not None
         self.system_writer.map_key(start_cursor, end_cursor)
 
-    def draw_comm_routes(self, area: Sector):
+    def draw_comm_routes(self, area: Sector) -> None:
         sector_indexes = [star.index for star in area.worlds]
         comm_routes = [star for star in self.galaxy.stars.edges(sector_indexes, True)
                        if star[2].get('xboat', False) or star[2].get('comm', False)]
@@ -172,6 +174,7 @@ class SectorMap(Map):
 
     def comm_line(self, start: Star, end: Star, sector: Sector) -> None:
         colour = self.colours['comm']
+        assert self.system_writer is not None
 
         start_cursor = self.system_writer.location(start.hex)
         start_cursor.y_plus(self.hex_size.y)
@@ -195,7 +198,7 @@ class SectorMap(Map):
         clip_start, clip_end = self.line_clipping(start_cursor, end_cursor)
         self.add_line(clip_start, clip_end, colour, stroke='dashed', width=2)
 
-    def draw_trade_routes(self, area: Sector):
+    def draw_trade_routes(self, area: Sector) -> None:
         sector_indexes = [star.index for star in area.worlds]
         trade_routes = [star for star in self.galaxy.stars.edges(sector_indexes, True)
                         if star[2]['trade'] > 0 and StatCalculation.trade_to_btn(star[2]['trade']) >= self.galaxy.min_btn]
@@ -207,6 +210,7 @@ class SectorMap(Map):
 
     def trade_line(self, start: Star, end: Star, sector: Sector, data: dict) -> None:
         colour = self.colours['trade']
+        assert self.system_writer is not None
 
         start_cursor = self.system_writer.location(start.hex)
         start_cursor.y_plus(self.hex_size.y)
@@ -230,6 +234,7 @@ class SectorMap(Map):
         clip_start, clip_end = self.line_clipping(start_cursor, end_cursor)
         self.add_line(clip_start, clip_end, colour, stroke='solid', width=2)
 
-    def line_clipping(self, start_cursor, end_cursor) -> (Cursor, Cursor):
+    def line_clipping(self, start_cursor, end_cursor) -> tuple[Cursor, Cursor]:
         clip_start, clip_end = Map.clipping(self.start, self.image_size, start_cursor, end_cursor)
+        assert isinstance(clip_start, Cursor) and isinstance(clip_end, Cursor)
         return clip_start, clip_end

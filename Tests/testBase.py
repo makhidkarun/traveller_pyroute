@@ -4,7 +4,7 @@ import unittest
 
 
 class testBase(unittest.TestCase):
-    def _make_args(self):
+    def _make_args(self) -> argparse.ArgumentParser:
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
         args.max_jump = 2
@@ -26,7 +26,7 @@ class testBase(unittest.TestCase):
         args.output = tempfile.gettempdir()
         return args
 
-    def _make_args_no_line(self):
+    def _make_args_no_line(self) -> argparse.ArgumentParser:
         args = self._make_args()
         args.interestingline = None
 

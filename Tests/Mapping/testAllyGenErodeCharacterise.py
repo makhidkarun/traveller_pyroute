@@ -5,7 +5,7 @@ from Tests.Mapping.testAllyGenBase import TestAllyGenBase
 
 class TestAllyGenErodeCharacterise(TestAllyGenBase):
 
-    def testErodeBorderOddClientState(self):
+    def testErodeBorderOddClientState(self) -> None:
         self.setupOneWorldCoreSector("0503", 0, "CsIm")
         self.borders.create_erode_border('separate')
 
@@ -16,7 +16,7 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.assertEqual({(4, 35): 'Na'}, border_map, "Unexpected border map value")
         self.assertEqual({}, borders, "Unexpected borders value")
 
-    def testErodeBorderOddImperialWorld(self):
+    def testErodeBorderOddImperialWorld(self) -> None:
         self.setupOneWorldCoreSector("0503", 0, "ImDs")
         self.borders.create_erode_border('separate', False)
 
@@ -34,7 +34,7 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
 
-    def testErodeBorderTwoOddImperialWorlds(self):
+    def testErodeBorderTwoOddImperialWorlds(self) -> None:
         self.setupOneWorldCoreSector("0503", 0, "ImDs")
         self.setupOneWorldCoreSector("0504", 1, "ImDs")
         self.assertEqual(2, len(self.galaxy.star_mapping), "Should be 2 worlds in galaxy")
@@ -54,7 +54,7 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
 
-    def testErodeBorderTwoEvenImperialWorlds(self):
+    def testErodeBorderTwoEvenImperialWorlds(self) -> None:
         self.setupOneWorldCoreSector("0603", 0, "ImDs")
         self.setupOneWorldCoreSector("0604", 1, "ImDs")
         self.assertEqual(2, len(self.galaxy.star_mapping), "Should be 2 worlds in galaxy")
@@ -74,7 +74,7 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
 
-    def testErodeBorderOnIbaraSubsector(self):
+    def testErodeBorderOnIbaraSubsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -127,7 +127,7 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
 
-    def testErodeBorderOnFarFrontiersSector(self):
+    def testErodeBorderOnFarFrontiersSector(self) -> None:
         sourcefile = self.unpack_filename('BorderGeneration/Far Frontiers.sec')
         mapfile = self.unpack_filename('BorderGeneration/Far Frontiers-erode-allymap.json')
         borderfile = self.unpack_filename('BorderGeneration/Far Frontiers-erode-border.json')
@@ -156,7 +156,7 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
 
-    def testErodeBorderOnVanguardReachesSector(self):
+    def testErodeBorderOnVanguardReachesSector(self) -> None:
         sourcefile = self.unpack_filename('BorderGeneration/Vanguard Reaches.sec')
         mapfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-erode-allymap.json')
         borderfile = self.unpack_filename('BorderGeneration/Vanguard Reaches-erode-border.json')

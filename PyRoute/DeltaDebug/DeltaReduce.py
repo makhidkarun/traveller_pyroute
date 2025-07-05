@@ -68,7 +68,7 @@ class DeltaReduce:
         self.two_line_reducer = TwoLineReducer(self)
         self.breacher = WidenHoleReducer(self)
 
-    def is_initial_state_interesting(self):
+    def is_initial_state_interesting(self) -> None:
         sectors = copy.deepcopy(self.sectors)
         args = self.args
 
@@ -77,7 +77,7 @@ class DeltaReduce:
         if not interesting:
             raise AssertionError("Original input not interesting - aborting")
 
-    def is_initial_state_uninteresting(self, reraise=False):
+    def is_initial_state_uninteresting(self, reraise=False) -> None:
         sectors = copy.deepcopy(self.sectors)
         args = self.args
 
@@ -88,23 +88,23 @@ class DeltaReduce:
                 raise e
             raise AssertionError(msg)
 
-    def reduce_sector_pass(self, singleton_only=False):
+    def reduce_sector_pass(self, singleton_only=False) -> None:
         self.sector_reducer.run(singleton_only)
 
-    def reduce_allegiance_pass(self, singleton_only=False):
+    def reduce_allegiance_pass(self, singleton_only=False) -> None:
         self.allegiance_reducer.run(singleton_only)
 
-    def reduce_subsector_pass(self):
+    def reduce_subsector_pass(self) -> None:
         self.subsector_reducer.run(False)
 
-    def reduce_line_pass(self, singleton_only=False):
+    def reduce_line_pass(self, singleton_only=False) -> None:
         self.single_line_reducer.run(singleton_only)
 
-    def reduce_line_two_minimal(self):
+    def reduce_line_two_minimal(self) -> None:
         self.two_line_reducer.run(False, first_segment=True)
         self.two_line_reducer.run(False, first_segment=False)
 
-    def reduce_within_line(self):
+    def reduce_within_line(self) -> None:
         # we're going to be deliberately mangling lines in the process of reducing them, so shut up loggers,
         # such as the TradeCodes logger, that will complain, to stop flooding stdout.
         logger = logging.getLogger('PyRoute.TradeCodes')
@@ -114,7 +114,7 @@ class DeltaReduce:
             if reducer.preflight():
                 reducer.run()
 
-    def reduce_full_within_line(self):
+    def reduce_full_within_line(self) -> None:
         logger = logging.getLogger('PyRoute.TradeCodes')
         logger.setLevel(logging.CRITICAL)
         reduce = self.withinline[0]
@@ -125,7 +125,7 @@ class DeltaReduce:
         if reduce.preflight():
             reduce.run()
 
-    def reduce_end_of_lines(self, reverse=True):
+    def reduce_end_of_lines(self, reverse=True) -> None:
         if reverse:
             self.breacher.run(start_pos=-1, reverse=True)
         else:
@@ -139,7 +139,7 @@ class DeltaReduce:
         return raw_lines
 
     @staticmethod
-    def update_short_msg(msg, short_msg):
+    def update_short_msg(msg, short_msg) -> str:
         if msg is not None and (short_msg is None or len(msg) < len(short_msg)):
             short_msg = msg
         return short_msg
@@ -227,7 +227,7 @@ class DeltaReduce:
         return interesting, msg, q
 
     @staticmethod
-    def chunk_lines(lines, num_chunks):
+    def chunk_lines(lines, num_chunks) -> list:
         n = math.ceil(len(lines) / num_chunks)
         chunks = [lines[i:i + n] for i in range(0, len(lines), n)]
         chunks = [item for item in chunks if 0 < len(item)]

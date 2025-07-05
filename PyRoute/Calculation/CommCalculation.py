@@ -3,6 +3,8 @@ Created on Aug 09, 2023
 
 @author: CyberiaResurrection
 """
+from typing import Optional
+
 import networkx as nx
 
 from PyRoute.Allies.AllyGen import AllyGen
@@ -10,15 +12,16 @@ from PyRoute.Calculation.RouteCalculation import RouteCalculation
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 except ImportError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 try:
     from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
     from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
 except ImportError:
     from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+from PyRoute.Star import Star
 
 
 class CommCalculation(RouteCalculation):
@@ -32,12 +35,12 @@ class CommCalculation(RouteCalculation):
         self.route_reuse = reuse
         self.min_importance = 4
 
-    def base_route_filter(self, star, neighbor):
+    def base_route_filter(self, star, neighbor) -> bool:
         return not AllyGen.are_allies(star.alg_code, neighbor.alg_code)
 
-    def base_range_routes(self, star, neighbor):
+    def base_range_routes(self, star, neighbor) -> Optional[int]:
         if not getattr(self.galaxy.alg[star.alg_base_code], 'min_importance', False):
-            return
+            return None
         min_importance = self.galaxy.alg[star.alg_base_code].min_importance
         if self.endpoint_selection(star, min_importance) and self.endpoint_selection(neighbor, min_importance):
             dist = star.distance(neighbor)
@@ -52,31 +55,32 @@ class CommCalculation(RouteCalculation):
                          self.is_rich(star) or self.is_rich(neighbor)]
                 self.galaxy.ranges.add_edge(star, neighbor, distance=dist, flags=flags)
             return dist
+        return None
 
-    def capitals(self, star):
+    def capitals(self, star) -> bool:
         # Capital of sector, subsector, or empire are in the list
         return star.tradeCode.capital
 
-    def bases(self, star):
+    def bases(self, star) -> bool:
         # if it has a Depot, Way station, or XBoat station,
         # or external naval base or (aslan) Tlaukhu base
         return len({'D', 'W', 'K', 'T'} & set(star.baseCode)) > 0
 
-    def comm_bases(self, star):
+    def comm_bases(self, star) -> bool:
         # Imperial scout or naval base, external military base, or Aslan clan base
         return len({'S', 'N', 'M', 'R'} & set(star.baseCode)) > 0
 
-    def important(self, star, min_importance):
+    def important(self, star, min_importance) -> bool:
         return star.importance > min_importance
 
-    def is_rich(self, star):
+    def is_rich(self, star) -> bool:
         return star.ru > 10000
 
-    def endpoint_selection(self, star, min_importance):
+    def endpoint_selection(self, star, min_importance) -> bool:
         return self.capitals(star) or self.bases(star) or \
                self.important(star, min_importance) or self.is_rich(star)
 
-    def generate_routes(self):
+    def generate_routes(self) -> None:
         for alg in self.galaxy.alg.values():
             # No comm routes for the non-aligned worlds.
             if AllyGen.is_nonaligned(alg.code):
@@ -126,17 +130,17 @@ class CommCalculation(RouteCalculation):
                          (self.galaxy.stars.number_of_edges(),
                           self.galaxy.ranges.number_of_edges()))
 
-    def calculate_routes(self):
+    def calculate_routes(self) -> None:
         self.calculate_components()
         # Pick landmarks - biggest WTN system in each graph component.  It worked out simpler to do this for _all_
         # components, even those with only one star.
         landmarks, _ = self.get_landmarks(index=True)
-        landmarks = None if 0 == len(landmarks) else landmarks
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
         source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
-        self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon, sources=landmarks)
+        self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon,
+                                                                       sources=None if 0 == len(landmarks) else landmarks)
 
         self.logger.info('sorting routes...')
         routes = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
@@ -152,13 +156,13 @@ class CommCalculation(RouteCalculation):
             processed += 1
 
         active = [(s, n, d) for (s, n, d) in self.galaxy.stars.edges(data=True) if d['count'] > 0]
-        active_graph = nx.Graph()
+        active_graph: nx.Graph = nx.Graph()
 
         active_graph.add_edges_from(active)
         # for (star, neighbor, data) in self.galaxy.stars.edges(data=True):
         #    pass
 
-    def route_weight(self, star, target):
+    def route_weight(self, star, target) -> float:
         dist = star.distance(target)
         weight = self.distance_weight[dist]
         if star.port in 'CDEX?' or target.port in 'CDEX?':
@@ -182,7 +186,7 @@ class CommCalculation(RouteCalculation):
             target) + " must be positive"
         return weight
 
-    def more_important(self, star, neighbor, imp):
+    def more_important(self, star, neighbor, imp) -> Optional[Star]:
         set1 = [self.capitals(star), self.bases(star), self.important(star, imp), self.is_rich(star)]
         set2 = [self.capitals(neighbor), self.bases(neighbor), self.important(neighbor, imp), self.is_rich(neighbor)]
 
@@ -197,7 +201,7 @@ class CommCalculation(RouteCalculation):
                 return self.lesser_importance(star, neighbor)
             return None
 
-    def lesser_importance(self, star, neighbor):
+    def lesser_importance(self, star, neighbor) -> Optional[Star]:
         if star.importance > neighbor.importance:
             return neighbor
         elif star.importance < neighbor.importance:
@@ -205,7 +209,7 @@ class CommCalculation(RouteCalculation):
         else:
             return None
 
-    def get_route_between(self, star, target):
+    def get_route_between(self, star, target) -> None:
         try:
             upbound = self.shortest_path_tree.triangle_upbound(star.index, target.index) * 1.005
             route, _ = astar_path_numpy(self.star_graph, star.index, target.index,
@@ -233,5 +237,5 @@ class CommCalculation(RouteCalculation):
 
         self.shortest_path_tree.update_edges(edges)
 
-    def unilateral_filter(self, star):
+    def unilateral_filter(self, star) -> bool:
         return star.zone in ['R', 'F']

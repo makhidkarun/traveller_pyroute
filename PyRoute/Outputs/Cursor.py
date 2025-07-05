@@ -4,6 +4,7 @@ Created on Sep 12, 2023
 @author: CyberiaResurrection
 """
 from typing import Union
+from typing_extensions import Self
 
 
 class Cursor(object):
@@ -23,41 +24,41 @@ class Cursor(object):
     def __hash__(self):
         return hash((self.x, self.y))
 
-    def set_deltas(self, dx=2, dy=2):
+    def set_deltas(self, dx=2, dy=2) -> None:
         self.dx = dx
         self.dy = dy
 
     @property
-    def x(self):
+    def x(self) -> int:
         return self._x
 
     @x.setter
-    def x(self, value=0):
+    def x(self, value=0) -> None:
         # If in left margin, sets to minimum value.
         self._x = value
 
     @property
-    def y(self):
+    def y(self) -> int:
         return self._y
 
     @y.setter
-    def y(self, value=0):
+    def y(self, value=0) -> None:
         self._y = value
 
     # Changes this cursor
-    def x_plus(self, dx=None):
+    def x_plus(self, dx=None) -> None:
         """
         Mutable x addition. Defaults to set delta value.
         """
         self._x += dx if dx is not None else self.dx
 
-    def y_plus(self, dy=None):
+    def y_plus(self, dy=None) -> None:
         """
         Mutable y addition. Defaults to set delta value.
         """
         self._y += dy if dy is not None else self.dy
 
-    def copy(self):
+    def copy(self) -> Self:
         new_cursor = self.__class__(self.x, self.y)
         new_cursor.set_deltas(self.dx, self.dy)
         return new_cursor

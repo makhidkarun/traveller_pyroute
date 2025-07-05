@@ -22,7 +22,7 @@ except ImportError:
 
 
 class testTradeCalculation(baseTest):
-    def test_nodes_not_duplicated(self):
+    def test_nodes_not_duplicated(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/duplicate_node_blowup/Trojan Reach.sec')
 
         args = self._make_args()
@@ -47,7 +47,7 @@ class testTradeCalculation(baseTest):
 
         galaxy.trade.calculate_routes()
 
-    def test_nodes_not_duplicated_2(self):
+    def test_nodes_not_duplicated_2(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/duplicate_node_blowup/Verge.sec')
 
         args = self._make_args()
@@ -72,7 +72,7 @@ class testTradeCalculation(baseTest):
 
         galaxy.trade.calculate_routes()
 
-    def test_route_update_simple(self):
+    def test_route_update_simple(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/duplicate_node_blowup/Trojan Reach.sec')
         args = self._make_args()
         args.route_btn = 8

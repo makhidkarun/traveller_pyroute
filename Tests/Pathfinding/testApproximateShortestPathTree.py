@@ -23,7 +23,7 @@ from Tests.baseTest import baseTest
 
 
 class testApproximateShortestPathTree(baseTest):
-    def test_lower_bound_doesnt_overlap(self):
+    def test_lower_bound_doesnt_overlap(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -54,7 +54,7 @@ class testApproximateShortestPathTree(baseTest):
         actual = approx.lower_bound(src, targ)
         self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
-    def test_lower_bound_does_overlap(self):
+    def test_lower_bound_does_overlap(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -84,7 +84,7 @@ class testApproximateShortestPathTree(baseTest):
         actual = approx.lower_bound(src, targ)
         self.assertAlmostEqual(expected, actual, 3, "Unexpected lower bound value")
 
-    def test_lower_bound_self_to_self(self):
+    def test_lower_bound_self_to_self(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -113,7 +113,7 @@ class testApproximateShortestPathTree(baseTest):
         actual = approx.lower_bound(src, src)
         self.assertEqual(expected, actual, "Unexpected lower bound value")
 
-    def test_bulk_lower_bound_on_distance_graph(self):
+    def test_bulk_lower_bound_on_distance_graph(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -144,7 +144,7 @@ class testApproximateShortestPathTree(baseTest):
         expected = np.array([15.833, 15, 0])
         np.testing.assert_array_almost_equal(expected, result, 0.000001, "Unexpected bounds array")
 
-    def test_drop_first_level_intermediate_nodes_in_same_component(self):
+    def test_drop_first_level_intermediate_nodes_in_same_component(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -182,7 +182,7 @@ class testApproximateShortestPathTree(baseTest):
         approx.update_edges(edges)
         self.assertEqual(old_num, len(approx.distances))
 
-    def test_drop_third_level_intermediate_nodes_in_same_component_and_regenerate(self):
+    def test_drop_third_level_intermediate_nodes_in_same_component_and_regenerate(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -218,7 +218,7 @@ class testApproximateShortestPathTree(baseTest):
         approx.update_edges(edges)
         self.assertEqual(496, len(approx.distances))
 
-    def test_verify_changed_leaf_edge_trip_update(self):
+    def test_verify_changed_leaf_edge_trip_update(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         jsonfile = self.unpack_filename('PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
 
@@ -275,7 +275,7 @@ class testApproximateShortestPathTree(baseTest):
         # verify update tripped
         self.assertEqual(expected_distances[leafnode] - 1, approx.distances[leafnode], "Leaf node distance not updated")
 
-    def test_verify_near_root_edge_propagates(self):
+    def test_verify_near_root_edge_propagates(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         jsonfile = self.unpack_filename('PathfindingFiles/single_source_distances_ibara_subsector_from_0101.json')
 
@@ -339,7 +339,7 @@ class testApproximateShortestPathTree(baseTest):
         distance_check = list(expected_distances.values()) == approx.distances[:, 0]
         self.assertTrue(distance_check.all(), "Unexpected distances after SPT restart")
 
-    def test_verify_multiple_near_root_edges_propagate(self):
+    def test_verify_multiple_near_root_edges_propagate(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/dijkstra_restart_blowup/Lishun.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -369,7 +369,7 @@ class testApproximateShortestPathTree(baseTest):
 
         approx.update_edges(edges)
 
-    def _make_args(self):
+    def _make_args(self) -> argparse.ArgumentParser:
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
         args.max_jump = 2

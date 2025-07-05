@@ -5,7 +5,7 @@ from Tests.baseTest import baseTest
 
 
 class testDeltaStarReduction(baseTest):
-    def test_drop_trade_codes_on_none(self):
+    def test_drop_trade_codes_on_none(self) -> None:
         src = "0410 Omwyf                B75978A-B                           { 2 }  (D6C+4) [997D] B    N  - 604 9  ImDa G1 V           Xb:0213 Xb:0609"
 
         exp = "0410 Omwyf                B75978A-B                                       { 2 }  (D6C+4) [997D] B    N  - 604 9  ImDa G1 V           Xb:0213 Xb:0609                          "
@@ -13,7 +13,7 @@ class testDeltaStarReduction(baseTest):
 
         self.assertEqual(exp, actual)
 
-    def test_drop_trade_codes_on_existing(self):
+    def test_drop_trade_codes_on_existing(self) -> None:
         src = "0216 Ambemshan            A5457BC-B Ag Cp Pi Pz (Cassilldans) { 4 }  (D6E+5) [AB8E] BCDF NS A 913 10 ImDa M3 V M6 V"
 
         exp = "0216 Ambemshan            A5457BC-B                                       { 3 }  (D6E+5) [AB8E] BCDF NS A 913 10 ImDa M3 V M6 V                                               "
@@ -21,7 +21,7 @@ class testDeltaStarReduction(baseTest):
 
         self.assertEqual(exp, actual)
 
-    def test_reduce_routes_on_none(self):
+    def test_reduce_routes_on_none(self) -> None:
         src = "0216 Ambemshan            A5457BC-B Ag Cp Pi Pz (Cassilldans) { 4 }  (D6E+5) [AB8E] BCDF NS A 913 10 ImDa M3 V M6 V"
 
         exp = "0216 Ambemshan            A5457BC-B (Cassilldans) Ag Cp Pi Pz             { 4 }  (D6E+5) [AB8E] BCDF NS A 913 10 ImDa M3 V M6 V                                               "
@@ -29,7 +29,7 @@ class testDeltaStarReduction(baseTest):
 
         self.assertEqual(exp, actual)
 
-    def test_reduce_routes_on_existing(self):
+    def test_reduce_routes_on_existing(self) -> None:
         src = "0410 Omwyf                B75978A-B                           { 2 }  (D6C+4) [997D] B    N  - 604 9  ImDa G1 V           Xb:0213 Xb:0609"
 
         exp = "0410 Omwyf                B75978A-B                                       { 2 }  (D6C+4) [997D] B    N  - 604 9  ImDa G1 V                                                    "
@@ -37,7 +37,7 @@ class testDeltaStarReduction(baseTest):
 
         self.assertEqual(exp, actual)
 
-    def test_three_way_combinations_of_reductions(self):
+    def test_three_way_combinations_of_reductions(self) -> None:
         src = "0627 Taku                 AA676AD-C Ag Ni Ri Cp Da            { 4 }  (B58+5) [AA9G] BCF  NS A 912 14 ImDa K1 V M1 V      Xb:0524 Xb:1029"
 
         blurb = [
@@ -92,7 +92,7 @@ class testDeltaStarReduction(baseTest):
                 new_actual = DeltaStar.reduce(actual, **args)
                 self.assertEqual(actual, new_actual)
 
-    def test_canonicalisation_of_dagudashaag_1722(self):
+    def test_canonicalisation_of_dagudashaag_1722(self) -> None:
         src = "1722 Campbell             B99A200-E Lo Wa                                 { 2 }  (812-2) [1419] B    W  - 204 7  ImDv M1 V            Xb:1420 Xb:1823 Xb:2020"
         exp = "1722 Campbell             B99A200-E Lo Wa                                 { 2 }  (812-2) [1419] B    W  - 204 7  ImDv M1 V           Xb:1420 Xb:1823 Xb:2020                  "
 
@@ -102,7 +102,7 @@ class testDeltaStarReduction(baseTest):
         nu_actual = DeltaStar.reduce(actual)
         self.assertEqual(actual, nu_actual, "Canonicalisation did not round trip")
 
-    def test_canonicalisation_of_dagudashaag_2124(self):
+    def test_canonicalisation_of_dagudashaag_2124(self) -> None:
         src = "2123 Medurma              A9D7954-C Hi An Cs Di(Miyavine) Asla1 S'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V            Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322"
         exp = "2123 Medurma              A9D7954-C An Asla1 Cs Di(Miyavine) Hi S'mr0     { 3 }  (G8E+1) [7C3A] BEF  -  - 823 12 ImDv G0 V           Xb:1823 Xb:1926 Xb:2223 Xb:2225 Xb:2322  "
 

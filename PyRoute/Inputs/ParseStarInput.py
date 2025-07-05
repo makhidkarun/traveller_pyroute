@@ -4,6 +4,7 @@ Created on Nov 27, 2023
 @author: CyberiaResurrection
 """
 import re
+from typing import Optional, Union
 
 from lark import UnexpectedCharacters, UnexpectedEOF
 
@@ -47,11 +48,11 @@ class ParseStarInput:
     # Allegiance
     # Stars and star data (parsed separately)
     starline = re.compile(''.join([line.rstrip('\n') for line in regex]))
-    parser = None
-    transformer = None
-    station_parser = None
-    station_transformer = None
-    deep_space = {}
+    parser: Optional[StarlineParser] = None
+    transformer: Optional[StarlineTransformer] = None
+    station_parser: Optional[StarlineStationParser] = None
+    station_transformer: Optional[StarlineStationTransformer] = None
+    deep_space: dict[str, list[str]] = {}
     valid_zone = 'arufgbARUFGB-'
     valid_nobles = 'BCcDEeFfGH-'
 
@@ -193,7 +194,7 @@ class ParseStarInput:
         return star
 
     @staticmethod
-    def _unpack_starline(star, line, sector):
+    def _unpack_starline(star, line, sector) -> Union[tuple[list[Optional[str]], bool], tuple[None, None]]:
         is_station = False
         if '{Anomaly}' in line and sector.name not in ParseStarInput.deep_space:
             star.logger.info("Found anomaly, skipping processing: {}".format(line))
@@ -216,12 +217,12 @@ class ParseStarInput:
             else:
                 result, line = ParseStarInput.parser.parse(line)
         except UnexpectedCharacters:
-            result = ParseStarInput._unpack_starline_fallback(line)
+            result = ParseStarInput._unpack_starline_fallback(line)  # type: ignore
             if result is None:
                 star.logger.error("Unmatched line: {}".format(line))
                 return None, None
         except UnexpectedEOF:
-            result = ParseStarInput._unpack_starline_fallback(line)
+            result = ParseStarInput._unpack_starline_fallback(line)  # type: ignore
             if result is None:
                 star.logger.error("Unmatched line: {}".format(line))
                 return None, None
@@ -247,10 +248,10 @@ class ParseStarInput:
         return transformed, is_station
 
     @staticmethod
-    def _unpack_starline_fallback(line):
+    def _unpack_starline_fallback(line) -> Optional[list[str]]:
         matches = ParseStarInput.starline.match(line)
         if matches is None:
-            return
+            return None
         data = list(matches.groups())
         parsed = {'position': data[0], 'name': data[1], 'uwp': data[2], 'trade': data[3]}
         raw_extensions = data[4].replace('  ', ' ').replace('{ ', '{').replace(' }', '}')
@@ -285,7 +286,7 @@ class ParseStarInput:
         return data
 
     @staticmethod
-    def _unpack_starline_tweak(data):
+    def _unpack_starline_tweak(data) -> list[str]:
         data[1] = data[1].replace('  ', ' ')
         if data[16].startswith('--') and '----' != data[16] and 2 < len(data[16]):
             data[17] = data[16][2:] + " " + data[17]
@@ -294,7 +295,7 @@ class ParseStarInput:
         return data
 
     @staticmethod
-    def check_tl(star, fullmsg=None):
+    def check_tl(star, fullmsg=None) -> None:
         if '???-' in str(star.uwp) or star.tl_unknown:
             return
 
@@ -311,7 +312,7 @@ class ParseStarInput:
             fullmsg.append(msg)
 
     @staticmethod
-    def check_tl_core(star):
+    def check_tl_core(star) -> tuple[int, int]:
         mod = 0
         if star.size in '01':
             mod += 2

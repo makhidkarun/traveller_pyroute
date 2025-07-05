@@ -21,11 +21,11 @@ import codecs
 from xml.dom import minidom
 
 
-def sort_key(aString):
+def sort_key(aString) -> str:
     return aString[-8:-3]
 
 
-def prettify(elem):
+def prettify(elem) -> str:
     """
     Return a pretty-printed XML string for the Element.
     """
@@ -38,7 +38,7 @@ def prettify(elem):
     return reparsed.toprettyxml(indent="  ")
 
 
-def output_link(route_start, route_end, route_color, route_type, sector_start, sector_end):
+def output_link(route_start, route_end, route_color, route_type, sector_start, sector_end) -> tuple:
     output = ET.Element('Route', {'Start': route_start, 'End': route_end, 'Color': route_color, 'Type': route_type})
 
     if sector_start == sector_end:
@@ -84,7 +84,10 @@ if __name__ == '__main__':
 
     with open(args.route_file, encoding="utf-8") as f:
         for entry in f:
-            data = match.match(entry).groups()
+            rawdata = match.match(entry)
+            if rawdata is None:
+                continue
+            data = rawdata.groups()
             sectorStart = data[0]
             start = data[1]
             sectorEnd = data[2]
@@ -118,10 +121,12 @@ if __name__ == '__main__':
                     routes.remove(route)
         else:
             routes = ET.Element('Routes')
-            tree.getroot().append(routes)
+            treeroot = tree.getroot()
+            if treeroot is not None:
+                treeroot.append(routes)
 
         routes.extend(sectors[sector])
         pretty = prettify(tree.getroot())
         outPath = os.path.join(args.output_dir, '%s.xml' % sector)
-        with codecs.open(outPath, 'wb', encoding='utf-8') as f:
-            f.write(pretty)
+        with codecs.open(outPath, 'wb', encoding='utf-8') as g:
+            g.write(pretty)

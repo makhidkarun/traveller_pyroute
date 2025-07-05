@@ -12,19 +12,19 @@ from PyRoute.Nobles import Nobles
 
 
 class TestNobles(unittest.TestCase):
-    def testDefaultString(self):
+    def testDefaultString(self) -> None:
         nobles = Nobles()
         expected = '-'
         self.assertEqual(expected, nobles.__str__())
 
-    def testStringWithOneViscount(self):
+    def testStringWithOneViscount(self) -> None:
         nobles = Nobles()
         nobles.nobles['Viscounts'] = 1
 
         expected = 'e'
         self.assertEqual(expected, nobles.__str__())
 
-    def testCountWithViscount(self):
+    def testCountWithViscount(self) -> None:
         nobles = Nobles()
         nobles.count(['e'])
 
@@ -33,7 +33,7 @@ class TestNobles(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    def testAccumulateSelf(self):
+    def testAccumulateSelf(self) -> None:
         nobles = Nobles()
         nobles.nobles['Viscounts'] = 1
 
