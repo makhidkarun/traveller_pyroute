@@ -93,7 +93,7 @@ class RouteCalculation(object):
             if dist <= self.galaxy.max_jump_range:
                 weight = self.route_weight(star, neighbor)
                 btn = self.get_btn(star, neighbor, dist)
-                excess = (weight / dist - 1)
+                excess = (weight / (dist * epsilon) - 1)
                 exhaust = 1 + math.ceil(math.log(excess) * multiplier)
                 assert (weight - dist) * (ratio ** exhaust) <= epsilon * dist,\
                     'Edge between %s and %s has insufficient exhaust value, %i' % (star, neighbor, exhaust)
