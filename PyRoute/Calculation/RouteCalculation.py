@@ -81,6 +81,7 @@ class RouteCalculation(object):
         raw_ranges = self._raw_ranges()
         ratio = 1 - 1 / self.route_reuse
         multiplier = -1 / math.log(ratio)
+        epsilon = max(0.001, self.epsilon)
         for star, neighbor in raw_ranges:
             if self.base_route_filter(star, neighbor):
                 continue
@@ -94,6 +95,8 @@ class RouteCalculation(object):
                 btn = self.get_btn(star, neighbor, dist)
                 excess = (weight / dist - 1)
                 exhaust = 1 + math.ceil(math.log(excess) * multiplier)
+                assert (weight - dist) * (ratio ** exhaust) <= epsilon * dist,\
+                    'Edge between %s and %s has insufficient exhaust value, %i' % (star, neighbor, exhaust)
                 self.galaxy.stars.add_edge(star.index, neighbor.index, distance=dist,
                                            weight=weight, trade=0, btn=btn, count=0, exhaust=exhaust)
                 self.check_existing_routes(star, neighbor)
