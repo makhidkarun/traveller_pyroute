@@ -56,3 +56,13 @@ follow_imports = "silent"
 
 # Assume Python 3.9
 python_version = "3.9"
+
+
+[tool.coverage.run]
+source = ["PyRoute/"]
+
+[tool.mutmut]
+paths_to_mutate = ["PyRoute/"]
+tests_dir = ["Tests/"]
+also_copy = ["Tests/", "PyRoute/Pathfinding/*.so"]
+runner = "pytest -x"
