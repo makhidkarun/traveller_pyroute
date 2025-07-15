@@ -207,6 +207,7 @@ class ParseStarInput:
             else:
                 is_station = True
 
+        line = ParseStarInput._unpack_starline_pre_tweak(line)
         if ParseStarInput.parser is None:
             ParseStarInput.parser = StarlineParser()
         if ParseStarInput.station_parser is None:
@@ -291,6 +292,11 @@ class ParseStarInput:
 
         data = ParseStarInput._unpack_starline_tweak(data)
         return data
+
+    @staticmethod
+    def _unpack_starline_pre_tweak(line: str) -> str:
+        line = line.replace('{ {', '{')
+        return line
 
     @staticmethod
     def _unpack_starline_tweak(data) -> list[str]:

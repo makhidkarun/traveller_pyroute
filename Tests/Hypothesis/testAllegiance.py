@@ -103,7 +103,8 @@ class testAllegiance(unittest.TestCase):
             'First part of name string must not be an empty string itself',
             'Name must not contain square brackets',
             'Second part of name string must not be an empty string itself',
-            'must have at most one comma'
+            'must have at most one comma',
+            'Name must not be pair of empty strings'
         ]
 
         try:

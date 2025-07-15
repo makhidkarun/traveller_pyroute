@@ -173,6 +173,7 @@ class testStar(unittest.TestCase):
     @example('0101 02111111111111) ???????-? [oPrh00011111GitpHqwhA{KRNf{rpjqI}7bj]A        - - B 000   100', '0101 02111111111111)      ???????-? [oPrh00011111GitpHqwhA{KRNf{rpjqI}7b]                       -    -  B 000 0  100                                                          ')
     @example('0101 000000000000000 ???????-? [0000000)(]X [        - - B 001   100', '0101 000000000000000      ???????-? [0000000)(]X                                                -    -  B 001 0  100                                                          ')
     @example('2931 Dinenruum            E432679-6 Na Ni Po Da                           { -3 } (851-2) [7367] B    -  A 122 10 ImDc K1 IV M3 V M4 V', '2931 Dinenruum            E432679-6 Da Na Ni Po                           { -3 } (851-2) [7367] B    -  A 122 10 ImDc K1 IV M3 V M4 V                                          ')
+    @example('000000000000000 ???????-? 0000000000000 { {0} (000-0)  - -  -    A   000   00', None)
     def test_parse_line_to_star(self, s, t) -> None:
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
@@ -232,6 +233,7 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ?000000-0 0000000000000 B {   0} (000-0) [0000] - - A 000 0 00')
     @example('0101 000000000000?-0 A000000-0 000000000000000 {0} -  [0000] - - A 000   00')
     @example('2040 okQy)WREOS[xZE4LhS18Jz1DiAeXILGQ(n       hBdebAG-c                  } E}Zsi} AW]WHH {                 +0} -           [1111]         - -  B 018     1u1X')
+    @example('0101 [0000]000000000 A000000-0 000000000000000       - - A 000   00')
     def test_star_line_extension_parsing(self, s) -> None:
         econ_match = r'[ ]\([0-9A-Za-z]{3}[+-]\d\)[ ]'
         soc_match = r'[ ]\[[0-9A-Za-z]{4}\][ ]'
@@ -259,7 +261,7 @@ class testStar(unittest.TestCase):
         if imp_m:
             keep_imp = True
 
-        self.assertTrue(keep_econ or keep_social or keep_imp, "Must keep at least one of Ix and/or Ex and/or Cx")
+        assume(keep_econ or keep_social or keep_imp)
 
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
