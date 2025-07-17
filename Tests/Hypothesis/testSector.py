@@ -4,7 +4,7 @@ from datetime import timedelta
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, composite, floats, integers
 
-from PyRoute.AreaItems.Sector import Sector
+from AreaItems.Sector import Sector
 
 
 @composite
@@ -46,7 +46,7 @@ class testSector(unittest.TestCase):
 
     @given(sector_name(), position_string())
     @settings(
-        suppress_health_check=[HealthCheck(3), HealthCheck(2)],  # suppress slow-data health check, too-much filtering
+        suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)],  # suppress slow-data health check, too-much filtering
         deadline=timedelta(1000))
     @example('00', '0:,0')
     @example('#00', '#00,:')
@@ -92,6 +92,7 @@ class testSector(unittest.TestCase):
         self.assertIsNotNone(to_string)
 
     @given(two_sectors())
+    @settings(suppress_health_check=[HealthCheck(10)])
     @example({'sx': -2316, 'sy': 117, 'tx': 107, 'ty': 3057, 'direction': 1})
     def test_non_adjacent_sectors_hooked_together_are_not_ok(self, payload) -> None:
         source_pos = '# ' + str(payload['sx']) + ", " + str(payload['sy'])

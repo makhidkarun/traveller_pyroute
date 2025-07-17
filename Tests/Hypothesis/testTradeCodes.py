@@ -6,11 +6,11 @@ from typing import Union
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, from_regex, composite, sampled_from, lists, floats, booleans
 
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Errors.MultipleWPopError import MultipleWPopError
-from PyRoute.TradeCodes import TradeCodes
-from PyRoute.Star import Star
-from PyRoute.SystemData.UWP import UWP
+from AreaItems.Sector import Sector
+from Errors.MultipleWPopError import MultipleWPopError
+from TradeCodes import TradeCodes
+from Star import Star
+from SystemData.UWP import UWP
 
 
 tradecodes = []
@@ -45,6 +45,7 @@ class testTradeCodes(unittest.TestCase):
     cleanly round-trip to/from string
     """
     @given(text(min_size=15, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'))
+    @settings(suppress_health_check=[HealthCheck(10)])
     @example('(000000000000000000000000000000000000)')
     @example('000000000000000')
     @example('Pi (Feime)? Re Sa ')
@@ -129,7 +130,7 @@ class testTradeCodes(unittest.TestCase):
 
     @given(from_regex(regex=UWP.match, alphabet='0123456789abcdefghjklmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWYXZ -{}()[]?\'+*'),
           trade_line())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)], deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
     @example('A000000-0', '000000000000000')
     @example('A000100-0', '000000000000000')
     @example('A000400-0', '000000000000000')
@@ -181,6 +182,7 @@ class testTradeCodes(unittest.TestCase):
         self.assertEqual(0, len(msg), "Canonicalisation failed.  " + badline + '\n' + hyp_input)
 
     @given(trade_code(unique=True))
+    @settings(suppress_health_check=[HealthCheck(10)])
     def test_verify_trade_codes_from_direct_selection(self, trade_line) -> None:
         if isinstance(trade_line, list):
             trade_line = ' '.join(trade_line)
@@ -203,6 +205,7 @@ class testTradeCodes(unittest.TestCase):
     @given(from_regex(regex=UWP.match, alphabet='0123456789abcdefghjklmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWYXZ -{}()[]?\'+*'),
            trade_code(max_size=1, min_size=1),
            booleans())
+    @settings(suppress_health_check=[HealthCheck(10)])
     @example('?000000-0', ['De'], False)
     def test_has_code_but_not_uwp(self, s, trade_line, forward) -> None:
         s = s[0:9]

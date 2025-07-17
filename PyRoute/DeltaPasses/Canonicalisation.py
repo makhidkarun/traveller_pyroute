@@ -3,7 +3,7 @@ Created on Jun 13, 2023
 
 @author: CyberiaResurrection
 """
-from PyRoute.DeltaStar import DeltaStar
+from DeltaStar import DeltaStar
 
 
 class Canonicalisation(object):

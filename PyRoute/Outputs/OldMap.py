@@ -6,7 +6,7 @@ Created on May 14, 2016
 import logging
 from typing import Union, Any
 
-from PyRoute.Outputs.Cursor import Cursor
+from Outputs.Cursor import Cursor
 
 
 class OldMap(object):

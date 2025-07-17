@@ -3,7 +3,7 @@ import unittest
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, composite, floats, booleans
 
-from PyRoute.AreaItems.Allegiance import Allegiance
+from AreaItems.Allegiance import Allegiance
 
 
 @composite
@@ -41,7 +41,7 @@ def text_flanking_comma(draw) -> composite:
 class testAllegiance(unittest.TestCase):
 
     @given(text_or_none(), text_or_none(), booleans())
-    @settings(max_examples=1100)
+    @settings(max_examples=1100, suppress_health_check=[HealthCheck(10)])
     @example(None, '', True)
     @example(None, '', False)
     @example(None, None, True)
@@ -95,6 +95,7 @@ class testAllegiance(unittest.TestCase):
         text_starts_with(starts="Na"),
         booleans()
     )
+    @settings(suppress_health_check=[HealthCheck(10)])
     @example('00 ', 'Na', False)
     def test_allegiance_creation_with_nonaligned_code(self, name, code, base) -> None:
         assume('' != name.strip())
@@ -131,6 +132,7 @@ class testAllegiance(unittest.TestCase):
         text_starts_with(starts="Cs"),
         booleans()
     )
+    @settings(suppress_health_check=[HealthCheck(10)])
     @example('00 ', 'Cs', False)
     @example('0  ', 'Cs', True)
     @example('0  0', 'Cs', False)
@@ -172,6 +174,7 @@ class testAllegiance(unittest.TestCase):
         text(min_size=2, max_size=4),
         booleans()
     )
+    @settings(suppress_health_check=[HealthCheck(10)])
     def test_allegiance_creation_with_comma_in_name(self, name, code, base) -> None:
         assume('' != name.strip())
         alg = None
@@ -207,7 +210,7 @@ class testAllegiance(unittest.TestCase):
         text_starts_with(starts="Na"),
         booleans()
     )
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], max_examples=1100)
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)], max_examples=1100)
     @example(None, None, True)
     @example(None, None, False)
     @example('', None, True)

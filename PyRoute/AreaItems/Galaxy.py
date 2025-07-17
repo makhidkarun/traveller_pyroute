@@ -14,21 +14,21 @@ import math
 import networkx as nx
 import numpy as np
 
-from PyRoute.Allies.AllyGen import AllyGen
-from PyRoute.Allies.Borders import Borders
-from PyRoute.AreaItems.AreaItem import AreaItem
-from PyRoute.AreaItems.Allegiance import Allegiance
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Inputs.ParseSectorInput import ParseSectorInput
-from PyRoute.Star import Star
-from PyRoute.Calculation.TradeCalculation import TradeCalculation
-from PyRoute.Calculation.TradeMPCalculation import TradeMPCalculation
-from PyRoute.Calculation.CommCalculation import CommCalculation
-from PyRoute.Calculation.OwnedWorldCalculation import OwnedWorldCalculation
-from PyRoute.Calculation.NoneCalculation import NoneCalculation
-from PyRoute.Calculation.XRouteCalculation import XRouteCalculation
-from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
-from PyRoute.Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
+from Allies.AllyGen import AllyGen
+from Allies.Borders import Borders
+from AreaItems.AreaItem import AreaItem
+from AreaItems.Allegiance import Allegiance
+from AreaItems.Sector import Sector
+from Inputs.ParseSectorInput import ParseSectorInput
+from Star import Star
+from Calculation.TradeCalculation import TradeCalculation
+from Calculation.TradeMPCalculation import TradeMPCalculation
+from Calculation.CommCalculation import CommCalculation
+from Calculation.OwnedWorldCalculation import OwnedWorldCalculation
+from Calculation.NoneCalculation import NoneCalculation
+from Calculation.XRouteCalculation import XRouteCalculation
+from DataClasses.ReadSectorOptions import ReadSectorOptions
+from Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
 
 
 class Galaxy(AreaItem):
@@ -82,7 +82,7 @@ class Galaxy(AreaItem):
         self._set_trade_object(route_reuse, trade_choice, route_btn, mp_threads, debug_flag)
         star_counter = 0
         loaded_sectors: set[str] = set()
-        from PyRoute.Inputs.ParseStarInput import ParseStarInput
+        from Inputs.ParseStarInput import ParseStarInput
         ParseStarInput.deep_space = {} if (options.deep_space is None or not isinstance(options.deep_space, dict)) else options.deep_space
         logger = self.logger
         for sector in sectors:

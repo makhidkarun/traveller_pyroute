@@ -3,7 +3,7 @@ Created on 21 Jul, 2024
 
 @author: CyberiaResurrection
 """
-from PyRoute.AreaItems.AreaItem import AreaItem
+from AreaItems.AreaItem import AreaItem
 
 
 class Subsector(AreaItem):

@@ -6,7 +6,7 @@ Created on Jan 02, 2024
 
 import unittest
 
-from PyRoute.Inputs.StarlineTransformer import StarlineTransformer
+from Inputs.StarlineTransformer import StarlineTransformer
 
 
 class testStarlineTransformer(unittest.TestCase):

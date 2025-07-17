@@ -5,9 +5,9 @@ Created on Feb 25, 2024
 """
 import numpy as np
 
-from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
-from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
+from DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
 from Tests.baseTest import baseTest
 
 

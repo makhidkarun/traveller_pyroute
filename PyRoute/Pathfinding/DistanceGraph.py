@@ -11,7 +11,7 @@ import numpy as np
 from networkx.classes import Graph
 from numpy.core import multiarray
 
-from PyRoute.Pathfinding.DistanceBase import DistanceBase
+from Pathfinding.DistanceBase import DistanceBase
 
 
 class DistanceGraph(DistanceBase):

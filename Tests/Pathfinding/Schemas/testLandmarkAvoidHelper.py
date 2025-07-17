@@ -5,12 +5,12 @@ Created on Mar 06, 2024
 """
 import numpy as np
 
-from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
-from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
-from PyRoute.Pathfinding.LandmarkSchemes.LandmarkAvoidHelper import LandmarkAvoidHelper
+from DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from Pathfinding.DistanceGraph import DistanceGraph
+from Pathfinding.LandmarkSchemes.LandmarkAvoidHelper import LandmarkAvoidHelper
 from Tests.baseTest import baseTest
-from PyRoute.Pathfinding.single_source_dijkstra import explicit_shortest_path_dijkstra_distance_graph
+from Pathfinding.single_source_dijkstra import explicit_shortest_path_dijkstra_distance_graph
 
 
 class testLandmarkAvoidHelper(baseTest):

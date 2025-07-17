@@ -9,15 +9,15 @@ import unittest
 import networkx as nx
 import numpy as np
 
-from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
-from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
-from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
+from DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from DeltaDebug.DeltaGalaxy import DeltaGalaxy
 try:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
+    from Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
 except ImportError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
 from Tests.baseTest import baseTest
 
 

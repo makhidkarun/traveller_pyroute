@@ -5,12 +5,12 @@ Created on May 21, 2023
 """
 import copy
 
-from PyRoute.AreaItems.Allegiance import Allegiance
-from PyRoute.AreaItems.Galaxy import Galaxy
-from PyRoute.AreaItems.Subsector import Subsector
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, SubsectorDictionary
-from PyRoute.Star import Star
+from AreaItems.Allegiance import Allegiance
+from AreaItems.Galaxy import Galaxy
+from AreaItems.Subsector import Subsector
+from AreaItems.Sector import Sector
+from DeltaDebug.DeltaDictionary import SectorDictionary, SubsectorDictionary
+from Star import Star
 
 
 class DeltaGalaxy(Galaxy):

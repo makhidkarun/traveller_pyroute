@@ -8,16 +8,16 @@ from typing import Optional, Union
 
 from lark import UnexpectedCharacters, UnexpectedEOF
 
-from PyRoute.Allies.AllyGen import AllyGen
-from PyRoute.Errors.MultipleWPopError import MultipleWPopError
-from PyRoute.Inputs.StarlineStationParser import StarlineStationParser
-from PyRoute.Inputs.StarlineStationTransformer import StarlineStationTransformer
-from PyRoute.Inputs.StarlineTransformer import StarlineTransformer
-from PyRoute.Inputs.StarlineParser import StarlineParser
-from PyRoute.Nobles import Nobles
-from PyRoute.SystemData.UWP import UWP
-from PyRoute.SystemData.Utilities import Utilities
-from PyRoute.TradeCodes import TradeCodes
+from Allies.AllyGen import AllyGen
+from Errors.MultipleWPopError import MultipleWPopError
+from Inputs.StarlineStationParser import StarlineStationParser
+from Inputs.StarlineStationTransformer import StarlineStationTransformer
+from Inputs.StarlineTransformer import StarlineTransformer
+from Inputs.StarlineParser import StarlineParser
+from Nobles import Nobles
+from SystemData.UWP import UWP
+from SystemData.Utilities import Utilities
+from TradeCodes import TradeCodes
 
 
 class ParseStarInput:

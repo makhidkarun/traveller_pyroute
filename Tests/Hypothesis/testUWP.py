@@ -3,7 +3,7 @@ import unittest
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import from_regex, none
 
-from PyRoute.SystemData.UWP import UWP
+from SystemData.UWP import UWP
 
 
 class testUWP(unittest.TestCase):
@@ -12,6 +12,7 @@ class testUWP(unittest.TestCase):
     Given an otherwise valid input string, ensure the resulting UWP's string representation has no lowercase elements
     """
     @given(from_regex(UWP.match), none())
+    @settings(suppress_health_check=[HealthCheck(10)])
     @example('?000000-0', True)
     @example('?000000-00', True)
     @example('?000000-a', True)
@@ -50,7 +51,7 @@ class testUWP(unittest.TestCase):
     on the tin, and that canonicalisation is itself idempotent
     """
     @given(from_regex(UWP.match), none())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)])  # suppress slow-data health check, too-much filtering
     @example('?010000-0', '?000000-5')
     @example('?001000-0', '?000000-5')
     @example('?101000-0', '?100000-5')

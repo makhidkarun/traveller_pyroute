@@ -268,7 +268,7 @@ class BaseTransformer(Transformer):
     def _is_zone(self, zone_string):
         if 1 != len(zone_string):
             return False
-        from PyRoute.Inputs.ParseStarInput import ParseStarInput
+        from Inputs.ParseStarInput import ParseStarInput
         return zone_string[0] in ParseStarInput.valid_zone
 
     def _preprocess_tree_suspect_empty_trade_code(self, tree):
@@ -294,7 +294,7 @@ class BaseTransformer(Transformer):
 
     @staticmethod
     def _calc_trade_overrun(children, raw):
-        from PyRoute.Inputs.ParseStarInput import ParseStarInput
+        from Inputs.ParseStarInput import ParseStarInput
         trade_ext = ''
         overrun = 0
         # first check whether trade codes are straight up aligned
@@ -380,7 +380,7 @@ class BaseTransformer(Transformer):
                             self.raw = self.raw[index:]
 
     def _square_up_parsed_zero(self, rawstring, parsed):
-        from PyRoute.Inputs.ParseStarInput import ParseStarInput
+        from Inputs.ParseStarInput import ParseStarInput
         bitz = [item for item in rawstring.split(' ') if '' != item]
         if 3 == len(bitz) and bitz[0] == parsed['nobles'] and bitz[1] == parsed['base'] and bitz[2] == parsed['zone']:
             return parsed

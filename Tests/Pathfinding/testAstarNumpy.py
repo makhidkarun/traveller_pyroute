@@ -3,26 +3,26 @@ Created on Sep 21, 2023
 
 @author: CyberiaResurrection
 """
-from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
-from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
-from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from Pathfinding.DistanceGraph import DistanceGraph
+from DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from Tests.baseTest import baseTest
 goodimport = True
 try:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
+    from Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
     goodimport = False
 except ImportError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
     goodimport = False
 try:
-    from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
+    from Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
-    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+    from Pathfinding.astar_numpy_fallback import astar_path_numpy
     goodimport = False
 except ImportError:
-    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+    from Pathfinding.astar_numpy_fallback import astar_path_numpy
     goodimport = False
 
 

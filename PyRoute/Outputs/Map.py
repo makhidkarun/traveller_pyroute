@@ -8,10 +8,10 @@ import logging
 from typing import Any, Union, Optional
 from typing_extensions import TypeAlias
 
-from PyRoute.AreaItems.Galaxy import Galaxy, AreaItem
-from PyRoute.Outputs.Cursor import Cursor
-from PyRoute.Outputs.Colour import Colour
-from PyRoute.Outputs.HexSystem import HexSystem
+from AreaItems.Galaxy import Galaxy, AreaItem
+from Outputs.Cursor import Cursor
+from Outputs.Colour import Colour
+from Outputs.HexSystem import HexSystem
 
 Scheme: TypeAlias = str
 

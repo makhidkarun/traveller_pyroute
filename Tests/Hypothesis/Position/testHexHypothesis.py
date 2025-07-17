@@ -1,10 +1,10 @@
 import unittest
 
-from hypothesis import given, example
+from hypothesis import given, example, settings, HealthCheck
 from hypothesis.strategies import integers
 
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Position.Hex import Hex
+from AreaItems.Sector import Sector
+from Position.Hex import Hex
 
 
 class testHexHypothesis(unittest.TestCase):
@@ -13,6 +13,7 @@ class testHexHypothesis(unittest.TestCase):
     Given a hex co-ord pair, verify it converts cleanly to axial co-ordinates, and then back to the original hex co-ords
     """
     @given(integers(), integers())
+    @settings(suppress_health_check=[HealthCheck(10)])
     @example(1, 0)
     def test_axial_to_hex_and_hex_to_axial_round_trip(self, row, col) -> None:
         hyp_line = "Hypothesis input: " + str(row) + ", " + str(col)
@@ -31,6 +32,7 @@ class testHexHypothesis(unittest.TestCase):
     co-ords match the original values
     """
     @given(integers(min_value=-10, max_value=10), integers(min_value=-10, max_value=10), integers(min_value=1, max_value=32), integers(min_value=1, max_value=40))
+    @settings(suppress_health_check=[HealthCheck(10)])
     @example(0, 0, 1, 1)
     @example(0, 0, 1, 40)
     @example(0, 0, 32, 1)
@@ -52,6 +54,7 @@ class testHexHypothesis(unittest.TestCase):
         self.assertEqual(hex_co_ords, nu_hex_co_ords, "Position string did not round trip.  " + hyp_line)
 
     @given(integers(), integers(min_value=1, max_value=40))
+    @settings(suppress_health_check=[HealthCheck(10)])
     @example(0, 1)
     def test_dy_offset_and_reverse(self, sector_y, row) -> None:
         hyp_line = "Hypothesis input: " + str(sector_y) + ", " + str(row)

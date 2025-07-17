@@ -1,11 +1,9 @@
 import unittest
-import sys
 import logging
 
-sys.path.append('../PyRoute')
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.TradeCodes import TradeCodes
-from PyRoute.Star import Star
+from AreaItems.Sector import Sector
+from TradeCodes import TradeCodes
+from Star import Star
 
 
 class TestTradeCode(unittest.TestCase):

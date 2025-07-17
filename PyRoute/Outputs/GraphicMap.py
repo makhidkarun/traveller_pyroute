@@ -8,10 +8,10 @@ import math
 
 from PIL import Image, ImageDraw, ImageColor, ImageFont  # type:ignore[import-untyped]
 
-from PyRoute.Outputs.Colour import Colour
-from PyRoute.Outputs.Cursor import Cursor
-from PyRoute.Outputs.FontLayer import FontLayer
-from PyRoute.Outputs.Map import Map, Scheme
+from Outputs.Colour import Colour
+from Outputs.Cursor import Cursor
+from Outputs.FontLayer import FontLayer
+from Outputs.Map import Map, Scheme
 
 
 class GraphicMap(Map):

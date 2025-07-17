@@ -5,12 +5,9 @@ Created on Nov 30, 2021
 """
 
 import unittest
-import sys
 
-sys.path.append('../PyRoute')
-
-from PyRoute.AreaItems.Galaxy import Galaxy
-from PyRoute.AreaItems.Sector import Sector
+from AreaItems.Galaxy import Galaxy
+from AreaItems.Sector import Sector
 
 
 class testGalaxy(unittest.TestCase):

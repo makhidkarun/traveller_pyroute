@@ -3,14 +3,14 @@ Created on Apr 05, 2025
 
 @author: CyberiaResurrection
 """
-from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
-from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
+from DeltaDebug.DeltaDictionary import DeltaDictionary
+from DeltaPasses.WidenHoleReducer import WidenHoleReducer
 
 
 class BeyondLineReducer(object):
 
     def __init__(self, reducer):
-        from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
+        from DeltaDebug.DeltaReduce import DeltaReduce
         self.reducer: DeltaReduce = reducer
         self.breacher = WidenHoleReducer(reducer)
 

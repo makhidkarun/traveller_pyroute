@@ -4,10 +4,10 @@ Created on Nov 28, 2024
 @author: CyberiaResurrection
 """
 
-from PyRoute.AreaItems.Galaxy import Galaxy
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.SpeculativeTrade import SpeculativeTrade
-from PyRoute.Star import Star
+from AreaItems.Galaxy import Galaxy
+from AreaItems.Sector import Sector
+from SpeculativeTrade import SpeculativeTrade
+from Star import Star
 from Tests.baseTest import baseTest
 import unittest
 

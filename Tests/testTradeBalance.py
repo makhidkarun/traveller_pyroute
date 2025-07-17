@@ -1,9 +1,9 @@
 import unittest
 
-from PyRoute.AreaItems.AreaItem import AreaItem
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Star import Star
-from PyRoute.TradeBalance import TradeBalance
+from AreaItems.AreaItem import AreaItem
+from AreaItems.Sector import Sector
+from Star import Star
+from TradeBalance import TradeBalance
 
 
 class testTradeBalance(unittest.TestCase):

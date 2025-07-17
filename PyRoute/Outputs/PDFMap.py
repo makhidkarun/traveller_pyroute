@@ -12,10 +12,10 @@ from reportlab.lib.colors import toColor
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-from PyRoute.Outputs.Colour import Colour
-from PyRoute.Outputs.Cursor import Cursor
-from PyRoute.Outputs.FontLayer import FontLayer
-from PyRoute.Outputs.Map import MapOutput, Scheme
+from Outputs.Colour import Colour
+from Outputs.Cursor import Cursor
+from Outputs.FontLayer import FontLayer
+from Outputs.Map import MapOutput, Scheme
 
 
 class PDFMap(MapOutput):

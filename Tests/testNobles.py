@@ -5,10 +5,8 @@ Created on Jan 1, 2019
 """
 
 import unittest
-import sys
 
-sys.path.append('../PyRoute')
-from PyRoute.Nobles import Nobles
+from Nobles import Nobles
 
 
 class TestNobles(unittest.TestCase):

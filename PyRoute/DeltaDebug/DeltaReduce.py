@@ -10,36 +10,36 @@ import copy
 import logging
 import math
 
-from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
-from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
-from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.DeltaPasses.AllegianceReducer import AllegianceReducer
-from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
-from PyRoute.DeltaPasses.BaseLineReduce import BaseLineReduce
-from PyRoute.DeltaPasses.BaseTrimLineReduce import BaseTrimLineReduce
-from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
-from PyRoute.DeltaPasses.CapitalLineReduce import CapitalLineReduce
-from PyRoute.DeltaPasses.FullLineReduce import FullLineReduce
-from PyRoute.DeltaPasses.IdentityLineReduce import IdentityLineReduce
-from PyRoute.DeltaPasses.ImportanceLineReduce import ImportanceLineReduce
-from PyRoute.DeltaPasses.NBZLineReduce import NBZLineReduce
-from PyRoute.DeltaPasses.NoblesTrimLineReduce import NoblesTrimLineReduce
-from PyRoute.DeltaPasses.PortAndTlLineReduce import PortAndTlLineReduce
-from PyRoute.DeltaPasses.SectorReducer import SectorReducer
-from PyRoute.DeltaPasses.SingleLineReducer import SingleLineReducer
-from PyRoute.DeltaPasses.SubsectorReducer import SubsectorReducer
-from PyRoute.DeltaPasses.TradeCodeLineReduce import TradeCodeLineReduce
-from PyRoute.DeltaPasses.TradeCodeTrimLineReduce import TradeCodeTrimLineReduce
-from PyRoute.DeltaPasses.TwoLineReducer import TwoLineReducer
-from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
-from PyRoute.DeltaPasses.ZoneLineReduce import ZoneLineReduce
-from PyRoute.DeltaPasses.ZoneTrimLineReduce import ZoneTrimLineReduce
-from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
-from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
-from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
-from PyRoute.Outputs.SubsectorMap import SubsectorMap
-from PyRoute.SpeculativeTrade import SpeculativeTrade
-from PyRoute.StatCalculation import StatCalculation
+from DeltaDebug.DeltaLogicError import DeltaLogicError
+from DeltaDebug.DeltaDictionary import DeltaDictionary
+from DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from DeltaPasses.AllegianceReducer import AllegianceReducer
+from DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
+from DeltaPasses.BaseLineReduce import BaseLineReduce
+from DeltaPasses.BaseTrimLineReduce import BaseTrimLineReduce
+from DeltaPasses.Canonicalisation import Canonicalisation
+from DeltaPasses.CapitalLineReduce import CapitalLineReduce
+from DeltaPasses.FullLineReduce import FullLineReduce
+from DeltaPasses.IdentityLineReduce import IdentityLineReduce
+from DeltaPasses.ImportanceLineReduce import ImportanceLineReduce
+from DeltaPasses.NBZLineReduce import NBZLineReduce
+from DeltaPasses.NoblesTrimLineReduce import NoblesTrimLineReduce
+from DeltaPasses.PortAndTlLineReduce import PortAndTlLineReduce
+from DeltaPasses.SectorReducer import SectorReducer
+from DeltaPasses.SingleLineReducer import SingleLineReducer
+from DeltaPasses.SubsectorReducer import SubsectorReducer
+from DeltaPasses.TradeCodeLineReduce import TradeCodeLineReduce
+from DeltaPasses.TradeCodeTrimLineReduce import TradeCodeTrimLineReduce
+from DeltaPasses.TwoLineReducer import TwoLineReducer
+from DeltaPasses.WidenHoleReducer import WidenHoleReducer
+from DeltaPasses.ZoneLineReduce import ZoneLineReduce
+from DeltaPasses.ZoneTrimLineReduce import ZoneTrimLineReduce
+from Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
+from Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
+from Outputs.LightModePDFSectorMap import LightModePDFSectorMap
+from Outputs.SubsectorMap import SubsectorMap
+from SpeculativeTrade import SpeculativeTrade
+from StatCalculation import StatCalculation
 
 
 class DeltaReduce:

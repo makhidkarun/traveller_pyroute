@@ -10,7 +10,7 @@ import logging
 import sys
 from typing import Union
 
-from PyRoute.Errors.MultipleWPopError import MultipleWPopError
+from Errors.MultipleWPopError import MultipleWPopError
 
 
 class TradeCodes(object):

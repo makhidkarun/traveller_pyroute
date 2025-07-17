@@ -5,9 +5,9 @@ Created on Aug 29, 2023
 """
 import unittest
 
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Position.Hex import Hex
-from PyRoute.Star import Star
+from AreaItems.Sector import Sector
+from Position.Hex import Hex
+from Star import Star
 
 
 class testHex(unittest.TestCase):

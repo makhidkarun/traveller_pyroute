@@ -7,13 +7,13 @@ from datetime import timedelta
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import from_regex, composite, booleans, none
 
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Inputs.ParseStarInput import ParseStarInput
-from PyRoute.Position.Hex import Hex
-from PyRoute.Star import Star
-from PyRoute.SystemData.StarList import StarList
-from PyRoute.SystemData.UWP import UWP
-from PyRoute.TradeCodes import TradeCodes
+from AreaItems.Sector import Sector
+from Inputs.ParseStarInput import ParseStarInput
+from Position.Hex import Hex
+from Star import Star
+from SystemData.StarList import StarList
+from SystemData.UWP import UWP
+from TradeCodes import TradeCodes
 
 
 @composite
@@ -94,7 +94,7 @@ class testStar(unittest.TestCase):
     Given a regex-matching string, parse_line_to_star should return either a valid Star object or None
     """
     @given(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'), none())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)],
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)],
         deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
     @example('0101 000000000000000 00000O0-0 000000000000000       - - 0 000   00', '')
     @example('0101 000000000000000 ???????-? 000000000000000 {0} (000-0)  - - - 0 000   00', '')
@@ -210,7 +210,7 @@ class testStar(unittest.TestCase):
             self.assertEqual(t, nu_line, "Reparsed line not equal to expected line.\n " + hyp_line + " \n Reparsed: '" + nu_line + "'\n Expected: '" + t + "'\n")
 
     @given(importance_starline())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)],
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)],
               deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
     @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   0000D')
     @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000]         - 0 000   0000D')
@@ -291,7 +291,7 @@ class testStar(unittest.TestCase):
         self.assertTrue(foo.is_well_formed())
 
     @given(canonical_check())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(3000))
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)], deadline=timedelta(3000))
     @example('1919 Khula                ???????-? Hi In Pz Di(Khulans)      {0}  (000-0) [0000] BEf  N  A 510 10 ImDv M0 V')
     def test_star_canonicalise(self, s) -> None:
         hyp_line = "Hypothesis input: " + s
@@ -327,6 +327,7 @@ class testStar(unittest.TestCase):
            from_regex(r'^\([0-9A-Za-z]{3}[+-]\d\)'),
            from_regex(r'^\[[0-9A-Za-z]{4}\]'),
            none())
+    @settings(suppress_health_check=[HealthCheck(10)])
     @example('?000000-0', '(000-0)', '[0000]', None)
     @example('?000000-0', '(000-0)0', '[0000]', 'Star Sample economics must be None or 7-char string')
     @example('?000000-0', '(000-0)', '[0000]0', 'Star Sample social must be None or 6-char string')

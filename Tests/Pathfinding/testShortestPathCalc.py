@@ -1,11 +1,11 @@
 import json
 import unittest
 
-from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
-from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
+from DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from Pathfinding.DistanceGraph import DistanceGraph
 from Tests.baseTest import baseTest
-from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph,\
+from Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph,\
     explicit_shortest_path_dijkstra_distance_graph
 import numpy as np
 

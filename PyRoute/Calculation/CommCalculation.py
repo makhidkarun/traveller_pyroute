@@ -7,21 +7,21 @@ from typing import Optional
 
 import networkx as nx
 
-from PyRoute.Allies.AllyGen import AllyGen
-from PyRoute.Calculation.RouteCalculation import RouteCalculation
+from Allies.AllyGen import AllyGen
+from Calculation.RouteCalculation import RouteCalculation
 try:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
+    from Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
+    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 except ImportError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
+    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 try:
-    from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
+    from Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
-    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+    from Pathfinding.astar_numpy_fallback import astar_path_numpy
 except ImportError:
-    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
-from PyRoute.Star import Star
+    from Pathfinding.astar_numpy_fallback import astar_path_numpy
+from Star import Star
 
 
 class CommCalculation(RouteCalculation):

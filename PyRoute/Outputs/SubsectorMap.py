@@ -2,14 +2,14 @@ import math
 
 from PIL import ImageDraw, ImageFont, ImageColor  # type: ignore[import-untyped]
 
-from PyRoute.Allies.AllyGen import AllyGen
-from PyRoute.Position.Hex import Hex
-from PyRoute.Outputs.Cursor import Cursor
-from PyRoute.Outputs.GraphicMap import GraphicMap
-from PyRoute.Outputs.HexGrid import HexGrid
-from PyRoute.AreaItems.Galaxy import Galaxy
-from PyRoute.AreaItems.Subsector import Subsector
-from PyRoute.Star import Star
+from Allies.AllyGen import AllyGen
+from Position.Hex import Hex
+from Outputs.Cursor import Cursor
+from Outputs.GraphicMap import GraphicMap
+from Outputs.HexGrid import HexGrid
+from AreaItems.Galaxy import Galaxy
+from AreaItems.Subsector import Subsector
+from Star import Star
 
 
 class SubsectorMap(GraphicMap):

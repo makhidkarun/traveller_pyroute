@@ -3,7 +3,7 @@ Created on Oct 09, 2023
 
 @author: CyberiaResurrection
 """
-from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
+from DeltaDebug.DeltaReduce import DeltaReduce
 
 
 class DummyReduce(DeltaReduce):

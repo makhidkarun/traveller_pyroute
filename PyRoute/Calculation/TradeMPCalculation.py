@@ -9,20 +9,20 @@ from networkx import is_path
 from multiprocessing import Queue, Pool
 from queue import Empty
 
-from PyRoute.Calculation.TradeCalculation import TradeCalculation
-from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
+from Calculation.TradeCalculation import TradeCalculation
+from Pathfinding.DistanceGraph import DistanceGraph
 try:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
+    from Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
+    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 except ImportError:
-    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
+    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 try:
-    from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
+    from Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
-    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+    from Pathfinding.astar_numpy_fallback import astar_path_numpy
 except ImportError:
-    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+    from Pathfinding.astar_numpy_fallback import astar_path_numpy
 
 # Convert the TradeMPCalculation to a global variable to allow the child processes to access it, and all the data.
 tradeCalculation = None

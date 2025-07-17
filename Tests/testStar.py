@@ -6,18 +6,16 @@ Created on Mar 7, 2014
 import logging
 import copy
 import unittest
-import sys
 
-from PyRoute.AreaItems.Allegiance import Allegiance
-from PyRoute.Inputs.ParseStarInput import ParseStarInput
-from PyRoute.Position.Hex import Hex
-from PyRoute.Calculation.TradeCalculation import TradeCalculation
-from PyRoute.StatCalculation import StatCalculation
+from AreaItems.Allegiance import Allegiance
+from Inputs.ParseStarInput import ParseStarInput
+from Position.Hex import Hex
+from Calculation.TradeCalculation import TradeCalculation
+from StatCalculation import StatCalculation
 
-sys.path.append('../PyRoute')
-from PyRoute.AreaItems.Galaxy import Galaxy
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Star import Star
+from AreaItems.Galaxy import Galaxy
+from AreaItems.Sector import Sector
+from Star import Star
 
 
 class TestStar(unittest.TestCase):

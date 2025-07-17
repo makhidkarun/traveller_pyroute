@@ -3,8 +3,8 @@ Created on Jul 14, 2023
 
 @author: CyberiaResurrection
 """
-from PyRoute.DeltaPasses.WithinLineReducer import WithinLineReducer
-from PyRoute.DeltaStar import DeltaStar
+from DeltaPasses.WithinLineReducer import WithinLineReducer
+from DeltaStar import DeltaStar
 
 
 class ImportanceLineReduce(WithinLineReducer):

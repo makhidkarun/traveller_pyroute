@@ -1,9 +1,9 @@
 from Tests.baseTest import baseTest
 
-from PyRoute.AreaItems.Galaxy import Galaxy
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Outputs.Cursor import Cursor
-from PyRoute.Outputs.Map import Map
+from AreaItems.Galaxy import Galaxy
+from AreaItems.Sector import Sector
+from Outputs.Cursor import Cursor
+from Outputs.Map import Map
 
 
 class testMap(baseTest):
@@ -12,14 +12,14 @@ class testMap(baseTest):
         map = Map(galaxy, "trade", "./", "writer")
 
         expected_start = Cursor(0, 0)
-        self.assertEquals(expected_start, map.start, "Unexpected start value")
+        self.assertEqual(expected_start, map.start, "Unexpected start value")
 
     def test_hex_size(self) -> None:
         galaxy = Galaxy(8)
         map = Map(galaxy, "trade", "./", "writer")
 
         expected_hex_size = Cursor(6, 9)
-        self.assertEquals(expected_hex_size, map.hex_size, "Unexpected hex_size value")
+        self.assertEqual(expected_hex_size, map.hex_size, "Unexpected hex_size value")
 
     def test_document(self) -> None:
         galaxy = Galaxy(8)

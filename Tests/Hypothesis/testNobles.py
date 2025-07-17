@@ -1,14 +1,15 @@
 import unittest
 
-from hypothesis import given, assume
+from hypothesis import given, assume, settings, HealthCheck
 from hypothesis.strategies import text
 
-from PyRoute.Nobles import Nobles
+from Nobles import Nobles
 
 
 class testNobles(unittest.TestCase):
 
     @given(text(min_size=1, max_size=20, alphabet='ABcCDEfFGHI'))
+    @settings(suppress_health_check=[HealthCheck(10)])
     def test_nobles_creation(self, noble_line) -> None:
         hyp_line = "Hypothesis input: " + noble_line
         foo = Nobles()
@@ -18,6 +19,7 @@ class testNobles(unittest.TestCase):
         self.assertTrue(result, msg + '.  ' + hyp_line)
 
     @given(text(min_size=1, max_size=6, alphabet='ABcCDEfFGHI'))
+    @settings(suppress_health_check=[HealthCheck(10)])
     def test_nobles_str_round_trip(self, noble_line) -> None:
         hyp_line = "Hypothesis input: " + noble_line
         foo = Nobles()

@@ -5,11 +5,11 @@ Created on Apr 17, 2025
 """
 import copy
 
-from PyRoute.AreaItems.Allegiance import Allegiance
-from PyRoute.AreaItems.Galaxy import Galaxy
-from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
-from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
-from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from AreaItems.Allegiance import Allegiance
+from AreaItems.Galaxy import Galaxy
+from DataClasses.ReadSectorOptions import ReadSectorOptions
+from DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from Tests.baseTest import baseTest
 
 

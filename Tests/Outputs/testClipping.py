@@ -1,9 +1,9 @@
 import unittest
-from PyRoute.Outputs.Map import Map
-from PyRoute.Outputs.Cursor import Cursor
+from Outputs.Map import Map
+from Outputs.Cursor import Cursor
 
 
-class MyTestCase(unittest.TestCase):
+class testClipping(unittest.TestCase):
     def setUp(self) -> None:
         self.min_pos = Cursor(25, 25)
         self.max_pos = Cursor(100, 100)

@@ -5,11 +5,11 @@ Created on Oct 19, 2023
 """
 import copy
 
-from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
-from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.StatCalculation import StatCalculation, Populations
+from DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from StatCalculation import StatCalculation, Populations
 from Tests.baseTest import baseTest
-from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
+from Utilities.NoNoneDefaultDict import NoNoneDefaultDict
 
 
 class testStatCalcRegression(baseTest):

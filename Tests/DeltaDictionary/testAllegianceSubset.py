@@ -3,7 +3,7 @@ Created on Apr 23, 2025
 
 @author: CyberiaResurrection
 """
-from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from Tests.baseTest import baseTest
 
 

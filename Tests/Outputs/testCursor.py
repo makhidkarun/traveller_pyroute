@@ -1,7 +1,7 @@
 
 import unittest
 
-from PyRoute.Outputs.Cursor import Cursor
+from Outputs.Cursor import Cursor
 
 
 class TestCursor(unittest.TestCase):

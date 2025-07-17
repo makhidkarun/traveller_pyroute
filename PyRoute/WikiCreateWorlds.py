@@ -9,8 +9,8 @@ import argparse
 import os
 from typing import Union
 
-from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
-from PyRoute.AreaItems.Galaxy import Galaxy
+from DataClasses.ReadSectorOptions import ReadSectorOptions
+from AreaItems.Galaxy import Galaxy
 from .WikiReview import WikiReview
 from wikitools.page import Page  # type:ignore[import-not-found]
 

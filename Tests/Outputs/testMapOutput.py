@@ -1,8 +1,8 @@
 import logging
 
-from PyRoute.AreaItems.Galaxy import Galaxy
-from PyRoute.Outputs.Cursor import Cursor
-from PyRoute.Outputs.Map import Map, MapOutput
+from AreaItems.Galaxy import Galaxy
+from Outputs.Cursor import Cursor
+from Outputs.Map import Map, MapOutput
 from Tests.baseTest import baseTest
 
 
@@ -56,21 +56,21 @@ class testMapOutput(baseTest):
         galaxy = Galaxy(8)
         map = MapOutput(galaxy, "trade", "./", "writer")
 
-        self.assertEquals('./', map.output_path, "Unexpected output value")
+        self.assertEqual('./', map.output_path, "Unexpected output value")
 
     def test_logger(self) -> None:
         galaxy = Galaxy(8)
         map = MapOutput(galaxy, "trade", "./", "writer")
         logger = logging.getLogger('PyRoute.Outputs.MapOutput')
 
-        self.assertEquals(logger, map.logger, "Unexpected logger value")
+        self.assertEqual(logger, map.logger, "Unexpected logger value")
 
     def test_image_size(self) -> None:
         galaxy = Galaxy(8)
         map = MapOutput(galaxy, "trade", "./", "writer")
         image_size = Cursor(0, 0)
 
-        self.assertEquals(image_size, map.image_size, "Unexpected image_size value")
+        self.assertEqual(image_size, map.image_size, "Unexpected image_size value")
 
     def test_clipping(self) -> None:
         minpos = Cursor(0, 0)

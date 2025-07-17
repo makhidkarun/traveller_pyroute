@@ -1,7 +1,7 @@
 import functools
 from math import ceil
 
-from PyRoute.Star import Star
+from Star import Star
 
 
 class TradeBalance(dict):
@@ -9,7 +9,7 @@ class TradeBalance(dict):
     def __init__(self, stat_field=None, region=None, target="passenger", field="sectors", star_field="sector",
                  target_property="name"):
         assert isinstance(stat_field, str), "Stat_field must be a string"
-        from PyRoute.AreaItems.Galaxy import Galaxy
+        from AreaItems.Galaxy import Galaxy
         assert isinstance(type(region), type(Galaxy)), "Region must be an Galaxy"
         assert isinstance(target, str)
         assert isinstance(field, str), "Target field must be a string"

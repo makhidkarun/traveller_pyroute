@@ -3,12 +3,12 @@ Created on Feb 19, 2024
 
 @author: CyberiaResurrection
 """
-from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
-from PyRoute.Pathfinding.LandmarkSchemes.LandmarksQExtremes import LandmarksQExtremes
-from PyRoute.Pathfinding.LandmarkSchemes.LandmarksRExtremes import LandmarksRExtremes
-from PyRoute.Pathfinding.LandmarkSchemes.LandmarksSExtremes import LandmarksSExtremes
-from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
+from DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from Pathfinding.LandmarkSchemes.LandmarksQExtremes import LandmarksQExtremes
+from Pathfinding.LandmarkSchemes.LandmarksRExtremes import LandmarksRExtremes
+from Pathfinding.LandmarkSchemes.LandmarksSExtremes import LandmarksSExtremes
+from Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
 from Tests.baseTest import baseTest
 
 

@@ -1,8 +1,8 @@
 import unittest
 
-from PyRoute.AreaItems.Sector import Sector
-from PyRoute.DeltaStar import DeltaStar
-from PyRoute.Star import Star
+from AreaItems.Sector import Sector
+from DeltaStar import DeltaStar
+from Star import Star
 
 
 class testDeltaStar(unittest.TestCase):
