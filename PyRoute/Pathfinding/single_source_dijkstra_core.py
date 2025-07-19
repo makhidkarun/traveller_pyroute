@@ -22,6 +22,9 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
                   distance_labels: cnp.ndarray[cython.float], divisor: cython.float,
                   seeds: cython.list[cython.int],
                   max_neighbour_labels: cnp.ndarray[cython.float], min_cost: cnp.ndarray[cython.float]) -> tuple:
+    if not isinstance(min_cost, cnp.ndarray):
+        raise ValueError("min_cost must be ndarray")
+
     neighbours: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
     act_wt: cython.float
     act_nod: cython.int
