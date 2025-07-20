@@ -3,8 +3,8 @@ import unittest
 from hypothesis import given, example, settings, HealthCheck
 from hypothesis.strategies import integers
 
-from AreaItems.Sector import Sector
-from Position.Hex import Hex
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Position.Hex import Hex
 
 
 class testHexHypothesis(unittest.TestCase):

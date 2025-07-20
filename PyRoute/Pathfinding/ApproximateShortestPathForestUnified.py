@@ -10,9 +10,9 @@ import functools
 from typing import Any
 
 import numpy as np
-from Star import Star
-from Pathfinding.DistanceGraph import DistanceGraph
-from Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph
+from PyRoute.Star import Star
+from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
+from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph
 from single_source_dijkstra_core import dijkstra_core
 
 cnp.import_array()

@@ -2,12 +2,12 @@ import unittest
 import logging
 import tempfile
 
-from AreaItems.Galaxy import Galaxy
-from AreaItems.Sector import Sector
-from DataClasses.ReadSectorOptions import ReadSectorOptions
-from Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
-from Outputs.LightModeGraphicSectorMap import LightModeGraphicSectorMap
-from Outputs.LightModePDFSectorMap import LightModePDFSectorMap
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
+from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
+from PyRoute.Outputs.LightModeGraphicSectorMap import LightModeGraphicSectorMap
+from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
 
 from Tests.baseTest import baseTest
 from Tests.Outputs.TestMap import TestSectorMap

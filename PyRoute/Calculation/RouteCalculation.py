@@ -13,9 +13,9 @@ from typing import Any, Optional
 
 import networkx as nx
 
-from Allies.AllyGen import AllyGen
-from Pathfinding.DistanceGraph import DistanceGraph
-from Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
+from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
+from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
 
 
 class RouteCalculation(object):
@@ -36,7 +36,7 @@ class RouteCalculation(object):
     btn_jump_mod = [0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10]
 
     def __init__(self, galaxy):
-        from AreaItems.Galaxy import Galaxy
+        from PyRoute.AreaItems.Galaxy import Galaxy
         self.logger = logging.getLogger('PyRoute.TradeCalculation')
         self.galaxy: Galaxy = galaxy
         self.epsilon = 0.2

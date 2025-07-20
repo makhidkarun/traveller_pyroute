@@ -3,7 +3,7 @@ Created on 21 Jul, 2024
 
 @author: CyberiaResurrection
 """
-from StatCalculation import ObjectStatistics
+from PyRoute.StatCalculation import ObjectStatistics
 
 
 class AreaItem(object):

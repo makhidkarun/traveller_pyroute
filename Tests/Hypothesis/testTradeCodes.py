@@ -6,11 +6,11 @@ from typing import Union
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, from_regex, composite, sampled_from, lists, floats, booleans
 
-from AreaItems.Sector import Sector
-from Errors.MultipleWPopError import MultipleWPopError
-from TradeCodes import TradeCodes
-from Star import Star
-from SystemData.UWP import UWP
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Errors.MultipleWPopError import MultipleWPopError
+from PyRoute.TradeCodes import TradeCodes
+from PyRoute.Star import Star
+from PyRoute.SystemData.UWP import UWP
 
 
 tradecodes = []

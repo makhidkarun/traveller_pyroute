@@ -4,7 +4,7 @@ from datetime import timedelta
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, composite, floats, integers
 
-from AreaItems.Sector import Sector
+from PyRoute.AreaItems.Sector import Sector
 
 
 @composite

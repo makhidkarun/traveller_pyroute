@@ -9,12 +9,12 @@ import os
 from logging import Logger
 from typing import Union
 
-from Allies.AllyGen import AllyGen
-from AreaItems.Allegiance import Allegiance
-from AreaItems.Sector import Sector
-from AreaItems.Subsector import Subsector
-from DeltaDebug.DeltaDictionary import SectorDictionary, SubsectorDictionary
-from Star import Star
+from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.AreaItems.Allegiance import Allegiance
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.AreaItems.Subsector import Subsector
+from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, SubsectorDictionary
+from PyRoute.Star import Star
 
 
 class ParseSectorInput:

@@ -3,22 +3,22 @@ Created on Aug 08, 2024
 
 @author: CyberiaResurrection
 """
-from AreaItems.Galaxy import Galaxy
-from DataClasses.ReadSectorOptions import ReadSectorOptions
-from Pathfinding.DistanceGraph import DistanceGraph
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
+from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from Tests.baseTest import baseTest
 try:
-    from Pathfinding.astar_numpy import astar_path_numpy
+    from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
-    from Pathfinding.astar_numpy_fallback import astar_path_numpy
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
 except ImportError:
-    from Pathfinding.astar_numpy_fallback import astar_path_numpy
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
 try:
-    from Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
-    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
 except ImportError:
-    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
 
 
 class testTradeCalculation(baseTest):

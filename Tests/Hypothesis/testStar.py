@@ -7,13 +7,13 @@ from datetime import timedelta
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import from_regex, composite, booleans, none
 
-from AreaItems.Sector import Sector
-from Inputs.ParseStarInput import ParseStarInput
-from Position.Hex import Hex
-from Star import Star
-from SystemData.StarList import StarList
-from SystemData.UWP import UWP
-from TradeCodes import TradeCodes
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
+from PyRoute.Position.Hex import Hex
+from PyRoute.Star import Star
+from PyRoute.SystemData.StarList import StarList
+from PyRoute.SystemData.UWP import UWP
+from PyRoute.TradeCodes import TradeCodes
 
 
 @composite

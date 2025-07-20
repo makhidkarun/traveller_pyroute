@@ -3,7 +3,7 @@ Created on Oct 03, 2023
 
 @author: CyberiaResurrection
 """
-from DeltaPasses.BeyondLineReducer import BeyondLineReducer
+from PyRoute.DeltaPasses.BeyondLineReducer import BeyondLineReducer
 
 
 class SingleLineReducer(BeyondLineReducer):

@@ -23,10 +23,10 @@ import codecs
 import os
 from typing import Optional
 
-from AreaItems.Galaxy import Galaxy
-from AreaItems.Sector import Sector
-from DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
-from DeltaDebug.DeltaReduce import DeltaReduce
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
+from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
 
 
 logger = logging.getLogger('PyRoute')
@@ -147,7 +147,7 @@ def process() -> None:
             deep_space[bitz[0]] = []
         deep_space[bitz[0]].append(bitz[1].strip('\n'))
 
-    from Inputs.ParseStarInput import ParseStarInput
+    from PyRoute.Inputs.ParseStarInput import ParseStarInput
     ParseStarInput.deep_space = {} if (deep_space is None or not isinstance(deep_space, dict)) else deep_space
 
     delta_dict = DeltaDictionary()

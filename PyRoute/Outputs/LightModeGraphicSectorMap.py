@@ -1,8 +1,8 @@
 
-from AreaItems.Galaxy import Galaxy
+from PyRoute.AreaItems.Galaxy import Galaxy
 
-from Outputs.GraphicMap import GraphicMap
-from Outputs.SectorMap import SectorMap
+from PyRoute.Outputs.GraphicMap import GraphicMap
+from PyRoute.Outputs.SectorMap import SectorMap
 
 
 class LightModeGraphicSectorMap(GraphicMap, SectorMap):

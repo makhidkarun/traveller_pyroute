@@ -6,8 +6,8 @@ Created on Dec 27, 2023
 
 import unittest
 
-from Inputs.StarlineParser import StarlineParser
-from Inputs.StarlineTransformer import StarlineTransformer
+from PyRoute.Inputs.StarlineParser import StarlineParser
+from PyRoute.Inputs.StarlineTransformer import StarlineTransformer
 
 
 class testStarlineParser(unittest.TestCase):

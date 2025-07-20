@@ -3,7 +3,7 @@ Created on Oct 07, 2023
 
 @author: CyberiaResurrection
 """
-from DeltaDebug.DeltaDictionary import DeltaDictionary
+from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 
 
 class AllegianceReducer(object):

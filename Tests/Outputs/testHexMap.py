@@ -8,14 +8,14 @@ import networkx as nx
 import numpy as np
 from pymupdf import pymupdf
 
-from DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
-from DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
-from Outputs.SubsectorMap import SubsectorMap
-from Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
-from Outputs.LightModePDFSectorMap import LightModePDFSectorMap
-from Position.Hex import Hex
-from SpeculativeTrade import SpeculativeTrade
+from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
+from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
+from PyRoute.Outputs.SubsectorMap import SubsectorMap
+from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
+from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
+from PyRoute.Position.Hex import Hex
+from PyRoute.SpeculativeTrade import SpeculativeTrade
 from Tests.baseTest import baseTest
 
 

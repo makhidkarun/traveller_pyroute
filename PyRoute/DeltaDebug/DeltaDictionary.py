@@ -10,8 +10,8 @@ import os
 from typing import Optional
 from typing_extensions import Self
 
-from AreaItems.Sector import Sector
-from DeltaDebug.DeltaLogicError import DeltaLogicError
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
 
 
 class DeltaDictionary(dict):
@@ -364,7 +364,7 @@ class SectorDictionary(dict):
 
     @staticmethod
     def load_traveller_map_file(filename) -> Optional[Sector]:
-        from Inputs.ParseSectorInput import ParseSectorInput
+        from PyRoute.Inputs.ParseSectorInput import ParseSectorInput
         basename = os.path.basename(filename)
         logger = logging.getLogger('PyRoute.DeltaDictionary')
         headers, starlines = ParseSectorInput.read_sector_file(filename, logger)

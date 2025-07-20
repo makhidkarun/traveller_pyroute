@@ -1,15 +1,15 @@
-from Outputs.HexGrid import HexGrid
-from Outputs.Cursor import Cursor
-from Position.Hex import Hex
-from Star import Star
-from StatCalculation import StatCalculation
-from SystemData.UWP import UWP
-from TradeCodes import TradeCodes
+from PyRoute.Outputs.HexGrid import HexGrid
+from PyRoute.Outputs.Cursor import Cursor
+from PyRoute.Position.Hex import Hex
+from PyRoute.Star import Star
+from PyRoute.StatCalculation import StatCalculation
+from PyRoute.SystemData.UWP import UWP
+from PyRoute.TradeCodes import TradeCodes
 
 
 class HexSystem(object):
     def __init__(self, doc: "MapOutput", start: Cursor, hex_size: Cursor, routes: str = "trade"):  # noqa
-        from Outputs.Map import MapOutput
+        from PyRoute.Outputs.Map import MapOutput
         self.doc: MapOutput = doc
         self.start: Cursor = start
         self.hex_size: Cursor = hex_size

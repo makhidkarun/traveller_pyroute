@@ -9,13 +9,13 @@ from collections import defaultdict
 from typing import Any
 
 try:
-    from Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
-    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
 except ImportError:
-    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
-from Pathfinding.LandmarkSchemes.LandmarkAvoidHelper import LandmarkAvoidHelper
-from Pathfinding.single_source_dijkstra import explicit_shortest_path_dijkstra_distance_graph
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+from PyRoute.Pathfinding.LandmarkSchemes.LandmarkAvoidHelper import LandmarkAvoidHelper
+from PyRoute.Pathfinding.single_source_dijkstra import explicit_shortest_path_dijkstra_distance_graph
 
 
 class LandmarksTriaxialExtremes:

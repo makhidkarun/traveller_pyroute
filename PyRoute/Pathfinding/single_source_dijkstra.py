@@ -12,11 +12,11 @@ the specific input format used in PyRoute.
 import numpy as np
 
 try:
-    from Pathfinding.single_source_dijkstra_core import dijkstra_core
+    from PyRoute.Pathfinding.single_source_dijkstra_core import dijkstra_core
 except ModuleNotFoundError:
-    from Pathfinding.single_source_dijkstra_core_fallback import dijkstra_core
+    from PyRoute.Pathfinding.single_source_dijkstra_core_fallback import dijkstra_core
 except ImportError:
-    from Pathfinding.single_source_dijkstra_core_fallback import dijkstra_core
+    from PyRoute.Pathfinding.single_source_dijkstra_core_fallback import dijkstra_core
 
 
 def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1, min_cost=None, max_labels=None) -> tuple:

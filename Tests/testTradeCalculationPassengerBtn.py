@@ -1,9 +1,9 @@
 import unittest
 
-from Calculation.TradeCalculation import TradeCalculation
+from PyRoute.Calculation.TradeCalculation import TradeCalculation
 
-from Star import Star
-from TradeCodes import TradeCodes
+from PyRoute.Star import Star
+from PyRoute.TradeCodes import TradeCodes
 
 param_list = [
     ('A sector capital, B rich sector capital', False, False, True, False, True, False, True, True, 5),

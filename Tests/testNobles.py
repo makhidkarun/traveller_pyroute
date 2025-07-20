@@ -6,7 +6,7 @@ Created on Jan 1, 2019
 
 import unittest
 
-from Nobles import Nobles
+from PyRoute.Nobles import Nobles
 
 
 class TestNobles(unittest.TestCase):

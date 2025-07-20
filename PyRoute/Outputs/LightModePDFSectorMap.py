@@ -1,8 +1,8 @@
 
-from AreaItems.Galaxy import Galaxy
+from PyRoute.AreaItems.Galaxy import Galaxy
 
-from Outputs.PDFMap import PDFMap
-from Outputs.SectorMap import SectorMap
+from PyRoute.Outputs.PDFMap import PDFMap
+from PyRoute.Outputs.SectorMap import SectorMap
 
 
 class LightModePDFSectorMap(PDFMap, SectorMap):

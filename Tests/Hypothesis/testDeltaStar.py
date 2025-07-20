@@ -7,10 +7,10 @@ import unittest
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, lists, from_regex, composite, sampled_from, integers, floats
 
-from AreaItems.Sector import Sector
-from DeltaStar import DeltaStar
-from Inputs.ParseStarInput import ParseStarInput
-from TradeCodes import TradeCodes
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.DeltaStar import DeltaStar
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
+from PyRoute.TradeCodes import TradeCodes
 
 tradecodes = []
 

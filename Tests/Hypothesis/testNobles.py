@@ -3,7 +3,7 @@ import unittest
 from hypothesis import given, assume, settings, HealthCheck
 from hypothesis.strategies import text
 
-from Nobles import Nobles
+from PyRoute.Nobles import Nobles
 
 
 class testNobles(unittest.TestCase):

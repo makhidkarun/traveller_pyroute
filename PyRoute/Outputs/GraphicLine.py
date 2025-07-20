@@ -5,7 +5,7 @@ Created on Sep 12, 2023
 """
 from PIL import ImageColor  # type: ignore
 
-from Outputs.Cursor import Cursor
+from PyRoute.Outputs.Cursor import Cursor
 
 
 class GraphicLine(object):

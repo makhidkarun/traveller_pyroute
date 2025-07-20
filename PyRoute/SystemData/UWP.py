@@ -8,7 +8,7 @@ rather than the multiple concerns the Star class has evolved to embody.
 """
 import re
 
-from SystemData.Utilities import Utilities
+from PyRoute.SystemData.Utilities import Utilities
 
 
 class UWP(object):

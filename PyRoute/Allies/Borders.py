@@ -11,11 +11,11 @@ import os
 from typing_extensions import TypeAlias
 from typing import Optional, Union
 
-from Allies.AllyGen import AllyGen
-import AreaItems.Galaxy as Galaxy
-from Outputs.Colour import Colour
-from Position.Hex import Hex, HexPos
-from Star import Star
+from PyRoute.Allies.AllyGen import AllyGen
+import PyRoute.AreaItems.Galaxy as Galaxy
+from PyRoute.Outputs.Colour import Colour
+from PyRoute.Position.Hex import Hex, HexPos
+from PyRoute.Star import Star
 
 Alg: TypeAlias = Optional[str]
 AllyMap: TypeAlias = dict[HexPos, Alg]

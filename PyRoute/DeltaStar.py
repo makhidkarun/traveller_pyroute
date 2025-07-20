@@ -5,11 +5,11 @@ Created on Jun 13, 2023
 """
 from typing import Optional
 
-from AreaItems.Sector import Sector
-from Inputs.ParseStarInput import ParseStarInput
-from Nobles import Nobles
-from Star import Star
-from TradeCodes import TradeCodes
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
+from PyRoute.Nobles import Nobles
+from PyRoute.Star import Star
+from PyRoute.TradeCodes import TradeCodes
 
 
 class DeltaStar(Star):

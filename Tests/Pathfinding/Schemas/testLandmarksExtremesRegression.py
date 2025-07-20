@@ -3,9 +3,9 @@ Created on 05 Sep, 2024
 
 @author: CyberiaResurrection
 """
-from AreaItems.Galaxy import Galaxy
-from DataClasses.ReadSectorOptions import ReadSectorOptions
-from Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
+from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
 from Tests.baseTest import baseTest
 
 

@@ -6,8 +6,8 @@ Created on 19 Apr, 2025
 import copy
 import logging
 
-from Star import Star
-from AreaItems.Sector import Sector
+from PyRoute.Star import Star
+from PyRoute.AreaItems.Sector import Sector
 from Tests.baseTest import baseTest
 
 

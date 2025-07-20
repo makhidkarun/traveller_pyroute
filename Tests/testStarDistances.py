@@ -1,8 +1,8 @@
 import unittest
 
-from AreaItems.Sector import Sector
-from Position.Hex import Hex
-from Star import Star
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Position.Hex import Hex
+from PyRoute.Star import Star
 
 distance_list = [
     ('0104, Core, big odd dx, odd dy', ' Core', ' 0, 0', '0104', '2209', 21, 5, 21),

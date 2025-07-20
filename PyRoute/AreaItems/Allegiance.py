@@ -5,8 +5,8 @@ Created on 21 Jul, 2024
 """
 import copy
 
-from Allies.AllyGen import AllyGen
-from AreaItems.AreaItem import AreaItem
+from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.AreaItems.AreaItem import AreaItem
 
 
 class Allegiance(AreaItem):

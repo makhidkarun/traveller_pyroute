@@ -12,14 +12,14 @@ import math
 from typing import Tuple, Optional
 from typing_extensions import TypeAlias
 
-from Position.Hex import Hex
+from PyRoute.Position.Hex import Hex
 
-from Allies.AllyGen import AllyGen
-from Inputs.ParseStarInput import ParseStarInput
-from SystemData.Utilities import Utilities
+from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
+from PyRoute.SystemData.Utilities import Utilities
 from collections import OrderedDict
 
-from SystemData.StarList import StarList
+from PyRoute.SystemData.StarList import StarList
 
 HexPos: TypeAlias = Tuple[int, int]
 
@@ -155,7 +155,7 @@ class Star(object):
 
     @staticmethod
     def parse_line_into_star(line, sector, pop_code, ru_calc, fix_pop=False):
-        from Inputs.ParseStarInput import ParseStarInput
+        from PyRoute.Inputs.ParseStarInput import ParseStarInput
         star = Star()
         return ParseStarInput.parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=fix_pop)
 

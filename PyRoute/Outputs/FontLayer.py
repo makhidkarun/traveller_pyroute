@@ -11,7 +11,7 @@ though they're now bundled with the project.
 import os
 import functools
 
-from Utilities.UnpackFilename import UnpackFilename
+from PyRoute.Utilities.UnpackFilename import UnpackFilename
 
 
 class FontLayer(object):

@@ -3,8 +3,8 @@ Created on Jun 13, 2023
 
 @author: CyberiaResurrection
 """
-from DeltaPasses.WithinLineReducer import WithinLineReducer
-from DeltaStar import DeltaStar
+from PyRoute.DeltaPasses.WithinLineReducer import WithinLineReducer
+from PyRoute.DeltaStar import DeltaStar
 
 
 class FullLineReduce(WithinLineReducer):

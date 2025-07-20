@@ -1,8 +1,8 @@
 
-from Allies.Borders import Borders
-from Outputs.Cursor import Cursor
-from Outputs.Colour import Colour
-from Position.Hex import Hex
+from PyRoute.Allies.Borders import Borders
+from PyRoute.Outputs.Cursor import Cursor
+from PyRoute.Outputs.Colour import Colour
+from PyRoute.Position.Hex import Hex
 
 
 class HexGrid(object):
@@ -33,7 +33,7 @@ class HexGrid(object):
     size x/y determine the width and height of each hex.
     """
     def __init__(self, doc: "MapOutput", start: Cursor, size: Cursor, rows: int, cols: int, legacy: bool = False):  # noqa
-        from Outputs.Map import MapOutput
+        from PyRoute.Outputs.Map import MapOutput
         self.hex_grid_colour: Colour = 'gray'
         self.doc: MapOutput = doc
 

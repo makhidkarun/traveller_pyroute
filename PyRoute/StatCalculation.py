@@ -7,11 +7,11 @@ import contextlib
 import copy
 import logging
 import math
-from wikistats import WikiStats
+from PyRoute.wikistats import WikiStats
 from collections import OrderedDict
-from Allies.AllyGen import AllyGen
-from Star import UWPCodes
-from Utilities.NoNoneDefaultDict import NoNoneDefaultDict
+from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.Star import UWPCodes
+from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
 
 
 class Populations(object):

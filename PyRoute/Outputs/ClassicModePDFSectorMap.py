@@ -9,15 +9,15 @@ import os
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.colors import toColor
 
-from AreaItems.Galaxy import Galaxy
-from Star import Star
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.Star import Star
 
-from AreaItems.Sector import Sector
-from Outputs.Cursor import Cursor
-from Outputs.HexGrid import HexGrid
-from Outputs.PDFMap import PDFMap
-from Outputs.SectorMap import SectorMap
-from StatCalculation import StatCalculation
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Outputs.Cursor import Cursor
+from PyRoute.Outputs.HexGrid import HexGrid
+from PyRoute.Outputs.PDFMap import PDFMap
+from PyRoute.Outputs.SectorMap import SectorMap
+from PyRoute.StatCalculation import StatCalculation
 
 
 class ClassicModePDFSectorMap(PDFMap, SectorMap):

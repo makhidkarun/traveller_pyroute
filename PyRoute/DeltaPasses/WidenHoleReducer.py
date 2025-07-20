@@ -5,13 +5,13 @@ Created on Oct 04, 2023
 """
 from typing import Optional
 
-from DeltaDebug.DeltaDictionary import DeltaDictionary
+from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
 
 
 class WidenHoleReducer(object):
 
     def __init__(self, reducer):
-        from DeltaDebug.DeltaReduce import DeltaReduce
+        from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
         self.reducer: DeltaReduce = reducer
 
     def preflight(self) -> bool:

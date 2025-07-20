@@ -2,16 +2,16 @@ import argparse
 import tempfile
 import unittest.main
 
-from AreaItems.Allegiance import Allegiance
-from DeltaPasses.AllegianceReducer import AllegianceReducer
-from DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
-from DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
-from DeltaPasses.Canonicalisation import Canonicalisation
-from DeltaDebug.DeltaReduce import DeltaReduce
-from DeltaPasses.FullLineReduce import FullLineReduce
-from DeltaPasses.ImportanceLineReduce import ImportanceLineReduce
-from DeltaPasses.WidenHoleReducer import WidenHoleReducer
-from DeltaStar import DeltaStar
+from PyRoute.AreaItems.Allegiance import Allegiance
+from PyRoute.DeltaPasses.AllegianceReducer import AllegianceReducer
+from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from PyRoute.DeltaPasses.AuxiliaryLineReduce import AuxiliaryLineReduce
+from PyRoute.DeltaPasses.Canonicalisation import Canonicalisation
+from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
+from PyRoute.DeltaPasses.FullLineReduce import FullLineReduce
+from PyRoute.DeltaPasses.ImportanceLineReduce import ImportanceLineReduce
+from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
+from PyRoute.DeltaStar import DeltaStar
 from Tests.Dummy.DeltaDebug.DummyReduce import DummyReduce
 from Tests.baseTest import baseTest
 

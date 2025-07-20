@@ -5,8 +5,8 @@ Created on Aug 05, 2024
 """
 import logging
 
-from Outputs.OldMap import OldMap
-from StatCalculation import StatCalculation
+from PyRoute.Outputs.OldMap import OldMap
+from PyRoute.StatCalculation import StatCalculation
 
 
 class SectorHexMap(OldMap):

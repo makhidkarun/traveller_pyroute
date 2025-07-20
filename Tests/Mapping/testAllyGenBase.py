@@ -1,10 +1,10 @@
 import json
 
-from AreaItems.Galaxy import Galaxy
-from AreaItems.Subsector import Subsector
-from AreaItems.Sector import Sector
-from Calculation.NoneCalculation import NoneCalculation
-from Star import Star
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.AreaItems.Subsector import Subsector
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Calculation.NoneCalculation import NoneCalculation
+from PyRoute.Star import Star
 from Tests.baseTest import baseTest
 
 

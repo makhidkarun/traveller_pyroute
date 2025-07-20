@@ -10,15 +10,15 @@ import logging
 import codecs
 import os
 
-from AreaItems.Galaxy import Galaxy
-from DataClasses.ReadSectorOptions import ReadSectorOptions
-from SpeculativeTrade import SpeculativeTrade
-from Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
-from Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
-from Outputs.LightModePDFSectorMap import LightModePDFSectorMap
-from Outputs.SectorMap import SectorMap
-from Outputs.SubsectorMap import SubsectorMap
-from StatCalculation import StatCalculation
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
+from PyRoute.SpeculativeTrade import SpeculativeTrade
+from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
+from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
+from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
+from PyRoute.Outputs.SectorMap import SectorMap
+from PyRoute.Outputs.SubsectorMap import SubsectorMap
+from PyRoute.StatCalculation import StatCalculation
 
 logger = logging.getLogger('PyRoute')
 

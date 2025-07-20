@@ -8,9 +8,9 @@ from typing import Union
 
 from reportlab.pdfgen.canvas import Canvas
 
-from Position.Hex import Hex
-from Outputs.Cursor import Cursor
-from Outputs.SectorHexMap import SectorHexMap
+from PyRoute.Position.Hex import Hex
+from PyRoute.Outputs.Cursor import Cursor
+from PyRoute.Outputs.SectorHexMap import SectorHexMap
 
 
 class PDFHexMap(SectorHexMap):

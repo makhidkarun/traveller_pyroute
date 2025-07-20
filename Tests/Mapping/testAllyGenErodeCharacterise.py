@@ -1,5 +1,5 @@
-from DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
-from DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from Tests.Mapping.testAllyGenBase import TestAllyGenBase
 
 

@@ -11,23 +11,23 @@ from typing import Optional
 import numpy as np
 import networkx as nx
 
-from Pathfinding.DistanceGraph import DistanceGraph
-from Allies.AllyGen import AllyGen
-from Calculation.RouteCalculation import RouteCalculation
+from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
+from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.Calculation.RouteCalculation import RouteCalculation
 try:
-    from Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
-    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 except ImportError:
-    from Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
-from TradeBalance import TradeBalance
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
+from PyRoute.TradeBalance import TradeBalance
 try:
-    from Pathfinding.astar_numpy import astar_path_numpy
+    from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
-    from Pathfinding.astar_numpy_fallback import astar_path_numpy
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
 except ImportError:
-    from Pathfinding.astar_numpy_fallback import astar_path_numpy
-from Star import Star
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+from PyRoute.Star import Star
 
 
 class TradeCalculation(RouteCalculation):

@@ -3,8 +3,8 @@ Created on Aug 09, 2023
 
 @author: CyberiaResurrection
 """
-from Allies.AllyGen import AllyGen
-from Calculation.RouteCalculation import RouteCalculation
+from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.Calculation.RouteCalculation import RouteCalculation
 
 
 class NoneCalculation(RouteCalculation):

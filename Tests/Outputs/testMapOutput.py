@@ -1,8 +1,8 @@
 import logging
 
-from AreaItems.Galaxy import Galaxy
-from Outputs.Cursor import Cursor
-from Outputs.Map import Map, MapOutput
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.Outputs.Cursor import Cursor
+from PyRoute.Outputs.Map import Map, MapOutput
 from Tests.baseTest import baseTest
 
 

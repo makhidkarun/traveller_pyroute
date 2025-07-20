@@ -1,6 +1,6 @@
 import unittest
 
-from Allies.AllyGen import AllyGen
+from PyRoute.Allies.AllyGen import AllyGen
 
 
 class testAllyGen(unittest.TestCase):

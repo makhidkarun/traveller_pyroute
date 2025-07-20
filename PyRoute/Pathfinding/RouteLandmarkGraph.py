@@ -6,7 +6,7 @@ Created on Feb 25, 2024
 import functools
 import numpy as np
 
-from Pathfinding.DistanceBase import DistanceBase
+from PyRoute.Pathfinding.DistanceBase import DistanceBase
 
 
 class RouteLandmarkGraph(DistanceBase):

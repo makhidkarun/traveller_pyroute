@@ -3,8 +3,8 @@ Created on Aug 08, 2024
 
 @author: CyberiaResurrection
 """
-from AreaItems.Galaxy import Galaxy
-from DataClasses.ReadSectorOptions import ReadSectorOptions
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from Tests.baseTest import baseTest
 
 

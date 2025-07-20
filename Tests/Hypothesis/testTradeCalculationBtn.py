@@ -3,13 +3,13 @@ import unittest
 from hypothesis import given, assume, HealthCheck, settings
 from hypothesis.strategies import composite, sampled_from, integers
 
-from Position.Hex import Hex
-from AreaItems.Galaxy import Galaxy
-from AreaItems.Sector import Sector
-from Calculation.RouteCalculation import RouteCalculation
-from Calculation.TradeCalculation import TradeCalculation
-from TradeCodes import TradeCodes
-from Star import Star
+from PyRoute.Position.Hex import Hex
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Calculation.RouteCalculation import RouteCalculation
+from PyRoute.Calculation.TradeCalculation import TradeCalculation
+from PyRoute.TradeCodes import TradeCodes
+from PyRoute.Star import Star
 
 
 btn_param_list = [

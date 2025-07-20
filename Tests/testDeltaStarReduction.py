@@ -1,6 +1,6 @@
 import unittest
 
-from DeltaStar import DeltaStar
+from PyRoute.DeltaStar import DeltaStar
 from Tests.baseTest import baseTest
 
 

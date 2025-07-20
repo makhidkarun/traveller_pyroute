@@ -1,9 +1,9 @@
 from Tests.baseTest import baseTest
 
-from AreaItems.Galaxy import Galaxy
-from AreaItems.Sector import Sector
-from Outputs.Cursor import Cursor
-from Outputs.Map import Map
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Outputs.Cursor import Cursor
+from PyRoute.Outputs.Map import Map
 
 
 class testMap(baseTest):

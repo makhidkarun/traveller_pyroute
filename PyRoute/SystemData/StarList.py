@@ -10,7 +10,7 @@ stars, rather than the multi-concern mashup that is the Star class
 import re
 from typing import Optional
 
-from SystemData.SystemStar import SystemStar
+from PyRoute.SystemData.SystemStar import SystemStar
 
 
 class StarList(object):

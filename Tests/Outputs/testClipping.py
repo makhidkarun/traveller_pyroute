@@ -1,6 +1,6 @@
 import unittest
-from Outputs.Map import Map
-from Outputs.Cursor import Cursor
+from PyRoute.Outputs.Map import Map
+from PyRoute.Outputs.Cursor import Cursor
 
 
 class testClipping(unittest.TestCase):

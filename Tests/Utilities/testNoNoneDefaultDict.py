@@ -1,6 +1,6 @@
 import unittest
 
-from Utilities.NoNoneDefaultDict import NoNoneDefaultDict
+from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
 
 
 class testNoNoneDefaultDict(unittest.TestCase):

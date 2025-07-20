@@ -3,7 +3,7 @@ import unittest
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import text, composite, floats, booleans
 
-from AreaItems.Allegiance import Allegiance
+from PyRoute.AreaItems.Allegiance import Allegiance
 
 
 @composite

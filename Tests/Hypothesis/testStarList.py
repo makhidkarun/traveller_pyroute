@@ -3,7 +3,7 @@ import unittest
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import from_regex, none, composite, integers
 
-from SystemData.StarList import StarList
+from PyRoute.SystemData.StarList import StarList
 
 
 @composite

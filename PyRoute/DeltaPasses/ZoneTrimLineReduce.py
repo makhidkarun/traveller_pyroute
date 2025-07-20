@@ -3,8 +3,8 @@ Created on May 07, 2025
 
 @author: CyberiaResurrection
 """
-from DeltaPasses.WithinLineReducer import WithinLineReducer
-from DeltaStar import DeltaStar
+from PyRoute.DeltaPasses.WithinLineReducer import WithinLineReducer
+from PyRoute.DeltaStar import DeltaStar
 
 
 class ZoneTrimLineReduce(WithinLineReducer):

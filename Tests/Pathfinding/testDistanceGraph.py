@@ -3,9 +3,9 @@ Created on Mar 19, 2024
 
 @author: CyberiaResurrection
 """
-from DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
-from DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from Pathfinding.DistanceGraph import DistanceGraph
+from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from Tests.baseTest import baseTest
 
 

@@ -1,10 +1,10 @@
 from typing_extensions import Self
 
-from AreaItems.Galaxy import Galaxy
-from Outputs.Cursor import Cursor
-from Outputs.Colour import Colour
-from Outputs.Map import Map, Scheme
-from Outputs.SectorMap import SectorMap
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.Outputs.Cursor import Cursor
+from PyRoute.Outputs.Colour import Colour
+from PyRoute.Outputs.Map import Map, Scheme
+from PyRoute.Outputs.SectorMap import SectorMap
 
 
 class TestMap(Map):

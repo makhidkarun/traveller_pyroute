@@ -8,8 +8,8 @@ import typing
 
 from typing_extensions import TypeAlias
 
-from Outputs.Colour import Colour
-from Position.Hex import HexPos
+from PyRoute.Outputs.Colour import Colour
+from PyRoute.Position.Hex import HexPos
 
 Alg: TypeAlias = typing.Optional[str]
 AllyMap: TypeAlias = dict[HexPos, Alg]

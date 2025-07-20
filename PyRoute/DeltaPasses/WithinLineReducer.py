@@ -3,9 +3,9 @@ Created on Jun 13, 2023
 
 @author: CyberiaResurrection
 """
-from DeltaDebug.DeltaLogicError import DeltaLogicError
-from DeltaDebug.DeltaDictionary import DeltaDictionary
-from DeltaStar import DeltaStar
+from PyRoute.DeltaDebug.DeltaLogicError import DeltaLogicError
+from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary
+from PyRoute.DeltaStar import DeltaStar
 
 
 class WithinLineReducer(object):

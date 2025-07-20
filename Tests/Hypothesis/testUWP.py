@@ -3,7 +3,7 @@ import unittest
 from hypothesis import given, assume, example, HealthCheck, settings
 from hypothesis.strategies import from_regex, none
 
-from SystemData.UWP import UWP
+from PyRoute.SystemData.UWP import UWP
 
 
 class testUWP(unittest.TestCase):

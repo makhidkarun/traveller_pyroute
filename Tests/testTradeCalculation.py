@@ -1,10 +1,10 @@
 import unittest
 
-from Calculation.TradeCalculation import TradeCalculation
+from PyRoute.Calculation.TradeCalculation import TradeCalculation
 
-from AreaItems.Galaxy import Galaxy
-from AreaItems.Sector import Sector
-from Star import Star
+from PyRoute.AreaItems.Galaxy import Galaxy
+from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Star import Star
 
 
 class testTradeCalculation(unittest.TestCase):

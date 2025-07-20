@@ -6,8 +6,8 @@ Created on 21 Jul, 2024
 import re
 from typing import Optional
 
-from Star import Star
-from AreaItems.AreaItem import AreaItem
+from PyRoute.Star import Star
+from PyRoute.AreaItems.AreaItem import AreaItem
 
 
 class Sector(AreaItem):
