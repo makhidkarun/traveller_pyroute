@@ -8,6 +8,13 @@ import numpy as np
 
 
 def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, min_cost) -> tuple:
+    if not isinstance(min_cost, np.ndarray):
+        raise ValueError("min_cost must be ndarray")
+    if not isinstance(max_neighbour_labels, np.ndarray):
+        raise ValueError("max_neighbour_labels must be ndarray")
+    if not isinstance(distance_labels, np.ndarray):
+        raise ValueError("distance_labels must be ndarray")
+
     heap = [(distance_labels[seed], seed) for seed in seeds if 0 < len(arcs[seed][0])]
     heapq.heapify(heap)
 

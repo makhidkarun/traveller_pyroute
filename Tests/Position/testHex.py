@@ -395,6 +395,7 @@ class testHexDummy(object):
     def __hash__(self):
         return self._hash
 
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
