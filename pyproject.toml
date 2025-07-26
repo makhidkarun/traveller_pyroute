@@ -66,3 +66,4 @@ paths_to_mutate = ["PyRoute/"]
 tests_dir = ["Tests/"]
 also_copy = ["Tests/", "PyRoute/Pathfinding/*.so", "pytest.ini"]
 runner = "pytest -x"
+max_stack_depth = 8
