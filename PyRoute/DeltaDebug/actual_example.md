@@ -6,7 +6,7 @@ While setting up the worked example in the delta debugging readme, I discovered 
 The set up is the same as the worked example, but the command line is different (I didn't specify any interesting-related restrictions):
 
 ```
-python ./PyRoute/DeltaDebug/DeltaDebug.py --min-btn 15 --max-jump 2 --routes trade --borders erode --pop-code scaled --min-dir ./reduced/ --output ./prof-maps/ --sectors ./deltalist.txt --input ./deltasectors/
+python ./PyRoute/DeltaDebug/DeltaDebug.py --min-btn 15 --max-jump 2 --routes trade --borders erode --pop-code scaled --min-dir ./reduced/ --output ./prof-maps/ --sectors ./deltalist.txt --input ./deltasectors/ --no-allegiance
 ```
 
 The result wasn't what I was expecting:
