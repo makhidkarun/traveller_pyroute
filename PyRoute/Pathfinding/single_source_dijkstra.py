@@ -30,6 +30,9 @@ def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_label
 
 
 def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1, min_cost=None, max_labels=None) -> tuple:
+    if not isinstance(distance_labels, np.ndarray):
+        raise ValueError("distance labels must be ndarray")
+
     # assumes that distance_labels is already setup
     if seeds is None:
         seeds = {source}

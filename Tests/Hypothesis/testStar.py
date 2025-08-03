@@ -94,7 +94,7 @@ class testStar(unittest.TestCase):
     Given a regex-matching string, parse_line_to_star should return either a valid Star object or None
     """
     @given(from_regex(regex=ParseStarInput.starline, alphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ -{}()[]?\'+*'), none())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)],
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)],
         deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
     @example('0101 000000000000000 00000O0-0 000000000000000       - - 0 000   00', '')
     @example('0101 000000000000000 ???????-? 000000000000000 {0} (000-0)  - - - 0 000   00', '')
@@ -173,6 +173,7 @@ class testStar(unittest.TestCase):
     @example('0101 02111111111111) ???????-? [oPrh00011111GitpHqwhA{KRNf{rpjqI}7bj]A        - - B 000   100', '0101 02111111111111)      ???????-? [oPrh00011111GitpHqwhA{KRNf{rpjqI}7b]                       -    -  B 000 0  100                                                          ')
     @example('0101 000000000000000 ???????-? [0000000)(]X [        - - B 001   100', '0101 000000000000000      ???????-? [0000000)(]X                                                -    -  B 001 0  100                                                          ')
     @example('2931 Dinenruum            E432679-6 Na Ni Po Da                           { -3 } (851-2) [7367] B    -  A 122 10 ImDc K1 IV M3 V M4 V', '2931 Dinenruum            E432679-6 Da Na Ni Po                           { -3 } (851-2) [7367] B    -  A 122 10 ImDc K1 IV M3 V M4 V                                          ')
+    @example('000000000000000 ???????-? 0000000000000 { {0} (000-0)  - -  -    A   000   00', None)
     def test_parse_line_to_star(self, s, t) -> None:
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
@@ -209,7 +210,7 @@ class testStar(unittest.TestCase):
             self.assertEqual(t, nu_line, "Reparsed line not equal to expected line.\n " + hyp_line + " \n Reparsed: '" + nu_line + "'\n Expected: '" + t + "'\n")
 
     @given(importance_starline())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)],
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)],
               deadline=timedelta(1000))  # suppress slow-data health check, too-much filtering
     @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   0000D')
     @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000]         - 0 000   0000D')
@@ -231,6 +232,8 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000000 ?000000-0 0000000000000 B - (000-0)   [0000] - - A 000   00')
     @example('0101 000000000000000 ?000000-0 0000000000000 B {   0} (000-0) [0000] - - A 000 0 00')
     @example('0101 000000000000?-0 A000000-0 000000000000000 {0} -  [0000] - - A 000   00')
+    @example('2040 okQy)WREOS[xZE4LhS18Jz1DiAeXILGQ(n       hBdebAG-c                  } E}Zsi} AW]WHH {                 +0} -           [1111]         - -  B 018     1u1X')
+    @example('0101 [0000]000000000 A000000-0 000000000000000       - - A 000   00')
     def test_star_line_extension_parsing(self, s) -> None:
         econ_match = r'[ ]\([0-9A-Za-z]{3}[+-]\d\)[ ]'
         soc_match = r'[ ]\[[0-9A-Za-z]{4}\][ ]'
@@ -258,7 +261,7 @@ class testStar(unittest.TestCase):
         if imp_m:
             keep_imp = True
 
-        self.assertTrue(keep_econ or keep_social or keep_imp, "Must keep at least one of Ix and/or Ex and/or Cx")
+        assume(keep_econ or keep_social or keep_imp)
 
         hyp_line = "Hypothesis input: " + s
         sector = Sector('# Core', '# 0, 0')
@@ -288,7 +291,7 @@ class testStar(unittest.TestCase):
         self.assertTrue(foo.is_well_formed())
 
     @given(canonical_check())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(3000))
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)], deadline=timedelta(3000))
     @example('1919 Khula                ???????-? Hi In Pz Di(Khulans)      {0}  (000-0) [0000] BEf  N  A 510 10 ImDv M0 V')
     def test_star_canonicalise(self, s) -> None:
         hyp_line = "Hypothesis input: " + s
@@ -324,6 +327,7 @@ class testStar(unittest.TestCase):
            from_regex(r'^\([0-9A-Za-z]{3}[+-]\d\)'),
            from_regex(r'^\[[0-9A-Za-z]{4}\]'),
            none())
+    @settings(suppress_health_check=[HealthCheck(10)])
     @example('?000000-0', '(000-0)', '[0000]', None)
     @example('?000000-0', '(000-0)0', '[0000]', 'Star Sample economics must be None or 7-char string')
     @example('?000000-0', '(000-0)', '[0000]0', 'Star Sample social must be None or 6-char string')

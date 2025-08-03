@@ -207,6 +207,7 @@ class ParseStarInput:
             else:
                 is_station = True
 
+        line = ParseStarInput._unpack_starline_pre_tweak(line)
         if ParseStarInput.parser is None:
             ParseStarInput.parser = StarlineParser()
         if ParseStarInput.station_parser is None:
@@ -253,6 +254,13 @@ class ParseStarInput:
         if matches is None:
             return None
         data = list(matches.groups())
+        imp_match = r'\{ *[+-]?[0-6] ?\}'
+        imp_m = re.search(imp_match, data[3])
+        if imp_m:
+            bitz = re.split(imp_match, data[3])
+            data[3] = bitz[0]
+            data[4] = imp_m.group() + " " + bitz[1]
+
         parsed = {'position': data[0], 'name': data[1], 'uwp': data[2], 'trade': data[3]}
         raw_extensions = data[4].replace('  ', ' ').replace('{ ', '{').replace(' }', '}')
         oldlen = 0
@@ -284,6 +292,11 @@ class ParseStarInput:
 
         data = ParseStarInput._unpack_starline_tweak(data)
         return data
+
+    @staticmethod
+    def _unpack_starline_pre_tweak(line: str) -> str:
+        line = line.replace('{ {', '{')
+        return line
 
     @staticmethod
     def _unpack_starline_tweak(data) -> list[str]:

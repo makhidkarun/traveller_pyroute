@@ -176,7 +176,7 @@ class Map(MapOutput):
 
         # reject as parallel to the borders of the clipping window.
         if (p1 == 0 and q1 < 0) or (p2 == 0 and q2 < 0) or (p3 == 0 and q3 < 0) or (p4 == 0 and q4 < 0):
-            return start, end
+            return None, None
 
         if p1 != 0:
             r1 = q1 / p1

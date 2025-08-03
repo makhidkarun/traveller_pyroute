@@ -6,7 +6,7 @@ Created on 19 Apr, 2025
 import copy
 import logging
 
-from PyRoute import Star
+from PyRoute.Star import Star
 from PyRoute.AreaItems.Sector import Sector
 from Tests.baseTest import baseTest
 

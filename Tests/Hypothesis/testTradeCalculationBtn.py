@@ -1,9 +1,9 @@
 import unittest
 
-from hypothesis import given, assume
+from hypothesis import given, assume, HealthCheck, settings
 from hypothesis.strategies import composite, sampled_from, integers
 
-from Position.Hex import Hex
+from PyRoute.Position.Hex import Hex
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
@@ -92,6 +92,7 @@ def star_set(draw) -> tuple[int, str, str, str, int, str, str, str]:
 class testTradeCalculationBtn(unittest.TestCase):
 
     @given(star_set())
+    @settings(suppress_health_check=[HealthCheck(10)])
     def test_get_btn(self, value) -> None:
         star1_wtn, star1_trade, star1_alleg, star1_pos, star2_wtn, star2_trade, star2_alleg, star2_pos = value
         sector = Sector('# Core', '# 0, 0')

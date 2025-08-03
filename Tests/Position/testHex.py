@@ -264,6 +264,112 @@ class testHex(unittest.TestCase):
         hex_distance = star1.hex.hex_distance(star2.hex)
         self.assertEqual(exp_distance, hex_distance)
 
+    def test_hex_should_equal_self(self) -> None:
+        hex = Hex(self.coreSector, "0202")
+        self.assertEqual(hex, hex, "Hex should equal itself")
+
+    def test_different_hex_should_not_equal_1(self) -> None:
+        hex1 = Hex(self.coreSector, "0202")
+        hex2 = Hex(self.coreSector, "0203")
+        hex1._hash = 0
+        hex2._hash = 0
+
+        self.assertNotEqual(hex1, hex2, "Hex1 (Core 0202) should not equal Hex2 (Core 0203)")
+
+    def test_different_hex_should_not_equal_2(self) -> None:
+        hex1 = Hex(self.coreSector, "0202")
+        hex2 = Hex(self.coreSector, "0302")
+        self.assertNotEqual(hex1.dx, hex2.dx)
+        hex1._hash = 0
+        hex2._hash = 0
+        hex2.position = "0202"
+
+        self.assertNotEqual(hex1, hex2, "Hex1 (Core 0202) should not equal Hex2 (Core 0302)")
+
+    def test_hex_should_not_equal_nonhex(self) -> None:
+        hex1 = Hex(self.coreSector, "0202")
+        int1 = testHexDummy(hex1.__hash__())
+        self.assertEqual(hex1.__hash__(), int1.__hash__())
+
+        self.assertNotEqual(hex1, int1, "Hex and nonhex should not be equal")
+
+    def test_hex_is_well_formed(self) -> None:
+        cases = [
+            ("Well-formed", "1620", True, ""),
+            ("Col big", "3220", True, ""),
+            ("Col too big", "3320", False, "Column must be in range 1-32 - is 33"),
+            ("Row big", "1640", True, ""),
+            ("Row too big", "1641", False, "Row must be in range 1-40 - is 41")
+        ]
+
+        for msg, posn, exp_result, exp_msg in cases:
+            with self.subTest(msg):
+                hex1 = Hex(self.coreSector, posn)
+                act_result, act_msg = hex1.is_well_formed()
+                self.assertEqual(exp_result, act_result)
+                self.assertEqual(exp_msg, act_msg)
+
+    def test_hex_static_get_neighbour(self) -> None:
+        start = (0, 0)
+        cases = [
+            ("Dir 0", 0, 2, -2),
+            ("Dir 1", 1, 2, 0),
+            ("Dir 2", 2, 0, 2),
+            ("Dir 3", 3, -2, 2),
+            ("Dir 4", 4, -2, 0),
+            ("Dir 5", 5, 0, -2),
+            ("Dir 0, no dist", 6, 1, -1)
+        ]
+
+        for msg, raw_direction, end_x, end_y in cases:
+            with self.subTest(msg):
+                exp_neighbour = (end_x, end_y)
+                direction = raw_direction % 6
+                if raw_direction < 6:
+                    act_neighbour = Hex.get_neighbor(start, direction, 2)
+                else:
+                    act_neighbour = Hex.get_neighbor(start, direction)
+                self.assertEqual(exp_neighbour, act_neighbour)
+
+    def test_hex_get_neighbour(self) -> None:
+        start = Hex(self.coreSector, "0140")
+        cases = [
+            ("Dir 0", 0, 2, -2),
+            ("Dir 1", 1, 2, 0),
+            ("Dir 2", 2, 0, 2),
+            ("Dir 3", 3, -2, 2),
+            ("Dir 4", 4, -2, 0),
+            ("Dir 5", 5, 0, -2),
+            ("Dir 0, no dist", 6, 1, -1)
+        ]
+
+        for msg, raw_direction, end_x, end_y in cases:
+            with self.subTest(msg):
+                exp_neighbour = (end_x, end_y)
+                direction = raw_direction % 6
+                if raw_direction < 6:
+                    act_neighbour = start.get_neighbour(direction, 2)
+                else:
+                    act_neighbour = start.get_neighbour(direction)
+                self.assertEqual(exp_neighbour, act_neighbour)
+
+    def test_hex_blow_up_ctor(self) -> None:
+        cases = [
+            ("Non-string position", None, "Position argument must be string"),
+            ("Too-short position", "011", "Position argument must be 4-character string"),
+            ("Too-long position", "0112A", "Position argument must be 4-character string")
+        ]
+
+        for msg, posn, exp_msg in cases:
+            with self.subTest(msg):
+                act_msg = None
+                try:
+                    Hex(self.coreSector, posn)
+                except ValueError as e:
+                    act_msg = str(e)
+
+                self.assertEqual(exp_msg, act_msg)
+
     def _generate_corner_hexes(self, sector: Sector) -> list[Hex]:
         pos = [
             Hex(sector, "0101"),
@@ -279,6 +385,15 @@ class testHex(unittest.TestCase):
             offset = Hex.dy_offset(y, (sector.dy // 40))
             q, r = Hex.hex_to_axial(x + sector.dx - 1, offset)
             self.assertEqual(pos[idx].hex_position(), (q, r))
+
+
+class testHexDummy(object):
+
+    def __init__(self, hash: int):
+        self._hash = hash
+
+    def __hash__(self):
+        return self._hash
 
 
 if __name__ == "__main__":

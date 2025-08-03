@@ -43,7 +43,7 @@ class testStarList(unittest.TestCase):
     Given an input string, either reject it cleanly, or parse it to a well-formed StarList object
     """
     @given(star_list())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)])  # suppress slow-data health check, too-much filtering
     @example('OD ')
     @example('D ')
     @example('G5 V A4 V')
@@ -102,7 +102,7 @@ class testStarList(unittest.TestCase):
     on the tin, and that canonicalisation is itself idempotent
     """
     @given(star_list(max_stars=8, cleanup=True), none())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)])  # suppress slow-data health check, too-much filtering
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)])  # suppress slow-data health check, too-much filtering
     @example('K9 Ib ', 'K9 II')
     @example('D ', '')  # Examples with expected value of '' do not make it far enough to check their starline
     @example('A0 D ', 'A0 V')
@@ -174,6 +174,7 @@ class testStarList(unittest.TestCase):
             self.assertEqual(expected, str(starlist))
 
     @given(star_list(max_stars=1))
+    @settings(suppress_health_check=[HealthCheck(10)])
     @example('PSR ')
     @example('A0Ia ')
     @example('D')
@@ -198,7 +199,7 @@ class testStarList(unittest.TestCase):
             self.assertTrue(max_flux >= min_flux, "Min-flux cannot exceed max-flux.  " + hyp_line)
 
     @given(star_list(min_stars=2, max_stars=2, cleanup=True), none())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)]
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)]
               )  # suppress slow-data health check, too-much filtering
     @example('O0Ia O0Ia ', 'O0 Ia O0 II')
     @example('O0Ia B0Ia ', 'O0 Ia B0 II')

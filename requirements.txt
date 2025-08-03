@@ -3,10 +3,12 @@ inflect
 Cython
 Pillow >= 10.0
 wikitools3==3.0.1
+coverage[toml]
 hypothesis >= 6.97.0
 jinja2
 jsonpickle
 lark==1.1.8
+mutmut
 mypy
 numpy == 1.26
 pymupdf

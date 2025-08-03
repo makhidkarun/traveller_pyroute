@@ -1,9 +1,7 @@
 import unittest
-import sys
 
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 
-sys.path.append('../PyRoute')
 from PyRoute.Star import Star
 from PyRoute.TradeCodes import TradeCodes
 

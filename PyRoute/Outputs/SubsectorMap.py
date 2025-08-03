@@ -414,7 +414,7 @@ class SubsectorMap(GraphicMap):
         radius = (xm / 2) - 1
 
         if star.tradeCode.asteroid:
-            worldCharacter = '\u2059'
+            worldCharacter = '\u2059'  # pragma: no mutate
             size = self._get_text_size(self.fonts['hexes3'], worldCharacter)
 
             pos = Cursor(point.x - size[0] / 2, point.y - size[1] * 0.45)
@@ -431,26 +431,32 @@ class SubsectorMap(GraphicMap):
         self.add_text(star.port, pos, 'world')
 
         if star.ggCount:
-            self.print_base_char('\u25CF', 'world', point, (1.75, -1.2))
+            baseChar = '\u25CF'  # pragma: no mutate
+            self.print_base_char(baseChar, 'world', point, (1.75, -1.2))
 
         if 'N' in star.baseCode or 'K' in star.baseCode:
-            self.print_base_char('\u066D', 'hexes3', point, (-0.7, -0.4))
+            baseChar = '\u066D'  # pragma: no mutate
+            self.print_base_char(baseChar, 'hexes3', point, (-0.7, -0.4))
             self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         if 'S' in star.baseCode:
-            self.print_base_char('\u25B2', 'hexes4', point, (-1.8, -1.0))
+            baseChar = '\u25B2'  # pragma: no mutate
+            self.print_base_char(baseChar, 'hexes4', point, (-1.8, -1.0))
             self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         if 'D' in star.baseCode:
-            self.print_base_char('\u25A0', 'hexes4', point, (-1.55, -0.35))
+            baseChar = '\u25A0'  # pragma: no mutate
+            self.print_base_char(baseChar, 'hexes4', point, (-1.55, -0.35))
             self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         if 'W' in star.baseCode:
-            self.print_base_char('\u25B2', 'hexes4red', point, (-1.85, -1.0))
+            baseChar = '\u25B2'  # pragma: no mutate
+            self.print_base_char(baseChar, 'hexes4red', point, (-1.85, -1.0))
             self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         if 'I' in star.baseCode:
-            self.print_base_char('\u2316', 'hexes5', point, (-2.5, -0.5))
+            baseChar = '\u2316'  # pragma: no mutate
+            self.print_base_char(baseChar, 'hexes5', point, (-2.5, -0.5))
             self.logger.debug("Base for {} : {}".format(star.name, star.baseCode))
 
         station_code = star.tradeCode.research_station_char

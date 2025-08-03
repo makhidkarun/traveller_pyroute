@@ -1,9 +1,7 @@
 import unittest
-import sys
 
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
 
-sys.path.append('../PyRoute')
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Star import Star

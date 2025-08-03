@@ -1,12 +1,9 @@
 import unittest
-import sys
 
 from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary, SubsectorDictionary
 from Tests.baseTest import baseTest
 from PyRoute.DeltaStar import DeltaStar
-
-sys.path.append('../PyRoute')
 
 
 class testDeltaDictionary(baseTest):

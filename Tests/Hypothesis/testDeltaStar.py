@@ -154,7 +154,7 @@ class testDeltaStar(unittest.TestCase):
     same number of messages
     """
     @given(starline())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)], deadline=timedelta(1000))
     @example('0101 0                    A000000-0                                       { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V ')
     @example('0101 0                    A000000-0                                       { 0 } (000+0) [0000] BBBBB - A 000 0 NaHu G5 V')
     @example('0101 0                    A000000-0 As                                     { 0 } (000+0) [0001] - - A 000 0 NaHu G5 V')
@@ -255,7 +255,7 @@ class testDeltaStar(unittest.TestCase):
                 )
 
     @given(starline())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)], deadline=timedelta(1000))
     @example('0101 0                    A000000-0 As De                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000000-0 As Ga                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000000-0 As Fl                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
@@ -313,7 +313,7 @@ class testDeltaStar(unittest.TestCase):
         self.assertEqual(0, len(invalid), 'At least one invalid trade code remaining: \n' + starline)
 
     @given(starline())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)], deadline=timedelta(1000))
     @example('0101 0                    A000000-0 As As                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000100-0 As As                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000000-0 De De                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
@@ -375,7 +375,7 @@ class testDeltaStar(unittest.TestCase):
         self.assertEqual(0, len(invalid), 'At least one missing trade code not added: \n' + starline + '\n' + badline)
 
     @given(starline(barren_world=True))
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)], deadline=timedelta(1000))
     @example('0101 0                    A000000-0 As Ba                                  { 0 } (000+0) [0001] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000000-0 As Ba                                  { 0 } (000+0) [0010] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000000-0 As Ba                                  { 0 } (000+0) [0100] - - A 000 0 NaHu G5 V')
@@ -421,7 +421,7 @@ class testDeltaStar(unittest.TestCase):
         self.assertEqual(0, len(invalid), 'At least one characteristic not canonicalised: \n' + starline + '\n' + badline)
 
     @given(starline())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)], deadline=timedelta(1000))
     @example('0101 0                    A000100-0 As As                                  { 0 } (001+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000100-0 As As                                  { 0 } (010+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000400-0 As As                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
@@ -463,7 +463,7 @@ class testDeltaStar(unittest.TestCase):
         self.assertEqual(0, len(invalid), 'At least one characteristic not canonicalised: \n' + starline + '\n' + badline)
 
     @given(starline())
-    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2)], deadline=timedelta(1000))
+    @settings(suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)], deadline=timedelta(1000))
     @example('0101 0                    A000100-0 As As                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 0                    A000900-0 As As                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
     @example('0101 Coruscant            A000F00-0 As As                                  { 0 } (000+0) [0000] - - A 000 0 NaHu G5 V')
@@ -510,7 +510,7 @@ class testDeltaStar(unittest.TestCase):
     """
     @given(mixed_starline())
     @settings(
-        suppress_health_check=[HealthCheck(3), HealthCheck(2)],  # suppress slow-data health check, too-much filtering
+        suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)],  # suppress slow-data health check, too-much filtering
         deadline=timedelta(1000))
     @example('0101 000000000000000 ???????-? 000000000000000       - - 0 000   00 D')
     @example('0101 000000000000000 ???????-? 000000000000000 {0} -  [0000] - - 0 000   00 D')

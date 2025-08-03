@@ -11,7 +11,7 @@ from typing import Union
 
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.AreaItems.Galaxy import Galaxy
-from .WikiReview import WikiReview
+from PyRoute.WikiReview import WikiReview
 from wikitools.page import Page  # type:ignore[import-not-found]
 
 logger = logging.getLogger('WikiCreateWorlds')
