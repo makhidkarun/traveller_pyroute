@@ -110,8 +110,8 @@ def process() -> None:
                        help="Try all pairs of star lines to see if any can be removed.")
     delta.add_argument('--within-line', dest="run_within", default=False, action='store_true',
                        help="Try to remove irrelevant components (eg base codes) from _within_ individual lines")
-    delta.add_argument('--allegiance', dest="run_allegiance", default=False, action='store_true',
-                       help="Try to remove irrelevant allegiances")
+    delta.add_argument('--no-allegiance', dest="run_allegiance", default=True, action='store_false',
+                       help="Skip removing irrelevant allegiances")
     delta.add_argument('--assume-interesting', dest="run_init", default=True, action='store_false',
                        help="Assume initial input is interesting.")
 

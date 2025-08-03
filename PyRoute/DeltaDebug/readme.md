@@ -23,18 +23,18 @@ A reduced-size test case also helps identify (semi-)duplicate reported bugs, by 
 
 How is delta debugging being applied here, and what problem is it solving?
 -----------------
-PyRoute's version of delta debugging takes a list of input sectors, a definition of the problem, and automates the grunt work of reducing the input's size by:
+PyRoute's version of delta debugging takes a list of input sectors, a definition of the problem, and automates the grunt work of reducing the input's size by, in order:
 
 - Discarding irrelevant sectors completely
+- Discarding irrelevant allegiances
 - Discarding irrelevant subsectors
 - Discarding irrelevant star systems
 
 This default setting works reasonably well - in the worked example below, starting with Zarushagar and a broken copy of Dagudashaag (approx 1050 stars in total), those default settings reduced the input to 1 sector file (Dagudashaag) with only 2 star systems in it.
 
-There are three extra, currently-experimental, passes available:
-- Discarding irrelevant allegiances (runs after sector discard)
-- Discarding irrelevant _pairs_ (not merely adjacent pairs) of star systems (runs after single-system discard)
-- Discarding irrelevant _portions_ (eg trade codes, high/low TL) of a given star system (runs after double-system discard)
+There are two extra, currently-experimental, passes available:
+- Discarding irrelevant _portions_ (eg trade codes, high/low TL) of a given star system (runs after single-system discard)
+- Discarding irrelevant _pairs_ (not merely adjacent pairs) of star systems (runs after portion discard)
 
 You might need one or more of these experimental passes if your particular problem doesn't reduce well with the standard ones.
 
@@ -142,7 +142,7 @@ Debugging:
                         subsector, line and two-minimisation must be selected
   --within-line         Try to remove irrelevant components (eg base codes)
                         from _within_ individual lines
-  --allegiance          Try to remove irrelevant allegiances
+  --no-allegiance       Skip removing irrelevant allegiances
   --assume-interesting  Assume initial input is interesting.
 ```
 
@@ -188,10 +188,18 @@ problem's input.
 
 This will have no effect if you are reducing exactly one sector file.
 
+```--no-allegiance``` :  Disable allegiance-level reduction.
+
+Sub-allegiances - such as "ImDd" and "ImDv" - are counted as different from both each other, and the parent "Im"
+allegiance for this pass.
+
+Allegiances vary in coarseness - "ImDs" ranges across multiple sectors (let alone the various non-aligned allegiances),
+but (for instance) "Sb" (Serendip Belt) is limited to two systems in Reft sector.
+
 ```--no-subsector``` :  Disable subsector-level reduction.  Subsectors are the second-coarsest reduction units
 routinely used.
 
-Like with sector level reduction, it's not a good idea to skip subsector reduction on your first attempt reducing a given
+Like with sector level reduction, it's not a good idea to skip subsector reduction on your first attempt at reducing a given
 problem's input.
 
 This will have no effect if you are reducing exactly one sector file with stars in exactly one subsector.
@@ -202,14 +210,6 @@ Leaving sector and subsector reduction enabled while disabling single-line reduc
 first, rough, reduction that can either be manually investigated further, or fed back in to a full reduction.
 
 Experimental, off by default:
-
-```--allegiance``` :  Enable allegiance-level reduction, running between sector and subsector reduction.
-
-Sub-allegiances - such as "ImDd" and "ImDv" - are counted as different from both each other, and the parent "Im"
-allegiance for this pass.
-
-Allegiances vary in coarseness - "ImDs" ranges across multiple sectors (let alone the various non-aligned allegiances),
-but (for instance) "Sb" (Serendip Belt) is limited to two systems in Reft sector.
 
 ```--two-reduce``` :  Enable double-starline-level reduction, running after single-line reduction.
 
@@ -280,7 +280,7 @@ AssertionError: Star Kashmiir (Dagudashaag 0103) duplicated in sector Dagudashaa
 You'll need somewhere to _store_ the reduced sector files.  For this pass, you'll just be using the default settings.
 
 1.  Create the ```./reduced``` directory.
-2.  Run delta debugging from the repo root: ```python ./PyRoute/DeltaDebug/DeltaDebug.py --min-btn 15 --max-jump 4 --routes trade --borders erode --pop-code scaled --min-dir ./reduced/ --output ./prof-maps/ --sectors ./deltalist.txt --input ./deltasectors/ --interesting-line=duplicated```
+2.  Run delta debugging from the repo root: ```python ./PyRoute/DeltaDebug/DeltaDebug.py --min-btn 15 --max-jump 4 --routes trade --borders erode --pop-code scaled --min-dir ./reduced/ --output ./prof-maps/ --sectors ./deltalist.txt --input ./deltasectors/ --interesting-line=duplicated --no-allegiance```
 
 The output will take longer this time, and _be_ longer.  Something like:
 
@@ -363,10 +363,10 @@ This is a somewhat simplified example, but the general result should be clear.
 
 Instead of having 1,057 starlines to wade through over 2 sectors, you now have 2 starlines in 1 sector - approx 500x less to look through. 
 
-If you want to keep that file, copy it somewhere.  Let's now do a second run, but this time skipping single-line reduction and enabling within-line reduction.
+If you want to keep that file, copy it somewhere.  Let's now do a second run, but this time skipping single-line and allegiance reduction and enabling within-line reduction.
 
 The command line you will need is:
-```python ./PyRoute/DeltaDebug/DeltaDebug.py --min-btn 15 --max-jump 4 --routes trade --borders erode --pop-code scaled --min-dir ./reduced/ --output ./prof-maps/ --sectors ./deltalist.txt --input ./deltasectors/ --interesting-line=duplicated --no-line --within-line```
+```python ./PyRoute/DeltaDebug/DeltaDebug.py --min-btn 15 --max-jump 4 --routes trade --borders erode --pop-code scaled --min-dir ./reduced/ --output ./prof-maps/ --sectors ./deltalist.txt --input ./deltasectors/ --interesting-line=duplicated --no-line --no-allegiance --within-line```
 
 That will result in something like the following output:
 ```
