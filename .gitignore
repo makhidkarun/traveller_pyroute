@@ -37,6 +37,15 @@ PyRoute/Pathfinding/*.html
 b*/
 c*/
 d*/
+D*/
+f*/
+k*/
+n*/
+p*/
+s*/
 t*/
 .coverage
 *.log
+*.wiki
+*.png
+*.lprof
