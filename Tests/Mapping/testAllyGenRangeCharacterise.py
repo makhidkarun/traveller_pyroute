@@ -1,5 +1,10 @@
+import tempfile
+
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
+from PyRoute.Position.Hex import Hex
 from Tests.Mapping.testAllyGenBase import TestAllyGenBase
 
 
@@ -247,3 +252,48 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+
+    def test_wonky_setup(self):
+        self.setupOneWorldCoreSector("0503", 0, "ImDc")
+        self.galaxy.debug_flag = False
+        self.borders.create_borders('separate')
+
+        ally_map = self.borders.allyMap
+        borders = self.borders.borders
+
+        expected_ally_map = {(2, 35): 'ImDc', (2, 36): 'ImDc', (2, 37): 'ImDc', (3, 34): 'ImDc', (3, 35): 'ImDc',
+                             (3, 36): 'ImDc', (3, 37): 'ImDc', (4, 33): 'ImDc', (4, 34): 'ImDc', (4, 35): 'ImDc',
+                             (4, 36): 'ImDc', (4, 37): 'ImDc', (5, 33): 'ImDc', (5, 34): 'ImDc', (5, 35): 'ImDc',
+                             (5, 36): 'ImDc', (6, 33): 'ImDc', (6, 34): 'ImDc', (6, 35): 'ImDc'}
+        expected_borders = {(2, 34): ['white', 'white', None], (2, 35): [None, 'white', 'white'],
+                            (2, 36): [None, 'white', 'white'], (2, 37): ['white', None, 'white'],
+                            (3, 33): ['white', None, 'white'], (3, 36): [None, 'white', None],
+                            (3, 37): ['white', None, None], (4, 32): ['white', 'white', None],
+                            (4, 37): ['white', None, 'white'], (5, 31): [None, 'white', None],
+                            (5, 32): ['white', None, None], (5, 36): ['white', None, 'white'],
+                            (6, 32): ['white', None, 'white'], (6, 35): ['white', 'white', None],
+                            (7, 31): [None, 'white', None], (7, 32): [None, 'white', 'white'],
+                            (7, 33): [None, 'white', 'white'], (7, 34): [None, None, 'white']}
+
+        self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
+        self.assertEqual(expected_borders, borders, "Unexpected borders value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def test_is_well_formed_single_hex_even_q(self):
+        left_up = Hex.get_neighbor((6, 36), 3)
+        mid_up = Hex.get_neighbor((6, 36), 2)
+        right_up = Hex.get_neighbor((6, 36), 1)
+        self.borders.borders = {(6, 36): ['white', 'white', 'white'], left_up: [None, None, 'white'],
+                                mid_up: [None, 'white', None], right_up: ['white', None, None]}
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def test_is_well_formed_single_hex_odd_q(self):
+        left_up = Hex.get_neighbor((5, 36), 3)
+        mid_up = Hex.get_neighbor((5, 36), 2)
+        right_up = Hex.get_neighbor((5, 36), 1)
+        self.borders.borders = {(5, 36): ['white', 'white', 'white'], left_up: [None, None, 'white'],
+                                mid_up: [None, 'white', None], right_up: ['white', None, None]}
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
