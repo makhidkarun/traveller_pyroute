@@ -497,3 +497,17 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         self.galaxy.output = args.output
         result, msg = self.borders.is_well_formed()
         self.assertTrue(result, msg)
+
+    def test_empty_borders_are_well_formed(self):
+        self.borders.borders = {}
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
+        self.assertEqual('', msg)
+
+    def test_single_border_is_not_well_formed(self):
+        base = (5, 40)
+
+        self.borders.borders = {base: ['white', None, None]}
+        result, msg = self.borders.is_well_formed()
+        self.assertFalse(result, msg)
+        self.assertEqual('At least one border segment disconnected', msg)
