@@ -577,29 +577,27 @@ class Borders(object):
             odd_q = item[0] % 2 == 1
             base = (item[0], item[1])
 
-            if 1 == item[2]:
-                if odd_q:
-                    search_tuple = (item[0], item[1], 2)
-                    if search_tuple in edge_dict:
-                        edge_dict[item] |= 1
-                        edge_dict[search_tuple] |= 1
+            if 1 == item[2] and odd_q:
+                search_tuple = (item[0], item[1], 2)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 1
+                    edge_dict[search_tuple] |= 1
 
-                    neighbour = Hex.get_neighbor(base, Hex.UP)
-                    search_tuple = (neighbour[0], neighbour[1], 2)
-                    if search_tuple in edge_dict:
-                        edge_dict[item] |= 2
-                        edge_dict[search_tuple] |= 2
-            elif 2 == item[2]:
-                if not odd_q:
-                    search_tuple = (base[0], base[1], 1)
-                    if search_tuple in edge_dict:
-                        edge_dict[item] |= 2
-                        edge_dict[search_tuple] |= 2
-                    neighbour = Hex.get_neighbor(base, Hex.DOWN)
-                    search_tuple = (neighbour[0], neighbour[1], 1)
-                    if search_tuple in edge_dict:
-                        edge_dict[item] |= 1
-                        edge_dict[search_tuple] |= 1
+                neighbour = Hex.get_neighbor(base, Hex.UP)
+                search_tuple = (neighbour[0], neighbour[1], 2)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 2
+            if 2 == item[2] and not odd_q:
+                search_tuple = (base[0], base[1], 1)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 2
+                neighbour = Hex.get_neighbor(base, Hex.DOWN)
+                search_tuple = (neighbour[0], neighbour[1], 1)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 1
+                    edge_dict[search_tuple] |= 1
 
         check = [item for k, item in edge_dict.items() if 3 != item]
         if 0 < len(check):

@@ -3,7 +3,6 @@ import tempfile
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
 from PyRoute.Position.Hex import Hex
 from Tests.Mapping.testAllyGenBase import TestAllyGenBase
 
@@ -253,7 +252,7 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
 
-    def test_wonky_setup(self):
+    def test_wonky_setup(self) -> None:
         self.setupOneWorldCoreSector("0503", 0, "ImDc")
         self.galaxy.debug_flag = False
         self.borders.create_borders('separate')
@@ -280,7 +279,7 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         result, msg = self.borders.is_well_formed()
         self.assertTrue(result, msg)
 
-    def test_is_well_formed_single_hex_even_q(self):
+    def test_is_well_formed_single_hex_even_q(self) -> None:
         base = (6, 40)
 
         mid_up = Hex.get_neighbor(base, Hex.UP)
@@ -299,7 +298,7 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         result, msg = self.borders.is_well_formed()
         self.assertTrue(result, msg)
 
-    def test_is_well_formed_single_hex_odd_q(self):
+    def test_is_well_formed_single_hex_odd_q(self) -> None:
         base = (5, 40)
 
         mid_up = Hex.get_neighbor(base, Hex.UP)
@@ -316,7 +315,7 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         result, msg = self.borders.is_well_formed()
         self.assertTrue(result, msg)
 
-    def test_is_well_formed_single_hex_radius_even_q(self):
+    def test_is_well_formed_single_hex_radius_even_q(self) -> None:
         base = (6, 40)
         bottom = base
         left_up_1 = Hex.get_neighbor(bottom, Hex.UP_LEFT)
@@ -354,7 +353,7 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         result, msg = self.borders.is_well_formed()
         self.assertTrue(result, msg)
 
-    def test_is_well_formed_single_hex_radius_odd_q(self):
+    def test_is_well_formed_single_hex_radius_odd_q(self) -> None:
         base = (5, 40)
         bottom = base
         left_up_1 = Hex.get_neighbor(bottom, Hex.UP_LEFT)
@@ -394,7 +393,7 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         result, msg = self.borders.is_well_formed()
         self.assertTrue(result, msg)
 
-    def test_is_well_formed_double_hex_radius_even_q(self):
+    def test_is_well_formed_double_hex_radius_even_q(self) -> None:
         base = (6, 36)
         bottom = base
         left_up_1 = Hex.get_neighbor(bottom, Hex.UP_LEFT)
@@ -446,7 +445,7 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         result, msg = self.borders.is_well_formed()
         self.assertTrue(result, msg)
 
-    def test_is_well_formed_double_hex_radius_odd_q(self):
+    def test_is_well_formed_double_hex_radius_odd_q(self) -> None:
         base = (5, 40)
         bottom = base
         left_up_1 = Hex.get_neighbor(bottom, Hex.UP_LEFT)
@@ -498,13 +497,13 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         result, msg = self.borders.is_well_formed()
         self.assertTrue(result, msg)
 
-    def test_empty_borders_are_well_formed(self):
+    def test_empty_borders_are_well_formed(self) -> None:
         self.borders.borders = {}
         result, msg = self.borders.is_well_formed()
         self.assertTrue(result, msg)
         self.assertEqual('', msg)
 
-    def test_single_border_is_not_well_formed(self):
+    def test_single_border_is_not_well_formed(self) -> None:
         base = (5, 40)
 
         self.borders.borders = {base: ['white', None, None]}
