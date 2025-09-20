@@ -281,19 +281,194 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
         self.assertTrue(result, msg)
 
     def test_is_well_formed_single_hex_even_q(self):
-        left_up = Hex.get_neighbor((6, 36), 3)
-        mid_up = Hex.get_neighbor((6, 36), 2)
-        right_up = Hex.get_neighbor((6, 36), 1)
-        self.borders.borders = {(6, 36): ['white', 'white', 'white'], left_up: [None, None, 'white'],
-                                mid_up: [None, 'white', None], right_up: ['white', None, None]}
+        base = (6, 40)
+
+        mid_up = Hex.get_neighbor(base, 2)
+        right_up = Hex.get_neighbor(base, 1)
+        right_up_down_1 = Hex.get_neighbor(right_up, 5)
+        self.borders.borders = {base: ['white', 'white', None], mid_up: ['white', None, 'white'],
+                                right_up: [None, None, 'white'], right_up_down_1: [None, 'white', None]}
+
+        args = self._make_args()
+        args.output = tempfile.gettempdir()
+        self.galaxy.output = args.output
         result, msg = self.borders.is_well_formed()
         self.assertTrue(result, msg)
 
     def test_is_well_formed_single_hex_odd_q(self):
-        left_up = Hex.get_neighbor((5, 36), 3)
-        mid_up = Hex.get_neighbor((5, 36), 2)
-        right_up = Hex.get_neighbor((5, 36), 1)
-        self.borders.borders = {(5, 36): ['white', 'white', 'white'], left_up: [None, None, 'white'],
-                                mid_up: [None, 'white', None], right_up: ['white', None, None]}
+        base = (5, 40)
+
+        mid_up = Hex.get_neighbor(base, 2)
+        right_up = Hex.get_neighbor(base, 1)
+        self.borders.borders = {base: ['white', 'white', 'white'], mid_up: ['white', None, None],
+                                right_up: [None, 'white', 'white']}
+
+        args = self._make_args()
+        args.output = tempfile.gettempdir()
+        self.galaxy.output = args.output
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def test_is_well_formed_single_hex_radius_even_q(self):
+        base = (6, 40)
+        bottom = base
+        left_up_1 = Hex.get_neighbor(bottom, 3)
+        right_up_1 = Hex.get_neighbor(bottom, 1)
+        right_up_1_down_1 = Hex.get_neighbor(right_up_1, 5)
+
+        nu_borders = {bottom: ['white', 'white', None], left_up_1: ['white', None, 'white'],
+                      right_up_1: ['white', None, None], right_up_1_down_1: [None, 'white', None]}
+
+        top = Hex.get_neighbor(base, 2, 3)
+        top_left_1 = Hex.get_neighbor(top, 4)
+        top_left_1_down_1 = Hex.get_neighbor(top_left_1, 5)
+        top_left_1_down_2 = Hex.get_neighbor(top_left_1_down_1, 5)
+        top_right_1 = Hex.get_neighbor(top, 0)
+        top_right_2 = Hex.get_neighbor(top_right_1, 0)
+        top_right_2_down_1 = Hex.get_neighbor(top_right_2, 5)
+
+        nu_borders[top] = ['white', None, 'white']
+        nu_borders[top_left_1] = ['white', None, None]
+        nu_borders[top_left_1_down_1] = [None, 'white', 'white']
+        nu_borders[top_left_1_down_2] = ['white', 'white', 'white']
+        nu_borders[top_right_1] = ['white', None, 'white']
+        nu_borders[top_right_2] = [None, 'white', 'white']
+        nu_borders[top_right_2_down_1] = [None, 'white', 'white']
+
+        self.borders.borders = nu_borders
+
+        args = self._make_args()
+        args.output = tempfile.gettempdir()
+        self.galaxy.output = args.output
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def test_is_well_formed_single_hex_radius_odd_q(self):
+        base = (5, 40)
+        bottom = base
+        left_up_1 = Hex.get_neighbor(bottom, 3)
+        right_up_1 = Hex.get_neighbor(bottom, 1)
+        right_up_1_down_1 = Hex.get_neighbor(right_up_1, 5)
+        right_up_2 = Hex.get_neighbor(right_up_1, 1)
+        right_up_2_down_1 = Hex.get_neighbor(right_up_2, 5)
+
+        nu_borders = {bottom: ['white', None, 'white'], left_up_1: ['white', 'white', None],
+        right_up_1: ['white', None, 'white'],
+        right_up_1_down_1: [None, None, None], right_up_2: [None, 'white', 'white'],
+                      right_up_2_down_1: [None, 'white', None]}
+
+        top = Hex.get_neighbor(base, 2, 3)
+        top_down_1 = Hex.get_neighbor(top, 5)
+        top_left_1 = Hex.get_neighbor(top, 4)
+        top_left_1_down_1 = Hex.get_neighbor(top_left_1, 5)
+        top_right_1 = Hex.get_neighbor(top, 0)
+        top_right_2 = Hex.get_neighbor(top_right_1, 0)
+
+        nu_borders[top] = ['white', None, None]
+        nu_borders[top_down_1] = [None, 'white', None]
+        nu_borders[top_left_1] = ['white', None, 'white']
+        nu_borders[top_left_1_down_1] = [None, 'white', 'white']
+        nu_borders[top_right_1] = ['white', 'white', None]
+        nu_borders[top_right_2] = [None, None, 'white']
+
+        self.borders.borders = nu_borders
+
+        args = self._make_args()
+        args.output = tempfile.gettempdir()
+        self.galaxy.output = args.output
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def test_is_well_formed_double_hex_radius_even_q(self):
+        base = (6, 36)
+        bottom = base
+        left_up_1 = Hex.get_neighbor(bottom, 3)
+        left_up_2 = Hex.get_neighbor(left_up_1, 3)
+        right_up_1 = Hex.get_neighbor(bottom, 1)
+        right_up_1_down_1 = Hex.get_neighbor(right_up_1, 5)
+        right_up_2 = Hex.get_neighbor(right_up_1, 1)
+
+        nu_borders = {bottom: ['white', 'white', None], left_up_1: ['white', None, 'white'],
+        left_up_2: ['white', 'white', None], right_up_1: ['white', None, None],
+        right_up_1_down_1: [None, 'white', None], right_up_2: ['white', None, 'white']}
+
+        top = Hex.get_neighbor(base, 2, 5)
+        top_left_1 = Hex.get_neighbor(top, 4)
+        top_left_1_down_1 = Hex.get_neighbor(top_left_1, 5)
+        top_left_2 = Hex.get_neighbor(top_left_1, 4)
+        top_left_3 = Hex.get_neighbor(top_left_2, 5)
+        top_left_4 = Hex.get_neighbor(top_left_3, 5)
+        top_right_1 = Hex.get_neighbor(top, 0)
+        top_right_2 = Hex.get_neighbor(top_right_1, 0)
+        top_right_3 = Hex.get_neighbor(top_right_2, 0)
+        top_right_3_down_1 = Hex.get_neighbor(top_right_3, 5)
+        top_right_3_down_2 = Hex.get_neighbor(top_right_3_down_1, 5)
+        top_right_3_down_3 = Hex.get_neighbor(top_right_3_down_2, 5)
+        nu_borders[top] = ['white', None, 'white']
+        nu_borders[top_left_1] = ['white', None, None]
+        nu_borders[top_left_1_down_1] = [None, 'white', None]
+        nu_borders[top_left_2] = ['white', None, 'white']
+        nu_borders[top_left_3] = [None, 'white', 'white']
+        nu_borders[top_left_4] = [None, 'white', 'white']
+        nu_borders[top_right_1] = ['white', None, 'white']
+        nu_borders[top_right_2] = ['white', 'white', None]
+        nu_borders[top_right_3] = [None, None, 'white']
+        nu_borders[top_right_3_down_1] = [None, 'white', 'white']
+        nu_borders[top_right_3_down_2] = [None, 'white', 'white']
+        nu_borders[top_right_3_down_3] = [None, 'white', None]
+
+        self.borders.borders = nu_borders
+        self.galaxy.sectors['Core'] = Sector('# Core', '# 0, 0')
+
+        args = self._make_args()
+        args.output = tempfile.gettempdir()
+        self.galaxy.output = args.output
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def test_is_well_formed_double_hex_radius_odd_q(self):
+        base = (5, 40)
+        bottom = base
+        left_up_1 = Hex.get_neighbor(bottom, 3)
+        left_up_2 = Hex.get_neighbor(left_up_1, 3)
+        right_up_1 = Hex.get_neighbor(bottom, 1)
+        right_up_1_down_1 = Hex.get_neighbor(right_up_1, 5)
+        right_up_2 = Hex.get_neighbor(right_up_1, 1)
+        right_up_2_down_1 = Hex.get_neighbor(right_up_2, 5)
+
+        nu_borders = {bottom: ['white', None, 'white'], left_up_1: ['white', 'white', None],
+        left_up_2: ['white', 'white', 'white'], right_up_1: ['white', None, 'white'],
+        right_up_1_down_1: [None, None, None], right_up_2: ['white', None, None],
+                      right_up_2_down_1: [None, 'white', None]}
+
+        top = Hex.get_neighbor(base, 2, 5)
+        top_down_1 = Hex.get_neighbor(top, 5)
+        top_left_1 = Hex.get_neighbor(top, 4)
+        top_left_2 = Hex.get_neighbor(top_left_1, 4)
+        top_left_3 = Hex.get_neighbor(top_left_2, 5)
+        top_left_4 = Hex.get_neighbor(top_left_3, 5)
+        top_right_1 = Hex.get_neighbor(top, 0)
+        top_right_2 = Hex.get_neighbor(top_right_1, 0)
+        top_right_3 = Hex.get_neighbor(top_right_2, 0)
+        top_right_3_down_1 = Hex.get_neighbor(top_right_3, 5)
+        top_right_3_down_2 = Hex.get_neighbor(top_right_3_down_1, 5)
+        nu_borders[top] = ['white', None, None]
+        nu_borders[top_down_1] = [None, 'white', None]
+        nu_borders[top_left_1] = ['white', None, 'white']
+        nu_borders[top_left_2] = ['white', None, None]
+        nu_borders[top_left_3] = [None, 'white', 'white']
+        nu_borders[top_left_4] = [None, 'white', 'white']
+        nu_borders[top_right_1] = ['white', 'white', None]
+        nu_borders[top_right_2] = ['white', None, 'white']
+        nu_borders[top_right_3] = [None, 'white', 'white']
+        nu_borders[top_right_3_down_1] = [None, 'white', 'white']
+        nu_borders[top_right_3_down_2] = [None, 'white', 'white']
+
+        self.borders.borders = nu_borders
+        self.galaxy.sectors['Core'] = Sector('# Core', '# 0, 0')
+
+        args = self._make_args()
+        args.output = tempfile.gettempdir()
+        self.galaxy.output = args.output
         result, msg = self.borders.is_well_formed()
         self.assertTrue(result, msg)
