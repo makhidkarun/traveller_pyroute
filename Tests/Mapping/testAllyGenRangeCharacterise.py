@@ -283,11 +283,15 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
     def test_is_well_formed_single_hex_even_q(self):
         base = (6, 40)
 
-        mid_up = Hex.get_neighbor(base, 2)
-        right_up = Hex.get_neighbor(base, 1)
+        mid_up = Hex.get_neighbor(base, Hex.UP)
+        right_up = Hex.get_neighbor(base, Hex.UP_RIGHT)
         right_up_down_1 = Hex.get_neighbor(right_up, 5)
-        self.borders.borders = {base: ['white', 'white', None], mid_up: ['white', None, 'white'],
-                                right_up: [None, None, 'white'], right_up_down_1: [None, 'white', None]}
+        self.borders.borders = {
+            base: ['white', 'white', None],
+            mid_up: ['white', None, 'white'],
+            right_up: [None, None, 'white'],
+            right_up_down_1: [None, 'white', None]
+        }
 
         args = self._make_args()
         args.output = tempfile.gettempdir()
@@ -298,10 +302,13 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
     def test_is_well_formed_single_hex_odd_q(self):
         base = (5, 40)
 
-        mid_up = Hex.get_neighbor(base, 2)
-        right_up = Hex.get_neighbor(base, 1)
-        self.borders.borders = {base: ['white', 'white', 'white'], mid_up: ['white', None, None],
-                                right_up: [None, 'white', 'white']}
+        mid_up = Hex.get_neighbor(base, Hex.UP)
+        right_up = Hex.get_neighbor(base, Hex.UP_RIGHT)
+        self.borders.borders = {
+            base: ['white', 'white', 'white'],
+            mid_up: ['white', None, None],
+            right_up: [None, 'white', 'white']
+        }
 
         args = self._make_args()
         args.output = tempfile.gettempdir()
@@ -312,20 +319,24 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
     def test_is_well_formed_single_hex_radius_even_q(self):
         base = (6, 40)
         bottom = base
-        left_up_1 = Hex.get_neighbor(bottom, 3)
-        right_up_1 = Hex.get_neighbor(bottom, 1)
-        right_up_1_down_1 = Hex.get_neighbor(right_up_1, 5)
+        left_up_1 = Hex.get_neighbor(bottom, Hex.UP_LEFT)
+        right_up_1 = Hex.get_neighbor(bottom, Hex.UP_RIGHT)
+        right_up_1_down_1 = Hex.get_neighbor(right_up_1, Hex.DOWN)
 
-        nu_borders = {bottom: ['white', 'white', None], left_up_1: ['white', None, 'white'],
-                      right_up_1: ['white', None, None], right_up_1_down_1: [None, 'white', None]}
+        nu_borders = {
+            bottom: ['white', 'white', None],
+            left_up_1: ['white', None, 'white'],
+            right_up_1: ['white', None, None],
+            right_up_1_down_1: [None, 'white', None]
+        }
 
-        top = Hex.get_neighbor(base, 2, 3)
-        top_left_1 = Hex.get_neighbor(top, 4)
-        top_left_1_down_1 = Hex.get_neighbor(top_left_1, 5)
-        top_left_1_down_2 = Hex.get_neighbor(top_left_1_down_1, 5)
-        top_right_1 = Hex.get_neighbor(top, 0)
-        top_right_2 = Hex.get_neighbor(top_right_1, 0)
-        top_right_2_down_1 = Hex.get_neighbor(top_right_2, 5)
+        top = Hex.get_neighbor(base, Hex.UP, 3)
+        top_left_1 = Hex.get_neighbor(top, Hex.DOWN_LEFT)
+        top_left_1_down_1 = Hex.get_neighbor(top_left_1, Hex.DOWN)
+        top_left_1_down_2 = Hex.get_neighbor(top_left_1_down_1, Hex.DOWN)
+        top_right_1 = Hex.get_neighbor(top, Hex.DOWN_RIGHT)
+        top_right_2 = Hex.get_neighbor(top_right_1, Hex.DOWN_RIGHT)
+        top_right_2_down_1 = Hex.get_neighbor(top_right_2, Hex.DOWN)
 
         nu_borders[top] = ['white', None, 'white']
         nu_borders[top_left_1] = ['white', None, None]
@@ -346,23 +357,27 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
     def test_is_well_formed_single_hex_radius_odd_q(self):
         base = (5, 40)
         bottom = base
-        left_up_1 = Hex.get_neighbor(bottom, 3)
-        right_up_1 = Hex.get_neighbor(bottom, 1)
-        right_up_1_down_1 = Hex.get_neighbor(right_up_1, 5)
-        right_up_2 = Hex.get_neighbor(right_up_1, 1)
-        right_up_2_down_1 = Hex.get_neighbor(right_up_2, 5)
+        left_up_1 = Hex.get_neighbor(bottom, Hex.UP_LEFT)
+        right_up_1 = Hex.get_neighbor(bottom, Hex.UP_RIGHT)
+        right_up_1_down_1 = Hex.get_neighbor(right_up_1, Hex.DOWN)
+        right_up_2 = Hex.get_neighbor(right_up_1, Hex.UP_RIGHT)
+        right_up_2_down_1 = Hex.get_neighbor(right_up_2, Hex.DOWN)
 
-        nu_borders = {bottom: ['white', None, 'white'], left_up_1: ['white', 'white', None],
-        right_up_1: ['white', None, 'white'],
-        right_up_1_down_1: [None, None, None], right_up_2: [None, 'white', 'white'],
-                      right_up_2_down_1: [None, 'white', None]}
+        nu_borders = {
+            bottom: ['white', None, 'white'],
+            left_up_1: ['white', 'white', None],
+            right_up_1: ['white', None, 'white'],
+            right_up_1_down_1: [None, None, None],
+            right_up_2: [None, 'white', 'white'],
+            right_up_2_down_1: [None, 'white', None]
+        }
 
-        top = Hex.get_neighbor(base, 2, 3)
-        top_down_1 = Hex.get_neighbor(top, 5)
-        top_left_1 = Hex.get_neighbor(top, 4)
-        top_left_1_down_1 = Hex.get_neighbor(top_left_1, 5)
-        top_right_1 = Hex.get_neighbor(top, 0)
-        top_right_2 = Hex.get_neighbor(top_right_1, 0)
+        top = Hex.get_neighbor(base, Hex.UP, 3)
+        top_down_1 = Hex.get_neighbor(top, Hex.DOWN)
+        top_left_1 = Hex.get_neighbor(top, Hex.DOWN_LEFT)
+        top_left_1_down_1 = Hex.get_neighbor(top_left_1, Hex.DOWN)
+        top_right_1 = Hex.get_neighbor(top, Hex.DOWN_RIGHT)
+        top_right_2 = Hex.get_neighbor(top_right_1, Hex.DOWN_RIGHT)
 
         nu_borders[top] = ['white', None, None]
         nu_borders[top_down_1] = [None, 'white', None]
@@ -382,28 +397,33 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
     def test_is_well_formed_double_hex_radius_even_q(self):
         base = (6, 36)
         bottom = base
-        left_up_1 = Hex.get_neighbor(bottom, 3)
-        left_up_2 = Hex.get_neighbor(left_up_1, 3)
-        right_up_1 = Hex.get_neighbor(bottom, 1)
-        right_up_1_down_1 = Hex.get_neighbor(right_up_1, 5)
-        right_up_2 = Hex.get_neighbor(right_up_1, 1)
+        left_up_1 = Hex.get_neighbor(bottom, Hex.UP_LEFT)
+        left_up_2 = Hex.get_neighbor(left_up_1, Hex.UP_LEFT)
+        right_up_1 = Hex.get_neighbor(bottom, Hex.UP_RIGHT)
+        right_up_1_down_1 = Hex.get_neighbor(right_up_1, Hex.DOWN)
+        right_up_2 = Hex.get_neighbor(right_up_1, Hex.UP_RIGHT)
 
-        nu_borders = {bottom: ['white', 'white', None], left_up_1: ['white', None, 'white'],
-        left_up_2: ['white', 'white', None], right_up_1: ['white', None, None],
-        right_up_1_down_1: [None, 'white', None], right_up_2: ['white', None, 'white']}
+        nu_borders = {
+            bottom: ['white', 'white', None],
+            left_up_1: ['white', None, 'white'],
+            left_up_2: ['white', 'white', None],
+            right_up_1: ['white', None, None],
+            right_up_1_down_1: [None, 'white', None],
+            right_up_2: ['white', None, 'white']
+        }
 
-        top = Hex.get_neighbor(base, 2, 5)
-        top_left_1 = Hex.get_neighbor(top, 4)
-        top_left_1_down_1 = Hex.get_neighbor(top_left_1, 5)
-        top_left_2 = Hex.get_neighbor(top_left_1, 4)
-        top_left_3 = Hex.get_neighbor(top_left_2, 5)
-        top_left_4 = Hex.get_neighbor(top_left_3, 5)
-        top_right_1 = Hex.get_neighbor(top, 0)
-        top_right_2 = Hex.get_neighbor(top_right_1, 0)
-        top_right_3 = Hex.get_neighbor(top_right_2, 0)
-        top_right_3_down_1 = Hex.get_neighbor(top_right_3, 5)
-        top_right_3_down_2 = Hex.get_neighbor(top_right_3_down_1, 5)
-        top_right_3_down_3 = Hex.get_neighbor(top_right_3_down_2, 5)
+        top = Hex.get_neighbor(base, Hex.UP, 5)
+        top_left_1 = Hex.get_neighbor(top, Hex.DOWN_LEFT)
+        top_left_1_down_1 = Hex.get_neighbor(top_left_1, Hex.DOWN)
+        top_left_2 = Hex.get_neighbor(top_left_1, Hex.DOWN_LEFT)
+        top_left_3 = Hex.get_neighbor(top_left_2, Hex.DOWN)
+        top_left_4 = Hex.get_neighbor(top_left_3, Hex.DOWN)
+        top_right_1 = Hex.get_neighbor(top, Hex.DOWN_RIGHT)
+        top_right_2 = Hex.get_neighbor(top_right_1, Hex.DOWN_RIGHT)
+        top_right_3 = Hex.get_neighbor(top_right_2, Hex.DOWN_RIGHT)
+        top_right_3_down_1 = Hex.get_neighbor(top_right_3, Hex.DOWN)
+        top_right_3_down_2 = Hex.get_neighbor(top_right_3_down_1, Hex.DOWN)
+        top_right_3_down_3 = Hex.get_neighbor(top_right_3_down_2, Hex.DOWN)
         nu_borders[top] = ['white', None, 'white']
         nu_borders[top_left_1] = ['white', None, None]
         nu_borders[top_left_1_down_1] = [None, 'white', None]
@@ -429,29 +449,34 @@ class TestAllyGenRangeCharacterise(TestAllyGenBase):
     def test_is_well_formed_double_hex_radius_odd_q(self):
         base = (5, 40)
         bottom = base
-        left_up_1 = Hex.get_neighbor(bottom, 3)
-        left_up_2 = Hex.get_neighbor(left_up_1, 3)
-        right_up_1 = Hex.get_neighbor(bottom, 1)
-        right_up_1_down_1 = Hex.get_neighbor(right_up_1, 5)
-        right_up_2 = Hex.get_neighbor(right_up_1, 1)
-        right_up_2_down_1 = Hex.get_neighbor(right_up_2, 5)
+        left_up_1 = Hex.get_neighbor(bottom, Hex.UP_LEFT)
+        left_up_2 = Hex.get_neighbor(left_up_1, Hex.UP_LEFT)
+        right_up_1 = Hex.get_neighbor(bottom, Hex.UP_RIGHT)
+        right_up_1_down_1 = Hex.get_neighbor(right_up_1, Hex.DOWN)
+        right_up_2 = Hex.get_neighbor(right_up_1, Hex.UP_RIGHT)
+        right_up_2_down_1 = Hex.get_neighbor(right_up_2, Hex.DOWN)
 
-        nu_borders = {bottom: ['white', None, 'white'], left_up_1: ['white', 'white', None],
-        left_up_2: ['white', 'white', 'white'], right_up_1: ['white', None, 'white'],
-        right_up_1_down_1: [None, None, None], right_up_2: ['white', None, None],
-                      right_up_2_down_1: [None, 'white', None]}
+        nu_borders = {
+            bottom: ['white', None, 'white'],
+            left_up_1: ['white', 'white', None],
+            left_up_2: ['white', 'white', 'white'],
+            right_up_1: ['white', None, 'white'],
+            right_up_1_down_1: [None, None, None],
+            right_up_2: ['white', None, None],
+            right_up_2_down_1: [None, 'white', None]
+        }
 
-        top = Hex.get_neighbor(base, 2, 5)
-        top_down_1 = Hex.get_neighbor(top, 5)
-        top_left_1 = Hex.get_neighbor(top, 4)
-        top_left_2 = Hex.get_neighbor(top_left_1, 4)
-        top_left_3 = Hex.get_neighbor(top_left_2, 5)
-        top_left_4 = Hex.get_neighbor(top_left_3, 5)
-        top_right_1 = Hex.get_neighbor(top, 0)
-        top_right_2 = Hex.get_neighbor(top_right_1, 0)
-        top_right_3 = Hex.get_neighbor(top_right_2, 0)
-        top_right_3_down_1 = Hex.get_neighbor(top_right_3, 5)
-        top_right_3_down_2 = Hex.get_neighbor(top_right_3_down_1, 5)
+        top = Hex.get_neighbor(base, Hex.UP, 5)
+        top_down_1 = Hex.get_neighbor(top, Hex.DOWN)
+        top_left_1 = Hex.get_neighbor(top, Hex.DOWN_LEFT)
+        top_left_2 = Hex.get_neighbor(top_left_1, Hex.DOWN_LEFT)
+        top_left_3 = Hex.get_neighbor(top_left_2, Hex.DOWN)
+        top_left_4 = Hex.get_neighbor(top_left_3, Hex.DOWN)
+        top_right_1 = Hex.get_neighbor(top, Hex.DOWN_RIGHT)
+        top_right_2 = Hex.get_neighbor(top_right_1, Hex.DOWN_RIGHT)
+        top_right_3 = Hex.get_neighbor(top_right_2, Hex.DOWN_RIGHT)
+        top_right_3_down_1 = Hex.get_neighbor(top_right_3, Hex.DOWN)
+        top_right_3_down_2 = Hex.get_neighbor(top_right_3_down_1, Hex.DOWN)
         nu_borders[top] = ['white', None, None]
         nu_borders[top_down_1] = [None, 'white', None]
         nu_borders[top_left_1] = ['white', None, 'white']
