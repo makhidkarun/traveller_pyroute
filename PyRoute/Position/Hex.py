@@ -12,6 +12,13 @@ HexPos: TypeAlias = Tuple[int, int]
 
 class Hex(object):
 
+    DOWN_RIGHT = 0
+    UP_RIGHT = 1
+    UP = 2
+    UP_LEFT = 3
+    DOWN_LEFT = 4
+    DOWN = 5
+
     position: str  # Hex location
     row: int = 0  # Location in the sector.
     col: int = 0
