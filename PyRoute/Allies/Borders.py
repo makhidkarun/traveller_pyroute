@@ -514,14 +514,14 @@ class Borders(object):
     def is_well_formed(self) -> tuple[bool, str]:
         edge_dict = {}  # two bit value - LH end connected is 1, RH end connected is 2
         # assemble border structure
-        for item in self.borders:
-            links = self.borders[item]
+        for rawitem in self.borders:
+            links = self.borders[rawitem]
             counter = -1
             while counter < 2:
                 counter += 1
                 if links[counter] is None:
                     continue
-                edge_tuple = (item[0], item[1], counter)
+                edge_tuple = (rawitem[0], rawitem[1], counter)
                 edge_dict[edge_tuple] = 0
 
         # process border structure - horizontal lines first
