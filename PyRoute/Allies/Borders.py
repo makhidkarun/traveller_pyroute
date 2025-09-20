@@ -526,60 +526,47 @@ class Borders(object):
 
         # process border structure
         for item in edge_dict:
+            odd_q = item[0] % 2 == 1
             base = (item[0], item[1])
-            if 0 == item[2]:
-                search_tuple = (item[0], item[1], 1)  # right upper
-                if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
-                    edge_dict[search_tuple] |= 1
-                neighbour = Hex.get_neighbor(base, 4)  # down/left
-                search_tuple = (neighbour[0], neighbour[1], 2)  # right lower - RH edge of neighbour
-                if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
-                    edge_dict[search_tuple] |= 2
-                neighbour = Hex.get_neighbor(base, 3)  # up/left
-                search_tuple = (neighbour[0], neighbour[1], 1)  # left lower - bottom edge of neighbour
-                if search_tuple in edge_dict:
-                    edge_dict[item] |= 1
-                    edge_dict[search_tuple] |= 2
-                search_tuple = (neighbour[0], neighbour[1], 2)  # left upper - RH edge of neighbour
-                if search_tuple in edge_dict:
-                    edge_dict[item] |= 1
-                    edge_dict[search_tuple] |= 1
-
-            if 1 == item[2]:
-                # left upper has already been handled
-                search_tuple = (item[0], item[1], 2)  # right upper
-                if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
-                    edge_dict[search_tuple] |= 1
-                neighbour = Hex.get_neighbor(base, 4)  # down/left
-                search_tuple = (neighbour[0], neighbour[1], 2)  # left lower - RH edge of neighbour
-                if search_tuple in edge_dict:
-                    edge_dict[item] |= 1
-                    edge_dict[search_tuple] |= 2
-                neighbour = Hex.get_neighbor(base, 0)  # down/right
-                search_tuple = (neighbour[0], neighbour[1], 2)  # right lower LH edge of neighbour
-                if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
-                    edge_dict[search_tuple] |= 1
-
-            if 2 == item[2]:
-                # left upper has already been handled
-                neighbour = Hex.get_neighbor(base, 0)  # down/right
-                search_tuple = (neighbour[0], neighbour[1], 1)  # left lower - LH edge of neighbour
-                if search_tuple in edge_dict:
-                    edge_dict[item] |= 1
-                    edge_dict[search_tuple] |= 1
-                neighbour = Hex.get_neighbor(base, 1)  # up/right
-                search_tuple = (neighbour[0], neighbour[1], 1)  # right upper - LH edge of neighbour
-                if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
-                    edge_dict[search_tuple] |= 2
-                search_tuple = (neighbour[0], neighbour[1], 1)  # right lower - bottom edge of neighbour
-                if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
-                    edge_dict[search_tuple] |= 1
+            if 0 == item[2]:  # _bottom_ edge of base
+                if odd_q:
+                    pass
+                else:
+                    search_tuple = (item[0], item[1], 1)
+                    if search_tuple in edge_dict:
+                        edge_dict[item] |= 2
+                        edge_dict[search_tuple] |= 1
+                    search_tuple = (item[0], item[1], 2)
+                    if search_tuple in edge_dict:
+                        edge_dict[item] |= 2
+                        edge_dict[search_tuple] |= 1
+                    neighbour = Hex.get_neighbor(base, Hex.DOWN_RIGHT)
+                    search_tuple = (neighbour[0], neighbour[1], 1)
+                    if search_tuple in edge_dict:
+                        edge_dict[item] |= 1
+                        edge_dict[search_tuple] |= 2
+                    search_tuple = (neighbour[0], neighbour[1], 2)
+                    if search_tuple in edge_dict:
+                        edge_dict[item] |= 1
+                        edge_dict[search_tuple] |= 2
+            elif 1 == item[2]:
+                if odd_q:
+                    neighbour = Hex.get_neighbor(base, Hex.UP)
+                    search_tuple = (neighbour[0], neighbour[1], 2)
+                    if search_tuple in edge_dict:
+                        edge_dict[item] |= 1
+                        edge_dict[search_tuple] |= 1
+                else:
+                    pass
+            elif 2 == item[2]:
+                if odd_q:
+                    pass
+                else:
+                    neighbour = Hex.get_neighbor(base, Hex.DOWN)
+                    search_tuple = (neighbour[0], neighbour[1], 1)
+                    if search_tuple in edge_dict:
+                        edge_dict[item] |= 2
+                        edge_dict[search_tuple] |= 2
 
         check = [item for k, item in edge_dict.items() if 3 != item]
         if 0 < len(check):
