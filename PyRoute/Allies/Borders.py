@@ -85,39 +85,39 @@ class Borders(object):
                 colour = AllyGen.alleg_border_colors.get(allyMap[system], 'white')  # Default to white for unknown borders
                 colours = [colour, colour, colour, colour, colour, colour, colour, colour, colour, colour]
 
-            if self._set_border(allyMap, system, 5):  # down
-                neighbour = Hex.get_neighbor(system, 5)
+            if self._set_border(allyMap, system, Hex.DOWN):  # down
+                neighbour = Hex.get_neighbor(system, Hex.DOWN)
                 self._set_border_colour(neighbour, 0, colours[0])
 
-            if self._set_border(allyMap, system, 2):  # up
+            if self._set_border(allyMap, system, Hex.UP):  # up
                 self._set_border_colour(system, 0, colours[1])
 
-            if self._set_border(allyMap, system, 1):  # up right
-                neighbour = Hex.get_neighbor(system, 0)
+            if self._set_border(allyMap, system, Hex.UP_RIGHT):  # up right
+                neighbour = Hex.get_neighbor(system, Hex.DOWN_RIGHT)
                 if system[0] & 1:
                     self._set_border_colour(neighbour, 1, colours[2])
                 else:
                     self._set_border_colour(neighbour, 2, colours[3])
 
-            if self._set_border(allyMap, system, 0):  # down right
-                neighbour = Hex.get_neighbor(system, 0)
+            if self._set_border(allyMap, system, Hex.DOWN_RIGHT):  # down right
+                neighbour = Hex.get_neighbor(system, Hex.DOWN_RIGHT)
                 if system[0] & 1:
                     self._set_border_colour(neighbour, 2, colours[4])
                 else:
-                    neighbour = Hex.get_neighbor(system, 0)
-                    neighbour = Hex.get_neighbor(neighbour, 5)
+                    neighbour = Hex.get_neighbor(system, Hex.DOWN_RIGHT)
+                    neighbour = Hex.get_neighbor(neighbour, Hex.DOWN)
                     self._set_border_colour(neighbour, 1, colours[5])
 
-            if self._set_border(allyMap, system, 4):  # down left
+            if self._set_border(allyMap, system, Hex.DOWN_LEFT):  # down left
                 if system[0] & 1:
-                    neighbour = Hex.get_neighbor(system, 5)
+                    neighbour = Hex.get_neighbor(system, Hex.DOWN)
                     self._set_border_colour(neighbour, 2, colours[6])
                 else:
-                    neighbour = Hex.get_neighbor(system, 5)
+                    neighbour = Hex.get_neighbor(system, Hex.DOWN)
                     self._set_border_colour(neighbour, 1, colours[7])
 
-            if self._set_border(allyMap, system, 3):  # up left
-                neighbour = Hex.get_neighbor(system, 5)
+            if self._set_border(allyMap, system, Hex.UP_LEFT):  # up left
+                neighbour = Hex.get_neighbor(system, Hex.DOWN)
                 if system[0] & 1:
                     self._set_border_colour(neighbour, 1, colours[8])
                 else:
