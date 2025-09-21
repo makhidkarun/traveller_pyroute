@@ -12,7 +12,7 @@ from Tests.baseTest import baseTest
 
 class testBordersRegression(baseTest):
 
-    def test_border_regression_zdiedeiant_sector_minimised(self):
+    def test_border_regression_zdiedeiant_sector_minimised(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/border_blowup_1/Zdiedeiant.sec')
 
         galaxy = DeltaGalaxy(min_btn=15, max_jump=4)
