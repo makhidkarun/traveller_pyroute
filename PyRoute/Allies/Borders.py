@@ -85,39 +85,39 @@ class Borders(object):
                 colour = AllyGen.alleg_border_colors.get(allyMap[system], 'white')  # Default to white for unknown borders
                 colours = [colour, colour, colour, colour, colour, colour, colour, colour, colour, colour]
 
-            if self._set_border(allyMap, system, 5):  # down
-                neighbour = Hex.get_neighbor(system, 5)
+            if self._set_border(allyMap, system, Hex.DOWN):  # down
+                neighbour = Hex.get_neighbor(system, Hex.DOWN)
                 self._set_border_colour(neighbour, 0, colours[0])
 
-            if self._set_border(allyMap, system, 2):  # up
+            if self._set_border(allyMap, system, Hex.UP):  # up
                 self._set_border_colour(system, 0, colours[1])
 
-            if self._set_border(allyMap, system, 1):  # up right
-                neighbour = Hex.get_neighbor(system, 0)
+            if self._set_border(allyMap, system, Hex.UP_RIGHT):  # up right
+                neighbour = Hex.get_neighbor(system, Hex.DOWN_RIGHT)
                 if system[0] & 1:
                     self._set_border_colour(neighbour, 1, colours[2])
                 else:
                     self._set_border_colour(neighbour, 2, colours[3])
 
-            if self._set_border(allyMap, system, 0):  # down right
-                neighbour = Hex.get_neighbor(system, 0)
+            if self._set_border(allyMap, system, Hex.DOWN_RIGHT):  # down right
+                neighbour = Hex.get_neighbor(system, Hex.DOWN_RIGHT)
                 if system[0] & 1:
                     self._set_border_colour(neighbour, 2, colours[4])
                 else:
-                    neighbour = Hex.get_neighbor(system, 0)
-                    neighbour = Hex.get_neighbor(neighbour, 5)
+                    neighbour = Hex.get_neighbor(system, Hex.DOWN_RIGHT)
+                    neighbour = Hex.get_neighbor(neighbour, Hex.DOWN)
                     self._set_border_colour(neighbour, 1, colours[5])
 
-            if self._set_border(allyMap, system, 4):  # down left
+            if self._set_border(allyMap, system, Hex.DOWN_LEFT):  # down left
                 if system[0] & 1:
-                    neighbour = Hex.get_neighbor(system, 5)
+                    neighbour = Hex.get_neighbor(system, Hex.DOWN)
                     self._set_border_colour(neighbour, 2, colours[6])
                 else:
-                    neighbour = Hex.get_neighbor(system, 5)
+                    neighbour = Hex.get_neighbor(system, Hex.DOWN)
                     self._set_border_colour(neighbour, 1, colours[7])
 
-            if self._set_border(allyMap, system, 3):  # up left
-                neighbour = Hex.get_neighbor(system, 5)
+            if self._set_border(allyMap, system, Hex.UP_LEFT):  # up left
+                neighbour = Hex.get_neighbor(system, Hex.DOWN)
                 if system[0] & 1:
                     self._set_border_colour(neighbour, 1, colours[8])
                 else:
@@ -150,6 +150,8 @@ class Borders(object):
 
     def _set_border_colour(self, system: HexPos, index: int, colour: Colour):
         if self.borders.get(system, False):
+            if colour is None and self.borders[system][index] is not None:
+                return
             self.borders[system][index] = colour
         else:
             colours: list[Union[str, tuple[float, float, float], tuple[float, float, float, float], None]] = [None, None, None]
@@ -512,4 +514,95 @@ class Borders(object):
         return alg
 
     def is_well_formed(self) -> tuple[bool, str]:
+        edge_dict = {}  # two bit value - LH end connected is 1, RH end connected is 2
+        # assemble border structure
+        for rawitem in self.borders:
+            links = self.borders[rawitem]
+            counter = -1
+            while counter < 2:
+                counter += 1
+                if links[counter] is None:
+                    continue
+                edge_tuple = (rawitem[0], rawitem[1], counter)
+                edge_dict[edge_tuple] = 0
+
+        # process border structure - horizontal lines first
+        for item in edge_dict:
+            if 0 != item[2]:
+                continue
+            odd_q = item[0] % 2 == 1
+            base = (item[0], item[1])
+            if odd_q:
+                search_tuple = (item[0], item[1], 2)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 1
+                    edge_dict[search_tuple] |= 2
+                neighbour = Hex.get_neighbor(base, Hex.DOWN)
+                search_tuple = (neighbour[0], neighbour[1], 1)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 1
+                    edge_dict[search_tuple] |= 2
+                neighbour = Hex.get_neighbor(base, Hex.DOWN_RIGHT)
+                search_tuple = (neighbour[0], neighbour[1], 1)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 1
+                neighbour = Hex.get_neighbor(base, Hex.UP_RIGHT)
+                search_tuple = (neighbour[0], neighbour[1], 2)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 1
+            else:
+                search_tuple = (item[0], item[1], 1)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 1
+                    edge_dict[search_tuple] |= 2
+                search_tuple = (item[0], item[1], 2)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 1
+                    edge_dict[search_tuple] |= 2
+                neighbour = Hex.get_neighbor(base, Hex.DOWN_RIGHT)
+                search_tuple = (neighbour[0], neighbour[1], 1)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 1
+                search_tuple = (neighbour[0], neighbour[1], 2)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 1
+
+        # process border structure - now we've done all horizontal lines, only need to check connections to
+        # non-horizontal lines
+        for item in edge_dict:
+            if 0 == item[2]:  # _bottom_ edge of base
+                continue
+            odd_q = item[0] % 2 == 1
+            base = (item[0], item[1])
+
+            if 1 == item[2] and odd_q:
+                search_tuple = (item[0], item[1], 2)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 1
+                    edge_dict[search_tuple] |= 1
+
+                neighbour = Hex.get_neighbor(base, Hex.UP)
+                search_tuple = (neighbour[0], neighbour[1], 2)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 2
+            if 2 == item[2] and not odd_q:
+                search_tuple = (base[0], base[1], 1)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 2
+                neighbour = Hex.get_neighbor(base, Hex.DOWN)
+                search_tuple = (neighbour[0], neighbour[1], 1)
+                if search_tuple in edge_dict:
+                    edge_dict[item] |= 1
+                    edge_dict[search_tuple] |= 1
+
+        check = [item for k, item in edge_dict.items() if 3 != item]
+        if 0 < len(check):
+            return False, 'At least one border segment disconnected'
+
         return True, ''

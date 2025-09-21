@@ -190,14 +190,14 @@ class Galaxy(AreaItem):
         elif routes == 'none':
             self.trade = NoneCalculation(self)
 
-    def set_borders(self, border_gen, match) -> None:
+    def set_borders(self, border_gen, match, enforce: bool = True) -> None:
         self.logger.info('setting borders...')
         if border_gen == 'range':
-            self.borders.create_borders(match)
+            self.borders.create_borders(match, enforce)
         elif border_gen == 'allygen':
-            self.borders.create_ally_map(match)
+            self.borders.create_ally_map(match, enforce)
         elif border_gen == 'erode':
-            self.borders.create_erode_border(match)
+            self.borders.create_erode_border(match, enforce)
         else:
             pass
 

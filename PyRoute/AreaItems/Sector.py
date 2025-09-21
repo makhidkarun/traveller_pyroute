@@ -66,7 +66,7 @@ class Sector(AreaItem):
         return '{} ({},{})'.format(self.name, str(self.x), str(self.y))
 
     def sector_name(self) -> str:
-        return self.name[:-7] if self.name.endswith('Sector') else self.name
+        return self.name.removesuffix(' Sector').removesuffix('Sector').strip()
 
     def find_world_by_pos(self, pos) -> Optional[Star]:
         for world in self.worlds:
