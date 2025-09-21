@@ -150,6 +150,8 @@ class Borders(object):
 
     def _set_border_colour(self, system: HexPos, index: int, colour: Colour):
         if self.borders.get(system, False):
+            if colour is None and self.borders[system][index] is not None:
+                return
             self.borders[system][index] = colour
         else:
             colours: list[Union[str, tuple[float, float, float], tuple[float, float, float, float], None]] = [None, None, None]
