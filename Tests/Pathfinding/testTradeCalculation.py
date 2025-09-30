@@ -13,6 +13,8 @@ except ModuleNotFoundError:
     from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
 except ImportError:
     from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+except AttributeError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
