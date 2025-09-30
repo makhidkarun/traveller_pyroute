@@ -22,6 +22,8 @@ from heapq import heappop, heappush, heapify
 import networkx as nx
 import numpy as np
 
+float64max = np.finfo(np.float64).max
+
 
 def _calc_branching_factor(nodes_queued, path_len):
     if path_len == nodes_queued:
@@ -50,7 +52,7 @@ def _calc_branching_factor(nodes_queued, path_len):
     return round(new, 3)
 
 
-def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=None, diagnostics=False) -> tuple[list, dict]:
+def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=float64max, diagnostics=False) -> tuple[list, dict]:
 
     G_succ = G._arcs  # For speed-up
 
