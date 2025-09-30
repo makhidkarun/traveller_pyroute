@@ -13,6 +13,7 @@ except ImportError:
 except AttributeError:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 
+
 class testDeltaGalaxy(baseTest):
     def test_read_sectors(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-spiked.sec')

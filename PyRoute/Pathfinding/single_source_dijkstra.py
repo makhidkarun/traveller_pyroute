@@ -20,6 +20,7 @@ except ImportError:
 except AttributeError:
     from PyRoute.Pathfinding.single_source_dijkstra_core_fallback import dijkstra_core
 
+
 def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1, min_cost=None, max_labels=None) -> tuple:
     # return only distance_labels from the explicit version
     distance_labels, _, max_neighbour_labels = explicit_shortest_path_dijkstra_distance_graph(graph, source,
