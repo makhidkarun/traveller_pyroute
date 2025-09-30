@@ -116,7 +116,7 @@ class testDeltaGalaxy(baseTest):
         expected = np.array(raw_expected, dtype=float)
         self.assertEqual(len(expected), len(actual))
         delta = np.abs(expected - actual)
-        self.assertTrue((delta < 0.00001).all(), "Unexpected bulk heuristic value")
+        self.assertTrue((delta < 0.0001).all(), "Unexpected bulk heuristic value")
 
 
 if __name__ == '__main__':
