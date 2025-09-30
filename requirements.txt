@@ -18,6 +18,7 @@ pytest-randomly
 pytest-subtests
 reportlab >= 4.1.0
 ruff >= 0.3.0
+setuptools
 types-networkx
 types-reportlab
 typing_extensions
