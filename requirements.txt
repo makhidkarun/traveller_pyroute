@@ -10,7 +10,7 @@ jsonpickle
 lark==1.1.8
 mutmut
 mypy
-numpy == 1.26
+numpy == 2.0.0
 pymupdf
 pytest >= 8.0.0
 pytest-console-scripts
