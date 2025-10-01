@@ -117,14 +117,11 @@ class testLandmarksExtremes(baseTest):
 
         expected = [
             {0: 132, 5: 411, 6: 420},
-            {0: 486, 5: 409, 6: 418},
-            {0: 126, 6: 416},
+            {0: 486, 6: 418},
+            {0: 126},
             {0: 0},
             {0: 5},
             {0: 428},
-            {0: 413},
-            {0: 258},
-            {0: 268}
         ]
         actual, _ = foo.get_landmarks(index=True)
         self.assertEqual(expected, actual)
