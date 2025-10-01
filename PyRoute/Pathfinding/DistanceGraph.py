@@ -9,7 +9,6 @@ import copy
 
 import numpy as np
 from networkx.classes import Graph
-from numpy.core import multiarray
 
 from PyRoute.Pathfinding.DistanceBase import DistanceBase
 
@@ -39,7 +38,7 @@ class DistanceGraph(DistanceBase):
             if 0 < len(node_neighbours):
                 self._min_indirect[i] = min(self._min_cost[node_neighbours])
 
-    def min_cost(self, target: int, indirect: bool = False) -> multiarray:
+    def min_cost(self, target: int, indirect: bool = False) -> np.ndarray:
         min_cost = copy.deepcopy(self._min_cost)
         min_cost[target] = 0
 
