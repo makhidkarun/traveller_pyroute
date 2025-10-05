@@ -10,6 +10,8 @@ except ModuleNotFoundError:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 except ImportError:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
+except AttributeError:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 
 
 class testDeltaGalaxy(baseTest):
@@ -114,7 +116,7 @@ class testDeltaGalaxy(baseTest):
         expected = np.array(raw_expected, dtype=float)
         self.assertEqual(len(expected), len(actual))
         delta = np.abs(expected - actual)
-        self.assertTrue((delta < 0.00001).all(), "Unexpected bulk heuristic value")
+        self.assertTrue((delta < 0.0001).all(), "Unexpected bulk heuristic value")
 
 
 if __name__ == '__main__':

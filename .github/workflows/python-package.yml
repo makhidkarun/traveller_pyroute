@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9"]
+        python-version: ["3.9", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -37,10 +37,10 @@ jobs:
           mypy PyRoute/Allies/*.py PyRoute/AreaItems/*.py PyRoute/Calculation/*.py PyRoute/DeltaDebug/*.py PyRoute/DeltaPasses/*.py PyRoute/Inputs/*.py PyRoute/Position/*.py PyRoute/SystemData/*.py PyRoute/*.py
       - name: Run non-cython tests
         run: |
-          pytest -k testAstarOverSubsector
+          pytest "Tests/Pathfinding/testAstarNumpy.py::testAStarNumpy::testAStarOverSubsector" "Tests/Pathfinding/testTradeCalculation.py::testTradeCalculation::test_route_update_simple"
       - name: Set up cython build
         run: |
-          cd $LD_LIBRARY_PATH/python3.9/site-packages/numpy/
+          cd $LD_LIBRARY_PATH/python${{ matrix.python-version }}/site-packages/numpy/
           ls -al
           cp __init__.cython-30.pxd numpy.pxd
       - name: Build cython modules

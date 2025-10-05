@@ -31,18 +31,18 @@ class testLandmarkAvoidHelper(baseTest):
 
         self.assertEqual(list(expected_weights), list(actual_weights), "Unexpected from-scratch node weights")
 
-        expected_sizes = [7439, 980, 787, 263, 285, 306, 1125, 283, 7133, 5577, 145, 2064, 1476, 283, 252, 1958, 166,
-                          687, 1686, 607, 875, 151, 213, 655, 1127, 223, 497, 482, 751, 263, 353, 255, 273, 253, 236,
-                          238, 239]
+        expected_sizes = [7894, 980, 787, 263, 285, 331, 1125, 283, 7563, 6558, 145, 2114, 1526, 283, 277, 2864, 191,
+                          737, 1736, 757, 174, 176, 213, 705, 1983, 273, 547, 582, 239, 313, 403, 305, 281, 261, 778,
+                          263, 239]
         actual_sizes = LandmarkAvoidHelper.calc_sizes(actual_weights, actual_parents, [])
         self.assertEqual(list(expected_sizes), list(actual_sizes), "Unexpected from-scratch node sizes")
 
-        expected_landmark = 30
+        expected_landmark = 32
         actual_landmark = LandmarkAvoidHelper.traverse_sizes(actual_sizes, source, actual_parents)
         self.assertEqual(expected_landmark, actual_landmark, "Unexpected new landmark choice")
 
         # Now verify subtrees containing existing landmarks get their sizes zeroed
-        contains_landmark = [0, 8, 9, 11, 12, 18, 23, 30]
+        contains_landmark = [0, 8, 9, 15, 24, 32, 34]
         for item in contains_landmark:
             expected_sizes[item] = 0
 

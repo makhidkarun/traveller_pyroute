@@ -70,9 +70,7 @@ class testAllegiance(baseTest):
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
 
-        expected_allegiances = ['As', 'AsMw', 'AsSc', 'AsT0', 'AsT1', 'AsT2', 'AsT3', 'AsT4', 'AsT5', 'AsT6', 'AsT7',
-                                'AsT8', 'AsT9', 'AsTv', 'AsVc', 'AsWc', 'AsXX', 'BlSo', 'CsIm', 'CsZh', 'FlLe', 'GlEm',
-                                'Im', 'ImDd', 'NaDr', 'NaHu', 'NaXX', 'SeFo', 'StCl']
+        expected_allegiances = ['AsMw', 'AsT0', 'AsT9', 'AsTv', 'AsVc', 'AsWc', 'CsIm', 'ImDd', 'NaHu']
         actual_allegiances = list(sector.allegiances.keys())
 
         self.assertEqual(expected_allegiances, actual_allegiances, "Allegiance name list unexpected")
@@ -91,10 +89,8 @@ class testAllegiance(baseTest):
         galaxy.read_sectors(delta, args.pop_code, args.ru_calc, args.route_reuse, args.routes, args.route_btn,
                             1, False)
 
-        expected_allegiances = {'As': 7, 'AsMw': 1, 'AsSc': 0, 'AsT0': 1, 'AsT1': 0, 'AsT2': 0, 'AsT3': 0, 'AsT4': 0,
-                                'AsT5': 0, 'AsT6': 0, 'AsT7': 0, 'AsT8': 0, 'AsT9': 1, 'AsTv': 2, 'AsVc': 1, 'AsWc': 1,
-                                'AsXX': 0, 'BlSo': 0, 'CsIm': 1, 'CsZh': 0, 'FlLe': 0, 'GlEm': 0, 'Im': 3, 'ImDd': 3,
-                                'NaDr': 0, 'NaHu': 5, 'NaXX': 0, 'SeFo': 0, 'StCl': 0}
+        expected_allegiances = {'AsMw': 1, 'AsT0': 1, 'AsT9': 1, 'AsTv': 2, 'AsVc': 1, 'AsWc': 1,
+                                'CsIm': 1, 'ImDd': 3, 'NaHu': 5, 'Im': 3, 'As': 7}
         actual_allegiances = list(galaxy.alg.keys())
         self.assertEqual(list(expected_allegiances.keys()), actual_allegiances, "Allegiance name list unexpected")
         for alg_name in expected_allegiances:

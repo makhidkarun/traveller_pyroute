@@ -17,11 +17,15 @@ except ModuleNotFoundError:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 except ImportError:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
+except AttributeError:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 try:
     from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
     from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
 except ImportError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+except AttributeError:
     from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
 
 # Convert the TradeMPCalculation to a global variable to allow the child processes to access it, and all the data.

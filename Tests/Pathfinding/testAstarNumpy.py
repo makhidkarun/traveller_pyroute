@@ -16,12 +16,18 @@ except ModuleNotFoundError:
 except ImportError:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
     goodimport = False
+except AttributeError:
+    from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
+    goodimport = False
 try:
     from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
     from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
     goodimport = False
 except ImportError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+    goodimport = False
+except AttributeError:
     from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
     goodimport = False
 
