@@ -324,7 +324,7 @@ class testXRouteCalculation(baseTest):
         exp_weights = [24, 28]
         for i in range(2):
             start = route[i]
-            fin = route[i+1]
+            fin = route[i + 1]
             foo = galaxy.stars[start.index][fin.index]
             self.assertEqual(exp_weights[i], foo['weight'])
 
@@ -383,10 +383,89 @@ class testXRouteCalculation(baseTest):
                 self.assertEqual(names[counter][i], item[2]['route'][i].name)
                 if i < len(names[counter]) - 1:
                     first = item[2]['route'][i]
-                    second = item[2]['route'][i+1]
+                    second = item[2]['route'][i + 1]
                     firstdex = first.index
                     seconddex = second.index
                     edge = galaxy.stars[firstdex][seconddex]
                     self.assertEqual(exp_trade, edge['trade'])
 
             counter += 1
+
+    def test_routes_pass_1_2(self) -> None:
+        sourcefile = [
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Core.sec'),
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Delphi.sec'),
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Fornast.sec'),
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Massilia.sec'),
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Old Expanses.sec'),
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Diaspora.sec'),
+        ]
+
+        args = self._make_args()
+        args.route_btn = 15
+        readparms = ReadSectorOptions(sectors=sourcefile, pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                      route_reuse=args.route_reuse, trade_choice='comm', route_btn=args.route_btn,
+                                      mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=False,
+                                      deep_space={}, map_type=args.map_type)
+
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.read_sectors(readparms)
+
+        calc = XRouteCalculation(galaxy)
+        galaxy.trade = calc
+        logger = calc.logger
+        logger.manager.disable = 10
+
+        calc.generate_routes()
+        self.assertEqual(1, len(calc.capital))
+        self.assertEqual(5, len(calc.secCapitals))
+        calc.calculate_components()
+        source = max(galaxy.star_mapping.values(), key=lambda item: item.wtn)
+        calc.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, galaxy.stars, calc.epsilon)
+        galaxy.sectors['Core'].rimward = None
+        galaxy.sectors['Fornast'].spinward = None
+        galaxy.sectors['Delphi'].coreward = None
+        galaxy.sectors['Massilia'].trailing = None
+
+        calc.routes_pass_1()
+        self.assertEqual(13, galaxy.ranges.number_of_edges())
+
+    def test_routes_pass_1_3(self) -> None:
+        sourcefile = [
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Core.sec'),
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Delphi.sec'),
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Fornast.sec'),
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Massilia.sec'),
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Old Expanses.sec'),
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Diaspora.sec'),
+        ]
+
+        args = self._make_args()
+        args.route_btn = 15
+        readparms = ReadSectorOptions(sectors=sourcefile, pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                    route_reuse=args.route_reuse, trade_choice='comm', route_btn=args.route_btn,
+                                    mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=False,
+                                    deep_space={}, map_type=args.map_type)
+
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.read_sectors(readparms)
+
+        calc = XRouteCalculation(galaxy)
+        galaxy.trade = calc
+        logger = calc.logger
+        logger.manager.disable = 10
+
+        calc.generate_routes()
+        self.assertEqual(1, len(calc.capital))
+        self.assertEqual(5, len(calc.secCapitals))
+        calc.calculate_components()
+        calc.secCapitals.reverse()
+        source = max(galaxy.star_mapping.values(), key=lambda item: item.wtn)
+        calc.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, galaxy.stars, calc.epsilon)
+        galaxy.sectors['Core'].trailing = None
+        galaxy.sectors['Fornast'].rimward = None
+        galaxy.sectors['Delphi'].spinward = None
+        galaxy.sectors['Massilia'].coreward = None
+
+        calc.routes_pass_1()
+        self.assertEqual(13, galaxy.ranges.number_of_edges())

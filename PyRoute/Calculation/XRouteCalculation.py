@@ -8,6 +8,7 @@ from typing import Union, Any, Optional
 import networkx as nx
 
 from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
@@ -33,6 +34,8 @@ class XRouteCalculation(RouteCalculation):
     capSec_weight = [0, 95, 90, 85, 75, 75, 70]
     inSec_weight = [0, 140, 110, 85, 70, 95, 140]
     impt_weight = [0, 90, 80, 70, 70, 110, 140]
+
+    localCapitalDirs = ['coreward', 'rimward', 'spinward', 'trailing', 'corespin', 'coretrail', 'rimspin', 'rimtrail']
 
     def __init__(self, galaxy):
         super(XRouteCalculation, self).__init__(galaxy)
@@ -64,41 +67,80 @@ class XRouteCalculation(RouteCalculation):
             self.get_route_between(self.capital[0], star, self.calc_trade(25))
 
         for star in self.secCapitals:
-            localCapital: dict[str, Optional[Star]] = {'coreward': None, 'spinward': None, 'trailing': None,
-                                                       'rimward': None, 'corespin': None, 'coretrail': None,
-                                                       'rimspin': None, 'rimtrail': None}
+            localCapital: dict[str, Optional[Star]] = {}
 
+            # If the diagonal adjacencies are dug up twice, take advantage of the second pass to verify the first
+            # - they have to be the same, as they're pointing to the _same_ thing.
             if star.sector.coreward:
                 localCapital['coreward'] = self.find_sector_capital(star.sector.coreward)
-                if localCapital['coreward'] and localCapital['coreward'].sector.spinward:
-                    localCapital['corespin'] = self.find_sector_capital(localCapital['coreward'].sector.spinward)
-                if localCapital['coreward'] and localCapital['coreward'].sector.trailing:
-                    localCapital['coretrail'] = self.find_sector_capital(localCapital['coreward'].sector.trailing)
+                if localCapital['coreward']:
+                    localSector = localCapital['coreward'].sector
+                    if localSector.spinward:
+                        corespin = self.find_sector_capital(localSector.spinward)
+                        if 'corespin' not in localCapital:
+                            localCapital['corespin'] = corespin
+                        else:
+                            assert localCapital['corespin'] == corespin
+                    if localSector.trailing:
+                        coretrail = self.find_sector_capital(localSector.trailing)
+                        if 'coretrail' not in localCapital:
+                            localCapital['coretrail'] = coretrail
+                        else:
+                            assert localCapital['coretrail'] == coretrail
             if star.sector.rimward:
                 localCapital['rimward'] = self.find_sector_capital(star.sector.rimward)
-                if localCapital['rimward'] and localCapital['rimward'].sector.spinward:
-                    localCapital['rimspin'] = self.find_sector_capital(localCapital['rimward'].sector.spinward)
-                if localCapital['rimward'] and localCapital['rimward'].sector.trailing:
-                    localCapital['rimtrail'] = self.find_sector_capital(localCapital['rimward'].sector.trailing)
+                if localCapital['rimward']:
+                    localSector = localCapital['rimward'].sector
+                    if localSector.spinward:
+                        rimspin = self.find_sector_capital(localSector.spinward)
+                        if 'rimspin' not in localCapital:
+                            localCapital['rimspin'] = rimspin
+                        else:
+                            assert localCapital['rimspin'] == rimspin
+                    if localSector.trailing:
+                        rimtrail = self.find_sector_capital(localSector.trailing)
+                        if 'rimtrail' not in localCapital:
+                            localCapital['rimtrail'] = rimtrail
+                        else:
+                            assert localCapital['rimtrail'] == rimtrail
             if star.sector.spinward:
                 localCapital['spinward'] = self.find_sector_capital(star.sector.spinward)
-                if localCapital['spinward'] and localCapital['spinward'].sector.coreward and not localCapital[
-                    'corespin']:
-                    localCapital['corespin'] = self.find_sector_capital(localCapital['spinward'].sector.coreward)
-                if localCapital['spinward'] and localCapital['spinward'].sector.rimward and not localCapital['rimspin']:
-                    localCapital['rimwspin'] = self.find_sector_capital(localCapital['spinward'].sector.rimward)
+                if localCapital['spinward']:
+                    localSector = localCapital['spinward'].sector
+                    if localSector.coreward:
+                        corespin = self.find_sector_capital(localSector.coreward)
+                        if 'corespin' not in localCapital:
+                            localCapital['corespin'] = corespin
+                        else:
+                            assert localCapital['corespin'] == corespin
+                    if localSector.rimward:
+                        rimspin = self.find_sector_capital(localSector.rimward)
+                        if 'rimspin' not in localCapital:
+                            localCapital['rimspin'] = rimspin
+                        else:
+                            assert localCapital['rimspin'] == rimspin
             if star.sector.trailing:
                 localCapital['trailing'] = self.find_sector_capital(star.sector.trailing)
-                if localCapital['trailing'] and localCapital['trailing'].sector.coreward and not localCapital[
-                    'coretrail']:
-                    localCapital['coretrail'] = self.find_sector_capital(localCapital['trailing'].sector.coreward)
-                if localCapital['trailing'] and localCapital['trailing'].sector.rimward and not localCapital[
-                    'rimtrail']:
-                    localCapital['rimtrail'] = self.find_sector_capital(localCapital['trailing'].sector.rimward)
+                if localCapital['trailing']:
+                    localSector = localCapital['trailing'].sector
+                    if localSector.coreward:
+                        coretrail = self.find_sector_capital(localSector.coreward)
+                        if 'coretrail' not in localCapital:
+                            localCapital['coretrail'] = coretrail
+                        else:
+                            assert localCapital['coretrail'] == coretrail
+                    if localSector.rimward:
+                        rimtrail = self.find_sector_capital(localSector.rimward)
+                        if 'rimtrail' not in localCapital:
+                            localCapital['rimtrail'] = rimtrail
+                        else:
+                            assert localCapital['rimtrail'] == rimtrail
 
-            for neighbor in localCapital.values():
-                if neighbor and not self.galaxy.ranges.has_edge(star, neighbor):
-                    self.get_route_between(star, neighbor, self.calc_trade(25))
+            for item in self.localCapitalDirs:
+                if item in localCapital:
+                    neighbour = localCapital[item]
+                    if neighbour and not self.galaxy.ranges.has_edge(star, neighbour):
+                        self.get_route_between(star, neighbour, self.calc_trade(25))
 
     def routes_pass_2(self) -> None:
         # Step 2a - re-weight the routes to be more weighted to J4 than J6
@@ -208,6 +250,7 @@ class XRouteCalculation(RouteCalculation):
         return dist
 
     def find_sector_capital(self, sector) -> Optional[Star]:
+        assert isinstance(sector, Sector)
         for world in self.secCapitals:
             if world.sector == sector:
                 return world
