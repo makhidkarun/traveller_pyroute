@@ -26,6 +26,17 @@ class baseTest(unittest.TestCase):
 
         return workdir
 
+    def reset_logging(self) -> None:
+        loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
+        loggers.append(logging.getLogger())
+        for logger in loggers:
+            handlers = logger.handlers[:]
+            for handler in handlers:
+                logger.removeHandler(handler)
+                handler.close()
+            logger.setLevel(logging.NOTSET)
+            logger.propagate = True
+
     def _make_args(self) -> argparse.ArgumentParser:
         args = argparse.ArgumentParser(description='PyRoute input minimiser.')
         args.btn = 8
