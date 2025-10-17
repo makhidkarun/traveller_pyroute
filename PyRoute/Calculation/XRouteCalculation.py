@@ -68,11 +68,12 @@ class XRouteCalculation(RouteCalculation):
 
         for star in self.secCapitals:
             localCapital: dict[str, Optional[Star]] = {}
+            sector: Sector = star.sector
 
             # If the diagonal adjacencies are dug up twice, take advantage of the second pass to verify the first
             # - they have to be the same, as they're pointing to the _same_ thing.
-            if star.sector.coreward:
-                localCapital['coreward'] = self.find_sector_capital(star.sector.coreward)
+            if sector.coreward:
+                localCapital['coreward'] = self.find_sector_capital(sector.coreward)
                 if localCapital['coreward']:
                     localSector = localCapital['coreward'].sector
                     if localSector.spinward:
@@ -87,8 +88,8 @@ class XRouteCalculation(RouteCalculation):
                             localCapital['coretrail'] = coretrail
                         else:
                             assert localCapital['coretrail'] == coretrail
-            if star.sector.rimward:
-                localCapital['rimward'] = self.find_sector_capital(star.sector.rimward)
+            if sector.rimward:
+                localCapital['rimward'] = self.find_sector_capital(sector.rimward)
                 if localCapital['rimward']:
                     localSector = localCapital['rimward'].sector
                     if localSector.spinward:
@@ -103,8 +104,8 @@ class XRouteCalculation(RouteCalculation):
                             localCapital['rimtrail'] = rimtrail
                         else:
                             assert localCapital['rimtrail'] == rimtrail
-            if star.sector.spinward:
-                localCapital['spinward'] = self.find_sector_capital(star.sector.spinward)
+            if sector.spinward:
+                localCapital['spinward'] = self.find_sector_capital(sector.spinward)
                 if localCapital['spinward']:
                     localSector = localCapital['spinward'].sector
                     if localSector.coreward:
@@ -119,8 +120,8 @@ class XRouteCalculation(RouteCalculation):
                             localCapital['rimspin'] = rimspin
                         else:
                             assert localCapital['rimspin'] == rimspin
-            if star.sector.trailing:
-                localCapital['trailing'] = self.find_sector_capital(star.sector.trailing)
+            if sector.trailing:
+                localCapital['trailing'] = self.find_sector_capital(sector.trailing)
                 if localCapital['trailing']:
                     localSector = localCapital['trailing'].sector
                     if localSector.coreward:
