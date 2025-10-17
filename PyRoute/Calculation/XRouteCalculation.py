@@ -37,6 +37,9 @@ class XRouteCalculation(RouteCalculation):
     def __init__(self, galaxy):
         super(XRouteCalculation, self).__init__(galaxy)
         self.route_reuse = 5
+        self.capital = []
+        self.secCapitals = []
+        self.subCapitals = []
 
     def base_range_routes(self, star, neighbor) -> int:
         return star.distance(neighbor)
@@ -174,7 +177,6 @@ class XRouteCalculation(RouteCalculation):
         # components, even those with only one star.
         landmarks, _ = self.get_landmarks(index=True)
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
-        source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
         self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon,
@@ -195,7 +197,7 @@ class XRouteCalculation(RouteCalculation):
             neighbour_world = self.galaxy.star_mapping[neighbor]
             data['weight'] = self.route_weight(star_world, neighbour_world)
             for _ in range(1, min(data['count'], 5)):
-                data['weight'] -= data['weight'] // self.route_reuse
+                data['weight'] -= (data['weight'] - data['distance']) // self.route_reuse
 
     def find_nearest_capital(self, world, capitals) -> Union[tuple[None, int], tuple[Any, Any]]:
         dist = (None, 9999)
@@ -225,10 +227,12 @@ class XRouteCalculation(RouteCalculation):
         start = route[0]
         startstar = self.galaxy.star_mapping[start]
         startstar.tradeCount += 1
+        full_route = [startstar]
         edges = []
 
         for end in route[1:]:
             endstar = self.galaxy.star_mapping[end]
+            full_route.append(endstar)
             distance += startstar.distance(endstar)
             endstar.tradeCount += 1
             data = self.galaxy.stars[start][end]
@@ -245,15 +249,16 @@ class XRouteCalculation(RouteCalculation):
         self.shortest_path_tree.update_edges(edges)
         self.galaxy.ranges[startstar][endstar]['actual distance'] = distance
         self.galaxy.ranges[startstar][endstar]['jumps'] = len(route) - 1
+        self.galaxy.ranges[startstar][endstar]['route'] = full_route
 
     def route_weight(self, star, target) -> float:
         dist = star.distance(target)
         weight = self.distance_weight[dist]
-        if star.port in 'CDEX?' or target.port in 'CDEX?':
+        if star.port in ['C', 'D', 'E', 'X', '?'] or target.port in ['C', 'D', 'E', 'X', '?']:
             weight += 25
-        if star.port in 'DEX?' or target.port in 'DEX?':
+        if star.port in ['D', 'E', 'X', '?'] or target.port in ['D', 'E', 'X', '?']:
             weight += 25
-        if star.zone in 'RF' or target.zone in 'RF':
+        if star.zone in ['R', 'F'] or target.zone in ['R', 'F']:
             weight += 50
         if star.popCode == 0 or target.popCode == 0:
             weight += 25
