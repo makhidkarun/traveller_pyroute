@@ -3,7 +3,7 @@ Created on Aug 09, 2023
 
 @author: CyberiaResurrection
 """
-from typing import Union, Any, Optional
+from typing import Union, Optional
 
 import networkx as nx
 
@@ -207,10 +207,10 @@ class XRouteCalculation(RouteCalculation):
             for _ in range(1, min(data['count'], 5)):
                 data['weight'] -= (data['weight'] - data['distance']) // self.route_reuse
 
-    def find_nearest_capital(self, world: Star, capitals: list[Star]) -> Union[tuple[None, int], tuple[Any, Any]]:
+    def find_nearest_capital(self, world: Star, capitals: list[Star]) -> Union[tuple[None, int], tuple[Star, int]]:
         assert isinstance(world, Star), "World must be Star object"
         assert isinstance(capitals, list), "Capitals must be list"
-        dist = (None, 9999)
+        dist: Union[tuple[None, int], tuple[Star, int]] = (None, 9999)
         for capital in capitals:
             newDist = capital.distance(world)
             if newDist < dist[1]:
