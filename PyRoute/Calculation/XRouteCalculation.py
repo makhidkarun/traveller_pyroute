@@ -155,7 +155,7 @@ class XRouteCalculation(RouteCalculation):
 
             if len(secCap) == 0:
                 if len(subCap) == 0:
-                    continue
+                    continue  # pragma: no mutate
                 else:
                     self.logger.info("{} has subsector capitals but no sector capital".format(sector.name))
                     for star in subCap:
@@ -173,6 +173,8 @@ class XRouteCalculation(RouteCalculation):
         for star in self.subCapitals:
             routes = [neighbor for neighbor in self.subCapitals if neighbor != star and neighbor.distance(star) <= 40]
             for neighbor in routes:
+                if self.galaxy.ranges.has_edge(star, neighbor):
+                    continue
                 self.get_route_between(star, neighbor, self.calc_trade(23))
 
     def routes_pass_3(self) -> None:
@@ -241,7 +243,9 @@ class XRouteCalculation(RouteCalculation):
             for _ in range(1, min(data['count'], 5)):
                 data['weight'] -= (data['weight'] - data['distance']) // self.route_reuse
 
-    def find_nearest_capital(self, world, capitals) -> Union[tuple[None, int], tuple[Any, Any]]:
+    def find_nearest_capital(self, world: Star, capitals: list[Star]) -> Union[tuple[None, int], tuple[Any, Any]]:
+        assert isinstance(world, Star), "World must be Star object"
+        assert isinstance(capitals, list), "Capitals must be list"
         dist = (None, 9999)
         for capital in capitals:
             newDist = capital.distance(world)
@@ -260,7 +264,7 @@ class XRouteCalculation(RouteCalculation):
         try:
             upbound = self.shortest_path_tree.triangle_upbound(star.index, target.index) * 1.005
             route, _ = astar_path_numpy(self.star_graph, star.index, target.index,
-                                           self.galaxy.heuristic_distance_bulk, upbound=upbound)
+                                           self.galaxy.heuristic_distance_bulk, upbound=upbound)  # pragma: no mutate
         except nx.NetworkXNoPath:
             return
 
