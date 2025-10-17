@@ -72,76 +72,44 @@ class XRouteCalculation(RouteCalculation):
 
             # If the diagonal adjacencies are dug up twice, take advantage of the second pass to verify the first
             # - they have to be the same, as they're pointing to the _same_ thing.
-            if sector.coreward:
-                localCapital['coreward'] = self.find_sector_capital(sector.coreward)
-                if localCapital['coreward']:
-                    localSector = localCapital['coreward'].sector
-                    if localSector.spinward:
-                        corespin = self.find_sector_capital(localSector.spinward)
-                        if 'corespin' not in localCapital:
-                            localCapital['corespin'] = corespin
-                        else:
-                            assert localCapital['corespin'] == corespin
-                    if localSector.trailing:
-                        coretrail = self.find_sector_capital(localSector.trailing)
-                        if 'coretrail' not in localCapital:
-                            localCapital['coretrail'] = coretrail
-                        else:
-                            assert localCapital['coretrail'] == coretrail
-            if sector.rimward:
-                localCapital['rimward'] = self.find_sector_capital(sector.rimward)
-                if localCapital['rimward']:
-                    localSector = localCapital['rimward'].sector
-                    if localSector.spinward:
-                        rimspin = self.find_sector_capital(localSector.spinward)
-                        if 'rimspin' not in localCapital:
-                            localCapital['rimspin'] = rimspin
-                        else:
-                            assert localCapital['rimspin'] == rimspin
-                    if localSector.trailing:
-                        rimtrail = self.find_sector_capital(localSector.trailing)
-                        if 'rimtrail' not in localCapital:
-                            localCapital['rimtrail'] = rimtrail
-                        else:
-                            assert localCapital['rimtrail'] == rimtrail
-            if sector.spinward:
-                localCapital['spinward'] = self.find_sector_capital(sector.spinward)
-                if localCapital['spinward']:
-                    localSector = localCapital['spinward'].sector
-                    if localSector.coreward:
-                        corespin = self.find_sector_capital(localSector.coreward)
-                        if 'corespin' not in localCapital:
-                            localCapital['corespin'] = corespin
-                        else:
-                            assert localCapital['corespin'] == corespin
-                    if localSector.rimward:
-                        rimspin = self.find_sector_capital(localSector.rimward)
-                        if 'rimspin' not in localCapital:
-                            localCapital['rimspin'] = rimspin
-                        else:
-                            assert localCapital['rimspin'] == rimspin
-            if sector.trailing:
-                localCapital['trailing'] = self.find_sector_capital(sector.trailing)
-                if localCapital['trailing']:
-                    localSector = localCapital['trailing'].sector
-                    if localSector.coreward:
-                        coretrail = self.find_sector_capital(localSector.coreward)
-                        if 'coretrail' not in localCapital:
-                            localCapital['coretrail'] = coretrail
-                        else:
-                            assert localCapital['coretrail'] == coretrail
-                    if localSector.rimward:
-                        rimtrail = self.find_sector_capital(localSector.rimward)
-                        if 'rimtrail' not in localCapital:
-                            localCapital['rimtrail'] = rimtrail
-                        else:
-                            assert localCapital['rimtrail'] == rimtrail
+            self._routes_pass_1_sector_capitals(sector, localCapital, 'coreward', 'spinward', 'trailing',
+                                                'corespin', 'coretrail')
+            self._routes_pass_1_sector_capitals(sector, localCapital, 'rimward', 'spinward', 'trailing',
+                                                'rimspin', 'rimtrail')
+            self._routes_pass_1_sector_capitals(sector, localCapital, 'spinward', 'coreward', 'rimward',
+                                                'corespin', 'rimspin')
+            self._routes_pass_1_sector_capitals(sector, localCapital, 'trailing', 'coreward', 'rimward',
+                                                'coretrail', 'rimtrail')
 
             for item in self.localCapitalDirs:
                 if item in localCapital:
                     neighbour = localCapital[item]
                     if neighbour and not self.galaxy.ranges.has_edge(star, neighbour):
                         self.get_route_between(star, neighbour, self.calc_trade(25))
+
+    def _routes_pass_1_sector_capitals(self, sector, localCapital, direction, perpendicular_1, perpendicular_2,
+                                       diagonal_1, diagonal_2):
+        dir_sector = sector.__dict__[direction]
+        if not dir_sector:
+            return
+        localCapital[direction] = self.find_sector_capital(dir_sector)
+        if not localCapital[direction]:
+            return
+        localSector = localCapital[direction].sector
+        perpensector_1 = localSector.__dict__[perpendicular_1]
+        if perpensector_1:
+            local_capital = self.find_sector_capital(perpensector_1)
+            if diagonal_1 not in localCapital:
+                localCapital[diagonal_1] = local_capital
+            else:
+                assert localCapital[diagonal_1] == local_capital
+        perpensector_2 = localSector.__dict__[perpendicular_2]
+        if perpensector_2:
+            local_capital = self.find_sector_capital(perpensector_2)
+            if diagonal_2 not in localCapital:
+                localCapital[diagonal_2] = local_capital
+            else:
+                assert localCapital[diagonal_2] == local_capital
 
     def routes_pass_2(self) -> None:
         # Step 2a - re-weight the routes to be more weighted to J4 than J6
