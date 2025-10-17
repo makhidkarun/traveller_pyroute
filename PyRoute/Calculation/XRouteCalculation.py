@@ -89,6 +89,9 @@ class XRouteCalculation(RouteCalculation):
 
     def _routes_pass_1_sector_capitals(self, sector, localCapital, direction, perpendicular_1, perpendicular_2,
                                        diagonal_1, diagonal_2):
+        assert direction in self.localCapitalDirs
+        assert diagonal_1 in self.localCapitalDirs
+        assert diagonal_2 in self.localCapitalDirs
         dir_sector = sector.__dict__[direction]
         if not dir_sector:
             return
@@ -135,7 +138,7 @@ class XRouteCalculation(RouteCalculation):
                         self.get_route_between(capital[0], star, self.calc_trade(23))
             else:
                 for star in subCap:
-                    if self.galaxy.ranges.has_edge(secCap[0], star):
+                    if self.galaxy.ranges.has_edge(secCap[0], star):  # pragma: no mutate
                         continue
                     self.get_route_between(secCap[0], star, self.calc_trade(23))
 
@@ -225,9 +228,9 @@ class XRouteCalculation(RouteCalculation):
         assert isinstance(star, Star)
         assert isinstance(target, Star)
         try:
+            bulk = self.galaxy.heuristic_distance_bulk
             upbound = self.shortest_path_tree.triangle_upbound(star.index, target.index) * 1.005
-            route, _ = astar_path_numpy(self.star_graph, star.index, target.index,
-                                           self.galaxy.heuristic_distance_bulk, upbound=upbound)  # pragma: no mutate
+            route, _ = astar_path_numpy(self.star_graph, star.index, target.index, bulk, upbound=upbound)  # pragma: no mutate
         except nx.NetworkXNoPath:
             return
 

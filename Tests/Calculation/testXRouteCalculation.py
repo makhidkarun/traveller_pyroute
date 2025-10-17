@@ -398,6 +398,15 @@ class testXRouteCalculation(baseTest):
             foo = galaxy.stars[start.index][fin.index]
             self.assertEqual(exp_weights[i], foo['weight'])
 
+        trade_25 = calc.calc_trade(25)
+        trade_23 = calc.calc_trade(23)
+        trade_21 = calc.calc_trade(21)
+        for item in galaxy.stars.edges(data=True):
+            trade = item[2]['trade']
+            if 0 == trade:
+                continue
+            self.assertTrue(trade_25 == trade or trade_23 == trade or trade_21 == trade, 'Unexpected trade value: ' + str(trade))
+
     def test_routes_pass_1_1(self) -> None:
         sourcefile = [
             self.unpack_filename('DeltaFiles/xroute_routes_pass_1_1/Zarushagar.sec'),
@@ -561,6 +570,40 @@ class testXRouteCalculation(baseTest):
 
         calc.routes_pass_1()
         self.assertEqual(13, galaxy.ranges.number_of_edges())
+
+    def test_routes_pass_1_4(self) -> None:
+        sourcefile = [
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_4/Core.sec'),
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_4/Massilia.sec'),
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_4/Delphi.sec'),
+        ]
+
+        args = self._make_args()
+        args.route_btn = 15
+        readparms = ReadSectorOptions(sectors=sourcefile, pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                    route_reuse=args.route_reuse, trade_choice='comm', route_btn=args.route_btn,
+                                    mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=False,
+                                    deep_space={}, map_type=args.map_type)
+
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.read_sectors(readparms)
+        galaxy.sectors['Massilia'].spinward = None
+
+        calc = XRouteCalculation(galaxy)
+        galaxy.trade = calc
+        logger = calc.logger
+        logger.manager.disable = 10
+
+        calc.generate_routes()
+        self.assertEqual(1, len(calc.capital))
+        self.assertEqual(2, len(calc.secCapitals))
+        calc.calculate_components()
+
+        source = max(galaxy.star_mapping.values(), key=lambda item: item.wtn)
+        calc.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, galaxy.stars, calc.epsilon)
+
+        calc.routes_pass_1()
+        self.assertEqual(3, galaxy.ranges.number_of_edges())
 
     def test_routes_pass_2_1(self) -> None:
         sourcefile = [
@@ -872,6 +915,10 @@ class testXRouteCalculation(baseTest):
         source = max(galaxy.star_mapping.values(), key=lambda item: item.wtn)
         calc.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, galaxy.stars, calc.epsilon)
 
+        capital = calc.capital[0]
+        subcap = calc.subCapitals[0]
+        galaxy.ranges.add_edge(capital, subcap, route=[])
+
         exp_logs = [
             'INFO:PyRoute.TradeCalculation:Important worlds: 20, jump stations: 128',
             'INFO:PyRoute.TradeCalculation:Important worlds: 0, jump stations: 148'
@@ -937,6 +984,13 @@ class testXRouteCalculation(baseTest):
         with self.assertLogs(logger, 'INFO') as logs:
             calc.routes_pass_3()
             self.assertEqual(exp_logs, logs.output)
+
+        trade_23 = calc.calc_trade(23)
+        trade_21 = calc.calc_trade(21)
+
+        for item in galaxy.stars.edges(data=True):
+            trade = item[2]['trade']
+            self.assertTrue(trade_21 == trade or trade_23 == trade)
 
     def test_route_pass_3_3(self) -> None:
         sourcefile = [
