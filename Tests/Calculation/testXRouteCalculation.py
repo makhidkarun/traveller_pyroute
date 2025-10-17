@@ -378,7 +378,6 @@ class testXRouteCalculation(baseTest):
             'INFO:PyRoute.TradeCalculation:[Liasdi (Zarushagar 0928), Unchin (Zarushagar 0522)]',
             'INFO:PyRoute.TradeCalculation:XRoute pass 3',
             'INFO:PyRoute.TradeCalculation:Important worlds: 10, jump stations: 96',
-            'INFO:PyRoute.TradeCalculation:Important worlds: 1, jump stations: 105',
             'INFO:PyRoute.TradeCalculation:No route for important world: Aashrikan (Zarushagar 1740)',
             'INFO:PyRoute.TradeCalculation:Important worlds: 1, jump stations: 105'
         ]
@@ -874,7 +873,6 @@ class testXRouteCalculation(baseTest):
 
         exp_logs = [
             'INFO:PyRoute.TradeCalculation:Important worlds: 20, jump stations: 128',
-            'INFO:PyRoute.TradeCalculation:Important worlds: 0, jump stations: 148',
             'INFO:PyRoute.TradeCalculation:Important worlds: 0, jump stations: 148'
         ]
         calc.routes_pass_2()
@@ -931,7 +929,6 @@ class testXRouteCalculation(baseTest):
         calc.routes_pass_2()
         exp_logs = [
             'INFO:PyRoute.TradeCalculation:Important worlds: 1, jump stations: 3',
-            'INFO:PyRoute.TradeCalculation:Important worlds: 1, jump stations: 3',
             'INFO:PyRoute.TradeCalculation:No route for important world: Lenox (Zarushagar 0621)',
             'INFO:PyRoute.TradeCalculation:Important worlds: 1, jump stations: 3'
         ]
@@ -970,7 +967,6 @@ class testXRouteCalculation(baseTest):
         calc.routes_pass_2()
         exp_logs = [
             'INFO:PyRoute.TradeCalculation:Important worlds: 1, jump stations: 18',
-            'INFO:PyRoute.TradeCalculation:Important worlds: 0, jump stations: 19',
             'INFO:PyRoute.TradeCalculation:Important worlds: 0, jump stations: 19'
         ]
 

@@ -189,36 +189,21 @@ class XRouteCalculation(RouteCalculation):
         important2 = []
         for star in important:
             if star in jumpStations:
-                continue
+                continue  # pragma: no mutate
             for neighbor in self.galaxy.stars.neighbors(star.index):
                 neighbour_world = self.galaxy.star_mapping[neighbor]
-                if star.distance(neighbour_world) > 4:
-                    continue
                 if neighbour_world in jumpStations:
                     self.get_route_between(star, neighbour_world, self.calc_trade(21))
                     if star not in jumpStations:
                         jumpStations.append(star)
             if star.tradeCount == 0:
                 important2.append(star)
+                self.logger.info("No route for important world: {}".format(star))
 
         self.logger.info('Important worlds: {}, jump stations: {}'.format(len(important2), len(jumpStations)))
 
-        important3 = []
-        for star in important2:
-            for neighbor in self.galaxy.stars.neighbors(star.index):
-                neighbour_world = self.galaxy.star_mapping[neighbor]
-                if neighbour_world in jumpStations:
-                    self.get_route_between(star, neighbour_world, self.calc_trade(21))
-                    if star not in jumpStations:
-                        jumpStations.append(star)
-            if star.tradeCount == 0:
-                important3.append(star)
-                self.logger.info("No route for important world: {}".format(star))
-
-        self.logger.info('Important worlds: {}, jump stations: {}'.format(len(important3), len(jumpStations)))
-
         capitalList = self.capital + self.secCapitals + self.subCapitals
-        for star in important3:
+        for star in important2:
             capital = self.find_nearest_capital(star, capitalList)
             self.get_route_between(capital[0], star, self.calc_trade(21))
 
