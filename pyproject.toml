@@ -67,3 +67,4 @@ tests_dir = ["Tests/"]
 also_copy = ["Tests/", "PyRoute/Pathfinding/*.so", "pytest.ini"]
 runner = "pytest -x"
 max_stack_depth = 8
+pytest_add_cli_args_test_selection = ['--ignore=Tests/Hypothesis/']
