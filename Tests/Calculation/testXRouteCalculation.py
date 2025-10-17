@@ -378,16 +378,9 @@ class testXRouteCalculation(baseTest):
             'INFO:PyRoute.TradeCalculation:[Liasdi (Zarushagar 0928), Unchin (Zarushagar 0522)]',
             'INFO:PyRoute.TradeCalculation:XRoute pass 3',
             'INFO:PyRoute.TradeCalculation:Important worlds: 10, jump stations: 96',
-            'INFO:PyRoute.TradeCalculation:No route for important world: Strela (Zarushagar 0407)',
-            'INFO:PyRoute.TradeCalculation:No route for important world: Lode (Zarushagar 2908)',
-            'INFO:PyRoute.TradeCalculation:No route for important world: Ibaru (Zarushagar 0321)',
-            'INFO:PyRoute.TradeCalculation:No route for important world: Lenox (Zarushagar 0621)',
-            'INFO:PyRoute.TradeCalculation:No route for important world: Irap (Zarushagar 2630)',
-            'INFO:PyRoute.TradeCalculation:No route for important world: Romany (Zarushagar 3129)',
+            'INFO:PyRoute.TradeCalculation:Important worlds: 1, jump stations: 105',
             'INFO:PyRoute.TradeCalculation:No route for important world: Aashrikan (Zarushagar 1740)',
-            'INFO:PyRoute.TradeCalculation:No route for important world: Riggs (Zarushagar 2731)',
-            'INFO:PyRoute.TradeCalculation:No route for important world: Borderline (Zarushagar 3040)',
-            'INFO:PyRoute.TradeCalculation:No route for important world: Gaidraa (Zarushagar 3136)'
+            'INFO:PyRoute.TradeCalculation:Important worlds: 1, jump stations: 105'
         ]
         calc.generate_routes()
         with self.assertLogs(logger, 'INFO') as logs:
@@ -880,9 +873,9 @@ class testXRouteCalculation(baseTest):
         calc.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, galaxy.stars, calc.epsilon)
 
         exp_logs = [
-            'INFO:PyRoute.TradeCalculation:Important worlds: 1, jump stations: 47',
-            'INFO:PyRoute.TradeCalculation:No route for important world: Gavin (Core '
-            '1033)'
+            'INFO:PyRoute.TradeCalculation:Important worlds: 20, jump stations: 128',
+            'INFO:PyRoute.TradeCalculation:Important worlds: 0, jump stations: 148',
+            'INFO:PyRoute.TradeCalculation:Important worlds: 0, jump stations: 148'
         ]
         calc.routes_pass_2()
         self.assertEqual(114, galaxy.ranges.number_of_edges())
@@ -891,4 +884,58 @@ class testXRouteCalculation(baseTest):
             calc.routes_pass_3()
             self.assertEqual(exp_logs, logs.output)
 
-        self.assertEqual(115, galaxy.ranges.number_of_edges())
+        self.assertEqual(232, galaxy.ranges.number_of_edges())
+
+        trade_21 = calc.calc_trade(21)
+        trade_23 = calc.calc_trade(23)
+
+        for item in galaxy.ranges.edges(data=True):
+            route = item[2]['route']
+            for i in range(len(route) - 1):
+                first = route[i]
+                second = route[i + 1]
+                firstdex = first.index
+                seconddex = second.index
+                edge = galaxy.stars[firstdex][seconddex]
+                trade = edge['trade']
+                self.assertTrue(trade in [trade_21, trade_23], 'Unexpected trade value ' + str(trade)
+                                + ' for edge ' + first.name + " " + second.name)
+
+    def test_route_pass_3_2(self) -> None:
+        sourcefile = [
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_3_2/Zarushagar.sec')
+        ]
+
+        args = self._make_args()
+        args.route_btn = 15
+        readparms = ReadSectorOptions(sectors=sourcefile, pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                      route_reuse=args.route_reuse, trade_choice='comm', route_btn=args.route_btn,
+                                      mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=False,
+                                      deep_space={}, map_type=args.map_type)
+
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.read_sectors(readparms)
+
+        calc = XRouteCalculation(galaxy)
+        galaxy.trade = calc
+        logger = calc.logger
+        logger.manager.disable = 10
+
+        calc.generate_routes()
+        self.assertEqual(1, len(calc.secCapitals))
+        calc.calculate_components()
+
+        source = max(galaxy.star_mapping.values(), key=lambda item: item.wtn)
+        calc.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, galaxy.stars, calc.epsilon)
+
+        calc.routes_pass_2()
+        exp_logs = [
+            'INFO:PyRoute.TradeCalculation:Important worlds: 1, jump stations: 3',
+            'INFO:PyRoute.TradeCalculation:Important worlds: 1, jump stations: 3',
+            'INFO:PyRoute.TradeCalculation:No route for important world: Lenox (Zarushagar 0621)',
+            'INFO:PyRoute.TradeCalculation:Important worlds: 1, jump stations: 3'
+        ]
+
+        with self.assertLogs(logger, 'INFO') as logs:
+            calc.routes_pass_3()
+            self.assertEqual(exp_logs, logs.output)

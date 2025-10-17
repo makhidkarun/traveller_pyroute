@@ -194,21 +194,28 @@ class XRouteCalculation(RouteCalculation):
                 neighbour_world = self.galaxy.star_mapping[neighbor]
                 if star.distance(neighbour_world) > 4:
                     continue
-                if neighbor in jumpStations:
-                    self.get_route_between(star, neighbor, self.calc_trade(21))
-                    jumpStations.append(star)
+                if neighbour_world in jumpStations:
+                    self.get_route_between(star, neighbour_world, self.calc_trade(21))
+                    if star not in jumpStations:
+                        jumpStations.append(star)
             if star.tradeCount == 0:
                 important2.append(star)
+
+        self.logger.info('Important worlds: {}, jump stations: {}'.format(len(important2), len(jumpStations)))
 
         important3 = []
         for star in important2:
             for neighbor in self.galaxy.stars.neighbors(star.index):
-                if neighbor in jumpStations:
-                    self.get_route_between(star, neighbor, self.calc_trade(21))
-                    jumpStations.append(star)
+                neighbour_world = self.galaxy.star_mapping[neighbor]
+                if neighbour_world in jumpStations:
+                    self.get_route_between(star, neighbour_world, self.calc_trade(21))
+                    if star not in jumpStations:
+                        jumpStations.append(star)
             if star.tradeCount == 0:
                 important3.append(star)
                 self.logger.info("No route for important world: {}".format(star))
+
+        self.logger.info('Important worlds: {}, jump stations: {}'.format(len(important3), len(jumpStations)))
 
         capitalList = self.capital + self.secCapitals + self.subCapitals
         for star in important3:
@@ -261,6 +268,8 @@ class XRouteCalculation(RouteCalculation):
         return None
 
     def get_route_between(self, star, target, trade) -> None:
+        assert isinstance(star, Star)
+        assert isinstance(target, Star)
         try:
             upbound = self.shortest_path_tree.triangle_upbound(star.index, target.index) * 1.005
             route, _ = astar_path_numpy(self.star_graph, star.index, target.index,
