@@ -3,11 +3,12 @@ Created on Aug 09, 2023
 
 @author: CyberiaResurrection
 """
-from typing import Union, Any, Optional
+from typing import Union, Optional
 
 import networkx as nx
 
 from PyRoute.Allies.AllyGen import AllyGen
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
@@ -34,9 +35,14 @@ class XRouteCalculation(RouteCalculation):
     inSec_weight = [0, 140, 110, 85, 70, 95, 140]
     impt_weight = [0, 90, 80, 70, 70, 110, 140]
 
+    localCapitalDirs = ['coreward', 'rimward', 'spinward', 'trailing', 'corespin', 'coretrail', 'rimspin', 'rimtrail']
+
     def __init__(self, galaxy):
         super(XRouteCalculation, self).__init__(galaxy)
         self.route_reuse = 5
+        self.capital = []
+        self.secCapitals = []
+        self.subCapitals = []
 
     def base_range_routes(self, star, neighbor) -> int:
         return star.distance(neighbor)
@@ -61,41 +67,52 @@ class XRouteCalculation(RouteCalculation):
             self.get_route_between(self.capital[0], star, self.calc_trade(25))
 
         for star in self.secCapitals:
-            localCapital: dict[str, Optional[Star]] = {'coreward': None, 'spinward': None, 'trailing': None,
-                                                       'rimward': None, 'corespin': None, 'coretrail': None,
-                                                       'rimspin': None, 'rimtrail': None}
+            localCapital: dict[str, Optional[Star]] = {}
+            sector: Sector = star.sector
 
-            if star.sector.coreward:
-                localCapital['coreward'] = self.find_sector_capital(star.sector.coreward)
-                if localCapital['coreward'] and localCapital['coreward'].sector.spinward:
-                    localCapital['corespin'] = self.find_sector_capital(localCapital['coreward'].sector.spinward)
-                if localCapital['coreward'] and localCapital['coreward'].sector.trailing:
-                    localCapital['coretrail'] = self.find_sector_capital(localCapital['coreward'].sector.trailing)
-            if star.sector.rimward:
-                localCapital['rimward'] = self.find_sector_capital(star.sector.rimward)
-                if localCapital['rimward'] and localCapital['rimward'].sector.spinward:
-                    localCapital['rimspin'] = self.find_sector_capital(localCapital['rimward'].sector.spinward)
-                if localCapital['rimward'] and localCapital['rimward'].sector.trailing:
-                    localCapital['rimtrail'] = self.find_sector_capital(localCapital['rimward'].sector.trailing)
-            if star.sector.spinward:
-                localCapital['spinward'] = self.find_sector_capital(star.sector.spinward)
-                if localCapital['spinward'] and localCapital['spinward'].sector.coreward and not localCapital[
-                    'corespin']:
-                    localCapital['corespin'] = self.find_sector_capital(localCapital['spinward'].sector.coreward)
-                if localCapital['spinward'] and localCapital['spinward'].sector.rimward and not localCapital['rimspin']:
-                    localCapital['rimwspin'] = self.find_sector_capital(localCapital['spinward'].sector.rimward)
-            if star.sector.trailing:
-                localCapital['trailing'] = self.find_sector_capital(star.sector.trailing)
-                if localCapital['trailing'] and localCapital['trailing'].sector.coreward and not localCapital[
-                    'coretrail']:
-                    localCapital['coretrail'] = self.find_sector_capital(localCapital['trailing'].sector.coreward)
-                if localCapital['trailing'] and localCapital['trailing'].sector.rimward and not localCapital[
-                    'rimtrail']:
-                    localCapital['rimtrail'] = self.find_sector_capital(localCapital['trailing'].sector.rimward)
+            # If the diagonal adjacencies are dug up twice, take advantage of the second pass to verify the first
+            # - they have to be the same, as they're pointing to the _same_ thing.
+            self._routes_pass_1_sector_capitals(sector, localCapital, 'coreward', 'spinward', 'trailing',
+                                                'corespin', 'coretrail')
+            self._routes_pass_1_sector_capitals(sector, localCapital, 'rimward', 'spinward', 'trailing',
+                                                'rimspin', 'rimtrail')
+            self._routes_pass_1_sector_capitals(sector, localCapital, 'spinward', 'coreward', 'rimward',
+                                                'corespin', 'rimspin')
+            self._routes_pass_1_sector_capitals(sector, localCapital, 'trailing', 'coreward', 'rimward',
+                                                'coretrail', 'rimtrail')
 
-            for neighbor in localCapital.values():
-                if neighbor and not self.galaxy.ranges.has_edge(star, neighbor):
-                    self.get_route_between(star, neighbor, self.calc_trade(25))
+            for item in self.localCapitalDirs:
+                if item in localCapital:
+                    neighbour = localCapital[item]
+                    if neighbour and not self.galaxy.ranges.has_edge(star, neighbour):
+                        self.get_route_between(star, neighbour, self.calc_trade(25))
+
+    def _routes_pass_1_sector_capitals(self, sector, localCapital, direction, perpendicular_1, perpendicular_2,
+                                       diagonal_1, diagonal_2):
+        assert direction in self.localCapitalDirs
+        assert diagonal_1 in self.localCapitalDirs
+        assert diagonal_2 in self.localCapitalDirs
+        dir_sector = sector.__dict__[direction]
+        if not dir_sector:
+            return
+        localCapital[direction] = self.find_sector_capital(dir_sector)
+        if not localCapital[direction]:
+            return
+        localSector = localCapital[direction].sector
+        perpensector_1 = localSector.__dict__[perpendicular_1]
+        if perpensector_1:
+            local_capital = self.find_sector_capital(perpensector_1)
+            if diagonal_1 not in localCapital:
+                localCapital[diagonal_1] = local_capital
+            else:
+                assert localCapital[diagonal_1] == local_capital
+        perpensector_2 = localSector.__dict__[perpendicular_2]
+        if perpensector_2:
+            local_capital = self.find_sector_capital(perpensector_2)
+            if diagonal_2 not in localCapital:
+                localCapital[diagonal_2] = local_capital
+            else:
+                assert localCapital[diagonal_2] == local_capital
 
     def routes_pass_2(self) -> None:
         # Step 2a - re-weight the routes to be more weighted to J4 than J6
@@ -110,7 +127,7 @@ class XRouteCalculation(RouteCalculation):
 
             if len(secCap) == 0:
                 if len(subCap) == 0:
-                    continue
+                    continue  # pragma: no mutate
                 else:
                     self.logger.info("{} has subsector capitals but no sector capital".format(sector.name))
                     for star in subCap:
@@ -121,13 +138,15 @@ class XRouteCalculation(RouteCalculation):
                         self.get_route_between(capital[0], star, self.calc_trade(23))
             else:
                 for star in subCap:
-                    if self.galaxy.ranges.has_edge(secCap[0], star):
+                    if self.galaxy.ranges.has_edge(secCap[0], star):  # pragma: no mutate
                         continue
                     self.get_route_between(secCap[0], star, self.calc_trade(23))
 
         for star in self.subCapitals:
             routes = [neighbor for neighbor in self.subCapitals if neighbor != star and neighbor.distance(star) <= 40]
             for neighbor in routes:
+                if self.galaxy.ranges.has_edge(star, neighbor):
+                    continue
                 self.get_route_between(star, neighbor, self.calc_trade(23))
 
     def routes_pass_3(self) -> None:
@@ -142,29 +161,21 @@ class XRouteCalculation(RouteCalculation):
         important2 = []
         for star in important:
             if star in jumpStations:
-                continue
+                continue  # pragma: no mutate
             for neighbor in self.galaxy.stars.neighbors(star.index):
                 neighbour_world = self.galaxy.star_mapping[neighbor]
-                if star.distance(neighbour_world) > 4:
-                    continue
-                if neighbor in jumpStations:
-                    self.get_route_between(star, neighbor, self.calc_trade(21))
-                    jumpStations.append(star)
+                if neighbour_world in jumpStations:
+                    self.get_route_between(star, neighbour_world, self.calc_trade(21))
+                    if star not in jumpStations:
+                        jumpStations.append(star)
             if star.tradeCount == 0:
                 important2.append(star)
-
-        important3 = []
-        for star in important2:
-            for neighbor in self.galaxy.stars.neighbors(star.index):
-                if neighbor in jumpStations:
-                    self.get_route_between(star, neighbor, self.calc_trade(21))
-                    jumpStations.append(star)
-            if star.tradeCount == 0:
-                important3.append(star)
                 self.logger.info("No route for important world: {}".format(star))
 
+        self.logger.info('Important worlds: {}, jump stations: {}'.format(len(important2), len(jumpStations)))
+
         capitalList = self.capital + self.secCapitals + self.subCapitals
-        for star in important3:
+        for star in important2:
             capital = self.find_nearest_capital(star, capitalList)
             self.get_route_between(capital[0], star, self.calc_trade(21))
 
@@ -174,7 +185,6 @@ class XRouteCalculation(RouteCalculation):
         # components, even those with only one star.
         landmarks, _ = self.get_landmarks(index=True)
         source = max(self.galaxy.star_mapping.values(), key=lambda item: item.wtn)
-        source.is_landmark = True
         # Feed the landmarks in as roots of their respective shortest-path trees.
         # This sets up the approximate-shortest-path bounds to be during the first pathfinding call.
         self.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, self.galaxy.stars, self.epsilon,
@@ -195,10 +205,12 @@ class XRouteCalculation(RouteCalculation):
             neighbour_world = self.galaxy.star_mapping[neighbor]
             data['weight'] = self.route_weight(star_world, neighbour_world)
             for _ in range(1, min(data['count'], 5)):
-                data['weight'] -= data['weight'] // self.route_reuse
+                data['weight'] -= (data['weight'] - data['distance']) // self.route_reuse
 
-    def find_nearest_capital(self, world, capitals) -> Union[tuple[None, int], tuple[Any, Any]]:
-        dist = (None, 9999)
+    def find_nearest_capital(self, world: Star, capitals: list[Star]) -> Union[tuple[None, int], tuple[Star, int]]:
+        assert isinstance(world, Star), "World must be Star object"
+        assert isinstance(capitals, list), "Capitals must be list"
+        dist: Union[tuple[None, int], tuple[Star, int]] = (None, 9999)
         for capital in capitals:
             newDist = capital.distance(world)
             if newDist < dist[1]:
@@ -206,16 +218,19 @@ class XRouteCalculation(RouteCalculation):
         return dist
 
     def find_sector_capital(self, sector) -> Optional[Star]:
+        assert isinstance(sector, Sector)
         for world in self.secCapitals:
             if world.sector == sector:
                 return world
         return None
 
     def get_route_between(self, star, target, trade) -> None:
+        assert isinstance(star, Star)
+        assert isinstance(target, Star)
         try:
+            bulk = self.galaxy.heuristic_distance_bulk
             upbound = self.shortest_path_tree.triangle_upbound(star.index, target.index) * 1.005
-            route, _ = astar_path_numpy(self.star_graph, star.index, target.index,
-                                           self.galaxy.heuristic_distance_bulk, upbound=upbound)
+            route, _ = astar_path_numpy(self.star_graph, star.index, target.index, bulk, upbound=upbound)  # pragma: no mutate
         except nx.NetworkXNoPath:
             return
 
@@ -225,10 +240,12 @@ class XRouteCalculation(RouteCalculation):
         start = route[0]
         startstar = self.galaxy.star_mapping[start]
         startstar.tradeCount += 1
+        full_route = [startstar]
         edges = []
 
         for end in route[1:]:
             endstar = self.galaxy.star_mapping[end]
+            full_route.append(endstar)
             distance += startstar.distance(endstar)
             endstar.tradeCount += 1
             data = self.galaxy.stars[start][end]
@@ -245,15 +262,16 @@ class XRouteCalculation(RouteCalculation):
         self.shortest_path_tree.update_edges(edges)
         self.galaxy.ranges[startstar][endstar]['actual distance'] = distance
         self.galaxy.ranges[startstar][endstar]['jumps'] = len(route) - 1
+        self.galaxy.ranges[startstar][endstar]['route'] = full_route
 
     def route_weight(self, star, target) -> float:
         dist = star.distance(target)
         weight = self.distance_weight[dist]
-        if star.port in 'CDEX?' or target.port in 'CDEX?':
+        if star.port in ['C', 'D', 'E', 'X', '?'] or target.port in ['C', 'D', 'E', 'X', '?']:
             weight += 25
-        if star.port in 'DEX?' or target.port in 'DEX?':
+        if star.port in ['D', 'E', 'X', '?'] or target.port in ['D', 'E', 'X', '?']:
             weight += 25
-        if star.zone in 'RF' or target.zone in 'RF':
+        if star.zone in ['R', 'F'] or target.zone in ['R', 'F']:
             weight += 50
         if star.popCode == 0 or target.popCode == 0:
             weight += 25

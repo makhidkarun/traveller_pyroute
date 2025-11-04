@@ -282,3 +282,6 @@ class RouteCalculation(object):
 
     def multilateral_balance_trade_volume(self) -> None:
         pass
+
+    def cross_check_totals(self) -> None:
+        pass
