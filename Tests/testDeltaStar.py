@@ -1,3 +1,5 @@
+import copy
+import logging
 import unittest
 
 from PyRoute.AreaItems.Sector import Sector
@@ -216,6 +218,89 @@ class testDeltaStar(unittest.TestCase):
                 self.assertIsInstance(remix_star, Star)
                 self.assertFalse(remix_star.tradeCode.capital, "Remixed star should not be a capital")
 
+    def test_check_uwp_1(self) -> None:
+        outer_logger = logging.getLogger("PyRoute.Star")
+        outer_logger.manager.disable = 0
+        outer_logger.setLevel(10)
+
+        original = "2123 Medurma              A9GB9X4-C An Cs Hi                             { 3 }  (G8E+1) [7C3A] -    -  - 100 0  ImDv G0 V"
+        sector = Sector("# dummy", "# 0, 0")
+        star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+        self.assertIsNotNone(star, "Starline should be parsed")
+
+        with self.assertLogs(outer_logger, "DEBUG") as outer_logs:
+            outer_logger.debug(
+                'Dummy log entry to shut assertion up now that canonicalisation has been straightened out'
+            )
+            star.check_canonical()
+
+            output = copy.deepcopy(outer_logs.output)
+            exp_logs = [
+                'DEBUG:PyRoute.Star:Dummy log entry to shut assertion up now that canonicalisation has been '
+                'straightened out',
+                'WARNING:PyRoute.Star:Medurma (dummy 2123)-A9GB9X4-C Atmospheric code "G" out '
+                'of range - not in range 0-F',
+                'WARNING:PyRoute.Star:Medurma (dummy 2123)-A9GB9X4-C Hydrographic code "B" '
+                'out of range - not in range 0-A',
+                'WARNING:PyRoute.Star:Medurma (dummy 2123)-A9GB9X4-C Calculated government '
+                'code "X" out of range - should be 0'
+            ]
+            self.assertEqual(exp_logs, output)
+
+    def test_check_uwp_2(self) -> None:
+        outer_logger = logging.getLogger("PyRoute.Star")
+        outer_logger.manager.disable = 0
+        outer_logger.setLevel(10)
+
+        original = "2123 Medurma              A9XX9X4-C An Cs Hi                             { 3 }  (G8E+1) [7C3A] -    -  - 100 0  ImDv G0 V"
+        sector = Sector("# dummy", "# 0, 0")
+        star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+        self.assertIsNotNone(star, "Starline should be parsed")
+
+        with self.assertLogs(outer_logger, "DEBUG") as outer_logs:
+            outer_logger.debug(
+                'Dummy log entry to shut assertion up now that canonicalisation has been straightened out'
+            )
+            star.check_canonical()
+
+            output = copy.deepcopy(outer_logs.output)
+            exp_logs = [
+                'DEBUG:PyRoute.Star:Dummy log entry to shut assertion up now that canonicalisation has been '
+                'straightened out',
+                'WARNING:PyRoute.Star:Medurma (dummy 2123)-A9XX9X4-C Atmospheric code "X" out '
+                'of range - not in range 0-F',
+                'WARNING:PyRoute.Star:Medurma (dummy 2123)-A9XX9X4-C Hydrographic code "X" '
+                'out of range - not in range 0-A',
+                'WARNING:PyRoute.Star:Medurma (dummy 2123)-A9XX9X4-C Calculated government '
+                'code "X" out of range - should be 0'
+            ]
+            self.assertEqual(exp_logs, output)
+
+    def test_check_uwp_3(self) -> None:
+        outer_logger = logging.getLogger("PyRoute.Star")
+        outer_logger.manager.disable = 0
+        outer_logger.setLevel(10)
+
+        original = "2123 Medurma              A9AA9X4-C An Cs Hi                             { 3 }  (G8E+1) [7C3A] -    -  - 100 0  ImDv G0 V"
+        sector = Sector("# dummy", "# 0, 0")
+        star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+        self.assertIsNotNone(star, "Starline should be parsed")
+
+        with self.assertLogs(outer_logger, "DEBUG") as outer_logs:
+            outer_logger.debug(
+                'Dummy log entry to shut assertion up now that canonicalisation has been straightened out'
+            )
+            star.check_canonical()
+
+            output = copy.deepcopy(outer_logs.output)
+            exp_logs = [
+                'DEBUG:PyRoute.Star:Dummy log entry to shut assertion up now that canonicalisation has been '
+                'straightened out',
+                'WARNING:PyRoute.Star:Medurma (dummy 2123)-A9AA9X4-C Calculated government '
+                'code "X" out of range - should be 0'
+            ]
+            self.assertEqual(exp_logs, output)
+
     def test_check_canonical_instance_good(self) -> None:
         original = "0240 Bolivar              A78699D-E Cp Ga Hi Pr Pz                       { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
         sector = Sector("# dummy", "# 0, 0")
@@ -228,7 +313,7 @@ class testDeltaStar(unittest.TestCase):
         self.assertEqual(exp_msg, msg)
 
     def test_check_canonical_instance_bad_1(self) -> None:
-        original = "0240 Bolivar              A78689D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+        original = "0240 Bolivar              A79789D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
         sector = Sector("# dummy", "# 0, 0")
         star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
 
@@ -236,19 +321,20 @@ class testDeltaStar(unittest.TestCase):
             'Bolivar (dummy 0240) - EX Calculated infrastructure 16 not in range 0 - 15',
             'Bolivar (dummy 0240) - EX Calculated labor 8 does not match generated labor 7',
             'Bolivar (dummy 0240) - CX Calculated acceptance 13 does not match generated acceptance 11',
-            'Bolivar (dummy 0240)-A78689D-E Found invalid "Pr" in trade codes: [\'Ga\', '
+            'Bolivar (dummy 0240)-A79789D-E Found invalid "Ga" in trade codes: [\'Ga\', '
             "'Hi', 'Pr']",
-            'Bolivar (dummy 0240)-A78689D-E Calculated "Pa" not in trade codes [\'Ga\', '
+            'Bolivar (dummy 0240)-A79789D-E Calculated "Pi" not in trade codes [\'Ga\', '
             "'Hi', 'Pr']",
-            'Bolivar (dummy 0240)-A78689D-E Calculated "Ri" not in trade codes [\'Ga\', '
+            'Bolivar (dummy 0240)-A79789D-E Found invalid "Pr" in trade codes: [\'Ga\', '
             "'Hi', 'Pr']",
-            'Bolivar (dummy 0240)-A78689D-E Calculated "Ph" not in trade codes [\'Ga\', '
+            'Bolivar (dummy 0240)-A79789D-E Calculated "Pa" not in trade codes [\'Ga\', '
             "'Hi', 'Pr']",
-            'Bolivar (dummy 0240)-A78689D-E Found invalid "Hi" code on world with 8 '
+            'Bolivar (dummy 0240)-A79789D-E Calculated "Ph" not in trade codes [\'Ga\', '
+            "'Hi', 'Pr']",
+            'Bolivar (dummy 0240)-A79789D-E Found invalid "Hi" code on world with 8 '
             "population: ['Ga', 'Hi', 'Pr']",
-            'Bolivar (dummy 0240)-A78689D-E Calculated TL "14" not in range 7-12'
+            'Bolivar (dummy 0240)-A79789D-E Calculated TL "14" not in range 7-12'
         ]
-        msg = []
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
         self.assertEqual(exp_msg, msg)
@@ -301,14 +387,14 @@ class testDeltaStar(unittest.TestCase):
         self.assertEqual(exp_msg, msg)
 
     def test_check_canonical_instance_bad_5(self) -> None:
-        original = '0101 000000000000000 C010400-8 000000000000000       B A A 000 0 00'
+        original = '0101 000000000000000 C010400-8 000000000000000 Ni  {0} (006+1) - B A A 000 0 00'
         sector = Sector("# dummy", "# 0, 0")
         star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+        star.importance = 0
 
         exp_msg = [
-            '000000000000000 (dummy 0101)-C010400-8 Calculated "Ni" not in trade codes []'
+            '000000000000000 (dummy 0101) - EX Calculated labor 0 does not match generated labor 3',
         ]
-        msg = []
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
         self.assertEqual(exp_msg, msg)
@@ -404,29 +490,30 @@ class testDeltaStar(unittest.TestCase):
         self.assertEqual(exp_msg, msg)
 
     def test_check_canonical_instance_bad_11(self) -> None:
-        original = '0140 000000000000000 D33A710-5 As De Ga Fl Ic Po He      - - A 000   00'
+        original = '0140 000000000000000 DA4A710-5 As De Ga Fl Ic Po He      - - A 000   00'
         sector = Sector("# dummy", "# 0, 0")
         star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
 
         exp_msg = [
-            '000000000000000 (dummy 0140)-D33A710-5 Found invalid "As" in trade codes: '
+            '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "As" in trade codes: '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
-            '000000000000000 (dummy 0140)-D33A710-5 Found invalid "De" in trade codes: '
+            '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "De" in trade codes: '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
-            '000000000000000 (dummy 0140)-D33A710-5 Found invalid "Ga" in trade codes: '
+            '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "Ga" in trade codes: '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
-            '000000000000000 (dummy 0140)-D33A710-5 Found invalid "Fl" in trade codes: '
+            '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "Fl" in trade codes: '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
-            '000000000000000 (dummy 0140)-D33A710-5 Found invalid "Ic" in trade codes: '
+            '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "Ic" in trade codes: '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
-            '000000000000000 (dummy 0140)-D33A710-5 Found invalid "Po" in trade codes: '
+            '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "Po" in trade codes: '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
-            '000000000000000 (dummy 0140)-D33A710-5 Found invalid "He" in trade codes: '
+            '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "He" in trade codes: '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
-            '000000000000000 (dummy 0140)-D33A710-5 Calculated "Wa" not in trade codes '
+            '000000000000000 (dummy 0140)-DA4A710-5 Calculated "Oc" not in trade codes '
+            "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
+            '000000000000000 (dummy 0140)-DA4A710-5 Calculated "Pi" not in trade codes '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']"
         ]
-        msg = []
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
         self.assertEqual(exp_msg, msg)
@@ -439,20 +526,19 @@ class testDeltaStar(unittest.TestCase):
         exp_msg = [
             '000000000000000 (dummy 0140)-???????-? Found invalid "De" in trade codes: [\'De\']'
         ]
-        msg = []
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
         self.assertEqual(exp_msg, msg)
 
     def test_check_canonical_instance_bad_13(self) -> None:
-        original = '0140 000000000000000 ?A4a?00-4 000000000000000       - - A 000   00'
+        original = '0140 000000000000000 ?ADa?00-4 000000000000000       - - A 000   00'
         sector = Sector("# dummy", "# 0, 0")
         star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
 
         exp_msg = [
-            '000000000000000 (dummy 0140)-?A4A?00-4 Calculated "Oc" not in trade codes []'
+            '000000000000000 (dummy 0140)-?ADA?00-4 Calculated "Oc" not in trade codes []',
+            '000000000000000 (dummy 0140)-?ADA?00-4 Calculated TL "4" not in range 5-10'
         ]
-        msg = []
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
         self.assertEqual(exp_msg, msg)
@@ -476,7 +562,152 @@ class testDeltaStar(unittest.TestCase):
             '000000000000000 (dummy 0140)-B2A1710-7 Found invalid "Hi" code on world with '
             "7 population: ['Ba', 'Hi', 'Lo', 'Ni', 'Ph']"
         ]
-        msg = []
+        actual, msg = star.check_canonical()
+        self.assertFalse(actual)
+        self.assertEqual(exp_msg, msg)
+
+    def test_check_canonical_instance_bad_15(self) -> None:
+        original = '0140 000000000000000 B2a1000-0 Ba   {0} (G8E+1)  [1630] - - A 000   00'
+        sector = Sector("# dummy", "# 0, 0")
+        star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+        exp_msg = [
+            '000000000000000 (dummy 0140) - EX Calculated infrastructure 14 does not match generated infrastructure 0',
+            '000000000000000 (dummy 0140) - EX Calculated labor 8 does not match generated labor 0',
+            '000000000000000 (dummy 0140) - CX Calculated strangeness 3 should be 0 for barren worlds',
+            '000000000000000 (dummy 0140) - CX Calculated acceptance 6 should be 0 for barren worlds',
+            '000000000000000 (dummy 0140) - CX Calculated homogeneity 1 should be 0 for barren worlds',
+            '000000000000000 (dummy 0140)-B2A1000-0 Calculated "Fl" not in trade codes '
+            "['Ba']",
+            '000000000000000 (dummy 0140)-B2A1000-0 Calculated TL "0" not in range 8-13'
+        ]
+        actual, msg = star.check_canonical()
+        self.assertFalse(actual)
+        self.assertEqual(exp_msg, msg)
+
+    def test_check_canonical_instance_bad_16(self) -> None:
+        original = '0140 000000000000000 B2a1710-7  {0} (G8E+1) [063D] - - A 000   00'
+        sector = Sector("# dummy", "# 0, 0")
+        star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+        exp_msg = [
+            '000000000000000 (dummy 0140) - EX Calculated infrastructure 14 not in range 0 - 12',
+            '000000000000000 (dummy 0140) - EX Calculated labor 8 does not match generated labor 6',
+            '000000000000000 (dummy 0140) - CX Calculated symbols 13 not in range 2 - 12',
+            '000000000000000 (dummy 0140) - CX Calculated acceptance 6 does not match generated acceptance 7',
+            '000000000000000 (dummy 0140) - CX Calculated homogeneity 0 not in range 2 - 12',
+            '000000000000000 (dummy 0140)-B2A1710-7 Calculated "Fl" not in trade codes []'
+        ]
+        actual, msg = star.check_canonical()
+        self.assertFalse(actual)
+        self.assertEqual(exp_msg, msg)
+
+    def test_check_canonical_instance_bad_17(self) -> None:
+        original = '0140 000000000000000 B2a1310-7 Lo  {0} (G80+1) [C630] - - A 000   00'
+        sector = Sector("# dummy", "# 0, 0")
+        star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+        star.importance = 0
+        exp_msg = [
+            '000000000000000 (dummy 0140) - EX Calculated labor 8 does not match generated labor 2',
+            '000000000000000 (dummy 0140) - CX Calculated symbols 0 not in range 2 - 12',
+            '000000000000000 (dummy 0140) - CX Calculated acceptance 6 does not match generated acceptance 3',
+            '000000000000000 (dummy 0140) - CX Calculated homogeneity 12 not in range 1 - 8',
+            '000000000000000 (dummy 0140)-B2A1310-7 Calculated "Fl" not in trade codes '
+            "['Lo']",
+            '000000000000000 (dummy 0140)-B2A1310-7 Calculated TL "7" not in range 8-13'
+        ]
+        actual, msg = star.check_canonical()
+        self.assertFalse(actual)
+        self.assertEqual(exp_msg, msg)
+
+    def test_check_canonical_instance_bad_18(self) -> None:
+        original = '0140 000000000000000 B2a1610-7 Ni  {0} (G87+1) [C630] - - A 000   00'
+        sector = Sector("# dummy", "# 0, 0")
+        star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+        star.importance = 0
+        exp_msg = [
+            '000000000000000 (dummy 0140) - EX Calculated infrastructure 7 not in NI range 0 - 6',
+            '000000000000000 (dummy 0140) - EX Calculated labor 8 does not match generated labor 5',
+            '000000000000000 (dummy 0140) - CX Calculated symbols 0 not in range 2 - 12',
+            '000000000000000 (dummy 0140) - CX Calculated homogeneity 12 not in range 1 - 11',
+            '000000000000000 (dummy 0140)-B2A1610-7 Calculated "Fl" not in trade codes '
+            "['Ni']",
+        ]
+        actual, msg = star.check_canonical()
+        self.assertFalse(actual)
+        self.assertEqual(exp_msg, msg)
+
+    def test_check_canonical_instance_bad_19(self) -> None:
+        original = '0140 000000000000000 B200610-7 As  - - - - - A 000   00'
+        sector = Sector("# dummy", "# 0, 0")
+        star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+        star.importance = 0
+        exp_msg = [
+            '000000000000000 (dummy 0140)-B200610-7 Found invalid "As" in trade codes: '
+            "['As']",
+            '000000000000000 (dummy 0140)-B200610-7 Calculated "Va" not in trade codes '
+            "['As']",
+            '000000000000000 (dummy 0140)-B200610-7 Calculated "Na" not in trade codes '
+            "['As']",
+            '000000000000000 (dummy 0140)-B200610-7 Calculated "Ni" not in trade codes '
+            "['As']"
+        ]
+        actual, msg = star.check_canonical()
+        self.assertFalse(actual)
+        self.assertEqual(exp_msg, msg)
+
+    def test_check_canonical_instance_bad_20(self) -> None:
+        original = '0140 000000000000000 BAA2610-7 He  - - - - - A 000   00'
+        sector = Sector("# dummy", "# 0, 0")
+        star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+
+        exp_msg = [
+            '000000000000000 (dummy 0140)-BAA2610-7 Calculated "Fl" not in trade codes '
+            "['He']",
+            '000000000000000 (dummy 0140)-BAA2610-7 Calculated "Ni" not in trade codes '
+            "['He']"
+        ]
+        actual, msg = star.check_canonical()
+        self.assertFalse(actual)
+        self.assertEqual(exp_msg, msg)
+
+    def test_check_canonical_instance_bad_21(self) -> None:
+        original = '0140 000000000000000 B998810-7 Pa  - - - - - A 000   00'
+        sector = Sector("# dummy", "# 0, 0")
+        star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+
+        exp_msg = [
+            '000000000000000 (dummy 0140)-B998810-7 Calculated "Pi" not in trade codes '
+            "['Pa']",
+            '000000000000000 (dummy 0140)-B998810-7 Calculated "Ph" not in trade codes '
+            "['Pa']"
+        ]
+        actual, msg = star.check_canonical()
+        self.assertFalse(actual)
+        self.assertEqual(exp_msg, msg)
+
+    def test_check_canonical_instance_bad_22(self) -> None:
+        original = '0140 000000000000000 B9D2810-7 He  - - - - - A 000   00'
+        sector = Sector("# dummy", "# 0, 0")
+        star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+
+        exp_msg = [
+            '000000000000000 (dummy 0140)-B9D2810-7 Found invalid "He" in trade codes: '
+            "['He']",
+            '000000000000000 (dummy 0140)-B9D2810-7 Calculated "Ph" not in trade codes '
+            "['He']"
+        ]
+        actual, msg = star.check_canonical()
+        self.assertFalse(actual)
+        self.assertEqual(exp_msg, msg)
+
+    def test_check_canonical_instance_bad_23(self) -> None:
+        original = '0140 000000000000000 B9EA810-7 Wa  - - - - - A 000   00'
+        sector = Sector("# dummy", "# 0, 0")
+        star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+        exp_msg = [
+            '000000000000000 (dummy 0140)-B9EA810-7 Calculated "Ph" not in trade codes '
+            "['Wa']",
+            '000000000000000 (dummy 0140)-B9EA810-7 Calculated TL "7" not in range 8-13'
+        ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
         self.assertEqual(exp_msg, msg)
