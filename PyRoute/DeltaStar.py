@@ -347,9 +347,11 @@ class DeltaStar(Star):
         return check
 
     def _check_econ_code(self, msg, code, atmo, hydro, pop, implied=None):
-        atmo = '0123456789ABCDEF' if atmo is None else atmo
+        # Commented out because _every_ caller supplies an atmo string
+        # atmo = '0123456789ABCDEF' if atmo is None else atmo
         hydro = '0123456789A' if hydro is None else hydro
-        pop = '0123456789ABCD' if pop is None else pop
+        # Commented out because _every_ caller supplies a pop string
+        # pop = '0123456789ABCDEF' if pop is None else pop
 
         code_match = code in self.tradeCode.codeset
         phys_match = self.atmo in atmo and self.hydro in hydro and self.pop in pop
