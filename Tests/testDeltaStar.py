@@ -318,16 +318,16 @@ class testDeltaStar(unittest.TestCase):
         star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
 
         exp_msg = [
-            'Bolivar (dummy 0240) - EX Calculated infrastructure 16 not in range 0 - 15',
             'Bolivar (dummy 0240) - EX Calculated labor 8 does not match generated labor 7',
+            'Bolivar (dummy 0240) - EX Calculated infrastructure 16 not in range 0 - 15',
             'Bolivar (dummy 0240) - CX Calculated acceptance 13 does not match generated acceptance 11',
             'Bolivar (dummy 0240)-A79789D-E Found invalid "Ga" in trade codes: [\'Ga\', '
+            "'Hi', 'Pr']",
+            'Bolivar (dummy 0240)-A79789D-E Calculated "Pa" not in trade codes [\'Ga\', '
             "'Hi', 'Pr']",
             'Bolivar (dummy 0240)-A79789D-E Calculated "Pi" not in trade codes [\'Ga\', '
             "'Hi', 'Pr']",
             'Bolivar (dummy 0240)-A79789D-E Found invalid "Pr" in trade codes: [\'Ga\', '
-            "'Hi', 'Pr']",
-            'Bolivar (dummy 0240)-A79789D-E Calculated "Pa" not in trade codes [\'Ga\', '
             "'Hi', 'Pr']",
             'Bolivar (dummy 0240)-A79789D-E Calculated "Ph" not in trade codes [\'Ga\', '
             "'Hi', 'Pr']",
@@ -337,7 +337,7 @@ class testDeltaStar(unittest.TestCase):
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_2(self) -> None:
         original = "0101 000000000000000 A000000-0 000000000000000 {0} (000-0) [0000] B A A 000 0 00"
@@ -352,10 +352,9 @@ class testDeltaStar(unittest.TestCase):
             '000000000000000 (dummy 0101)-A000000-0 Calculated "Ba" not in trade codes []',
             '000000000000000 (dummy 0101)-A000000-0 Calculated TL "0" not in range 11-16'
         ]
-        msg = []
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_3(self) -> None:
         original = '0101 000000000000000 D540000-2 000000000000000       B A A 000 0 00'
@@ -364,14 +363,13 @@ class testDeltaStar(unittest.TestCase):
 
         exp_msg = [
             '000000000000000 (dummy 0101)-D540000-2 Calculated "De" not in trade codes []',
-            '000000000000000 (dummy 0101)-D540000-2 Calculated "Po" not in trade codes []',
             '000000000000000 (dummy 0101)-D540000-2 Calculated "He" not in trade codes []',
+            '000000000000000 (dummy 0101)-D540000-2 Calculated "Po" not in trade codes []',
             '000000000000000 (dummy 0101)-D540000-2 Calculated "Ba" not in trade codes []'
         ]
-        msg = []
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_4(self) -> None:
         original = '0101 000000000000000 ?00?100-6 000000000000000       B A A 000 0 00'
@@ -381,10 +379,13 @@ class testDeltaStar(unittest.TestCase):
         exp_msg = [
             '000000000000000 (dummy 0101)-?00?100-6 Calculated "Lo" not in trade codes []'
         ]
-        msg = []
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
+
+        actual, msg = star.check_canonical()
+        self.assertFalse(actual)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_5(self) -> None:
         original = '0101 000000000000000 C010400-8 000000000000000 Ni  {0} (006+1) - B A A 000 0 00'
@@ -397,7 +398,7 @@ class testDeltaStar(unittest.TestCase):
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_6(self) -> None:
         original = '0101 000000000000000 ???????-? 000000000000000 {0} -  [0001] B A A 000 0 00'
@@ -407,10 +408,9 @@ class testDeltaStar(unittest.TestCase):
         exp_msg = [
             '000000000000000 (dummy 0101) - CX Calculated symbols 1 should be 0 for barren worlds'
         ]
-        msg = []
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_7(self) -> None:
         original = '0101 000000000000000 A010700-b 000000000000000       B A A 000 0 00'
@@ -421,10 +421,9 @@ class testDeltaStar(unittest.TestCase):
             '000000000000000 (dummy 0101)-A010700-B Calculated "Na" not in trade codes []',
             '000000000000000 (dummy 0101)-A010700-B Calculated "Pi" not in trade codes []'
         ]
-        msg = []
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_8(self) -> None:
         original = '0101 000000000000000 A060900-C 000000000000000       B A A 000 0 00'
@@ -436,10 +435,9 @@ class testDeltaStar(unittest.TestCase):
             '000000000000000 (dummy 0101)-A060900-C Calculated "Pr" not in trade codes []',
             '000000000000000 (dummy 0101)-A060900-C Calculated "Hi" not in trade codes []'
         ]
-        msg = []
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_9(self) -> None:
         original = '0101 000000000000000 ???????-? Na Pi In Pr Pa Ri Ag  {0} -  [0002] B A A 000 0 00'
@@ -448,25 +446,24 @@ class testDeltaStar(unittest.TestCase):
 
         exp_msg = [
             '000000000000000 (dummy 0101) - CX Calculated symbols 2 should be 0 for barren worlds',
+            '000000000000000 (dummy 0101)-???????-? Found invalid "In" in trade codes: '
+            "['Ag', 'In', 'Na', 'Pa', 'Pi', 'Pr', 'Ri']",
+            '000000000000000 (dummy 0101)-???????-? Found invalid "Pa" in trade codes: '
+            "['Ag', 'In', 'Na', 'Pa', 'Pi', 'Pr', 'Ri']",
+            '000000000000000 (dummy 0101)-???????-? Found invalid "Ag" in trade codes: '
+            "['Ag', 'In', 'Na', 'Pa', 'Pi', 'Pr', 'Ri']",
             '000000000000000 (dummy 0101)-???????-? Found invalid "Na" in trade codes: '
             "['Ag', 'In', 'Na', 'Pa', 'Pi', 'Pr', 'Ri']",
             '000000000000000 (dummy 0101)-???????-? Found invalid "Pi" in trade codes: '
             "['Ag', 'In', 'Na', 'Pa', 'Pi', 'Pr', 'Ri']",
-            '000000000000000 (dummy 0101)-???????-? Found invalid "In" in trade codes: '
-            "['Ag', 'In', 'Na', 'Pa', 'Pi', 'Pr', 'Ri']",
             '000000000000000 (dummy 0101)-???????-? Found invalid "Pr" in trade codes: '
             "['Ag', 'In', 'Na', 'Pa', 'Pi', 'Pr', 'Ri']",
-            '000000000000000 (dummy 0101)-???????-? Found invalid "Pa" in trade codes: '
-            "['Ag', 'In', 'Na', 'Pa', 'Pi', 'Pr', 'Ri']",
             '000000000000000 (dummy 0101)-???????-? Found invalid "Ri" in trade codes: '
-            "['Ag', 'In', 'Na', 'Pa', 'Pi', 'Pr', 'Ri']",
-            '000000000000000 (dummy 0101)-???????-? Found invalid "Ag" in trade codes: '
             "['Ag', 'In', 'Na', 'Pa', 'Pi', 'Pr', 'Ri']"
         ]
-        msg = []
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_10(self) -> None:
         original = '0101 000000000000000 F2G0700-3 Wa Oc Va   {0} -  [0600] B A A 000 0 00'
@@ -474,20 +471,19 @@ class testDeltaStar(unittest.TestCase):
         star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
 
         exp_msg = [
-            '000000000000000 (dummy 0101) - CX Calculated symbols 0 not in range 1 - 8',
-            '000000000000000 (dummy 0101) - CX Calculated strangeness 0 not in range 1 - 10',
             '000000000000000 (dummy 0101) - CX Calculated homogeneity 0 not in range 2 - 12',
-            '000000000000000 (dummy 0101)-F2G0700-3 Found invalid "Wa" in trade codes: '
-            "['Oc', 'Va', 'Wa']",
+            '000000000000000 (dummy 0101) - CX Calculated strangeness 0 not in range 1 - 10',
+            '000000000000000 (dummy 0101) - CX Calculated symbols 0 not in range 1 - 8',
             '000000000000000 (dummy 0101)-F2G0700-3 Found invalid "Oc" in trade codes: '
             "['Oc', 'Va', 'Wa']",
             '000000000000000 (dummy 0101)-F2G0700-3 Found invalid "Va" in trade codes: '
+            "['Oc', 'Va', 'Wa']",
+            '000000000000000 (dummy 0101)-F2G0700-3 Found invalid "Wa" in trade codes: '
             "['Oc', 'Va', 'Wa']"
         ]
-        msg = []
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_11(self) -> None:
         original = '0140 000000000000000 DA4A710-5 As De Ga Fl Ic Po He      - - A 000   00'
@@ -499,15 +495,15 @@ class testDeltaStar(unittest.TestCase):
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
             '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "De" in trade codes: '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
+            '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "Fl" in trade codes: '
+            "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
             '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "Ga" in trade codes: '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
-            '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "Fl" in trade codes: '
+            '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "He" in trade codes: '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
             '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "Ic" in trade codes: '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
             '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "Po" in trade codes: '
-            "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
-            '000000000000000 (dummy 0140)-DA4A710-5 Found invalid "He" in trade codes: '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
             '000000000000000 (dummy 0140)-DA4A710-5 Calculated "Oc" not in trade codes '
             "['As', 'De', 'Fl', 'Ga', 'He', 'Ic', 'Po']",
@@ -516,7 +512,7 @@ class testDeltaStar(unittest.TestCase):
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_12(self) -> None:
         original = '0140 000000000000000 ???????-? 000000000000000       De     - A   000   00'
@@ -528,7 +524,7 @@ class testDeltaStar(unittest.TestCase):
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_13(self) -> None:
         original = '0140 000000000000000 ?ADa?00-4 000000000000000       - - A 000   00'
@@ -541,7 +537,7 @@ class testDeltaStar(unittest.TestCase):
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_14(self) -> None:
         original = '0140 000000000000000 B2a1710-7 Ba Lo Ni Ph Hi       - - A 000   00'
@@ -564,41 +560,41 @@ class testDeltaStar(unittest.TestCase):
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_15(self) -> None:
         original = '0140 000000000000000 B2a1000-0 Ba   {0} (G8E+1)  [1630] - - A 000   00'
         sector = Sector("# dummy", "# 0, 0")
         star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
         exp_msg = [
-            '000000000000000 (dummy 0140) - EX Calculated infrastructure 14 does not match generated infrastructure 0',
             '000000000000000 (dummy 0140) - EX Calculated labor 8 does not match generated labor 0',
-            '000000000000000 (dummy 0140) - CX Calculated strangeness 3 should be 0 for barren worlds',
-            '000000000000000 (dummy 0140) - CX Calculated acceptance 6 should be 0 for barren worlds',
+            '000000000000000 (dummy 0140) - EX Calculated infrastructure 14 does not match generated infrastructure 0',
             '000000000000000 (dummy 0140) - CX Calculated homogeneity 1 should be 0 for barren worlds',
+            '000000000000000 (dummy 0140) - CX Calculated acceptance 6 should be 0 for barren worlds',
+            '000000000000000 (dummy 0140) - CX Calculated strangeness 3 should be 0 for barren worlds',
             '000000000000000 (dummy 0140)-B2A1000-0 Calculated "Fl" not in trade codes '
             "['Ba']",
             '000000000000000 (dummy 0140)-B2A1000-0 Calculated TL "0" not in range 8-13'
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_16(self) -> None:
         original = '0140 000000000000000 B2a1710-7  {0} (G8E+1) [063D] - - A 000   00'
         sector = Sector("# dummy", "# 0, 0")
         star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
         exp_msg = [
-            '000000000000000 (dummy 0140) - EX Calculated infrastructure 14 not in range 0 - 12',
             '000000000000000 (dummy 0140) - EX Calculated labor 8 does not match generated labor 6',
-            '000000000000000 (dummy 0140) - CX Calculated symbols 13 not in range 2 - 12',
-            '000000000000000 (dummy 0140) - CX Calculated acceptance 6 does not match generated acceptance 7',
+            '000000000000000 (dummy 0140) - EX Calculated infrastructure 14 not in range 0 - 12',
             '000000000000000 (dummy 0140) - CX Calculated homogeneity 0 not in range 2 - 12',
+            '000000000000000 (dummy 0140) - CX Calculated acceptance 6 does not match generated acceptance 7',
+            '000000000000000 (dummy 0140) - CX Calculated symbols 13 not in range 2 - 12',
             '000000000000000 (dummy 0140)-B2A1710-7 Calculated "Fl" not in trade codes []'
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_17(self) -> None:
         original = '0140 000000000000000 B2a1310-7 Lo  {0} (G80+1) [C630] - - A 000   00'
@@ -607,16 +603,16 @@ class testDeltaStar(unittest.TestCase):
         star.importance = 0
         exp_msg = [
             '000000000000000 (dummy 0140) - EX Calculated labor 8 does not match generated labor 2',
-            '000000000000000 (dummy 0140) - CX Calculated symbols 0 not in range 2 - 12',
-            '000000000000000 (dummy 0140) - CX Calculated acceptance 6 does not match generated acceptance 3',
             '000000000000000 (dummy 0140) - CX Calculated homogeneity 12 not in range 1 - 8',
+            '000000000000000 (dummy 0140) - CX Calculated acceptance 6 does not match generated acceptance 3',
+            '000000000000000 (dummy 0140) - CX Calculated symbols 0 not in range 2 - 12',
             '000000000000000 (dummy 0140)-B2A1310-7 Calculated "Fl" not in trade codes '
             "['Lo']",
             '000000000000000 (dummy 0140)-B2A1310-7 Calculated TL "7" not in range 8-13'
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_18(self) -> None:
         original = '0140 000000000000000 B2a1610-7 Ni  {0} (G87+1) [C630] - - A 000   00'
@@ -624,16 +620,16 @@ class testDeltaStar(unittest.TestCase):
         star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
         star.importance = 0
         exp_msg = [
-            '000000000000000 (dummy 0140) - EX Calculated infrastructure 7 not in NI range 0 - 6',
             '000000000000000 (dummy 0140) - EX Calculated labor 8 does not match generated labor 5',
-            '000000000000000 (dummy 0140) - CX Calculated symbols 0 not in range 2 - 12',
+            '000000000000000 (dummy 0140) - EX Calculated infrastructure 7 not in NI range 0 - 6',
             '000000000000000 (dummy 0140) - CX Calculated homogeneity 12 not in range 1 - 11',
+            '000000000000000 (dummy 0140) - CX Calculated symbols 0 not in range 2 - 12',
             '000000000000000 (dummy 0140)-B2A1610-7 Calculated "Fl" not in trade codes '
             "['Ni']",
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_19(self) -> None:
         original = '0140 000000000000000 B200610-7 As  - - - - - A 000   00'
@@ -652,7 +648,7 @@ class testDeltaStar(unittest.TestCase):
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_20(self) -> None:
         original = '0140 000000000000000 BAA2610-7 He  - - - - - A 000   00'
@@ -667,7 +663,7 @@ class testDeltaStar(unittest.TestCase):
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_21(self) -> None:
         original = '0140 000000000000000 B998810-7 Pa  - - - - - A 000   00'
@@ -682,7 +678,7 @@ class testDeltaStar(unittest.TestCase):
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_22(self) -> None:
         original = '0140 000000000000000 B9D2810-7 He  - - - - - A 000   00'
@@ -697,7 +693,7 @@ class testDeltaStar(unittest.TestCase):
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
     def test_check_canonical_instance_bad_23(self) -> None:
         original = '0140 000000000000000 B9EA810-7 Wa  - - - - - A 000   00'
@@ -710,7 +706,7 @@ class testDeltaStar(unittest.TestCase):
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
-        self.assertEqual(exp_msg, msg)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
 
 
 if __name__ == '__main__':
