@@ -88,14 +88,11 @@ class DeltaStar(Star):
         self.routes = []
 
     def reduce_trade_codes(self) -> None:
-        self.tradeCode = TradeCodes('')
+        self.tradeCode = TradeCodes('')  # pragma: no mutate
 
     def trim_trade_codes(self) -> None:
-        if '' == str(self.tradeCode):
-            return
-
-        matches = {"In", "Ni", "Ag", "Na", "Ex", "Hi", "Ri", "Cp", "Cs", "Cx"}.union(TradeCodes.ex_codes)
-        trade_string = ""
+        matches = {"In", "Ni", "Ag", "Ex", "Hi", "Ri", "Cp", "Cs", "Cx"}.union(TradeCodes.ex_codes)
+        trade_string = ""  # pragma: no mutate
         for codes in self.tradeCode.codes:
             if codes in matches:
                 trade_string += " " + str(codes)
@@ -127,8 +124,6 @@ class DeltaStar(Star):
         self.zone = '-'
 
     def trim_trade_zone(self) -> None:
-        if '-' == self.zone:
-            return
         if 'R' == self.zone.upper():
             self.zone = 'A'
         elif 'F' == self.zone.upper():
@@ -137,7 +132,7 @@ class DeltaStar(Star):
             self.zone = '-'
 
     def reduce_extra_stars(self) -> None:
-        if 0 < len(self.star_list):
+        if 0 < len(self.star_list):  # pragma: no mutate
             self.star_list_object.stars_list = [self.star_list_object.stars_list[0]]
 
     def reduce_pbg(self) -> None:
@@ -149,7 +144,7 @@ class DeltaStar(Star):
         self.worlds = 1
 
     def reduce_port(self) -> None:
-        self.port = 'C'
+        self.port = 'C'  # pragma: no mutate
 
     def reduce_tl(self) -> None:
         self.tl = 8
@@ -181,7 +176,7 @@ class DeltaStar(Star):
         outer_logger = logging.getLogger("PyRoute.Star")
         old_level = outer_logger.level
         old_handlers = len(outer_logger.handlers)
-        outer_logger.setLevel(10)
+        outer_logger.setLevel(10)  # pragma: no mutate
         list_handler = ListHandler()
         outer_logger.addHandler(list_handler)
 
@@ -195,7 +190,7 @@ class DeltaStar(Star):
         if ('O:' + self.position) in self.tradeCode.codes:
             line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, 'O:' + self.position, self.tradeCode.codes)
             msg.append(line)
-        if ('C:' + self.position) in self.tradeCode.codeset:
+        if ('C:' + self.position) in self.tradeCode.codes:
             line = '{}-{} Found invalid "{}" in trade codes: {}'.format(self, self.uwp, 'C:' + self.position, self.tradeCode.codes)
             msg.append(line)
 
@@ -204,7 +199,7 @@ class DeltaStar(Star):
 
         outer_logger.removeHandler(list_handler)
         new_handlers = len(outer_logger.handlers)
-        assert old_handlers == new_handlers, "ListHandler not removed"
+        assert old_handlers == new_handlers
         outer_logger.setLevel(old_level)
 
         self.tradeCode.check_world_codes(self, msg)
@@ -225,17 +220,6 @@ class DeltaStar(Star):
             self.logger.warning(
                 '{}-{} Calculated government code "{}" out of range - should be {}'.
                     format(self, self.uwp, 'X', '0'))
-
-    def _check_trade_code(self, msg, code, size, atmo, hydro, implied=None):
-        self.tradeCode._check_planet_code(self, code, size, atmo, hydro, msg, implied)
-        return
-
-    def _check_pop_code(self, msg, code, pop):
-        return self.tradeCode._check_pop_code(self, code, pop, msg)
-
-    def _check_econ_code(self, msg, code, atmo, hydro, pop, implied=None):
-        self.tradeCode._check_econ_code(self, code, atmo, hydro, pop, msg, implied)
-        return
 
 
 class ListHandler(logging.Handler):

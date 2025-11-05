@@ -8,6 +8,12 @@ from PyRoute.Star import Star
 
 
 class testDeltaStar(unittest.TestCase):
+
+    def setUp(self) -> None:
+        outer_logger = logging.getLogger('PyRoute.Star')
+        outer_logger.manager.disable = 0
+        outer_logger.setLevel(10)
+
     def test_null_reduction(self) -> None:
         original = "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
         actual = DeltaStar.reduce(original)
@@ -75,11 +81,145 @@ class testDeltaStar(unittest.TestCase):
         self.assertEqual(expected, actual, "Trade-zone-drop reduction unexpected result")
 
     def test_drop_extra_stars_reduction(self) -> None:
-        original = "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
-        actual = DeltaStar.reduce(original, drop_extra_stars=True)
+        check_list = [
+            (
+                "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V           Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V            Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V           Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V M9 V  Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V           Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+        ]
 
-        expected = "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V           Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
-        self.assertEqual(expected, actual, "Star-drop reduction unexpected result")
+        for original, expected in check_list:
+            with self.subTest():
+                actual = DeltaStar.reduce(original, drop_extra_stars=True)
+                self.assertEqual(expected, actual, "Star-drop reduction unexpected result")
+
+    def test_trim_trade_zone_reduction(self) -> None:
+        check_list = [
+            (
+                "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS G 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS U 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS R 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS F 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] BcEF NS U 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+        ]
+
+        for original, expected in check_list:
+            with self.subTest():
+                actual = DeltaStar.reduce(original, trim_trade_zone=True)
+                self.assertEqual(expected, actual, "Trade-zone reduction unexpected result")
+
+    def test_trim_base_code_reduction(self) -> None:
+        check_list = [
+            (
+                "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 3 }  (G8G+5) [DD9J] BcEF N  - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 3 }  (G8G+5) [DD9J] BcEF N  - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 3 }  (G8G+5) [DD9J] BcEF N  - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 3 }  (G8G+5) [DD9J] BcEF -  - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 3 }  (G8G+5) [DD9J] BcEF -  - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            )
+        ]
+
+        for original, expected in check_list:
+            with self.subTest():
+                actual = DeltaStar.reduce(original, trim_base_codes=True)
+                self.assertEqual(expected, actual, "Base-code reduction unexpected result")
+
+    def test_trim_trade_codes_reduction(self) -> None:
+        check_list = [
+            (
+                "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Cp Hi                                 { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E                                       { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E                                       { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Ag Ni                                 { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Ag Ni                                 { 5 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Na                                    { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Na                                    { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E XXNaXX                                { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E                                       { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Ex                                    { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Ex                                    { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Hi In                                 { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Hi In                                 { 5 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Ri                                    { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Ri                                    { 5 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Cs                                    { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Cs                                    { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Cx                                    { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Cx                                    { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+        ]
+
+        for original, expected in check_list:
+            with self.subTest():
+                actual = DeltaStar.reduce(original, trim_trade_codes=True)
+                self.assertEqual(expected, actual, "Trade-code reduction unexpected result")
+
+    def test_trim_noble_codes_reduction(self) -> None:
+        check_list = [
+            (
+                "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] B    NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+            (
+                "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] Bc   NS - 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        ",
+                "0240 Bolivar              A78699D-E Asla0 Cp Ga Hi Pr Pz                  { 4 }  (G8G+5) [DD9J] B    NS - 814 11 ImDv K1 V M9 V      Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
+            ),
+        ]
+
+        for original, expected in check_list:
+            with self.subTest():
+                actual = DeltaStar.reduce(original, trim_noble_codes=True)
+                self.assertEqual(expected, actual, "Noble-code reduction unexpected result")
 
     def test_drop_extra_stars_reduction_instance(self) -> None:
         original = "0240 Bolivar              A78699D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
@@ -316,6 +456,8 @@ class testDeltaStar(unittest.TestCase):
         original = "0240 Bolivar              A79789D-E Hi Ga Cp Pr Pz Asla0                  { 4 }  (G8G+5) [DD9J] BcEF NS A 814 11 ImDv K1 V M9 V       Xb:0639 Xb:Gush-3240 Xb:Zaru-0201        "
         sector = Sector("# dummy", "# 0, 0")
         star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+        self.assertIsNotNone(star.economics)
+        self.assertIsNotNone(star.social)
 
         exp_msg = [
             'Bolivar (dummy 0240) - EX Calculated labor 8 does not match generated labor 7',
@@ -468,6 +610,7 @@ class testDeltaStar(unittest.TestCase):
     def test_check_canonical_instance_bad_10(self) -> None:
         original = '0101 000000000000000 F2G0700-3 Wa Oc Va   {0} -  [0600] B A A 000 0 00'
         sector = Sector("# dummy", "# 0, 0")
+
         star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
 
         exp_msg = [
@@ -703,6 +846,20 @@ class testDeltaStar(unittest.TestCase):
             '000000000000000 (dummy 0140)-B9EA810-7 Calculated "Ph" not in trade codes '
             "['Wa']",
             '000000000000000 (dummy 0140)-B9EA810-7 Calculated TL "7" not in range 8-13'
+        ]
+        actual, msg = star.check_canonical()
+        self.assertFalse(actual)
+        self.assertEqual(sorted(exp_msg), sorted(msg))
+
+    def test_check_canonical_instance_bad_24(self) -> None:
+        original = '0140 000000000000000 B9EA810-8 O:0140 C:0140 Ph Wa  - - - - - A 000   00'
+        sector = Sector("# dummy", "# 0, 0")
+        star = DeltaStar.parse_line_into_star(original, sector, "fixed", "fixed")
+        exp_msg = [
+            '000000000000000 (dummy 0140)-B9EA810-8 Found invalid "C:0140" in trade '
+            "codes: ['C:0140', 'O:0140', 'Ph', 'Wa']",
+            '000000000000000 (dummy 0140)-B9EA810-8 Found invalid "O:0140" in trade '
+            "codes: ['C:0140', 'O:0140', 'Ph', 'Wa']",
         ]
         actual, msg = star.check_canonical()
         self.assertFalse(actual)
