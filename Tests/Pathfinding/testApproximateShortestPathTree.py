@@ -21,10 +21,16 @@ except AttributeError:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from Tests.baseTest import baseTest
 
 
 class testApproximateShortestPathTree(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
+
     def test_lower_bound_doesnt_overlap(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar.sec')
 

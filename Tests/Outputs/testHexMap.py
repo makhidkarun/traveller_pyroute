@@ -10,6 +10,7 @@ from pymupdf import pymupdf
 
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Outputs.ClassicModePDFSectorMap import ClassicModePDFSectorMap
 from PyRoute.Outputs.SubsectorMap import SubsectorMap
 from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
@@ -24,6 +25,9 @@ class testHexMap(baseTest):
     md5_regex = rb'([0-9a-f]{32,})'
     timeline = re.compile(timestamp_regex)
     md5line = re.compile(md5_regex)
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
 
     def test_document_object(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/no_subsectors_named/Zao Kfeng Ig Grilokh empty.sec')

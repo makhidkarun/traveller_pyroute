@@ -4,6 +4,7 @@ from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Subsector import Subsector
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Calculation.NoneCalculation import NoneCalculation
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Star import Star
 from Tests.baseTest import baseTest
 
@@ -35,6 +36,7 @@ class TestAllyGenBase(baseTest):
         self.galaxy.sectors[3] = mass_sector
         self.galaxy.sectors[4] = forn_sector
         self.borders = self.galaxy.borders
+        ParseStarInput.deep_space = {}
 
     def setupOneWorldAllSectors(self, loc: str = "0102") -> None:
         for sector in range(5):

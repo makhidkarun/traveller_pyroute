@@ -6,6 +6,7 @@ Created on Sep 21, 2023
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from Tests.baseTest import baseTest
 goodimport = True
 try:
@@ -33,6 +34,9 @@ except AttributeError:
 
 
 class testAStarNumpy(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
 
     def testAStarOverSubsector(self) -> None:
         self.maxDiff = None

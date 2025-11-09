@@ -2,11 +2,16 @@ import unittest
 
 from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary, SubsectorDictionary
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from Tests.baseTest import baseTest
 from PyRoute.DeltaStar import DeltaStar
 
 
 class testDeltaDictionary(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
+
     def test_add_bad_item_by_index(self) -> None:
         expected = 'Values must be SectorDictionary objects'
         actual = None

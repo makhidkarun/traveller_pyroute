@@ -83,7 +83,7 @@ class Galaxy(AreaItem):
         star_counter = 0
         loaded_sectors: set[str] = set()
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
-        ParseStarInput.deep_space = {} if (options.deep_space is None or not isinstance(options.deep_space, dict)) else options.deep_space
+        ParseStarInput.deep_space = {} if not isinstance(options.deep_space, dict) else options.deep_space
         logger = self.logger
         for sector in sectors:
             headers, starlines = ParseSectorInput.read_sector_file(sector, logger)
@@ -103,7 +103,7 @@ class Galaxy(AreaItem):
         self.set_bounding_sectors()
         self.set_bounding_subsectors()
         self.set_positions()
-        self.logger.debug("Allegiances: {}".format(self.alg))
+        self.logger.debug("Allegiances: {}".format(self.alg.keys()))
 
     def add_star_to_galaxy(self, star: Star, star_counter: int, sec: Sector) -> int:
         assert star not in sec.worlds, "Star " + str(star) + " duplicated in sector " + str(sec)
@@ -125,15 +125,14 @@ class Galaxy(AreaItem):
         return star_counter + 1
 
     def set_area_alg(self, star, area, algs: dict) -> None:
-        full_alg = algs.get(star.alg_code, Allegiance(star.alg_code, 'Unknown Allegiance', base=False))
+        full_alg = algs.get(star.alg_code, Allegiance(star.alg_code, 'Unknown Allegiance'))
         base_alg = algs.get(star.alg_base_code, Allegiance(star.alg_base_code, 'Unknown Allegiance', base=True))
 
-        area.alg.setdefault(star.alg_base_code, Allegiance(base_alg.code, base_alg.name, base=True)).worlds.append(star)
+        area.alg.setdefault(star.alg_base_code, Allegiance(base_alg.code, base_alg.name, base=base_alg.base)).worlds.append(star)
         if star.alg_code != star.alg_base_code:
-            area.alg.setdefault(star.alg_code, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
+            area.alg.setdefault(star.alg_code, Allegiance(full_alg.code, full_alg.name, base=full_alg.base)).worlds.append(star)
 
     def set_positions(self) -> None:
-        shadow_len = self.stars.number_of_nodes()
         for sector in self.sectors.values():
             for star in sector.worlds:
                 if star not in self.ranges:
@@ -198,8 +197,6 @@ class Galaxy(AreaItem):
             self.borders.create_ally_map(match, enforce)
         elif border_gen == 'erode':
             self.borders.create_erode_border(match, enforce)
-        else:
-            pass
 
     def write_routes(self, routes=None) -> None:
         path = os.path.join(self.output_path, 'ranges.txt')
@@ -209,13 +206,14 @@ class Galaxy(AreaItem):
         with open(path, "wb") as f:
             nx.write_edgelist(self.stars, f, data=True)
         path = os.path.join(self.output_path, 'borders.txt')
-        with codecs.open(path, "wb", "utf-8") as f:
+        encoding = 'utf-8'  # pragma: no mutate
+        with codecs.open(path, "wb", encoding=encoding) as f:
             for key, value in self.borders.borders.items():
                 f.write("{}-{}: border: {}\n".format(key[0], key[1], value))
 
         if routes == 'xroute':
             path = os.path.join(self.output_path, 'stations.txt')
-            with codecs.open(path, "wb", 'utf-8') as f:
+            with codecs.open(path, "wb", encoding=encoding) as f:
                 stars = [star for star in self.star_mapping.values() if star.tradeCount > 0]
                 for star in stars:
                     f.write("{} - {}\n".format(star, star.tradeCount))
@@ -268,7 +266,8 @@ class Galaxy(AreaItem):
     def process_owned_worlds(self) -> None:
         ow_names = os.path.join(self.output_path, 'owned-worlds-names.csv')
         ow_list = os.path.join(self.output_path, 'owned-worlds-list.csv')
-        with codecs.open(ow_names, 'w+', encoding="utf-8") as f, codecs.open(ow_list, 'w+', encoding="utf-8") as g:
+        encoding = 'utf-8'  # pragma: no mutate
+        with codecs.open(ow_names, 'w+', encoding=encoding) as f, codecs.open(ow_list, 'w+', encoding=encoding) as g:
 
             for world in self.stars:
                 worldstar = self.star_mapping[world]

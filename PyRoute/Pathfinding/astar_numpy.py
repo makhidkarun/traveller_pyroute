@@ -75,6 +75,8 @@ def astar_path_numpy(G, source: cython.int, target: cython.int, bulk_heuristic,
 
     # pre-calc heuristics for all nodes to the target node
     potentials = bulk_heuristic(target)
+    if potentials is None:
+        raise ValueError("Bulk heuristic function cannot be None")
 
     # Traces lowest distance from source node found for each node
     distances = np.ones(len(G_succ), dtype=float) * upbound

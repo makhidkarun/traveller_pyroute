@@ -8,11 +8,15 @@ import copy
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.StatCalculation import StatCalculation, Populations
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from Tests.baseTest import baseTest
 from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
 
 
 class testStatCalcRegression(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
 
     def testStatsCalcWithZeroPopulation(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/stat_calc_division_by_zero_population/Dagudashaag-zero.sec')

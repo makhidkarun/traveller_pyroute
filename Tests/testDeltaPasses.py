@@ -12,11 +12,16 @@ from PyRoute.DeltaPasses.FullLineReduce import FullLineReduce
 from PyRoute.DeltaPasses.ImportanceLineReduce import ImportanceLineReduce
 from PyRoute.DeltaPasses.WidenHoleReducer import WidenHoleReducer
 from PyRoute.DeltaStar import DeltaStar
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from Tests.Dummy.DeltaDebug.DummyReduce import DummyReduce
 from Tests.baseTest import baseTest
 
 
 class testDeltaPasses(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
+
     def test_canonicalisation_of_subsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-subsector-spiked.sec')
         args = self._make_args()
