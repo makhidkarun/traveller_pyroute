@@ -53,10 +53,14 @@ class testGalaxy(baseTest):
             'name': 'Charted Space',
             'output_path': 'maps',
             'star_mapping': {},
-            'stats': ObjectStatistics(),
             'worlds': []
         }
-        self.assertEqual(exp_dict, galaxy.__getstate__())
+
+        self.assertIsInstance(galaxy.stats, ObjectStatistics)
+
+        rawstate = galaxy.__getstate__()
+        del rawstate['stats']
+        self.assertEqual(exp_dict, rawstate)
 
     def test_is_well_formed_1(self) -> None:
         galaxy = Galaxy(0)
