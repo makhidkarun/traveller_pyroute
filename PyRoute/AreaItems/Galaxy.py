@@ -125,12 +125,12 @@ class Galaxy(AreaItem):
         return star_counter + 1
 
     def set_area_alg(self, star, area, algs: dict) -> None:
-        full_alg = algs.get(star.alg_code, Allegiance(star.alg_code, 'Unknown Allegiance', base=False))
+        full_alg = algs.get(star.alg_code, Allegiance(star.alg_code, 'Unknown Allegiance'))
         base_alg = algs.get(star.alg_base_code, Allegiance(star.alg_base_code, 'Unknown Allegiance', base=True))
 
-        area.alg.setdefault(star.alg_base_code, Allegiance(base_alg.code, base_alg.name, base=True)).worlds.append(star)
+        area.alg.setdefault(star.alg_base_code, Allegiance(base_alg.code, base_alg.name, base=base_alg.base)).worlds.append(star)
         if star.alg_code != star.alg_base_code:
-            area.alg.setdefault(star.alg_code, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
+            area.alg.setdefault(star.alg_code, Allegiance(full_alg.code, full_alg.name, base=full_alg.base)).worlds.append(star)
 
     def set_positions(self) -> None:
         for sector in self.sectors.values():

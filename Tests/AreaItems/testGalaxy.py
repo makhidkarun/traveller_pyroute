@@ -661,3 +661,94 @@ class testGalaxy(baseTest):
         result, msg = galaxy._check_allegiance_counts_well_formed()
         self.assertTrue(result)
         self.assertEqual('', msg)
+
+    def test_set_area_alg_1(self) -> None:
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        star = Star()
+        star.alg_code = 'NA'
+        star.alg_base_code = 'Na'
+        self.assertEqual(0, len(galaxy.alg))
+        galaxy.set_area_alg(star, galaxy, {})
+        self.assertEqual(2, len(galaxy.alg))
+
+        alg: Allegiance = galaxy.alg['NA']
+        self.assertEqual('NA', alg.code)
+        self.assertEqual('Unknown Allegiance', alg.name)
+        self.assertFalse(alg.base)
+        self.assertEqual(1, len(alg.worlds))
+
+        alg: Allegiance = galaxy.alg['Na']
+        self.assertEqual('Na', alg.code)
+        self.assertEqual('Unknown Allegiance', alg.name)
+        self.assertTrue(alg.base)
+        self.assertEqual(1, len(alg.worlds))
+
+    def test_set_area_alg_2(self) -> None:
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        star = Star()
+        star.alg_code = 'NA'
+        star.alg_base_code = 'Na'
+        NA_alg = Allegiance('NA', 'Unknown Allegiance')
+        Na_alg = Allegiance('Na', 'Unknown Allegiance', base=True)
+        self.assertEqual(0, len(galaxy.alg))
+        self.assertEqual(0, len(NA_alg.worlds))
+        self.assertEqual(0, len(Na_alg.worlds))
+
+        galaxy.set_area_alg(star, galaxy, {'NA': NA_alg, 'Na': Na_alg})
+        self.assertEqual(2, len(galaxy.alg))
+
+        alg: Allegiance = galaxy.alg['NA']
+        self.assertEqual('NA', alg.code)
+        self.assertEqual('Unknown Allegiance', alg.name)
+        self.assertFalse(alg.base)
+        self.assertEqual(1, len(alg.worlds))
+
+        alg: Allegiance = galaxy.alg['Na']
+        self.assertEqual('Na', alg.code)
+        self.assertEqual('Unknown Allegiance', alg.name)
+        self.assertTrue(alg.base)
+        self.assertEqual(1, len(alg.worlds))
+
+    def test_set_area_alg_3(self) -> None:
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        star = Star()
+        star.alg_code = 'ImDd'
+        star.alg_base_code = 'Im'
+        NA_alg = Allegiance('ImDd', 'Third Imperium - Domain of Deneb')
+        Na_alg = Allegiance('Im', 'Third Imperium', base=True)
+        self.assertEqual(0, len(galaxy.alg))
+        self.assertEqual(0, len(NA_alg.worlds))
+        self.assertEqual(0, len(Na_alg.worlds))
+
+        galaxy.set_area_alg(star, galaxy, {'ImDd': NA_alg, 'Im': Na_alg})
+        self.assertEqual(2, len(galaxy.alg))
+        alg: Allegiance = galaxy.alg['ImDd']
+        self.assertEqual(1, len(alg.worlds))
+        self.assertEqual('Third Imperium - Domain of Deneb', alg.name)
+        self.assertFalse(alg.base)
+        alg: Allegiance = galaxy.alg['Im']
+        self.assertEqual(1, len(alg.worlds))
+        self.assertEqual('Third Imperium', alg.name)
+        self.assertTrue(alg.base)
+
+    def test_set_area_alg_4(self) -> None:
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        star = Star()
+        star.alg_code = 'ImDd'
+        star.alg_base_code = 'Im'
+        NA_alg = Allegiance('ImDd', 'Third Imperium - Domain of Deneb', base=True)
+        Na_alg = Allegiance('Im', 'Third Imperium', base=True)
+        self.assertEqual(0, len(galaxy.alg))
+        self.assertEqual(0, len(NA_alg.worlds))
+        self.assertEqual(0, len(Na_alg.worlds))
+
+        galaxy.set_area_alg(star, galaxy, {'ImDd': NA_alg, 'Im': Na_alg})
+        self.assertEqual(2, len(galaxy.alg))
+        alg: Allegiance = galaxy.alg['ImDd']
+        self.assertEqual(1, len(alg.worlds))
+        self.assertEqual('Third Imperium - Domain of Deneb', alg.name)
+        self.assertTrue(alg.base)
+        alg: Allegiance = galaxy.alg['Im']
+        self.assertEqual(1, len(alg.worlds))
+        self.assertEqual('Third Imperium', alg.name)
+        self.assertTrue(alg.base)
