@@ -20,7 +20,11 @@ from PyRoute.Calculation.XRouteCalculation import XRouteCalculation
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
+from PyRoute.Position.Hex import Hex
 from PyRoute.StatCalculation import ObjectStatistics
+from PyRoute.SystemData.StarList import StarList
+from PyRoute.SystemData.UWP import UWP
+from PyRoute.TradeCodes import TradeCodes
 from Tests.baseTest import baseTest
 
 
@@ -752,3 +756,40 @@ class testGalaxy(baseTest):
         self.assertEqual(1, len(alg.worlds))
         self.assertEqual('Third Imperium', alg.name)
         self.assertTrue(alg.base)
+
+    def test_add_star_to_galaxy_1(self) -> None:
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.sectors['Core'] = Sector('# Core', '# 0, 0')
+        galaxy.sectors['Core'].subsectors['F'] = Subsector('F', 'F', galaxy.sectors['Core'])
+        galaxy.trade = TradeCalculation(galaxy)
+
+        star = Star()
+        star.hex = Hex(galaxy.sectors['Core'], '1620')
+        star.name = 'Star'
+        star.position = '1620'
+        star.alg_code = 'Na'
+        star.tradeCode = TradeCodes('')
+        star.zone = 'R'
+        star.sector = galaxy.sectors['Core']
+        star.uwp = UWP('???????-?')
+        star.star_list_object = StarList('')
+        self.assertEqual('F', star.subsector())
+
+        result = galaxy.add_star_to_galaxy(star, 1, galaxy.sectors['Core'])
+        self.assertEqual(2, result)
+        self.assertEqual(1, star.index)
+        self.assertTrue(star.is_redzone)
+        self.assertEqual('Na', star.alg_base_code)
+        self.assertEqual(0, len(galaxy.worlds))
+        self.assertEqual(1, len(galaxy.alg['Na'].worlds))
+        self.assertEqual(1, len(galaxy.sectors['Core'].worlds))
+        self.assertEqual(1, len(galaxy.sectors['Core'].subsectors['F'].worlds))
+        self.assertEqual(galaxy.alg['Na'], star.allegiance_base)
+        self.assertEqual(['HumaA'], star.tradeCode.sophont_list)
+
+        msg = None
+        try:
+            galaxy.add_star_to_galaxy(star, 1, galaxy.sectors['Core'])
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star Star (Core 1620) duplicated in sector Core (0,0)', msg)

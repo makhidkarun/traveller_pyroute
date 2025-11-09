@@ -206,7 +206,7 @@ class Galaxy(AreaItem):
         with open(path, "wb") as f:
             nx.write_edgelist(self.stars, f, data=True)
         path = os.path.join(self.output_path, 'borders.txt')
-        encoding = 'utf-8'
+        encoding = 'utf-8'  # pragma: no mutate
         with codecs.open(path, "wb", encoding=encoding) as f:
             for key, value in self.borders.borders.items():
                 f.write("{}-{}: border: {}\n".format(key[0], key[1], value))
