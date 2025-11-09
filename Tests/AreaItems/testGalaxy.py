@@ -3,7 +3,8 @@ Created on Nov 30, 2021
 
 @author: CyberiaResurrection
 """
-from unittest.mock import patch
+import os
+from unittest.mock import patch, call, mock_open
 
 from PyRoute import Star
 from PyRoute.AreaItems.Galaxy import Galaxy
@@ -398,3 +399,150 @@ class testGalaxy(baseTest):
         galaxy = Galaxy(min_btn=15, max_jump=4)
         galaxy.read_sectors(readparms)
         self.assertEqual({}, ParseStarInput.deep_space)
+
+    def test_set_bounding_sectors_1(self) -> None:
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.sectors['Core'] = Sector('# Core', '# 0, 0')
+        galaxy.sectors['Delphi'] = Sector('# Delphi', '# 1,-1')
+        galaxy.sectors['Fornast'] = Sector('# Fornast', '# 1, 0')
+        galaxy.sectors['Massilia'] = Sector('# Massilia', '# 0,-1')
+        galaxy.sectors['Old Expanses'] = Sector('# Old Expanses', '# 1,-2')
+        galaxy.sectors['Diaspora'] = Sector('# Diaspora', '# 0,-2')
+        core = galaxy.sectors['Core']
+        delp = galaxy.sectors['Delphi']
+        forn = galaxy.sectors['Fornast']
+        mass = galaxy.sectors['Massilia']
+        olde = galaxy.sectors['Old Expanses']
+        dias = galaxy.sectors['Diaspora']
+        galaxy.set_bounding_sectors()
+
+        self.assertEqual(mass, core.rimward)
+        self.assertEqual(forn, core.trailing)
+        self.assertEqual(core, forn.spinward)
+        self.assertEqual(delp, forn.rimward)
+        self.assertEqual(core, mass.coreward)
+        self.assertEqual(delp, mass.trailing)
+        self.assertEqual(dias, mass.rimward)
+        self.assertEqual(forn, delp.coreward)
+        self.assertEqual(mass, delp.spinward)
+        self.assertEqual(olde, delp.rimward)
+
+    def test_set_bounding_sectors_2(self) -> None:
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.sectors['Core'] = Sector('# Core', '# 0, 0')
+        galaxy.sectors['Delphi'] = Sector('# Core', '# 0, 0')
+        galaxy.sectors['Diaspora'] = Sector('# Diaspora', '# 0,-2')
+
+        logger = galaxy.logger
+        exp_logs = [
+            'ERROR:PyRoute.Galaxy:Duplicate sector Core and Core'
+        ]
+
+        with self.assertLogs(logger, 'ERROR') as logs:
+            galaxy.set_bounding_sectors()
+            self.assertEqual(exp_logs, logs.output)
+
+    def test_set_positions_1(self) -> None:
+        sourcefile = [
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Core.sec')
+        ]
+
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+
+        args = self._make_args()
+        args.routes = 'trade-mp'
+        args.route_btn = 15
+        args.ru_calc = 'scaled'
+        readparms = ReadSectorOptions(sectors=sourcefile, pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                      route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
+                                      mp_threads=args.mp_threads, debug_flag=True, fix_pop=True,
+                                      deep_space={}, map_type=args.map_type)
+
+        logger = galaxy.logger
+        exp_logs = [
+            'INFO:PyRoute.Galaxy:Sector Core (0,0) loaded 4 worlds',
+            'INFO:PyRoute.Galaxy:Total number of worlds: 4'
+        ]
+        with self.assertLogs(logger, 'INFO') as logs:
+            galaxy.read_sectors(readparms)
+            self.assertEqual(exp_logs, logs.output)
+
+        self.assertEqual(4, len(galaxy.stars))
+        self.assertEqual(4, len(galaxy.ranges))
+        self.assertEqual(4, len(galaxy.historic_costs))
+
+    def test_set_positions_2(self) -> None:
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.sectors['Core'] = Sector('# Core', '# 0, 0')
+
+        galaxy.sectors['Core'].worlds.append('foo')
+        galaxy.star_mapping[0] = 'foo'
+        galaxy.ranges.add_node('foo')
+        galaxy.stars.add_node(0)
+
+        msg = None
+        try:
+            galaxy.set_positions()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star attribute not set for item 0', msg)
+
+    def test_set_positions_3(self) -> None:
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.sectors['Core'] = Sector('# Core', '# 0, 0')
+
+        galaxy.sectors['Core'].worlds.append('foo')
+        galaxy.star_mapping[0] = 'foo'
+        galaxy.ranges.add_node('foo')
+
+        msg = None
+        try:
+            galaxy.set_positions()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Mismatch between shadow stars and stars mapping, 0 and 1', msg)
+
+    def test_write_routes_1(self) -> None:
+        sourcefile = [
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Core.sec')
+        ]
+
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        args = self._make_args()
+        args.routes = 'xroute'
+        args.route_btn = 15
+        args.ru_calc = 'scaled'
+        readparms = ReadSectorOptions(sectors=sourcefile, pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                      route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
+                                      mp_threads=args.mp_threads, debug_flag=True, fix_pop=True,
+                                      deep_space={}, map_type=args.map_type)
+        outpath = galaxy.output_path
+
+        galaxy.read_sectors(readparms)
+        galaxy.set_borders('range', args.ally_match)
+        galaxy.generate_routes()
+        galaxy.trade.calculate_routes()
+        mock_file = mock_open()
+        with patch('builtins.open', mock_file), patch('networkx.write_edgelist') as mock_edge:
+            galaxy.write_routes('xroute')
+            self.assertEqual(4, mock_file.call_count)
+            call_list = mock_file.call_args_list
+            filenames = ['ranges.txt', 'stars.txt', 'borders.txt', 'stations.txt']
+            counter = 0
+            for item in call_list:
+                if 2 > counter:
+                    expected = call(os.path.join(outpath, filenames[counter]), 'wb')
+                else:
+                    expected = call(os.path.join(outpath, filenames[counter]), 'wb', -1)
+                self.assertEqual(expected, item)
+                counter += 1
+            self.assertEqual(2, mock_edge.call_count)
+            call_list = mock_edge.call_args_list
+            self.assertEqual(galaxy.ranges, call_list[0].args[0])
+            self.assertEqual({'data': True}, call_list[0][1])
+            self.assertEqual(galaxy.stars, call_list[1].args[0])
+            self.assertEqual({'data': True}, call_list[1][1])
+            mock_write = mock_file.return_value.write
+            call_list = mock_write.call_args_list
+            self.assertEqual(b"23-9: border: ['red', 'red', 'red']\n", call_list[0].args[0])
+            mock_write.assert_called_with(b'Capital (Core 2118) - 1\n')

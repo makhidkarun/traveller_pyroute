@@ -208,13 +208,14 @@ class Galaxy(AreaItem):
         with open(path, "wb") as f:
             nx.write_edgelist(self.stars, f, data=True)
         path = os.path.join(self.output_path, 'borders.txt')
-        with codecs.open(path, "wb", "utf-8") as f:
+        encoding = 'utf-8'
+        with codecs.open(path, "wb", encoding=encoding) as f:
             for key, value in self.borders.borders.items():
                 f.write("{}-{}: border: {}\n".format(key[0], key[1], value))
 
         if routes == 'xroute':
             path = os.path.join(self.output_path, 'stations.txt')
-            with codecs.open(path, "wb", 'utf-8') as f:
+            with codecs.open(path, "wb", encoding=encoding) as f:
                 stars = [star for star in self.star_mapping.values() if star.tradeCount > 0]
                 for star in stars:
                     f.write("{} - {}\n".format(star, star.tradeCount))
