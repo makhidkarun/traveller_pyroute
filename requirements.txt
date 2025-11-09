@@ -12,6 +12,7 @@ mutmut
 mypy
 numpy == 2.0.0
 pymupdf
+pyfakefs
 pytest >= 8.0.0
 pytest-console-scripts
 pytest-randomly
