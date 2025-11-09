@@ -7,6 +7,7 @@ import os
 from unittest.mock import patch, call, mock_open
 
 from PyRoute import Star
+from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.AreaItems.Subsector import Subsector
@@ -632,3 +633,31 @@ class testGalaxy(baseTest):
                     mock_method.assert_called_with(match, enforce)
                 else:
                     mock_method.assert_not_called()
+
+    def test_check_allegiance_counts_well_formed_1(self) -> None:
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.sectors['Core'] = Sector('# Core', '# 0, 0')
+        galaxy.sectors['Core'].alg['Na'] = Allegiance('Na', 'Non-Aligned, Human dominated')
+
+        result, msg = galaxy._check_allegiance_counts_well_formed()
+        self.assertFalse(result)
+        self.assertEqual('Allegiance Na found in sector Core but not galaxy', msg)
+
+    def test_check_allegiance_counts_well_formed_2(self) -> None:
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.alg['Na'] = Allegiance('Na', 'Non-Aligned, Human dominated')
+        galaxy.alg['Na'].worlds.append('foo')
+        galaxy.sectors['Core'] = Sector('# Core', '# 0, 0')
+        galaxy.sectors['Core'].alg['Na'] = Allegiance('Na', 'Non-Aligned, Human dominated')
+
+        result, msg = galaxy._check_allegiance_counts_well_formed()
+        self.assertFalse(result)
+        self.assertEqual('Allegiance Na has 1 worlds at galaxy, and 0 totalled across sectors', msg)
+
+    def test_check_allegiance_counts_well_formed_3(self) -> None:
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.sectors['Core'] = Sector('# Core', '# 0, 0')
+
+        result, msg = galaxy._check_allegiance_counts_well_formed()
+        self.assertTrue(result)
+        self.assertEqual('', msg)
