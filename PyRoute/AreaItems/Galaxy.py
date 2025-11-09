@@ -266,7 +266,8 @@ class Galaxy(AreaItem):
     def process_owned_worlds(self) -> None:
         ow_names = os.path.join(self.output_path, 'owned-worlds-names.csv')
         ow_list = os.path.join(self.output_path, 'owned-worlds-list.csv')
-        with codecs.open(ow_names, 'w+', encoding="utf-8") as f, codecs.open(ow_list, 'w+', encoding="utf-8") as g:
+        encoding = 'utf-8'  # pragma: no mutate
+        with codecs.open(ow_names, 'w+', encoding=encoding) as f, codecs.open(ow_list, 'w+', encoding=encoding) as g:
 
             for world in self.stars:
                 worldstar = self.star_mapping[world]
