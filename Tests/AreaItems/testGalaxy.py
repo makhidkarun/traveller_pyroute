@@ -722,8 +722,8 @@ class testGalaxy(baseTest):
                         galaxy.set_borders(border_gen, match)
                     self.assertEqual(exp_logs, logs.output)
                 if has_call:
-                    enforce = enforce is not False
-                    mock_method.assert_called_with(match, enforce)
+                    nu_enforce = enforce is not False
+                    mock_method.assert_called_with(match, nu_enforce)
                 else:
                     mock_method.assert_not_called()
 
