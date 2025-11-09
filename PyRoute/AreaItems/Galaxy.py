@@ -197,8 +197,6 @@ class Galaxy(AreaItem):
             self.borders.create_ally_map(match, enforce)
         elif border_gen == 'erode':
             self.borders.create_erode_border(match, enforce)
-        else:
-            pass
 
     def write_routes(self, routes=None) -> None:
         path = os.path.join(self.output_path, 'ranges.txt')

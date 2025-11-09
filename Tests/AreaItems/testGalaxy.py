@@ -459,6 +459,7 @@ class testGalaxy(baseTest):
                                       deep_space={}, map_type=args.map_type)
 
         logger = galaxy.logger
+        logger.manager.disable = 0
         exp_logs = [
             'INFO:PyRoute.Galaxy:Sector Core (0,0) loaded 4 worlds',
             'INFO:PyRoute.Galaxy:Total number of worlds: 4'
@@ -546,3 +547,38 @@ class testGalaxy(baseTest):
             call_list = mock_write.call_args_list
             self.assertEqual(b"23-9: border: ['red', 'red', 'red']\n", call_list[0].args[0])
             mock_write.assert_called_with(b'Capital (Core 2118) - 1\n')
+
+    def test_set_borders_1(self) -> None:
+        cases = [
+            ('range', 'fixed', True, 'create_borders'),
+            ('range', 'fixed', False, 'create_borders'),
+            ('range', 'fixed', None, 'create_borders'),
+            ('foo', 'fixed', None, 'create_borders'),
+            ('allygen', 'fixed', True, 'create_ally_map'),
+            ('allygen', 'fixed', False, 'create_ally_map'),
+            ('allygen', 'fixed', None, 'create_ally_map'),
+            ('erode', 'fixed', True, 'create_erode_border'),
+            ('erode', 'fixed', False, 'create_erode_border'),
+            ('erode', 'fixed', None, 'create_erode_border'),
+        ]
+
+        for border_gen, match, enforce, method_name in cases:
+            with self.subTest(border_gen + " " + match + " " + str(enforce)):
+                has_call = border_gen in ['range', 'allygen', 'erode']
+
+                galaxy = Galaxy(min_btn=15, max_jump=4)
+                logger = galaxy.logger
+                logger.manager.disable = 0
+                exp_logs = ['INFO:PyRoute.Galaxy:setting borders...']
+
+                with patch.object(galaxy.borders, method_name) as mock_method, self.assertLogs(logger, 'INFO') as logs:
+                    if enforce is not None:
+                        galaxy.set_borders(border_gen, match, enforce)
+                    else:
+                        galaxy.set_borders(border_gen, match)
+                    self.assertEqual(exp_logs, logs.output)
+                if has_call:
+                    enforce = enforce is not False
+                    mock_method.assert_called_with(match, enforce)
+                else:
+                    mock_method.assert_not_called()
