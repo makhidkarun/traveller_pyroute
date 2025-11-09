@@ -4,7 +4,7 @@ Created on Nov 30, 2021
 @author: CyberiaResurrection
 """
 import os
-from unittest.mock import patch, call, mock_open
+from unittest.mock import patch, call, mock_open, MagicMock
 
 from PyRoute import Star
 from PyRoute.AreaItems.Allegiance import Allegiance
@@ -58,9 +58,98 @@ class testGalaxy(baseTest):
         }
         self.assertEqual(exp_dict, galaxy.__getstate__())
 
-    def test_is_well_formed(self) -> None:
+    def test_is_well_formed_1(self) -> None:
         galaxy = Galaxy(0)
         galaxy.is_well_formed()
+
+    def test_is_well_formed_2(self) -> None:
+        galaxy = Galaxy(0)
+        galaxy.sectors['Foo'] = 'Bar'
+
+        msg = None
+        try:
+            galaxy.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Galaxy sectors must be instance of Sector object', msg)
+
+    def test_is_well_formed_3(self) -> None:
+        galaxy = Galaxy(0)
+        galaxy.alg['Foo'] = 'Bar'
+
+        msg = None
+        try:
+            galaxy.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Galaxy allegiances must be instance of Allegiance object', msg)
+
+    def test_is_well_formed_4(self) -> None:
+        galaxy = Galaxy(0)
+        galaxy.stars.add_node('Foo')
+
+        msg = None
+        try:
+            galaxy.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star nodes must be integers', msg)
+
+    def test_is_well_formed_5(self) -> None:
+        galaxy = Galaxy(0)
+        galaxy.stars.add_node(0)
+
+        msg = None
+        try:
+            galaxy.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star attribute not set for item 0', msg)
+
+    def test_is_well_formed_6(self) -> None:
+        galaxy = Galaxy(0)
+        sector = Sector('# Foo', '# 0, 0')
+        retval = (False, "Dummy message")
+        sector.is_well_formed = MagicMock(return_value=retval)
+        galaxy.sectors['Foo'] = sector
+
+        msg = None
+        try:
+            galaxy.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Dummy message', msg)
+        sector.is_well_formed.assert_called()
+
+    def test_is_well_formed_7(self) -> None:
+        galaxy = Galaxy(0)
+        alg = Allegiance('Foo', '# 0, 0')
+        retval = (False, "Dummy message")
+        alg.is_well_formed = MagicMock(return_value=retval)
+        galaxy.alg['Foo'] = alg
+
+        msg = None
+        try:
+            galaxy.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Dummy message', msg)
+        alg.is_well_formed.assert_called()
+
+    def test_is_well_formed_8(self) -> None:
+        galaxy = Galaxy(0)
+        star = Star()
+        star.is_well_formed = MagicMock(side_effect=AssertionError('Dummy message'))
+
+        msg = None
+        try:
+            galaxy.stars.add_node(0, star=star)
+            galaxy.star_mapping[0] = star
+            galaxy.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Dummy message', msg)
+        star.is_well_formed.assert_called()
 
     """
     A very simple, barebones test to check that Verge and Reft end up in their correct relative positions
