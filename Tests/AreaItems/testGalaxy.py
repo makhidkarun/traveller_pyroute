@@ -6,11 +6,38 @@ Created on Nov 30, 2021
 
 import unittest
 
+from PyRoute import Star
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Sector import Sector
+from PyRoute.AreaItems.Subsector import Subsector
+from PyRoute.Calculation.NoneCalculation import NoneCalculation
+from PyRoute.StatCalculation import ObjectStatistics
+from PyRoute.Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
 
 
 class testGalaxy(unittest.TestCase):
+
+    def test_get_state(self) -> None:
+        galaxy = Galaxy(0)
+        exp_dict = {
+            '_wiki_name': '[[Charted Space]]',
+            'alg': {},
+            'big_component': None,
+            'debug_flag': False,
+            'historic_costs': None,
+            'max_jump_range': 4,
+            'min_btn': 0,
+            'name': 'Charted Space',
+            'output_path': 'maps',
+            'star_mapping': {},
+            'stats': ObjectStatistics(),
+            'worlds': []
+        }
+        self.assertEqual(exp_dict, galaxy.__getstate__())
+
+    def test_is_well_formed(self) -> None:
+        galaxy = Galaxy(0)
+        galaxy.is_well_formed()
 
     """
     A very simple, barebones test to check that Verge and Reft end up in their correct relative positions
@@ -95,3 +122,41 @@ class testGalaxy(unittest.TestCase):
         self.assertIsNone(galaxy.sectors[dagudashaag.name].rimward, "Nothing should be rimward of Dagudashaag")
         self.assertIsNone(galaxy.sectors[dagudashaag.name].spinward, "Nothing should be spinward of Dagudashaag")
         self.assertEqual(galaxy.sectors[core.name], galaxy.sectors[dagudashaag.name].trailing, "Core should be trailing of Dagudashaag")
+
+    def test_add_star_to_galaxy(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        subs = Subsector('Foobar', 'A', sector)
+        sector.subsectors['A'] = subs
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+
+        galaxy = Galaxy(0)
+        galaxy.trade = NoneCalculation(galaxy)
+        galaxy.sectors['Core'] = sector
+        final = galaxy.add_star_to_galaxy(star1, 1, sector)
+        self.assertEqual(2, final)
+        galaxy.set_positions()
+        self.assertIsInstance(galaxy.historic_costs, RouteLandmarkGraph)
+
+    def test_process_eti(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        subs = Subsector('Foobar', 'A', sector)
+        sector.subsectors['A'] = subs
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+        star2 = Star.parse_line_into_star(
+            "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+            sector, 'fixed', 'fixed')
+
+        galaxy = Galaxy(0)
+        galaxy.trade = NoneCalculation(galaxy)
+        galaxy.sectors['Core'] = sector
+        galaxy.add_star_to_galaxy(star1, 1, sector)
+        galaxy.add_star_to_galaxy(star2, 2, sector)
+        galaxy.stars.add_edge(1, 2, btn=0)
+        galaxy.process_eti()
+        edge = galaxy.stars.get_edge_data(1, 2)
+        self.assertEqual(0, edge['CargoTradeIndex'])
+        self.assertEqual(0, edge['PassTradeIndex'])

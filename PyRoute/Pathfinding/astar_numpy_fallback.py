@@ -58,6 +58,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=f
 
     # pre-calc heuristics for all nodes to the target node
     potentials = bulk_heuristic(target)
+    if potentials is None:
+        raise ValueError("Bulk heuristic function cannot be None")
 
     # The queue stores priority, cost to reach, node,  and parent.
     # Uses Python heapq to keep in priority order.

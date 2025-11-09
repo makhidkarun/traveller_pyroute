@@ -133,7 +133,6 @@ class Galaxy(AreaItem):
             area.alg.setdefault(star.alg_code, Allegiance(full_alg.code, full_alg.name, base=False)).worlds.append(star)
 
     def set_positions(self) -> None:
-        shadow_len = self.stars.number_of_nodes()
         for sector in self.sectors.values():
             for star in sector.worlds:
                 if star not in self.ranges:

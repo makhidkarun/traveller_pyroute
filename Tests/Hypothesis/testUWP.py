@@ -12,7 +12,7 @@ class testUWP(unittest.TestCase):
     Given an otherwise valid input string, ensure the resulting UWP's string representation has no lowercase elements
     """
     @given(from_regex(UWP.match), none())
-    @settings(suppress_health_check=[HealthCheck(10)])
+    @settings(suppress_health_check=[HealthCheck(2), HealthCheck(3), HealthCheck(10)])
     @example('?000000-0', True)
     @example('?000000-00', True)
     @example('?000000-a', True)
