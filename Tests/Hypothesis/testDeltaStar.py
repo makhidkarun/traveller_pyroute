@@ -572,6 +572,95 @@ class testDeltaStar(unittest.TestCase):
         second_round = nu_foo.parse_to_line()
         self.assertEqual(first_round, second_round, 'Canonicalisation should be idempotent.\nHypothesis input: ' + starline + '\n')
 
+    # @staticmethod
+    # @given(mixed_starline())
+    # @settings(
+    #     suppress_health_check=[HealthCheck(3), HealthCheck(2), HealthCheck(10)],  # suppress slow-data health check, too-much filtering
+    #     deadline=timedelta(1000))
+    # @example('0101 000000000000000 F2G0700-3 000000000000000 {0} -  [0600] B A A 000 0 00')
+    # @example("0140 000000000000000 D33A710-5 000000000000000       - - A 000   00")
+    # @example('0140 000000000000000 ???????-? 000000000000000       De     - A   000   00')
+    # @example('0140 000000000000000 B2a1710-7 Ba Lo Ni Ph Hi        - - A 000   00')
+    # def test_static_canonicalise_messages(s) -> None:
+    #     allowed_messages = [
+    #         'EX Calculated infrastructure',
+    #         'EX Calculated labor',
+    #         'CX Calculated acceptance',
+    #         'CX Calculated symbols',
+    #         'CX Calculated strangeness',
+    #         'CX Calculated homogeneity',
+    #         'Found invalid "Pr" in trade',
+    #         'Found invalid "De" in trade',
+    #         'Found invalid "As" in trade',
+    #         'Found invalid "De" in trade',
+    #         'Found invalid "Ga" in trade',
+    #         'Found invalid "Fl" in trade',
+    #         'Found invalid "Ic" in trade',
+    #         'Found invalid "Po" in trade',
+    #         'Found invalid "He" in trade',
+    #         'Found invalid "Ba" code',
+    #         'Found invalid "Lo" code',
+    #         'Found invalid "Ni" code',
+    #         'Found invalid "Ph" code',
+    #         'Found invalid "Hi" code',
+    #         'Calculated "Pa" not in trade',
+    #         'Calculated "Ri" not in trade',
+    #         'Calculated "Ph" not in trade',
+    #         'Calculated "As" not in trade',
+    #         'Calculated "Va" not in trade',
+    #         'Calculated "Ba" not in trade',
+    #         'Calculated "Po" not in trade',
+    #         'Calculated "He" not in trade',
+    #         'Calculated "Lo" not in trade',
+    #         'Calculated "Ni" not in trade',
+    #         'Calculated "Na" not in trade',
+    #         'Calculated "Pi" not in trade',
+    #         'Calculated "De" not in trade',
+    #         'Calculated "Pr" not in trade',
+    #         'Calculated "Hi" not in trade',
+    #         'Calculated "Wa" not in trade',
+    #         'Calculated "Oc" not in trade',
+    #         'Calculated "Fl" not in trade',
+    #         'Found invalid "Hi" code on world with 8',
+    #         'Calculated TL',
+    #         'EX Calculated efficiency 0 should be',
+    #         'CX Calculated symbols 9 should be 0 for barren worlds',
+    #         'CX Calculated symbols 8 should be 0 for barren worlds',
+    #         'CX Calculated symbols 7 should be 0 for barren worlds',
+    #         'CX Calculated symbols 6 should be 0 for barren worlds',
+    #         'CX Calculated symbols 5 should be 0 for barren worlds',
+    #         'CX Calculated symbols 4 should be 0 for barren worlds',
+    #         'CX Calculated symbols 3 should be 0 for barren worlds',
+    #         'CX Calculated symbols 2 should be 0 for barren worlds',
+    #         'CX Calculated symbols 1 should be 0 for barren worlds',
+    #     ]
+    #
+    #     sector = Sector("# dummy", "# 0, 0")
+    #     star = None
+    #     try:
+    #         star = DeltaStar.parse_line_into_star(s, sector, "fixed", "fixed")
+    #     except IndexError:
+    #         pass
+    #     assume(star is not None)
+    #     raw_msg = []
+    #     actual, raw_msg = star.check_canonical()
+    #     assume(actual is False)
+    #     msg = []
+    #     act_msg = []
+    #     for item in raw_msg:
+    #         match = False
+    #         # if spins thru allowed_messages and NO match, add
+    #         for exp_item in allowed_messages:
+    #             if exp_item in item:
+    #                 match = True
+    #                 act_msg.append(item)
+    #                 break
+    #         if not match:
+    #             msg.append(item)
+    #     assume(1 > len(act_msg))
+    #     #self.assertEqual([], msg, "Hypothesis line: " + s + " contains new canonicalisation message")
+    #     assert [] == msg, "Hypothesis line: " + s + " contains new canonicalisation message"
+
 
 if __name__ == '__main__':
     unittest.main()

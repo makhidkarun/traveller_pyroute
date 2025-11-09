@@ -506,13 +506,14 @@ class Star(object):
                 format(self, homogeneity, max(1, pop - 5), pop + 5))
 
         acceptance = self._ehex_to_int(self.social[2])  # pop + Ix, min 1
+        pop_plus_imp = min(33, max(1, pop + self.importance))  # Cap out at 33 - converts to ehex as Z
         if pop == 0 and acceptance != 0:
             self.logger.warning(
                 '{} - CX Calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
-        elif pop != 0 and max(1, pop + self.importance) != acceptance:
+        elif pop != 0 and pop_plus_imp != acceptance:
             self.logger.warning(
                 '{} - CX Calculated acceptance {} does not match generated acceptance {}'.
-                format(self, acceptance, max(1, pop + self.importance)))
+                format(self, acceptance, pop_plus_imp))
 
         strangeness = self._ehex_to_int(self.social[3])  # flux + 5
         if pop == 0 and strangeness != 0:
