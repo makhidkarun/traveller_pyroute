@@ -158,7 +158,7 @@ class testGalaxy(baseTest):
         galaxy.set_positions()
         self.assertIsInstance(galaxy.historic_costs, RouteLandmarkGraph)
 
-    def test_process_eti(self) -> None:
+    def test_process_eti_1(self) -> None:
         ParseStarInput.deep_space = {}
         sector = Sector('# Core', '# 0, 0')
         subs = Subsector('Foobar', 'A', sector)
@@ -176,10 +176,60 @@ class testGalaxy(baseTest):
         galaxy.add_star_to_galaxy(star1, 1, sector)
         galaxy.add_star_to_galaxy(star2, 2, sector)
         galaxy.stars.add_edge(1, 2, btn=0)
-        galaxy.process_eti()
+        logger = galaxy.logger
+        logger.manager.disable = 0
+        exp_logs = ['INFO:PyRoute.Galaxy:Processing ETI for worlds']
+
+        with self.assertLogs(logger, 'INFO') as logs:
+            galaxy.process_eti()
+            self.assertEqual(exp_logs, logs.output)
         edge = galaxy.stars.get_edge_data(1, 2)
         self.assertEqual(0, edge['CargoTradeIndex'])
         self.assertEqual(0, edge['PassTradeIndex'])
+
+    def test_process_eti_2(self) -> None:
+        ParseStarInput.deep_space = {}
+        sourcefile = [self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Core.sec')]
+
+        args = self._make_args()
+        args.routes = 'trade'
+        args.route_btn = 15
+        readparms = ReadSectorOptions(sectors=sourcefile, pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                      route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
+                                      mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=False,
+                                      deep_space={}, map_type=args.map_type)
+
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.read_sectors(readparms)
+        galaxy.stars.add_node(0, star=galaxy.star_mapping[0])
+        galaxy.stars.add_node(1, star=galaxy.star_mapping[1])
+        galaxy.stars.add_node(2, star=galaxy.star_mapping[2])
+        galaxy.stars.add_node(3, star=galaxy.star_mapping[3])
+        galaxy.stars.add_edge(0, 1)
+        galaxy.stars.add_edge(0, 2)
+        galaxy.stars.add_edge(0, 3)
+        galaxy.stars.add_edge(1, 2)
+        galaxy.stars.add_edge(1, 3)
+        galaxy.stars.add_edge(2, 3)
+        galaxy.star_mapping[0].eti_cargo += 3
+        galaxy.star_mapping[1].eti_cargo += 3
+        galaxy.star_mapping[2].eti_cargo += 3
+        galaxy.star_mapping[3].eti_cargo += 3
+        galaxy.star_mapping[0].eti_passenger += 3
+        galaxy.star_mapping[1].eti_passenger += 3
+        galaxy.star_mapping[2].eti_passenger += 3
+        galaxy.star_mapping[3].eti_passenger += 3
+
+        galaxy.process_eti()
+        cargo = {0: 10001000.0, 1: 10000100.0, 2: 0, 3: 1100.0}
+        pax = {0: 250250.0, 1: 250025.0, 2: 0, 3: 275.0}
+        worlds = {0: 2, 1: 2, 2: 0, 3: 2}
+
+        for item in galaxy.star_mapping:
+            worldstar: Star = galaxy.star_mapping[item]
+            self.assertEqual(worlds[item], worldstar.eti_worlds, item)
+            self.assertEqual(cargo[item], worldstar.eti_cargo_volume, item)
+            self.assertEqual(pax[item], worldstar.eti_pass_volume, item)
 
     def test_set_trade_object(self) -> None:
         cases = [
