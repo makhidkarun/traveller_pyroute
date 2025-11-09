@@ -9,10 +9,14 @@ from PyRoute.Pathfinding.LandmarkSchemes.LandmarksQExtremes import LandmarksQExt
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarksRExtremes import LandmarksRExtremes
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarksSExtremes import LandmarksSExtremes
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from Tests.baseTest import baseTest
 
 
 class testLandmarksExtremes(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
 
     def test_q_extremes_of_zarushagar(self) -> None:
         sourcefile = self.unpack_filename('../DeltaFiles/Zarushagar.sec')

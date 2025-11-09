@@ -7,10 +7,14 @@ import tempfile
 
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from Tests.baseTest import baseTest
 
 
 class testBordersRegression(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
 
     def test_border_regression_zdiedeiant_sector_minimised(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/border_blowup_1/Zdiedeiant.sec')

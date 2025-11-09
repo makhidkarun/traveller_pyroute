@@ -4,10 +4,15 @@ from PyRoute.Calculation.TradeCalculation import TradeCalculation
 
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Star import Star
 
 
 class testTradeCalculation(unittest.TestCase):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
+
     def test_negative_route_weight_trips_assertion(self) -> None:
         expected = 'Weight of edge between Irkigkhan (Core 0103) and Irkigkhan (Core 0103) must be positive'
         actual = None

@@ -16,6 +16,7 @@ from PyRoute.Calculation.TradeCalculation import TradeCalculation
 from PyRoute.Calculation.TradeMPCalculation import TradeMPCalculation
 from PyRoute.Calculation.XRouteCalculation import XRouteCalculation
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
 from PyRoute.StatCalculation import ObjectStatistics
 from Tests.baseTest import baseTest
@@ -25,6 +26,7 @@ class testGalaxy(baseTest):
 
     def setUp(self) -> None:
         self.reset_logging()
+        ParseStarInput.deep_space = None
 
     def test_init_blank(self) -> None:
         galaxy = Galaxy(8)
@@ -139,6 +141,7 @@ class testGalaxy(baseTest):
         self.assertEqual(galaxy.sectors[core.name], galaxy.sectors[dagudashaag.name].trailing, "Core should be trailing of Dagudashaag")
 
     def test_add_star_to_galaxy(self) -> None:
+        ParseStarInput.deep_space = {}
         sector = Sector('# Core', '# 0, 0')
         subs = Subsector('Foobar', 'A', sector)
         sector.subsectors['A'] = subs
@@ -155,6 +158,7 @@ class testGalaxy(baseTest):
         self.assertIsInstance(galaxy.historic_costs, RouteLandmarkGraph)
 
     def test_process_eti(self) -> None:
+        ParseStarInput.deep_space = {}
         sector = Sector('# Core', '# 0, 0')
         subs = Subsector('Foobar', 'A', sector)
         sector.subsectors['A'] = subs
@@ -292,3 +296,105 @@ class testGalaxy(baseTest):
                 self.assertEqual(none_owned[item], check, 'Bad ownership choices for ' + str(item))
             else:
                 self.assertEqual(worldstar, worldstar.ownedBy, 'Bad ownership choices for ' + str(item))
+
+    def test_read_sectors_1(self) -> None:
+        readparms = 'foobar'
+        msg = None
+        galaxy = Galaxy(8)
+        try:
+            galaxy.read_sectors(readparms)
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('options parm not ReadSectorOptions, is str', msg)
+
+    def test_read_sectors_2(self) -> None:
+        sourcefile = [
+            self.unpack_filename('DeltaFiles/ReadSectorsDummy1.sec'),
+            self.unpack_filename('DeltaFiles/ReadSectorsDummy2.sec'),
+            self.unpack_filename('DeltaFiles/ReadSectorsDummy2.sec'),
+            self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec'),
+            self.unpack_filename('DeltaFiles/Dagudashaag-Bolivar.sec'),
+        ]
+
+        source2 = sourcefile[2]
+        source2 = source2.replace('2', '3')
+        sourcefile.append(source2)
+
+        args = self._make_args()
+        args.routes = 'trade-mp'
+        args.route_btn = 15
+        args.ru_calc = 'scaled'
+        readparms = ReadSectorOptions(sectors=sourcefile, pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                      route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
+                                      mp_threads=args.mp_threads, debug_flag=True, fix_pop=True,
+                                      deep_space='foobar', map_type=args.map_type)
+
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        logger = galaxy.logger
+        logger.manager.disable = 0
+
+        exp_logs = [
+            'INFO:PyRoute.Galaxy:Sector Downtown Woop Woop (-999,-999) loaded 0 worlds',
+            'INFO:PyRoute.Galaxy:Sector Zarushagar (-1,-1) loaded 37 worlds',
+            'INFO:PyRoute.Galaxy:Sector Dagudashaag (-1,0) loaded 29 worlds',
+            'INFO:PyRoute.Galaxy:Total number of worlds: 66',
+            "DEBUG:PyRoute.Galaxy:Allegiances: dict_keys(['CsIm', 'Im', 'ImDi', 'NaHu', 'ImAp', 'ImDv', 'ImLc'])"
+        ]
+
+        with self.assertLogs(logger, 'DEBUG') as logs:
+            galaxy.read_sectors(readparms)
+            output = logs.output
+            output = [item for item in output if 'reading ' not in item]
+            errorput = [item for item in output if 'ERROR' in item]
+            output = [item for item in output if 'ERROR' not in item]
+            self.assertEqual(exp_logs, output)
+            self.assertEqual(2, len(errorput))
+            self.assertIn('loads duplicate sector Downtown Woop Woop (-999,-999)', errorput[0])
+            self.assertIn('ReadSectorsDummy3.sec not found', errorput[1])
+
+        self.assertEqual({}, ParseStarInput.deep_space)
+
+        trade = galaxy.trade
+        self.assertIsInstance(trade, TradeMPCalculation, "Bad trade type")
+        self.assertEqual(readparms.route_reuse, trade.route_reuse)
+        self.assertEqual(readparms.route_btn, trade.min_wtn)
+        self.assertEqual(readparms.mp_threads, trade.mp_threads)
+        self.assertEqual(readparms.debug_flag, trade.debug_flag)
+
+        zaru = galaxy.sectors['Zarushagar']
+        dagu = galaxy.sectors['Dagudashaag']
+
+        self.assertEqual(dagu, zaru.coreward, "Coreward sector of Zarushagar not set")
+        self.assertEqual(zaru, dagu.rimward, "Rimward sector of Dagudashaag not set")
+
+        ru_stat = {
+            0: 1274, 1: 4, 2: 3960, 3: 842, 4: 220, 5: 924, 6: 160, 7: 216, 8: 6720, 9: 346, 10: 6, 11: 160, 12: 4,
+            13: 15, 14: 50, 15: 264, 16: 5, 17: 862, 18: 8400, 19: 2, 20: 420, 21: 2, 22: 10, 23: 1152, 24: 270, 25: 16,
+            26: 924, 27: 225, 28: 11, 29: 2, 30: 5, 31: 288, 32: 16, 33: 198, 34: 8820, 35: 1248, 36: 5, 37: 5, 38: 5,
+            39: 198, 40: 72, 41: 210, 42: 10240, 43: 28, 44: 108, 45: 704, 46: 60, 47: 480, 48: 192, 49: 3, 50: 18,
+            51: 10, 52: 3, 53: 11, 54: 900, 55: 1404, 56: 2184, 57: 504, 58: 7200, 59: 3, 60: 4, 61: 32, 62: 20,
+            63: 975, 64: 8, 65: 67
+        }
+
+        for item in galaxy.star_mapping:
+            worldstar: Star = galaxy.star_mapping[item]
+            self.assertEqual(ru_stat[item], worldstar.ru, "Bad ru count for " + str(item))
+
+        worldstar: Star = galaxy.star_mapping[37]
+        self.assertEqual('Da Lo', str(worldstar.tradeCode))
+
+    def test_read_sectors_3(self) -> None:
+        sourcefile = []
+
+        args = self._make_args()
+        args.routes = 'trade-mp'
+        args.route_btn = 15
+        args.ru_calc = 'scaled'
+        readparms = ReadSectorOptions(sectors=sourcefile, pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                      route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
+                                      mp_threads=args.mp_threads, debug_flag=True, fix_pop=True,
+                                      deep_space=None, map_type=args.map_type)
+
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.read_sectors(readparms)
+        self.assertEqual({}, ParseStarInput.deep_space)

@@ -5,12 +5,17 @@ Created on Mar 19, 2024
 """
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from Tests.baseTest import baseTest
 
 
 class testDistanceGraph(baseTest):
-    def test_min_cost_in_single_component(self) -> None:
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
+
+    def test_min_cost_in_single_component_1(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
         galaxy, graph, _, _ = self._setup_graph(sourcefile)
         components = galaxy.trade.components

@@ -12,6 +12,7 @@ import numpy as np
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
@@ -24,6 +25,9 @@ from Tests.baseTest import baseTest
 
 
 class testApproximateShortestPathForest(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
 
     def test_trixial_bounds_in_bulk_unified(self) -> None:
         galaxy = self.set_up_zarushagar_sector()

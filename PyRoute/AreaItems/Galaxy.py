@@ -83,7 +83,7 @@ class Galaxy(AreaItem):
         star_counter = 0
         loaded_sectors: set[str] = set()
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
-        ParseStarInput.deep_space = {} if (options.deep_space is None or not isinstance(options.deep_space, dict)) else options.deep_space
+        ParseStarInput.deep_space = {} if not isinstance(options.deep_space, dict) else options.deep_space
         logger = self.logger
         for sector in sectors:
             headers, starlines = ParseSectorInput.read_sector_file(sector, logger)
@@ -103,7 +103,7 @@ class Galaxy(AreaItem):
         self.set_bounding_sectors()
         self.set_bounding_subsectors()
         self.set_positions()
-        self.logger.debug("Allegiances: {}".format(self.alg))
+        self.logger.debug("Allegiances: {}".format(self.alg.keys()))
 
     def add_star_to_galaxy(self, star: Star, star_counter: int, sec: Sector) -> int:
         assert star not in sec.worlds, "Star " + str(star) + " duplicated in sector " + str(sec)

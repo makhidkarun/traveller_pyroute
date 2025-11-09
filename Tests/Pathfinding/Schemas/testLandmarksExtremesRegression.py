@@ -6,10 +6,14 @@ Created on 05 Sep, 2024
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarksTriaxialExtremes import LandmarksTriaxialExtremes
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from Tests.baseTest import baseTest
 
 
 class testLandmarksExtremesRegression(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
 
     def testZeroArgsInTransposeLandmarks(self) -> None:
         sourcefile = self.unpack_filename('../DeltaFiles/zero_arg_in_transpose_landmarks/Bar\'kakr.sec')

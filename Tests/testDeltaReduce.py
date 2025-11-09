@@ -6,6 +6,7 @@ import unittest
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.DeltaDebug.DeltaReduce import DeltaReduce
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
@@ -18,6 +19,10 @@ from Tests.baseTest import baseTest
 
 
 class testDeltaReduce(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
+
     def test_subsector_reduction(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Dagudashaag-spiked.sec')
 

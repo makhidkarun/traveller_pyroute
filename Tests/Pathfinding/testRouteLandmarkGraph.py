@@ -7,11 +7,15 @@ import numpy as np
 
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
 from Tests.baseTest import baseTest
 
 
 class testRouteLandmarkGraph(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
 
     def test_subscript_bad(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')

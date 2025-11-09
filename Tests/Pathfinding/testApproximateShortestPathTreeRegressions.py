@@ -5,6 +5,7 @@ import unittest
 
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 try:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
 except ModuleNotFoundError:
@@ -17,6 +18,10 @@ from Tests.baseTest import baseTest
 
 
 class testApproximateShortestPathTreeRegressions(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
+
     def test_restart_blowup(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/dijkstra_restart_blowup/Lishun.sec')
 
