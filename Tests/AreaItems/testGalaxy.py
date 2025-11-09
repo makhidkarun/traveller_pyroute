@@ -3,19 +3,34 @@ Created on Nov 30, 2021
 
 @author: CyberiaResurrection
 """
-
-import unittest
+from unittest.mock import patch
 
 from PyRoute import Star
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.AreaItems.Subsector import Subsector
+from PyRoute.Calculation.CommCalculation import CommCalculation
 from PyRoute.Calculation.NoneCalculation import NoneCalculation
-from PyRoute.StatCalculation import ObjectStatistics
+from PyRoute.Calculation.OwnedWorldCalculation import OwnedWorldCalculation
+from PyRoute.Calculation.TradeCalculation import TradeCalculation
+from PyRoute.Calculation.TradeMPCalculation import TradeMPCalculation
+from PyRoute.Calculation.XRouteCalculation import XRouteCalculation
+from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
+from PyRoute.StatCalculation import ObjectStatistics
+from Tests.baseTest import baseTest
 
 
-class testGalaxy(unittest.TestCase):
+class testGalaxy(baseTest):
+
+    def setUp(self) -> None:
+        self.reset_logging()
+
+    def test_init_blank(self) -> None:
+        galaxy = Galaxy(8)
+        self.assertEqual('PyRoute.Galaxy', galaxy.logger.name)
+        self.assertEqual({}, galaxy.sectors)
+        self.assertEqual('[[Charted Space]]', galaxy.borders.galaxy._wiki_name)
 
     def test_get_state(self) -> None:
         galaxy = Galaxy(0)
@@ -160,3 +175,120 @@ class testGalaxy(unittest.TestCase):
         edge = galaxy.stars.get_edge_data(1, 2)
         self.assertEqual(0, edge['CargoTradeIndex'])
         self.assertEqual(0, edge['PassTradeIndex'])
+
+    def test_set_trade_object(self) -> None:
+        cases = [
+            ('trade', TradeCalculation, 10),
+            ('trade-mp', TradeMPCalculation, 10),
+            ('comm', CommCalculation, 10),
+            ('xroute', XRouteCalculation, 5),
+            ('none', NoneCalculation, 10),
+            ('owned', OwnedWorldCalculation, 10)
+        ]
+
+        for routes, exp_type, exp_reuse in cases:
+            with self.subTest(routes):
+                galaxy = Galaxy(8)
+                galaxy._set_trade_object(10, routes, 8, 1, False)
+                self.assertIsInstance(galaxy.trade, exp_type)
+                galaxy._set_trade_object(10, routes, 8, 1, False)
+                self.assertIsInstance(galaxy.trade, exp_type)
+                self.assertEqual(exp_reuse, galaxy.trade.route_reuse)
+                if 'trade_mp' == routes:
+                    self.assertEqual(1, galaxy.trade.mp_threads)
+                    self.assertEqual(8, galaxy.trade.route_btn)
+                elif 'trade' == routes:
+                    self.assertEqual(8, galaxy.trade.min_btn)
+
+    def test_process_owned_worlds_1(self) -> None:
+        sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
+
+        args = self._make_args()
+        args.routes = 'trade'
+        args.route_btn = 15
+        readparms = ReadSectorOptions(sectors=[sourcefile], pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                      route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
+                                      mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=False,
+                                      deep_space={}, map_type=args.map_type)
+
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.read_sectors(readparms)
+        galaxy.generate_routes()
+        galaxy.output_path = args.output
+        galaxy.set_borders(args.borders, args.ally_match)
+
+        foostar = galaxy.star_mapping[24]
+        foostar.ownedBy = 'Dagu-0'
+        barstar = galaxy.star_mapping[23]
+        barstar.ownedBy = 'Re'
+        barstar = galaxy.star_mapping[22]
+        barstar.ownedBy = 'Px'
+
+        logger = galaxy.logger
+        logger.manager.disable = 0
+        exp_logs = [
+            'DEBUG:PyRoute.Galaxy:Worlds Woden (Zarushagar 0306) is owned by Mr',
+            'DEBUG:PyRoute.Galaxy:Worlds Villenuve (Zarushagar 0507) is owned by Px',
+            'DEBUG:PyRoute.Galaxy:Worlds Toulon-Cadiz (Zarushagar 0510) is owned by Re',
+            'DEBUG:PyRoute.Galaxy:World Aslungi (Zarushagar 0605)@(6,5) owned by Dagu - 0',
+            'DEBUG:PyRoute.Galaxy:Worlds Aslungi (Zarushagar 0605) is owned by None',
+            'DEBUG:PyRoute.Galaxy:Worlds Airvae (Zarushagar 0801) is owned by Mr',
+            'DEBUG:PyRoute.Galaxy:Worlds Ginshe (Zarushagar 0805) is owned by Gishin (Zarushagar 0804)'
+        ]
+
+        with patch('builtins.open', create=True) as mock_file, self.assertLogs(logger, 'DEBUG') as logs:
+            galaxy.process_owned_worlds()
+            mock_file.assert_called()
+            self.assertEqual(2, mock_file.call_count)
+            exp_1 = args.output + "/owned-worlds-names.csv"
+            exp_2 = args.output + "/owned-worlds-list.csv"
+            mock_file.assert_any_call(exp_1, 'w+b', -1)
+            mock_file.assert_any_call(exp_2, 'w+b', -1)
+
+            self.assertEqual(exp_logs, logs.output)
+
+        milrule = {
+            11: [18, 17, 26, 9], 31: [34, 27]
+        }
+        owned = {
+            35: (34, [34, 26, 18, 17]),
+        }
+        none_owned = {
+            24: [34, 26, 18, 17]
+        }
+        re_owned = {
+            23: [18, 26, 2, 3]
+        }
+        px_owned = {
+            22: [18, 26, 17, 34]
+        }
+
+        for item in galaxy.star_mapping:
+            worldstar = galaxy.star_mapping[item]
+            if item in owned:
+                self.assertIsInstance(worldstar.ownedBy, tuple, "OwnedBy not tuple for " + str(item))
+                self.assertEqual(owned[item][0], worldstar.ownedBy[0].index, "Bad ownership index for " + str(item))
+                check = [item.index for item in worldstar.ownedBy[1]]
+                self.assertEqual(owned[item][1], check, 'Bad ownership choices for ' + str(item))
+            elif item in milrule:
+                self.assertIsInstance(worldstar.ownedBy, tuple, "OwnedBy not tuple for " + str(item))
+                self.assertEqual('Mr', worldstar.ownedBy[0], "OwnedBy not Mr for " + str(item))
+                check = [item.index for item in worldstar.ownedBy[1]]
+                self.assertEqual(milrule[item], check, 'Bad ownership choices for ' + str(item))
+            elif item in re_owned:
+                self.assertIsInstance(worldstar.ownedBy, tuple, "OwnedBy not tuple for " + str(item))
+                self.assertEqual('Re', worldstar.ownedBy[0], "OwnedBy not Re for " + str(item))
+                check = [item.index for item in worldstar.ownedBy[1]]
+                self.assertEqual(re_owned[item], check, 'Bad ownership choices for ' + str(item))
+            elif item in px_owned:
+                self.assertIsInstance(worldstar.ownedBy, tuple, "OwnedBy not tuple for " + str(item))
+                self.assertEqual('Px', worldstar.ownedBy[0], "OwnedBy not Px for " + str(item))
+                check = [item.index for item in worldstar.ownedBy[1]]
+                self.assertEqual(px_owned[item], check, 'Bad ownership choices for ' + str(item))
+            elif item in none_owned:
+                self.assertIsInstance(worldstar.ownedBy, tuple, "OwnedBy not tuple for " + str(item))
+                self.assertIsNone(worldstar.ownedBy[0], "OwnedBy not None for " + str(item))
+                check = [item.index for item in worldstar.ownedBy[1]]
+                self.assertEqual(none_owned[item], check, 'Bad ownership choices for ' + str(item))
+            else:
+                self.assertEqual(worldstar, worldstar.ownedBy, 'Bad ownership choices for ' + str(item))

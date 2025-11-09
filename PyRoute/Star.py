@@ -202,12 +202,11 @@ class Star(object):
         return self._key
 
     def __eq__(self, y):
+        if not isinstance(y, Star):
+            return False
         if self.__hash__() != y.__hash__():
             return False
-        if isinstance(y, Star):
-            return self.__key() == y.__key()
-        else:
-            return False
+        return self.__key() == y.__key()
 
     def __hash__(self):
         return self._hash
