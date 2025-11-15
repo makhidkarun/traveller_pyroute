@@ -261,6 +261,14 @@ class ParseStarInput:
             data[3] = bitz[0]
             data[4] = imp_m.group() + " " + bitz[1]
 
+        if '[' in data[3] and ']' in data[3] and '' == data[10].strip():
+            soc_match = r'[ ]\[[0-9A-Za-z]{4}\][ ]'
+            soc_m = re.search(soc_match, data[3])
+            if soc_m:
+                bitz = re.split(soc_match, data[3])
+                data[3] = bitz[0]
+                data[4] = '{0} - ' + soc_m.group() + " " + bitz[1]
+
         parsed = {'position': data[0], 'name': data[1], 'uwp': data[2], 'trade': data[3]}
         raw_extensions = data[4].replace('  ', ' ').replace('{ ', '{').replace(' }', '}')
         oldlen = 0
