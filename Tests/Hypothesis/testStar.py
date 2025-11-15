@@ -234,6 +234,7 @@ class testStar(unittest.TestCase):
     @example('0101 000000000000?-0 A000000-0 000000000000000 {0} -  [0000] - - A 000   00')
     @example('2040 okQy)WREOS[xZE4LhS18Jz1DiAeXILGQ(n       hBdebAG-c                  } E}Zsi} AW]WHH {                 +0} -           [1111]         - -  B 018     1u1X')
     @example('0101 [0000]000000000 A000000-0 000000000000000       - - A 000   00')
+    @example('0101 000000000000000 A000000-0 0000000000000 - - -  [0000] - -         A   000   00')
     def test_star_line_extension_parsing(self, s) -> None:
         econ_match = r'[ ]\([0-9A-Za-z]{3}[+-]\d\)[ ]'
         soc_match = r'[ ]\[[0-9A-Za-z]{4}\][ ]'

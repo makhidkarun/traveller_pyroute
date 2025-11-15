@@ -44,7 +44,7 @@ class testLandmarkAvoidHelper(baseTest):
         # Now verify subtrees containing existing landmarks get their sizes zeroed
         contains_landmark = [0, 8, 9, 15, 24, 32, 34]
         for item in contains_landmark:
-            expected_sizes[item] = 0
+            expected_sizes[item] = 0.0
 
         landmarks = [actual_landmark]
         old_mark = [actual_landmark]
