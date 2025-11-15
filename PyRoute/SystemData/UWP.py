@@ -58,9 +58,6 @@ class UWP(object):
         if 9 != len(rep):
             msg = "String representation wrong length"
             return False, msg
-        if rep.islower():
-            msg = "String representation not uppercased"
-            return False, msg
 
         return True, msg
 
@@ -70,7 +67,7 @@ class UWP(object):
 
     @property
     def port(self) -> str:
-        return self._port
+        return self._port.upper()
 
     @port.setter
     def port(self, value) -> None:
@@ -78,7 +75,7 @@ class UWP(object):
 
     @property
     def size(self) -> str:
-        return self._size
+        return self._size.upper()
 
     @size.setter
     def size(self, value) -> None:
@@ -94,7 +91,7 @@ class UWP(object):
 
     @property
     def atmo(self) -> str:
-        return self._atmo
+        return self._atmo.upper()
 
     @atmo.setter
     def atmo(self, value) -> None:
@@ -110,7 +107,7 @@ class UWP(object):
 
     @property
     def hydro(self) -> str:
-        return self._hydro
+        return self._hydro.upper()
 
     @hydro.setter
     def hydro(self, value) -> None:
@@ -126,7 +123,7 @@ class UWP(object):
 
     @property
     def pop(self) -> str:
-        return self._pop
+        return self._pop.upper()
 
     @pop.setter
     def pop(self, value) -> None:
@@ -142,7 +139,7 @@ class UWP(object):
 
     @property
     def gov(self) -> str:
-        return self._gov
+        return self._gov.upper()
 
     @gov.setter
     def gov(self, value) -> None:
@@ -158,7 +155,7 @@ class UWP(object):
 
     @property
     def law(self) -> str:
-        return self._law
+        return self._law.upper()
 
     @law.setter
     def law(self, value) -> None:
@@ -174,7 +171,7 @@ class UWP(object):
 
     @property
     def tl(self) -> str:
-        return self._tl
+        return self._tl.upper()
 
     @tl.setter
     def tl(self, value) -> None:
@@ -285,7 +282,7 @@ class UWP(object):
 
     def _get_tl_bounds(self):
         mod = 0
-        if self.gov in '01X':
+        if self.gov in '01X':  # pragma: no mutate
             mod += 1
         elif 'D' == self.gov:
             mod -= 1
