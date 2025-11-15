@@ -196,6 +196,8 @@ class ParseStarInput:
     @staticmethod
     def _unpack_starline(star, line, sector) -> Union[tuple[list[Optional[str]], bool], tuple[None, None]]:
         is_station = False
+        if not isinstance(ParseStarInput.deep_space, dict):
+            ParseStarInput.deep_space = {}
         if '{Anomaly}' in line and sector.name not in ParseStarInput.deep_space:
             star.logger.info("Found anomaly, skipping processing: {}".format(line))
             return None, None

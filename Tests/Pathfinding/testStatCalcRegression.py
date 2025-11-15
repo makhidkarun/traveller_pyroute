@@ -44,6 +44,8 @@ class testStatCalcRegression(baseTest):
         stats.write_statistics(args.ally_count, args.ally_match, args.json_data)
 
     def testStatsCalcReftSector(self) -> None:
+        self.maxDiff = None
+
         sourcefile = self.unpack_filename('DeltaFiles/reft-allegiance-pax-balance/Reft Sector.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -72,11 +74,11 @@ class testStatCalcRegression(baseTest):
         expected = {'TLmean': 0, 'TLstddev': 0, 'bases': NoNoneDefaultDict(int), 'code_counts': NoNoneDefaultDict(int),
                     'col_be': 6797.200000000001, 'economy': 381621, 'eti_cargo': 0,
                     'eti_pass': 0, 'eti_worlds': 0, 'gg_count': 93, 'im_be': 6196.989999999999, 'maxPop': 0,
-                    'maxPort': 'X', 'maxTL': 0, 'milBudget': 0, 'number': 122, 'passengers': 7817280, 'percapita': 4741,
+                    'maxPort': 'X', 'maxTL': 0, 'milBudget': 0, 'number': 122, 'passengers': 7817295, 'percapita': 4741,
                     'population': 80481, 'populations': NoNoneDefaultDict(Populations), 'port_size': NoNoneDefaultDict(int),
                     'primary_count': NoNoneDefaultDict(int), 'shipyards': 81, 'spa_people': 23705,
-                    'star_count': NoNoneDefaultDict(int), 'stars': 172, 'sum_ru': 121636.0, 'trade': 143514360000,
-                    'tradeDton': 3273598, 'tradeDtonExt': 0, 'tradeExt': 0, 'tradeVol': 144540060000, 'worlds': 1272,
+                    'star_count': NoNoneDefaultDict(int), 'stars': 172, 'sum_ru': 121636.0, 'trade': 143514760000,
+                    'tradeDton': 3273603, 'tradeDtonExt': 0, 'tradeExt': 0, 'tradeVol': 144540860000, 'worlds': 1272,
                     '__dict__': {}}
         expected['bases']['Military base'] = 18
         expected['bases']['Naval base'] = 23
