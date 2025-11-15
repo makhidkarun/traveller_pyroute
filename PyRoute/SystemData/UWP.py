@@ -315,7 +315,7 @@ class UWP(object):
 
     def _canonicalise_physicals(self):
         size_is_zero = self.size_is_zero
-        if '0' == self.size:
+        if size_is_zero:
             self.atmo_code = 0
             self.hydro_code = 0
 

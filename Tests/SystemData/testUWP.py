@@ -38,6 +38,60 @@ class testUWP(unittest.TestCase):
         uwp.canonicalise()
         self.assertEqual('X120456-7', str(uwp))
 
+    def test_canonicalisation_6(self) -> None:
+        uwp = UWP('x023456-7')
+        self.assertEqual('X023456-7', str(uwp))
+        uwp.canonicalise()
+        self.assertEqual('X000456-7', str(uwp))
+
+    def test_canonicalisation_7(self) -> None:
+        uwp = UWP('x1?3456-7')
+        self.assertEqual('X1?3456-7', str(uwp))
+        uwp.canonicalise()
+        self.assertEqual('X1?0456-7', str(uwp))
+
+    def test_canonicalisation_8(self) -> None:
+        uwp = UWP('x2?4567-8')
+        self.assertEqual('X2?4567-8', str(uwp))
+        uwp.canonicalise()
+        self.assertEqual('X2?4567-8', str(uwp))
+
+    def test_canonicalisation_9(self) -> None:
+        uwp = UWP('x23?567-8')
+        self.assertEqual('X23?567-8', str(uwp))
+        uwp.canonicalise()
+        self.assertEqual('X23?567-8', str(uwp))
+
+    def test_canonicalisation_10(self) -> None:
+        uwp = UWP('x023456-?')
+        self.assertEqual('X023456-?', str(uwp))
+        uwp.canonicalise()
+        self.assertEqual('X000456-?', str(uwp))
+
+    def test_canonicalisation_11(self) -> None:
+        uwp = UWP('x1234?6-7')
+        self.assertEqual('X1234?6-7', str(uwp))
+        uwp.canonicalise()
+        self.assertEqual('X1204?6-7', str(uwp))
+
+    def test_canonicalisation_12(self) -> None:
+        uwp = UWP('???????-?')
+        self.assertEqual('???????-?', str(uwp))
+        uwp.canonicalise()
+        self.assertEqual('???????-?', str(uwp))
+
+    def test_canonicalisation_13(self) -> None:
+        uwp = UWP('????1?F-?')
+        self.assertEqual('????1?F-?', str(uwp))
+        uwp.canonicalise()
+        self.assertEqual('????1?B-?', str(uwp))
+
+    def test_canonicalisation_14(self) -> None:
+        uwp = UWP('??????K-?')
+        self.assertEqual('??????K-?', str(uwp))
+        uwp.canonicalise()
+        self.assertEqual('??????K-?', str(uwp))
+
     def test_malformed_uwp(self) -> None:
         msg = ''
         try:
@@ -212,6 +266,84 @@ class testUWP(unittest.TestCase):
 
         result, act_msg = uwp.check_canonical()
         self.assertFalse(result)
+        self.assertEqual(exp_msg, act_msg)
+
+    def test_check_canonical_14(self) -> None:
+        uwp = UWP('???????-?')
+        exp_msg = []
+
+        result, act_msg = uwp.check_canonical()
+        self.assertTrue(result)
+        self.assertEqual(exp_msg, act_msg)
+
+    def test_check_canonical_15(self) -> None:
+        uwp = UWP('x023456-7')
+        exp_msg = [
+            'UWP Calculated atmo "2" does not match generated atmo 0',
+            'UWP Calculated hydro "3" does not match generated hydro 0'
+        ]
+
+        result, act_msg = uwp.check_canonical()
+        self.assertFalse(result)
+        self.assertEqual(exp_msg, act_msg)
+
+    def test_check_canonical_16(self) -> None:
+        uwp = UWP('x1?3456-7')
+        exp_msg = [
+            'UWP Calculated hydro "3" does not match generated hydro 0'
+        ]
+
+        result, act_msg = uwp.check_canonical()
+        self.assertFalse(result)
+        self.assertEqual(exp_msg, act_msg)
+
+    def test_check_canonical_17(self) -> None:
+        uwp = UWP('x023456-?')
+        exp_msg = [
+            'UWP Calculated atmo "2" does not match generated atmo 0',
+            'UWP Calculated hydro "3" does not match generated hydro 0'
+        ]
+
+        result, act_msg = uwp.check_canonical()
+        self.assertFalse(result)
+        self.assertEqual(exp_msg, act_msg)
+
+    def test_check_canonical_18(self) -> None:
+        uwp = UWP('x23?567-8')
+        exp_msg = []
+
+        result, act_msg = uwp.check_canonical()
+        self.assertTrue(result)
+        self.assertEqual(exp_msg, act_msg)
+
+    def test_check_canonical_19(self) -> None:
+        uwp = UWP('????1?F-?')
+        exp_msg = [
+            'UWP Calculated law "F" not in expected range 0-11'
+        ]
+
+        result, act_msg = uwp.check_canonical()
+        self.assertFalse(result)
+        self.assertEqual(exp_msg, act_msg)
+
+    def test_check_canonical_20(self) -> None:
+        uwp = UWP('x12391J-7')
+        exp_msg = [
+            'UWP Calculated hydro "3" does not match generated hydro 0',
+            'UWP Calculated gov "1" not in expected range 4-14',
+            'UWP Calculated law "J" not in expected range 0-6'
+        ]
+
+        result, act_msg = uwp.check_canonical()
+        self.assertFalse(result)
+        self.assertEqual(exp_msg, act_msg)
+
+    def test_check_canonical_21(self) -> None:
+        uwp = UWP('??????K-?')
+        exp_msg = []
+
+        result, act_msg = uwp.check_canonical()
+        self.assertTrue(result)
         self.assertEqual(exp_msg, act_msg)
 
 
