@@ -43,15 +43,17 @@ class StarList(object):
         'K': (2, 1),
         'M': (5, 3)
     }
+    max_fill = 8
 
     def __init__(self, stars_line, trim_stars=False):
         # Count C as a typoed V, given their adjacency on QWERTY keyboards
         stars_line = stars_line.replace(' IC', ' IV')
         stars_line = stars_line.replace(' C', ' V')
-        old_line = None
+        old_line = None  # pragma: no mutate
         # Try to rumble missing star sizes, and iteratively fill them in
-        while stars_line != old_line:
-            old_line = stars_line
+        counter = 0
+        while stars_line != old_line and counter <= StarList.max_fill:
+            old_line = stars_line  # pragma: no mutate
             twostars = StarList.two_stars_match.findall(stars_line)
             if twostars:
                 for item in twostars:
@@ -62,11 +64,11 @@ class StarList(object):
             endstar = StarList.end_star_match.findall(stars_line)
             if endstar:
                 stars_line = stars_line.strip() + ' V'
+            counter += 1
 
         self.stars_line = stars_line
         stars = StarList.stellar_match.findall(stars_line)
-        if not stars:
-            pass  # We used to disallow empty star lists, but real data said otherwise.
+        # We used to disallow empty star lists, but real data said otherwise.
         if 8 < len(stars):
             if trim_stars:
                 stars = stars[0:8]

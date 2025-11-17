@@ -230,6 +230,7 @@ class testStarList(unittest.TestCase):
     @example('K0Ia K0Ia ', 'K0 II K0 VI')
     @example('K0Ia M0Ia ', 'K0 II M0 VI')
     @example('M0Ia M0Ia ', 'M0 II M0 VI')
+    @example('D BD', 'D BD')
     def test_check_star_size_against_primary(self, star_line, expected) -> None:
         hyp_line = "Hypothesis input: " + star_line
 

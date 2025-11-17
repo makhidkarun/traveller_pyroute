@@ -127,6 +127,7 @@ class SystemStar(object):
         choice = self.flux_choice
         flux_line = SystemStar.star_fluxen[choice]
         trim_line = {v for (k, v) in flux_line.items() if max_flux >= k >= min_flux}
+        trim_line = sorted(trim_line)
         msg = None
         if self.size not in trim_line:
             msg = "Flux values {} to {} only permit sizes {} of {} class star - not {}".format(min_flux, max_flux, ' '.join(trim_line), choice, self.size)
