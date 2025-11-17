@@ -117,6 +117,14 @@ class testStarList(unittest.TestCase):
         self.assertIsNotNone(starlist.stars_line)
         self.assertEqual('BD', starlist.stars_line)
 
+    def test_v_as_c(self) -> None:
+        star_line = 'B2 IC F2 C'
+        starlist = StarList(star_line)
+
+        exp_str = 'B2 IV F2 V'
+        act_str = str(starlist)
+        self.assertEqual(exp_str, act_str)
+
     def test_canonicalise_1(self) -> None:
         cases = [
             ("G5 V B2 Ia", "G5 V B2 Ia", "B2 Ia G5 V"),
@@ -276,8 +284,17 @@ class testStarList(unittest.TestCase):
         cases = [
             ("G5 V B2 Ia", "G5 V B2 V"),
             ('D A5 Ib', 'D A5 Ib'),
+            ('B5 Ia F4 II', 'B5 Ia F4 IV'),
+            ('B5 Ia F4 III', 'B5 Ia F4 IV'),
+            ('B5 Ia F4 IV', 'B5 Ia F4 IV'),
+            ('B5 Ia F4 V', 'B5 Ia F4 V'),
+            ('B5 Ia F4 VI', 'B5 Ia F4 IV'),
+            ('B5 Ia K4 II', 'B5 Ia K4 IV'),
             ('B5 Ia F5 II', 'B5 Ia F5 IV'),
             ('B5 Ia K5 II', 'B5 Ia K5 V'),
+            ('B5 Ia F6 II', 'B5 Ia F6 IV'),
+            ('B5 Ia K6 II', 'B5 Ia K6 V'),
+            ('M0 V M9 IV', 'M0 V M9 VI'),
         ]
 
         for star_line, exp_line in cases:
