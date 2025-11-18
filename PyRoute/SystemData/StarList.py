@@ -43,15 +43,17 @@ class StarList(object):
         'K': (2, 1),
         'M': (5, 3)
     }
+    max_fill = 8
 
     def __init__(self, stars_line, trim_stars=False):
         # Count C as a typoed V, given their adjacency on QWERTY keyboards
         stars_line = stars_line.replace(' IC', ' IV')
         stars_line = stars_line.replace(' C', ' V')
-        old_line = None
+        old_line = None  # pragma: no mutate
         # Try to rumble missing star sizes, and iteratively fill them in
-        while stars_line != old_line:
-            old_line = stars_line
+        counter = 0
+        while stars_line != old_line and counter <= StarList.max_fill:  # pragma: no mutate
+            old_line = stars_line  # pragma: no mutate
             twostars = StarList.two_stars_match.findall(stars_line)
             if twostars:
                 for item in twostars:
@@ -62,11 +64,11 @@ class StarList(object):
             endstar = StarList.end_star_match.findall(stars_line)
             if endstar:
                 stars_line = stars_line.strip() + ' V'
+            counter += 1  # pragma: no mutate
 
         self.stars_line = stars_line
         stars = StarList.stellar_match.findall(stars_line)
-        if not stars:
-            pass  # We used to disallow empty star lists, but real data said otherwise.
+        # We used to disallow empty star lists, but real data said otherwise.
         if 8 < len(stars):
             if trim_stars:
                 stars = stars[0:8]
@@ -78,7 +80,7 @@ class StarList(object):
             if s == "D" or s == "NS" or s == "PSR" or s == "BH" or s == "BD":
                 item = SystemStar(s)
             else:
-                bitz = s.split(' ') if ' ' in s else [s[0:2], s[2:]]
+                bitz = s.split() if ' ' in s else [s[0:2], s[2:]]  # pragma: no mutate
                 item = SystemStar(bitz[1], bitz[0][0], int(bitz[0][1]))
             self.stars_list.append(item)
 
@@ -95,7 +97,7 @@ class StarList(object):
             return
         biggest = self.stars_list[0]
         bigdex = 0
-        for i in range(1, num_stars):
+        for i in range(num_stars):
             if not biggest.is_bigger(self.stars_list[i]):
                 biggest = self.stars_list[i]
                 bigdex = i
@@ -113,7 +115,7 @@ class StarList(object):
             if not isinstance(item, SystemStar):
                 msg = "Item " + str(item) + " not a SystemStar"
                 return False, msg
-        for i in range(1, num_stars):
+        for i in range(num_stars):
             if not self.stars_list[0].is_bigger(self.stars_list[i]):
                 msg = "Index " + str(i) + " better primary candidate than index 0"
                 return False, msg
@@ -177,7 +179,7 @@ class StarList(object):
                         if 'A' == current.spectral and current.size in ['II', 'III']:
                             line = 'Ib supergiant primary precludes A-class bright and regular giants - size II and III - is ' + str(current)
                             msg.append(line)
-                        if current.spectral in 'FGKM' and current.size in ['II', 'III', 'IV']:
+                        if current.spectral in ['F', 'G', 'K', 'M'] and current.size in ['II', 'III', 'IV']:
                             line = 'Ib supergiant primary precludes {}-class bright, regular and subgiants - size II, III and IV - is {}'.format(current.spectral, str(current))
                             msg.append(line)
                 self.check_star_size_against_primary(current, msg)
@@ -185,52 +187,49 @@ class StarList(object):
         return 0 == len(msg), msg
 
     def canonicalise(self) -> None:
+        num_stars = len(self.stars_list)
+        if 0 == num_stars:
+            return
         for star in self.stars_list:
             star.canonicalise()
         self.move_biggest_to_primary()
 
-        num_stars = len(self.stars_list)
-        if 1 < num_stars:
-            primary = self.primary
-            # per T5.10 Book 3 p28, _other_ stars' sizes are based off the primary's flux roll, then (1d6+2) is added
-            # - a minimum of 3, a maximum of 8
-            # Supergiants only happen on flux rolls of -6 thru -4 - so the _smallest_ possible other-star flux value is
-            # -3
-            # Ib supergiants only happen on a flux roll of -4, so the smallest possible other-star flux value is -1
-            primary_supergiant = primary.is_supergiant
-            # Although brown dwarfs would be precluded by F-class or earlier primaries, there's enough old data floating
-            # around to make those removals confusing, so we're only canonicalising star size
-            for i in range(1, num_stars):
-                current = self.stars_list[i]
-                if current.is_supergiant and \
-                        ('A' == current.spectral or 'B' == current.spectral or 'O' == current.spectral):
-                    current.size = 'II'
-                if primary_supergiant:
-                    if 'F' == current.spectral and current.size in ['II', 'III']:
+        primary = self.primary
+        # per T5.10 Book 3 p28, _other_ stars' sizes are based off the primary's flux roll, then (1d6+2) is added
+        # - a minimum of 3, a maximum of 8
+        # Supergiants only happen on flux rolls of -6 thru -4 - so the _smallest_ possible other-star flux value is
+        # -3
+        # Ib supergiants only happen on a flux roll of -4, so the smallest possible other-star flux value is -1
+        primary_supergiant = primary.is_supergiant
+        # Although brown dwarfs would be precluded by F-class or earlier primaries, there's enough old data floating
+        # around to make those removals confusing, so we're only canonicalising star size
+        for i in range(1, num_stars):
+            current = self.stars_list[i]
+            if current.is_supergiant:
+                current.size = 'II'
+            if primary_supergiant:
+                # spectral classes of F and G for sizes II and III stars are handled by fix_star_size_against_primary
+                if current.size in ['II', 'III'] and 'K' == current.spectral:
+                    current.size = 'IV' if int(current.digit) < 4 else 'V'
+                # M-class stars aren't constrained by a supergiant primary _per se_
+                # A Ib primary _further_ constrains the following:
+                # OB class to size III and smaller
+                # A class to size IV and smaller
+                # FGKM class to size V and smaller
+                if 'Ib' == self.stars_list[0].size:
+                    if 'O' == current.spectral and current.size in ['II']:
+                        current.size = 'III'
+                    if 'B' == current.spectral and current.size in ['II']:
+                        current.size = 'III'
+                    if 'A' == current.spectral and current.size in ['II', 'III']:
                         current.size = 'IV'
-                    if 'G' == current.spectral and current.size in ['II', 'III']:
-                        current.size = 'IV'
-                    if 'K' == current.spectral and current.size in ['II', 'III']:
-                        current.size = 'IV' if int(current.digit) < 4 else 'V'
-                    # M-class stars aren't constrained by a supergiant primary _per se_
-                    # A Ib primary _further_ constrains the following:
-                    # OB class to size III and smaller
-                    # A class to size IV and smaller
-                    # FGKM class to size V and smaller
-                    if 'Ib' == self.stars_list[0].size:
-                        if 'O' == current.spectral and current.size in ['II']:
-                            current.size = 'III'
-                        if 'B' == current.spectral and current.size in ['II']:
-                            current.size = 'III'
-                        if 'A' == current.spectral and current.size in ['II', 'III']:
-                            current.size = 'IV'
-                        if current.spectral is not None and current.spectral in 'FGKM' and current.size in ['II', 'III', 'IV']:
-                            current.size = 'V'
+                    if current.spectral in ['F', 'G', 'K', 'M'] and current.size in ['II', 'III', 'IV']:
+                        current.size = 'V'
 
-                self.fix_star_size_against_primary(current)
+            self.fix_star_size_against_primary(current)
 
-            if primary_supergiant:  # Supergiant primary precludes D-class stars, so out the window they go
-                self.stars_list = [star for star in self.stars_list if 'D' != star.size]
+        if primary_supergiant:  # Supergiant primary precludes D-class stars, so out the window they go
+            self.stars_list = [star for star in self.stars_list if 'D' != star.size]
 
     def check_star_size_against_primary(self, current, msg) -> None:
         if not current.is_stellar_not_dwarf:
@@ -250,10 +249,10 @@ class StarList(object):
             return
 
         max_pri, min_pri = self.primary_flux_bounds
-        if max_pri is None or min_pri is None:
+        if max_pri is None or min_pri is None:  # pragma: no mutate
             return
         max_flux = min(8, max_pri + 8)
         min_flux = min_pri + 3
         current.fix_canonical_size(max_flux, min_flux)
-        if current.spectral in 'FK':
+        if current.spectral in ['F', 'K']:
             current.canonicalise()
