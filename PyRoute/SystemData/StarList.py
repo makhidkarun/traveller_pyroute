@@ -249,7 +249,7 @@ class StarList(object):
             return
 
         max_pri, min_pri = self.primary_flux_bounds
-        if max_pri is None and min_pri is None:  # pragma: no mutate
+        if max_pri is None or min_pri is None:  # pragma: no mutate
             return
         max_flux = min(8, max_pri + 8)
         min_flux = min_pri + 3
