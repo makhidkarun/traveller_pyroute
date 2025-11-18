@@ -196,6 +196,9 @@ class ParseStarInput:
     @staticmethod
     def _unpack_starline(star, line, sector) -> Union[tuple[list[Optional[str]], bool], tuple[None, None]]:
         is_station = False
+        # This was added to stop tests blowing up, and to _ensure_ that deep_space is a dict by time it gets used
+        if not isinstance(ParseStarInput.deep_space, dict):
+            ParseStarInput.deep_space = {}
         if '{Anomaly}' in line and sector.name not in ParseStarInput.deep_space:
             star.logger.info("Found anomaly, skipping processing: {}".format(line))
             return None, None
@@ -260,6 +263,14 @@ class ParseStarInput:
             bitz = re.split(imp_match, data[3])
             data[3] = bitz[0]
             data[4] = imp_m.group() + " " + bitz[1]
+
+        if '[' in data[3] and ']' in data[3] and '' == data[10].strip():
+            soc_match = r'[ ]\[[0-9A-Za-z]{4}\][ ]'
+            soc_m = re.search(soc_match, data[3])
+            if soc_m:
+                bitz = re.split(soc_match, data[3])
+                data[3] = bitz[0]
+                data[4] = '{0} - ' + soc_m.group() + " " + bitz[1]
 
         parsed = {'position': data[0], 'name': data[1], 'uwp': data[2], 'trade': data[3]}
         raw_extensions = data[4].replace('  ', ' ').replace('{ ', '{').replace(' }', '}')

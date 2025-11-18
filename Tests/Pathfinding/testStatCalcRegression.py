@@ -44,6 +44,8 @@ class testStatCalcRegression(baseTest):
         stats.write_statistics(args.ally_count, args.ally_match, args.json_data)
 
     def testStatsCalcReftSector(self) -> None:
+        self.maxDiff = None
+
         sourcefile = self.unpack_filename('DeltaFiles/reft-allegiance-pax-balance/Reft Sector.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -75,7 +77,7 @@ class testStatCalcRegression(baseTest):
                     'maxPort': 'X', 'maxTL': 0, 'milBudget': 0, 'number': 122, 'passengers': 7817295, 'percapita': 4741,
                     'population': 80481, 'populations': NoNoneDefaultDict(Populations), 'port_size': NoNoneDefaultDict(int),
                     'primary_count': NoNoneDefaultDict(int), 'shipyards': 81, 'spa_people': 23705,
-                    'star_count': NoNoneDefaultDict(int), 'stars': 172, 'sum_ru': 121636, 'trade': 143514760000,
+                    'star_count': NoNoneDefaultDict(int), 'stars': 172, 'sum_ru': 121636.0, 'trade': 143514760000,
                     'tradeDton': 3273603, 'tradeDtonExt': 0, 'tradeExt': 0, 'tradeVol': 144540860000, 'worlds': 1272,
                     '__dict__': {}}
         expected['bases']['Military base'] = 18

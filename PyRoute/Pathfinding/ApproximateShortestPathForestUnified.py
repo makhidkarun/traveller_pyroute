@@ -17,6 +17,8 @@ from single_source_dijkstra_core import dijkstra_core
 
 cnp.import_array()
 
+float64max = np.finfo(np.float64).max
+
 
 @cython.cclass
 class ApproximateShortestPathForestUnified:
@@ -96,6 +98,9 @@ class ApproximateShortestPathForestUnified:
         raw: cnp.ndarray[cython.float]
         raw = self._distances[source, :] + self._distances[target, :]
         raw = raw[raw != float('+inf')]
+
+        if 0 == len(raw):
+            return float64max / 2
 
         return np.min(raw) * (1 + self._epsilon)
 

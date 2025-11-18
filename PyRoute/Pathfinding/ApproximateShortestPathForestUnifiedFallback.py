@@ -11,6 +11,8 @@ from PyRoute.Star import Star
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.Pathfinding.single_source_dijkstra import implicit_shortest_path_dijkstra_distance_graph, explicit_shortest_path_dijkstra_distance_graph
 
+float64max = np.finfo(np.float64).max
+
 
 class ApproximateShortestPathForestUnified:
 
@@ -66,6 +68,9 @@ class ApproximateShortestPathForestUnified:
     def triangle_upbound(self, source: int, target: int) -> float:
         raw = self._distances[source, :] + self._distances[target, :]
         raw = raw[raw != float('+inf')]
+
+        if 0 == len(raw):
+            return float64max / 2
 
         return np.min(raw) * (1 + self._epsilon)
 
