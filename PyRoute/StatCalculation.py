@@ -136,6 +136,32 @@ class ObjectStatistics(object):
     def __setitem__(self, key, value):
         setattr(self, key, value)
 
+    def __eq__(self, y) -> bool:
+        if not isinstance(y, ObjectStatistics):
+            return False
+        if self.maxTL != y.maxTL:
+            return False
+        if self.TLmean != y.TLmean:
+            return False
+        if self.TLstddev != y.TLstddev:
+            return False
+        if self.maxPop != y.maxPop:
+            return False
+        if self.maxPort != y.maxPort:
+            return False
+        if self.trade != y.trade:
+            return False
+        if self.tradeExt != y.tradeExt:
+            return False
+        if self.tradeDton != y.tradeDton:
+            return False
+        if self.tradeDtonExt != y.tradeDtonExt:
+            return False
+        return self.tradeVol == y.tradeVol
+
+    def __hash__(self):
+        return 0
+
     def homeworld_count(self) -> int:
         return len(self.homeworlds)
 
