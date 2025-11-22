@@ -244,3 +244,12 @@ class testAllegiance(baseTest):
         is_well_formed, msg = alleg.is_well_formed()
         self.assertFalse(is_well_formed)
         self.assertEqual('Should be at most one comma in allegiance name, Foo, Bar, Baz', msg)
+
+    def test_str_1(self) -> None:
+        code = "A8"
+        name = "Aslan Hierate, Tlaukhu control, Seieakh (9), Akatoiloh (18), We'okurir (29)"
+        pop = "Asla"
+        alleg = Allegiance(code, name, False, pop)
+
+        exp_str = 'Aslan Hierate, Tlaukhu control (A8)'
+        self.assertEqual(exp_str, str(alleg))
