@@ -40,6 +40,8 @@ class Allegiance(AreaItem):
             raise ValueError("Code must be string - received " + str(code))
         if 4 < len(code):
             raise ValueError("Code must not exceed 4 characters - received " + str(code))
+        if not isinstance(base, bool):
+            raise ValueError("Base flag must be boolean")
         name = name.strip()
         if '' == name:
             raise ValueError("Name must not be empty string")
@@ -72,6 +74,8 @@ class Allegiance(AreaItem):
             raise ValueError("Name must be string - received " + str(name))
         if not isinstance(code, str):
             raise ValueError("Code must be string - received " + str(code))
+        if not isinstance(base, bool):
+            raise ValueError("Base must be boolean - received " + str(base))
         name = name.strip()
         if '' == name:
             raise ValueError("Name must not be empty string")

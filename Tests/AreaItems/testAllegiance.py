@@ -3,13 +3,12 @@ Created on Apr 17, 2025
 
 @author: CyberiaResurrection
 """
-import copy
-
 from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
+from PyRoute.StatCalculation import ObjectStatistics
 from Tests.baseTest import baseTest
 
 
@@ -32,8 +31,16 @@ class testAllegiance(baseTest):
 
         alleg = Allegiance(code, name, False, pop)
 
-        foo = copy.deepcopy(alleg)
+        foo = alleg.__deepcopy__()
         self.assertTrue(isinstance(foo, Allegiance))
+        self.assertEqual("A8", foo.code)
+        self.assertEqual("Asla", foo.population)
+        self.assertEqual(alleg.base, foo.base)
+        self.assertEqual(alleg.name, foo.name)
+        self.assertEqual(alleg.wiki_name(), foo.wiki_name())
+        self.assertEqual(alleg.alg_sorted, foo.alg_sorted)
+        self.assertIsNotNone(foo.debug_flag)
+        self.assertEqual(alleg.debug_flag, foo.debug_flag)
 
     def test_allegiance_list_on_galaxy_read(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/duplicate_node_blowup/Trojan Reach.sec')
@@ -102,3 +109,147 @@ class testAllegiance(baseTest):
                 self.assertEqual(expected_count, actual_count, "Unexpected world count for " + alg_name + " allegiance")
             else:
                 self.assertNotIn(alg_name, galaxy.sectors['Trojan Reach'].alg, "Unexpected allegiance " + alg_name)
+
+    def test_are_allies_yes(self) -> None:
+        code = "A8"
+        name = "Aslan Hierate, Tlaukhu control, Seieakh (9), Akatoiloh (18), We'okurir (29)"
+        pop = "Asla"
+
+        alleg1 = Allegiance(code, name, False, pop)
+
+        code = "A7"
+        name = "Aslan Hierate, Tlaukhu control, Seieakh (9), Akatoiloh (18), We'okurir (29)"
+        pop = "Asla"
+
+        alleg2 = Allegiance(code, name, False, pop)
+        self.assertTrue(alleg1.are_allies(alleg2))
+        self.assertTrue(alleg2.are_allies(alleg1))
+
+    def test_is_client_state(self) -> None:
+        code = "Im"
+        name = "Third Imperium"
+        pop = "Huma"
+
+        alleg1 = Allegiance(code, name, False, pop)
+
+        code = "CsIm"
+        name = "Client State, Third Imperium"
+
+        alleg2 = Allegiance(code, name, False)
+        self.assertEqual("Huma", alleg1.population)
+        self.assertEqual("Huma", alleg2.population)
+        self.assertFalse(alleg1.is_client_state())
+        self.assertTrue(alleg2.is_client_state())
+
+    def test_is_wilds_no(self) -> None:
+        code = "A8"
+        name = "Aslan Hierate, Tlaukhu control, Seieakh (9), Akatoiloh (18), We'okurir (29)"
+        pop = "Asla"
+
+        alleg1 = Allegiance(code, name, False, pop)
+        self.assertFalse(alleg1.is_wilds())
+
+    def test_is_wilds_yes(self) -> None:
+        code = "Wild"
+        name = "Wilds"
+        pop = "Huma"
+
+        alleg1 = Allegiance(code, name, False, pop)
+        self.assertTrue(alleg1.is_wilds())
+
+    def test_is_unclaimed_no(self) -> None:
+        code = "A8"
+        name = "Aslan Hierate, Tlaukhu control, Seieakh (9), Akatoiloh (18), We'okurir (29)"
+        pop = "Asla"
+
+        alleg1 = Allegiance(code, name, False, pop)
+        self.assertFalse(alleg1.is_unclaimed())
+
+    def test_is_unclaimed_yes(self) -> None:
+        code = "??"
+        name = "??"
+        pop = "Huma"
+
+        alleg1 = Allegiance(code, name, False, pop)
+        self.assertTrue(alleg1.is_unclaimed())
+
+    def test_get_state(self) -> None:
+        code = "CsIm"
+        name = "Client State, Third Imperium"
+        pop = "Huma"
+
+        alleg = Allegiance(code, name, False, pop)
+        exp_dict = {
+            '_wiki_name': '[[Client State]]s of the [[Third Imperium]]',
+            'alg': {},
+            'base': False,
+            'code': 'CsIm',
+            'debug_flag': False,
+            'name': 'Client States of the Third Imperium',
+            'population': 'Huma',
+            'stats': ObjectStatistics(),
+            'worlds': []
+        }
+        act_dict = alleg.__getstate__()
+        self.assertEqual(exp_dict, act_dict)
+
+    def test_set_item_get_item(self) -> None:
+        code = "A8"
+        name = "Aslan Hierate, Tlaukhu control, Seieakh (9), Akatoiloh (18), We'okurir (29)"
+        pop = "Asla"
+
+        alleg = Allegiance(code, name, False, pop)
+        alleg.__setitem__('foo', 'bar')
+        self.assertEqual('bar', alleg.__getitem__('foo'))
+
+    def test_is_well_formed(self) -> None:
+        code = "A8"
+        name = "Aslan Hierate, Tlaukhu control, Seieakh (9), Akatoiloh (18), We'okurir (29)"
+        pop = "Asla"
+        alleg = Allegiance(code, name, False, pop)
+
+        is_well_formed, msg = alleg.is_well_formed()
+        self.assertTrue(is_well_formed)
+        self.assertEqual('', msg)
+
+    def test_is_well_formed_empty_name(self) -> None:
+        code = "A8"
+        name = "Aslan Hierate, Tlaukhu control, Seieakh (9), Akatoiloh (18), We'okurir (29)"
+        pop = "Asla"
+        alleg = Allegiance(code, name, False, pop)
+        alleg.name = ' '
+
+        is_well_formed, msg = alleg.is_well_formed()
+        self.assertFalse(is_well_formed)
+        self.assertEqual('Allegiance name should not be empty', msg)
+
+    def test_is_well_formed_double_space_in_name(self) -> None:
+        code = "A8"
+        name = "Aslan Hierate, Tlaukhu control, Seieakh (9), Akatoiloh (18), We'okurir (29)"
+        pop = "Asla"
+        alleg = Allegiance(code, name, False, pop)
+        alleg.name = 'Foo  Bar'
+
+        is_well_formed, msg = alleg.is_well_formed()
+        self.assertFalse(is_well_formed)
+        self.assertEqual('Should not have successive spaces in allegiance name, Foo  Bar', msg)
+
+    def test_is_well_formed_multiple_commas_in_name(self) -> None:
+        code = "A8"
+        name = "Aslan Hierate, Tlaukhu control, Seieakh (9), Akatoiloh (18), We'okurir (29)"
+        pop = "Asla"
+        alleg = Allegiance(code, name, False, pop)
+        alleg.name = "Foo, Bar, Baz"
+
+        is_well_formed, msg = alleg.is_well_formed()
+        self.assertFalse(is_well_formed)
+        self.assertEqual('Should be at most one comma in allegiance name, Foo, Bar, Baz', msg)
+
+    def test_str_1(self) -> None:
+        code = "A8"
+        name = "Aslan Hierate, Tlaukhu control, Seieakh (9), Akatoiloh (18), We'okurir (29)"
+        pop = "Asla"
+        alleg = Allegiance(code, name, False, pop)
+
+        exp_str = 'Aslan Hierate, Tlaukhu control (A8)'
+        self.assertEqual(exp_str, str(alleg))
