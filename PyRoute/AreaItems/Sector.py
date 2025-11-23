@@ -18,7 +18,7 @@ class Sector(AreaItem):
             raise ValueError("Name must be a string")
         if not isinstance(position, str):
             raise ValueError("Position must be a string")
-        name = name.rstrip()
+        name = name.strip()
         if 3 > len(name):
             raise ValueError("Name string too short")
         if 5 > len(position):

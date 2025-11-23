@@ -359,3 +359,11 @@ class testSector(baseTest):
 
         sector = Sector(name, position)
         self.assertIsNone(sector.find_world_by_pos('0101'))
+
+    def test_eq_1(self) -> None:
+        name = "# Fnordia"
+        position = "# -5, 4"
+
+        sector = Sector(name, position)
+        self.assertFalse('' == sector)
+        self.assertFalse(sector == '')
