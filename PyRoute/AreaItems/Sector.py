@@ -35,7 +35,7 @@ class Sector(AreaItem):
         super(Sector, self).__init__(name[1:].strip())
 
         # Same here, the position has a leading comment marker.  Strip that, and then any flanking whitespace.
-        position = position[1:].strip().replace(' ', '')
+        position = position[1:].strip()
         positions = Sector.position_match.match(position)
         if not positions:
             raise ValueError("Position string malformed")
@@ -135,9 +135,9 @@ class Sector(AreaItem):
                 msg = "Trailing sector y co-ord mismatch for " + self.name
                 return False, msg
 
-        result, tempmsg = self._check_allegiance_counts_well_formed()
+        result, msg = self._check_allegiance_counts_well_formed()
         if not result:
-            return False, tempmsg
+            return False, msg
 
         return True, msg
 
