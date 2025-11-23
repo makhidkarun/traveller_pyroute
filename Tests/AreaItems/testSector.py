@@ -138,6 +138,14 @@ class testSector(baseTest):
         exp_name = "Fnordia"
         self.assertEqual(exp_name, sector.sector_name())
 
+    def test_sector_name_with_sector_3(self) -> None:
+        name = "  # FnordiaSector Sector"
+        position = "# -5, 4"
+
+        sector = Sector(name, position)
+        exp_name = "Fnordia"
+        self.assertEqual(exp_name, sector.sector_name())
+
     def test_str(self) -> None:
         name = "# Fnordia"
         position = "# -5, 4"
@@ -174,6 +182,7 @@ class testSector(baseTest):
         sector = Sector(name, position)
         well_formed, msg = sector.is_well_formed()
         self.assertTrue(well_formed)
+        self.assertIsNotNone(msg)
         self.assertEqual("", msg)
 
     def test_is_well_formed_bad_name(self) -> None:

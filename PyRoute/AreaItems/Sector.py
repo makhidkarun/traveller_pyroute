@@ -79,7 +79,6 @@ class Sector(AreaItem):
         return None
 
     def is_well_formed(self) -> tuple[bool, str]:
-        msg = ""
         # check name
         if self.name is None or '' == self.name.strip():
             msg = "Name cannot be empty"
