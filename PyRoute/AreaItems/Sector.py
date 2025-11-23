@@ -14,6 +14,10 @@ class Sector(AreaItem):
     position_match = re.compile(r"([-+ ]?\d{1,4})\s*[,]\s*([-+ ]?\d{1,4})")
 
     def __init__(self, name, position):
+        if not isinstance(name, str):
+            raise ValueError("Name must be a string")
+        if not isinstance(position, str):
+            raise ValueError("Position must be a string")
         name = name.rstrip()
         if 3 > len(name):
             raise ValueError("Name string too short")
