@@ -14,7 +14,11 @@ class Sector(AreaItem):
     position_match = re.compile(r"([-+ ]?\d{1,4})\s*[,]\s*([-+ ]?\d{1,4})")
 
     def __init__(self, name, position):
-        name = name.rstrip()
+        if not isinstance(name, str):
+            raise ValueError("Name must be a string")
+        if not isinstance(position, str):
+            raise ValueError("Position must be a string")
+        name = name.strip()
         if 3 > len(name):
             raise ValueError("Name string too short")
         if 5 > len(position):
@@ -31,7 +35,7 @@ class Sector(AreaItem):
         super(Sector, self).__init__(name[1:].strip())
 
         # Same here, the position has a leading comment marker.  Strip that, and then any flanking whitespace.
-        position = position[1:].strip().replace(' ', '')
+        position = position[1:].strip()
         positions = Sector.position_match.match(position)
         if not positions:
             raise ValueError("Position string malformed")
@@ -75,7 +79,6 @@ class Sector(AreaItem):
         return None
 
     def is_well_formed(self) -> tuple[bool, str]:
-        msg = ""
         # check name
         if self.name is None or '' == self.name.strip():
             msg = "Name cannot be empty"
@@ -131,9 +134,9 @@ class Sector(AreaItem):
                 msg = "Trailing sector y co-ord mismatch for " + self.name
                 return False, msg
 
-        result, tempmsg = self._check_allegiance_counts_well_formed()
+        result, msg = self._check_allegiance_counts_well_formed()
         if not result:
-            return False, tempmsg
+            return False, msg
 
         return True, msg
 
