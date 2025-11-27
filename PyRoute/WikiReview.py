@@ -1,10 +1,8 @@
 #!/usr/bin/python
+from typing import Optional
 
-from wikitools_py3 import wiki  # type:ignore[import-not-found]
-from wikitools_py3.api import APIRequest  # type:ignore[import-not-found]
-from wikitools_py3.exceptions import WikiError, NoPage  # type:ignore[import-not-found]
-from wikitools_py3.wikifile import File  # type:ignore[import-not-found]
-from wikitools_py3.page import Page  # type:ignore[import-not-found]
+from wikitools3 import wiki, WikiError, NoPage, Page, APIRequest  # type:ignore[import-untyped]
+from wikitools3.wikifile import File  # type:ignore[import-untyped]
 import logging
 import traceback
 import re
@@ -105,7 +103,7 @@ class WikiReview(object):
             logger.error('Unable to log in')
         return site
 
-    def get_page(self, title) -> wiki.Page:
+    def get_page(self, title) -> Optional[Page]:
         try:
             target_page = Page(self.site, title)
         except NoPage:

@@ -10,8 +10,8 @@ Created on Apr 26, 2015
 # pip install poster
 #
 #
-from wikitools_py3.exceptions import WikiError, NoPage  # type:ignore[import-not-found]
-from wikitools_py3.page import Page  # type:ignore[import-not-found]
+from wikitools3 import WikiError, NoPage  # type:ignore[import-untyped]
+from wikitools3.page import Page  # type:ignore[import-untyped]
 from .WikiReview import WikiReview
 
 import logging
