@@ -330,26 +330,7 @@ def set_logging(level) -> None:
 def process() -> None:
     warnings.simplefilter("always")
 
-    parser = argparse.ArgumentParser(description='Trade map generator wiki upload.')
-    parser.add_argument('--input', default='../maps', help='output directory for maps, statistics')
-    parser.add_argument('--no-maps', dest='maps', default=True, action='store_false',
-                        help="Don't upload the sector PDF maps, default is upload the maps")
-    parser.add_argument('--no-secs', dest='secs', default=True, action='store_false',
-                        help="Don't upload the sector table pages, default is to upload the sector table pages")
-    parser.add_argument('--no-summary', dest='summary', default=True, action='store_false',
-                        help="Don't upload the sector summary pages, default is to upload the sector summary pages")
-    parser.add_argument('--no-subsector', dest='subsector', default=True, action='store_false',
-                        help="Don't upload the subsector summary pages, default is to upload the subsector summary pages")
-    parser.add_argument('--worlds', default=False, action='store_true',
-                        help="Upload the data for individual worlds, default is to not upload world data")
-    parser.add_argument('--era', dest='era', default='Milieu 1116',
-                        help="Set the era for the world upload data, default [Milieu 1116]")
-    parser.add_argument('--log-level', default='INFO')
-    parser.add_argument('--site', dest='site', default='https://wiki.travellerrpg.com/api.php')
-    parser.add_argument('--user', default='AB-101',
-                        help="(Bot) user to connect to the wiki and perform the uploads, default [AB-101]")
-
-    args = parser.parse_args()
+    args = build_parser()
     set_logging(args.log_level)
 
     site = WikiReview.get_site(args.user, args.site)
@@ -389,6 +370,29 @@ def process() -> None:
             if sector in list(shortNames.keys()):
                 sec = eco.replace('Sector.economic.wiki', 'Sector.sector.wiki')
                 uploadWorlds(wiki_review, sec, eco, args.era)
+
+
+def build_parser() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description='Trade map generator wiki upload.')
+    parser.add_argument('--input', default='../maps', help='output directory for maps, statistics')
+    parser.add_argument('--no-maps', dest='maps', action='store_false',
+                        help="Don't upload the sector PDF maps, default is upload the maps")
+    parser.add_argument('--no-secs', dest='secs', action='store_false',
+                        help="Don't upload the sector table pages, default is to upload the sector table pages")
+    parser.add_argument('--no-summary', dest='summary', action='store_false',
+                        help="Don't upload the sector summary pages, default is to upload the sector summary pages")
+    parser.add_argument('--no-subsector', dest='subsector', action='store_false',
+                        help="Don't upload the subsector summary pages, default is to upload the subsector summary pages")
+    parser.add_argument('--worlds', action='store_true',
+                        help="Upload the data for individual worlds, default is to not upload world data")
+    parser.add_argument('--era', default='Milieu 1116',
+                        help="Set the era for the world upload data, default [Milieu 1116]")
+    parser.add_argument('--log-level', default='INFO')
+    parser.add_argument('--site', default='https://wiki.travellerrpg.com/api.php')
+    parser.add_argument('--user', default='AB-101',
+                        help="(Bot) user to connect to the wiki and perform the uploads, default [AB-101]")
+    args = parser.parse_args()
+    return args
 
 
 if __name__ == '__main__':
