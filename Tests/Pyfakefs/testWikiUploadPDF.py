@@ -12,6 +12,7 @@ from wikitools3.page import Page
 from wikitools3.wiki import Wiki
 
 from PyRoute.WikiUploadPDF import set_logging, uploadSummaryText, uploadSec, build_parser, process
+from PyRoute.WikiReview import WikiReview
 from Tests.Pyfakefs.baseTest import baseTest
 
 
@@ -183,3 +184,104 @@ class testWikiUploadPDF(baseTest):
             self.assertIn('  --site SITE\n', buf)
             self.assertIn('  --user USER           (Bot) user to connect to the wiki and perform the\n', buf)
             self.assertIn('                        uploads, default [AB-101]\n', buf)
+
+    def test_process_1(self) -> None:
+        fullpath = self.unpack_filename('../../PyRoute/WikiUploadPDF.py')
+
+        ecopath = self.unpack_filename('../../Tests/DeltaFiles/wiki upload/Reft Sector.economic.wiki')
+        secpath = self.unpack_filename('../../Tests/DeltaFiles/wiki upload/Reft Sector.sector.wiki')
+
+        self.setUpPyfakefs()
+        self.fs.add_real_file(fullpath, target_path='/PyRoute/WikiUploadPDF.py')
+        self.fs.add_real_file(ecopath, target_path='/data/Reft Sector.economic.wiki')
+        self.fs.add_real_file(secpath, target_path='/data/Reft Sector.sector.wiki')
+        with open('/data/sectors.wiki', 'w', encoding='utf-8') as f:
+            f.writelines(['Foo'])
+        with open('/data/subsectors.wiki', 'w', encoding='utf-8') as f:
+            f.writelines(['Bar'])
+        with open('/data/Reft Sector.pdf', 'w', encoding='utf-8') as f:
+            f.writelines(['Baz'])
+
+        args = ['/PyRoute/WikiUploadPDF.py', '--input', '/data/']
+
+        logger = logging.getLogger('WikiUpload')
+        logger.manager.disable = 0
+        exp_logs = ['DEBUG:WikiUpload:Dummy message']
+
+        site = MagicMock(autospec=Wiki)
+        review = MagicMock(autospec=WikiReview)
+
+        with self.assertLogs(logger, 'DEBUG') as logs,\
+                patch('PyRoute.WikiUploadPDF.WikiReview.get_site', return_value=site) as mock_site,\
+                patch('PyRoute.WikiUploadPDF.WikiReview', return_value=review) as mock_review,\
+                patch('PyRoute.WikiUploadPDF.uploadSec') as mock_sec, \
+                patch('PyRoute.WikiUploadPDF.uploadSummaryText') as mock_summary, \
+                patch('sys.argv', args):
+            logger.debug('Dummy message')
+            process()
+            self.assertEqual(exp_logs, logs.output)
+            mock_site.assert_not_called()
+            mock_review.assert_called_once()
+            calls = mock_review.call_args
+            self.assertIsNone(calls.args[1])
+            self.assertIsNotNone(calls.args[2])
+            self.assertFalse(calls.args[2])
+            self.assertIsNone(calls.args[3])
+            mock_sec.assert_called()
+            self.assertEqual(2, len(mock_sec.call_args_list))
+            self.assertEqual(call(review, '/data/Reft Sector.economic.wiki', '/economic', 'Milieu 1116'),
+                             mock_sec.call_args_list[0])
+            self.assertEqual(call(review, '/data/Reft Sector.sector.wiki', '/sector', 'Milieu 1116'),
+                             mock_sec.call_args_list[1])
+            mock_summary.assert_called()
+            self.assertEqual(2, len(mock_summary.call_args_list))
+            self.assertEqual(call(review, '/data/sectors.wiki', 'Milieu 1116', 'Sector'),
+                             mock_summary.call_args_list[0])
+            self.assertEqual(call(review, '/data/subsectors.wiki', 'Milieu 1116', 'Subsector'),
+                             mock_summary.call_args_list[1])
+            self.assertEqual(call.upload_file('/data/Reft Sector.pdf'), mock_review.return_value.method_calls[0])
+
+    def test_process_2(self) -> None:
+        fullpath = self.unpack_filename('../../PyRoute/WikiUploadPDF.py')
+
+        ecopath = self.unpack_filename('../../Tests/DeltaFiles/wiki upload/Reft Sector.economic.wiki')
+        secpath = self.unpack_filename('../../Tests/DeltaFiles/wiki upload/Reft Sector.sector.wiki')
+
+        self.setUpPyfakefs()
+        self.fs.add_real_file(fullpath, target_path='/PyRoute/WikiUploadPDF.py')
+        self.fs.add_real_file(ecopath, target_path='/data/Dagudashaag Sector.economic.wiki')
+        self.fs.add_real_file(secpath, target_path='/data/Dagudashaag Sector.sector.wiki')
+        self.fs.add_real_file(ecopath, target_path='/data/Core Sector.economic.wiki')
+        self.fs.add_real_file(secpath, target_path='/data/Core Sector.sector.wiki')
+
+        args = ['/PyRoute/WikiUploadPDF.py', '--input', '/data/', '--no-maps', '--no-secs', '--no-summary',
+                '--no-subsector', '--worlds', '--site', 'http://foo.travellerrpg.com/api.php', '--user', 'CD-202',
+                '--log-level', 'DEBUG']
+
+        logger = logging.getLogger('WikiUpload')
+        logger.manager.disable = 0
+        logger.setLevel('DEBUG')
+        exp_logs = ['DEBUG:WikiUpload:Checking Path /data/* Sector.economic.wiki -> '
+                    "['/data/Dagudashaag Sector.economic.wiki', '/data/Core Sector.economic.wiki']"]
+
+        with self.assertLogs(logger, 'DEBUG') as logs,\
+                patch('PyRoute.WikiUploadPDF.WikiReview') as mock_review,\
+                patch('PyRoute.WikiUploadPDF.uploadWorlds') as mock_worlds, \
+                patch('sys.argv', args):
+            process()
+            self.assertEqual(exp_logs, logs.output)
+            mock_worlds.assert_called_once()
+            mock_review.assert_called_once_with(mock_review.get_site.return_value, None, False, None)
+            self.assertEqual(1, mock_worlds.call_count)
+            self.assertEqual(
+                call(
+                    mock_review.return_value,
+                    '/data/Dagudashaag Sector.sector.wiki',
+                    '/data/Dagudashaag Sector.economic.wiki',
+                    'Milieu 1116'
+                ),
+                mock_worlds.call_args_list[0]
+            )
+            self.assertEqual(1, mock_review.get_site.call_count)
+            calls = mock_review.get_site.call_args_list
+            self.assertEqual(call('CD-202', 'http://foo.travellerrpg.com/api.php'), calls[0])

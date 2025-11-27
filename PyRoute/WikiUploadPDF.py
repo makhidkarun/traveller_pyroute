@@ -362,14 +362,15 @@ def process() -> None:
         uploadSummaryText(wiki_review, path, args.era, "Subsector")
 
     if args.worlds:
-        path = os.path.join(args.input, "{0} Sector.economic.wiki".format(args.worlds))
+        shortlist = list(shortNames.keys())
+        path = os.path.join(args.input, "* Sector.economic.wiki")
         logger.debug("Checking Path {} -> {}".format(path, glob.glob(path)))
 
         for eco in glob.glob(path):
-            sector = args.worlds
-            if sector in list(shortNames.keys()):
-                sec = eco.replace('Sector.economic.wiki', 'Sector.sector.wiki')
-                uploadWorlds(wiki_review, sec, eco, args.era)
+            for sector in shortlist:
+                if sector in eco and os.path.isfile(eco):
+                    sec = eco.replace('Sector.economic.wiki', 'Sector.sector.wiki')
+                    uploadWorlds(wiki_review, sec, eco, args.era)
 
 
 def build_parser() -> argparse.Namespace:
