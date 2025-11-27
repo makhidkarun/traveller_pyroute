@@ -188,9 +188,9 @@ No information yet available.
 
     def get_comments(self, star) -> str:
         comments = []
-        for code in star.tradeCode.dcode:
+        for code in sorted(star.tradeCode.dcode):
             comments.append('{{{{World summary comment|trade={} }}}}'.format(code))
-        for code in star.tradeCode.xcode:
+        for code in sorted(star.tradeCode.xcode):
             comments.append('{{{{World summary comment|trade={} }}}}'.format(code))
         return '\n' + '\n'.join(comments) if len(comments) > 0 else ' '
 
