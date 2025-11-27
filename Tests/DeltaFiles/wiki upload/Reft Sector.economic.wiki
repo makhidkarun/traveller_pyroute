@@ -1,0 +1,2467 @@
+<section begin="header"/>
+{| class="wikitable sortable" width="90%"
+|+ Reft economic data
+!Hex!!Name!!UWP!!PBG!!{Ix}!!WTN!!MSPR!!RU!!Per Capita (Cr)!!GWP (BCr)!!Trade (MCr/year)!!Passengers (per year)!!Build!!Army!!Port!!SPA Population!!Trade Goods!!Subsector <section end="header"/><section begin="Vestus" />
+|-
+| 0102
+| Cauldron (world)
+| D988222-4
+| 403
+| { -3 }
+| 3
+| 8
+| 2
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| D-4 Lo Cr7400
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0105
+| Iselen (world)
+| A543678-9
+| 403
+| { 0 }
+| 9
+| 7
+| 220
+| 2,928
+| 11
+| 981
+| 785,745
+| 4,000
+| 1
+| 5
+| 2,755
+| A-9 Ni Po Cr2900
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0106
+| Reudden (world)
+| B5536BG-7
+| 400
+| { -1 }
+| 8
+| 8
+| 480
+| 1,144
+| 4
+| 145
+| 101,760
+| 4,400
+| 20
+| 5
+| 4,410
+| B-7 Ni Po Cr3700
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0108
+| Kukaa (world)
+| C544100-A
+| 503
+| { 0 }
+| 4
+| 7
+| 4
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| C-A Lo Cr7000
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0109
+| Amoirve (world)
+| B565476-B
+| 704
+| { 1 }
+| 7
+| 9
+| 120
+| 0
+| 0
+| 18
+| 14,710
+| 0
+| 0
+| 5
+| 4,270
+| B-B Ni Pa Cr5100
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0203
+| Solbatn (world)
+| B87A443-A
+| 603
+| { 1 }
+| 7
+| 7
+| 86
+| 0
+| 0
+| 19
+| 14,810
+| 0
+| 0
+| 5
+| 3,700
+| B-A Ni Wa Cr5000
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0208
+| Peshtorno (world)
+| B783841-8
+| 622
+| { 1 }
+| 9
+| 8
+| 617
+| 3,662
+| 2,197
+| 270
+| 874,320
+| 510,000
+| 2,000
+| 4
+| 2,580
+| B-8 Ph Ri Cr4800
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0210
+| Petre (world)
+| B696478-A
+| 210
+| { 1 }
+| 7
+| 7
+| 84
+| 0
+| 0
+| 18
+| 14,270
+| 0
+| 0
+| 5
+| 12,245
+| B-A Ni Pa Cr5000
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0305
+| Dimple (world)
+| D200201-8
+| 500
+| { -3 }
+| 4
+| 0
+| 2
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| D-8 Lo Va Cr8800
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0402
+| Benidorm (world)
+| E546400-8
+| 120
+| { -3 }
+| 5
+| 7
+| 12
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| E-8 Ni Pa Cr7800
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0408
+| Carian (world)
+| B300459-B
+| 924
+| { 1 }
+| 7
+| 0
+| 288
+| 0
+| 0
+| 18
+| 14,660
+| 0
+| 0
+| 5
+| 12,635
+| B-B Ni Va Cr6100
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0410
+| Ambossa (world)
+| B684459-9
+| 700
+| { 0 }
+| 7
+| 8
+| 54
+| 0
+| 0
+| 14
+| 13,310
+| 0
+| 0
+| 3
+| 85
+| B-9 Ni Pa Cr4900
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0502
+| Corp Town (world)
+| B574211-B
+| 100
+| { 1 }
+| 5
+| 8
+| 3
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 5
+| 18,145
+| B-B Lo Cr6100
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0503
+| Lintl (world)
+| B739AEE-C
+| 404
+| { 3 }
+| 11
+| 0
+| 10,080
+| 5,860
+| 234,400
+| 3,306
+| 3,086,940
+| 30,000,000
+| 12,000
+| 5
+| 18,640
+| B-C Hi Cr3200
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0602
+| Whisp (world)
+| C551110-6
+| 204
+| { -2 }
+| 3
+| 7
+| 2
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| C-6 Lo Po Cr5600
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0604
+| Gaspar (world)
+| B436337-D
+| 801
+| { 1 }
+| 6
+| 0
+| 12
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 5
+| 10,395
+| B-D Lo Cr6300
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0605
+| Igualada (world)
+| B540567-9
+| 701
+| { 0 }
+| 8
+| 5
+| 128
+| 0
+| 0
+| 139
+| 103,230
+| 0
+| 0
+| 4
+| 360
+| B-9 De He Ni Po Cr4900
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0701
+| Mukiud (world)
+| B433210-D
+| 823
+| { 1 }
+| 5
+| 0
+| 6
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| B-D Lo Po Cr5300
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0702
+| Checker (world)
+| C300225-9
+| 615
+| { -1 }
+| 5
+| 0
+| 7
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| C-9 Lo Va Cr7900
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0707
+| Colony Five (world)
+| B5759A5-B
+| 420
+| { 4 }
+| 11
+| 8
+| 3,120
+| 5,124
+| 20,496
+| 2,749
+| 8,119,080
+| 4,800,000
+| 1,200
+| 5
+| 22,355
+| B-B Hi In Cr3100
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0710
+| Zaguki (world)
+| B560212-9
+| 804
+| { 0 }
+| 5
+| 7
+| 5
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| B-9 De Lo Cr6900
+| [[Vestus Subsector|Vestus]]
+
+|-
+| 0801
+| Elixir (world)
+| B768321-9
+| 423
+| { 0 }
+| 6
+| 9
+| 12
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 5
+| 3,755
+| B-9 Lo Cr5900
+| [[Vestus Subsector|Vestus]]
+<section end="Vestus" /><section begin="Macon" />
+|-
+| 0903
+| Evet's World (world)
+| B201656-D
+| 503
+| { 1 }
+| 8
+| 0
+| 275
+| 4,688
+| 23
+| 107
+| 96,635
+| 4,750
+| 1
+| 4
+| 320
+| B-D Ic Na Ni Va Cr6300
+| [[Macon Subsector|Macon]]
+
+|-
+| 1002
+| Ulnert (world)
+| B53769D-7
+| 803
+| { -1 }
+| 8
+| 0
+| 360
+| 1,144
+| 9
+| 129
+| 101,005
+| 9,200
+| 2
+| 4
+| 345
+| B-7 Ni Cr4700
+| [[Macon Subsector|Macon]]
+
+|-
+| 1102
+| Earl Center (world)
+| A998111-9
+| 604
+| { 0 }
+| 5
+| 7
+| 4
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| A-9 Lo Cr4900
+| [[Macon Subsector|Macon]]
+
+|-
+| 1103
+| Yvette (world)
+| A79A633-D
+| 133
+| { 1 }
+| 9
+| 6
+| 280
+| 4,688
+| 4
+| 532
+| 327,920
+| 900
+| 1
+| 4
+| 1,230
+| A-D Ni Wa Cr4300
+| [[Macon Subsector|Macon]]
+
+|-
+| 1204
+| Oleiros (world)
+| B000457-D
+| 300
+| { 1 }
+| 7
+| 0
+| 72
+| 0
+| 0
+| 4
+| 4,000
+| 0
+| 0
+| 2
+| 10
+| B-D As Ni Va Cr4300
+| [[Macon Subsector|Macon]]
+
+|-
+| 1301
+| Sestao (world)
+| A420675-C
+| 611
+| { 1 }
+| 9
+| 0
+| 225
+| 4,688
+| 28
+| 747
+| 340,855
+| 6,000
+| 1
+| 4
+| 1,505
+| A-C De He Na Ni Po Cr4200
+| [[Macon Subsector|Macon]]
+
+|-
+| 1302
+| Gorod (world)
+| D6689CG-7
+| 111
+| { -1 }
+| 8
+| 9
+| 2,816
+| 1,430
+| 1,430
+| 54
+| 28,825
+| 1,200,000
+| 20,000
+| 3
+| 110
+| D-7 Hi Pr Cr4700
+| [[Macon Subsector|Macon]]
+<section end="Macon" /><section begin="Two Little" />
+|-
+| 1907
+| Aum-rhar (world)
+| A857948-C
+| 824
+| { 3 }
+| 11
+| 8
+| 5,712
+| 5,860
+| 46,880
+| 30
+| 6,000
+| 6,800,000
+| 12,000
+| 3
+| 35
+| A-C Ga Hi Cr2200
+| [[Two Little Subsector|Two Little]]
+
+|-
+| 2108
+| Zamoran (world)
+| B674675-A
+| 904
+| { 2 }
+| 8
+| 8
+| 360
+| 3,513
+| 31
+| 30
+| 6,000
+| 9,000
+| 1
+| 3
+| 45
+| B-A Ag Ni Cr4000
+| [[Two Little Subsector|Two Little]]
+<section end="Two Little" /><section begin="Barker" />
+|-
+| 2509
+| Arnorac (world)
+| B581468-A
+| 302
+| { 1 }
+| 7
+| 7
+| 96
+| 0
+| 0
+| 2
+| 500
+| 0
+| 0
+| 3
+| 20
+| B-A Ni Cr5000
+| [[Barker Subsector|Barker]]
+
+|-
+| 2609
+| Gordon (world)
+| B310776-A
+| 203
+| { 2 }
+| 9
+| 0
+| 792
+| 2,928
+| 58
+| 12
+| 2,500
+| 20,000
+| 15
+| 3
+| 15
+| B-A Na Pi Cr4000
+| [[Barker Subsector|Barker]]
+
+|-
+| 2904
+| Schuuni (world)
+| BA9A599-D
+| 100
+| { 1 }
+| 8
+| 6
+| 280
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| B-D Ni Oc Cr5300
+| [[Barker Subsector|Barker]]
+<section end="Barker" /><section begin="Usher" />
+|-
+| 0111
+| Grudovo (world)
+| B560453-C
+| 914
+| { 1 }
+| 7
+| 7
+| 106
+| 0
+| 0
+| 23
+| 15,650
+| 0
+| 0
+| 5
+| 16,475
+| B-C De Ni Cr6200
+| [[Usher Subsector|Usher]]
+
+|-
+| 0112
+| Banskonno (world)
+| A582444-C
+| 204
+| { 1 }
+| 7
+| 7
+| 108
+| 0
+| 0
+| 23
+| 15,250
+| 0
+| 0
+| 3
+| 55
+| A-C Ni Cr4200
+| [[Usher Subsector|Usher]]
+
+|-
+| 0118
+| Bastion (world)
+| B737532-B
+| 401
+| { 1 }
+| 8
+| 0
+| 112
+| 0
+| 0
+| 115
+| 89,370
+| 0
+| 0
+| 4
+| 995
+| B-B Ni Cr5100
+| [[Usher Subsector|Usher]]
+
+|-
+| 0212
+| Aldaya (world)
+| B885620-6
+| 423
+| { 1 }
+| 8
+| 8
+| 140
+| 1,374
+| 5
+| 184
+| 319,260
+| 4,000
+| 30
+| 4
+| 1,035
+| B-6 Ag Ga Ni Ri Cr4600
+| [[Usher Subsector|Usher]]
+
+|-
+| 0216
+| Neon (world)
+| D78227A-7
+| 923
+| { -3 }
+| 4
+| 7
+| 4
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| D-7 Lo Cr7700
+| [[Usher Subsector|Usher]]
+
+|-
+| 0217
+| Cerebin (world)
+| B423662-C
+| 534
+| { 1 }
+| 8
+| 0
+| 262
+| 4,688
+| 23
+| 108
+| 83,990
+| 5,000
+| 1
+| 4
+| 640
+| B-C Na Ni Po Cr4200
+| [[Usher Subsector|Usher]]
+
+|-
+| 0313
+| Helifil (world)
+| D310724-8
+| 403
+| { -2 }
+| 7
+| 0
+| 259
+| 1,831
+| 73
+| 12
+| 8,050
+| 40,000
+| 20
+| 3
+| 25
+| D-8 Na Pi Cr5800
+| [[Usher Subsector|Usher]]
+
+|-
+| 0416
+| Tonnurad (world)
+| B563695-7
+| 803
+| { 0 }
+| 8
+| 9
+| 128
+| 1,830
+| 14
+| 39
+| 128,100
+| 9,200
+| 20
+| 3
+| 350
+| B-7 Ni Ri Cr5700
+| [[Usher Subsector|Usher]]
+
+|-
+| 0511
+| Fraaga (world)
+| B691420-B
+| 702
+| { 1 }
+| 7
+| 6
+| 67
+| 0
+| 0
+| 13
+| 13,260
+| 0
+| 0
+| 3
+| 40
+| B-B He Ni Cr5100
+| [[Usher Subsector|Usher]]
+<section end="Usher" /><section begin="Sagittarian" />
+|-
+| 1314
+| R'Bak (world)
+| X587777-2
+| 721
+| { 0 }
+| 1
+| 8
+| 270
+| 1,075
+| 75
+| 0
+| 0
+| 70,000
+| 50
+| 0
+| 0
+| X-2 Ag Ri Cr8200
+| [[Sagittarian Subsector|Sagittarian]]
+<section end="Sagittarian" /><section begin="Lost Way" />
+|-
+| 1812
+| Undrelyn (world)
+| B551433-6
+| 514
+| { -1 }
+| 6
+| 7
+| 22
+| 0
+| 0
+| 0
+| 0
+| 0
+| 2
+| 0
+| 0
+| B-6 Ni Po Cr3600
+| [[Lost Way Subsector|Lost Way]]
+<section end="Lost Way" /><section begin="Gome" /><section end="Gome" /><section begin="Void 8" /><section end="Void 8" /><section begin="New Islands" />
+|-
+| 0921
+| Zuflucht (world)
+| C545720-8
+| 610
+| { 0 }
+| 8
+| 7
+| 288
+| 2,746
+| 164
+| 65
+| 13,000
+| 60,000
+| 20
+| 3
+| 80
+| C-8 Ag Pi Cr3800
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 0925
+| Wellington (world)
+| C8B0263-A
+| 600
+| { 0 }
+| 5
+| 0
+| 3
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 3
+| 45
+| C-A He Lo Cr7000
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 0926
+| Esperanza (world)
+| A674ABC-B
+| 113
+| { 5 }
+| 12
+| 8
+| 11,520
+| 5,124
+| 51,240
+| 4,662
+| 972,500
+| 11,000,000
+| 12,000
+| 5
+| 6,025
+| A-B Hi In Cr2100
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 0930
+| St. Hilaire (world)
+| B579763-A
+| 900
+| { 2 }
+| 9
+| 8
+| 535
+| 3,660
+| 329
+| 302
+| 61,000
+| 90,000
+| 15
+| 4
+| 375
+| B-A Pi Cr4000
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 1030
+| Nebelwelt (world)
+| C879425-5
+| 202
+| { -2 }
+| 6
+| 8
+| 11
+| 0
+| 0
+| 0
+| 0
+| 0
+| 1
+| 0
+| 0
+| C-5 Ni Cr5500
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 1123
+| Gloire (world)
+| C764567-9
+| 301
+| { 0 }
+| 7
+| 9
+| 176
+| 0
+| 0
+| 13
+| 2,600
+| 0
+| 1
+| 5
+| 945
+| C-9 Ag Ni Pr Cr4900
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 1323
+| Serendip Belt (world)
+| A000949-C
+| 223
+| { 5 }
+| 11
+| 0
+| 8,960
+| 6,563
+| 13,126
+| 2,010
+| 442,000
+| 1,700,000
+| 1,200
+| 5
+| 2,695
+| A-C As Hi In Na Va Cr1200
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 1327
+| New Colchis (world)
+| A8959AA-C
+| 300
+| { 5 }
+| 11
+| 7
+| 7,040
+| 8,204
+| 24,612
+| 4,015
+| 843,000
+| 3,600,000
+| 1,200
+| 5
+| 8,615
+| A-C Hi In Cr2200
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 1426
+| Herzenslust (world)
+| E995765-6
+| 602
+| { -1 }
+| 6
+| 7
+| 227
+| 1,074
+| 64
+| 0
+| 0
+| 60,000
+| 30
+| 0
+| 0
+| E-6 Ag Pi Cr5600
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 1429
+| Orphee (world)
+| X885610-0
+| 110
+| { -1 }
+| 0
+| 8
+| 60
+| 337
+| 0
+| 0
+| 0
+| 800
+| 0
+| 0
+| 0
+| X-0 Ag Ga Ni Ri Cr9000
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 1522
+| Topas (world)
+| D420899-7
+| 301
+| { -2 }
+| 8
+| 0
+| 378
+| 1,144
+| 343
+| 71
+| 14,600
+| 345,000
+| 200
+| 5
+| 1,015
+| D-7 De He Na Ph Pi Po Cr5700
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 1525
+| Elysee (world)
+| B502532-9
+| 820
+| { 0 }
+| 8
+| 0
+| 77
+| 0
+| 0
+| 113
+| 23,100
+| 0
+| 0
+| 5
+| 1,920
+| B-9 Ic Ni Va Cr5900
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 1526
+| Besancon (world)
+| C201341-9
+| 604
+| { -1 }
+| 6
+| 0
+| 7
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| C-9 Ic Lo Va Cr7900
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 1621
+| Berlichingen (world)
+| D500437-8
+| 600
+| { -3 }
+| 5
+| 0
+| 13
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| D-8 Ni Va Cr7800
+| [[New Islands Subsector|New Islands]]
+
+|-
+| 1628
+| Joyeuse (world)
+| A7899B9-C
+| 304
+| { 4 }
+| 11
+| 8
+| 9,000
+| 5,860
+| 17,580
+| 1,925
+| 425,000
+| 3,300,000
+| 12,000
+| 5
+| 3,935
+| A-C Hi Pr Cr2200
+| [[New Islands Subsector|New Islands]]
+<section end="New Islands" /><section begin="Old Islands" />
+|-
+| 1724
+| Sturgeon's Law (world)
+| DAC1451-9
+| 301
+| { -2 }
+| 6
+| 0
+| 16
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| D-9 Fl He Ni Cr7900
+| [[Old Islands Subsector|Old Islands]]
+
+|-
+| 1729
+| Quichotte (world)
+| E576667-6
+| 601
+| { -2 }
+| 6
+| 8
+| 64
+| 859
+| 5
+| 0
+| 0
+| 6,000
+| 3
+| 0
+| 0
+| E-6 Ag Ni Cr6600
+| [[Old Islands Subsector|Old Islands]]
+
+|-
+| 1822
+| Neubayern (world)
+| A7889C9-C
+| 310
+| { 4 }
+| 11
+| 8
+| 7,200
+| 5,860
+| 17,580
+| 2,361
+| 522,200
+| 3,600,000
+| 12,000
+| 5
+| 3,630
+| A-C Hi Pr Cr2200
+| [[Old Islands Subsector|Old Islands]]
+
+|-
+| 1923
+| Schlesien Belt (world)
+| C000367-B
+| 122
+| { 0 }
+| 6
+| 0
+| 14
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| C-B As Lo Va Cr6100
+| [[Old Islands Subsector|Old Islands]]
+
+|-
+| 1925
+| New Home (world)
+| A565857-D
+| 811
+| { 4 }
+| 10
+| 9
+| 6,300
+| 9,376
+| 7,500
+| 1,206
+| 603,500
+| 760,000
+| 1,000
+| 5
+| 2,880
+| A-D Pa Ph Ri Cr4300
+| [[Old Islands Subsector|Old Islands]]
+
+|-
+| 2026
+| Colchis (world)
+| B676898-9
+| 501
+| { 1 }
+| 10
+| 8
+| 770
+| 3,660
+| 1,830
+| 1,183
+| 286,700
+| 575,000
+| 150
+| 5
+| 4,150
+| B-9 Pa Ph Pi Cr3900
+| [[Old Islands Subsector|Old Islands]]
+
+|-
+| 2123
+| St. Genevieve (world)
+| C560100-A
+| 802
+| { 0 }
+| 4
+| 7
+| 4
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 5
+| 2,530
+| C-A De Lo Cr8000
+| [[Old Islands Subsector|Old Islands]]
+
+|-
+| 2225
+| Acadie (world)
+| C868563-9
+| 600
+| { 0 }
+| 7
+| 9
+| 78
+| 0
+| 0
+| 22
+| 5,000
+| 0
+| 1
+| 3
+| 25
+| C-9 Ag Ni Pr Cr4900
+| [[Old Islands Subsector|Old Islands]]
+
+|-
+| 2322
+| Sansterre (world)
+| A87A943-C
+| 311
+| { 5 }
+| 11
+| 7
+| 3,840
+| 6,563
+| 19,689
+| 1,720
+| 394,000
+| 2,550,000
+| 1,200
+| 5
+| 2,275
+| A-C Hi In Wa Cr2200
+| [[Old Islands Subsector|Old Islands]]
+
+|-
+| 2324
+| Achille (world)
+| E301335-9
+| 120
+| { -2 }
+| 5
+| 0
+| 7
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| E-9 Ic Lo Va Cr9900
+| [[Old Islands Subsector|Old Islands]]
+
+|-
+| 2325
+| Amondiage (world)
+| A5629A9-C
+| 304
+| { 4 }
+| 11
+| 8
+| 7,800
+| 5,860
+| 17,580
+| 1,867
+| 423,500
+| 3,600,000
+| 12,000
+| 5
+| 2,785
+| A-C Hi Pr Cr2200
+| [[Old Islands Subsector|Old Islands]]
+
+|-
+| 2423
+| St. Denis (world)
+| D735764-7
+| 711
+| { -2 }
+| 7
+| 0
+| 194
+| 1,430
+| 100
+| 13
+| 3,100
+| 70,000
+| 20
+| 3
+| 15
+| D-7  Cr5700
+| [[Old Islands Subsector|Old Islands]]
+<section end="Old Islands" /><section begin="Limon" />
+|-
+| 2930
+| Cyclone (world)
+| B599347-9
+| 204
+| { 0 }
+| 6
+| 7
+| 18
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| B-9 Lo Cr5900
+| [[Limon Subsector|Limon]]
+
+|-
+| 3028
+| Eskandor (world)
+| C551499-9
+| 804
+| { -1 }
+| 6
+| 7
+| 60
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| C-9 Ni Po Cr4900
+| [[Limon Subsector|Limon]]
+
+|-
+| 3029
+| Sakaliin (world)
+| B857222-B
+| 413
+| { 1 }
+| 5
+| 8
+| 6
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| B-B Ga Lo Cr6100
+| [[Limon Subsector|Limon]]
+
+|-
+| 3030
+| Rampart (world)
+| A434200-F
+| 812
+| { 1 }
+| 7
+| 0
+| 5
+| 0
+| 0
+| 9
+| 2,750
+| 0
+| 0
+| 2
+| 10
+| A-F Lo Cr5500
+| [[Limon Subsector|Limon]]
+
+|-
+| 3128
+| Jokelyn (world)
+| B201469-B
+| 915
+| { 1 }
+| 7
+| 0
+| 288
+| 0
+| 0
+| 22
+| 8,700
+| 0
+| 0
+| 3
+| 35
+| B-B Ic Ni Va Cr6100
+| [[Limon Subsector|Limon]]
+
+|-
+| 3229
+| Hoilhapuli (world)
+| B76565A-8
+| 335
+| { 1 }
+| 8
+| 9
+| 1,200
+| 3,515
+| 10
+| 296
+| 379,120
+| 2,849
+| 20
+| 4
+| 1,215
+| B-8 Ag Ga Ni Ri Cr4800
+| [[Limon Subsector|Limon]]
+
+|-
+| 3230
+| Bonn (world)
+| A8C578C-B
+| 913
+| { 2 }
+| 10
+| 0
+| 4,680
+| 2,928
+| 263
+| 1,388
+| 465,010
+| 99,000
+| 12
+| 5
+| 3,910
+| A-B Fl Cr4100
+| [[Limon Subsector|Limon]]
+<section end="Limon" /><section begin="Alone" />
+|-
+| 0435
+| Garden (world)
+| B755578-A
+| 404
+| { 2 }
+| 8
+| 8
+| 528
+| 0
+| 0
+| 0
+| 0
+| 0
+| 1
+| 0
+| 0
+| B-A Ag Ga Ni Cr4000
+| [[Alone Subsector|Alone]]
+<section end="Alone" /><section begin="Evestin" /><section end="Evestin" /><section begin="Arcrant" />
+|-
+| 2139
+| Arraste (world)
+| B59368B-6
+| 604
+| { -1 }
+| 8
+| 7
+| 120
+| 716
+| 4
+| 110
+| 46,445
+| 6,600
+| 3
+| 4
+| 195
+| B-6 Ni Cr4600
+| [[Arcrant Subsector|Arcrant]]
+
+|-
+| 2239
+| Jacob (world)
+| B100400-E
+| 302
+| { 1 }
+| 7
+| 0
+| 67
+| 0
+| 0
+| 16
+| 5,290
+| 0
+| 0
+| 3
+| 25
+| B-E Ni Va Cr6400
+| [[Arcrant Subsector|Arcrant]]
+
+|-
+| 2240
+| Fresneise (world)
+| B728512-A
+| 622
+| { 1 }
+| 8
+| 0
+| 154
+| 0
+| 0
+| 128
+| 53,605
+| 0
+| 0
+| 4
+| 290
+| B-A Ni Cr5000
+| [[Arcrant Subsector|Arcrant]]
+
+|-
+| 2337
+| Pit Stop (world)
+| B593326-A
+| 311
+| { 1 }
+| 6
+| 7
+| 14
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 4
+| 260
+| B-A Lo Cr6000
+| [[Arcrant Subsector|Arcrant]]
+
+|-
+| 2435
+| Uxors (world)
+| BA97677-5
+| 804
+| { 0 }
+| 8
+| 7
+| 160
+| 859
+| 6
+| 293
+| 115,135
+| 8,000
+| 3
+| 4
+| 505
+| B-5 Ag Ni Cr3500
+| [[Arcrant Subsector|Arcrant]]
+
+|-
+| 2436
+| Mieniept (world)
+| B794454-B
+| 800
+| { 1 }
+| 7
+| 7
+| 65
+| 0
+| 0
+| 22
+| 7,400
+| 0
+| 0
+| 3
+| 35
+| B-B Ni Pa Cr5100
+| [[Arcrant Subsector|Arcrant]]
+<section end="Arcrant" /><section begin="Moibin" />
+|-
+| 2534
+| Quiver (world)
+| B310405-D
+| 404
+| { 1 }
+| 7
+| 0
+| 108
+| 0
+| 0
+| 19
+| 6,350
+| 0
+| 0
+| 3
+| 30
+| B-D Ni Cr5300
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2536
+| Argus (world)
+| C755A96-8
+| 403
+| { 0 }
+| 10
+| 8
+| 1,094
+| 2,289
+| 91,560
+| 1,042
+| 444,210
+| 46,000,000
+| 200,000
+| 5
+| 2,850
+| C-8 Ga Hi Cr3800
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2537
+| Boneyard (world)
+| B420310-A
+| 914
+| { 1 }
+| 6
+| 0
+| 14
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| B-A De He Lo Po Cr6000
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2538
+| Delinski (world)
+| B55367A-8
+| 914
+| { -1 }
+| 8
+| 8
+| 195
+| 1,831
+| 16
+| 171
+| 66,440
+| 9,000
+| 20
+| 4
+| 295
+| B-8 Ni Po Cr3800
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2539
+| Valentorn (world)
+| D556512-4
+| 900
+| { -2 }
+| 5
+| 8
+| 28
+| 0
+| 0
+| 0
+| 0
+| 0
+| 10
+| 0
+| 0
+| D-4 Ag Ni Cr5400
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2540
+| Haliburn (world)
+| B565777-7
+| 514
+| { 2 }
+| 8
+| 9
+| 1,080
+| 2,745
+| 137
+| 147
+| 212,350
+| 50,000
+| 200
+| 4
+| 995
+| B-7 Ag Ri Cr3700
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2636
+| Stock Point 3 (world)
+| A436110-F
+| 500
+| { 1 }
+| 6
+| 0
+| 2
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| A-F Lo Cr5500
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2638
+| Grecorn (world)
+| B79858C-B
+| 700
+| { 2 }
+| 8
+| 7
+| 840
+| 0
+| 0
+| 337
+| 133,765
+| 0
+| 0
+| 5
+| 2,010
+| B-B Ag Ni Cr4100
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2731
+| Filentred (world)
+| B548534-8
+| 504
+| { 0 }
+| 7
+| 7
+| 141
+| 0
+| 0
+| 49
+| 17,310
+| 0
+| 1
+| 3
+| 80
+| B-8 Ag Ni Cr3800
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2733
+| G'haenbaz (world)
+| C557558-A
+| 100
+| { 1 }
+| 7
+| 8
+| 140
+| 0
+| 0
+| 48
+| 17,075
+| 0
+| 1
+| 3
+| 75
+| C-A Ag Ni Cr5000
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2737
+| Bouvrier (world)
+| E430668-8
+| 210
+| { -3 }
+| 6
+| 0
+| 31
+| 1,831
+| 3
+| 0
+| 0
+| 2,000
+| 2
+| 0
+| 0
+| E-8 De Na Ni Po Cr7800
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2738
+| Cyril (world)
+| A7969B9-E
+| 522
+| { 5 }
+| 11
+| 7
+| 10,200
+| 13,125
+| 65,625
+| 9,175
+| 5,466,000
+| 5,500,000
+| 700
+| 6
+| 25,040
+| A-E Hi In Cr2400
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2739
+| Chateau (world)
+| E450200-5
+| 714
+| { -3 }
+| 3
+| 5
+| 2
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| E-5 De Lo Po Cr8500
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2740
+| Dead End (world)
+| C576310-5
+| 902
+| { -2 }
+| 5
+| 8
+| 5
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| C-5 Lo Cr6500
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2832
+| Debica (world)
+| D645688-6
+| 600
+| { -2 }
+| 7
+| 7
+| 64
+| 859
+| 5
+| 50
+| 17,475
+| 6,600
+| 3
+| 3
+| 80
+| D-6 Ag Ni Cr5600
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2833
+| Gundamoor (world)
+| B311637-C
+| 324
+| { 1 }
+| 8
+| 0
+| 350
+| 4,688
+| 14
+| 106
+| 44,565
+| 2,700
+| 1
+| 4
+| 290
+| B-C Ic Na Ni Cr5200
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2834
+| Bokilborn (world)
+| B573552-C
+| 804
+| { 1 }
+| 8
+| 8
+| 154
+| 0
+| 0
+| 149
+| 61,915
+| 0
+| 0
+| 4
+| 290
+| B-C Ni Cr5200
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2837
+| Angsturm (world)
+| A545788-B
+| 314
+| { 3 }
+| 10
+| 7
+| 3,276
+| 4,392
+| 131
+| 5,285
+| 2,223,740
+| 33,000
+| 12
+| 5
+| 10,460
+| A-B Ag Pi Cr2100
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2838
+| Vlad (world)
+| A554844-C
+| 804
+| { 2 }
+| 10
+| 8
+| 1,176
+| 5,860
+| 4,688
+| 4,366
+| 1,582,145
+| 680,000
+| 1,200
+| 5
+| 7,230
+| A-C Pa Ph Cr3200
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2931
+| Vleeck (world)
+| C762475-6
+| 404
+| { -2 }
+| 6
+| 8
+| 11
+| 0
+| 0
+| 0
+| 0
+| 0
+| 2
+| 0
+| 0
+| C-6 Ni Cr5600
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2932
+| Pamraeltan (world)
+| A537651-E
+| 703
+| { 1 }
+| 9
+| 0
+| 192
+| 7,500
+| 52
+| 393
+| 185,170
+| 6,649
+| 0
+| 4
+| 1,305
+| A-E Ni Cr4400
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2934
+| P'hakar (world)
+| C420456-B
+| 923
+| { 0 }
+| 6
+| 0
+| 89
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| C-B De He Ni Po Cr6100
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2935
+| Harmony (world)
+| E6538AF-4
+| 633
+| { -2 }
+| 6
+| 8
+| 840
+| 448
+| 268
+| 0
+| 0
+| 720,000
+| 2,000
+| 0
+| 0
+| E-4 Ph Po Cr5400
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 2939
+| Numeron (world)
+| B432769-9
+| 313
+| { 1 }
+| 9
+| 0
+| 1,560
+| 2,928
+| 87
+| 1,111
+| 362,140
+| 30,000
+| 15
+| 6
+| 23,885
+| B-9 Na Po Cr2900
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 3035
+| Mynez (world)
+| E627989-8
+| 904
+| { 0 }
+| 7
+| 0
+| 1,080
+| 3,204
+| 28,841
+| 13
+| 4,080
+| 9,900,000
+| 2,000
+| 3
+| 20
+| E-8 Hi In Cr5800
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 3036
+| Seville (world)
+| B657445-7
+| 404
+| { -1 }
+| 6
+| 8
+| 25
+| 0
+| 0
+| 0
+| 0
+| 0
+| 1
+| 0
+| 0
+| B-7 Ga Ni Pa Cr4700
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 3037
+| Dagu (world)
+| B100362-C
+| 504
+| { 1 }
+| 6
+| 0
+| 13
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| B-C Lo Va Cr7200
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 3038
+| Transit (world)
+| B987230-8
+| 520
+| { -1 }
+| 5
+| 8
+| 3
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 5
+| 1,850
+| B-8 Lo Cr5800
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 3040
+| Elphintrax (world)
+| C574476-7
+| 413
+| { -2 }
+| 6
+| 8
+| 13
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| C-7 Ni Pa Cr5700
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 3132
+| Alexander (world)
+| B42369A-B
+| 404
+| { 1 }
+| 8
+| 0
+| 900
+| 2,928
+| 11
+| 137
+| 51,915
+| 4,600
+| 1
+| 4
+| 230
+| B-B Na Ni Po Cr4100
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 3133
+| Breezy (world)
+| B100544-C
+| 704
+| { 1 }
+| 8
+| 0
+| 198
+| 0
+| 0
+| 172
+| 74,590
+| 0
+| 0
+| 4
+| 315
+| B-C Ni Va Cr6200
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 3134
+| Dlaekan (world)
+| A583657-D
+| 202
+| { 2 }
+| 9
+| 8
+| 600
+| 7,500
+| 15
+| 656
+| 902,000
+| 1,900
+| 10
+| 4
+| 3,100
+| A-D Ni Ri Cr5300
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 3135
+| Good Home (world)
+| B745789-9
+| 303
+| { 2 }
+| 9
+| 7
+| 2,376
+| 4,392
+| 131
+| 870
+| 367,440
+| 33,000
+| 15
+| 4
+| 1,570
+| B-9 Ag Pi Cr2900
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 3136
+| Alverik (world)
+| A550698-A
+| 800
+| { 1 }
+| 9
+| 6
+| 200
+| 2,928
+| 23
+| 1,126
+| 477,245
+| 9,200
+| 15
+| 5
+| 2,035
+| A-A De Ni Po Cr4000
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 3140
+| Unseren (world)
+| B552549-9
+| 803
+| { 0 }
+| 8
+| 7
+| 160
+| 0
+| 0
+| 270
+| 103,490
+| 0
+| 1
+| 6
+| 23,080
+| B-9 Ni Po Cr3900
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 3231
+| Roger (world)
+| B424200-B
+| 300
+| { 1 }
+| 5
+| 0
+| 3
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| 0
+| B-B Lo Cr6100
+| [[Moibin Subsector|Moibin]]
+
+|-
+| 3237
+| Jeandrent (world)
+| BA7A666-8
+| 613
+| { -1 }
+| 8
+| 7
+| 144
+| 1,831
+| 10
+| 209
+| 80,340
+| 6,000
+| 2
+| 4
+| 355
+| B-8 Ni Oc Cr4800
+| [[Moibin Subsector|Moibin]]
+<section end="Moibin" />
+|}
+
+[[Category: Sectors with sector economic data]]

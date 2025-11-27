@@ -26,7 +26,7 @@ logger = logging.getLogger('WikiUpload')
 
 
 def uploadSummaryText(site, summaryFile, era, area_name) -> None:
-    with codecs.open(summaryFile, 'r', encoding="utf-8") as f:
+    with codecs.open(summaryFile, 'r', encoding="utf-8") as f:  # pragma: no mutate
         lines = f.readlines()
 
     name = 'initial table'
@@ -34,7 +34,9 @@ def uploadSummaryText(site, summaryFile, era, area_name) -> None:
 
     for line in lines:
         if "statistics ==" in line:
-            name = line.strip().strip('=').replace('statistics', '').strip()
+            name = line.strip()
+            name = name.strip('=')  # pragma: no mutate
+            name = name.replace('statistics', '').strip()
             stats_text[name] = []
         else:
             stats_text[name].append(line)
@@ -55,7 +57,7 @@ def uploadSummaryText(site, summaryFile, era, area_name) -> None:
 
 
 def uploadSec(site, filename, place, era) -> None:
-    with codecs.open(filename, "r", encoding="utf-8") as f:
+    with codecs.open(filename, "r", encoding="utf-8") as f:  # pragma: no mutate
         text = f.read()
     targetTitle = os.path.basename(filename).split('.')[0] + place
     target_page = site.get_page(targetTitle)
@@ -129,7 +131,7 @@ No information yet available.
 {{{{LEN}}}}
 '''
     try:
-        with codecs.open(sectorFile, 'r', encoding="utf-8") as f:
+        with codecs.open(sectorFile, 'r', encoding="utf-8") as f:  # pragma: no mutate
             sectorLines = [line for line in f]
     except (OSError, IOError):
         logger.error("Sector file not found: {}".format(sectorFile))
@@ -140,7 +142,7 @@ No information yet available.
                           or line.startswith('|}') or line.startswith('[[Category:'))]
 
     try:
-        with codecs.open(economicFile, 'r', encoding="utf-8") as f:
+        with codecs.open(economicFile, 'r', encoding="utf-8") as f:  # pragma: no mutate
             economicLines = [line for line in f]
     except (OSError, IOError):
         logger.error("Economic file not found: {}".format(economicFile))
