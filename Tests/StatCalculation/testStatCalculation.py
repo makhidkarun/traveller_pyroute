@@ -159,7 +159,7 @@ class testStatCalculation(baseTest):
         self.assertEqual(756, objstat.sum_ru)
         self.assertEqual(400, objstat.tradeVol)
         self.assertEqual(1.5, objstat.col_be)
-        self.assertAlmostEquals(0.45, objstat.im_be, 3)
+        self.assertAlmostEqual(0.45, objstat.im_be, 3)
         self.assertEqual(11, objstat.passengers)
         self.assertEqual(0, objstat.spa_people)
         self.assertEqual(1, objstat.port_size['B'])
@@ -228,6 +228,26 @@ class testStatCalculation(baseTest):
         stat = StatCalculation(galaxy)
         objstat = ObjectStatistics()
         objstat.primary_count[None] = 0
+
+        msg = None
+        try:
+            stat.add_stats(objstat, star1)
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Null primary type will blow up templating', msg)
+
+    def test_add_stats_4(self) -> None:
+        galaxy = Galaxy(8, 4)
+
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            B9C4733-9 Fl                   { 0 }  (E69+0) [4726]  B    - - 423 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+        star1.star_list[0].spectral = None
+        star1.star_list[0].size = None
+
+        stat = StatCalculation(galaxy)
+        objstat = ObjectStatistics()
 
         msg = None
         try:
@@ -307,7 +327,7 @@ class testStatCalculation(baseTest):
 
         stat.per_capita([star1, star2, star3, star4], objstat)
         self.assertEqual(8.5, objstat.TLmean)
-        self.assertAlmostEquals(1.118, objstat.TLstddev, 3)
+        self.assertAlmostEqual(1.118, objstat.TLstddev, 3)
         self.assertEqual([star4, star3], objstat.high_pop_worlds)
         self.assertEqual([star3], objstat.high_tech_worlds)
         self.assertEqual([star3], objstat.subsectorCp)
@@ -334,7 +354,7 @@ class testStatCalculation(baseTest):
 
         stat.per_capita([star1, star2, star3], objstat)
         self.assertEqual(0, objstat.TLmean)
-        self.assertAlmostEquals(0, objstat.TLstddev, 3)
+        self.assertAlmostEqual(0, objstat.TLstddev, 3)
         self.assertEqual([star3], objstat.high_pop_worlds)
         self.assertEqual([star3], objstat.high_tech_worlds)
         self.assertEqual([star3], objstat.subsectorCp)

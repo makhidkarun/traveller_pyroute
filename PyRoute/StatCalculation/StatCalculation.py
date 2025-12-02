@@ -5,6 +5,8 @@ Created on Mar 17, 2014
 """
 import logging
 import math
+
+from PyRoute import Star
 from PyRoute.wikistats import WikiStats
 from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.StatCalculation.ObjectStatistics import ObjectStatistics
@@ -39,8 +41,8 @@ class StatCalculation(object):
                 star.uwpCodes['Starport Size'] = star.starportSize
                 # Budget in MCr
                 star.starportBudget = \
-                    ((star.tradeIn // 10000) * 150 + (star.tradeOver // 10000) * 140 +
-                     (star.passIn) * 500 + (star.passOver) * 460) // 1000000
+                    ((star.tradeIn // 10000) * 150 + (star.tradeOver // 10000) * 140 +  # pragma: no mutate
+                     (star.passIn) * 500 + (star.passOver) * 460) // 1000000  # pragma: no mutate
 
                 # Population in people employed.
                 star.starportPop = int(star.starportBudget / 0.2)
@@ -134,10 +136,12 @@ class StatCalculation(object):
 
             total_pct -= soph_pct
 
+        if not isinstance(home, (Star, type(None))):
+            raise ValueError
         # We don't need to hear umpteen times that a given star has bad sophont percentages - just once will do
         squish = star.suppress_soph_percent_warning is True
 
-        if total_pct < -5 and not squish:
+        if total_pct < -5 and not squish:  # pragma: no mutate
             self.logger.warning("{} has sophont percent over 100%: {}".format(star, total_pct))
             star.suppress_soph_percent_warning = True
         elif total_pct < 0 and not squish:
