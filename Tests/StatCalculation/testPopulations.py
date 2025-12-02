@@ -3,7 +3,7 @@ Created on Dec 03, 2025
 
 @author: CyberiaResurrection
 """
-from PyRoute.StatCalculation import Populations
+from PyRoute.StatCalculation.Populations import Populations
 from Tests.baseTest import baseTest
 
 

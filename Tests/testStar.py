@@ -11,7 +11,7 @@ from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Position.Hex import Hex
 from PyRoute.Calculation.TradeCalculation import TradeCalculation
-from PyRoute.StatCalculation import StatCalculation
+from PyRoute.StatCalculation.StatCalculation import StatCalculation
 
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Sector import Sector

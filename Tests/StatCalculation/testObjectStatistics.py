@@ -4,7 +4,8 @@ Created on Dec 03, 2025
 @author: CyberiaResurrection
 """
 from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
-from PyRoute.StatCalculation import ObjectStatistics, Populations
+from PyRoute.StatCalculation.Populations import Populations
+from PyRoute.StatCalculation.ObjectStatistics import ObjectStatistics
 from Tests.baseTest import baseTest
 
 

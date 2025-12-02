@@ -19,9 +19,9 @@ from PyRoute.Calculation.TradeMPCalculation import TradeMPCalculation
 from PyRoute.Calculation.XRouteCalculation import XRouteCalculation
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
+from PyRoute.StatCalculation.ObjectStatistics import ObjectStatistics
 from PyRoute.Pathfinding.RouteLandmarkGraph import RouteLandmarkGraph
 from PyRoute.Position.Hex import Hex
-from PyRoute.StatCalculation import ObjectStatistics
 from PyRoute.SystemData.StarList import StarList
 from PyRoute.SystemData.UWP import UWP
 from PyRoute.TradeCodes import TradeCodes

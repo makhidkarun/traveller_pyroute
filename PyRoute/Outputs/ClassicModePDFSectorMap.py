@@ -17,7 +17,7 @@ from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Outputs.HexGrid import HexGrid
 from PyRoute.Outputs.PDFMap import PDFMap
 from PyRoute.Outputs.SectorMap import SectorMap
-from PyRoute.StatCalculation import StatCalculation
+from PyRoute.StatCalculation.StatCalculation import StatCalculation
 
 
 class ClassicModePDFSectorMap(PDFMap, SectorMap):

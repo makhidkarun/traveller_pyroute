@@ -6,7 +6,7 @@ Created on Nov 27, 2025
 
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.AreaItems.Subsector import Subsector
-from PyRoute.StatCalculation import ObjectStatistics
+from PyRoute.StatCalculation.ObjectStatistics import ObjectStatistics
 from Tests.baseTest import baseTest
 
 

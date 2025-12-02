@@ -1,5 +1,5 @@
 """
-Created on Oct 19, 2023
+Created on Dec 03, 2023
 
 @author: CyberiaResurrection
 """
@@ -7,10 +7,11 @@ import copy
 
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.StatCalculation import StatCalculation, Populations
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
-from Tests.baseTest import baseTest
+from PyRoute.StatCalculation.Populations import Populations
+from PyRoute.StatCalculation.StatCalculation import StatCalculation
 from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
+from Tests.baseTest import baseTest
 
 
 class testStatCalcRegression(baseTest):
