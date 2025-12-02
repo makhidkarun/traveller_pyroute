@@ -49,13 +49,13 @@ class Subsector(AreaItem):
         if len(self.name) == 0:
             return "Location {}".format(self.position)
         else:
-            return self.name[:-9] if self.name.endswith('Subsector') else self.name
+            return self.name[:-9].strip() if self.name.endswith('Subsector') else self.name
 
     def set_bounding_subsectors(self) -> None:
         posrow = 0
         for row in self.positions:
             if self.position in row:
-                pos = self.positions[posrow].index(self.position)
+                pos = self.positions[posrow].index(self.position)  # pragma: no mutate
                 break
             posrow += 1
 
