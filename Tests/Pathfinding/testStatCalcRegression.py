@@ -46,7 +46,6 @@ class testStatCalcRegression(baseTest):
 
     def testStatsCalcReftSector(self) -> None:
         self.maxDiff = None
-
         sourcefile = self.unpack_filename('DeltaFiles/reft-allegiance-pax-balance/Reft Sector.sec')
 
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
@@ -93,7 +92,7 @@ class testStatCalcRegression(baseTest):
                                         'O:Troj-3215': 1, 'Oc': 2, 'Pa': 10, 'Ph': 6, 'Pi': 9, 'Po': 20, 'Pr': 6,
                                         'Pz': 9, 'Ri': 9, 'RsA': 1, 'RsB': 1, 'Tapa2': 1, 'Tapa3': 1, 'Tapa4': 1,
                                         'Tapa6': 1, 'Tapa8': 1, 'Va': 15, 'Wa': 3})
-        expected['port_size'].update({0: 23, 1: 27, 2: 41, 3: 24, 4: 4, 5: 3, 'A': 22, 'B': 61, 'C': 18, 'D': 11,
+        expected['port_size'].update({0: 22, 1: 28, 2: 41, 3: 24, 4: 4, 5: 3, 'A': 22, 'B': 61, 'C': 18, 'D': 11,
                                       'E': 8, 'X': 2})
         expected['primary_count'].update({'A': 3, 'F': 23, 'G': 43, 'K': 31, 'M': 22})
         expected['star_count'][1] = 74
@@ -103,8 +102,8 @@ class testStatCalcRegression(baseTest):
         expected['populations']['Chir'].count = 3
         expected['populations']['Chir'].population = 6
         expected['populations']['Droy'] = Populations()
-        expected['populations']['Droy'].count = 3
-        expected['populations']['Droy'].population = 2
+        expected['populations']['Droy'].count = 2
+        expected['populations']['Droy'].population = -1
         expected['populations']['Huma'] = Populations()
         expected['populations']['Huma'].count = 122
         expected['populations']['Huma'].population = 80467
@@ -113,13 +112,17 @@ class testStatCalcRegression(baseTest):
         expected['populations']['Orph'].population = 1
         expected['populations']['Orph'].homeworlds.append(galaxy.star_mapping[53])
         expected['populations']['Sali'] = Populations()
-        expected['populations']['Sali'].count = 1
+        expected['populations']['Sali'].count = 0
+        expected['populations']['Sali'].population = -1
         expected['populations']['Tapa'] = Populations()
         expected['populations']['Tapa'].count = 6
         expected['populations']['Tapa'].population = 2
         expected['populations']['Tapa'].homeworlds.append(galaxy.star_mapping[116])
         actual = gal_stats.__getstate__()
         act_pops = actual['populations']
+        self.assertEqual(expected['populations'].keys(), act_pops.keys())
+        for pop in expected['populations']:
+            self.assertEqual(expected['populations'][pop], act_pops[pop], pop)
         self.assertEqual(expected['populations'], act_pops)
         self.assertEqual(expected, actual)
 

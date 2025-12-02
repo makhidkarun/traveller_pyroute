@@ -34,8 +34,6 @@ class StatCalculation(object):
 
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
         for sector in self.galaxy.sectors.values():
-            if sector is None:
-                continue
             for star in sector.worlds:
                 star.starportSize = max(self.trade_to_btn(star.tradeIn + star.tradeOver) - 5, 0)
                 star.uwpCodes['Starport Size'] = star.starportSize
@@ -120,14 +118,15 @@ class StatCalculation(object):
                 default_soph = soph_code
                 continue
 
-            soph_pct = 100.0 if soph_pct == 'W' else 0.0 if soph_pct in ['X', 'A', '?'] else \
+            old_soph_pct = soph_pct
+            soph_pct = 100.0 if soph_pct == 'W' else 0.0 if soph_pct in ['X', '?'] else \
                 5.0 if soph_pct == '0' else 10.0 * int(soph_pct)
 
             if any([soph for soph in star.tradeCode.homeworld if soph.startswith(soph_code)]):
                 home = star
 
             # Soph_pct == 'X' is dieback or extinct.
-            if soph_pct == 'X':
+            if old_soph_pct == 'X':
                 stats.populations[soph_code].population = -1
             # skip the empty worlds
             elif not star.tradeCode.barren:
@@ -211,14 +210,14 @@ class StatCalculation(object):
         stats.eti_pass += star.eti_pass_volume
 
     def max_tl(self, stats, star) -> None:
+        ports = 'ABCDEX?'
+
         stats.maxTL = max(stats.maxTL, star.tl)
-        stats.maxPort = 'ABCDEX?'[min('ABCDEX?'.index(star.uwpCodes['Starport']), 'ABCDEX?'.index(stats.maxPort))]
+        stats.maxPort = ports[min(ports.index(star.uwpCodes['Starport']), ports.index(stats.maxPort))]  # pragma: no mutate
         stats.maxPop = max(stats.maxPop, star.popCode)
 
     def per_capita(self, worlds, stats) -> None:
-        if stats.population > 100000:
-            stats.percapita = stats.economy // (stats.population // 1000)
-        elif stats.population > 0:
+        if stats.population > 0:
             stats.percapita = stats.economy * 1000 // stats.population
         else:
             stats.percapita = 0
@@ -266,6 +265,9 @@ class StatCalculation(object):
 
             self.logger.debug("min count: {}, match: {}".format(ally_count, ally_match))
 
+        self._write_statistics_to_wiki(ally_count, ally_match, json_data)
+
+    def _write_statistics_to_wiki(self, ally_count, ally_match, json_data):
         wiki = WikiStats(self.galaxy, self.all_uwp, ally_count, ally_match, json_data)
         wiki.write_statistics()
 
@@ -273,4 +275,5 @@ class StatCalculation(object):
     def trade_to_btn(trade) -> int:
         if trade == 0:
             return 0
-        return int(math.log(trade, 10))
+        raw_btn = round(math.log(trade, 10), 2)
+        return int(raw_btn)
