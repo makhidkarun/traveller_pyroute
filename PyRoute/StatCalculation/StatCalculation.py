@@ -6,7 +6,7 @@ Created on Mar 17, 2014
 import logging
 import math
 
-from PyRoute import Star
+from PyRoute.Star import Star
 from PyRoute.wikistats import WikiStats
 from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.StatCalculation.ObjectStatistics import ObjectStatistics
@@ -248,7 +248,6 @@ class StatCalculation(object):
         for target in self.galaxy.ranges.neighbors_iter(world):
             if target.position == owner_hex:
                 target.tradeCode.append("C:{}-{}".format(world.sector[0:4], world.position))
-                pass
 
     def write_statistics(self, ally_count, ally_match, json_data) -> None:
         self.logger.info('Charted star count: ' + str(self.galaxy.stats.number))
@@ -272,8 +271,8 @@ class StatCalculation(object):
         self._write_statistics_to_wiki(ally_count, ally_match, json_data)
 
     def _write_statistics_to_wiki(self, ally_count, ally_match, json_data):
-        wiki = WikiStats(self.galaxy, self.all_uwp, ally_count, ally_match, json_data)
-        wiki.write_statistics()
+        wiki = WikiStats(self.galaxy, self.all_uwp, ally_count, ally_match, json_data)  # pragma: no mutate
+        wiki.write_statistics()  # pragma: no mutate
 
     @staticmethod
     def trade_to_btn(trade) -> int:
