@@ -1,4 +1,5 @@
 from collections import defaultdict
+from unittest.mock import patch
 
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
@@ -9,7 +10,10 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
 
     def testAllyGenBorderOddClientState(self) -> None:
         self.setupOneWorldCoreSector("0503", 0, "CsIm")
-        self.borders.create_ally_map('separate')
+
+        with patch.object(self.borders, 'is_well_formed', return_value=(True, '')) as mock_method:
+            self.borders.create_ally_map('separate')
+            mock_method.assert_called_once()
 
         ally_map = self.borders.allyMap
         borders = self.borders.borders
@@ -28,6 +32,8 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         # Hexes which collapse to non-aligned shouldn't have _any_ borders
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def testAllyGenBorderOddImperialWorld(self) -> None:
         self.setupOneWorldCoreSector("0503", 0, "ImDs")
@@ -49,6 +55,8 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def testAllyGenBorderTwoOddImperialWorlds(self) -> None:
         self.setupOneWorldCoreSector("0503", 0, "ImDs")
@@ -73,6 +81,8 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def testAllyGenBorderTwoEvenImperialWorlds(self) -> None:
         self.setupOneWorldCoreSector("0603", 0, "ImDs")
@@ -97,6 +107,34 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def testAllyGenBorderTwoEvenImperialWorldsCollapse(self) -> None:
+        self.setupOneWorldCoreSector("0603", 0, "ImDs")
+        self.setupOneWorldCoreSector("0604", 1, "ImDs")
+        self.assertEqual(2, len(self.galaxy.star_mapping), "Should be 2 worlds in galaxy")
+        self.borders.create_ally_map('collapse', False)
+
+        ally_map = self.borders.allyMap
+        borders = self.borders.borders
+        borders_map = self.borders.borders_map
+
+        expected_ally_map = defaultdict(set)
+        expected_ally_map[(5, 34)] = 'Im'
+        expected_ally_map[(5, 33)] = 'Im'
+
+        expected_borders = {
+            (5, 32): ['green', 'orange', 'black'], (5, 33): [None, 'orange', 'black'], (5, 34): ['blue', None, None],
+            (6, 32): [None, 'maroon', 'pink'], (6, 33): [None, 'maroon', 'pink']
+        }
+        expected_borders_map = {}
+
+        self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
+        self.assertEqual(expected_borders, borders, "Unexpected borders value")
+        self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def testAllyGenBorderOnIbaraSubsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
@@ -111,7 +149,15 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         self.galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
                             args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         self.borders = self.galaxy.borders
-        self.borders.create_ally_map('separate', False)
+        logger = self.borders.logger
+        logger.manager.disable = 0
+
+        with self.assertLogs(logger, "DEBUG") as logs:
+            self.borders.create_ally_map('separate', False)
+            output = logs.output
+
+            exp_output = ['INFO:PyRoute.Borders:Processing worlds for ally map drawing']
+            self.assertEqual(exp_output, output)
 
         ally_map = dict(self.borders.allyMap)
         borders = self.borders.borders
@@ -184,6 +230,8 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def testAllyGenBorderOnFarFrontiersSector(self) -> None:
         sourcefile = self.unpack_filename('BorderGeneration/Far Frontiers.sec')
@@ -221,6 +269,8 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
             borders = {key: borders[key] for key in borders if key not in combo}
             self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def testAllyGenBorderOnFarFrontiersPartialSector(self) -> None:
         sourcefile = self.unpack_filename('BorderGeneration/Far Frontiers - partial.sec')
@@ -258,6 +308,8 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
             borders = {key: borders[key] for key in borders if key not in combo}
             self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def testAllyGenBorderOnVanguardReachesSector(self) -> None:
         sourcefile = self.unpack_filename('BorderGeneration/Vanguard Reaches.sec')
@@ -295,3 +347,5 @@ class TestAllyGenAllyGenCharacterise(TestAllyGenBase):
             borders = {key: borders[key] for key in borders if key not in combo}
             self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)

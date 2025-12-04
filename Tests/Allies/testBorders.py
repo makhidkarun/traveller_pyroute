@@ -52,6 +52,29 @@ class testBorders(baseTest):
         self.assertEqual(exp_borders, borders.borders)
         self.assertEqual(exp_borders_map, borders.borders_map)
         self.assertEqual(exp_allymap, borders.allyMap)
+        result, msg = borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def test_ally_map_x_port_diff_q(self) -> None:
+        galaxy = Galaxy(0)
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star.parse_line_into_star(
+            "0204 Irkigkhan            X9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+        star1.index = 0
+        galaxy.star_mapping[0] = star1
+
+        borders = galaxy.borders
+        borders.create_ally_map('')
+        exp_borders = {(1, 34): ['red', 'red', 'red'], (1, 35): ['red', None, None], (2, 34): [None, 'red', 'red']}
+        exp_borders_map = {}
+        exp_allymap = defaultdict(set, {(1, 35): 'Im'})
+
+        self.assertEqual(exp_borders, borders.borders)
+        self.assertEqual(exp_borders_map, borders.borders_map)
+        self.assertEqual(exp_allymap, borders.allyMap)
+        result, msg = borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def test_ally_map_e_port(self) -> None:
         galaxy = Galaxy(0)
@@ -72,6 +95,8 @@ class testBorders(baseTest):
         self.assertEqual(exp_borders, borders.borders)
         self.assertEqual(exp_borders_map, borders.borders_map)
         self.assertEqual(exp_allymap, borders.allyMap)
+        result, msg = borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def test_ally_map_d_port(self) -> None:
         galaxy = Galaxy(0)
@@ -93,6 +118,8 @@ class testBorders(baseTest):
         self.assertEqual(exp_borders, borders.borders)
         self.assertEqual(exp_borders_map, borders.borders_map)
         self.assertEqual(exp_allymap, borders.allyMap)
+        result, msg = borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def test_ally_map_c_port(self) -> None:
         galaxy = Galaxy(0)
@@ -118,6 +145,8 @@ class testBorders(baseTest):
         self.assertEqual(exp_borders, borders.borders)
         self.assertEqual(exp_borders_map, borders.borders_map)
         self.assertEqual(exp_allymap, borders.allyMap)
+        result, msg = borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def test_ally_map_b_port(self) -> None:
         galaxy = Galaxy(0)
@@ -148,6 +177,8 @@ class testBorders(baseTest):
         self.assertEqual(exp_borders, borders.borders)
         self.assertEqual(exp_borders_map, borders.borders_map)
         self.assertEqual(exp_allymap, borders.allyMap)
+        result, msg = borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def test_ally_map_a_port(self) -> None:
         galaxy = Galaxy(0)
@@ -186,6 +217,8 @@ class testBorders(baseTest):
         self.assertEqual(exp_borders, borders.borders)
         self.assertEqual(exp_borders_map, borders.borders_map)
         self.assertEqual(exp_allymap, borders.allyMap)
+        result, msg = borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def test_ally_map_na_port(self) -> None:
         galaxy = Galaxy(0)
@@ -206,6 +239,8 @@ class testBorders(baseTest):
         self.assertEqual(exp_borders, borders.borders)
         self.assertEqual(exp_borders_map, borders.borders_map)
         self.assertEqual(exp_allymap, borders.allyMap)
+        result, msg = borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def test_ally_map_two_different_allegiances_one_droyne(self) -> None:
         galaxy = Galaxy(0)
@@ -248,3 +283,159 @@ class testBorders(baseTest):
         self.assertEqual(exp_borders, borders.borders)
         self.assertEqual(exp_borders_map, borders.borders_map)
         self.assertEqual(exp_allymap, borders.allyMap)
+        result, msg = borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def test_ally_map_six_different_allegiances_around_blank(self) -> None:
+        galaxy = Galaxy(0)
+        sector = Sector('# Zdiedeiant', '# -7,3')
+        star1 = Star.parse_line_into_star(
+            '0332 Plit-79              E252000-0 Ba Po                               - -  R 020   ZhIa        ',
+            sector, 'fixed', 'fixed'
+        )
+        star1.index = 0
+        galaxy.star_mapping[0] = star1
+        star2 = Star.parse_line_into_star(
+            '0532 Uevro                E3515X6-9 Ni Po                               - -  R 322   ZhIN          ',
+            sector, 'fixed', 'fixed'
+        )
+        star2.index = 1
+        galaxy.star_mapping[1] = star2
+        star3 = Star.parse_line_into_star(
+            '0433 Plit-79              E252000-0 Ba Po                               - -  R 020   Zh          ',
+            sector, 'fixed', 'fixed'
+        )
+        star3.index = 2
+        galaxy.star_mapping[2] = star3
+        star4 = Star.parse_line_into_star(
+            '0431 Uevro                E3515X6-9 Ni Po                               - -  R 322   CsZh          ',
+            sector, 'fixed', 'fixed'
+        )
+        star4.index = 3
+        galaxy.star_mapping[3] = star4
+        star5 = Star.parse_line_into_star(
+            '0333 Plit-79              E252000-0 Ba Po                               - -  R 020   ZhVq        ',
+            sector, 'fixed', 'fixed'
+        )
+        star5.index = 4
+        galaxy.star_mapping[4] = star5
+        star6 = Star.parse_line_into_star(
+            '0533 Uevro                E3515X6-9 Ni Po                               - -  R 322   ZhCh          ',
+            sector, 'fixed', 'fixed'
+        )
+        star6.index = 5
+        galaxy.star_mapping[5] = star6
+
+        galaxy.alg['ZhIN'] = Allegiance('ZhIN', 'Zhodani Consulate', False, 'Zhod')
+        galaxy.alg['ZhIN'].stats.numbers = 1
+        galaxy.alg['ZhIa'] = Allegiance('ZhIa', 'Zhodani Consulate', False, 'Zhod')
+        galaxy.alg['ZhIa'].stats.numbers = 1
+        galaxy.alg['Zh'] = Allegiance('Zh', 'Zhodani Consulate', True, 'Zhod')
+        galaxy.alg['Zh'].stats.numbers = 1
+        galaxy.alg['CsZh'] = Allegiance('CsZh', 'Client state, Zhodani Consulate', False, 'Zhod')
+        galaxy.alg['CsZh'].stats.numbers = 1
+        galaxy.alg['ZhVq'] = Allegiance('ZhVq', 'Zhodani Consulate', False, 'Zhod')
+        galaxy.alg['ZhVq'].stats.numbers = 1
+        galaxy.alg['ZhCh'] = Allegiance('ZhCh', 'Zhodani Consulate', False, 'Zhod')
+        galaxy.alg['ZhCh'].stats.numbers = 1
+
+        borders = galaxy.borders
+        borders.create_ally_map('separate')
+        exp_borders = {
+            (-222, 237): ['white', 'white', None], (-222, 238): ['white', 'white', 'white'],
+            (-222, 239): ['white', None, 'white'], (-221, 236): ['blue', 'white', 'blue'],
+            (-221, 237): ['white', 'white', 'white'], (-221, 238): ['white', None, 'white'],
+            (-220, 236): ['white', 'white', 'blue'], (-220, 237): ['white', 'white', None],
+            (-220, 238): ['white', None, 'white'], (-219, 235): [None, 'white', None],
+            (-219, 236): [None, 'white', 'white'], (-219, 237): [None, None, 'white']
+        }
+        exp_borders_map = {}
+        exp_allymap = defaultdict(set, {
+            (-222, 238): 'ZhVq',
+            (-222, 239): 'ZhIa',
+            (-222, 240): None,
+            (-221, 237): 'Zh',
+            (-221, 238): 'ZhCh',
+            (-221, 239): 'Na',
+            (-221, 240): None,
+            (-220, 237): 'ZhCh',
+            (-220, 238): 'ZhIN',
+            (-220, 239): None
+        })
+
+        self.assertEqual(exp_borders, borders.borders)
+        self.assertEqual(exp_borders_map, borders.borders_map)
+        self.assertEqual(exp_allymap, borders.allyMap)
+        result, msg = borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def test_ally_map_one_noone_world(self) -> None:
+        galaxy = Galaxy(0)
+        sector = Sector('# Zdiedeiant', '# -7,3')
+        star1 = Star.parse_line_into_star(
+            '0332 Plit-79              X252000-0 Ba Po                               - -  R 020   --        ',
+            sector, 'fixed', 'fixed'
+        )
+        star1.index = 0
+        galaxy.star_mapping[0] = star1
+        borders = galaxy.borders
+        borders.create_ally_map('separate')
+        exp_borders = {
+        }
+        exp_borders_map = {}
+        exp_allymap = defaultdict(set, {
+            (-223, 239): None, (-223, 240): None, (-222, 238): None,
+            (-222, 239): 'Na', (-222, 240): None, (-221, 238): None,
+            (-221, 239): None
+        })
+        self.assertEqual(exp_borders, borders.borders)
+        self.assertEqual(exp_borders_map, borders.borders_map)
+        self.assertEqual(exp_allymap, borders.allyMap)
+        result, msg = borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def test_erode_a_ports(self) -> None:
+        galaxy = Galaxy(0)
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            A9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+        star1.index = 0
+        galaxy.star_mapping[0] = star1
+
+        star2 = Star.parse_line_into_star(
+            "0303 Irkigkhan            A9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+        star1.index = 1
+        galaxy.star_mapping[1] = star2
+
+        borders = galaxy.borders
+        borders.create_erode_border('separate')
+        exp_borders = {(0, 36): ['red', 'red', None], (0, 37): ['red', None, 'red'], (1, 35): [None, 'red', None],
+                       (1, 36): [None, None, 'red'], (2, 35): ['red', 'red', None], (2, 36): ['red', None, 'red'],
+                       (3, 34): [None, 'red', None], (3, 35): [None, None, 'red']}
+        exp_borders_map = {}
+        exp_allymap = defaultdict(set, {
+            (0, 37): 'Im', (2, 36): 'Im'
+        })
+
+        self.assertEqual(exp_borders, borders.borders)
+        self.assertEqual(exp_borders_map, borders.borders_map)
+        self.assertEqual(exp_allymap, borders.allyMap)
+        result, msg = borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def test_break_spans(self) -> None:
+        cases = [
+            ({}, {}, False, {}),
+            ({}, {(0, 36): 'Im', (-1, 36): 'Im', (-2, 36): 'Im', (-3, 36): 'Im'},
+             True, {(0, 36): 'Im', (-1, 36): None, (-2, 36): 'Im', (-3, 36): 'Im'})
+        ]
+
+        for starmap, allymap, exp_changed, exp_allymap in cases:
+            galaxy = Galaxy(0)
+            borders = galaxy.borders
+            changed, act_allymap = borders._break_spans(allymap, starmap)
+            self.assertIsNotNone(changed, "Boolean flag must not be None")
+            self.assertEqual(exp_changed, changed, "Unexpected changed value")
+            self.assertEqual(exp_allymap, act_allymap, "Unexpected ally-map value")

@@ -59,7 +59,7 @@ class Borders(object):
 
         self._generate_borders(self.allyMap, enforce)
 
-    def _generate_borders(self, allyMap: AllyMap, enforce=True) -> None:
+    def _generate_borders(self, allyMap: AllyMap, enforce: bool) -> None:
         """
         This is deep, dark magic.  Futzing with this will break the border drawing process.
 
@@ -70,6 +70,8 @@ class Borders(object):
         This is a bit of a mess because the line drawing in HexMap is a little strange,
         So the complexity is here to make the draw portion quick.
         """
+        assert isinstance(enforce, bool)
+
         for system in allyMap:
             colours: list[Colour]
             if self.galaxy.debug_flag:  # type: ignore
@@ -192,8 +194,8 @@ class Borders(object):
             cand_hex = (star.q, star.r)
             alg = star_map[cand_hex]
 
-            max_range = 1 if star.port in ['E', 'X'] else ['D', 'C', 'B', 'A'].index(star.port) + 2
-            if AllyGen.is_nonaligned(alg, True):
+            max_range = 1 if star.port in ['E', 'X', '?'] else ['D', 'C', 'B', 'A'].index(star.port) + 2
+            if AllyGen.is_nonaligned(alg):
                 max_range = 2
             for dist in range(max_range):
                 neighbor = Hex.get_neighbor(cand_hex, 4, dist)
@@ -216,24 +218,22 @@ class Borders(object):
             else:
                 raw_ally_list = [algs for algs in ally_map[cand_hex]]
                 ally_list = sorted(raw_ally_list, key=itemgetter(1, 0))
-                if ally_list[0][1] == 0:
-                    ally_map[cand_hex] = ally_list[0][0]
+
+                min_distance = ally_list[0][1]
+                ally_dist = [algs for algs in ally_list if algs[1] == min_distance]
+                if len(ally_dist) == 1:
+                    ally_map[cand_hex] = ally_dist[0][0]
                 else:
-                    min_distance = ally_list[0][1]
-                    ally_dist = [algs for algs in ally_list if algs[1] == min_distance]
-                    if len(ally_dist) == 1:
-                        ally_map[cand_hex] = ally_dist[0][0]
-                    else:
-                        max_count = -1
-                        max_ally: Union[str, None] = None
-                        for alg, _ in ally_dist:
-                            if AllyGen.is_nonaligned(alg, True):
-                                max_ally = alg
-                                break
-                            if self.galaxy.alg[alg].stats.number > max_count:  # type: ignore
-                                max_ally = alg
-                                max_count = self.galaxy.alg[alg].stats.number  # type: ignore
-                        ally_map[cand_hex] = max_ally  # type: ignore
+                    max_count = -1  # pragma: no mutate
+                    max_ally: Union[str, None] = None  # pragma: no mutate
+                    for alg, _ in ally_dist:
+                        if AllyGen.is_nonaligned(alg):
+                            max_ally = alg
+                            break
+                        if self.galaxy.alg[alg].stats.number > max_count:  # type: ignore
+                            max_ally = alg
+                            max_count = self.galaxy.alg[alg].stats.number  # type: ignore
+                    ally_map[cand_hex] = max_ally  # type: ignore
 
         # Pass 3: find lonely claimed hexes and remove them
         # Do two passes through the data
@@ -247,12 +247,13 @@ class Borders(object):
                     neighbor_algs[neighbor_alg] += 1  # pragma: no mutate
 
                 alg_list = sorted(iter(neighbor_algs.items()), key=itemgetter(1), reverse=True)
-                if len(alg_list) == 0:
-                    ally_map[cand_hex] = None  # type: ignore
-                elif alg_list[0][1] >= 1:
-                    ally_map[cand_hex] = alg_list[0][0]  # type: ignore
-                else:
-                    ally_map[cand_hex] = AllyGen.nonAligned[0]  # type: ignore
+                # Alg_list can't be empty, as it's a sort on items of a 6-element defaultdict
+                # if len(alg_list) == 0:
+                #    ally_map[cand_hex] = None  # type: ignore
+                # if alg_list[0][1] >= 1:
+                ally_map[cand_hex] = alg_list[0][0]  # type: ignore
+                # else:
+                #    ally_map[cand_hex] = AllyGen.nonAligned[0]  # type: ignore
 
         return ally_map  # type: ignore
 
@@ -339,7 +340,7 @@ class Borders(object):
             cand_ally = ally_map[cand_hex]
             for direction in range(6):
                 check_hex = Hex.get_neighbor(cand_hex, direction)
-                neighborAlg = ally_map.get(check_hex, None)
+                neighborAlg = ally_map.get(check_hex)
                 if not AllyGen.are_allies(cand_ally, neighborAlg):
                     edge_map[cand_hex] = cand_ally
 
@@ -350,7 +351,7 @@ class Borders(object):
                 if self._check_aligned(star_map, edge_map, cand_hex, direction, 1) and \
                         self._check_aligned(star_map, edge_map, cand_hex, direction, 2) and \
                         self._check_aligned(star_map, edge_map, cand_hex, direction, 3):
-                    check_hex = Hex.get_neighbor(cand_hex, direction, 1)
+                    check_hex = Hex.get_neighbor(cand_hex, direction)
                     ally_map[check_hex] = None
                     edge_map[check_hex] = None
                     changed = True
@@ -364,7 +365,7 @@ class Borders(object):
         # Occupied hex does not count as aligned for this check
         if check_hex in star_map:
             return False
-        check_alleg = edge_map.get(check_hex, None)
+        check_alleg = edge_map.get(check_hex)
         return AllyGen.are_allies(start_alleg, check_alleg)
 
     def _build_bridges(self, ally_map: AllyMap, star_map: AllyMap) -> None:
@@ -389,7 +390,7 @@ class Borders(object):
                 if AllyGen.are_allies(star_candidate, star_map[check_hex]):
                     checked.append(check_hex)
                 continue
-            if AllyGen.are_allies(star_candidate, ally_map.get(check_hex, None)):
+            if AllyGen.are_allies(star_candidate, ally_map.get(check_hex)):
                 checked.append(check_hex)
                 continue
             for second in range(6):
@@ -403,7 +404,7 @@ class Borders(object):
                         AllyGen.are_allies(star_candidate, star_map[search_hex]):
                     new_bridge = check_hex
                     checked.append(check_hex)
-        if new_bridge:
+        if new_bridge is not None:
             ally_map[new_bridge] = star_candidate
 
     def _erode_map(self, match: str) -> tuple[AllyMap, AllyMap]:
@@ -488,8 +489,8 @@ class Borders(object):
     def _collapse_allegiance_if_needed(self, alg: Alg, match: str) -> Alg:
         if 'collapse' == match:
             alg = AllyGen.same_align(alg)
-        elif 'separate' == match:
-            pass
+        # elif 'separate' == match:
+        #    pass
         return alg
 
     def is_well_formed(self) -> tuple[bool, str]:
@@ -557,8 +558,10 @@ class Borders(object):
                 continue
             odd_q = item[0] % 2 == 1
             base = (item[0], item[1])
+            if (1 == item[2] and not odd_q) or (2 == item[2] and odd_q):  # pragma: no mutate
+                continue
 
-            if 1 == item[2] and odd_q:
+            if 1 == item[2]:
                 search_tuple = (item[0], item[1], 2)
                 if search_tuple in edge_dict:
                     edge_dict[item] |= 2
@@ -569,7 +572,7 @@ class Borders(object):
                 if search_tuple in edge_dict:
                     edge_dict[item] |= 4
                     edge_dict[search_tuple] |= 4
-            if 2 == item[2] and not odd_q:
+            elif 2 == item[2]:
                 search_tuple = (base[0], base[1], 1)
                 if search_tuple in edge_dict:
                     edge_dict[item] |= 4
