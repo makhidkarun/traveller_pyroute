@@ -243,8 +243,8 @@ class Borders(object):
                     continue
                 neighbor_algs = defaultdict(int)  # type: ignore
                 for direction in range(6):
-                    neighbor_alg = ally_map.get(Hex.get_neighbor(cand_hex, direction), None)
-                    neighbor_algs[neighbor_alg] += 1
+                    neighbor_alg = ally_map.get(Hex.get_neighbor(cand_hex, direction))
+                    neighbor_algs[neighbor_alg] += 1  # pragma: no mutate
 
                 alg_list = sorted(iter(neighbor_algs.items()), key=itemgetter(1), reverse=True)
                 if len(alg_list) == 0:
