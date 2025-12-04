@@ -493,7 +493,7 @@ class Borders(object):
         return alg
 
     def is_well_formed(self) -> tuple[bool, str]:
-        edge_dict = {}  # two bit value - LH end connected is 1, RH end connected is 2
+        edge_dict = {}  # two bit value - LH end connected is 2, RH end connected is 4
         # assemble border structure
         for rawitem in self.borders:
             links = self.borders[rawitem]
@@ -514,41 +514,41 @@ class Borders(object):
             if odd_q:
                 search_tuple = (item[0], item[1], 2)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 1
-                    edge_dict[search_tuple] |= 2
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 4
                 neighbour = Hex.get_neighbor(base, Hex.DOWN)
                 search_tuple = (neighbour[0], neighbour[1], 1)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 1
-                    edge_dict[search_tuple] |= 2
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 4
                 neighbour = Hex.get_neighbor(base, Hex.DOWN_RIGHT)
                 search_tuple = (neighbour[0], neighbour[1], 1)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
-                    edge_dict[search_tuple] |= 1
+                    edge_dict[item] |= 4
+                    edge_dict[search_tuple] |= 2
                 neighbour = Hex.get_neighbor(base, Hex.UP_RIGHT)
                 search_tuple = (neighbour[0], neighbour[1], 2)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
-                    edge_dict[search_tuple] |= 1
+                    edge_dict[item] |= 4
+                    edge_dict[search_tuple] |= 2
             else:
                 search_tuple = (item[0], item[1], 1)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 1
-                    edge_dict[search_tuple] |= 2
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 4
                 search_tuple = (item[0], item[1], 2)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 1
-                    edge_dict[search_tuple] |= 2
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 4
                 neighbour = Hex.get_neighbor(base, Hex.DOWN_RIGHT)
                 search_tuple = (neighbour[0], neighbour[1], 1)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
-                    edge_dict[search_tuple] |= 1
+                    edge_dict[item] |= 4
+                    edge_dict[search_tuple] |= 2
                 search_tuple = (neighbour[0], neighbour[1], 2)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
-                    edge_dict[search_tuple] |= 1
+                    edge_dict[item] |= 4
+                    edge_dict[search_tuple] |= 2
 
         # process border structure - now we've done all horizontal lines, only need to check connections to
         # non-horizontal lines
@@ -561,26 +561,26 @@ class Borders(object):
             if 1 == item[2] and odd_q:
                 search_tuple = (item[0], item[1], 2)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 1
-                    edge_dict[search_tuple] |= 1
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 2
 
                 neighbour = Hex.get_neighbor(base, Hex.UP)
                 search_tuple = (neighbour[0], neighbour[1], 2)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
-                    edge_dict[search_tuple] |= 2
+                    edge_dict[item] |= 4
+                    edge_dict[search_tuple] |= 4
             if 2 == item[2] and not odd_q:
                 search_tuple = (base[0], base[1], 1)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
-                    edge_dict[search_tuple] |= 2
+                    edge_dict[item] |= 4
+                    edge_dict[search_tuple] |= 4
                 neighbour = Hex.get_neighbor(base, Hex.DOWN)
                 search_tuple = (neighbour[0], neighbour[1], 1)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 1
-                    edge_dict[search_tuple] |= 1
+                    edge_dict[item] |= 2
+                    edge_dict[search_tuple] |= 2
 
-        check = [item for k, item in edge_dict.items() if 3 != item]
+        check = [item for k, item in edge_dict.items() if 6 != item]
         if 0 < len(check):
             return False, 'At least one border segment disconnected'
 
