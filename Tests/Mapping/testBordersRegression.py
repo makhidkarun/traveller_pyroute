@@ -84,3 +84,34 @@ class testBordersRegression(baseTest):
             (-218, 237): [None, None, None]
         }
         self.assertEqual(exp_borders, galaxy.borders.borders)
+
+    def test_border_regression_raakaan_sector_minimised(self) -> None:
+        sourcefile = self.unpack_filename('DeltaFiles/border_blowup_3/Raakaan.sec')
+
+        galaxy = DeltaGalaxy(min_btn=15, max_jump=4)
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta[sector.name] = sector
+
+        args = self._make_args()
+        args.pop_code = 'scaled'
+        args.ru_calc = 'scaled'
+        args.route_reuse = 10
+        args.trade_choice = 'trade'
+        args.fix_pop = False
+        args.route_btn = 8
+        args.output = tempfile.gettempdir()
+        args.borders = 'allygen'
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.trade_choice, args.route_btn, 1, False)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes()
+        galaxy.set_borders(args.borders, args.ally_match)
+        result, msg = galaxy.borders.is_well_formed()
+        self.assertTrue(result, msg)
+        exp_borders = {
+            (202, -31): ['green', 'green', None], (202, -30): ['green', None, 'green'],
+            (203, -32): [None, 'green', None], (203, -31): [None, None, 'green']
+        }
+        self.assertEqual(exp_borders, galaxy.borders.borders)
