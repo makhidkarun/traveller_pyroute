@@ -146,7 +146,7 @@ class Borders(object):
         return False
 
     def _set_border_colour(self, system: HexPos, index: int, colour: Colour):
-        if self.borders.get(system, False):
+        if self.borders.get(system):
             if colour is None and self.borders[system][index] is not None:
                 return
             self.borders[system][index] = colour
@@ -217,7 +217,7 @@ class Borders(object):
                 ally_map[cand_hex] = ally_map[cand_hex].pop()[0]
             else:
                 raw_ally_list = [algs for algs in ally_map[cand_hex]]
-                ally_list = sorted(raw_ally_list, key=itemgetter(1, 0))
+                ally_list = sorted(raw_ally_list, key=itemgetter(1, 0))  # pragma: no mutate
 
                 min_distance = ally_list[0][1]
                 ally_dist = [algs for algs in ally_list if algs[1] == min_distance]
@@ -308,22 +308,23 @@ class Borders(object):
             for direction in range(6):
                 # pre-heat not_ally_neighbours
                 check_hex = Hex.get_neighbor(cand_hex, direction)
-                not_ally_neighbours[direction] = not AllyGen.are_allies(ally_map_candidate, ally_map.get(check_hex, None))
+                not_ally_neighbours[direction] = not AllyGen.are_allies(ally_map_candidate, ally_map.get(check_hex))
 
             # Only spin through neighbours if there's 3 or more empty hexen - doing this with 2 or fewer empty
             # hexen is a hiding to nowhere, as 3 continuous empty hexen _can't_ exist
-            not_count = 0
-            if 2 < sum(not_ally_neighbours.values()):
-                for direction in range(6):
+            if 2 < sum(not_ally_neighbours.values()):  # pragma: no mutate
+                for direction in range(6):  # pragma: no mutate
                     not_count = 0
                     for check in range(3):
-                        if not_ally_neighbours[(direction + check) % 6]:
+                        if not_ally_neighbours[(direction + check) % 6]:   # pragma: no mutate
                             not_count += 1
                     if not_count >= 3:
                         break
 
-            if not_count >= 3:
-                changed = True
+                if not_count >= 3:
+                    changed = True
+                else:
+                    new_map[cand_hex] = ally_map_candidate
             else:  # No empty hex in range found, keep allegiance.
                 new_map[cand_hex] = ally_map_candidate
         return changed, new_map
@@ -353,7 +354,7 @@ class Borders(object):
                         self._check_aligned(star_map, edge_map, cand_hex, direction, 3):
                     check_hex = Hex.get_neighbor(cand_hex, direction)
                     ally_map[check_hex] = None
-                    edge_map[check_hex] = None
+                    edge_map[check_hex] = None  # pragma: no mutate
                     changed = True
                     break
 
@@ -421,15 +422,15 @@ class Borders(object):
             cand_hex = (star.q, star.r)
             alg = star_map[cand_hex]
 
-            if AllyGen.is_nonaligned(alg, True):
-                max_range = 0
+            if AllyGen.is_nonaligned(alg):
+                max_range = 0  # pragma: no mutate
             elif star.port in ['E', 'X', '?']:
-                max_range = 1
+                max_range = 1  # pragma: no mutate
             else:
                 max_range = ['D', 'C', 'B', 'A'].index(star.port) + 2
 
             # Walk the ring filling in the hexes around star with this neighbour
-            for dist in range(1, max_range):
+            for dist in range(1, max_range):  # pragma: no mutate
                 # Start in direction 0, at distance n
                 neighbour = Hex.get_neighbor(cand_hex, 4, dist)
                 # walk six sides
@@ -448,19 +449,19 @@ class Borders(object):
             if len(ally_map[cand_hex]) == 1:
                 ally_map[cand_hex] = ally_map[cand_hex].pop()[0]
             else:
-                ally_list = sorted([algs for algs in ally_map[cand_hex]], key=itemgetter(1))
-                if ally_list[0][1] == 0:
+                ally_list = sorted([algs for algs in ally_map[cand_hex]], key=itemgetter(1, 0))  # pragma: no mutate
+                min_distance = ally_list[0][1]
+                if min_distance == 0:  # pragma: no mutate
                     ally_map[cand_hex] = ally_list[0][0]
                 else:
-                    min_distance = ally_list[0][1]
                     ally_dist = [algs for algs in ally_list if algs[1] == min_distance]
                     if len(ally_dist) == 1:
                         ally_map[cand_hex] = ally_dist[0][0]
                     else:
-                        max_count = -1
-                        max_ally = None
+                        max_count = -1  # pragma: no mutate
+                        max_ally = None  # pragma: no mutate
                         for alg, _ in ally_dist:
-                            if not AllyGen.is_nonaligned(alg, True) and \
+                            if not AllyGen.is_nonaligned(alg) and \
                                     self.galaxy.alg[alg].stats.number > max_count:  # type: ignore
                                 max_ally = alg
                                 max_count = self.galaxy.alg[alg].stats.number  # type: ignore

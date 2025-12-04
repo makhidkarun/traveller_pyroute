@@ -5,6 +5,7 @@ Created on Apr 17, 2025
 """
 from collections import defaultdict
 from logging import Logger
+from unittest.mock import patch
 
 from PyRoute.AreaItems.Allegiance import Allegiance
 from PyRoute.AreaItems.Sector import Sector
@@ -439,3 +440,104 @@ class testBorders(baseTest):
             self.assertIsNotNone(changed, "Boolean flag must not be None")
             self.assertEqual(exp_changed, changed, "Unexpected changed value")
             self.assertEqual(exp_allymap, act_allymap, "Unexpected ally-map value")
+
+    def test_erode_too_much_change(self) -> None:
+        galaxy = Galaxy(0)
+        borders = galaxy.borders
+
+        logger = borders.logger
+        logger.manager.disable = 0
+
+        with patch.object(borders, '_erode', return_value=(True, {})) as mock_method, self.assertLogs(logger, 'DEBUG')\
+                as logs:
+            borders.create_erode_border('separate')
+            mock_method.assert_called()
+            exp_output = [
+                'INFO:PyRoute.Borders:Processing worlds for erode map drawing',
+                'ERROR:PyRoute.Borders:Change count for map processing exceeded expected value of 100',
+                'DEBUG:PyRoute.Borders:Change Count: 100'
+            ]
+            self.assertEqual(exp_output, logs.output)
+
+    def test_erode(self) -> None:
+        cases = [
+                    ({}, {}, False, {}),
+                    ({(0, 36): 'Im', (1, 35): 'Im', (1, 36): 'Im', (0, 37): 'Im'}, {},
+                     True, {}),
+                    ({(0, 36): 'Sc', (1, 35): 'Im', (1, 36): 'Im', (0, 37): 'Im', (-1, 36): 'Im', (0, 38): 'Im',
+                      (-2, 38): 'Im', (-2, 36): 'Im', (2, 34): 'Im', (2, 36): 'Im'}, {(0, 36): 'Sc'},
+                     True, {(0, 36): 'Sc', (1, 36): 'Im'})
+                ]
+
+        for allymap, starmap, exp_changed, exp_allymap in cases:
+            galaxy = Galaxy(0)
+            borders = galaxy.borders
+            act_changed, act_allymap = borders._erode(allymap, starmap)
+            self.assertIsNotNone(act_changed, 'Boolean flag should not be None')
+            self.assertEqual(exp_changed, act_changed, "Unexpected changed value")
+            self.assertEqual(exp_allymap, act_allymap, 'Unexpected ally_map result')
+
+    def test_erode_map(self) -> None:
+        cases = [
+                    ([], 'separate', defaultdict(set, {}), {}, []),
+                    ([], 'collapse', defaultdict(set, {}), {}, []),
+            (
+                [
+                    "0103 Irkigkhan            D9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V",
+                    "0303 Shana Ma             D551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Zh K2 IV M7 V"
+                ], "separate", defaultdict(set, {(-1, 37): 'Im', (-1, 38): 'Im', (0, 36): 'Im', (0, 37): 'Im',
+                                        (0, 38): 'Im', (1, 36): 'Im', (1, 37): 'Im', (2, 35): 'Zh', (2, 36): 'Zh',
+                                        (2, 37): 'Zh', (3, 35): 'Zh', (3, 36): 'Zh'}), {(0, 37): 'Im', (2, 36): 'Zh'},
+                ['Im', 'Zh']
+            ),
+            (
+                ["0103 Irkigkhan            D9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Na M2 V",
+                    "0303 Shana Ma             D551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Na K2 IV M7 V"
+                ], "separate", defaultdict(set, {(0, 37): 'Na', (2, 36): 'Na'}), {(0, 37): 'Na', (2, 36): 'Na'},
+                ['Na']
+            ),
+            (
+                ["0103 Irkigkhan            D9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Na M2 V"],
+                'separate', defaultdict(set, {(0, 37): 'Na'}), {(0, 37): 'Na'}, ['Na']
+            ),
+            (
+                ["0103 Irkigkhan            E9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V"],
+                'separate', defaultdict(set, {(0, 37): 'Im'}), {(0, 37): 'Im'}, ['Im']
+            ),
+            (
+                ["0103 Irkigkhan            ?9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V"],
+                'separate', defaultdict(set, {(0, 37): 'Im'}), {(0, 37): 'Im'}, ['Im']
+            ),
+            (
+                ["0103 Irkigkhan            X9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V"],
+                'separate', defaultdict(set, {(0, 37): 'Im'}), {(0, 37): 'Im'}, ['Im']
+            ),
+            (
+                ["0103 Irkigkhan            D9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  -- M2 V"],
+                'separate', defaultdict(set, {(0, 37): 'Na'}), {(0, 37): 'Na'}, ['--']
+            )
+            ]
+
+        for stars_list, match, exp_allymap, exp_starmap, alg_list in cases:
+            with self.subTest():
+                galaxy = Galaxy(0)
+                sector = Sector('# Core', '# 0, 0')
+
+                counter = -1
+                for item in stars_list:
+                    star = Star.parse_line_into_star(item, sector, 'fixed', 'fixed')
+                    if star is None:
+                        continue
+                    counter += 1
+                    star.index = counter
+                    galaxy.star_mapping[counter] = star
+                    alg = star.alg_code
+                    if alg not in galaxy.alg:
+                        galaxy.alg[alg] = Allegiance(alg, alg)
+                    galaxy.alg[alg].stats.number += 1
+
+                self.assertEqual(alg_list, list(galaxy.alg.keys()))
+
+                act_allymap, act_starmap = galaxy.borders._erode_map(match)
+                self.assertEqual(exp_allymap, act_allymap, "Unexpected allymap value")
+                self.assertEqual(exp_starmap, act_starmap, "Unexpected starmap value")
