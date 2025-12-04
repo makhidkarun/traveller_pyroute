@@ -149,7 +149,8 @@ class AllyGen(object):
         return alg in AllyGen.noOne
 
     @staticmethod
-    def is_nonaligned(alg: Alg, strict=False) -> bool:
+    def is_nonaligned(alg: Alg, strict: bool = False) -> bool:
+        assert isinstance(strict, bool)
         if strict:
             return alg in AllyGen.nonAligned
         return alg in AllyGen.nonAligned or alg in AllyGen.noOne

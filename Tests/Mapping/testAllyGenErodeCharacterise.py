@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from Tests.Mapping.testAllyGenBase import TestAllyGenBase
@@ -7,7 +9,10 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
 
     def testErodeBorderOddClientState(self) -> None:
         self.setupOneWorldCoreSector("0503", 0, "CsIm")
-        self.borders.create_erode_border('separate')
+
+        with patch.object(self.borders, 'is_well_formed', return_value=(True, '')) as mock_method:
+            self.borders.create_erode_border('separate')
+            mock_method.assert_called_once()
 
         border_map = self.borders.allyMap
         borders = self.borders.borders
@@ -33,6 +38,8 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.assertEqual({(4, 35): 'ImDs'}, ally_map, "Unexpected ally map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def testErodeBorderTwoOddImperialWorlds(self) -> None:
         self.setupOneWorldCoreSector("0503", 0, "ImDs")
@@ -53,6 +60,8 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def testErodeBorderTwoEvenImperialWorlds(self) -> None:
         self.setupOneWorldCoreSector("0603", 0, "ImDs")
@@ -73,6 +82,52 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def testErodeBorderTwoEvenImperialWorldsCollapse(self) -> None:
+        self.setupOneWorldCoreSector("0603", 0, "ImDs")
+        self.setupOneWorldCoreSector("0604", 1, "ImDs")
+        self.assertEqual(2, len(self.galaxy.star_mapping), "Should be 2 worlds in galaxy")
+        self.borders.create_erode_border('collapse', False)
+
+        ally_map = self.borders.allyMap
+        borders = self.borders.borders
+        borders_map = self.borders.borders_map
+
+        expected_ally_map = {(5, 33): 'Im', (5, 34): 'Im'}
+        expected_borders = {
+            (5, 32): ['green', 'orange', 'black'], (5, 33): [None, 'orange', 'black'], (5, 34): ['blue', None, None],
+            (6, 32): [None, 'maroon', 'pink'], (6, 33): [None, 'maroon', 'pink']
+        }
+        expected_borders_map = {}
+        self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
+        self.assertEqual(expected_borders, borders, "Unexpected borders value")
+        self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
+
+    def testErodeBorderTwoEvenImperialWorldsOneHexApart(self) -> None:
+        self.setupOneWorldCoreSector("0603", 0, "ImDs")
+        self.setupOneWorldCoreSector("0803", 1, "ImDs")
+        self.assertEqual(2, len(self.galaxy.star_mapping), "Should be 2 worlds in galaxy")
+        self.borders.create_erode_border('separate', False)
+
+        ally_map = self.borders.allyMap
+        borders = self.borders.borders
+        borders_map = self.borders.borders_map
+
+        expected_ally_map = {(5, 34): 'ImDs', (7, 33): 'ImDs'}
+        expected_borders = {
+            (5, 33): ['green', 'orange', 'black'], (5, 34): ['blue', None, None], (6, 33): [None, 'maroon', 'pink'],
+            (7, 32): ['green', 'orange', 'black'], (7, 33): ['blue', None, None], (8, 32): [None, 'maroon', 'pink']
+        }
+        expected_borders_map = {}
+        self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
+        self.assertEqual(expected_borders, borders, "Unexpected borders value")
+        self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def testErodeBorderOnIbaraSubsector(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
@@ -87,7 +142,16 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
                             args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         self.borders = self.galaxy.borders
-        self.borders.create_erode_border('separate', False)
+        logger = self.borders.logger
+        logger.manager.disable = 0
+
+        with self.assertLogs(logger, "DEBUG") as logs:
+            self.borders.create_erode_border('separate', False)
+            output = logs.output
+
+            exp_output = ['INFO:PyRoute.Borders:Processing worlds for erode map drawing',
+                          'DEBUG:PyRoute.Borders:Change Count: 13']
+            self.assertEqual(exp_output, output)
 
         ally_map = self.borders.allyMap
         borders = self.borders.borders
@@ -126,6 +190,8 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def testErodeBorderOnFarFrontiersSector(self) -> None:
         sourcefile = self.unpack_filename('BorderGeneration/Far Frontiers.sec')
@@ -142,7 +208,16 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
                             args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         self.borders = self.galaxy.borders
-        self.borders.create_erode_border('separate', True)
+        logger = self.borders.logger
+        logger.manager.disable = 0
+
+        with self.assertLogs(logger, "DEBUG") as logs:
+            self.borders.create_erode_border('separate', True)
+            output = logs.output
+
+            exp_output = ['INFO:PyRoute.Borders:Processing worlds for erode map drawing',
+                          'DEBUG:PyRoute.Borders:Change Count: 17']
+            self.assertEqual(exp_output, output)
 
         expected_ally_map = self.load_dict_from_json(mapfile)
         expected_borders = self.load_dict_from_json(borderfile)
@@ -155,6 +230,8 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
 
     def testErodeBorderOnVanguardReachesSector(self) -> None:
         sourcefile = self.unpack_filename('BorderGeneration/Vanguard Reaches.sec')
@@ -171,7 +248,16 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
                             args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         self.borders = self.galaxy.borders
-        self.borders.create_erode_border('separate', True)
+        logger = self.borders.logger
+        logger.manager.disable = 0
+
+        with self.assertLogs(logger, "DEBUG") as logs:
+            self.borders.create_erode_border('separate', True)
+            output = logs.output
+
+            exp_output = ['INFO:PyRoute.Borders:Processing worlds for erode map drawing',
+                          'DEBUG:PyRoute.Borders:Change Count: 23']
+            self.assertEqual(exp_output, output)
 
         expected_ally_map = self.load_dict_from_json(mapfile)
         expected_borders = self.load_dict_from_json(borderfile)
@@ -184,3 +270,5 @@ class TestAllyGenErodeCharacterise(TestAllyGenBase):
         self.assertEqual(expected_ally_map, ally_map, "Unexpected ally_map value")
         self.assertEqual(expected_borders, borders, "Unexpected borders value")
         self.assertEqual(expected_borders_map, borders_map, "Unexpected borders_map value")
+        result, msg = self.borders.is_well_formed()
+        self.assertTrue(result, msg)
