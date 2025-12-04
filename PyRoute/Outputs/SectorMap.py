@@ -11,7 +11,7 @@ from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Outputs.HexGrid import HexGrid
 from PyRoute.Outputs.HexSystem import HexSystem
 from PyRoute.Outputs.Map import Map
-from PyRoute.StatCalculation import StatCalculation
+from PyRoute.StatCalculation.StatCalculation import StatCalculation
 
 
 class SectorMap(Map):

@@ -2,7 +2,7 @@ from PyRoute.Outputs.HexGrid import HexGrid
 from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
-from PyRoute.StatCalculation import StatCalculation
+from PyRoute.StatCalculation.StatCalculation import StatCalculation
 from PyRoute.SystemData.UWP import UWP
 from PyRoute.TradeCodes import TradeCodes
 

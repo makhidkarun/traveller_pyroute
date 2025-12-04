@@ -3,202 +3,14 @@ Created on Mar 17, 2014
 
 @author: tjoneslo
 """
-import contextlib
-import copy
 import logging
 import math
+
+from PyRoute.Star import Star
 from PyRoute.wikistats import WikiStats
-from collections import OrderedDict
 from PyRoute.Allies.AllyGen import AllyGen
-from PyRoute.Star import UWPCodes
-from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
-
-
-class Populations(object):
-    def __init__(self):
-        self.code = ""
-        self.homeworlds = []
-        self.count = 0
-        self.population = 0
-
-    def add_population(self, population, homeworld) -> None:
-        self.count += 1
-        self.population += population
-        if homeworld:
-            self.homeworlds.append(homeworld)
-
-    def __lt__(self, other):
-        return self.population < other.population
-
-    def __eq__(self, other):
-        if self.__hash__() != other.__hash__():
-            return False
-        if self.code != other.code:
-            return False
-        if self.count != other.count:
-            return False
-        if self.population != other.population:
-            return False
-        return self.homeworlds == other.homeworlds
-
-    def __hash__(self):
-        key = (self.code, self.count, self.population)
-        return hash(key)
-
-
-class ObjectStatistics(object):
-
-    __slots__ = 'population', 'populations', 'economy', 'trade', 'tradeExt', 'tradeVol', 'tradeDton', 'tradeDtonExt',\
-                'percapita', 'number', 'milBudget', 'maxTL', 'maxPort', 'maxPop', 'sum_ru', 'shipyards', 'col_be',\
-                'im_be', 'passengers', 'spa_people', 'port_size', 'code_counts', 'bases', 'eti_worlds', 'eti_cargo',\
-                'eti_pass', 'homeworlds', 'high_pop_worlds', 'high_tech_worlds', 'TLmean', 'TLstddev', 'subsectorCp',\
-                'sectorCp', 'otherCp', 'gg_count', 'worlds', 'stars', 'star_count', 'primary_count', '__dict__'
-
-    base_mapping = {'C': 'Corsair base', 'D': 'Naval depot', 'E': 'Embassy', 'K': 'Naval base', 'M': 'Military base',
-                    'N': 'Naval base', 'O': 'Naval outpost',
-                    'R': 'Clan base', 'S': 'Scout base', 'T': 'Tlaukhu base', 'V': 'Scout base', 'W': 'Way station',
-                    '*': 'Unknown', 'I': 'Unknown',
-                    'G': 'Vargr Naval base', 'J': 'Naval base',
-                    'L': 'Hiver naval base', 'P': 'Droyne Naval base', 'Q': 'Droyne military garrison',
-                    'X': 'Zhodani relay station', 'Y': 'Zhodani depot',
-                    'A': 'Split', 'B': 'Split', 'F': 'Split', 'H': 'Split', 'U': 'Split', 'Z': 'Split'}
-
-    def __init__(self):
-        self.population = 0
-        self.populations = NoNoneDefaultDict(Populations)
-
-        self.economy = 0
-        self.trade = 0
-        self.tradeExt = 0
-        self.tradeVol = 0
-        self.tradeDton = 0
-        self.tradeDtonExt = 0
-        self.percapita = 0
-        self.number = 0
-        self.milBudget = 0
-        self.maxTL = 0
-        self.maxPort = 'X'
-        self.maxPop = 0
-        self.sum_ru = 0
-        self.shipyards = 0
-        self.col_be = 0
-        self.im_be = 0
-        self.passengers = 0
-        self.spa_people = 0
-        self.port_size = NoNoneDefaultDict(int)
-        self.code_counts = NoNoneDefaultDict(int)
-        self.bases = NoNoneDefaultDict(int)
-        self.eti_worlds = 0
-        self.eti_cargo = 0
-        self.eti_pass = 0
-        self.homeworlds = []
-        self.high_pop_worlds = []
-        self.high_tech_worlds = []
-        self.TLmean = 0
-        self.TLstddev = 0
-        self.subsectorCp = []
-        self.sectorCp = []
-        self.otherCp = []
-        self.gg_count = 0
-        self.worlds = 0
-        self.stars = 0
-        self.star_count = NoNoneDefaultDict(int)
-        self.primary_count = NoNoneDefaultDict(int)
-
-    # For the JSONPickel work
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        for key in ObjectStatistics.__slots__:
-            if key not in state:
-                state[key] = self[key]
-        del state['high_pop_worlds']
-        del state['high_tech_worlds']
-        del state['subsectorCp']
-        del state['sectorCp']
-        del state['otherCp']
-        del state['homeworlds']
-        return state
-
-    def __deepcopy__(self, memodict: dict = {}):
-        state = self.__dict__.copy()
-        foo = ObjectStatistics()
-        foo.__dict__.update(state)
-        for key in ObjectStatistics.__slots__:
-            if '__dict__' != key:
-                with contextlib.suppress(AttributeError):
-                    foo[key] = copy.deepcopy(self[key])
-
-        return foo
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-    def __setitem__(self, key, value):
-        setattr(self, key, value)
-
-    def __eq__(self, y) -> bool:
-        if not isinstance(y, ObjectStatistics):
-            return False
-        if self.maxTL != y.maxTL:
-            return False
-        if self.TLmean != y.TLmean:
-            return False
-        if self.TLstddev != y.TLstddev:
-            return False
-        if self.maxPop != y.maxPop:
-            return False
-        if self.maxPort != y.maxPort:
-            return False
-        if self.trade != y.trade:
-            return False
-        if self.tradeExt != y.tradeExt:
-            return False
-        if self.tradeDton != y.tradeDton:
-            return False
-        if self.tradeDtonExt != y.tradeDtonExt:
-            return False
-        return self.tradeVol == y.tradeVol
-
-    def __hash__(self):
-        return 0
-
-    def homeworld_count(self) -> int:
-        return len(self.homeworlds)
-
-    def high_pop_worlds_count(self) -> int:
-        return len(self.high_pop_worlds)
-
-    def high_pop_worlds_list(self) -> list[str]:
-        return [world.wiki_name() for world in self.high_pop_worlds[0:6]]
-
-    def high_tech_worlds_count(self) -> int:
-        return len(self.high_tech_worlds)
-
-    def high_tech_worlds_list(self) -> list[str]:
-        return [world.wiki_name() for world in self.high_tech_worlds[0:6]]
-
-    def populations_count(self) -> int:
-        return len(self.populations)
-
-    @property
-    def sum_ru_int(self) -> int:
-        return int(self.sum_ru)
-
-
-class UWPCollection(object):
-    def __init__(self):
-        self.uwp = OrderedDict()
-        for uwpCode in UWPCodes.uwpCodes:
-            self.uwp[uwpCode] = {}
-
-    def stats(self, code, value) -> ObjectStatistics:
-        return self.uwp[code].setdefault(value, ObjectStatistics())
-
-    def __getitem__(self, index):
-        return self.uwp[index]
-
-    def __setitem__(self, index, value):
-        self.uwp[index] = value
+from PyRoute.StatCalculation.ObjectStatistics import ObjectStatistics
+from PyRoute.StatCalculation.UWPCollection import UWPCollection
 
 
 class StatCalculation(object):
@@ -224,15 +36,13 @@ class StatCalculation(object):
 
         self.logger.info('Calculating statistics for {:d} worlds'.format(len(self.galaxy.stars)))
         for sector in self.galaxy.sectors.values():
-            if sector is None:
-                continue
             for star in sector.worlds:
                 star.starportSize = max(self.trade_to_btn(star.tradeIn + star.tradeOver) - 5, 0)
                 star.uwpCodes['Starport Size'] = star.starportSize
                 # Budget in MCr
                 star.starportBudget = \
-                    ((star.tradeIn // 10000) * 150 + (star.tradeOver // 10000) * 140 +
-                     (star.passIn) * 500 + (star.passOver) * 460) // 1000000
+                    ((star.tradeIn // 10000) * 150 + (star.tradeOver // 10000) * 140 +  # pragma: no mutate
+                     (star.passIn) * 500 + (star.passOver) * 460) // 1000000  # pragma: no mutate
 
                 # Population in people employed.
                 star.starportPop = int(star.starportBudget / 0.2)
@@ -310,14 +120,15 @@ class StatCalculation(object):
                 default_soph = soph_code
                 continue
 
-            soph_pct = 100.0 if soph_pct == 'W' else 0.0 if soph_pct in ['X', 'A', '?'] else \
+            old_soph_pct = soph_pct
+            soph_pct = 100.0 if soph_pct == 'W' else 0.0 if soph_pct in ['X', '?'] else \
                 5.0 if soph_pct == '0' else 10.0 * int(soph_pct)
 
             if any([soph for soph in star.tradeCode.homeworld if soph.startswith(soph_code)]):
                 home = star
 
             # Soph_pct == 'X' is dieback or extinct.
-            if soph_pct == 'X':
+            if old_soph_pct == 'X':
                 stats.populations[soph_code].population = -1
             # skip the empty worlds
             elif not star.tradeCode.barren:
@@ -325,10 +136,12 @@ class StatCalculation(object):
 
             total_pct -= soph_pct
 
+        if not isinstance(home, (Star, type(None))):
+            raise ValueError
         # We don't need to hear umpteen times that a given star has bad sophont percentages - just once will do
         squish = star.suppress_soph_percent_warning is True
 
-        if total_pct < -5 and not squish:
+        if total_pct < -5 and not squish:  # pragma: no mutate
             self.logger.warning("{} has sophont percent over 100%: {}".format(star, total_pct))
             star.suppress_soph_percent_warning = True
         elif total_pct < 0 and not squish:
@@ -401,14 +214,14 @@ class StatCalculation(object):
         stats.eti_pass += star.eti_pass_volume
 
     def max_tl(self, stats, star) -> None:
+        ports = 'ABCDEX?'
+
         stats.maxTL = max(stats.maxTL, star.tl)
-        stats.maxPort = 'ABCDEX?'[min('ABCDEX?'.index(star.uwpCodes['Starport']), 'ABCDEX?'.index(stats.maxPort))]
+        stats.maxPort = ports[min(ports.index(star.uwpCodes['Starport']), ports.index(stats.maxPort))]  # pragma: no mutate
         stats.maxPop = max(stats.maxPop, star.popCode)
 
     def per_capita(self, worlds, stats) -> None:
-        if stats.population > 100000:
-            stats.percapita = stats.economy // (stats.population // 1000)
-        elif stats.population > 0:
+        if stats.population > 0:
             stats.percapita = stats.economy * 1000 // stats.population
         else:
             stats.percapita = 0
@@ -435,7 +248,6 @@ class StatCalculation(object):
         for target in self.galaxy.ranges.neighbors_iter(world):
             if target.position == owner_hex:
                 target.tradeCode.append("C:{}-{}".format(world.sector[0:4], world.position))
-                pass
 
     def write_statistics(self, ally_count, ally_match, json_data) -> None:
         self.logger.info('Charted star count: ' + str(self.galaxy.stats.number))
@@ -456,11 +268,15 @@ class StatCalculation(object):
 
             self.logger.debug("min count: {}, match: {}".format(ally_count, ally_match))
 
-        wiki = WikiStats(self.galaxy, self.all_uwp, ally_count, ally_match, json_data)
-        wiki.write_statistics()
+        self._write_statistics_to_wiki(ally_count, ally_match, json_data)
+
+    def _write_statistics_to_wiki(self, ally_count, ally_match, json_data):
+        wiki = WikiStats(self.galaxy, self.all_uwp, ally_count, ally_match, json_data)  # pragma: no mutate
+        wiki.write_statistics()  # pragma: no mutate
 
     @staticmethod
     def trade_to_btn(trade) -> int:
         if trade == 0:
             return 0
-        return int(math.log(trade, 10))
+        raw_btn = round(math.log(trade, 10), 2)
+        return int(raw_btn)

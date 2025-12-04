@@ -39,7 +39,7 @@ from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
 from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
 from PyRoute.Outputs.SubsectorMap import SubsectorMap
 from PyRoute.SpeculativeTrade import SpeculativeTrade
-from PyRoute.StatCalculation import StatCalculation
+from PyRoute.StatCalculation.StatCalculation import StatCalculation
 
 
 class DeltaReduce:

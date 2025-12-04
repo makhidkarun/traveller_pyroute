@@ -18,7 +18,7 @@ from PyRoute.Outputs.DarkModePDFSectorMap import DarkModePDFSectorMap
 from PyRoute.Outputs.LightModePDFSectorMap import LightModePDFSectorMap
 from PyRoute.Outputs.SectorMap import SectorMap
 from PyRoute.Outputs.SubsectorMap import SubsectorMap
-from PyRoute.StatCalculation import StatCalculation
+from PyRoute.StatCalculation.StatCalculation import StatCalculation
 
 logger = logging.getLogger('PyRoute')
 

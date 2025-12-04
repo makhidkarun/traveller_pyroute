@@ -8,7 +8,7 @@ from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
-from PyRoute.StatCalculation import ObjectStatistics
+from PyRoute.StatCalculation.ObjectStatistics import ObjectStatistics
 from Tests.baseTest import baseTest
 
 

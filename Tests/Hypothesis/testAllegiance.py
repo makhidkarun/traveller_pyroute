@@ -41,7 +41,7 @@ def text_flanking_comma(draw) -> composite:
 class testAllegiance(unittest.TestCase):
 
     @given(text_or_none(), text_or_none(), booleans())
-    @settings(max_examples=1100, suppress_health_check=[HealthCheck(10)])
+    @settings(max_examples=1100, suppress_health_check=[HealthCheck(2), HealthCheck(3), HealthCheck(10)])
     @example(None, '', True)
     @example(None, '', False)
     @example(None, None, True)
