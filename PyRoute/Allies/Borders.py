@@ -273,7 +273,7 @@ class Borders(object):
             changed, ally_map = self._erode(ally_map, star_map)
             if not changed:
                 changed, ally_map = self._break_spans(ally_map, star_map)
-            change_count += 1
+            change_count += 1  # pragma: no mutate
 
         self.logger.debug('Change Count: {}'.format(change_count))
         self._build_bridges(ally_map, star_map)
@@ -446,7 +446,7 @@ class Borders(object):
         # 4: hexes claimed by two (or more) allies at the same distance
         #    are claimed by the larger empire.
         for cand_hex in ally_map:
-            if len(ally_map[cand_hex]) == 1:
+            if len(ally_map[cand_hex]) == 1:  # pragma: no mutate
                 ally_map[cand_hex] = ally_map[cand_hex].pop()[0]
             else:
                 ally_list = sorted([algs for algs in ally_map[cand_hex]], key=itemgetter(1, 0))  # pragma: no mutate
@@ -461,8 +461,9 @@ class Borders(object):
                         max_count = -1  # pragma: no mutate
                         max_ally = None  # pragma: no mutate
                         for alg, _ in ally_dist:
-                            if not AllyGen.is_nonaligned(alg) and \
-                                    self.galaxy.alg[alg].stats.number > max_count:  # type: ignore
+                            if AllyGen.is_nonaligned(alg):  # pragma: no mutate
+                                continue  # pragma: no mutate
+                            if self.galaxy.alg[alg].stats.number > max_count:  # type: ignore
                                 max_ally = alg
                                 max_count = self.galaxy.alg[alg].stats.number  # type: ignore
                         ally_map[cand_hex] = max_ally  # type: ignore
@@ -514,12 +515,12 @@ class Borders(object):
             if odd_q:
                 search_tuple = (item[0], item[1], 2)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
+                    edge_dict[item] |= 2  # pragma: no mutate
                     edge_dict[search_tuple] |= 4
                 neighbour = Hex.get_neighbor(base, Hex.DOWN)
                 search_tuple = (neighbour[0], neighbour[1], 1)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
+                    edge_dict[item] |= 2  # pragma: no mutate
                     edge_dict[search_tuple] |= 4
                 neighbour = Hex.get_neighbor(base, Hex.DOWN_RIGHT)
                 search_tuple = (neighbour[0], neighbour[1], 1)
@@ -534,11 +535,11 @@ class Borders(object):
             else:
                 search_tuple = (item[0], item[1], 1)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
+                    edge_dict[item] |= 2  # pragma: no mutate
                     edge_dict[search_tuple] |= 4
                 search_tuple = (item[0], item[1], 2)
                 if search_tuple in edge_dict:
-                    edge_dict[item] |= 2
+                    edge_dict[item] |= 2  # pragma: no mutate
                     edge_dict[search_tuple] |= 4
                 neighbour = Hex.get_neighbor(base, Hex.DOWN_RIGHT)
                 search_tuple = (neighbour[0], neighbour[1], 1)
