@@ -6,7 +6,6 @@ Created on Oct 19, 2024
 from collections import defaultdict
 import logging
 from operator import itemgetter
-import os
 
 from typing_extensions import TypeAlias
 from typing import Optional, Union
@@ -54,13 +53,9 @@ class Borders(object):
 
             self.allyMap[star.hex.hex_position()] = alg
 
-        # self._output_map(allyMap, 0)
+        self.allyMap = self.step_map(self.allyMap)
 
         self.allyMap = self.step_map(self.allyMap)
-        # self._output_map(allyMap, 1)
-
-        self.allyMap = self.step_map(self.allyMap)
-        # self._output_map(allyMap, 2)
 
         self._generate_borders(self.allyMap, enforce)
 
@@ -173,12 +168,6 @@ class Borders(object):
             if neighbour not in ally_map:
                 new_map[neighbour] = ally_map[cand_hex]
 
-    def _output_map(self, ally_map: AllyMap, stage: int) -> None:
-        path = os.path.join(self.galaxy.output_path, 'allyMap%s.txt' % stage)  # type: ignore
-        with open(path, "wb") as f:
-            for key, value in ally_map.items():
-                f.write("{}-{}: border: {}\n".format(key[0], key[1], value))  # type: ignore
-
     def create_ally_map(self, match: str, enforce=True) -> None:
         """
             Create borders around various allegiances, Algorithm Two.
@@ -190,14 +179,11 @@ class Borders(object):
         self.logger.info('Processing worlds for ally map drawing')
 
         self.allyMap = self._ally_map(match)
-        # self._output_map(allyMap, 3)
         self._generate_borders(self.allyMap, enforce)
 
     def _ally_map(self, match: str) -> AllyMap:
         # Create list of stars
         ally_map, star_map, stars = self._unpack_stars_and_maps(match)
-
-        # self._output_map(allyMap, 0)
 
         # Pass 1: generate initial allegiance arrays,
         # with overlapping maps
@@ -216,8 +202,6 @@ class Borders(object):
                         star_dist = Hex.axial_distance(cand_hex, neighbor)
                         ally_map[neighbor].add((alg, star_dist))
                         neighbor = Hex.get_neighbor(neighbor, direction)
-
-        # self._output_map(allyMap, 1)
 
         # Pass 2: find overlapping areas and reduce
         # 0: hexes with only one claimant, give it to them
@@ -250,8 +234,6 @@ class Borders(object):
                                 max_ally = alg
                                 max_count = self.galaxy.alg[alg].stats.number  # type: ignore
                         ally_map[cand_hex] = max_ally  # type: ignore
-
-        # self._output_map(allyMap, 2)
 
         # Pass 3: find lonely claimed hexes and remove them
         # Do two passes through the data
@@ -432,8 +414,6 @@ class Borders(object):
         # Create list of stars
         ally_map, star_map, stars = self._unpack_stars_and_maps(match)
 
-        # self._output_map(allyMap, 0)
-
         # Pass 1: generate initial allegiance arrays,
         # with overlapping maps
         for star in stars:
@@ -456,7 +436,6 @@ class Borders(object):
                     for _ in range(dist):
                         ally_map[neighbour].add((alg, Hex.axial_distance(cand_hex, neighbour)))
                         neighbour = Hex.get_neighbor(neighbour, side)
-        # self._output_map(allyMap, 1)
 
         # Pass 2: find overlapping areas and reduce
         # 0: hexes with only one claimant, give it to them
