@@ -499,9 +499,7 @@ class Borders(object):
         # assemble border structure
         for rawitem in self.borders:
             links = self.borders[rawitem]
-            counter = -1
-            while counter < 2:
-                counter += 1
+            for counter in range(3):
                 if links[counter] is None:
                     continue
                 edge_tuple = (rawitem[0], rawitem[1], counter)
