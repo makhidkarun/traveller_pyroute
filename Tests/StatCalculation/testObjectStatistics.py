@@ -3,6 +3,8 @@ Created on Dec 03, 2025
 
 @author: CyberiaResurrection
 """
+from PyRoute import Star
+from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
 from PyRoute.StatCalculation.Populations import Populations
 from PyRoute.StatCalculation.ObjectStatistics import ObjectStatistics
@@ -66,14 +68,55 @@ class testObjectStatistics(baseTest):
         self.assertEqual(exp_dict, stats.__getstate__())
 
     def test_hi_pop_worlds(self) -> None:
+        sector = Sector("# Core", "# 0,0")
+        star = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
         stats = ObjectStatistics()
-        self.assertEqual([], stats.high_pop_worlds_list())
+        stats.high_pop_worlds.append(star)
+        stats.high_pop_worlds.append(star)
+        stats.high_pop_worlds.append(star)
+        stats.high_pop_worlds.append(star)
+        stats.high_pop_worlds.append(star)
+        stats.high_pop_worlds.append(star)
+        stats.high_pop_worlds.append(star)
+        self.assertEqual(7, stats.high_pop_worlds_count())
+        self.assertEqual(['{{WorldS|Irkigkhan|Core|0103}}', '{{WorldS|Irkigkhan|Core|0103}}',
+                          '{{WorldS|Irkigkhan|Core|0103}}', '{{WorldS|Irkigkhan|Core|0103}}',
+                          '{{WorldS|Irkigkhan|Core|0103}}', '{{WorldS|Irkigkhan|Core|0103}}'],
+                         stats.high_pop_worlds_list())
 
     def test_hi_tech_worlds(self) -> None:
+        sector = Sector("# Core", "# 0,0")
+        star = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
         stats = ObjectStatistics()
-        self.assertEqual([], stats.high_tech_worlds_list())
+        stats.high_tech_worlds.append(star)
+        stats.high_tech_worlds.append(star)
+        stats.high_tech_worlds.append(star)
+        stats.high_tech_worlds.append(star)
+        stats.high_tech_worlds.append(star)
+        stats.high_tech_worlds.append(star)
+        stats.high_tech_worlds.append(star)
+        self.assertEqual(7, stats.high_tech_worlds_count())
+        self.assertEqual(['{{WorldS|Irkigkhan|Core|0103}}', '{{WorldS|Irkigkhan|Core|0103}}',
+                          '{{WorldS|Irkigkhan|Core|0103}}', '{{WorldS|Irkigkhan|Core|0103}}',
+                          '{{WorldS|Irkigkhan|Core|0103}}', '{{WorldS|Irkigkhan|Core|0103}}'],
+                         stats.high_tech_worlds_list())
 
     def test_blank_eq(self) -> None:
         stats1 = ObjectStatistics()
         stats2 = ObjectStatistics()
         self.assertEqual(stats1, stats2)
+
+    def test_setitem(self) -> None:
+        stats = ObjectStatistics()
+        stats.__setitem__('foo', 'bar')
+        self.assertEqual('bar', stats.__getitem__('foo'))
+
+    def test_deepcopy(self) -> None:
+        stats1 = ObjectStatistics()
+        stats1.__setitem__('__dict__', {'bar': 'foo'})
+        stats2 = stats1.__deepcopy__()
+        self.assertEqual(stats1['bar'], stats2['bar'])
