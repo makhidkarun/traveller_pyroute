@@ -90,8 +90,8 @@ class ObjectStatistics(object):
         foo = ObjectStatistics()
         foo.__dict__.update(state)
         for key in ObjectStatistics.__slots__:
-            if '__dict__' != key:
-                with contextlib.suppress(AttributeError):
+            if '__dict__' != key:  # pragma: no mutate
+                with contextlib.suppress(AttributeError):  # pragma: no mutate
                     foo[key] = copy.deepcopy(self[key])
 
         return foo

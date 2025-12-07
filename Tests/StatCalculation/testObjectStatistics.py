@@ -19,9 +19,16 @@ class testObjectStatistics(baseTest):
             'populations', 'maxPort', 'port_size', 'code_counts', 'bases', 'star_count', 'primary_count', 'homeworlds',
             'high_pop_worlds', 'high_tech_worlds', 'subsectorCp', 'sectorCp', 'otherCp', '__dict__'
         ]
+        brackets = [
+            'homeworlds', 'high_pop_worlds', 'high_tech_worlds', 'subsectorCp', 'sectorCp', 'otherCp'
+        ]
         self.assertEqual({}, stats.__getitem__('__dict__'))
         for key in ObjectStatistics.__slots__:
             if key in notint:
+                if key in brackets:
+                    value = stats.__getitem__(key)
+                    self.assertIsNotNone(value, key)
+                    self.assertEqual([], value, key)
                 continue
             value = stats.__getitem__(key)
             self.assertIsNotNone(value, key)
@@ -109,6 +116,25 @@ class testObjectStatistics(baseTest):
         stats1 = ObjectStatistics()
         stats2 = ObjectStatistics()
         self.assertEqual(stats1, stats2)
+
+    def test_non_object_stats_eq(self) -> None:
+        stats1 = ObjectStatistics()
+        stats2 = 42
+        self.assertNotEqual(stats1, stats2)
+
+    def test_equality_deep_dive(self) -> None:
+        cases = (
+            'maxTL', 'TLmean', 'TLstddev', 'maxPop', 'maxPort', 'trade', 'tradeExt', 'tradeDton', 'tradeDtonExt',
+            'tradeVol'
+        )
+
+        for item in cases:
+            with self.subTest(item):
+                value = 'C' if 'maxPort' == item else 2
+                stats1 = ObjectStatistics()
+                stats2 = ObjectStatistics()
+                stats2[item] = value
+                self.assertNotEqual(stats1, stats2, item)
 
     def test_setitem(self) -> None:
         stats = ObjectStatistics()
