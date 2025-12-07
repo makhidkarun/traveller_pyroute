@@ -248,12 +248,7 @@ class Borders(object):
 
                 alg_list = sorted(iter(neighbor_algs.items()), key=itemgetter(1), reverse=True)
                 # Alg_list can't be empty, as it's a sort on items of a 6-element defaultdict
-                # if len(alg_list) == 0:
-                #    ally_map[cand_hex] = None  # type: ignore
-                # if alg_list[0][1] >= 1:
                 ally_map[cand_hex] = alg_list[0][0]  # type: ignore
-                # else:
-                #    ally_map[cand_hex] = AllyGen.nonAligned[0]  # type: ignore
 
         return ally_map  # type: ignore
 
@@ -491,8 +486,6 @@ class Borders(object):
     def _collapse_allegiance_if_needed(self, alg: Alg, match: str) -> Alg:
         if 'collapse' == match:
             alg = AllyGen.same_align(alg)
-        # elif 'separate' == match:
-        #    pass
         return alg
 
     def is_well_formed(self) -> tuple[bool, str]:
