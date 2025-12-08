@@ -152,7 +152,7 @@ class TradeCodes(object):
             self.codes.remove(item)
         return homeworlds_found
 
-    def _preprocess_initial_codes(self, initial_codes):
+    def _preprocess_initial_codes(self, initial_codes, depth: int = 0):
         raw_codes = initial_codes.split()
         # look for successive codes that should be part of the same name (eg  "(Carte" , then "Blanche)", becoming
         # "(Carte Blanche)", and bolt them together
@@ -243,33 +243,45 @@ class TradeCodes(object):
                 codes.append(raw)
                 continue
             if raw.startswith('(') or raw.startswith('['):  # this _is_ a sophont code
-                if raw.endswith(')') or raw.endswith(']'):
+                if 1 == len(raw):
+                    continue
+                elif raw.endswith(')') or raw.endswith(']'):
                     if raw.startswith('[') and raw.endswith(']'):
                         raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _major_ race homeworld
                     elif raw.startswith('(') and raw.endswith(')'):
                         raw = self._trim_overlong_homeworld_code(raw)  # trim overlong _minor_ race homeworld
                     codes.append(raw)
                     continue
-                elif 1 < len(raw) and raw[-2] in ')]':
-                    pop = raw[-1] if raw[-1] in 'W?' or raw[-1].isdigit() else ''
-                    raw = raw[:-1]
+                elif raw[-2] in [')', ']']:
+                    pop = raw[-1] if TradeCodes._is_soph_code_digit(raw[-1]) else ''
+                    raw = raw[:-1]  # pragma: no mutate
                     raw = self._trim_overlong_homeworld_code(raw)
                     codes.append(raw + pop)
                     continue
 
-            if i < num_codes - 1:
-                next = raw_codes[i + 1]
-                if next.endswith(')') or next.endswith(']'):
+                if i < num_codes - 1:
+                    next = raw_codes[i + 1]
+                    if 2 > len(next):
+                        continue
+                    if next[-1] not in [')', ']'] and next[-2] not in [')', ']']:
+                        continue
+
+                    pop = ''
+                    if next[-2] in [')', ']']:
+                        pop = next[-1] if TradeCodes._is_soph_code_digit(next[-1]) else ''
+                        next = next[:-2]  # pragma: no mutate
                     combo = raw + ' ' + next
+                    combo = self._trim_overlong_homeworld_code(combo)
+                    combo += pop
                     codes.append(combo)
                     raw_codes[i + 1] = ''
-                continue
+                    continue
 
         codes = sorted(codes)
 
         final_codes = ' '.join(codes)
-        if initial_codes != final_codes:
-            codes, final_codes = self._preprocess_initial_codes(final_codes)
+        if initial_codes != final_codes and depth < 10:  # pragma: no mutate
+            codes, final_codes = self._preprocess_initial_codes(final_codes, depth + 1)  # pragma: no mutate
 
         return codes, final_codes
 
@@ -638,7 +650,6 @@ class TradeCodes(object):
         return (self.industrial and code.nonindustrial) or (self.nonindustrial and code.industrial)
 
     def is_well_formed(self) -> tuple[bool, str]:
-        msg = ""
         for code in self.codeset:
             if not self._check_residual_code_well_formed(code):
                 msg = "Residual code " + str(code) + " not in allowed residual list"
@@ -656,6 +667,8 @@ class TradeCodes(object):
             return False, msg
 
         result, msg = self._check_code_pairs_allowed()
+        if not result:
+            return False, msg
 
         # now check that sophont list is well-formed
         bad_sophonts = [code for code in self.sophont_list if 5 < len(code)]
@@ -685,9 +698,10 @@ class TradeCodes(object):
 
     def _check_residual_code_well_formed(self, code):
         max_code_len = 12
-        max_sophont_len = 35
         if code not in TradeCodes.ext_codes and code not in TradeCodes.ex_codes:
             if code in TradeCodes.weird_codes:
+                return True
+            if code in TradeCodes.dcodes:
                 return True
 
             open_brackets = code.count('(')
@@ -703,14 +717,9 @@ class TradeCodes(object):
             if open_squares != close_squares:
                 return False
 
-            if code.startswith('['):
-                return len(code) > max_sophont_len
-            elif len(code) > max_code_len:
+            if len(code) > max_code_len:
                 return False
-
-            if len(code) > max_code_len or (code.startswith('[') and len(code) > max_sophont_len):
-                return False
-            if code.startswith('Di(') or code.startswith('(') or code.endswith(')') or code.endswith(')?'):  # minor race homeworld
+            if (code.startswith('Di(') or code.startswith('(')) and (code.endswith(')') or ')' == code[-2]):  # minor race homeworld
                 return ')' in code
             if code.startswith('[') and (code.endswith(']') or ']' == code[-2]):  # major race homeworld
                 return ']' in code
@@ -722,7 +731,8 @@ class TradeCodes(object):
         msg = ""
 
         # Exclude weird codes, sophont codes and military rule straight-up
-        sortset = sorted([code for code in self.codeset if code not in TradeCodes.weird_codes and code[0] not in '([' and not code.startswith('Mr')])
+        sortset = sorted([code for code in self.codeset if code not in TradeCodes.weird_codes and not code.lower().startswith('mr')])
+        sortset = [code for code in sortset if not code.startswith('(') and not code.startswith('[')]
         outside = set()
 
         for code, other in itertools.combinations(sortset, 2):
@@ -839,3 +849,11 @@ class TradeCodes(object):
     def _add_missing_trade_code(self, targcode):
         self.codes.append(targcode)
         self.codeset.append(targcode)
+
+    @staticmethod
+    def _is_soph_code_digit(text) -> bool:
+        if not isinstance(text, str):
+            return False
+        if 1 != len(text):
+            return False
+        return text in ['W', 'X', '?'] or text.isdigit()

@@ -1,3 +1,4 @@
+import copy
 import unittest
 import logging
 
@@ -778,6 +779,237 @@ class TestTradeCode(unittest.TestCase):
                     for line in exp_msg:
                         output = [item for item in output if line not in item]
                     self.assertEqual(1, len(output), output)
+
+    def test_fix_synthetic_economic_code_out_of_bounds(self) -> None:
+        cases = [
+            ('X578800-9', 'Pi', '2', ''),
+            ('X578800-9', 'Pi', '4', ''),
+            ('X5A8A00-9', 'Pi', '', 'Pi')
+        ]
+        sector = Sector('# Core', '# 0, 0')
+        mods = ['port', 'size', 'atmo', 'hydro', 'pop', 'gov', 'law']
+        for uwp, trade_code, set_x, exp_trade in cases:
+            with self.subTest(uwp):
+                star = Star()
+                star.sector = sector
+                star.uwp = UWP(uwp)
+                for raw_item in set_x:
+                    item = int(raw_item)
+                    star.uwp.__setattr__(mods[item], 'X')
+                star.tradeCode = TradeCodes(trade_code)
+                star.tradeCode._fix_econ_code(star, 'Pi', None, '678', None)
+                self.assertEqual(exp_trade, str(star.tradeCode))
+
+    def test_trim_ill_formed_residual_codes(self) -> None:
+        cases = [
+            ('(Foobar', False),
+            ('{Foobar', False),
+            ('[Foobar', False),
+            ('Foobar)', False),
+            ('Foobar)', False),
+            ('Foobar)', False),
+            ('{Fuel}', True),
+            ('XX{XXFuel}', False),
+            ('Cp', True),
+            ('[Bar]', True),
+            ('[Bar]W', True),
+            ('(Foo)', True),
+            ('(Foo)?', True),
+            ('(Foo)8', True),
+            ('(Foo)81', False),
+            ('Di(Foo)', True),
+            ('0000000000000', False),
+            ('[0000000000000', False),
+            ('[000000000000]', False),
+            ('[00000000000]', False),
+            ('[0000000000]', True),
+            ('Lt', True),
+            ('As', True),
+        ]
+
+        for trade_code, temp in cases:
+            with self.subTest(trade_code):
+                tradeCode = TradeCodes('')
+                tradeCode.codes.append(trade_code)
+                tradeCode.codeset.append(trade_code)
+                tradeCode.logger.manager.disable = 0
+
+                with self.assertLogs(tradeCode.logger, level='WARNING') as log:
+                    tradeCode.logger.warning('Dummy error message')
+                    tradeCode.trim_ill_formed_residual_codes()
+                    if temp:
+                        self.assertEqual(trade_code, str(trade_code))
+                    else:
+                        self.assertEqual('', str(tradeCode))
+
+                    exp_msg = ["Residual code " + str(trade_code) + " not in allowed residual list - removing"]
+                    output = log.output
+                    self.assertEqual(1 + (1 if not temp else 0), len(output), output)
+                    for line in exp_msg:
+                        output = [item for item in output if line not in item]
+                    self.assertEqual(1, len(output), output)
+
+    def test_preprocess_initial_trade_codes(self) -> None:
+        cases = [
+            ('Ba Ba As', 'As Ba', []),
+            ('Ba    As', 'As Ba', []),
+            (')', '', []),
+            ('[ Ga A(Foob)', 'Ga', []),
+            ('A(Fooba)', '', []),
+            ('A()Foob Ba', 'Ba', []),
+            ('( Ga', 'Ga', []),
+            ('XXXX', '', ['XXXX']),
+            ('XX)XX', 'XX)XX', []),
+            ('X(XX)XX', '', []),
+            ('X(XX)XX]XX', '', []),
+            (') Ba', 'Ba', []),
+            (')] Ba', 'Ba', []),
+            ('])Ba', '', []),
+            ('XX)]XX Ba', 'Ba', ['XX)]XX']),
+            ('XX])XX Ba', 'Ba', ['XX])XX']),
+            ('[[Foob]', '[Foob]', []),
+            ('XX[[XX', '', ['XX[[XX']),
+            ('Di(Foob) Ga', 'Di(Foob) Ga', []),
+            ('Di(Foo Bar)0 Ga', 'Di(Foo Bar) Ga', []),
+            ('Di(Foo B)0 Ga', 'Di(Foo B) Ga', []),
+            ('Di(Foo )0 Ga', 'Ga', [')0']),
+            ('Di(Foob)', 'Di(Foob)', []),
+            ('Di(Foo bar)', 'Di(Foo bar)', []),
+            ('GDi(Di(Foo bar)', 'Di(Di(Foo bar)', ['G']),
+            ('[]Ba ()Ga', 'Ba Ga', []),
+            ('VaDi(Foob)', 'Di(Foob) Va', []),
+            ('XXDi(XXFoob)', 'Di(XXFoob)', ['XX']),
+            ('(Foobarbaz)Q', '(Foobarbaz)', []),
+            ('(Fooba)W', '(Fooba)W', []),
+            ('(Fooba)', '(Fooba)', []),
+            ('(Fooba r)', '(Fooba r)', []),
+            ('(Foob)67', '(Foob)6', []),
+            ('[Fooba]W', '[Fooba]W', []),
+            ('[Foo Bar]W Ga', 'Ga [Foo Bar]W', []),
+            ('(Foo Bar)W', '(Foo Bar)W', []),
+            ('(Foo Bar)Q Ga', '(Foo Bar) Ga', []),
+            ('(Foo Bar)Qa Ga', 'Ga', ['Bar)Qa']),
+            ('[Fooba)', '', ['[Fooba)']),
+            ('(Fooba]', '', ['(Fooba]']),
+            ('[0000000)(]X', '[0000000)(]X', []),
+            ('[000)(]X (00)Q (0000)Q', '(0000)Q [000)(]X', []),
+            ('[000)(]X (00)Q (0)00)Q', '[000)(]X', ['(0)00)Q']),
+            ('[00)(]X', '[00)(]X', []),
+            ('XX]XX', 'XX]XX', []),
+            ('[00000000000000 - Ga', 'Ga', ['-']),
+            ('[0000000)(]X [', '[0000000)(]X', []),
+            ('C0 D0 Ga', 'Chir0 Droy0 Ga', []),
+            ('[[[Fooba]]]', '[Fooba]', []),
+            ('(((Fooba)))', '(Fooba)', []),
+            ('(FoobaFoobaFoobaFoobaFoobaFoobaFoob)', '(FoobaFoobaFoobaFoobaFoobaFoobaFoob)', []),
+            ('(FoobaFoobaFoobaFoobaFoobaFoobaFooba)', '(FoobaFoobaFoobaFoobaFoobaFoobaFooba)', []),
+            ('(FoobaFoobaFoobaFoobaFoobaFoobaFoobaF)', '(FoobaFoobaFoobaFoobaFoobaFoobaFooba)', []),
+        ]
+
+        for init_trade, exp_code, exp_residuals in cases:
+            with self.subTest(init_trade):
+                logger = logging.getLogger('PyRoute.TradeCodes')
+                logger.manager.disable = 0
+
+                with self.assertLogs(logger, 'WARNING') as logs:
+                    logger.warning('Dummy Message')
+                    code = TradeCodes(init_trade)
+                    self.assertEqual(exp_code, str(code))
+
+                    output = logs.output
+                    self.assertEqual(1 + len(exp_residuals), len(output))
+                    for resid in exp_residuals:
+                        output = [item for item in output if ' ' + resid + ' ' not in item]
+                    self.assertEqual(1, len(output))
+
+    def test_process_sophonts_and_homeworlds(self) -> None:
+        cases = [
+            ('[[Foobar]', ['FoobW'], ['Foobar']),
+            ('(Foobar)', ['FoobW'], ['Foobar']),
+            ('(Foobar)W', ['FoobW'], ['Foobar']),
+            ('[Foobar]W', ['FoobW'], ['Foobar']),
+            ('Di(Foobar)', ['FoobX'], ['DiFoobar']),
+            ('(Foo)5 [Foo]5', ['FooX5', 'FooX5'], ['Foo', 'Foo']),
+            ('(Foo]b)', [], []),
+            ('(Ba[r)', [], []),
+            ('(XXXX)', ['XXXXW'], ['XXXX']),
+            ('(A)', ['AXXXW'], ['A']),
+            ('Fooba5', [], []),
+            ('(K\'kr)5', ['KXkr5'], ["K'kr"]),
+            ('(G!na)5', ['GXna5'], ['G!na']),
+            ('(G!na)X', ['GXnaX'], ['G!na']),
+            ('(G!na)?', ['GXna0'], ['G!na']),
+            ('(Foo Bar)', ['FooXW'], ['Foo Bar']),
+            ('[][][]', [], []),
+            ('[][][Foo Bar]', ['FooXW'], ['Foo Bar']),
+        ]
+
+        for init_trade, sophont_list, homeworld_list in cases:
+            with self.subTest(init_trade):
+                code = TradeCodes(init_trade)
+                self.assertEqual(sophont_list, code.sophont_list)
+                self.assertEqual(homeworld_list, code.homeworld_list)
+
+    def test_process_sophonts_and_homeworld_multiple_w_pop(self) -> None:
+        cases = [
+            ('[Foo] (Bar)'),
+            ('[Foo]W (Bar)W'),
+            ('[Foo]  DolpW')
+        ]
+        expected = "Can only have at most one W-pop sophont"
+        for init_trade in cases:
+            with self.subTest(init_trade):
+                msg = None
+                try:
+                    TradeCodes(init_trade)
+                except MultipleWPopError as e:
+                    msg = str(e)
+                self.assertEqual(expected, msg)
+
+    def test_process_homeworld(self) -> None:
+        cases = [
+             ('[Barfoo]', [], '[Barfoo]', ['BarfW', 'BarfW'], ['Barfoo', '[Barfoo]']),
+             ('(Barfoo)', [], '(Barfoo)', ['BarfW', 'BarfW'], ['Barfoo', 'Barfoo']),
+             ('', [], 'barfoo', [], []),
+        ]
+
+        for homeworld, homeworld_list, init_trade, exp_sophont, exp_homeworld in cases:
+            with self.subTest(init_trade):
+                code = TradeCodes(init_trade)
+                logger = code.logger
+                with self.assertLogs(logger, "WARNING") as logs:
+                    try:
+                        code._process_homeworld(homeworld, homeworld_list, init_trade)
+                    except SystemExit as e:
+                        output = logs.output
+                        self.assertEqual(1, len(output))
+                        expected = "Unable to process barfoo"
+                        self.assertIn(expected, output[0])
+                        self.assertTrue(output[0].endswith(expected))
+                        self.assertEqual('1', str(e))
+                        return
+                    logger.warning("Dummy message")
+                    self.assertEqual([homeworld], homeworld_list)
+                    self.assertEqual(exp_sophont, code.sophont_list)
+                    self.assertEqual(exp_homeworld, code.homeworld_list)
+
+    def test_process_deadworld(self) -> None:
+        cases = [
+            ('DiFoobar', ['DiFoobar'], ['DiFoX'], ['DiFoobar'], 'Di(Foobar)'),
+            ('Di(Foobar)', ['DiFoobar'], ['DiFoX'], ['DiFoobar'], 'Di(Foobar)'),
+            ('(Foobar)X', [], ['FoobX'], ['FoobarX'], '(Foobar)X')
+        ]
+        for homeworld, working_list, soph_list, home_list, init_trade in cases:
+            with self.subTest(init_trade):
+                code = TradeCodes('')
+                old_len = len(working_list)
+                old_list = copy.deepcopy(working_list)
+                code._process_deadworld(homeworld, working_list)
+                self.assertEqual(old_len + 1, len(working_list))
+                old_list.append(homeworld)
+                self.assertEqual(old_list, working_list)
+                self.assertEqual(soph_list, code.sophont_list)
+                self.assertEqual(home_list, code.homeworld_list)
 
 
 if __name__ == "__main__":
