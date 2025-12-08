@@ -264,7 +264,7 @@ class ParseStarInput:
             data[3] = bitz[0]
             data[4] = imp_m.group() + " " + bitz[1]
 
-        if '[' in data[3] and ']' in data[3] and '' == data[10].strip():
+        if '[' in data[3] and ']' in data[3] and isinstance(data[10], str) and '' == data[10].strip():
             soc_match = r'[ ]\[[0-9A-Za-z]{4}\][ ]'
             soc_m = re.search(soc_match, data[3])
             if soc_m:

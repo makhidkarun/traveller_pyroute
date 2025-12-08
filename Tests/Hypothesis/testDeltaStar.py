@@ -533,6 +533,7 @@ class testDeltaStar(unittest.TestCase):
     @example('0101 000000000000000 ???????-? 000000000000000       - - A 000 0 00')
     @example('0101 000000000000000 ???????-? 000000000000000 - -  [0001] B - A 000   00')
     @example('0101 0                    A201000-0 As As                                  { 0 } (000+0) [0000] B - A 000 0 NaHu G5 V')
+    @example('0201 000OLZon2wJ8I bx0 AAAAAAA-A 0000000000000000000000000000000000000000000000000000000]000000000000 [ {0}    (000-0) [0000] B B     A 00A 0  00')
     def test_canonicalise_from_regex_match_and_verify_idempotency(self, starline) -> None:
         assume('00' != starline[0:2] and '00' != starline[2:4])
         assume(33 > int(starline[0:2]) and 41 > int(starline[2:4]))
