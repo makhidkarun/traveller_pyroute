@@ -17,6 +17,7 @@ pytest >= 8.0.0
 pytest-console-scripts
 pytest-randomly
 pytest-subtests
+pytest-timeout
 reportlab >= 4.1.0
 ruff >= 0.3.0
 setuptools
