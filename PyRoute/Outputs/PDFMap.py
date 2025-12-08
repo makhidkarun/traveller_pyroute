@@ -15,7 +15,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 from PyRoute.Outputs.Colour import Colour
 from PyRoute.Outputs.Cursor import Cursor
 from PyRoute.Outputs.FontLayer import FontLayer
-from PyRoute.Outputs.Map import MapOutput, Scheme
+from PyRoute.Outputs.Map import Scheme
+from PyRoute.Outputs.MapOutput import MapOutput
 
 
 class PDFMap(MapOutput):

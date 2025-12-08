@@ -9,7 +9,7 @@ from PyRoute.TradeCodes import TradeCodes
 
 class HexSystem(object):
     def __init__(self, doc: "MapOutput", start: Cursor, hex_size: Cursor, routes: str = "trade"):  # noqa
-        from PyRoute.Outputs.Map import MapOutput
+        from PyRoute.Outputs.MapOutput import MapOutput
         self.doc: MapOutput = doc
         self.start: Cursor = start
         self.hex_size: Cursor = hex_size

@@ -168,16 +168,17 @@ class BaseTransformer(Transformer):
         return ' '.join(codes)
 
     def extensions_transform(self, extensions) -> tuple[Optional[str], Optional[str], Optional[str]]:
-        data = {'ix': None, 'ex': None, 'cx': None}
-        for kid in extensions:
-            if isinstance(kid, Token):
-                val = str(kid.type)
-                data[val] = kid.value
-            else:
-                val = str(kid.data)
-                data[val] = kid.children[0].value
-            if isinstance(data[val], str):
-                data[val] = self.boil_down_double_spaces(data[val])  # type:ignore[assignment,arg-type]
+        data: dict[str, Optional[str]] = {'ix': None, 'ex': None, 'cx': None}
+        if not isinstance(extensions, str):
+            for kid in extensions:
+                if isinstance(kid, Token):
+                    val = str(kid.type)
+                    data[val] = kid.value
+                else:
+                    val = str(kid.data)
+                    data[val] = kid.children[0].value
+                if isinstance(data[val], str):
+                    data[val] = self.boil_down_double_spaces(data[val])  # type:ignore[arg-type]
 
         return data['ix'], data['ex'], data['cx']
 

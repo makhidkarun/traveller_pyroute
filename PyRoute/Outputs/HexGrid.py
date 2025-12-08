@@ -33,7 +33,7 @@ class HexGrid(object):
     size x/y determine the width and height of each hex.
     """
     def __init__(self, doc: "MapOutput", start: Cursor, size: Cursor, rows: int, cols: int, legacy: bool = False):  # noqa
-        from PyRoute.Outputs.Map import MapOutput
+        from PyRoute.Outputs.MapOutput import MapOutput
         self.hex_grid_colour: Colour = 'gray'
         self.doc: MapOutput = doc
 
