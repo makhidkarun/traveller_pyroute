@@ -4,12 +4,14 @@ import unittest
 
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.DeltaStar import DeltaStar
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Star import Star
 
 
 class testDeltaStar(unittest.TestCase):
 
     def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
         outer_logger = logging.getLogger('PyRoute.Star')
         outer_logger.manager.disable = 0
         outer_logger.setLevel(10)

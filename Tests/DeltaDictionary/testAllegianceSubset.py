@@ -4,10 +4,14 @@ Created on Apr 23, 2025
 @author: CyberiaResurrection
 """
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from Tests.baseTest import baseTest
 
 
 class testAllegianceSubset(baseTest):
+
+    def setUp(self):
+        ParseStarInput.deep_space = {}
 
     def test_blowup_1(self) -> None:
         source = self.unpack_filename('DeltaFiles/allegiance_subset_blowup_1/Reaver\'s Deep.sec')

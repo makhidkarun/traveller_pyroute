@@ -1,6 +1,7 @@
 import unittest
 
 from PyRoute.AreaItems.Sector import Sector
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Position.Hex import Hex
 from PyRoute.Star import Star
 
@@ -113,6 +114,9 @@ param_list = [
 
 
 class testStarDistances(unittest.TestCase):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
 
     def test_core_0101(self) -> None:
         sector = Sector('# Core', '# 0, 0')

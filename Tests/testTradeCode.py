@@ -4,6 +4,7 @@ import logging
 
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Errors.MultipleWPopError import MultipleWPopError
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.TradeCodes import TradeCodes
 from PyRoute.Star import Star
 from PyRoute.SystemData.UWP import UWP
@@ -12,6 +13,7 @@ from PyRoute.SystemData.UWP import UWP
 class TestTradeCode(unittest.TestCase):
 
     def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
         self.star1 = Star.parse_line_into_star(
             "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
             Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
