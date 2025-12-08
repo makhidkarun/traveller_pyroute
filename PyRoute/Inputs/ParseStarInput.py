@@ -263,6 +263,13 @@ class ParseStarInput:
             bitz = re.split(imp_match, data[3])
             data[3] = bitz[0]
             data[4] = imp_m.group() + " " + bitz[1]
+        else:
+            econ_match = r'[ ]\([0-9A-Za-z]{3}[+-]\d\)[ ]'
+            econ_m = re.search(econ_match, data[3])
+            if econ_m:
+                bitz = re.split(econ_match, data[3])
+                data[3] = bitz[0]
+                data[4] = '- ' + econ_m.group() + " " + bitz[1]
 
         if '[' in data[3] and ']' in data[3] and isinstance(data[10], str) and '' == data[10].strip():
             soc_match = r'[ ]\[[0-9A-Za-z]{4}\][ ]'

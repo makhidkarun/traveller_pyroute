@@ -731,8 +731,9 @@ class TradeCodes(object):
                 outside.add(pair)
 
         if 0 < len(outside):
+            nu_outside = sorted(outside)
             msg = "Code pair(s)"
-            for pair in outside:
+            for pair in nu_outside:
                 pairline = ' ("' + pair[0] + '", "' + pair[1] + '"),'
                 msg += pairline
             msg = msg.strip(',')
