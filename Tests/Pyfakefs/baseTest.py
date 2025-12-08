@@ -4,6 +4,7 @@ import os
 import tempfile
 from pyfakefs.fake_filesystem_unittest import TestCase
 
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.Utilities.UnpackFilename import UnpackFilename
 
 
@@ -12,6 +13,9 @@ class baseTest(TestCase):
     # Set up logging information
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.DEBUG)
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
 
     def unpack_filename(self, filename: str) -> str:
         return UnpackFilename.unpack_filename(filename)

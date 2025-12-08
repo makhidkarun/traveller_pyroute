@@ -5,13 +5,17 @@ Created on Dec 03, 2025
 """
 from PyRoute import Star
 from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.StatCalculation.Populations import Populations
 from PyRoute.StatCalculation.ObjectStatistics import ObjectStatistics
+from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
 from Tests.baseTest import baseTest
 
 
 class testObjectStatistics(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
 
     def test_init(self) -> None:
         stats = ObjectStatistics()
