@@ -34,6 +34,10 @@ class testObjectStatistics(baseTest):
             self.assertIsNotNone(value, key)
             self.assertEqual(0, value, key)
 
+    def test_hash(self) -> None:
+        stats = ObjectStatistics()
+        self.assertEqual(0, stats.__hash__())
+
     def test_getstate(self) -> None:
         stats = ObjectStatistics()
         exp_dict = {
@@ -62,7 +66,7 @@ class testObjectStatistics(baseTest):
             'primary_count': NoNoneDefaultDict(int),
             'shipyards': 0,
             'spa_people': 0,
-            'star_count': NoNoneDefaultDict(int, {}),
+            'star_count': NoNoneDefaultDict(int),
             'stars': 0,
             'sum_ru': 0,
             'trade': 0,
