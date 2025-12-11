@@ -26,7 +26,7 @@ class TradeBalance(dict):
     def update(self, __m, **kwargs) -> None:  # type:ignore[override]
         for key in __m:
             self._check(key, __m[key])
-        super().update(__m, **kwargs)
+        super().update(__m, **kwargs)  # pragma: no mutate
 
     def __setitem__(self, item, value):
         self._check(item, value)

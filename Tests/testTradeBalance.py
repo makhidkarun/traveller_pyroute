@@ -293,3 +293,25 @@ class testTradeBalance(baseTest):
         self.assertEqual(655, sec1.stats.tradeExt)
         self.assertEqual(1541, sec2.stats.tradeExt)
         self.assertEqual(885, sec3.stats.tradeExt)
+
+    def test_is_balanced_1(self) -> None:
+        core = Sector('# Core', '# 0, 0')
+        forn = Sector('# Fornast', '# 0, -1')
+        delp = Sector('# Delphi', '# +1, -1')
+        mass = Sector('# Massilia', '# +1, 0')
+        olde = Sector('# Old Expanses', '# +2, -1')
+        dias = Sector('# Diaspora', '# +2, 0')
+
+        galaxy = Galaxy(8)
+        galaxy.sectors['Core'] = core
+        galaxy.sectors['Fornast'] = forn
+        galaxy.sectors['Delphi'] = delp
+        galaxy.sectors['Massilia'] = mass
+        galaxy.sectors['Old Expanses'] = olde
+        galaxy.sectors['Diaspora'] = dias
+
+        update_dict = {('Core', 'Fornast'): 1, ('Delphi', 'Massilia'): 1, ('Old Expanses', 'Diaspora'): 1}
+        foo = TradeBalance(stat_field='tradeExt', region=galaxy)
+        foo.update(update_dict)
+
+        foo.is_balanced()
