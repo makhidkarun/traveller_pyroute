@@ -38,6 +38,32 @@ class testTradeBalance(unittest.TestCase):
         self.assertEqual(1, core.stats.tradeExt, 'Core sector should have unit external trade')
         self.assertEqual(1, dagu.stats.tradeExt, 'Dagudashaag sector should have unit external trade')
 
+    def test_single_unit_imbalance(self) -> None:
+        core = Sector('# Core', '# 0, 0')
+        dagu = Sector('# Dagudashaag', '# -1, 0')
+        forn = Sector('# Fornast', '# 0, -1')
+
+        star1 = Star()
+        star1.sector = core
+
+        star2 = Star()
+        star2.sector = dagu
+
+        star3 = Star()
+        star3.sector = forn
+
+        foo = TradeBalance(stat_field='tradeExt', region=AreaItem('name'))
+        exp_imbal = {}
+        self.assertEqual(exp_imbal, foo.single_unit_imbalance())
+        tuple1 = ('Core', 'Dagudashaag')
+        tuple2 = ('Core', 'Fornast')
+        tuple3 = ('Dagudashaag', 'Fornast')
+        update_dict = {tuple1: 2, tuple2: 3, tuple3: 4}
+        foo.update(update_dict)
+
+        exp_imbal = {'Core': 5, 'Dagudashaag': 6, 'Fornast': 7}
+        self.assertEqual(exp_imbal, foo.single_unit_imbalance())
+
 
 if __name__ == '__main__':
     unittest.main()
