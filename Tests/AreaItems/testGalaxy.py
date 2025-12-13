@@ -582,6 +582,7 @@ class testGalaxy(baseTest):
         galaxy.sectors['Diaspora'] = Sector('# Diaspora', '# 0,-2')
 
         logger = galaxy.logger
+        logger.manager.disable = 0
         exp_logs = [
             'ERROR:PyRoute.Galaxy:Duplicate sector Core and Core'
         ]
