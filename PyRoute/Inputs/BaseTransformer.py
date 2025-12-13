@@ -6,7 +6,7 @@ Created on Nov 07, 2024
 import re
 from typing import Optional
 
-from lark import Transformer, Token
+from lark import Transformer, Token, Tree
 
 
 class BaseTransformer(Transformer):
@@ -168,17 +168,17 @@ class BaseTransformer(Transformer):
         return ' '.join(codes)
 
     def extensions_transform(self, extensions) -> tuple[Optional[str], Optional[str], Optional[str]]:
-        if 1 == len(extensions):  # Fallback no-extensions
-            return None, None, None
-        data = {'ix': '', 'ex': '', 'cx': ''}
-        for kid in extensions:
-            if isinstance(kid, Token):
-                val = str(kid.type)
-                data[val] = kid.value
-            else:
-                val = str(kid.data)
-                data[val] = kid.children[0].value
-            data[val] = self.boil_down_double_spaces(data[val])
+        data: dict[str, Optional[str]] = {'ix': None, 'ex': None, 'cx': None}
+        if not isinstance(extensions, str):
+            for kid in extensions:
+                if isinstance(kid, Token):
+                    val = str(kid.type)
+                    data[val] = kid.value
+                else:
+                    val = str(kid.data)
+                    data[val] = kid.children[0].value
+                if isinstance(data[val], str):
+                    data[val] = self.boil_down_double_spaces(data[val])  # type:ignore[arg-type]
 
         return data['ix'], data['ex'], data['cx']
 
@@ -236,6 +236,18 @@ class BaseTransformer(Transformer):
         trade = tree.children[2]
         extensions = tree.children[3]
         ix_reg = r'\{ *[+-]?[0-6] ?\}$'
+        soc_reg = r'[ ]\[[0-9A-Za-z]{4}\][ ]'
+
+        # if extensions are single blank child, look to trade for spillover
+        if 1 == len(extensions.children) and '' == extensions.children[0].value.strip() and 1 == len(trade.children):
+            tradeval = trade.children[0].value.strip() + ' '
+            soc_match = re.search(soc_reg, tradeval)
+            if soc_match is not None:
+                posn = soc_match.regs[0]
+                nu_social = Tree(Token('RULE', 'cx'), [Token('__ANON_3', tradeval[posn[0] + 1:posn[1] - 1])])
+                tradeval = tradeval[0:posn[0]] + tradeval[posn[1]:]
+                trade.children[0].value = tradeval
+                tree.children[3].children[0] = nu_social
 
         # If trade has importance-extension child, we need to fix it
         counter = -1

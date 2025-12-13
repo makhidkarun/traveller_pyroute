@@ -1,10 +1,15 @@
 import unittest
 
 from PyRoute.DeltaStar import DeltaStar
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from Tests.baseTest import baseTest
 
 
 class testDeltaStarReduction(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
+
     def test_drop_trade_codes_on_none(self) -> None:
         src = "0410 Omwyf                B75978A-B                           { 2 }  (D6C+4) [997D] B    N  - 604 9  ImDa G1 V           Xb:0213 Xb:0609"
 

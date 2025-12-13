@@ -179,6 +179,8 @@ class testStar(unittest.TestCase):
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
         ru_calc = 'scaled'
+        logger = logging.getLogger('PyRoute.Star')
+        logger.manager.disable = 70
         foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
         assume(foo is not None)
         # filter out malformed hex objects while we're at it
@@ -235,6 +237,8 @@ class testStar(unittest.TestCase):
     @example('2040 okQy)WREOS[xZE4LhS18Jz1DiAeXILGQ(n       hBdebAG-c                  } E}Zsi} AW]WHH {                 +0} -           [1111]         - -  B 018     1u1X')
     @example('0101 [0000]000000000 A000000-0 000000000000000       - - A 000   00')
     @example('0101 000000000000000 A000000-0 0000000000000 - - -  [0000] - -         A   000   00')
+    @example('0101 000000000000000 A000000-0 [00000000000000 - (000-0) [0000] B         A A 000 0 00')
+    @example('0101 000000000000000 A000000-0 [00000000000000 - -  [0000]     B A A 000 0 00')
     def test_star_line_extension_parsing(self, s) -> None:
         econ_match = r'[ ]\([0-9A-Za-z]{3}[+-]\d\)[ ]'
         soc_match = r'[ ]\[[0-9A-Za-z]{4}\][ ]'
@@ -268,6 +272,8 @@ class testStar(unittest.TestCase):
         sector = Sector('# Core', '# 0, 0')
         pop_code = 'scaled'
         ru_calc = 'scaled'
+        logger = logging.getLogger('PyRoute.Star')
+        logger.manager.disable = 70
         foo = Star.parse_line_into_star(s, sector, pop_code, ru_calc)
         assume(foo is not None)
         result, _ = foo.hex.is_well_formed()  # as we're interested in extensions, we assume hex is good

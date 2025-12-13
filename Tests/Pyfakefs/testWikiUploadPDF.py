@@ -36,6 +36,7 @@ class testWikiUploadPDF(baseTest):
 
     def test_upload_summary_text_1(self) -> None:
         logger = logging.getLogger('WikiUpload')
+        logger.manager.disable = 0
         exp_logs = ['INFO:WikiUpload:uploading summary articles: initial table baz  == foobar']
 
         self.setUpPyfakefs()
@@ -57,6 +58,7 @@ class testWikiUploadPDF(baseTest):
 
     def test_upload_summary_text_2(self) -> None:
         logger = logging.getLogger('WikiUpload')
+        logger.manager.disable = 0
         exp_logs = ['INFO:WikiUpload:uploading summary articles: initial table foobar baz']
 
         self.setUpPyfakefs()

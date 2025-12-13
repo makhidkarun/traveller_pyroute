@@ -63,6 +63,7 @@ source = ["PyRoute/"]
 
 [tool.mutmut]
 paths_to_mutate = ["PyRoute/"]
+do_not_mutate = ["PyRoute/downloadsec.py"]
 tests_dir = ["Tests/"]
 also_copy = ["Tests/", "PyRoute/Pathfinding/*.so", "pytest.ini"]
 max_stack_depth = 20

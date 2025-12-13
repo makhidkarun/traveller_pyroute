@@ -207,6 +207,7 @@ class testTradeCodes(unittest.TestCase):
            booleans())
     @settings(suppress_health_check=[HealthCheck(10)])
     @example('?000000-0', ['De'], False)
+    @example('?605000-0', ['As'], False)
     def test_has_code_but_not_uwp(self, s, trade_line, forward) -> None:
         s = s[0:9]
         if isinstance(trade_line, list):

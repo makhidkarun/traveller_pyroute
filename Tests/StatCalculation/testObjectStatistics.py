@@ -5,13 +5,17 @@ Created on Dec 03, 2025
 """
 from PyRoute import Star
 from PyRoute.AreaItems.Sector import Sector
-from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
+from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.StatCalculation.Populations import Populations
 from PyRoute.StatCalculation.ObjectStatistics import ObjectStatistics
+from PyRoute.Utilities.NoNoneDefaultDict import NoNoneDefaultDict
 from Tests.baseTest import baseTest
 
 
 class testObjectStatistics(baseTest):
+
+    def setUp(self) -> None:
+        ParseStarInput.deep_space = {}
 
     def test_init(self) -> None:
         stats = ObjectStatistics()
@@ -33,6 +37,10 @@ class testObjectStatistics(baseTest):
             value = stats.__getitem__(key)
             self.assertIsNotNone(value, key)
             self.assertEqual(0, value, key)
+
+    def test_hash(self) -> None:
+        stats = ObjectStatistics()
+        self.assertEqual(0, stats.__hash__())
 
     def test_getstate(self) -> None:
         stats = ObjectStatistics()
@@ -62,7 +70,7 @@ class testObjectStatistics(baseTest):
             'primary_count': NoNoneDefaultDict(int),
             'shipyards': 0,
             'spa_people': 0,
-            'star_count': NoNoneDefaultDict(int, {}),
+            'star_count': NoNoneDefaultDict(int),
             'stars': 0,
             'sum_ru': 0,
             'trade': 0,
