@@ -19,12 +19,14 @@ from PyRoute.Star import Star
 from PyRoute.SystemData.UWP import UWP
 from PyRoute.TradeCodes import TradeCodes
 from PyRoute.SystemData.StarList import StarList
+from Tests.baseTest import baseTest
 
 
-class TestStar(unittest.TestCase):
+class TestStar(baseTest):
 
     def setUp(self) -> None:
         ParseStarInput.deep_space = {}
+        self.reset_logging()
 
     def test_init_blank(self) -> None:
         star = Star()
@@ -1769,6 +1771,7 @@ class TestStar(unittest.TestCase):
                 star.stars = rawstars
 
                 logger = star.logger
+                logger.manager.disable = 0
                 with self.assertLogs(logger, 'DEBUG') as logs:
                     star.extract_routes()
                     self.assertEqual(exp_stars, star.stars)
@@ -1818,6 +1821,144 @@ class TestStar(unittest.TestCase):
                 star.position = posn
 
                 self.assertEqual(exp_subsector, star.subsector())
+
+    def test_check_cx_1(self):
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555055-5')
+        star.social = '[1111]'
+        star.importance = 0
+        self.assertEqual(0, star.popCode)
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated homogeneity 1 should be 0 for barren worlds',
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated acceptance 1 should be 0 for barren worlds',
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated strangeness 1 should be 0 for barren worlds',
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated symbols 1 should be 0 for barren worlds'
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            star.check_cx()
+            self.assertEqual(exp_logs, logs.output)
+
+    def test_check_cx_2(self):
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555555-7')
+        star.social = '[0101]'
+        star.importance = 0
+        self.assertEqual(5, star.popCode)
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated homogeneity 0 not in range 1 - 10',
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated acceptance 1 does not match generated acceptance 5',
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated strangeness 0 not in range 1 - 10',
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated symbols 1 not in range 2 - 12'
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            star.check_cx()
+            self.assertEqual(exp_logs, logs.output)
+
+    def test_check_cx_3(self):
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555555-7')
+        star.social = '[B6BD]'
+        star.importance = 0
+        self.assertEqual(5, star.popCode)
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated homogeneity 11 not in range 1 - 10',
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated acceptance 6 does not match generated acceptance 5',
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated strangeness 11 not in range 1 - 10',
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated symbols 13 not in range 2 - 12'
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            star.check_cx()
+            self.assertEqual(exp_logs, logs.output)
+
+    def test_check_cx_4(self):
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555255-7')
+        star.social = '[D0AC]'
+        star.importance = -2
+        self.assertEqual(2, star.popCode)
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated homogeneity 13 not in range 1 - 7',
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated acceptance 0 does not match generated acceptance 1'
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            star.check_cx()
+            self.assertEqual(exp_logs, logs.output)
+
+    def test_check_cx_5(self):
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555255-7')
+        star.social = '[13A2]'
+        star.importance = 1
+        self.assertEqual(2, star.popCode)
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:Dummy log'
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            logger.warning('Dummy log')
+            star.check_cx()
+            self.assertEqual(exp_logs, logs.output)
+
+    def test_check_cx_6(self):
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555255-4')
+        star.social = '[7311]'
+        star.importance = 1
+        self.assertEqual(2, star.popCode)
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:Dummy log'
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            logger.warning('Dummy log')
+            star.check_cx()
+            self.assertEqual(exp_logs, logs.output)
+
+    def test_check_cx_7(self):
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555A55-4')
+        star.social = '[4B11]'
+        star.importance = 1
+        self.assertEqual(10, star.popCode)
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:None (Core None) - CX Calculated homogeneity 4 not in range 5 - 15',
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            star.check_cx()
+            self.assertEqual(exp_logs, logs.output)
 
 
 if __name__ == "__main__":
