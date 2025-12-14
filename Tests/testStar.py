@@ -1991,6 +1991,141 @@ class TestStar(baseTest):
         star.__setitem__('_oldskool', True)
         self.assertTrue(star.__getitem__('_oldskool'))
 
+    def test_check_ex_1(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555555-5')
+        star.economics = '(000+1)'
+        star.tradeCode = TradeCodes('')
+        star.importance = 0
+
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:None (Core None) - EX Calculated labor 0 does not match generated labor 4'
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            star.check_ex()
+            self.assertEqual(exp_logs, logs.output)
+
+    def test_check_ex_2(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555055-5')
+        star.economics = '(001+1)'
+        star.tradeCode = TradeCodes('Ba')
+        star.importance = 0
+
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:None (Core None) - EX Calculated infrastructure 1 does not match generated infrastructure 0'
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            star.check_ex()
+            self.assertEqual(exp_logs, logs.output)
+
+    def test_check_ex_3(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555355-5')
+        star.economics = '(021+1)'
+        star.tradeCode = TradeCodes('Lo')
+        star.importance = 0
+
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:None (Core None) - EX Calculated infrastructure 1 does not match generated infrastructure 0'
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            star.check_ex()
+            self.assertEqual(exp_logs, logs.output)
+
+    def test_check_ex_4(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555655-5')
+        star.economics = '(058+1)'
+        star.tradeCode = TradeCodes('Ni')
+        star.importance = 1
+
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:None (Core None) - EX Calculated infrastructure 8 not in NI range 0 - 7'
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            star.check_ex()
+            self.assertEqual(exp_logs, logs.output)
+
+    def test_check_ex_5(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555655-5')
+        star.economics = '(057+1)'
+        star.tradeCode = TradeCodes('Ni')
+        star.importance = 1
+
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:Dummy log'
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            logger.warning('Dummy log')
+            star.check_ex()
+            self.assertEqual(exp_logs, logs.output)
+
+    def test_check_ex_6(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555655-5')
+        star.economics = '(050+1)'
+        star.tradeCode = TradeCodes('Ni')
+        star.importance = 1
+
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:Dummy log'
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            logger.warning('Dummy log')
+            star.check_ex()
+            self.assertEqual(exp_logs, logs.output)
+
+    def test_check_ex_7(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555755-5')
+        star.economics = '(06E+1)'
+        star.tradeCode = TradeCodes('')
+        star.importance = 1
+
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = [
+            'WARNING:PyRoute.Star:None (Core None) - EX Calculated infrastructure 14 not in range 0 - 13'
+        ]
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            star.check_ex()
+            self.assertEqual(exp_logs, logs.output)
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
