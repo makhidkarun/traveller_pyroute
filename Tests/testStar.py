@@ -74,6 +74,22 @@ class TestStar(unittest.TestCase):
         self.assertEqual(3, star1.row)
         self.assertEqual(1, star1.col)
 
+    def test_calc_hash(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-9 Fl                   { 0 }  (E69+0) [4726] B     - - 123 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+        exp_key = ('0103', 'Irkigkhan', 'C9C4733-9', 'Core')
+        self.assertEqual(exp_key, star1._key)
+        star2 = Star.parse_line_into_star(
+            "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
+            sector, 'fixed', 'fixed')
+        exp_key = ('0104', 'Shana Ma', 'E551112-7', 'Core')
+        self.assertEqual(exp_key, star2._key)
+        star1.calc_hash()
+        star2.calc_hash()
+        self.assertNotEqual(star1.__hash__(), star2.__hash__())
+
     def testParseIrkigkhanRUCollapse(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
@@ -612,6 +628,222 @@ class TestStar(unittest.TestCase):
         star = Star.parse_line_into_star(starline, sector, 'fixed', 'fixed')
         self.assertIsNotNone(star, "Starline should parse cleanly")
         self.assertEqual('B2424QJ-D', str(star.uwp))
+
+    def test_eq(self) -> None:
+        sector = Sector('# Kilong', '# 6,0')
+        star = Star()
+        star.sector = sector
+        rhubarb = object()
+        star._hash = rhubarb.__hash__()
+
+        self.assertFalse(star.__eq__(rhubarb))
+
+    def test_calculate_gwp_1(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-9 Ri In Ag         { 0 }  (E69+0) [4726] B     - - 623 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+        self.assertFalse(star1.tradeCode.low_per_capita_gwp)
+
+        star1.calculate_gwp('fixed')
+        self.assertEqual(60, star1.population)
+        self.assertEqual(9838, star1.perCapita)
+        self.assertEqual(590, star1.gwp)
+        self.assertEqual('6', star1.uwpCodes['Pop Code'])
+        del star1.uwpCodes['Pop Code']
+
+        star1.calculate_gwp('scaled')
+        self.assertEqual(36, star1.population)
+        self.assertEqual(9838, star1.perCapita)
+        self.assertEqual(354, star1.gwp)
+        self.assertEqual('3', star1.uwpCodes['Pop Code'])
+        del star1.uwpCodes['Pop Code']
+
+        star1.calculate_gwp('benford')
+        self.assertEqual(36, star1.population)
+        self.assertEqual(9838, star1.perCapita)
+        self.assertEqual(354, star1.gwp)
+        self.assertEqual('3.6', star1.uwpCodes['Pop Code'])
+
+    def test_calculate_gwp_2(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-8 Ni         { 0 }  (E69+0) [4726] B     - - 623 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+
+        star1.calculate_gwp('fixed')
+        self.assertEqual(60, star1.population)
+        self.assertEqual(1831, star1.perCapita)
+        self.assertEqual(109, star1.gwp)
+
+    def test_calculate_gwp_3(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4733-L Ni         { 0 }  (E69+0) [4726] B     - - 623 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+        self.assertEqual(20, star1.tl)
+
+        star1.calculate_gwp('fixed')
+        self.assertEqual(60, star1.population)
+        self.assertEqual(31200, star1.perCapita)
+        self.assertEqual(1872, star1.gwp)
+
+    def test_calculate_gwp_4(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4033-B Ri In         { 0 }  (E69+0) [4726] B     - - 023 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+
+        star1.calculate_gwp('fixed')
+        self.assertEqual(0, star1.population)
+        self.assertEqual(0, star1.perCapita)
+        self.assertEqual(0, star1.gwp)
+
+    def test_calculate_gwp_5(self) -> None:
+        cases = [
+            (0, 492, 0),
+            (1, 784, 0),
+            (2, 1254, 1),
+            (3, 1254, 1),
+            (4, 1254, 1),
+            (5, 2004, 2),
+            (6, 2004, 2),
+            (7, 3203, 3),
+            (8, 5127, 5),
+            (9, 8198, 8),
+            ('A', 8198, 8),
+            ('B', 8198, 8),
+            ('C', 13126, 13),
+            ('D', 13126, 13),
+            ('E', 21000, 21),
+            ('F', 33600, 33),
+            ('G', 54656, 54),
+            ('H', 54656, 54),
+            ('J', 87360, 87),
+            ('K', 87360, 87),
+        ]
+
+        sector = Sector('# Core', '# 0, 0')
+
+        for tl, perCapita, gwp in cases:
+            with self.subTest(tl):
+                star1 = Star.parse_line_into_star(
+                    f'0103 Irkigkhan            C9C4633-{str(tl)} Ri In      - (E69+0) [4726] B     - - 123 8  Im M2 V',
+                    sector, 'fixed', 'fixed')
+                self.assertIsNotNone(star1)
+
+                star1.calculate_gwp('fixed')
+                self.assertEqual(1, star1.population)
+                self.assertEqual(perCapita, star1.perCapita)
+                self.assertEqual(gwp, star1.gwp)
+
+    def test_calculate_gwp_6(self) -> None:
+        cases = [
+            (0, 0, '0'),
+            (1, 10, '1'),
+            (2, 13, '1'),
+            (3, 17, '1'),
+            (4, 22, '2'),
+            (5, 28, '2'),
+            (6, 36, '3'),
+            (7, 47, '4'),
+            (8, 60, '6'),
+            (9, 78, '7')
+        ]
+
+        sector = Sector('# Core', '# 0, 0')
+
+        for popM, population, popCode in cases:
+            with self.subTest(popM):
+                star1 = Star.parse_line_into_star(
+                    f"0103 Irkigkhan            C9C4733-B Ri In         -  (E69+0) [4726] B     - - {popM}23 8  Im M2 V",
+                    sector, 'fixed', 'fixed')
+                star1.calculate_gwp('scaled')
+                self.assertEqual(population, star1.population)
+                self.assertEqual(popCode, star1.uwpCodes['Pop Code'])
+
+    def test_calculate_gwp_7(self) -> None:
+        cases = [
+            (1, 10),
+            (2, 13),
+            (3, 17),
+            (4, 22),
+            (5, 28),
+            (6, 36),
+        ]
+
+        sector = Sector('# Core', '# 0, 0')
+
+        for popM, population in cases:
+            with self.subTest(popM):
+                star1 = Star.parse_line_into_star(
+                    f"0103 Irkigkhan            C9C4733-B Ri In         -  (E69+0) [4726] B     - - {popM}23 8  Im M2 V",
+                    sector, 'fixed', 'fixed')
+                star1.calculate_gwp('benford')
+                self.assertEqual(population, star1.population)
+
+    def test_calculate_gwp_8(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            C9C4833-B Ri In         { 0 }  (E69+0) [4726] B     - - 723 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+
+        exp_population = [400, 500, 600, 700, 800, 900]
+        star1.calculate_gwp('benford')
+        self.assertIn(star1.population, exp_population)
+
+    def test_calculate_tcs_1(self) -> None:
+        cases = [
+            (0, 900, 0, 0),
+            (1, 900, 0, 0),
+            (2, 900, 0, 0),
+            (3, 900, 0, 0),
+            (4, 900, 0, 0),
+            (5, 900, 4480, 48),
+            (6, 900, 8960, 108),
+            (7, 900, 13440, 181),
+            (8, 900, 17920, 265),
+            (9, 900, 22400, 362),
+            ('A', 900, 26880, 471),
+            ('B', 900, 31360, 592),
+            ('C', 900, 35840, 725),
+            ('D', 900, 40320, 870),
+            ('E', 900, 44800, 1027),
+            ('F', 900, 49280, 1197),
+            ('G', 900, 53760, 1378),
+            ('H', 900, 62720, 1693),
+            ('J', 900, 71680, 2031),
+            ('K', 900, 71680, 2128),
+            ('L', 900, 71680, 2225),
+        ]
+
+        sector = Sector('# Core', '# 0, 0')
+        for tl, ship_capacity, tcs_gwp, budget in cases:
+            with self.subTest(tl):
+                star1 = Star.parse_line_into_star(
+                    f'0103 Irkigkhan            C9C4633-{str(tl)} Ri In      - (E69+0) [4726] B     - - 123 8  Im M2 V',
+                    sector, 'fixed', 'fixed')
+                self.assertIsNotNone(star1)
+
+                star1.calculate_gwp('benford')
+                star1.calculate_TCS()
+                self.assertEqual(ship_capacity, star1.ship_capacity)
+                self.assertEqual(tcs_gwp, star1.tcs_gwp)
+                self.assertEqual(budget, star1.budget)
+
+    def test_calculate_tcs_2(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star.parse_line_into_star(
+            "0103 Irkigkhan            B9C4833-B Ag Po         { 0 }  (E69+0) [4726] B     - - 423 8  Im M2 V           ",
+            sector, 'fixed', 'fixed')
+        self.assertIsNotNone(star1)
+
+        star1.calculate_gwp('benford')
+        self.assertEqual(220, star1.population)
+        star1.calculate_TCS()
+        self.assertEqual(198000, star1.ship_capacity)
+        self.assertEqual(2956800, star1.tcs_gwp)
+        self.assertEqual(59874, star1.budget)
 
 
 if __name__ == "__main__":

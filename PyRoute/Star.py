@@ -53,7 +53,8 @@ class Star(object):
                 'eti_passenger', 'raw_be', 'im_be', 'col_be', 'star_list_object', 'routes', 'stars', 'is_enqueued',\
                 'is_target', 'is_landmark', '_pax_btn_mod', 'suppress_soph_percent_warning', 'is_redzone', 'hex',\
                 'deep_space_station', '_oldskool', 'tradeIn', 'tradeOver', 'tradeCount', 'passIn', 'passOver',\
-                'starportSize', 'starportBudget', 'starportPop', 'index', 'trade_cost', 'trade_id'
+                'starportSize', 'starportBudget', 'starportPop', 'index', 'trade_cost', 'trade_id', 'eti_cargo_volume',\
+                'eti_worlds', 'eti_pass_volume'
 
     def __init__(self):
         self.worlds = None
@@ -92,6 +93,9 @@ class Star(object):
         self.importance = None
         self.eti_cargo = None
         self.eti_passenger = None
+        self.eti_cargo_volume = None
+        self.eti_worlds = None
+        self.eti_pass_volume = None
         self.raw_be = None
         self.im_be = None
         self.col_be = None
@@ -355,20 +359,20 @@ class Star(object):
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
 
         if pop_code == 'scaled':
-            self.population = (pow(10, self.popCode) * popCodeM[self.popM]) // 1e7
+            self.population = (pow(10, self.popCode) * popCodeM[self.popM]) // 1e7  # pragma: no mutate
             self.uwpCodes['Pop Code'] = str(popCodeM[self.popM] // 10)
 
         elif pop_code == 'fixed':
-            self.population = (pow(10, self.popCode) * self.popM) // 1e6
+            self.population = (pow(10, self.popCode) * self.popM) // 1e6  # pragma: no mutate
 
         elif pop_code == 'benford':
-            popCodeRange = [0.243529203, 0.442507049, 0.610740422, 0.756470797, 0.885014099, 1]
+            popCodeRange = [0.243529203, 0.442507049, 0.610740422, 0.756470797, 0.885014099, 1]  # pragma: no mutate
 
             if self.popM >= 1 and self.popM <= 6:
                 popM = popCodeM[self.popM]
             else:
-                popM = (bisect.bisect(popCodeRange, random.random()) + 4) * 10
-            self.population = (pow(10, self.popCode) * popM) // 1e7
+                popM = (bisect.bisect(popCodeRange, random.random()) + 4) * 10  # pragma: no mutate
+            self.population = (pow(10, self.popCode) * popM) // 1e7  # pragma: no mutate
             self.uwpCodes['Pop Code'] = str(popM / 10)
 
         self.perCapita = calcGWP[min(self.tl, 19)] if self.population > 0 else 0
@@ -377,7 +381,7 @@ class Star(object):
         self.perCapita *= 1.2 if self.tradeCode.agricultural else 1
         self.perCapita *= 0.8 if self.tradeCode.low_per_capita_gwp else 1
 
-        self.gwp = int((self.population * self.perCapita) // 1000)
+        self.gwp = int((self.population * self.perCapita) // 1000)  # pragma: no mutate
         self.population = int(self.population)
         self.perCapita = int(self.perCapita)
 
