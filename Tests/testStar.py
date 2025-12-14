@@ -1775,6 +1775,22 @@ class TestStar(unittest.TestCase):
                     self.assertEqual([exp_message], logs.output)
                     self.assertEqual(exp_routes, star.routes)
 
+    def test_sec_pos_1(self) -> None:
+        cases = [
+            ('Core', '0, 0', '1620'),
+            ('Dagudashaag', '-1, 0', 'Core-1620')
+        ]
+
+        base_sector = Sector('# Core', '# 0, 0')
+        for sector, sector_pos, exp_sec_pos in cases:
+            with self.subTest(sector):
+                star = Star()
+                star.sector = base_sector
+                star.position = '1620'
+
+                check_sector = Sector('# ' + sector, '# ' + sector_pos)
+                self.assertEqual(exp_sec_pos, star.sec_pos(check_sector))
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

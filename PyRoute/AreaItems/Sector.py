@@ -69,6 +69,11 @@ class Sector(AreaItem):
     def __str__(self):
         return '{} ({},{})'.format(self.name, str(self.x), str(self.y))
 
+    def __eq__(self, other):
+        if not isinstance(other, Sector):
+            return False
+        return str(self) == str(other)
+
     def sector_name(self) -> str:
         return self.name.removesuffix(' Sector').removesuffix('Sector').strip()
 
