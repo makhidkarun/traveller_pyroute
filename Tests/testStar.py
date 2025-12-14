@@ -1221,6 +1221,294 @@ class TestStar(unittest.TestCase):
                 self.assertEqual(exp_eti_cargo, star1.eti_cargo)
                 self.assertEqual(exp_eti_pass, star1.eti_passenger)
 
+    def test_calculate_army_1(self) -> None:
+        cases = [
+            ('0', '3', 0, 0, 0),
+            ('0', '4', 0, 0, 0),
+            ('0', '5', 0, 0, 0),
+            ('0', '6', 0, 0, 0),
+            ('0', '7', 0, 0, 0),
+            ('0', '8', 1, 0, -0.015),
+            ('0', '9', 10, 0, -0.15),
+            ('0', 'A', 100, 0, -1.5),
+            ('0', 'B', 100, 0, -1.5),
+            ('1', '3', 0, 0, 0),
+            ('1', '4', 0, 0, 0),
+            ('1', '5', 0, 0, 0),
+            ('1', '6', 0, 0, 0),
+            ('1', '7', 1, 0, -0.01),
+            ('1', '8', 5, 0, -0.05),
+            ('1', '9', 50, 0, -0.5),
+            ('1', 'A', 500, 0, -5),
+            ('1', 'B', 500, 0, -5),
+        ]
+        for tl, popcode, exp_raw_be, exp_col_be, exp_im_be in cases:
+            with self.subTest(tl + " " + popcode):
+                star1 = Star()
+                star1.alg_code = 'Im'
+                star1.uwp = UWP(f'C9C4{popcode}33-{tl}')
+                star1.uwpCodes = {'Atmosphere': star1.atmo}
+
+                star1.calculate_army()
+                self.assertEqual(exp_raw_be, star1.raw_be)
+                self.assertEqual(exp_col_be, star1.col_be)
+                self.assertAlmostEqual(exp_im_be, star1.im_be, 3)
+
+    def test_calculate_army_2(self) -> None:
+        cases = [
+            ('0', 'A', 1000, 0, -15),
+            ('1', 'A', 5000, 0, -50),
+            ('2', '3', 0, 0, 0),
+            ('2', '4', 0, 0, 0),
+            ('2', '5', 1, 0, -0.005),
+            ('2', '6', 5, 0, -0.025),
+            ('2', '7', 50, 0, -0.25),
+            ('2', '8', 500, 0, -2.5),
+            ('2', '9', 5000, 0, -25),
+            ('2', 'A', 50000, 0, -250),
+            ('2', 'B', 50000, 0, -250),
+            ('3', '3', 0, 0, 0),
+            ('3', '4', 1, 0, 0),
+            ('3', '5', 10, 0, 0),
+            ('3', '6', 100, 0, 0),
+            ('3', '7', 1000, 0, 0),
+            ('3', '8', 10000, 0, 0),
+            ('3', '9', 50000, 0, 0),
+            ('3', 'A', 100000, 0, 0),
+            ('3', 'B', 100000, 0, 0),
+        ]
+        for tl, popcode, exp_raw_be, exp_col_be, exp_im_be in cases:
+            with self.subTest(tl + " " + popcode):
+                star1 = Star()
+                star1.alg_code = 'Im'
+                star1.uwp = UWP(f'C984{popcode}33-{tl}')
+                star1.uwpCodes = {'Atmosphere': star1.atmo}
+
+                star1.calculate_army()
+                self.assertEqual(exp_raw_be, star1.raw_be)
+                self.assertAlmostEqual(exp_col_be, star1.col_be, 3)
+                self.assertAlmostEqual(exp_im_be, star1.im_be, 3)
+
+    def test_calculate_army_3(self) -> None:
+        cases = [
+            ('4', '3', 0, 0, 0),
+            ('4', '4', 1, 0, 0.005),
+            ('4', '5', 10, 0, 0.05),
+            ('4', '6', 100, 0, 0.5),
+            ('4', '7', 1000, 0, 5),
+            ('4', '8', 2000, 0, 10),
+            ('4', '9', 20000, 0, 100),
+            ('4', 'A', 200000, 0, 1000),
+            ('4', 'B', 200000, 0, 1000),
+            ('5', '3', 1, 0, 0.01),
+            ('5', '4', 2, 0, 0.02),
+            ('5', '5', 3, 0, 0.03),
+            ('5', '6', 30, 0, 0.3),
+            ('5', '7', 300, 0, 3),
+            ('5', '8', 3000, 0, 30),
+            ('5', '9', 30000, 0, 300),
+            ('5', 'A', 300000, 0, 3000),
+            ('5', 'B', 300000, 0, 3000),
+        ]
+        for tl, popcode, exp_raw_be, exp_col_be, exp_im_be in cases:
+            with self.subTest(tl + " " + popcode):
+                star1 = Star()
+                star1.alg_code = 'Im'
+                star1.uwp = UWP(f'C984{popcode}33-{tl}')
+                star1.uwpCodes = {'Atmosphere': star1.atmo}
+
+                star1.calculate_army()
+                self.assertEqual(exp_raw_be, star1.raw_be)
+                self.assertAlmostEqual(exp_col_be, star1.col_be, 3)
+                self.assertAlmostEqual(exp_im_be, star1.im_be, 3)
+
+    def test_calculate_army_4(self) -> None:
+        cases = [
+            ('6', '3', 1, 0, 0.015),
+            ('6', '4', 2, 0, 0.03),
+            ('6', '5', 3, 0, 0.045),
+            ('6', '6', 30, 0, 0.45),
+            ('6', '7', 300, 0, 4.5),
+            ('6', '8', 3000, 0, 45),
+            ('6', '9', 30000, 0, 450),
+            ('6', 'A', 300000, 0, 4500),
+            ('6', 'B', 300000, 0, 4500),
+            ('7', '3', 0, 0, 0.0),
+            ('7', '4', 1, 0, 0.02),
+            ('7', '5', 2, 0, 0.04),
+            ('7', '6', 20, 0, 0.4),
+            ('7', '7', 200, 0, 4),
+            ('7', '8', 2000, 0, 40),
+            ('7', '9', 20000, 0, 400),
+            ('7', 'A', 200000, 0, 4000),
+            ('7', 'B', 200000, 0, 4000),
+        ]
+        for tl, popcode, exp_raw_be, exp_col_be, exp_im_be in cases:
+            with self.subTest(tl + " " + popcode):
+                star1 = Star()
+                star1.alg_code = 'Im'
+                star1.uwp = UWP(f'C984{popcode}33-{tl}')
+                star1.uwpCodes = {'Atmosphere': star1.atmo}
+
+                star1.calculate_army()
+                self.assertEqual(exp_raw_be, star1.raw_be)
+                self.assertAlmostEqual(exp_col_be, star1.col_be, 3)
+                self.assertAlmostEqual(exp_im_be, star1.im_be, 3)
+
+    def test_calculate_army_5(self) -> None:
+        cases = [
+            ('8', '3', 0, 0, 0.0),
+            ('8', '4', 1, 0, 0.025),
+            ('8', '5', 2, 0, 0.05),
+            ('8', '6', 20, 0, 0.5),
+            ('8', '7', 200, 0, 5),
+            ('8', '8', 2000, 0, 50),
+            ('8', '9', 20000, 0, 500),
+            ('8', 'A', 200000, 0, 5000),
+            ('8', 'B', 200000, 0, 5000),
+            ('9', '3', 0, 0, 0.0),
+            ('9', '4', 0, 0, 0.0),
+            ('9', '5', 1, 0.1, 0.03),
+            ('9', '6', 15, 1.5, 0.45),
+            ('9', '7', 150, 15, 4.5),
+            ('9', '8', 1500, 150, 45),
+            ('9', '9', 15000, 1500, 450),
+            ('9', 'A', 150000, 15000, 4500),
+            ('9', 'B', 150000, 15000, 4500),
+        ]
+        for tl, popcode, exp_raw_be, exp_col_be, exp_im_be in cases:
+            with self.subTest(tl + " " + popcode):
+                star1 = Star()
+                star1.alg_code = 'Im'
+                star1.uwp = UWP(f'C984{popcode}33-{tl}')
+                star1.uwpCodes = {'Atmosphere': star1.atmo}
+
+                star1.calculate_army()
+                self.assertEqual(exp_raw_be, star1.raw_be)
+                self.assertAlmostEqual(exp_col_be, star1.col_be, 3)
+                self.assertAlmostEqual(exp_im_be, star1.im_be, 3)
+
+    def test_calculate_army_6(self) -> None:
+        cases = [
+            ('A', '3', 0, 0, 0.0),
+            ('A', '4', 0, 0, 0.0),
+            ('A', '5', 1, 0.1, 0.035),
+            ('A', '6', 15, 1.5, 0.525),
+            ('A', '7', 150, 15, 5.25),
+            ('A', '8', 1500, 150, 52.50),
+            ('A', '9', 15000, 1500, 525),
+            ('A', 'A', 150000, 15000, 5250),
+            ('A', 'B', 150000, 15000, 5250),
+            ('B', '3', 0, 0, 0.0),
+            ('B', '4', 0, 0, 0.0),
+            ('B', '5', 1, 0.1, 0.04),
+            ('B', '6', 12, 1.2, 0.48),
+            ('B', '7', 120, 12, 4.8),
+            ('B', '8', 1200, 120, 48),
+            ('B', '9', 12000, 1200, 480),
+            ('B', 'A', 120000, 12000, 4800),
+            ('B', 'B', 120000, 12000, 4800),
+        ]
+        for tl, popcode, exp_raw_be, exp_col_be, exp_im_be in cases:
+            with self.subTest(tl + " " + popcode):
+                star1 = Star()
+                star1.alg_code = 'Im'
+                star1.uwp = UWP(f'C984{popcode}33-{tl}')
+                star1.uwpCodes = {'Atmosphere': star1.atmo}
+
+                star1.calculate_army()
+                self.assertEqual(exp_raw_be, star1.raw_be)
+                self.assertAlmostEqual(exp_col_be, star1.col_be, 3)
+                self.assertAlmostEqual(exp_im_be, star1.im_be, 3)
+
+    def test_calculate_army_7(self) -> None:
+        cases = [
+            ('C', '3', 0, 0, 0.0),
+            ('C', '4', 0, 0, 0.0),
+            ('C', '5', 1, 0.1, 0.045),
+            ('C', '6', 12, 1.2, 0.54),
+            ('C', '7', 120, 12, 5.4),
+            ('C', '8', 1200, 120, 54),
+            ('C', '9', 12000, 1200, 540),
+            ('C', 'A', 120000, 12000, 5400),
+            ('C', 'B', 120000, 12000, 5400),
+            ('D', '3', 0, 0, 0.0),
+            ('D', '4', 0, 0, 0.0),
+            ('D', '5', 1, 0.1, 0.05),
+            ('D', '6', 10, 1.0, 0.5),
+            ('D', '7', 100, 10, 5),
+            ('D', '8', 1000, 100, 50),
+            ('D', '9', 10000, 1000, 500),
+            ('D', 'A', 100000, 10000, 5000),
+            ('D', 'B', 100000, 10000, 5000),
+        ]
+        for tl, popcode, exp_raw_be, exp_col_be, exp_im_be in cases:
+            with self.subTest(tl + " " + popcode):
+                star1 = Star()
+                star1.alg_code = 'Im'
+                star1.uwp = UWP(f'C984{popcode}33-{tl}')
+                star1.uwpCodes = {'Atmosphere': star1.atmo}
+
+                star1.calculate_army()
+                self.assertEqual(exp_raw_be, star1.raw_be)
+                self.assertAlmostEqual(exp_col_be, star1.col_be, 3)
+                self.assertAlmostEqual(exp_im_be, star1.im_be, 3)
+
+    def test_calculate_army_8(self) -> None:
+        cases = [
+            ('E', '3', 0, 0, 0.0),
+            ('E', '4', 0, 0, 0.0),
+            ('E', '5', 0, 0.0, 0.0),
+            ('E', '6', 7, 0.7, 0.35),
+            ('E', '7', 70, 7, 3.5),
+            ('E', '8', 700, 70, 35),
+            ('E', '9', 7000, 700, 350),
+            ('E', 'A', 70000, 7000, 3500),
+            ('E', 'B', 70000, 7000, 3500),
+            ('F', '3', 0, 0, 0.0),
+            ('F', '4', 0, 0, 0.0),
+            ('F', '5', 0, 0.0, 0.0),
+            ('F', '6', 5, 0.5, 0.25),
+            ('F', '7', 50, 5, 2.5),
+            ('F', '8', 500, 50, 25),
+            ('F', '9', 5000, 500, 250),
+            ('F', 'A', 50000, 5000, 2500),
+            ('F', 'B', 50000, 5000, 2500),
+            ('G', '3', 0, 0, 0.0),
+            ('G', '4', 0, 0, 0.0),
+            ('G', '5', 0, 0.0, 0.0),
+            ('G', '6', 5, 0.5, 0.25),
+            ('G', '7', 50, 5, 2.5),
+            ('G', '8', 500, 50, 25),
+            ('G', '9', 5000, 500, 250),
+            ('G', 'A', 50000, 5000, 2500),
+            ('G', 'B', 50000, 5000, 2500),
+        ]
+        for tl, popcode, exp_raw_be, exp_col_be, exp_im_be in cases:
+            with self.subTest(tl + " " + popcode):
+                star1 = Star()
+                star1.alg_code = 'Im'
+                star1.uwp = UWP(f'C984{popcode}33-{tl}')
+                star1.uwpCodes = {'Atmosphere': star1.atmo}
+
+                star1.calculate_army()
+                self.assertEqual(exp_raw_be, star1.raw_be)
+                self.assertAlmostEqual(exp_col_be, star1.col_be, 3)
+                self.assertAlmostEqual(exp_im_be, star1.im_be, 3)
+
+    def test_calculate_army_9(self) -> None:
+        popcode = '6'
+        tl = 'C'
+        star1 = Star()
+        star1.alg_code = 'Na'
+        star1.uwp = UWP(f'C984{popcode}33-{tl}')
+        star1.uwpCodes = {'Atmosphere': star1.atmo}
+
+        star1.calculate_army()
+        self.assertEqual(12, star1.raw_be)
+        self.assertAlmostEqual(1.2, star1.col_be, 3)
+        self.assertAlmostEqual(0, star1.im_be, 3)
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

@@ -713,7 +713,7 @@ class Star(object):
               ]
 
         pop_code = min(self.popCode - 3, 7)
-        if self.uwpCodes['Atmosphere'] not in '568':
+        if self.uwpCodes['Atmosphere'] not in ['5', '6', '8']:
             pop_code -= 1
         if pop_code >= 0:
             self.raw_be = BE[min(self.tl, 16)][pop_code]
@@ -724,7 +724,7 @@ class Star(object):
 
         if AllyGen.imperial_align(self.alg_code):
             self.im_be = self.raw_be * 0.05
-            if self.tl < 13:
+            if self.tl < 13:  # pragma: no mutate
                 mul = 1 - ((13 - self.tl) / 10.0)
                 self.im_be = self.im_be * mul
         else:
