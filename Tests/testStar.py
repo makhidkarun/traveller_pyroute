@@ -18,6 +18,8 @@ from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Star import Star
 from PyRoute.SystemData.UWP import UWP
 from PyRoute.TradeCodes import TradeCodes
+from PyRoute.SystemData.StarList import StarList
+from PyRoute.UWPCodes import UWPCodes
 
 
 class TestStar(unittest.TestCase):
@@ -1508,6 +1510,236 @@ class TestStar(unittest.TestCase):
         self.assertEqual(12, star1.raw_be)
         self.assertAlmostEqual(1.2, star1.col_be, 3)
         self.assertAlmostEqual(0, star1.im_be, 3)
+
+    def test_calculate_importance_1(self):
+        cases = [
+            ('A', '7', '5', '', '-', -1),
+            ('B', '8', '6', 'Ag', 'NS', 1),
+            ('C', '9', '7', 'Ri', 'NW', 2),
+            ('D', 'A', '8', 'In', 'W', 2),
+            ('E', 'B', '9', '', 'D', 2),
+            ('X', 'F', 'A', 'Ag', 'X', 3),
+            ('A', 'G', '5', 'Ri', 'KV', 4),
+            ('B', 'H', '6', 'In', 'RT', 4),
+            ('C', '7', '7', '', 'CK', 0),
+            ('D', '8', '8', 'Ag', 'KM', 0)
+        ]
+
+        for port, tl, popCode, tradeCode, baseCode, exp_imp in cases:
+            with self.subTest(port + ' ' + tl + ' ' + popCode + ' ' + tradeCode + ' ' + baseCode):
+                star1 = Star()
+                star1.uwp = UWP(f'{port}984{popCode}33-{tl}')
+                star1.tradeCode = TradeCodes(tradeCode)
+                star1.baseCode = baseCode
+
+                star1.calculate_importance()
+                self.assertEqual(exp_imp, star1.importance)
+
+    def test_is_well_formed_1(self):
+        star = Star()
+        star.name = 'Foo'
+        self.assertTrue(hasattr(star, 'sector'))
+        msg = None
+
+        try:
+            star.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star Foo has empty/bad sector attribute', msg)
+
+    def test_is_well_formed_2(self):
+        star = Star()
+        star.name = 'Foo'
+        star.sector = 2
+        msg = None
+
+        try:
+            star.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star Foo has empty/bad sector attribute', msg)
+
+    def test_is_well_formed_3(self):
+        star = Star()
+        star.name = 'Foo'
+        star.sector = Sector('# Core', '# 0, 0')
+        msg = None
+
+        try:
+            star.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star Foo has empty/bad index attribute', msg)
+
+    def test_is_well_formed_4(self):
+        star = Star()
+        star.name = 'Foo'
+        star.sector = Sector('# Core', '# 0, 0')
+        star.index = 0
+        msg = None
+
+        try:
+            star.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star Foo has empty/bad hex attribute', msg)
+
+    def test_is_well_formed_5(self):
+        star = Star()
+        star.name = 'Foo'
+        star.sector = Sector('# Core', '# 0, 0')
+        star.index = 0
+        star.hex = Hex(star.sector, '0000')
+        msg = None
+
+        try:
+            star.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Column must be in range 1-32 - is 0', msg)
+
+    def test_is_well_formed_6(self):
+        star = Star()
+        star.name = 'Foo'
+        star.sector = Sector('# Core', '# 0, 0')
+        star.index = 0
+        star.hex = Hex(star.sector, '1620')
+        star.economics = '[000+0'
+        msg = None
+
+        try:
+            star.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star Foo economics must be None or 7-char string', msg)
+
+    def test_is_well_formed_7(self):
+        star = Star()
+        star.name = 'Foo'
+        star.sector = Sector('# Core', '# 0, 0')
+        star.index = 0
+        star.hex = Hex(star.sector, '1620')
+        star.economics = '[000+0]]'
+        msg = None
+
+        try:
+            star.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star Foo economics must be None or 7-char string', msg)
+
+    def test_is_well_formed_8(self):
+        star = Star()
+        star.name = 'Foo'
+        star.sector = Sector('# Core', '# 0, 0')
+        star.index = 0
+        star.hex = Hex(star.sector, '1620')
+        star.economics = '[000+0]'
+        star.social = '[AAAA'
+        msg = None
+
+        try:
+            star.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star Foo social must be None or 6-char string', msg)
+
+    def test_is_well_formed_9(self):
+        star = Star()
+        star.name = 'Foo'
+        star.sector = Sector('# Core', '# 0, 0')
+        star.index = 0
+        star.hex = Hex(star.sector, '1620')
+        star.economics = '[000+0]'
+        star.social = '[AAAA]]'
+        msg = None
+
+        try:
+            star.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star Foo social must be None or 6-char string', msg)
+
+    def test_is_well_formed_10(self):
+        star = Star()
+        star.name = 'Foo'
+        star.sector = Sector('# Core', '# 0, 0')
+        star.index = 0
+        star.hex = Hex(star.sector, '1620')
+        star.economics = '[000+0]'
+        star.social = 1
+        msg = None
+
+        try:
+            star.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star Foo social must be None or 6-char string', msg)
+
+    def test_is_well_formed_11(self):
+        star = Star()
+        star.name = 'Foo'
+        star.sector = Sector('# Core', '# 0, 0')
+        star.index = 0
+        star.hex = Hex(star.sector, '1620')
+        star.economics = '[000+0]'
+        star.social = '[0000]'
+        msg = None
+
+        try:
+            star.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star Foo has empty base allegiance attribute', msg)
+
+    def test_is_well_formed_12(self):
+        star = Star()
+        star.name = 'Foo'
+        star.sector = Sector('# Core', '# 0, 0')
+        star.index = 0
+        star.hex = Hex(star.sector, '1620')
+        star.economics = '[000+0]'
+        star.social = '[0000]'
+        star.allegiance_base = 'Na'
+        msg = None
+
+        try:
+            star.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star Foo has empty/bad UWP attribute', msg)
+
+    def test_is_well_formed_13(self):
+        star = Star()
+        star.name = 'Foo'
+        star.sector = Sector('# Core', '# 0, 0')
+        star.index = 0
+        star.hex = Hex(star.sector, '1620')
+        star.economics = '[000+0]'
+        star.social = '[0000]'
+        star.allegiance_base = 'Na'
+        star.uwp = UWP('???????-?')
+        msg = None
+
+        try:
+            star.is_well_formed()
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Star Foo has empty star_list_object attribute', msg)
+
+    def test_is_well_formed_14(self):
+        star = Star()
+        star.name = 'Foo'
+        star.sector = Sector('# Core', '# 0, 0')
+        star.index = 0
+        star.hex = Hex(star.sector, '1620')
+        star.economics = '[000+0]'
+        star.social = '[0000]'
+        star.allegiance_base = 'Na'
+        star.uwp = UWP('???????-?')
+        star.star_list_object = StarList('')
+
+        self.assertTrue(star.is_well_formed())
 
 
 if __name__ == "__main__":

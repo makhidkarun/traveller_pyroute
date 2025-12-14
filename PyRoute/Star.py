@@ -654,9 +654,8 @@ class Star(object):
         self.budget = int(budget * access)
 
     def calculate_importance(self) -> None:
-        imp = 0
-        imp += 1 if self.port in 'AB' else 0
-        imp -= 1 if self.port in 'DEX' else 0
+        imp = 1 if self.port in ['A', 'B'] else 0
+        imp -= 1 if self.port in ['D', 'E', 'X'] else 0
         imp -= 1 if self.tl <= 8 else 0
         imp += 1 if self.tl >= 10 else 0
         imp += 1 if self.tl >= 16 else 0
@@ -757,14 +756,13 @@ class Star(object):
             self.logger.debug("{} - routes: {}".format(self, self.routes))
 
     def is_well_formed(self) -> bool:
-        assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
-        assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
-        assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
-        assert self.hex is not None, "Star " + str(self.name) + " is missing hex attribute"
+        from PyRoute.AreaItems.Sector import Sector
+        from PyRoute.SystemData.UWP import UWP
+        assert isinstance(self.sector, Sector), "Star " + str(self.name) + " has empty/bad sector attribute"
+        assert isinstance(self.index, int), "Star " + str(self.name) + " has empty/bad index attribute"
+        assert isinstance(self.hex, Hex), "Star " + str(self.name) + " has empty/bad hex attribute"
         result, msg = self.hex.is_well_formed()
         assert result, msg
-        assert hasattr(self, 'economics'), "Star " + str(self.name) + " is missing economics attribute"
-        assert hasattr(self, 'social'), "Star " + str(self.name) + " is missing social attribute"
         if self.economics is not None:
             assert (isinstance(self.economics, str) and 7 == len(self.economics)),\
                 "Star " + str(self.name) + " economics must be None or 7-char string"
@@ -772,8 +770,8 @@ class Star(object):
             assert (isinstance(self.social, str) and 6 == len(self.social)),\
                 "Star " + str(self.name) + " social must be None or 6-char string"
 
-        assert hasattr(self, 'allegiance_base'), "Star " + str(self.name) + " is missing base allegiance attribute"
         assert self.allegiance_base is not None, "Star " + str(self.name) + " has empty base allegiance attribute"
+        assert isinstance(self.uwp, UWP), "Star " + str(self.name) + " has empty/bad UWP attribute"
         result, msg = self.uwp.is_well_formed()
         assert result, msg
         assert self.star_list_object is not None, "Star " + str(self.name) + " has empty star_list_object attribute"
