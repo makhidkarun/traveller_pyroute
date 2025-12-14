@@ -3,7 +3,6 @@ Created on Mar 5, 2014
 
 @author: tjoneslo
 """
-import copy
 import functools
 import logging
 import bisect
@@ -120,8 +119,6 @@ class Star(object):
     def __deepcopy__(self, memodict: dict = {}):
         state = self.__dict__.copy()
         for item in Star.__slots__:
-            if item in state:
-                continue
             if item.startswith('_'):
                 continue
             state[item] = self[item]
@@ -130,7 +127,7 @@ class Star(object):
         for key in state:
             item = state[key]
             setattr(foo, key, item)
-        foo.hex = copy.deepcopy(self.hex)
+        foo.hex = Hex(self.sector, foo.position)
         foo.calc_hash()
 
         return foo

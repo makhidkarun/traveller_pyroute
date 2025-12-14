@@ -56,6 +56,13 @@ class TestStar(baseTest):
 
         self.assertEqual(exp_state, state)
 
+    def test_getstate_1(self) -> None:
+        star = Star()
+        star.ownedBy = star
+
+        state = star.__getstate__()
+        self.assertNotIn('ownedBy', state)
+
     def testParseIrkigkhan(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
@@ -346,7 +353,7 @@ class TestStar(baseTest):
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
             Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
 
-    def test_deep_copy(self) -> None:
+    def test_deep_copy_1(self) -> None:
         alg = Allegiance("am", "name")
         star1 = Star.parse_line_into_star(
             "0104 Shana Ma             E551112-7 Lo Po                { -3 } (301-3) [1113] B     - - 913 9  Im K2 IV M7 V     ",
@@ -359,6 +366,25 @@ class TestStar(baseTest):
         starcopy.is_well_formed()
 
         self.assertEqual(star1, starcopy)
+
+    def test_deep_copy_2(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star1 = Star()
+        star1.sector = sector
+        star1.hex = Hex(sector, '0101')
+        star1.position = '0101'
+        star1.calc_hash()
+        star1._oldskool = True
+        strhex = str(star1.hex)
+
+        starcopy = copy.deepcopy(star1)
+        self.assertEqual('0101', star1.position)
+        self.assertEqual('0101', starcopy.position)
+        self.assertEqual(star1, starcopy)
+        copyhex = str(starcopy.hex)
+        self.assertEqual(strhex, copyhex)
+        self.assertEqual(star1.hex, starcopy.hex)
+        self.assertFalse(starcopy._oldskool)
 
     def test_ehex_to_numeric_mapping_for_TL_A_and_up(self) -> None:
         # shut up log output - is completely irrelevant
@@ -1822,7 +1848,7 @@ class TestStar(baseTest):
 
                 self.assertEqual(exp_subsector, star.subsector())
 
-    def test_check_cx_1(self):
+    def test_check_cx_1(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star = Star()
         star.sector = sector
@@ -1843,7 +1869,7 @@ class TestStar(baseTest):
             star.check_cx()
             self.assertEqual(exp_logs, logs.output)
 
-    def test_check_cx_2(self):
+    def test_check_cx_2(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star = Star()
         star.sector = sector
@@ -1864,7 +1890,7 @@ class TestStar(baseTest):
             star.check_cx()
             self.assertEqual(exp_logs, logs.output)
 
-    def test_check_cx_3(self):
+    def test_check_cx_3(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star = Star()
         star.sector = sector
@@ -1885,7 +1911,7 @@ class TestStar(baseTest):
             star.check_cx()
             self.assertEqual(exp_logs, logs.output)
 
-    def test_check_cx_4(self):
+    def test_check_cx_4(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star = Star()
         star.sector = sector
@@ -1904,7 +1930,7 @@ class TestStar(baseTest):
             star.check_cx()
             self.assertEqual(exp_logs, logs.output)
 
-    def test_check_cx_5(self):
+    def test_check_cx_5(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star = Star()
         star.sector = sector
@@ -1923,7 +1949,7 @@ class TestStar(baseTest):
             star.check_cx()
             self.assertEqual(exp_logs, logs.output)
 
-    def test_check_cx_6(self):
+    def test_check_cx_6(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star = Star()
         star.sector = sector
@@ -1942,7 +1968,7 @@ class TestStar(baseTest):
             star.check_cx()
             self.assertEqual(exp_logs, logs.output)
 
-    def test_check_cx_7(self):
+    def test_check_cx_7(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star = Star()
         star.sector = sector
@@ -1959,6 +1985,11 @@ class TestStar(baseTest):
         with self.assertLogs(logger, 'WARNING') as logs:
             star.check_cx()
             self.assertEqual(exp_logs, logs.output)
+
+    def test_setitem_1(self) -> None:
+        star = Star()
+        star.__setitem__('_oldskool', True)
+        self.assertTrue(star.__getitem__('_oldskool'))
 
 
 if __name__ == "__main__":
