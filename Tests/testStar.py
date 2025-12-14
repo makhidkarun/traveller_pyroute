@@ -2166,6 +2166,69 @@ class TestStar(baseTest):
                 star.fix_cx()
                 self.assertEqual(exp_social, star.social)
 
+    def test_fix_ex_1(self) -> None:
+        cases = [
+            ('5', '8', 'Ni', '(000+0)', '(040+1)'),
+            ('5', '8', 'Ni', '(GFE+D)', '(E47+D)'),
+            ('3', '8', 'Lo', '(000+0)', '(021+1)'),
+            ('3', '8', 'Lo', '(GFE+D)', '(E21+D)'),
+            ('3', '7', 'Lo', '(000+0)', '(021+1)'),
+            ('3', '7', 'Lo', '(GFE+D)', '(C21+D)'),
+            ('7', '7', '', '(000+0)', '(060+1)'),
+            ('7', '7', '', '(GFE+D)', '(C6D+D)'),
+            ('0', '7', 'Ba', '(000+0)', '(000+0)'),
+            ('0', '7', 'Ba', '(GFE+D)', '(C00+0)'),
+        ]
+        for pop, tl, trade_code, init_eco, exp_eco in cases:
+            with self.subTest(pop + " " + tl + " " + trade_code):
+                star = Star()
+                star.economics = init_eco
+                star.tradeCode = TradeCodes(trade_code)
+                star.uwp = UWP(f'C777{pop}77-{tl}')
+                star.importance = 1
+                star.ggCount = 1
+                star.belts = 1
+
+                star.fix_ex()
+                self.assertEqual(exp_eco, star.economics)
+
+    def test_fix_ex_2(self) -> None:
+        cases = [
+            ('5', '8', 'Ni', '(000+0)', '(040+1)'),
+            ('5', '8', 'Ni', '(GFE+D)', '(E46+D)'),
+            ('3', '8', 'Lo', '(000+0)', '(020+1)'),
+            ('3', '8', 'Lo', '(GFE+D)', '(E20+D)'),
+            ('3', '7', 'Lo', '(000+0)', '(020+1)'),
+            ('3', '7', 'Lo', '(GFE+D)', '(C20+D)'),
+            ('7', '7', '', '(000+0)', '(060+1)'),
+            ('7', '7', '', '(GFE+D)', '(C6C+D)'),
+            ('0', '7', 'Ba', '(000+0)', '(000+0)'),
+            ('0', '7', 'Ba', '(GFE+D)', '(C00+0)'),
+        ]
+        for pop, tl, trade_code, init_eco, exp_eco in cases:
+            with self.subTest(pop + " " + tl + " " + trade_code):
+                star = Star()
+                star.economics = init_eco
+                star.tradeCode = TradeCodes(trade_code)
+                star.uwp = UWP(f'C777{pop}77-{tl}')
+                star.importance = 0
+                star.ggCount = 1
+                star.belts = 1
+
+                star.fix_ex()
+                self.assertEqual(exp_eco, star.economics)
+
+    def test_wiki_short_name(self) -> None:
+        cases = [
+            ('Foobar', 'Foobar (world)')
+        ]
+        for name, exp_wiki_short in cases:
+            with self.subTest(name):
+                star = Star()
+                star.name = name
+
+                self.assertEqual(exp_wiki_short, star.wiki_short_name())
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

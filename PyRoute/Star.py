@@ -428,7 +428,6 @@ class Star(object):
             return
 
         resources = self._ehex_to_int(self.economics[1])
-        labor = self._ehex_to_int(self.economics[2])
         infrastructure = self._ehex_to_int(self.economics[3])
         efficiency = self._ehex_to_int(self.economics[5])
 
@@ -441,9 +440,8 @@ class Star(object):
             self.economics = self.economics[0:1] + nu_resources + self.economics[2:]
 
         max_labor = max(self.popCode - 1, 0)
-        if labor != max_labor:
-            nu_labour = self._int_to_ehex(max_labor)
-            self.economics = self.economics[0:2] + nu_labour + self.economics[3:]
+        nu_labour = self._int_to_ehex(max_labor)
+        self.economics = self.economics[0:2] + nu_labour + self.economics[3:]
 
         max_lo_infrastructure = max(self.importance, 0)
         max_ni_infrastructure = 6 + self.importance
@@ -453,10 +451,10 @@ class Star(object):
             nu_infrastructure = '0'
         elif self.tradeCode.low and infrastructure != max_lo_infrastructure:
             nu_infrastructure = self._int_to_ehex(max_lo_infrastructure)
-        elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= max_ni_infrastructure:
-            nu_infrastructure = '0' if 0 > infrastructure else self._int_to_ehex(max_ni_infrastructure)
-        elif not 0 <= infrastructure <= max_infrastructure:
-            nu_infrastructure = '0' if 0 > infrastructure else self._int_to_ehex(max_infrastructure)
+        elif self.tradeCode.nonindustrial and not infrastructure <= max_ni_infrastructure:  # pragma: no mutate
+            nu_infrastructure = self._int_to_ehex(max_ni_infrastructure)
+        elif not infrastructure <= max_infrastructure:  # pragma: no mutate
+            nu_infrastructure = self._int_to_ehex(max_infrastructure)
 
         if nu_infrastructure is not None:
             self.economics = self.economics[0:3] + nu_infrastructure + self.economics[4:]
