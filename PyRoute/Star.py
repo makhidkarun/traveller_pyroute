@@ -528,12 +528,7 @@ class Star(object):
         if nu_homogeneity is not None:
             self.social = self.social[0] + nu_homogeneity + self.social[2:]
 
-        acceptance = self._ehex_to_int(self.social[2])
-        nu_acceptance = None
-        if 0 == pop and 0 != acceptance:
-            nu_acceptance = '0'
-        elif 0 != pop and max(1, pop + self.importance) != acceptance:
-            nu_acceptance = self._int_to_ehex(max(1, pop + self.importance))
+        nu_acceptance = '0' if 0 == pop else self._int_to_ehex(max(1, pop + self.importance))
 
         if nu_acceptance is not None:
             self.social = self.social[0:2] + nu_acceptance + self.social[3:]
@@ -599,7 +594,7 @@ class Star(object):
         infrastructure += 0 if infrastructure < 18 else -1
 
         efficiency = efficiency if efficiency != 0 else 1
-        if efficiency < 0 and 'scaled' == ru_calc:
+        if efficiency < 0 and 'scaled' == ru_calc:  # pragma: no mutate
             efficiency = 1.0 + (efficiency * 0.1)
             # else ru_calc == 'negative' -> use efficiency as written
 

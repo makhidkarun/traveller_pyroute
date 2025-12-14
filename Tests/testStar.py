@@ -533,6 +533,26 @@ class TestStar(baseTest):
         exp_parse = "0101 000000000000000      ???????-?                                                             -    -  - 000 0  --                                                           "
         self.assertEqual(exp_parse, star1.parse_to_line())
 
+    def test_parse_to_line_long_trade_code_1(self) -> None:
+        line = "0101 000000000000000      ???????-? RsA RsB RsD RsE RsG RsI RsK RsO Pz An     { -2 } -       -      -    -    000 0  0000                                                          "
+        star1 = Star.parse_line_into_star(line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
+        self.assertIsNotNone(star1)
+        self.assertEqual(37, len(str(star1.tradeCode)))
+        star1.alg_code = ""
+        self.assertEqual("", star1.alg_code)
+        exp_parse = "0101 000000000000000      ???????-? An Pz RsA RsB RsD RsE RsG RsI RsK RsO                       -    -  - 000 0  --                                                           "
+        self.assertEqual(exp_parse, star1.parse_to_line())
+
+    def test_parse_to_line_long_trade_code_2(self) -> None:
+        line = "0101 000000000000000      ???????-? RsA RsB RsD RsE RsG RsI RsK RsO RsT An     { -2 } -       -      -    -    000 0  0000                                                          "
+        star1 = Star.parse_line_into_star(line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
+        self.assertIsNotNone(star1)
+        self.assertEqual(38, len(str(star1.tradeCode)))
+        star1.alg_code = ""
+        self.assertEqual("", star1.alg_code)
+        exp_parse = "0101 000000000000000      ???????-? An RsA RsB RsD RsE RsG RsI RsK RsO RsT                       -    -  - 000 0  --                                                           "
+        self.assertEqual(exp_parse, star1.parse_to_line())
+
     def testShortSophontCodeIntoStatsCalculation(self) -> None:
         line = '2926                      B8B2613-C He Fl Ni HakW Pz             {  1 } (735+3) [458B] - M  A 514 16 HvFd G4 V M1 V     '
         sector = Sector('# Phlask', '# 3,-3')
@@ -1530,7 +1550,20 @@ class TestStar(baseTest):
         tl = 'C'
         star1 = Star()
         star1.alg_code = 'Na'
-        star1.uwp = UWP(f'C984{popcode}33-{tl}')
+        star1.uwp = UWP(f'C964{popcode}33-{tl}')
+        star1.uwpCodes = {'Atmosphere': star1.atmo}
+
+        star1.calculate_army()
+        self.assertEqual(12, star1.raw_be)
+        self.assertAlmostEqual(1.2, star1.col_be, 3)
+        self.assertAlmostEqual(0, star1.im_be, 3)
+
+    def test_calculate_army_10(self) -> None:
+        popcode = '6'
+        tl = 'C'
+        star1 = Star()
+        star1.alg_code = 'Na'
+        star1.uwp = UWP(f'C954{popcode}33-{tl}')
         star1.uwpCodes = {'Atmosphere': star1.atmo}
 
         star1.calculate_army()
@@ -1820,6 +1853,22 @@ class TestStar(baseTest):
                 check_sector = Sector('# ' + sector, '# ' + sector_pos)
                 self.assertEqual(exp_sec_pos, star.sec_pos(check_sector))
 
+    def test_sec_pos_2(self) -> None:
+        cases = [
+            ('Core', '0, 0', 'Dagu-1620'),
+            ('Dagudashaag', '-1, 0', '1620')
+        ]
+
+        base_sector = Sector('# Dagudashaag', '# -1, 0')
+        for sector, sector_pos, exp_sec_pos in cases:
+            with self.subTest(sector):
+                star = Star()
+                star.sector = base_sector
+                star.position = '1620'
+
+                check_sector = Sector('# ' + sector, '# ' + sector_pos)
+                self.assertEqual(exp_sec_pos, star.sec_pos(check_sector))
+
     def test_subsector_1(self) -> None:
         cases = [
             ('0810', 'A'),
@@ -1838,6 +1887,7 @@ class TestStar(baseTest):
             ('1640', 'N'),
             ('2440', 'O'),
             ('3240', 'P'),
+            ('1822', 'K')
         ]
         sector = Sector('# Core', '# 0, 0')
         for posn, exp_subsector in cases:
