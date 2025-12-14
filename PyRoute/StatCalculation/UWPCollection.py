@@ -5,7 +5,7 @@ Created on Dec 03, 2025
 """
 from collections import OrderedDict
 
-from PyRoute.Star import UWPCodes
+from PyRoute.UWPCodes import UWPCodes
 from PyRoute.StatCalculation.ObjectStatistics import ObjectStatistics
 
 

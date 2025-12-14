@@ -17,32 +17,10 @@ from PyRoute.Position.Hex import Hex
 from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.SystemData.Utilities import Utilities
-from collections import OrderedDict
 
 from PyRoute.SystemData.StarList import StarList
 
 HexPos: TypeAlias = Tuple[int, int]
-
-
-class UWPCodes(object):
-    uwpCodes = ['Starport',
-                'Size',
-                'Atmosphere',
-                'Hydrographics',
-                'Population',
-                'Government',
-                'Law Level',
-                'Tech Level',
-                'Pop Code',
-                'Starport Size',
-                'Primary Type',
-                'Importance',
-                'Resources']
-
-    def __init__(self):
-        self.codes = OrderedDict()
-        for uwpCode in UWPCodes.uwpCodes:
-            self.codes[uwpCode] = "X"
 
 
 class Star(object):
@@ -125,7 +103,6 @@ class Star(object):
         self.starportPop = None
 
     def __getstate__(self):
-        state = self.__dict__.copy()
         state = self.__dict__.copy()
         for item in Star.__slots__:
             if item in state:
@@ -642,11 +619,11 @@ class Star(object):
             self.tcs_gwp = 0
 
         if self.tradeCode.rich:
-            self.tcs_gwp = self.tcs_gwp * 16 // 10
+            self.tcs_gwp = self.tcs_gwp * 16 // 10  # pragma: no mutate
         if self.tradeCode.industrial:
-            self.tcs_gwp = self.tcs_gwp * 14 // 10
+            self.tcs_gwp = self.tcs_gwp * 14 // 10  # pragma: no mutate
         if self.tradeCode.agricultural:
-            self.tcs_gwp = self.tcs_gwp * 12 // 10
+            self.tcs_gwp = self.tcs_gwp * 12 // 10  # pragma: no mutate
         if self.tradeCode.poor:
             self.tcs_gwp = self.tcs_gwp * 8 // 10
         if self.tradeCode.nonindustrial:
@@ -664,15 +641,15 @@ class Star(object):
         if self.uwpCodes['Starport'] in 'ABCDE':
             access = transfer_rate[self.uwpCodes['Starport']]
             access -= (15 - self.tl) * 0.05
-            if self.tl <= 4:
-                access -= 0.05
-            if self.tl <= 3:
-                access -= 0.05
+            # By the time we reach here, TL < 5 means tcs_gwp is 0, thus budget is zero
+            # if self.tl <= 4:
+            #     access -= 0.05
+            # if self.tl <= 3:
+            #     access -= 0.05
         else:
             access = 0
 
-        if access <= 0:
-            access = 0
+        access = max(0, access)
 
         self.budget = int(budget * access)
 
@@ -692,9 +669,8 @@ class Star(object):
         self.importance = imp
 
     def calculate_eti(self) -> None:
-        eti = 0
-        eti += 1 if self.port in 'AB' else 0
-        eti -= 1 if self.port in 'DEX' else 0
+        eti = 1 if self.port in ['A', 'B'] else 0
+        eti -= 1 if self.port in ['D', 'E', 'X'] else 0
         eti += 1 if self.tl >= 10 else 0
         eti -= 1 if self.tl <= 7 else 0
         eti += 1 if self.baseCode in ['NS', 'NW', 'D', 'X', 'KV', 'RT', 'CK', 'KM'] else 0

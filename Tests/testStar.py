@@ -24,12 +24,17 @@ class TestStar(unittest.TestCase):
 
     def setUp(self) -> None:
         ParseStarInput.deep_space = {}
-        pass
 
     def test_init_blank(self) -> None:
         star = Star()
         self.assertIsNone(star.sector)
+        self.assertIsNone(star._hash)
+        self.assertIsNone(star._key)
         self.assertIsInstance(star.logger, logging.Logger)
+        self.assertEqual('PyRoute.Star', star.logger.name)
+        self.assertEqual(0, star._pax_btn_mod)
+        self.assertIsNotNone(star._oldskool)
+        self.assertFalse(star._oldskool)
 
     def test_getstate_blank(self) -> None:
         star = Star()
@@ -863,6 +868,64 @@ class TestStar(unittest.TestCase):
         self.assertEqual(2956800, star1.tcs_gwp)
         self.assertEqual(59874, star1.budget)
 
+    def test_calculate_tcs_3(self) -> None:
+        cases = [
+            ('A', 900, 26880, 543),
+            ('B', 900, 26880, 507),
+            ('C', 900, 26880, 471),
+            ('D', 900, 26880, 435),
+            ('E', 900, 26880, 398),
+            ('X', 900, 26880, 0),
+        ]
+        sector = Sector('# Core', '# 0, 0')
+        for port, ship_capacity, tcs_gwp, budget in cases:
+            with self.subTest(port):
+                star1 = Star.parse_line_into_star(
+                    f'0103 Irkigkhan            {port}9C4633-A Ri In      - (E69+0) [4726] B     - - 123 8  Im M2 V',
+                    sector, 'fixed', 'fixed')
+
+                star1.calculate_gwp('benford')
+                star1.calculate_TCS()
+                self.assertEqual(ship_capacity, star1.ship_capacity)
+                self.assertEqual(tcs_gwp, star1.tcs_gwp)
+                self.assertEqual(budget, star1.budget)
+
+    def test_calculate_tcs_4(self) -> None:
+        cases = [
+            ('Ri', 2700, 57600, 1010),
+            ('In', 2700, 50400, 884),
+            ('Ag', 2700, 43200, 757),
+            ('Po', 2700, 28800, 505),
+            ('Ni', 2700, 28800, 505),
+            ('Na', 2700, 28800, 505),
+            ('Ri In', 2700, 80640, 1415),
+            ('Ri Ag', 2700, 69120, 1212),
+            ('Ri Po', 2700, 46080, 808),
+            ('Ri Ni', 2700, 46080, 808),
+            ('Ri Na', 2700, 46080, 808),
+            ('Ri In Ag', 2700, 96768, 1697),
+            ('Ri In Po', 2700, 64512, 1131),
+            ('Ri In Ni', 2700, 64512, 1131),
+            ('Ri In Na', 2700, 64512, 1131),
+            ('Ri In Ag Po', 2700, 77414, 1358),
+            ('Ri In Ag Ni', 2700, 77414, 1358),
+            ('Ri In Ag Na', 2700, 77414, 1358),
+            ('Ri In Ag Po Ni Na', 2700, 49544, 869)
+        ]
+        sector = Sector('# Core', '# 0, 0')
+        for trade_code, ship_capacity, tcs_gwp, budget in cases:
+            with self.subTest(trade_code):
+                star1 = Star.parse_line_into_star(
+                    f'0103 Irkigkhan            C9C4633-A {trade_code}      - (E69+0) [4726] B     - - 323 8  Im M2 V',
+                    sector, 'fixed', 'fixed')
+
+                star1.calculate_gwp('fixed')
+                self.assertEqual(3, star1.population)
+                star1.calculate_TCS()
+                self.assertEqual(ship_capacity, star1.ship_capacity)
+                self.assertEqual(tcs_gwp, star1.tcs_gwp)
+                self.assertEqual(budget, star1.budget)
+
     def test_wilderness_refuel_1(self) -> None:
         star = Star()
         star.uwpCodes = {'Hydrographics': 'X', 'Atmosphere': '9'}
@@ -1078,6 +1141,85 @@ class TestStar(unittest.TestCase):
             star.calculate_ru('negative')
             output = copy.deepcopy(outer_logs.output)
             self.assertEqual(exp_logs, output)
+
+    def test_calculate_eti_1(self) -> None:
+        cases = [
+            ('A', 'B', 2, 2),
+            ('A', 'A', 2, 2),
+            ('A', '9', 1, 1),
+            ('B', 'B', 2, 2),
+            ('B', 'A', 2, 2),
+            ('B', '9', 1, 1),
+            ('C', 'B', 1, 1),
+            ('C', 'A', 1, 1),
+            ('C', '9', 0, 0),
+            ('D', '8', -1, -1),
+            ('D', '7', -2, -2),
+            ('D', '6', -2, -2),
+            ('E', '8', -1, -1),
+            ('E', '7', -2, -2),
+            ('E', '6', -2, -2),
+            ('X', '8', -1, -1),
+            ('X', '7', -2, -2),
+            ('X', '6', -2, -2),
+        ]
+        sector = Sector('# Core', '# 0, 0')
+        for port, tl, exp_eti_cargo, exp_eti_pass in cases:
+            with self.subTest(port + ' ' + tl):
+                star1 = Star.parse_line_into_star(
+                    f'0103 Irkigkhan            {port}9C4633-{tl}       - (E69+0) [4726] B     - - 323 8  Im M2 V',
+                    sector, 'fixed', 'fixed')
+
+                star1.calculate_eti()
+                self.assertEqual(exp_eti_cargo, star1.eti_cargo)
+                self.assertEqual(exp_eti_pass, star1.eti_passenger)
+
+    def test_calculate_eti_2(self) -> None:
+        cases = [
+            ('-', '', 0, 0),
+            ('NS', 'Ri', 2, 1),
+            ('NW', 'Ag', 2, 0),
+            ('D', 'Cp', 2, 1),
+            ('X', 'In', 2, -1),
+            ('KV', 'Po', 0, -1),
+            ('RT', '', 1, 0),
+            ('CK', 'Ri', 2, 1),
+            ('KM', 'Ag', 2, 0),
+        ]
+
+        sector = Sector('# Core', '# 0, 0')
+        for basecode, tradecode, exp_eti_cargo, exp_eti_pass in cases:
+            with self.subTest(basecode + ' ' + tradecode):
+                star1 = Star.parse_line_into_star(
+                    f'0103 Irkigkhan            C9C4633-8 {tradecode}   - (E69+0) [4726] B     {basecode} - 323 8  Im M2 V',
+                    sector, 'fixed', 'fixed')
+
+                self.assertEqual(basecode, star1.baseCode)
+                star1.calculate_eti()
+                self.assertEqual(exp_eti_cargo, star1.eti_cargo)
+                self.assertEqual(exp_eti_pass, star1.eti_passenger)
+
+    def test_calculate_eti_3(self) -> None:
+        cases = [
+            ('2', '-', -1, -1),
+            ('3', 'R', -9, -9),
+            ('4', 'F', -8, -8),
+            ('8', 'A', -1, -2),
+            ('9', 'U', 0, -1),
+        ]
+
+        sector = Sector('# Core', '# 0, 0')
+        for popcode, zone, exp_eti_cargo, exp_eti_pass in cases:
+            with self.subTest(popcode + ' ' + zone):
+                star1 = Star.parse_line_into_star(
+                    f'0103 Irkigkhan            C9C4{popcode}33-8     - (E69+0) [4726] B     - {zone} 323 8  Im M2 V',
+                    sector, 'fixed', 'fixed')
+
+                self.assertEqual(int(popcode), star1.popCode)
+                self.assertEqual(zone, star1.zone)
+                star1.calculate_eti()
+                self.assertEqual(exp_eti_cargo, star1.eti_cargo)
+                self.assertEqual(exp_eti_pass, star1.eti_passenger)
 
 
 if __name__ == "__main__":
