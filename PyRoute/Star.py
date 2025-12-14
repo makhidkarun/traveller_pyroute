@@ -122,9 +122,16 @@ class Star(object):
 
     def __getstate__(self):
         state = self.__dict__.copy()
+        state = self.__dict__.copy()
+        for item in Star.__slots__:
+            if item in state:
+                continue
+            if item.startswith('_'):
+                continue
+            state[item] = self[item]
         del state['sector']
         del state['logger']
-        del state['_hash']
+        # del state['_hash']
         if self.ownedBy == self:
             del state['ownedBy']
         return state

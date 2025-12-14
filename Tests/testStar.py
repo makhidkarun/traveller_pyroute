@@ -24,6 +24,28 @@ class TestStar(unittest.TestCase):
         ParseStarInput.deep_space = {}
         pass
 
+    def test_init_blank(self) -> None:
+        star = Star()
+        self.assertIsNone(star.sector)
+        self.assertIsInstance(star.logger, logging.Logger)
+
+    def test_getstate_blank(self) -> None:
+        star = Star()
+        state = star.__getstate__()
+        exp_state = {'alg_base_code': None, 'alg_code': None, 'allegiance_base': None, 'baseCode': None, 'belts': None,
+                     'budget': None, 'col_be': None, 'component': None, 'deep_space_station': False, 'economics': None,
+                     'eti_cargo': None, 'eti_passenger': None, 'ggCount': None, 'gwp': None, 'hex': None, 'im_be': None,
+                     'importance': None, 'index': None, 'is_enqueued': False, 'is_landmark': False, 'is_redzone': False,
+                     'is_target': False, 'mspr': None, 'name': None, 'nobles': None, 'ownedBy': None, 'passIn': None,
+                     'passOver': None, 'perCapita': None, 'popM': None, 'population': None, 'position': None,
+                     'raw_be': None, 'routes': None, 'ru': None, 'ship_capacity': None, 'social': None,
+                     'star_list_object': None, 'starportBudget': None, 'starportPop': None, 'starportSize': None,
+                     'stars': None, 'suppress_soph_percent_warning': False, 'tcs_gwp': None, 'tradeCode': None,
+                     'tradeCount': None, 'tradeIn': None, 'tradeOver': None, 'trade_cost': 0.0, 'trade_id': '',
+                     'uwp': None, 'uwpCodes': None, 'worlds': None, 'wtn': None, 'zone': None}
+
+        self.assertEqual(exp_state, state)
+
     def testParseIrkigkhan(self) -> None:
         sector = Sector('# Core', '# 0, 0')
         star1 = Star.parse_line_into_star(
