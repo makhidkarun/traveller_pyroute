@@ -16,6 +16,8 @@ from PyRoute.StatCalculation.StatCalculation import StatCalculation
 from PyRoute.AreaItems.Galaxy import Galaxy
 from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Star import Star
+from PyRoute.SystemData.UWP import UWP
+from PyRoute.TradeCodes import TradeCodes
 
 
 class TestStar(unittest.TestCase):
@@ -463,7 +465,7 @@ class TestStar(unittest.TestCase):
             ("0101 000000000000000      ???????-?                                       { -2 } -       -      -    -  - 000 0  0000                                                          ", None),
             ("0101 000000000000000      ???????-?                                       { -2 } (731-5) [1125] -    -  - 000 0  0000                                                          ", None),
             ("0101 000000000000000      ???????-?                                       { -2 } -       [1125] -    -  - 000 0  0000                                                          ", None),
-            ("0101 000000000000000      ???????-?                                       { -2 } (731-5) -      -    -  - 000 0  0000                                                          ", None)
+            ("0101 000000000000000      ???????-?                                       { -2 } (731-5) -      -    -  - 000 0  0000                                                          ", None),
         ]
         for line, expected_primary_type in line_list:
             with self.subTest():
@@ -480,6 +482,22 @@ class TestStar(unittest.TestCase):
                 nu_line = star2.parse_to_line()
                 self.assertEqual(mid_line, nu_line, "Regenerated star line does not match round-trip star line")
                 self.assertEqual(expected_primary_type, star2.primary_type, "Unexpected primary type")
+
+    def test_parse_to_line_check_zone(self) -> None:
+        line = "0101 000000000000000      ???????-?                                       { -2 } -       -      -    -    000 0  0000                                                          "
+        star1 = Star.parse_line_into_star(line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
+        self.assertIsNotNone(star1)
+        exp_parse = '0101 000000000000000      ???????-?                                                             -    -  - 000 0  0000                                                         '
+        self.assertEqual(exp_parse, star1.parse_to_line())
+
+    def test_parse_to_line_check_alg_code(self) -> None:
+        line = "0101 000000000000000      ???????-?                                       { -2 } -       -      -    -    000 0  0000                                                          "
+        star1 = Star.parse_line_into_star(line, Sector('# Core', '# 0, 0'), 'fixed', 'fixed')
+        self.assertIsNotNone(star1)
+        star1.alg_code = ""
+        self.assertEqual("", star1.alg_code)
+        exp_parse = "0101 000000000000000      ???????-?                                                             -    -  - 000 0  --                                                           "
+        self.assertEqual(exp_parse, star1.parse_to_line())
 
     def testShortSophontCodeIntoStatsCalculation(self) -> None:
         line = '2926                      B8B2613-C He Fl Ni HakW Pz             {  1 } (735+3) [458B] - M  A 514 16 HvFd G4 V M1 V     '
@@ -844,6 +862,222 @@ class TestStar(unittest.TestCase):
         self.assertEqual(198000, star1.ship_capacity)
         self.assertEqual(2956800, star1.tcs_gwp)
         self.assertEqual(59874, star1.budget)
+
+    def test_wilderness_refuel_1(self) -> None:
+        star = Star()
+        star.uwpCodes = {'Hydrographics': 'X', 'Atmosphere': '9'}
+        self.assertFalse(star.wilderness_refuel())
+
+    def test_wilderness_refuel_2(self) -> None:
+        star = Star()
+        star.uwpCodes = {'Hydrographics': 'A', 'Atmosphere': 'A'}
+        self.assertFalse(star.wilderness_refuel())
+
+    def test_wilderness_refuel_3(self) -> None:
+        star = Star()
+        star.uwpCodes = {'Hydrographics': 'A', 'Atmosphere': 'X'}
+        self.assertTrue(star.wilderness_refuel())
+
+    def test_calculate_mspr_1(self) -> None:
+        star = Star()
+        star.uwp = UWP('X563000-0')
+        star.calculate_mspr()
+        self.assertEqual(9, star.mspr)
+
+    def test_calculate_mspr_2(self) -> None:
+        cases = [
+            ('X14A000-0', 4),
+            ('X252000-0', 6),
+            ('X370000-0', 5),
+            ('X481000-0', 6),
+            ('X489000-0', 7),
+            ('X000000-0', 0),
+            ('X095000-0', 5),
+            ('X?1?000-0', 0),
+            ('X?2?000-0', 0),
+            ('X?3?000-0', 0),
+            ('X?A?000-0', 0),
+            ('X?B?000-0', 0),
+            ('X?C?000-0', 0)
+        ]
+
+        for uwp, mspr in cases:
+            with self.subTest(uwp):
+                star = Star()
+                star.uwp = UWP(uwp)
+                star.calculate_mspr()
+                self.assertEqual(mspr, star.mspr)
+
+    def test_calculate_wtn_1(self) -> None:
+        cases = [
+            ('A000B00-F', 13),
+            ('A000900-F', 12),
+            ('A000900-0', 9),
+            ('B000B00-F', 13),
+            ('B000900-F', 11),
+            ('B000900-9', 11),
+            ('B000900-5', 10),
+            ('C000C00-F', 12),
+            ('C000B00-F', 11),
+            ('C000A00-F', 11),
+            ('C000900-F', 10),
+            ('C000900-9', 10),
+            ('C000800-9', 9),
+            ('C000900-5', 9),
+            ('C000900-4', 9),
+            ('C000800-4', 8),
+            ('C000700-4', 7),
+            ('C000600-4', 6),
+            ('C000500-4', 6),
+            ('C000400-4', 5),
+            ('C000300-4', 4),
+            ('C000200-4', 3),
+            ('D000900-E', 9),
+            ('D000900-9', 9),
+            ('D000800-9', 8),
+            ('D000700-4', 7),
+            ('D000600-4', 6),
+            ('D000500-4', 5),
+            ('D000400-4', 4),
+            ('D000300-4', 4),
+            ('D000200-4', 3),
+            ('D000600-0', 5),
+            ('E000900-9', 8),
+            ('E000900-8', 7),
+            ('E000700-5', 6),
+            ('E000600-4', 5),
+            ('E000400-4', 4),
+            ('E000300-4', 3),
+            ('E000200-4', 2),
+            ('E000100-4', 2),
+            ('X000900-0', 1),
+            ('X000900-9', 3),
+            ('X000100-0', 0),
+        ]
+
+        for uwp, wtn in cases:
+            with self.subTest(uwp):
+                star = Star()
+                star.uwp = UWP(uwp)
+                star.calculate_wtn()
+                self.assertEqual(wtn, star.wtn)
+
+    def test_fix_ex(self) -> None:
+        cases = [
+            ('E000400-4', 'Ba', '(221+2)', '(230+0)'),
+            ('E000400-9', 'Ba', '(F22+2)', '(E30+0)'),
+            ('E000300-4', 'Lo', '(F20+2)', '(C21+2)'),
+            ('E000500-9', 'Ni', '(F20+2)', '(E40+2)'),
+            ('E000400-9', 'Ni', '(F20+2)', '(E30+2)'),
+            ('E000400-9', 'Ni', '(F28+2)', '(E37+2)'),
+            ('E000700-9', '', '(F2F+2)', '(E6D+2)'),
+        ]
+        for uwp, tradecode, econ, exp_econ in cases:
+            with self.subTest(uwp + " " + tradecode + " " + econ):
+                star = Star()
+                star.importance = 1
+                star.ggCount = 1
+                star.belts = 1
+                star.uwp = UWP(uwp)
+                star.tradeCode = TradeCodes(tradecode)
+                star.economics = econ
+                star.fix_ex()
+                self.assertEqual(exp_econ, star.economics)
+
+    def test_fix_cx(self) -> None:
+        cases = [
+            ('X000000-0', 'Ba', '[1111]', '[0000]'),
+            ('E000400-4', 'Ba', '[1111]', '[1511]'),
+            ('E000400-9', 'Ba', '[F222]', '[9524]'),
+            ('E000300-4', 'Lo', '[F202]', '[8412]'),
+            ('E000500-9', 'Ni', '[F202]', '[A614]'),
+            ('E000400-9', 'Ni', '[F202]', '[9514]'),
+            ('E000400-9', 'Ni', '[F282]', '[9584]'),
+            ('E000700-9', '', '[F2F2]', '[C8A4]'),
+            ('E000700-9', '', '[F2B2]', '[C8A4]'),
+            ('E000900-9', '', '[32B2]', '[4AA4]'),
+            ('E000900-9', '', '[0000]', '[4A14]'),
+        ]
+        for uwp, tradecode, social, exp_social in cases:
+            with self.subTest(uwp + " " + tradecode + " " + social):
+                star = Star()
+                star.importance = 1
+                star.ggCount = 1
+                star.belts = 1
+                star.uwp = UWP(uwp)
+                star.tradeCode = TradeCodes(tradecode)
+                star.social = social
+                star.fix_cx()
+                self.assertEqual(exp_social, star.social)
+
+    def test_fix_tl(self) -> None:
+        cases = [
+            ('X000000-0', 'Ba', 1),
+            ('X000000-?', '', 0)
+        ]
+
+        for uwp, tradecode, exp_tl in cases:
+            with self.subTest(uwp + " " + tradecode):
+                star = Star()
+                star.uwp = UWP(uwp)
+                star.tradeCode = TradeCodes(tradecode)
+                star.fix_tl()
+                self.assertEqual(exp_tl, star.tl)
+
+    def test_calculate_ru(self) -> None:
+        cases = [
+            (None, 0, 'X000000-0', 'negative'),
+            ('(000+0)', 0, 'X000000-0', 'negative'),
+            ('(000+0)', 1, 'X000600-0', 'negative'),
+            ('(111+1)', 1, 'X000600-0', 'negative'),
+            ('(222-1)', -8, 'X000600-0', 'negative'),
+            ('(222-1)', 7, 'X000600-0', 'scaled'),
+            ('(222-2)', 6, 'X000600-0', 'scaled'),
+            ('(222+0)', 8, 'X000600-0', 'scaled'),
+            ('(222+2)', 16, 'X000600-0', 'scaled'),
+            ('(22-22)', 8, 'X000600-0', 'scaled'),
+            ('(22-222', 88, 'X000600-0', 'scaled'),
+            ('(22G+2)', 128, 'X000600-0', 'scaled'),
+            ('(22H+2)', 136, 'X000600-0', 'scaled'),
+            ('(22J+2)', 136, 'X000600-0', 'scaled'),
+            ('(22K+2)', 144, 'X000600-0', 'scaled'),
+            ('(22L+2)', 152, 'X000600-0', 'scaled'),
+            ('(G22+2)', 128, 'X000600-0', 'scaled'),
+            ('(H22+2)', 136, 'X000600-0', 'scaled'),
+            ('(J22+2)', 136, 'X000600-0', 'scaled'),
+            ('(K22+2)', 144, 'X000600-0', 'scaled'),
+            ('(L22+2)', 152, 'X000600-0', 'scaled'),
+        ]
+
+        for economics, exp_ru, uwp, calc in cases:
+            with self.subTest(str(economics) + " " + str(exp_ru)):
+                star = Star()
+                star.uwp = UWP(uwp)
+                star.economics = economics
+                star.calculate_ru(calc)
+                self.assertEqual(exp_ru, star.ru)
+
+    def test_calculate_ru_check_log(self) -> None:
+        star = Star()
+        star.uwp = UWP('X000000-0')
+        star.economics = '(000+0)'
+
+        outer_logger = logging.getLogger('PyRoute.Star')
+        outer_logger.manager.disable = 0
+        outer_logger.setLevel(10)
+
+        exp_logs = [
+            'DEBUG:PyRoute.Star:Dummy log entry to shut assertion up now that canonicalisation has been straightened out',
+            'DEBUG:PyRoute.Star:RU = 1 * 0 * 1 * 1 = 0'
+        ]
+
+        with self.assertLogs(outer_logger, "DEBUG") as outer_logs:
+            outer_logger.debug(
+                'Dummy log entry to shut assertion up now that canonicalisation has been straightened out'
+            )
+            star.calculate_ru('negative')
+            output = copy.deepcopy(outer_logs.output)
+            self.assertEqual(exp_logs, output)
 
 
 if __name__ == "__main__":

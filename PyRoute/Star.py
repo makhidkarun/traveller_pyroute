@@ -8,7 +8,7 @@ import functools
 import logging
 import bisect
 import random
-import math
+
 from typing import Tuple, Optional
 from typing_extensions import TypeAlias
 
@@ -197,7 +197,7 @@ class Star(object):
         basecode = str(self.baseCode).upper()
         alg_code = str(self.alg_code) if "" != self.alg_code.strip() else "--"
 
-        result += basecode.ljust(2) + " " + str(self.zone).ljust(1) + " " + popM + belts + ggCount + " "
+        result += basecode.ljust(2) + " " + str(self.zone).ljust(2) + popM + belts + ggCount + " "
         result += str(worlds).ljust(2) + " " + str(alg_code).ljust(4) + " "
         result += str(star_list).ljust(14) + " " + " ".join(self.routes).ljust(41)
 
@@ -412,24 +412,15 @@ class Star(object):
         if port == 'B':
             self.wtn = (self.wtn * 3 + 11) // 4
         if port == 'C':
-            if self.wtn > 9:
-                self.wtn = (self.wtn + 9) // 2
-            else:
-                self.wtn = (self.wtn * 3 + 9) // 4
+            self.wtn = min((self.wtn + 9) // 2, (self.wtn * 3 + 9) // 4)
         if port == 'D':
-            if self.wtn > 7:
-                self.wtn = (self.wtn + 7) // 2
-            else:
-                self.wtn = (self.wtn * 3 + 7) // 4
+            self.wtn = min((self.wtn + 7) // 2, (self.wtn * 3 + 7) // 4)
         if port == 'E':
-            if self.wtn > 5:
-                self.wtn = (self.wtn + 5) // 2
-            else:
-                self.wtn = (self.wtn * 3 + 5) // 4
+            self.wtn = min((self.wtn + 5) // 2, (self.wtn * 3 + 5) // 4)
         if port == 'X':
             self.wtn = (self.wtn - 5) // 2
 
-        self.wtn = math.trunc(max(0, self.wtn))
+        self.wtn = max(0, self.wtn)
 
     def check_ex(self) -> None:
         if not self.economics:
@@ -475,19 +466,23 @@ class Star(object):
             nu_resources = self._int_to_ehex(max(0, min(max_resources, resources)))
             self.economics = self.economics[0:1] + nu_resources + self.economics[2:]
 
-        if labor != max(self.popCode - 1, 0):
-            nu_labour = self._int_to_ehex(max(self.popCode - 1, 0))
+        max_labor = max(self.popCode - 1, 0)
+        if labor != max_labor:
+            nu_labour = self._int_to_ehex(max_labor)
             self.economics = self.economics[0:2] + nu_labour + self.economics[3:]
 
+        max_lo_infrastructure = max(self.importance, 0)
+        max_ni_infrastructure = 6 + self.importance
+        max_infrastructure = 12 + self.importance
         nu_infrastructure = None
         if self.tradeCode.barren and infrastructure != 0:
             nu_infrastructure = '0'
-        elif self.tradeCode.low and infrastructure != max(self.importance, 0):
-            nu_infrastructure = self._int_to_ehex(max(self.importance, 0))
-        elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= 6 + self.importance:
-            nu_infrastructure = '0' if 0 > infrastructure else self._int_to_ehex(6 + self.importance)
-        elif not 0 <= infrastructure <= 12 + self.importance:
-            nu_infrastructure = '0' if 0 > infrastructure else self._int_to_ehex(12 + self.importance)
+        elif self.tradeCode.low and infrastructure != max_lo_infrastructure:
+            nu_infrastructure = self._int_to_ehex(max_lo_infrastructure)
+        elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= max_ni_infrastructure:
+            nu_infrastructure = '0' if 0 > infrastructure else self._int_to_ehex(max_ni_infrastructure)
+        elif not 0 <= infrastructure <= max_infrastructure:
+            nu_infrastructure = '0' if 0 > infrastructure else self._int_to_ehex(max_infrastructure)
 
         if nu_infrastructure is not None:
             self.economics = self.economics[0:3] + nu_infrastructure + self.economics[4:]
@@ -547,13 +542,15 @@ class Star(object):
         pop = self.popCode
 
         homogeneity = self._ehex_to_int(self.social[1])
+        min_homogeneity = max(1, pop - 5)
+        max_homogeneity = pop + 5
         nu_homogeneity = None
         if 0 == pop and 0 != homogeneity:
             nu_homogeneity = '0'
-        elif 0 != pop and homogeneity < max(1, pop - 5):
-            nu_homogeneity = self._int_to_ehex(max(1, pop - 5))
-        elif 0 != pop and homogeneity > pop + 5:
-            nu_homogeneity = self._int_to_ehex(pop + 5)
+        elif 0 != pop and homogeneity < min_homogeneity:
+            nu_homogeneity = self._int_to_ehex(min_homogeneity)
+        elif 0 != pop and homogeneity > max_homogeneity:
+            nu_homogeneity = self._int_to_ehex(max_homogeneity)
 
         if nu_homogeneity is not None:
             self.social = self.social[0] + nu_homogeneity + self.social[2:]
@@ -581,13 +578,15 @@ class Star(object):
             self.social = self.social[0:3] + nu_strangeness + self.social[4:]
 
         symbols = self._ehex_to_int(self.social[4])
+        min_symbols = max(1, self.tl - 5)
+        max_symbols = self.tl + 5
         nu_symbols = None
         if 0 == pop and symbols != 0:
             nu_symbols = '0'
-        elif 0 != pop and symbols < max(1, self.tl - 5):
-            nu_symbols = self._int_to_ehex(max(1, self.tl - 5))
-        elif 0 != pop and symbols > self.tl + 5:
-            nu_symbols = self._int_to_ehex(self.tl + 5)
+        elif 0 != pop and symbols < min_symbols:
+            nu_symbols = self._int_to_ehex(min_symbols)
+        elif 0 != pop and symbols > max_symbols:
+            nu_symbols = self._int_to_ehex(max_symbols)
 
         if nu_symbols is not None:
             self.social = self.social[0:4] + nu_symbols + self.social[5:]
@@ -608,8 +607,8 @@ class Star(object):
         resources = self._ehex_to_int(self.economics[1])
         labor = self._ehex_to_int(self.economics[2])
         if self.economics[3] == '-':
-            infrastructure = self._ehex_to_int(self.economics[3:5])
-            efficiency = float(self.economics[5:7])
+            infrastructure = self._ehex_to_int(self.economics[3:5])  # pragma: no mutate
+            efficiency = float(self.economics[5:7].strip(')'))  # pragma: no mutate
         else:
             infrastructure = self._ehex_to_int(self.economics[3])
             efficiency = float(self.economics[4:6])
@@ -625,13 +624,11 @@ class Star(object):
         infrastructure += 0 if infrastructure < 18 else -1
 
         efficiency = efficiency if efficiency != 0 else 1
-        if efficiency < 0:
-            if ru_calc == 'scaled':
-                efficiency = 1.0 + (efficiency * 0.1)
+        if efficiency < 0 and 'scaled' == ru_calc:
+            efficiency = 1.0 + (efficiency * 0.1)
             # else ru_calc == 'negative' -> use efficiency as written
-            self.ru = int(round(resources * labor * infrastructure * efficiency))
-        else:
-            self.ru = resources * labor * infrastructure * efficiency
+
+        self.ru = int(round(resources * labor * infrastructure * efficiency))
 
         self.logger.debug(
             "RU = {0} * {1} * {2} * {3} = {4}".format(resources, labor, infrastructure, efficiency, self.ru))
