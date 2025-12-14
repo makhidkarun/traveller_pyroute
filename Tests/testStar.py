@@ -44,7 +44,8 @@ class TestStar(baseTest):
         state = star.__getstate__()
         exp_state = {'alg_base_code': None, 'alg_code': None, 'allegiance_base': None, 'baseCode': None, 'belts': None,
                      'budget': None, 'col_be': None, 'component': None, 'deep_space_station': False, 'economics': None,
-                     'eti_cargo': None, 'eti_passenger': None, 'ggCount': None, 'gwp': None, 'hex': None, 'im_be': None,
+                     'eti_cargo': None, 'eti_cargo_volume': None, 'eti_pass_volume': None, 'eti_passenger': None,
+                     'eti_worlds': None, 'ggCount': None, 'gwp': None, 'hex': None, 'im_be': None,
                      'importance': None, 'index': None, 'is_enqueued': False, 'is_landmark': False, 'is_redzone': False,
                      'is_target': False, 'mspr': None, 'name': None, 'nobles': None, 'ownedBy': None, 'passIn': None,
                      'passOver': None, 'perCapita': None, 'popM': None, 'population': None, 'position': None,
