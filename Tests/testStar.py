@@ -1791,6 +1791,34 @@ class TestStar(unittest.TestCase):
                 check_sector = Sector('# ' + sector, '# ' + sector_pos)
                 self.assertEqual(exp_sec_pos, star.sec_pos(check_sector))
 
+    def test_subsector_1(self) -> None:
+        cases = [
+            ('0810', 'A'),
+            ('1610', 'B'),
+            ('2410', 'C'),
+            ('3210', 'D'),
+            ('0820', 'E'),
+            ('1620', 'F'),
+            ('2420', 'G'),
+            ('3220', 'H'),
+            ('0830', 'I'),
+            ('1630', 'J'),
+            ('2430', 'K'),
+            ('3230', 'L'),
+            ('0840', 'M'),
+            ('1640', 'N'),
+            ('2440', 'O'),
+            ('3240', 'P'),
+        ]
+        sector = Sector('# Core', '# 0, 0')
+        for posn, exp_subsector in cases:
+            with self.subTest(posn):
+                star = Star()
+                star.hex = Hex(sector, posn)
+                star.position = posn
+
+                self.assertEqual(exp_subsector, star.subsector())
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

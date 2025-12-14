@@ -74,6 +74,9 @@ class Sector(AreaItem):
             return False
         return str(self) == str(other)
 
+    def __hash__(self):
+        return hash((self.name, str(self.x), str(self.y)))
+
     def sector_name(self) -> str:
         return self.name.removesuffix(' Sector').removesuffix('Sector').strip()
 
