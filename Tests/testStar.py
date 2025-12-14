@@ -19,7 +19,6 @@ from PyRoute.Star import Star
 from PyRoute.SystemData.UWP import UWP
 from PyRoute.TradeCodes import TradeCodes
 from PyRoute.SystemData.StarList import StarList
-from PyRoute.UWPCodes import UWPCodes
 
 
 class TestStar(unittest.TestCase):
@@ -1511,7 +1510,7 @@ class TestStar(unittest.TestCase):
         self.assertAlmostEqual(1.2, star1.col_be, 3)
         self.assertAlmostEqual(0, star1.im_be, 3)
 
-    def test_calculate_importance_1(self):
+    def test_calculate_importance_1(self) -> None:
         cases = [
             ('A', '7', '5', '', '-', -1),
             ('B', '8', '6', 'Ag', 'NS', 1),
@@ -1535,7 +1534,7 @@ class TestStar(unittest.TestCase):
                 star1.calculate_importance()
                 self.assertEqual(exp_imp, star1.importance)
 
-    def test_is_well_formed_1(self):
+    def test_is_well_formed_1(self) -> None:
         star = Star()
         star.name = 'Foo'
         self.assertTrue(hasattr(star, 'sector'))
@@ -1547,7 +1546,7 @@ class TestStar(unittest.TestCase):
             msg = str(e)
         self.assertEqual('Star Foo has empty/bad sector attribute', msg)
 
-    def test_is_well_formed_2(self):
+    def test_is_well_formed_2(self) -> None:
         star = Star()
         star.name = 'Foo'
         star.sector = 2
@@ -1559,7 +1558,7 @@ class TestStar(unittest.TestCase):
             msg = str(e)
         self.assertEqual('Star Foo has empty/bad sector attribute', msg)
 
-    def test_is_well_formed_3(self):
+    def test_is_well_formed_3(self) -> None:
         star = Star()
         star.name = 'Foo'
         star.sector = Sector('# Core', '# 0, 0')
@@ -1571,7 +1570,7 @@ class TestStar(unittest.TestCase):
             msg = str(e)
         self.assertEqual('Star Foo has empty/bad index attribute', msg)
 
-    def test_is_well_formed_4(self):
+    def test_is_well_formed_4(self) -> None:
         star = Star()
         star.name = 'Foo'
         star.sector = Sector('# Core', '# 0, 0')
@@ -1584,7 +1583,7 @@ class TestStar(unittest.TestCase):
             msg = str(e)
         self.assertEqual('Star Foo has empty/bad hex attribute', msg)
 
-    def test_is_well_formed_5(self):
+    def test_is_well_formed_5(self) -> None:
         star = Star()
         star.name = 'Foo'
         star.sector = Sector('# Core', '# 0, 0')
@@ -1598,7 +1597,7 @@ class TestStar(unittest.TestCase):
             msg = str(e)
         self.assertEqual('Column must be in range 1-32 - is 0', msg)
 
-    def test_is_well_formed_6(self):
+    def test_is_well_formed_6(self) -> None:
         star = Star()
         star.name = 'Foo'
         star.sector = Sector('# Core', '# 0, 0')
@@ -1613,7 +1612,7 @@ class TestStar(unittest.TestCase):
             msg = str(e)
         self.assertEqual('Star Foo economics must be None or 7-char string', msg)
 
-    def test_is_well_formed_7(self):
+    def test_is_well_formed_7(self) -> None:
         star = Star()
         star.name = 'Foo'
         star.sector = Sector('# Core', '# 0, 0')
@@ -1628,7 +1627,7 @@ class TestStar(unittest.TestCase):
             msg = str(e)
         self.assertEqual('Star Foo economics must be None or 7-char string', msg)
 
-    def test_is_well_formed_8(self):
+    def test_is_well_formed_8(self) -> None:
         star = Star()
         star.name = 'Foo'
         star.sector = Sector('# Core', '# 0, 0')
@@ -1644,7 +1643,7 @@ class TestStar(unittest.TestCase):
             msg = str(e)
         self.assertEqual('Star Foo social must be None or 6-char string', msg)
 
-    def test_is_well_formed_9(self):
+    def test_is_well_formed_9(self) -> None:
         star = Star()
         star.name = 'Foo'
         star.sector = Sector('# Core', '# 0, 0')
@@ -1660,7 +1659,7 @@ class TestStar(unittest.TestCase):
             msg = str(e)
         self.assertEqual('Star Foo social must be None or 6-char string', msg)
 
-    def test_is_well_formed_10(self):
+    def test_is_well_formed_10(self) -> None:
         star = Star()
         star.name = 'Foo'
         star.sector = Sector('# Core', '# 0, 0')
@@ -1676,7 +1675,7 @@ class TestStar(unittest.TestCase):
             msg = str(e)
         self.assertEqual('Star Foo social must be None or 6-char string', msg)
 
-    def test_is_well_formed_11(self):
+    def test_is_well_formed_11(self) -> None:
         star = Star()
         star.name = 'Foo'
         star.sector = Sector('# Core', '# 0, 0')
@@ -1692,7 +1691,7 @@ class TestStar(unittest.TestCase):
             msg = str(e)
         self.assertEqual('Star Foo has empty base allegiance attribute', msg)
 
-    def test_is_well_formed_12(self):
+    def test_is_well_formed_12(self) -> None:
         star = Star()
         star.name = 'Foo'
         star.sector = Sector('# Core', '# 0, 0')
@@ -1709,7 +1708,7 @@ class TestStar(unittest.TestCase):
             msg = str(e)
         self.assertEqual('Star Foo has empty/bad UWP attribute', msg)
 
-    def test_is_well_formed_13(self):
+    def test_is_well_formed_13(self) -> None:
         star = Star()
         star.name = 'Foo'
         star.sector = Sector('# Core', '# 0, 0')
@@ -1727,7 +1726,7 @@ class TestStar(unittest.TestCase):
             msg = str(e)
         self.assertEqual('Star Foo has empty star_list_object attribute', msg)
 
-    def test_is_well_formed_14(self):
+    def test_is_well_formed_14(self) -> None:
         star = Star()
         star.name = 'Foo'
         star.sector = Sector('# Core', '# 0, 0')
@@ -1740,6 +1739,41 @@ class TestStar(unittest.TestCase):
         star.star_list_object = StarList('')
 
         self.assertTrue(star.is_well_formed())
+
+    def test_extract_routes_1(self) -> None:
+        star = Star()
+        star.stars = 'M2 V '
+
+        star.extract_routes()
+        self.assertEqual([], star.routes)
+        self.assertEqual('M2 V', star.stars)
+
+    def test_extract_routes_2(self) -> None:
+        cases = [
+            ('M2 V Xb:0101', 'M2 V', ['Xb:0101'], "DEBUG:PyRoute.Star:None (Core None) - routes: ['Xb:0101']"),
+            ('M2 V Tr:0101', 'M2 V', ['Tr:0101'], "DEBUG:PyRoute.Star:None (Core None) - routes: ['Tr:0101']"),
+            ('M2 V Tr:0101 Xb:0102', 'M2 V', ['Tr:0101', 'Xb:0102'],
+             "DEBUG:PyRoute.Star:None (Core None) - routes: ['Tr:0101', 'Xb:0102']"),
+            ('M2 V Xb:0101 Xb:0102', 'M2 V', ['Xb:0101', 'Xb:0102'],
+             "DEBUG:PyRoute.Star:None (Core None) - routes: ['Xb:0101', 'Xb:0102']"),
+            ('M2 V Tr:0101 Tr:0102', 'M2 V', ['Tr:0101', 'Tr:0102'],
+             "DEBUG:PyRoute.Star:None (Core None) - routes: ['Tr:0101', 'Tr:0102']"),
+            ('Xb:0101', '', ['Xb:0101'], "DEBUG:PyRoute.Star:None (Core None) - routes: ['Xb:0101']"),
+            ('Tr:0101', '', ['Tr:0101'], "DEBUG:PyRoute.Star:None (Core None) - routes: ['Tr:0101']"),
+        ]
+        sector = Sector('# Core', '# 0, 0')
+        for rawstars, exp_stars, exp_routes, exp_message in cases:
+            with self.subTest(rawstars):
+                star = Star()
+                star.sector = sector
+                star.stars = rawstars
+
+                logger = star.logger
+                with self.assertLogs(logger, 'DEBUG') as logs:
+                    star.extract_routes()
+                    self.assertEqual(exp_stars, star.stars)
+                    self.assertEqual([exp_message], logs.output)
+                    self.assertEqual(exp_routes, star.routes)
 
 
 if __name__ == "__main__":
