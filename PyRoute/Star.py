@@ -521,10 +521,11 @@ class Star(object):
         nu_homogeneity = None
         if 0 == pop and 0 != homogeneity:
             nu_homogeneity = '0'
-        elif 0 != pop and homogeneity < min_homogeneity:
-            nu_homogeneity = self._int_to_ehex(min_homogeneity)
-        elif 0 != pop and homogeneity > max_homogeneity:
-            nu_homogeneity = self._int_to_ehex(max_homogeneity)
+        elif 0 != pop:
+            if homogeneity < min_homogeneity:  # pragma: no mutate
+                nu_homogeneity = self._int_to_ehex(min_homogeneity)
+            elif homogeneity > max_homogeneity:  # pragma: no mutate
+                nu_homogeneity = self._int_to_ehex(max_homogeneity)
 
         if nu_homogeneity is not None:
             self.social = self.social[0] + nu_homogeneity + self.social[2:]
@@ -543,10 +544,11 @@ class Star(object):
         nu_strangeness = None
         if 0 == pop and 0 != strangeness:
             nu_strangeness = '0'
-        elif 0 != pop and 1 > strangeness:
-            nu_strangeness = self._int_to_ehex(1)
-        elif 0 != pop and 10 < strangeness:
-            nu_strangeness = self._int_to_ehex(10)
+        elif 0 != pop:
+            if 1 > strangeness:  # pragma: no mutate
+                nu_strangeness = self._int_to_ehex(1)
+            elif 10 < strangeness:  # pragma: no mutate
+                nu_strangeness = self._int_to_ehex(10)
 
         if nu_strangeness is not None:
             self.social = self.social[0:3] + nu_strangeness + self.social[4:]
@@ -557,10 +559,11 @@ class Star(object):
         nu_symbols = None
         if 0 == pop and symbols != 0:
             nu_symbols = '0'
-        elif 0 != pop and symbols < min_symbols:
-            nu_symbols = self._int_to_ehex(min_symbols)
-        elif 0 != pop and symbols > max_symbols:
-            nu_symbols = self._int_to_ehex(max_symbols)
+        elif 0 != pop:
+            if symbols < min_symbols:  # pragma: no mutate
+                nu_symbols = self._int_to_ehex(min_symbols)
+            elif symbols > max_symbols:  # pragma: no mutate
+                nu_symbols = self._int_to_ehex(max_symbols)
 
         if nu_symbols is not None:
             self.social = self.social[0:4] + nu_symbols + self.social[5:]

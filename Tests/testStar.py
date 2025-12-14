@@ -2126,6 +2126,46 @@ class TestStar(baseTest):
             star.check_ex()
             self.assertEqual(exp_logs, logs.output)
 
+    def test_fix_cx_1(self) -> None:
+        cases = [
+            ('0', '[1111]', '[0000]'),
+            ('1', '[0000]', '[1211]'),
+            ('1', '[71BB]', '[62AA]'),
+            ('3', '[0000]', '[1411]'),
+            ('3', '[FFFF]', '[84AA]'),
+            ('7', '[0000]', '[2811]'),
+            ('7', '[FFFF]', '[C8AA]'),
+            ('7', '[C8AA]', '[C8AA]')
+        ]
+        for pop, init_social, exp_social in cases:
+            with self.subTest(pop + ' ' + init_social):
+                star = Star()
+                star.social = init_social
+                star.uwp = UWP(f'C555{pop}55-5')
+                star.importance = 1
+
+                star.fix_cx()
+                self.assertEqual(exp_social, star.social)
+
+    def test_fix_cx_2(self) -> None:
+        cases = [
+            ('4', '[0002]', '[1412]'),
+            ('4', '[FFFF]', '[94AC]'),
+            ('4', '[GF5E]', '[945C]'),
+            ('0', '[F0FF]', '[0000]'),
+            ('1', '[F2FF]', '[61AC]')
+        ]
+
+        for pop, init_social, exp_social in cases:
+            with self.subTest(pop + ' ' + init_social):
+                star = Star()
+                star.social = init_social
+                star.uwp = UWP(f'C777{pop}77-7')
+                star.importance = 0
+
+                star.fix_cx()
+                self.assertEqual(exp_social, star.social)
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
