@@ -2176,6 +2176,24 @@ class TestStar(baseTest):
             star.check_ex()
             self.assertEqual(exp_logs, logs.output)
 
+    def test_check_ex_8(self) -> None:
+        sector = Sector('# Core', '# 0, 0')
+        star = Star()
+        star.sector = sector
+        star.uwp = UWP('C555755-5')
+        star.economics = '(06D+1)'
+        star.tradeCode = TradeCodes('')
+        star.importance = 1
+
+        logger = star.logger
+        logger.manager.disable = 10
+        exp_logs = ['WARNING:PyRoute.Star:Dummy Message']
+
+        with self.assertLogs(logger, 'WARNING') as logs:
+            logger.warning('Dummy Message')
+            star.check_ex()
+            self.assertEqual(exp_logs, logs.output)
+
     def test_fix_cx_1(self) -> None:
         cases = [
             ('0', '[1111]', '[0000]'),
