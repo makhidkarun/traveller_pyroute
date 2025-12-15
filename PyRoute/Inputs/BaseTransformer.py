@@ -225,7 +225,7 @@ class BaseTransformer(Transformer):
         return tree
 
     def _is_noble(self, noble_string):
-        noble = "BCcDEeFfGH"
+        noble = "BCcDEeFfGH"  # pragma: no mutate
         return all(char in noble for char in noble_string)
 
     def is_zone(self, zone_string) -> bool:
@@ -347,7 +347,7 @@ class BaseTransformer(Transformer):
     def square_up_parsed_zero(self, rawstring, parsed) -> dict:
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
         bitz = [item for item in rawstring.split() if '' != item]
-        if 3 == len(bitz) and bitz[0] == parsed['nobles'] and bitz[1] == parsed['base'] and bitz[2] == parsed['zone']:
+        if 3 == len(bitz) and bitz[0] == parsed['nobles'] and bitz[1] == parsed['base'] and bitz[2] == parsed['zone']:  # pragma: no mutate
             return parsed
         if 2 == len(bitz) and "" == parsed['zone']:
             if 2 < len(bitz[0]):  # bitz[0] can only possibly be nobles, so return

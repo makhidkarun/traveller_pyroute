@@ -19,6 +19,7 @@ class testBaseTransformer(baseTest):
         self.assertIsNotNone(result)
 
         transformer = StarlineTransformer(raw=line)
+        self.assertIsNotNone(transformer.crankshaft)
         self.assertFalse(transformer.crankshaft)
         self.assertTrue(transformer.__visit_tokens__)
         self.assertEqual(line, transformer.raw)
@@ -588,7 +589,7 @@ class testBaseTransformer(baseTest):
                 actual = transformer.trim_raw_bitz(parsed)
                 self.assertEqual(expected, actual)
 
-    def test_square_up_parsed_zero(self) -> None:
+    def test_square_up_parsed_zero_1(self) -> None:
         cases = [
             (
                 {'residual': 'G9 V', 'position': '2531', 'name': 'Khese', 'uwp': 'C795448-7', 'trade': 'Ni Pa',
@@ -795,6 +796,22 @@ class testBaseTransformer(baseTest):
                 transformer = StarlineTransformer(raw='')
                 actual = transformer.square_up_parsed_zero(raw, parsed)
                 self.assertEqual(expected, actual)
+
+    def test_square_up_parsed_zero_2(self) -> None:
+        transformer = StarlineTransformer(raw='')
+        parsed = {'zone': '', 'nobles': ''}
+        rawstring = 'BCD N'
+
+        nu_parsed = transformer.square_up_parsed_zero(rawstring, parsed)
+        self.assertEqual(parsed, nu_parsed)
+
+    def test_square_up_parsed_zero_3(self) -> None:
+        transformer = StarlineTransformer(raw='')
+        parsed = {'zone': '-', 'nobles': 'BCD', 'base': 'N'}
+        rawstring = 'BCD N - foo'
+
+        nu_parsed = transformer.square_up_parsed_zero(rawstring, parsed)
+        self.assertEqual(parsed, nu_parsed)
 
     def test_square_up_allegiance_overflow(self) -> None:
         cases = [
