@@ -89,13 +89,13 @@ class testBaseTransformer(baseTest):
         self.assertEqual(expected, transformed)
 
     def test_transform_5(self) -> None:
-        original = "0101 Foobar              A000000-0 Ba                  *   123 8  ImDdab"
+        original = "0101 Foobar              A000000-0 Ba Lo Ni Po De He Va As                *   123 8  ImDdab"
         parser = StarlineParser()
         result, line = parser.parse(original)
         self.assertIsNotNone(result)
 
         transformer = StarlineTransformer(raw=line)
-        expected = ['0101', 'Foobar', 'A000000-0', 'Ba', '', None, None, None, ' ', ' ', ' ',
+        expected = ['0101', 'Foobar', 'A000000-0', 'Ba Lo Ni Po De He Va As', '', None, None, None, ' ', ' ', ' ',
                     '-', '*', '-', '123', '8', 'ImDd', 'ab']
         transformed = transformer.transform(result)
         self.assertEqual(expected, transformed)
