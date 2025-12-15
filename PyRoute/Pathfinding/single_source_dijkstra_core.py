@@ -46,6 +46,8 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
     tail: cython.int
     dist_tail: cython.float
     heap: MinMaxHeap[dijkstra_t]
+    diagnostics = {'nodes_processed': 0, 'nodes_queued': 0, 'nodes_exceeded': 0, 'nodes_min_exceeded': 0,
+                   'nodes_tailed': 0}
 
     heap = MinMaxHeap[dijkstra_t]()
     heap.reserve(1000)
@@ -57,6 +59,7 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
             continue
         parents_view[act_nod] = -1  # Using -1 to flag "root node of tree"
         heap.insert({'act_wt': distance_labels_view[act_nod], 'act_nod': act_nod})
+        diagnostics['nodes_queued'] += 1
 
     while 0 < heap.size():
         result = heap.popmin()
@@ -64,7 +67,13 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
         tail = result.act_nod
 
         if dist_tail > distance_labels_view[tail] or dist_tail + min_cost_view[tail] > max_neighbour_labels_view[tail]:
+            if dist_tail > distance_labels[tail] - 1e-8:
+                diagnostics['nodes_exceeded'] += 1
+            else:
+                diagnostics['nodes_min_exceeded'] += 1
             continue
+
+        diagnostics['nodes_processed'] += 1
 
         # Link weights are strictly positive, thus lower bounded by zero. Thus, when the current dist_tail value exceeds
         # the corresponding node's distance label at the other end of the candidate edge, trim that edge.  Such edges
@@ -79,12 +88,14 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
         for index in range(0, num_nodes):
             act_nod = active_nodes_view[index]
             if dist_tail + active_costs_view[index] >= distance_labels_view[act_nod]:
+                diagnostics['nodes_tailed'] += 1
                 continue
             act_wt = dist_tail + divisor * active_costs_view[index]
 
             distance_labels_view[act_nod] = act_wt
             parents_view[act_nod] = tail
             heap.insert({'act_wt': act_wt, 'act_nod': act_nod})
+            diagnostics['nodes_queued'] += 1
 
         # update max label _after_ neighbours are processed, to minimise the max_label as far as possible
         max_neighbour_labels_view[tail] = max(distance_labels[neighbours[0]])
