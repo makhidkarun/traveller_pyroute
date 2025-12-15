@@ -40,7 +40,7 @@ class testSingleSourceDijkstraCoreFallback(baseTest):
         min_cost = dist_graph.min_cost(0, True)
 
         nu_labels, nu_parents, nu_max = dijkstra_core(dist_graph._arcs, dist_labels, float(1.0 / 1.1),
-                                                      [source], max_labels, min_cost)
+                                        [source], max_labels, min_cost)
         exp_labels = [0.0, 158.18181818181816, 199.99999999999997, 222.7272727272727, 241.81818181818178,
                       49.090909090909086, 114.54545454545453, 241.81818181818178, 67.27272727272727, 108.18181818181817,
                       132.72727272727272, 150.0, 216.36363636363637, 241.8181818181818, 90.9090909090909,

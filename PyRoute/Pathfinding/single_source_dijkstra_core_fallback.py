@@ -21,6 +21,8 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
 
     heap = [(distance_labels[seed], seed) for seed in seeds if 0 < len(arcs[seed][0])]  # pragma: no mutate
     heapq.heapify(heap)
+    diagnostics = {'nodes_processed': 0, 'nodes_queued': len(heap), 'nodes_exceeded': 0, 'nodes_min_exceeded': 0,
+                   'nodes_tailed': 0}
 
     parents = np.ones(len(arcs)) * -100  # Using -100 to track "not considered during processing"
     parents[list(seeds)] = -1  # Using -1 to flag "root node of tree"
@@ -32,11 +34,17 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
             # Since we've just dequeued a bad node (distance exceeding its current label, or too close to max-label),
             # remove other bad nodes from the list to avoid tripping over them later, and chuck out nodes who
             # can't give better distance labels
+            if dist_tail > distance_labels[tail] - 1e-8:  # pragma: no mutate
+                diagnostics['nodes_exceeded'] += 1
+            else:
+                diagnostics['nodes_min_exceeded'] += 1  # pragma: no mutate
             if heap:
                 heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]  # pragma: no mutate
                         and distance + min_cost[tail] <= max_neighbour_labels[tail]]  # pragma: no mutate
                 heapq.heapify(heap)
             continue
+
+        diagnostics['nodes_processed'] += 1
 
         # Link weights are strictly positive, thus lower bounded by zero. Thus, when the current dist_tail value exceeds
         # the corresponding node's distance label at the other end of the candidate edge, trim that edge.  Such edges
@@ -52,6 +60,7 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
         num_nodes = len(active_nodes)
 
         if 0 == num_nodes:
+            diagnostics['nodes_tailed'] += 1
             continue
         active_weights = dist_tail + divisor * active_costs[keep]
         assert (active_weights > dist_tail).all()  # pragma: no mutate
@@ -61,6 +70,7 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
 
         # update max label _after_ neighbours are processed, to minimise the max_label as far as possible
         max_neighbour_labels[tail] = max(distance_labels[neighbours[0]])
+        diagnostics['nodes_queued'] += num_nodes
 
         if 1 == num_nodes:
             heapq.heappush(heap, (active_weights[0], active_nodes[0]))
