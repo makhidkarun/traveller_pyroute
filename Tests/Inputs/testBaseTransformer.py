@@ -100,6 +100,124 @@ class testBaseTransformer(baseTest):
         transformed = transformer.transform(result)
         self.assertEqual(expected, transformed)
 
+    def test_transform_6(self) -> None:
+        original = '0101 000000000000000 ???????-? 000000000000000       c -   000   00'
+        parser = StarlineParser()
+        result, line = parser.parse(original)
+        self.assertIsNotNone(result)
+
+        transformer = StarlineTransformer(raw=line)
+        expected = ['0101', '000000000000000', '???????-?', '000000000000000', '', None, None, None, ' ', ' ', ' ',
+                    'c', '-', '', '000', '0', '00', '']
+        transformed = transformer.transform(result)
+        self.assertIsNotNone(transformer.crankshaft)
+        self.assertFalse(transformer.crankshaft)
+        self.assertEqual(expected, transformed)
+
+    def test_transform_7(self) -> None:
+        original = '0101 000000000000000  ?000000-0                 {3 }  (7TG-1) [2IBt]   EHEG -    569 9 C5\''
+        parser = StarlineParser()
+        result, line = parser.parse(original)
+        self.assertIsNotNone(result)
+
+        transformer = StarlineTransformer(raw=line)
+        expected = ['0101', '000000000000000', '?000000-0', '', '{3 } (7TG-1) [2IBt]', '{3 }', '(7TG-1)', '[2IBt]',
+                    None, None, None, 'EHEG', '-', '-', '569', '9', 'C5', '\'']
+        transformed = transformer.transform(result)
+        self.assertIsNotNone(transformer.crankshaft)
+        self.assertFalse(transformer.crankshaft)
+        self.assertEqual(expected, transformed)
+
+    def test_transform_tree(self) -> None:
+        cases = [
+            (
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', '000000000000000 ???????-?')]),
+                                                 Tree(Token('RULE', 'trade'), [Token('TRADECODE', '000000000000000')]),
+                                                 Tree(Token('RULE', 'extensions'),
+                                                      [Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{0}')]),
+                                                       Tree(Token('RULE', 'ex'), [Token('__ANON_4', '(000-0)')]),
+                                                       Tree(Token('RULE', 'cx'), [Token('__ANON_5', '[0000]')])]),
+                                                 Tree(Token('RULE', 'nbz'),
+                                                      [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                       Tree(Token('RULE', 'base'), [Token('__ANON_7', '-')]),
+                                                       Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'a')])]),
+                                                 Tree(Token('RULE', 'world_alg'),
+                                                      [Tree(Token('RULE', 'pbg'), [Token('__ANON_9', '000')]),
+                                                       Tree(Token('RULE', 'worlds'), [Token('__ANON_11', '0')]),
+                                                       Tree(Token('RULE', 'allegiance'), [Token('__ANON_12', '00')])])]),
+                ['0101', '000000000000000', '???????-?', '000000000000000', '{0} (000-0) [0000]', '{0}', '(000-0)',
+                 '[0000]', None, None, None, '-', '-', 'A', '000', '0', '00', '']
+            ),
+            (
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', '000000000000000 ???????-?')]),
+                                                 Tree(Token('RULE', 'trade'), [Token('TRADECODE', '000000000000000')]),
+                                                 Tree(Token('RULE', 'extensions'),
+                                                      [Tree(Token('RULE', 'ex'), [Token('__ANON_4', '(000-0)')]),
+                                                       Tree(Token('RULE', 'cx'), [Token('__ANON_5', '[0000]')])]),
+                                                 Tree(Token('RULE', 'nbz'),
+                                                      [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                       Tree(Token('RULE', 'base'), [Token('__ANON_7', '-')]),
+                                                       Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'a')])]),
+                                                 Tree(Token('RULE', 'world_alg'),
+                                                      [Tree(Token('RULE', 'pbg'), [Token('__ANON_9', '000')]),
+                                                       Tree(Token('RULE', 'worlds'), [Token('__ANON_11', '0')]),
+                                                       Tree(Token('RULE', 'allegiance'),
+                                                            [Token('__ANON_12', '00')])])]),
+                ['0101', '000000000000000', '???????-?', '000000000000000', ' (000-0) [0000]', None, '(000-0)',
+                 '[0000]', None, None, None, '-', '-', 'A', '000', '0', '00', '']
+            ),
+            (
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', '000000000000000 ???????-?')]),
+                                                 Tree(Token('RULE', 'trade'), [Token('TRADECODE', '000000000000000')]),
+                                                 Tree(Token('RULE', 'extensions'),
+                                                      [Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{0}')]),
+                                                       Tree(Token('RULE', 'cx'), [Token('__ANON_5', '[0000]')])]),
+                                                 Tree(Token('RULE', 'nbz'),
+                                                      [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                       Tree(Token('RULE', 'base'), [Token('__ANON_7', '-')]),
+                                                       Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'a')])]),
+                                                 Tree(Token('RULE', 'world_alg'),
+                                                      [Tree(Token('RULE', 'pbg'), [Token('__ANON_9', '000')]),
+                                                       Tree(Token('RULE', 'worlds'), [Token('__ANON_11', '0')]),
+                                                       Tree(Token('RULE', 'allegiance'),
+                                                            [Token('__ANON_12', '00')])])]),
+                ['0101', '000000000000000', '???????-?', '000000000000000', '{0}   [0000]', '{0}', None,
+                 '[0000]', None, None, None, '-', '-', 'A', '000', '0', '00', '']
+            ),
+            (
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', '000000000000000 ???????-?')]),
+                                                 Tree(Token('RULE', 'trade'), [Token('TRADECODE', '000000000000000')]),
+                                                 Tree(Token('RULE', 'extensions'),
+                                                      [Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{0}')]),
+                                                       Tree(Token('RULE', 'ex'), [Token('__ANON_4', '(000-0)')])]),
+                                                 Tree(Token('RULE', 'nbz'),
+                                                      [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                       Tree(Token('RULE', 'base'), [Token('__ANON_7', '-')]),
+                                                       Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'a')])]),
+                                                 Tree(Token('RULE', 'world_alg'),
+                                                      [Tree(Token('RULE', 'pbg'), [Token('__ANON_9', '000')]),
+                                                       Tree(Token('RULE', 'worlds'), [Token('__ANON_11', '0')]),
+                                                       Tree(Token('RULE', 'allegiance'),
+                                                            [Token('__ANON_12', '00')])])]),
+                ['0101', '000000000000000', '???????-?', '000000000000000', '{0} (000-0)  ', '{0}', '(000-0)',
+                 None, None, None, None, '-', '-', 'A', '000', '0', '00', '']
+            )
+        ]
+
+        for tree, expected in cases:
+            with self.subTest(str(tree)):
+                transformer = StarlineTransformer(raw='')
+                actual = transformer.transform(tree)
+                self.assertEqual(expected, actual)
+
     def test_starname_transform(self) -> None:
         cases = [
             (' [0000]000000000 A000000-0 ', '[0000]000000000', 'A000000-0'),
