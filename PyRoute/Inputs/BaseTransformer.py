@@ -191,12 +191,12 @@ class BaseTransformer(Transformer):
 
     def transform(self, tree) -> list[Optional[str]]:
         self.crankshaft = '' == tree.children[4].children[0].children[0].value.strip() and '-' == tree.children[4].children[
-            1].children[0].value and '' == tree.children[4].children[2].children[0].value.strip() and 1 == self.raw.count(' -')\
-                          and 1 == self.raw.count('-   ')
+            1].children[0].value.strip() and '' == tree.children[4].children[2].children[0].value.strip()
+        self.crankshaft = self.crankshaft and 1 == self.raw.count(' -') and 1 == self.raw.count('-   ')
         tree = self._preprocess_trade_and_extensions(tree)
         tree = self._preprocess_tree_suspect_empty_trade_code(tree)
         tree = self._transform_tree(tree)
-        parsed = {'ix': None, 'ex': None, 'cx': None, 'residual': ''}
+        parsed: dict[str, Optional[str]] = {'residual': ''}
 
         parsed['position'] = tree[0][0].value
         parsed['name'], parsed['uwp'] = self.starname_transform(tree[1][0].value)
@@ -213,7 +213,6 @@ class BaseTransformer(Transformer):
         self.trim_raw_string(parsed)
         rawbitz = self._trim_raw_bitz(parsed)
         parsed = self._square_up_parsed_zero(rawbitz[0], parsed)
-        # parsed = self._square_up_parsed_one(rawbitz[1], parsed)
         parsed = self._square_up_allegiance_overflow(parsed)
 
         no_extensions = parsed['ix'] is None and parsed['ex'] is None and parsed['cx'] is None
@@ -228,7 +227,9 @@ class BaseTransformer(Transformer):
             extensions = ''
 
         # Currently aiming to drop-in replace the starline regex output
-        data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'], parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'], parsed['zone'].upper(), parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
+        data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'],
+                parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'],
+                parsed['zone'].upper() if parsed['zone'] is not None else '', parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
 
         return data
 
@@ -441,63 +442,6 @@ class BaseTransformer(Transformer):
                 parsed['nobles'] = bitz[0]
                 parsed['base'] = bitz[1]
                 parsed['zone'] = ''
-        return parsed
-
-    def _square_up_parsed_one(self, rawstring, parsed):
-        rawtrim = rawstring.lstrip()
-        rawbitz = rawtrim.split(' ')
-        trimbitz = self._square_up_star_codes(rawbitz)
-        if 3 < len(trimbitz):
-            if trimbitz[0].isdigit():
-                parsed['worlds'] = trimbitz[0]
-                parsed['allegiance'] = trimbitz[1]
-                parsed['residual'] = ' '.join(trimbitz[2:])
-            else:
-                parsed['worlds'] = ' '
-                parsed['allegiance'] = trimbitz[0]
-                parsed['residual'] = ' '.join(trimbitz[1:])
-        elif 3 == len(trimbitz):
-            if trimbitz[0].isdigit():
-                parsed['worlds'] = trimbitz[0]
-                parsed['allegiance'] = trimbitz[1]
-                parsed['residual'] = trimbitz[2]
-            else:
-                parsed['worlds'] = ' '
-                parsed['allegiance'] = trimbitz[0]
-                parsed['residual'] = trimbitz[1] + ' ' + trimbitz[2]
-        elif len(rawtrim) + 3 <= len(rawstring):  # We don't have three matches, need to figure out how they drop in
-            alg = trimbitz[0]
-            rawtrim = rawtrim.replace(alg, '', 1)
-
-            if 2 == len(trimbitz):
-                allegiance = trimbitz[1]
-                rawtrim = rawtrim.replace(allegiance, '', 1)
-                if alg.isdigit() and 5 > len(alg) and 1 < len(allegiance) and (not allegiance[0].islower()):  # if first trimbit fits in worlds field, stick it there
-                    parsed['worlds'] = alg
-                    parsed['allegiance'] = allegiance
-                    parsed['residual'] = rawtrim.strip()
-                else:
-                    parsed['worlds'] = ' '
-                    parsed['allegiance'] = alg
-                    parsed['residual'] = allegiance
-
-            elif 1 == len(alg):  # Allegiance codes can't be single-char, so we actually have a worlds field
-                parsed['worlds'] = alg
-                parsed['allegiance'] = rawtrim.strip()
-            else:
-                parsed['worlds'] = ' '
-                parsed['allegiance'] = alg
-                parsed['residual'] = rawtrim.strip()
-        else:  # Assume worlds field is _not_ blank
-            if ' ' == parsed['worlds'] and 2 == len(trimbitz):  # if worlds field has been _parsed_ as blank, need to move allegiance and residual up one
-                parsed['worlds'] = trimbitz[0]
-                parsed['allegiance'] = trimbitz[1]
-                parsed['residual'] = ''
-
-        if '' == parsed['allegiance'].strip() and '' != parsed['residual']:  # Allegiance _must_ be filled, residual is optional, so switch them back if they're transposed
-            parsed['allegiance'] = parsed['residual']
-            parsed['residual'] = ''
-
         return parsed
 
     def _square_up_star_codes(self, rawbitz):
