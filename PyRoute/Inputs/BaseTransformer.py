@@ -94,12 +94,10 @@ class BaseTransformer(Transformer):
         return args
 
     def position(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
-        return args
+        return self._strip_arg_0_value(args)
 
     def starname(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
-        return args
+        return self._strip_arg_0_value(args)
 
     def trade(self, args) -> list[str]:
         trimmed = []
@@ -109,31 +107,25 @@ class BaseTransformer(Transformer):
         return trimmed
 
     def extensions(self, args) -> list[list]:
-        if 1 == len(args):
-            return args
         return args
 
     def nobles(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
-        if '' == args[0].value:
-            args[0].value = '-'
-        return args
+        return self._nbz_core(args)
 
     def base(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
-        if '' == args[0].value:
-            args[0].value = '-'
-        return args
+        return self._nbz_core(args)
 
     def zone(self, args) -> list[list]:
+        return self._nbz_core(args)
+
+    def _nbz_core(self, args) -> list[list]:
         args[0].value = args[0].value.strip()
         if '' == args[0].value:
             args[0].value = '-'
         return args
 
     def pbg(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
-        return args
+        return self._strip_arg_0_value(args)
 
     def worlds(self, args) -> list[list]:
         raw = args[0].value
@@ -143,13 +135,15 @@ class BaseTransformer(Transformer):
         return args
 
     def allegiance(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
-        return args
+        return self._strip_arg_0_value(args)
 
     def world_alg(self, args) -> list[list]:
         return args
 
     def residual(self, args) -> list[list]:
+        return self._strip_arg_0_value(args)
+
+    def _strip_arg_0_value(self, args) -> list[list]:
         args[0].value = args[0].value.strip()
         return args
 
