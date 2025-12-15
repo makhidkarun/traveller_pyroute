@@ -104,6 +104,7 @@ class testBaseTransformer(baseTest):
         cases = [
             (' [0000]000000000 A000000-0 ', '[0000]000000000', 'A000000-0'),
             (' Foo Bar A000000-0 ', 'Foo Bar', 'A000000-0'),
+            (' Foo  Bar  A000000-0 ', 'Foo Bar', 'A000000-0'),
             (' A B C A000000-0 ', 'A B C', 'A000000-0'),
         ]
 

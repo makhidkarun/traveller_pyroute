@@ -109,7 +109,8 @@ class BaseTransformer(Transformer):
         return args
 
     def starname_transform(self, starname: str) -> tuple[str, str]:
-        bitz = [item for item in starname.split(' ') if 0 < len(item)]
+        bitz = [item for item in starname.split(' ')]  # pragma: no mutate
+        bitz = [item for item in bitz if 0 < len(item)]
         uwp = bitz[-1]
         bitz = bitz[:-1]
         return ' '.join(bitz), uwp
