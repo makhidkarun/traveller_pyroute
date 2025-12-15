@@ -36,26 +36,21 @@ class BaseTransformer(Transformer):
         nobles = args[4].children[0][0]
         base = args[4].children[1][0]
         zone = args[4].children[2][0]
-        # pbg = args[5][0][0]
-        # worlds = args[5][1][0] if 1 < len(args[5]) else Token('__ANON__11', ' ')
-        allegiance = args[5][2][0] if 2 < len(args[5]) else Token('__ANON__12', ' ')
 
         tradelen = sum([len(item) for item in trade]) + len(trade) - 1
         # Square up overspilled trade codes
         if 16 < tradelen and 3 <= len(trade) and 1 == len(extensions) and '' == extensions[0].value.strip() and \
-                '-' == nobles.value and '-' != base.value and '-' == zone.value:
-            move_fwd = 3 == len(base.value) and base.value.isdigit()  # Will base code still make sense as PBG?
-            move_rev = 3 == len(allegiance.value)  # Will allegiance code still make sense as PBG?
-            if move_fwd and not move_rev:
+                '-' == nobles.value and 3 == len(base.value) and '-' == zone.value:
+            move_fwd = base.value.isdigit()  # Will base code still make sense as PBG?
+            if move_fwd:
                 last = trade[-1]
                 mid = trade[-2]
-                zone.value = base.value
-                base.value = last
-                nobles.value = mid
-                trade = trade[:-2]
-            elif (move_rev and not move_fwd) or (move_fwd and move_rev):
-                pass
+                args[4].children[2][0].value = base.value
+                args[4].children[1][0].value = last
+                args[4].children[0][0].value = mid
+                args[2] = trade[:-2]
 
+        args[5] = args[5][:3]
         return args
 
     def position(self, args) -> list[list]:
@@ -149,8 +144,8 @@ class BaseTransformer(Transformer):
         self.crankshaft = '' == tree.children[4].children[0].children[0].value.strip() and '-' == tree.children[4].children[
             1].children[0].value.strip() and '' == tree.children[4].children[2].children[0].value.strip()
         self.crankshaft = self.crankshaft and 1 == self.raw.count(' -') and 1 == self.raw.count('-   ')
-        tree = self._preprocess_trade_and_extensions(tree)
-        tree = self._preprocess_tree_suspect_empty_trade_code(tree)
+        tree = self.preprocess_trade_and_extensions(tree)
+        tree = self.preprocess_tree_suspect_empty_trade_code(tree)
         tree = self._transform_tree(tree)
         parsed: dict[str, Optional[str]] = {'residual': ''}
 
@@ -165,11 +160,10 @@ class BaseTransformer(Transformer):
         if 7 == len(tree):
             parsed['residual'] = tree[6][0].value
 
-        parsed = self._square_up_parsed(parsed)
         self.trim_raw_string(parsed)
-        rawbitz = self._trim_raw_bitz(parsed)
-        parsed = self._square_up_parsed_zero(rawbitz[0], parsed)
-        parsed = self._square_up_allegiance_overflow(parsed)
+        rawbitz = self.trim_raw_bitz(parsed)
+        parsed = self.square_up_parsed_zero(rawbitz[0], parsed)
+        parsed = self.square_up_allegiance_overflow(parsed)
 
         no_extensions = parsed['ix'] is None and parsed['ex'] is None and parsed['cx'] is None
         ex_ix = parsed['ix'] if parsed['ix'] is not None else ' '
@@ -189,7 +183,7 @@ class BaseTransformer(Transformer):
 
         return data
 
-    def _preprocess_trade_and_extensions(self, tree):
+    def preprocess_trade_and_extensions(self, tree) -> Tree:
         trade = tree.children[2]
         extensions = tree.children[3]
         ix_reg = r'\{ *[+-]?[0-6] ?\}$'
@@ -234,13 +228,13 @@ class BaseTransformer(Transformer):
         noble = "BCcDEeFfGH"
         return all(char in noble for char in noble_string)
 
-    def _is_zone(self, zone_string):
+    def is_zone(self, zone_string) -> bool:
         if 1 != len(zone_string):
             return False
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
         return zone_string[0] in ParseStarInput.valid_zone
 
-    def _preprocess_tree_suspect_empty_trade_code(self, tree):
+    def preprocess_tree_suspect_empty_trade_code(self, tree) -> Tree:
         if 1 != len(tree.children[2].children):
             return tree
         if 1 != len(tree.children[3].children):
@@ -252,7 +246,7 @@ class BaseTransformer(Transformer):
         all_noble = self._is_noble(tree.children[2].children[0])
         if not all_noble:
             return tree
-        if self._is_zone(tree.children[4].children[2].children[0].value.strip()):
+        if self.is_zone(tree.children[4].children[2].children[0].value.strip()):
             return tree
         tree.children[4].children[2].children[0].value = tree.children[4].children[1].children[0].value
         tree.children[4].children[1].children[0].value = tree.children[4].children[0].children[0].value
@@ -308,47 +302,42 @@ class BaseTransformer(Transformer):
             i += 1
         return overrun
 
-    def _square_up_parsed(self, parsed):
-        if ' ' != parsed['nobles'] and 0 < len(parsed['nobles']) and '' == parsed['base'] and '' == parsed['zone'] and \
-                3 == len(parsed['allegiance']) and parsed['allegiance'][0].isdigit():
-            parsed['base'] = parsed['pbg']
-            parsed['zone'] = parsed['worlds']
-            parsed['pbg'] = parsed['allegiance']
-            parsed['worlds'] = ' '
-            parsed['allegiance'] = parsed['residual']
-            parsed['residual'] = ''
-
-        return parsed
-
     def trim_raw_string(self, tree) -> None:
         assert self.raw is not None, "Raw string not supplied before trimming"
-        strip_list = ['position', 'name', 'uwp', 'trade', 'ix', 'ex', 'cx']
+        strip_list = ['position', 'name', 'uwp', 'trade', 'ix', 'ex', 'cx']  # pragma: no mutate
 
         for dataval in strip_list:
             if dataval not in tree:
                 continue
             rawval = tree[dataval]
             if rawval is not None:
+                counter = 0
                 if rawval.startswith('{ '):
-                    oldlen = 0
-                    while oldlen != len(self.raw):
-                        oldlen = len(self.raw)
+                    while counter < 4:
+                        oldlen = len(self.raw)  # pragma: no mutate
                         self.raw = self.raw.replace('{  ', '{ ')
+                        self.raw = self.raw.replace('  }', ' }')
+                        if oldlen == len(self.raw):
+                            break
+                        counter += 1
 
                 index = self.raw.find(rawval)
                 self.raw = self.raw.replace(rawval, '', 1)
-                if 0 < index:
+                if -1 != index:
                     self.raw = self.raw[index:]
+                    continue
+                elif 'trade' != dataval:
+                    continue
                 # special-case trade-code removal
-                if 'trade' == dataval and -1 == index:
+                else:
                     bitz = rawval.split()
                     for valbit in bitz:
                         index = self.raw.find(valbit)
                         self.raw = self.raw.replace(valbit, '', 1)
-                        if 0 < index:
+                        if -1 != index:
                             self.raw = self.raw[index:]
 
-    def _square_up_parsed_zero(self, rawstring, parsed):
+    def square_up_parsed_zero(self, rawstring, parsed) -> dict:
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
         bitz = [item for item in rawstring.split(' ') if '' != item]
         if 3 == len(bitz) and bitz[0] == parsed['nobles'] and bitz[1] == parsed['base'] and bitz[2] == parsed['zone']:
@@ -417,10 +406,8 @@ class BaseTransformer(Transformer):
 
         return trimbitz
 
-    def _square_up_allegiance_overflow(self, parsed):
+    def square_up_allegiance_overflow(self, parsed) -> dict:
         alleg = parsed['allegiance']
-        if '----' == alleg or '--' == alleg:
-            return parsed
 
         if alleg.startswith('----') and 4 <= len(alleg):
             parsed['allegiance'] = '----'
@@ -431,14 +418,14 @@ class BaseTransformer(Transformer):
         else:
             counter = 0
             while counter < len(alleg) and (alleg[counter].isalnum() or '-' == alleg[counter] or '?' == alleg[counter]) and 4 > counter:
-                counter += 1
+                counter += 1  # pragma: no mutate
             if counter < len(alleg):
                 spacer = ' ' if parsed['residual'] != '' else ''
                 parsed['allegiance'] = alleg[:counter]
                 parsed['residual'] = alleg[counter:] + spacer + parsed['residual']
         return parsed
 
-    def _trim_raw_bitz(self, parsed):
+    def trim_raw_bitz(self, parsed) -> str:
         pbg = ' ' + parsed['pbg'] + ' '
         rawbitz = self.raw.split(pbg)
         oldlen = len(rawbitz)

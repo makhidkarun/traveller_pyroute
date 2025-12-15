@@ -262,3 +262,369 @@ class testBaseTransformer(baseTest):
         args = transformer.extensions(args)
         self.assertEqual('1 ', args[0].value)
         self.assertEqual('2 ', args[1].value)
+
+    def test_starline_1(self) -> None:
+        args = [[Token('__ANON_0', '0101')], [Token('__ANON_1', 'Foobar              A000000-0')],
+                ['Ba', 'Lo', 'Ni', 'Po', 'De', 'He', 'Va', 'As'], [Token('__ANON_2', '     ')],
+                Tree(Token('RULE', 'nbz'), [[Token('__ANON_6', '-')], [Token('__ANON_7', '100')], [Token('__ANON_8', '-')]]),
+                [[Token('__ANON_9', '123')], [Token('__ANON_11', '8')], [Token('__ANON_12', 'ImDd')], [Token('__ANON_13', '///')]],
+                [Token('__ANON_10', 'ab')]]
+
+        line = ''
+        transformer = StarlineTransformer(raw=line)
+
+        exp_args = [[Token('__ANON_0', '0101')], [Token('__ANON_1', 'Foobar              A000000-0')],
+                    ['Ba', 'Lo', 'Ni', 'Po', 'De', 'He'], [Token('__ANON_2', '     ')],
+                    Tree(Token('RULE', 'nbz'), [[Token('__ANON_6', 'Va')], [Token('__ANON_7', 'As')], [Token('__ANON_8', '100')]]),
+                    [[Token('__ANON_9', '123')], [Token('__ANON_11', '8')], [Token('__ANON_12', 'ImDd')]],
+                    [Token('__ANON_10', 'ab')]
+                    ]
+        act_args = transformer.starline(args)
+        self.assertEqual(str(exp_args), str(act_args))
+
+    def test_starline_2(self) -> None:
+        args = [[Token('__ANON_0', '0101')], [Token('__ANON_1', 'Foobar              A000000-0')],
+                ['Ba', 'Lo', 'Ni', 'Po', 'De', 'He', 'Va', 'As'], [Token('__ANON_2', '     ')],
+                Tree(Token('RULE', 'nbz'), [[Token('__ANON_6', '-')], [Token('__ANON_7', '100')], [Token('__ANON_8', '-')]]),
+                [[Token('__ANON_9', '123')], [Token('__ANON_11', '8')], [Token('__ANON_12', 'ImDd')]],
+                [Token('__ANON_10', 'ab')]]
+
+        line = ''
+        transformer = StarlineTransformer(raw=line)
+
+        exp_args = [[Token('__ANON_0', '0101')], [Token('__ANON_1', 'Foobar              A000000-0')],
+                    ['Ba', 'Lo', 'Ni', 'Po', 'De', 'He'], [Token('__ANON_2', '     ')],
+                    Tree(Token('RULE', 'nbz'), [[Token('__ANON_6', 'Va')], [Token('__ANON_7', 'As')], [Token('__ANON_8', '100')]]),
+                    [[Token('__ANON_9', '123')], [Token('__ANON_11', '8')], [Token('__ANON_12', 'ImDd')]],
+                    [Token('__ANON_10', 'ab')]
+                    ]
+        act_args = transformer.starline(args)
+        self.assertEqual(str(exp_args), str(act_args))
+
+    def test_starline_3(self) -> None:
+        args = [[Token('__ANON_0', '0101')], [Token('__ANON_1', 'Foobar              A000000-0')],
+                ['(Darr)', '(Azha)', 'Va'], [Token('__ANON_2', '     ')],
+                Tree(Token('RULE', 'nbz'), [[Token('__ANON_6', '-')], [Token('__ANON_7', '100')], [Token('__ANON_8', '-')]]),
+                [[Token('__ANON_9', '123')], [Token('__ANON_11', '8')], [Token('__ANON_12', 'ImDd')]],
+                [Token('__ANON_10', 'ab')]]
+
+        line = ''
+        transformer = StarlineTransformer(raw=line)
+
+        exp_args = [[Token('__ANON_0', '0101')], [Token('__ANON_1', 'Foobar              A000000-0')],
+                    ['(Darr)', '(Azha)', 'Va'], [Token('__ANON_2', '     ')],
+                    Tree(Token('RULE', 'nbz'), [[Token('__ANON_6', '-')], [Token('__ANON_7', '100')], [Token('__ANON_8', '-')]]),
+                    [[Token('__ANON_9', '123')], [Token('__ANON_11', '8')], [Token('__ANON_12', 'ImDd')]],
+                    [Token('__ANON_10', 'ab')]
+                    ]
+        act_args = transformer.starline(args)
+        self.assertEqual(str(exp_args), str(act_args))
+
+    def test_starline_4(self) -> None:
+        args = [[Token('__ANON_0', '0101')], [Token('__ANON_1', 'Foobar              A000000-0')],
+                ['(Darrian)', '(Azhanti)', 'Va'], [Token('__ANON_2', '     ')],
+                Tree(Token('RULE', 'nbz'), [[Token('__ANON_6', '-')], [Token('__ANON_7', '100')], [Token('__ANON_8', '-')]]),
+                [[Token('__ANON_9', '123')], [Token('__ANON_11', '8')], [Token('__ANON_12', 'ImDd')]],
+                [Token('__ANON_10', 'ab')]]
+
+        line = ''
+        transformer = StarlineTransformer(raw=line)
+
+        exp_args = [[Token('__ANON_0', '0101')], [Token('__ANON_1', 'Foobar              A000000-0')],
+                    ['(Darrian)'], [Token('__ANON_2', '     ')],
+                    Tree(Token('RULE', 'nbz'), [[Token('__ANON_6', '(Azhanti)')], [Token('__ANON_7', 'Va')], [Token('__ANON_8', '100')]]),
+                    [[Token('__ANON_9', '123')], [Token('__ANON_11', '8')], [Token('__ANON_12', 'ImDd')]],
+                    [Token('__ANON_10', 'ab')]
+                    ]
+        act_args = transformer.starline(args)
+        self.assertEqual(str(exp_args), str(act_args))
+
+    def test_starline_5(self) -> None:
+        args = [[Token('__ANON_0', '0101')], [Token('__ANON_1', 'Foobar              A000000-0')],
+                ['(Darri)', '(Azha)', 'Va'], [Token('__ANON_2', '     ')],
+                Tree(Token('RULE', 'nbz'), [[Token('__ANON_6', '-')], [Token('__ANON_7', '100')], [Token('__ANON_8', '-')]]),
+                [[Token('__ANON_9', '123')], [Token('__ANON_11', '8')], [Token('__ANON_12', 'ImDd')]],
+                [Token('__ANON_10', 'ab')]]
+
+        line = ''
+        transformer = StarlineTransformer(raw=line)
+
+        exp_args = [[Token('__ANON_0', '0101')], [Token('__ANON_1', 'Foobar              A000000-0')],
+                    ['(Darri)'], [Token('__ANON_2', '     ')],
+                    Tree(Token('RULE', 'nbz'), [[Token('__ANON_6', '(Azha)')], [Token('__ANON_7', 'Va')], [Token('__ANON_8', '100')]]),
+                    [[Token('__ANON_9', '123')], [Token('__ANON_11', '8')], [Token('__ANON_12', 'ImDd')]],
+                    [Token('__ANON_10', 'ab')]
+                    ]
+        act_args = transformer.starline(args)
+        self.assertEqual(str(exp_args), str(act_args))
+
+    def test_trim_raw_string_1(self) -> None:
+        transformer = StarlineTransformer(raw='')
+        transformer.raw = None
+        msg = None
+
+        try:
+            transformer.trim_raw_string({})
+        except AssertionError as e:
+            msg = str(e)
+        self.assertEqual('Raw string not supplied before trimming', msg)
+
+    def test_trim_raw_string_2(self) -> None:
+        cases = [
+            (
+                '2926                      B8B2613-C He Fl Ni HakW Pz             {  1 } (735+3) [458B] - M A 514 16 HvFd G4 V M1 V     ',
+                {'residual': 'G4 V M1 V', 'position': '2926', 'name': '', 'uwp': 'B8B2613-C',
+                 'trade': 'He Fl Ni HakW Pz', 'ix': '{ 1 }', 'ex': '(735+3)', 'cx': '[458B]', 'nobles': '-',
+                 'base': 'M', 'zone': 'A', 'pbg': '514', 'worlds': '16', 'allegiance': 'HvFd'},
+                ' - M A 514 16 HvFd G4 V M1 V     '
+            ),
+            (
+                '2926                      B8B2613-C He Fl Ni HakW Pz             {     1  } (735+3) [458B] - M A 514 16 HvFd G4 V M1 V     ',
+                {'ix': '{ 1 }'},
+                ' (735+3) [458B] - M A 514 16 HvFd G4 V M1 V     '
+            ),
+            (
+                '2926                      B8B2613-C He Fl Ni HakW Pz             {      1  } (735+3) [458B] - M A 514 16 HvFd G4 V M1 V     ',
+                {'ix': '{ 1 }'},
+                '2926                      B8B2613-C He Fl Ni HakW Pz             {  1 } (735+3) [458B] - M A 514 16 HvFd G4 V M1 V     '
+            ),
+            (
+                ' 2926                      B8B2613-C He Fl Ni HakW Pz             {  1  } (735+3) [458B] - M A 514 16 HvFd G4 V M1 V     ',
+                {'position': '2926'},
+                '                      B8B2613-C He Fl Ni HakW Pz             {  1  } (735+3) [458B] - M A 514 16 HvFd G4 V M1 V     '
+            ),
+            (
+                '2926                      B8B2613-C He  Fl            {  1  } (735+3) [458B] - M A 514 16 HeFd G4 V M1 V     ',
+                {'uwp': 'X000000-0', 'trade': 'He Fl Ga'},
+                '            {  1  } (735+3) [458B] - M A 514 16 HeFd G4 V M1 V     '
+            ),
+            (
+                '2926                      B8B2613-C He Fl Ni HakW Pz             {  1 } (735+3) [458B] - M A 514 16 HvFd G4 V M1 V     ',
+                {'name': 'Fnordia'},
+                '2926                      B8B2613-C He Fl Ni HakW Pz             {  1 } (735+3) [458B] - M A 514 16 HvFd G4 V M1 V     ',
+            )
+        ]
+
+        for raw, tree, exp_raw in cases:
+            with self.subTest(raw):
+                transformer = StarlineTransformer(raw=raw)
+                transformer.trim_raw_string(tree)
+                self.assertEqual(exp_raw, transformer.raw)
+
+    def test_is_zone(self) -> None:
+        cases = [
+            ('AR', False),
+            ('A', True),
+            ('Y', False),
+        ]
+
+        for zone_string, expected in cases:
+            transformer = StarlineTransformer(raw='')
+            actual = transformer.is_zone(zone_string)
+            self.assertEqual(expected, actual)
+
+    def test_trim_raw_bitz(self) -> None:
+        cases = [
+            (
+                {'residual': 'M1 V M8 V', 'position': '1309', 'name': 'Selkirk', 'uwp': 'B553420-B', 'trade': 'Ni Po',
+                 'ix': '{ 1 }', 'ex': '(A34-3)', 'cx': '[1516]', 'nobles': 'B', 'base': '-', 'zone': '-', 'pbg': '904',
+                 'worlds': '12', 'allegiance': 'ImDi'},
+                ' B     - - 904 12 ImDi M1 V M8 V                                                    ',
+                [' B     - - ',
+                 ' 12 ImDi M1 V M8 V                                                    ']
+            ),
+            (
+                {'residual': '', 'position': '0140', 'name': ']00111111111111', 'uwp': '???????-?', 'trade': '',
+                 'ix': None, 'ex': None, 'cx': None, 'nobles': '-', 'base': '-', 'zone': '-', 'pbg': '010',
+                 'worlds': '0', 'allegiance': '010'},
+                '                                                             -    - - 010 0 010                                                          ',
+                ['                                                             -    - - ',
+                 ' 0 010                                                          '],
+            )
+        ]
+
+        for parsed, raw, expected in cases:
+            with self.subTest():
+                transformer = StarlineTransformer(raw=raw)
+                actual = transformer.trim_raw_bitz(parsed)
+                self.assertEqual(expected, actual)
+
+    def test_square_up_parsed_zero(self) -> None:
+        cases = [
+            (
+                {'residual': 'G9 V', 'position': '2531', 'name': 'Khese', 'uwp': 'C795448-7', 'trade': 'Ni Pa',
+                 'ix': None, 'ex': None, 'cx': None, 'nobles': '-', 'base': '-', 'zone': '-', 'pbg': '803',
+                 'worlds': '0', 'allegiance': 'Va'},
+                '                               - - - ',
+                {'residual': 'G9 V', 'position': '2531', 'name': 'Khese', 'uwp': 'C795448-7', 'trade': 'Ni Pa',
+                 'ix': None, 'ex': None, 'cx': None, 'nobles': '-', 'base': '-', 'zone': '-', 'pbg': '803',
+                 'worlds': '0', 'allegiance': 'Va'}
+            ),
+            (
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '000000000000000', 'ix': None, 'ex': None, 'cx': None, 'nobles': '-', 'base': '-',
+                 'zone': '-', 'pbg': '001', 'worlds': '0', 'allegiance': '000'},
+                '         -   ',
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '000000000000000', 'ix': None, 'ex': None, 'cx': None, 'nobles': '-', 'base': '-',
+                 'zone': '-', 'pbg': '001', 'worlds': '0', 'allegiance': '000'}
+            ),
+            (
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': '', 'base': '-',
+                 'zone': 'a', 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '   - a   ',
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': '', 'base': '-',
+                 'zone': 'a', 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '00000000000+ 0', 'ix': None, 'ex': None, 'cx': None, 'nobles': '', 'base': '-', 'zone': 'a',
+                 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '         - a ',
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '00000000000+ 0', 'ix': None, 'ex': None, 'cx': None, 'nobles': '', 'base': '-', 'zone': 'a',
+                 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '000000000000000', 'ix': None, 'ex': None, 'cx': None, 'nobles': 'c', 'base': '-', 'zone': '',
+                 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '       c -   ',
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '000000000000000', 'ix': None, 'ex': None, 'cx': None, 'nobles': 'c', 'base': '-', 'zone': '',
+                 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': '', 'position': '0940', 'name': 'ouV)anTg*V0QDeNL', 'uwp': '???????-?',
+                 'trade': ']naJy2GDuB{hq8qG', 'ix': '-', 'ex': '-', 'cx': '[ouJB]', 'nobles': '-', 'base': 'XFX',
+                 'zone': '', 'pbg': 'X01', 'worlds': '0', 'allegiance': '11'},
+                '  - XFX      ',
+                {'residual': '', 'position': '0940', 'name': 'ouV)anTg*V0QDeNL', 'uwp': '???????-?',
+                 'trade': ']naJy2GDuB{hq8qG', 'ix': '-', 'ex': '-', 'cx': '[ouJB]', 'nobles': '-', 'base': 'XFX',
+                 'zone': '', 'pbg': 'X01', 'worlds': '0', 'allegiance': '11'}
+            ),
+            (
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'BB',
+                 'base': 'A', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '  BB A       A      ',
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'BB',
+                 'base': 'A', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            )
+        ]
+
+        for parsed, raw, expected in cases:
+            with self.subTest():
+                transformer = StarlineTransformer(raw='')
+                actual = transformer.square_up_parsed_zero(raw, parsed)
+                self.assertEqual(expected, actual)
+
+    def test_square_up_allegiance_overflow(self) -> None:
+        cases = [
+            ({'allegiance': '----', 'residual': 'Foo'}, {'allegiance': '----', 'residual': 'Foo'}),
+            ({'allegiance': '--', 'residual': ''}, {'allegiance': '--', 'residual': ''}),
+            ({'allegiance': '----G2V', 'residual': ''}, {'allegiance': '----', 'residual': 'G2V'}),
+            ({'allegiance': '--G2V', 'residual': ''}, {'allegiance': '--', 'residual': 'G2V '}),
+            ({'allegiance': '--G2', 'residual': ''}, {'allegiance': '--', 'residual': 'G2 '}),
+            ({'allegiance': 'ImDd', 'residual': ''}, {'allegiance': 'ImDd', 'residual': ''}),
+            ({'allegiance': '?-Z', 'residual': ''}, {'allegiance': '?-Z', 'residual': ''}),
+            ({'allegiance': '?-!', 'residual': ''}, {'allegiance': '?-', 'residual': '!'}),
+            ({'allegiance': '?-!', 'residual': 'Foo'}, {'allegiance': '?-', 'residual': '! Foo'}),
+            ({'allegiance': '/?-!', 'residual': 'Foo'}, {'allegiance': '', 'residual': '/?-! Foo'}),
+            ({'allegiance': 'Abcde', 'residual': 'Foo'}, {'allegiance': 'Abcd', 'residual': 'e Foo'}),
+        ]
+        for parsed, expected in cases:
+            with self.subTest():
+                transformer = StarlineTransformer(raw='')
+                actual = transformer.square_up_allegiance_overflow(parsed)
+                self.assertEqual(expected, actual)
+
+    def test_preprocess_trade_and_extensions(self) -> None:
+        cases = [
+            (
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', 'As'), Token('TRADECODE', 'Ba')]),
+                                                 Tree(Token('RULE', 'extensions'),
+                                                      [Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ 0 }')]),
+                                                       Tree(Token('RULE', 'ex'), [Token('__ANON_4', '(000+0)')]),
+                                                       Tree(Token('RULE', 'cx'), [Token('__ANON_5', '[0001]')])])]),
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', 'As'), Token('TRADECODE', 'Ba')]),
+                                                 Tree(Token('RULE', 'extensions'),
+                                                      [Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ 0 }')]),
+                                                       Tree(Token('RULE', 'ex'), [Token('__ANON_4', '(000+0)')]),
+                                                       Tree(Token('RULE', 'cx'), [Token('__ANON_5', '[0001]')])])])
+            ),
+            (
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '2340')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 6220]95I3k8??dHT CaA90aC-W ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', '6220]95I3k8??dHT'), Token('ix', '{0}'),
+                                                       Token('ex', '(000-0)'), Token('TRADECODE', '[00G0]'),
+                                                       Token('TRADECODE', 'BBB')]),
+                                                 Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     ')])]),
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '2340')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 6220]95I3k8??dHT CaA90aC-W ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', '6220]95I3k8??dHT'), ]),
+                                                 Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     '),
+                                                                                    Token('ix', '{0}'),
+                                                                                    Token('ex', '(000-0)'),
+                                                                                    Token('cx', '[00G0]'),
+                                                                                    Token('TRADECODE', 'BBB')])]),
+            )
+        ]
+        for tree, expected in cases:
+            with self.subTest(str(tree)):
+                transformer = StarlineTransformer(raw='')
+                actual = transformer.preprocess_trade_and_extensions(tree)
+                self.assertEqual(str(expected.children[3]), str(actual.children[3]))
+                self.assertEqual(expected, actual)
+
+    def test_preprocess_tree_suspect_empty_trade_code(self) -> None:
+        cases = [
+            (
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', 'As'), Token('TRADECODE', 'Ba')]),
+                                                 Tree(Token('RULE', 'extensions'),
+                                                      [Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ 0 }')]),
+                                                       Tree(Token('RULE', 'ex'), [Token('__ANON_4', '(000+0)')]),
+                                                       Tree(Token('RULE', 'cx'), [Token('__ANON_5', '[0001]')])]),
+                                                 Tree(Token('RULE', 'nbz'),
+                                                      [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                       Tree(Token('RULE', 'base'), [Token('__ANON_7', '- ')]),
+                                                       Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'A ')])])]),
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', 'As'), Token('TRADECODE', 'Ba')]),
+                                                 Tree(Token('RULE', 'extensions'),
+                                                      [Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ 0 }')]),
+                                                       Tree(Token('RULE', 'ex'), [Token('__ANON_4', '(000+0)')]),
+                                                       Tree(Token('RULE', 'cx'), [Token('__ANON_5', '[0001]')])]),
+                                                 Tree(Token('RULE', 'nbz'),
+                                                      [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                       Tree(Token('RULE', 'base'), [Token('__ANON_7', '- ')]),
+                                                       Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'A ')])])]),
+            ),
+        ]
+        for tree, expected in cases:
+            with self.subTest(str(tree)):
+                transformer = StarlineTransformer(raw='')
+                actual = transformer.preprocess_tree_suspect_empty_trade_code(tree)
+                self.assertEqual(expected, actual)
