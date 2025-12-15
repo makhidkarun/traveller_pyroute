@@ -79,7 +79,8 @@ class BaseTransformer(Transformer):
         return self._nbz_core(args)
 
     def _nbz_core(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
+        if args[0].value is not None:
+            args[0].value = args[0].value.strip()
         if '' == args[0].value:
             args[0].value = '-'
         return args
@@ -395,23 +396,6 @@ class BaseTransformer(Transformer):
                 parsed['base'] = bitz[1]
                 parsed['zone'] = ''
         return parsed
-
-    def _square_up_star_codes(self, rawbitz):
-        foobitz = [item for item in rawbitz if '' != item]
-        trimbitz = []
-        num_bitz = len(foobitz)
-        for i in range(0, num_bitz):
-            item = foobitz[i]
-            if '' == item:
-                continue
-            if 0 < i < num_bitz - 1:
-                next_item = foobitz[i + 1]
-                if next_item in self.star_classes:
-                    item += ' ' + next_item
-                    foobitz[i + 1] = ''
-            trimbitz.append(item)
-
-        return trimbitz
 
     def square_up_allegiance_overflow(self, parsed) -> dict:
         alleg = parsed['allegiance']

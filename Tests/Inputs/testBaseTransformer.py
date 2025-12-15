@@ -168,14 +168,14 @@ class testBaseTransformer(baseTest):
                                                  Tree(Token('RULE', 'nbz'),
                                                       [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
                                                        Tree(Token('RULE', 'base'), [Token('__ANON_7', '-')]),
-                                                       Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'a')])]),
+                                                       Tree(Token('RULE', 'zone'), [Token('__ANON_8', None)])]),
                                                  Tree(Token('RULE', 'world_alg'),
                                                       [Tree(Token('RULE', 'pbg'), [Token('__ANON_9', '000')]),
                                                        Tree(Token('RULE', 'worlds'), [Token('__ANON_11', '0')]),
                                                        Tree(Token('RULE', 'allegiance'),
                                                             [Token('__ANON_12', '00')])])]),
                 ['0101', '000000000000000', '???????-?', '000000000000000', ' (000-0) [0000]', None, '(000-0)',
-                 '[0000]', None, None, None, '-', '-', 'A', '000', '0', '00', '']
+                 '[0000]', None, None, None, '-', '-', '', '000', '0', '00', '']
             ),
             (
                 Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
