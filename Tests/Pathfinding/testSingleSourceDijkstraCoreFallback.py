@@ -39,8 +39,8 @@ class testSingleSourceDijkstraCoreFallback(baseTest):
         max_labels = np.ones((graph_len), dtype=float) * float('+inf')
         min_cost = dist_graph.min_cost(0, True)
 
-        nu_labels, nu_parents, nu_max = dijkstra_core(dist_graph._arcs, dist_labels, float(1.0 / 1.1),
-                                        [source], max_labels, min_cost)
+        nu_labels, nu_parents, nu_max, nu_diagnostics = dijkstra_core(dist_graph._arcs, dist_labels, float(1.0 / 1.1),
+                                                        [source], max_labels, min_cost)
         exp_labels = [0.0, 158.18181818181816, 199.99999999999997, 222.7272727272727, 241.81818181818178,
                       49.090909090909086, 114.54545454545453, 241.81818181818178, 67.27272727272727, 108.18181818181817,
                       132.72727272727272, 150.0, 216.36363636363637, 241.8181818181818, 90.9090909090909,
@@ -62,6 +62,9 @@ class testSingleSourceDijkstraCoreFallback(baseTest):
                    float('+inf'), float('+inf'), float('+inf'), float('+inf'), float('+inf'), float('+inf'),
                    float('+inf'), float('+inf')]
         self.assertEqual(exp_max, list(nu_max))
+        exp_diagnostics = {'nodes_exceeded': 3, 'nodes_min_exceeded': 0, 'nodes_processed': 37, 'nodes_queued': 75,
+                           'nodes_tailed': 18}
+        self.assertEqual(exp_diagnostics, nu_diagnostics)
 
     def test_dijkstra_core_2(self) -> None:
         msg = None
@@ -140,7 +143,7 @@ class testSingleSourceDijkstraCoreFallback(baseTest):
         max_labels = np.ones((graph_len), dtype=float) * float('+inf')
         min_cost = dist_graph.min_cost(0, True)
 
-        _, nu_parents, _ = dijkstra_core(dist_graph._arcs, dist_labels, 1.0, [source], max_labels, min_cost)
+        _, nu_parents, _, _ = dijkstra_core(dist_graph._arcs, dist_labels, 1.0, [source], max_labels, min_cost)
         exp_parents = [-1, -100, -100, -100, -100, 0, 9, -100, 5, 15, 15, 10, -100, -100, 8, 21, 15, 11, 17, 14, 14, 20,
                        17, -100, 25, 22, 22, -100, -100, 26, -100, -100, -100, -100, -100, -100, -100]
         self.assertEqual(exp_parents, list(nu_parents))

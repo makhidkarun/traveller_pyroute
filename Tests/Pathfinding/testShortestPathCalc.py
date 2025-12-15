@@ -40,7 +40,7 @@ class testShortestPathCalc(baseTest):
         expected_distances[19] = 175
         distance_labels = np.ones(len(graph)) * float('+inf')
         distance_labels[source] = 0.0
-        actual_distances, _ = implicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
+        actual_distances, _, _ = implicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
 
         self.assertEqual(list(expected_distances.values()), list(actual_distances), "Unexpected distances after SPT creation")
 
@@ -104,7 +104,7 @@ class testShortestPathCalc(baseTest):
         expected_parents[34] = 24
         expected_parents[35] = 24
         expected_parents[36] = 24
-        actual_distances, actual_parents, _ = explicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
+        actual_distances, actual_parents, _, _ = explicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
 
         self.assertEqual(list(expected_distances.values()), list(actual_distances), "Unexpected distances after SPT creation")
         self.assertEqual(list(expected_parents), list(actual_parents), "Unexpected parent relations")
@@ -203,7 +203,7 @@ class testShortestPathCalc(baseTest):
         dist_labels = np.array([100, 100, 100, 100])
 
         with patch('PyRoute.Pathfinding.single_source_dijkstra.explicit_shortest_path_dijkstra_distance_graph',
-                   return_value=(None, None, None)) as mock_object:
+                   return_value=(None, None, None, None)) as mock_object:
             implicit_shortest_path_dijkstra_distance_graph(distgraph, source, dist_labels, min_cost=min_cost, max_labels=max_labels)
             mock_object.assert_called()
             self.assertIsInstance(mock_object.call_args[1]['min_cost'], np.ndarray)

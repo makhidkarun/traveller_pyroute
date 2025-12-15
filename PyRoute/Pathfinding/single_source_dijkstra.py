@@ -24,12 +24,12 @@ except AttributeError:
 
 def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1.0, min_cost=None, max_labels=None) -> tuple:
     # return only distance_labels from the explicit version
-    distance_labels, _, max_neighbour_labels = explicit_shortest_path_dijkstra_distance_graph(graph, source,
+    distance_labels, _, max_neighbour_labels, diagnostics = explicit_shortest_path_dijkstra_distance_graph(graph, source,
                                                                                               distance_labels, seeds,
                                                                                               divisor,
                                                                                               min_cost=min_cost,
                                                                                               max_labels=max_labels)
-    return distance_labels, max_neighbour_labels
+    return distance_labels, max_neighbour_labels, diagnostics
 
 
 def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1.0, min_cost=None, max_labels=None) -> tuple:

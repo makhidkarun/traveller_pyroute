@@ -23,8 +23,8 @@ class testLandmarkAvoidHelper(baseTest):
 
         distance_labels = np.ones(len(graph)) * float('+inf')
         distance_labels[source] = 0
-        actual_distances, actual_parents, _ = explicit_shortest_path_dijkstra_distance_graph(distgraph, source,
-                                                                                      distance_labels)
+        actual_distances, actual_parents, _, _ = explicit_shortest_path_dijkstra_distance_graph(distgraph, source,
+                                                                                                distance_labels)
         lobound = np.zeros(num_stars, dtype=float)
         expected_weights = actual_distances
         actual_weights = LandmarkAvoidHelper.calc_weights(actual_distances, lobound)

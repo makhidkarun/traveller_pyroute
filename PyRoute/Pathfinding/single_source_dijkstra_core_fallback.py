@@ -85,4 +85,4 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
             for index in range(num_nodes):
                 heapq.heappush(heap, (active_weights[index], active_nodes[index]))
 
-    return distance_labels, parents, max_neighbour_labels
+    return distance_labels, parents, max_neighbour_labels, diagnostics

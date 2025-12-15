@@ -100,4 +100,4 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
         # update max label _after_ neighbours are processed, to minimise the max_label as far as possible
         max_neighbour_labels_view[tail] = max(distance_labels[neighbours[0]])
 
-    return distance_labels, parents, max_neighbour_labels
+    return distance_labels, parents, max_neighbour_labels, diagnostics
