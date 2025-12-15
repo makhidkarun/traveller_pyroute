@@ -1138,3 +1138,46 @@ class testBaseTransformer(baseTest):
                     self.assertEqual(expected.children[i], actual.children[i], "Child " + str(i) + " not equal")
                     i += 1
                 self.assertEqual(expected, actual)
+
+    def test_preprocess_trade_and_extensions_single_extension_1(self) -> None:
+        self.maxDiff = None
+        transformer = StarlineTransformer(raw='')
+        tree = Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                                Tree(Token('RULE', 'starname'),
+                                                     [Token('__ANON_1', ' 000000000000000 A000000-0 ')]),
+                                                Tree(Token('RULE', 'trade'), [Token('TRADECODE',
+                                                                                    '[00000000000000 - -  [0000] aa')]),
+                                                Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     ')]),
+                                                Tree(Token('RULE', 'nbz'), [Tree(Token('RULE', 'nobles'),
+                                                                                 [Token('__ANON_6', 'B')]),
+                                                                            Tree(Token('RULE', 'base'),
+                                                                                 [Token('__ANON_7', 'A ')]),
+                                                                            Tree(Token('RULE', 'zone'),
+                                                                                 [Token('__ANON_8', 'A ')])]),
+                                                Tree(Token('RULE', 'world_alg'), [Tree(Token('RULE', 'pbg'),
+                                                                                       [Token('__ANON_9', '000 ')]),
+                                                                                  Tree(Token('RULE', 'worlds'),
+                                                                                       [Token('__ANON_11', '0 ')]),
+                                                                                  Tree(Token('RULE', 'allegiance'),
+                                                                                       [Token('__ANON_12', '00')])])])
+
+        actual = transformer.preprocess_trade_and_extensions(tree)
+        trade = actual.children[2]
+        exp_trade = Tree(Token('RULE', 'trade'), [Token('TRADECODE', '[00000000000000 - - aa ')])
+        self.assertEqual(exp_trade.children[0].value, trade.children[0].value)
+        extensions = actual.children[3]
+        self.assertEqual(Tree(Token('RULE', 'cx'), [Token('__ANON_3', '[0000]')]), extensions.children[0])
+
+    def test_preprocess_trade_and_extensions_single_extension_2(self) -> None:
+        self.maxDiff = None
+        transformer = StarlineTransformer(raw='')
+        tree = Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                                Tree(Token('RULE', 'starname'),
+                                                     [Token('__ANON_1', ' 000000000000000 A000000-0 ')]),
+                                                Tree(Token('RULE', 'trade'), [Token('TRADECODE',
+                                                                                    '[00000000000000 - -  [AAaa]')]),
+                                                Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     ')])])
+
+        actual = transformer.preprocess_trade_and_extensions(tree)
+        extensions = actual.children[3]
+        self.assertEqual(Tree(Token('RULE', 'cx'), [Token('__ANON_3', '[AAaa]')]), extensions.children[0])
