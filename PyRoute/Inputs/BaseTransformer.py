@@ -26,7 +26,7 @@ class BaseTransformer(Transformer):
 
     def __init__(self, visit_tokens: bool = True, raw=None):
         super().__init__(visit_tokens)
-        self.raw = raw.strip('\n')
+        self.raw = raw.strip('\n')  # pragma: no mutate
         self.crankshaft = False
 
     def starline(self, args) -> list[list]:
@@ -202,7 +202,7 @@ class BaseTransformer(Transformer):
 
         # If trade has importance-extension child, we need to fix it
         counter = -1
-        ix_found = False
+        ix_found = False  # pragma: no mutate
         for kid in trade.children:
             counter += 1
             ix_match = re.match(ix_reg, kid.value)
@@ -241,17 +241,24 @@ class BaseTransformer(Transformer):
             return tree
         if 5 < len(tree.children[2].children[0]):
             return tree
-        if 5 != len(tree.children[3].children[0]):
-            return tree
+        try:
+            if 5 != len(tree.children[3].children[0]):
+                return tree
+        except TypeError:
+            if 5 != len(tree.children[3].children[0].children[0]):
+                return tree
         all_noble = self._is_noble(tree.children[2].children[0])
         if not all_noble:
             return tree
         if self.is_zone(tree.children[4].children[2].children[0].value.strip()):
             return tree
-        tree.children[4].children[2].children[0].value = tree.children[4].children[1].children[0].value
-        tree.children[4].children[1].children[0].value = tree.children[4].children[0].children[0].value
-        tree.children[4].children[0].children[0].value = tree.children[2].children[0].value
-        tree.children[2].children[0].value = ""
+        tree.children[4].children[2].children[0] = Token(tree.children[4].children[2].children[0].type,
+                                                         tree.children[4].children[1].children[0].value)
+        tree.children[4].children[1].children[0] = Token(tree.children[4].children[1].children[0].type,
+                                                        tree.children[4].children[0].children[0].value)
+        tree.children[4].children[0].children[0] = Token(tree.children[4].children[0].children[0].type,
+                                                        tree.children[2].children[0].value)
+        tree.children[2].children[0] = Token(tree.children[2].children[0].type, "")
 
         return tree
 
@@ -339,7 +346,7 @@ class BaseTransformer(Transformer):
 
     def square_up_parsed_zero(self, rawstring, parsed) -> dict:
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
-        bitz = [item for item in rawstring.split(' ') if '' != item]
+        bitz = [item for item in rawstring.split() if '' != item]
         if 3 == len(bitz) and bitz[0] == parsed['nobles'] and bitz[1] == parsed['base'] and bitz[2] == parsed['zone']:
             return parsed
         if 2 == len(bitz) and "" == parsed['zone']:
@@ -431,13 +438,11 @@ class BaseTransformer(Transformer):
         oldlen = len(rawbitz)
         if 1 == oldlen:
             rawbitz.append('')
-        if 2 < oldlen:
+        if 2 < oldlen:  # pragma: no mutate
             collide = self._check_raw_collision(parsed)
             first = pbg.join(rawbitz[:-1]) if not collide else pbg.join(rawbitz[:-2])
             second = rawbitz[-1] if not collide else pbg.join(rawbitz[-2:])
-            repack = []
-            repack.append(first)
-            repack.append(second)
+            repack = [first, second]
             rawbitz = repack
         rawbitz[0] += ' '
         rawbitz[1] = ' ' + rawbitz[1]

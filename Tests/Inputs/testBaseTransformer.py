@@ -128,6 +128,12 @@ class testBaseTransformer(baseTest):
         self.assertFalse(transformer.crankshaft)
         self.assertEqual(expected, transformed)
 
+    def test_transform_8(self) -> None:
+        raw = '0101 000000000000000  ?000000-0                 {3 }  (7TG-1) [2IBt]   EHEG -    569 9'
+        original = raw + '\n'
+        transformer = StarlineTransformer(raw=original)
+        self.assertEqual(raw, transformer.raw)
+
     def test_transform_tree(self) -> None:
         cases = [
             (
@@ -558,6 +564,21 @@ class testBaseTransformer(baseTest):
                 '                                                             -    - - 010 0 010                                                          ',
                 ['                                                             -    - - ',
                  ' 0 010                                                          '],
+            ),
+            (
+                {'pbg': '010', 'worlds': '010'},
+                '                                                             -    - - 010 0 010 ',
+                ['                                                             -    - - ', ' 0 010 ']
+            ),
+            (
+                {'pbg': '010', 'worlds': '010'},
+                '                                                             -    - - 010',
+                ['                                                             -    - - 010 ', ' ']
+            ),
+            (
+                {'pbg': '010', 'worlds': '1', 'allegiance': 'NaHu', 'residual': ''},
+                '                                                             -    - - 010 0 010 ',
+                ['                                                             -    - - 010 0 ', ' ']
             )
         ]
 
@@ -576,6 +597,24 @@ class testBaseTransformer(baseTest):
                 '                               - - - ',
                 {'residual': 'G9 V', 'position': '2531', 'name': 'Khese', 'uwp': 'C795448-7', 'trade': 'Ni Pa',
                  'ix': None, 'ex': None, 'cx': None, 'nobles': '-', 'base': '-', 'zone': '-', 'pbg': '803',
+                 'worlds': '0', 'allegiance': 'Va'}
+            ),
+            (
+                {'residual': 'G9 V', 'position': '2531', 'name': 'Khese', 'uwp': 'C795448-7', 'trade': 'Ni Pa',
+                 'ix': None, 'ex': None, 'cx': None, 'nobles': '-', 'base': '-', 'zone': '-', 'pbg': '803',
+                 'worlds': '0', 'allegiance': 'Va'},
+                '                               - N - ',
+                {'residual': 'G9 V', 'position': '2531', 'name': 'Khese', 'uwp': 'C795448-7', 'trade': 'Ni Pa',
+                 'ix': None, 'ex': None, 'cx': None, 'nobles': '-', 'base': 'N', 'zone': '-', 'pbg': '803',
+                 'worlds': '0', 'allegiance': 'Va'}
+            ),
+            (
+                {'residual': 'G9 V', 'position': '2531', 'name': 'Khese', 'uwp': 'C795448-7', 'trade': 'Ni Pa',
+                 'ix': None, 'ex': None, 'cx': None, 'nobles': '-', 'base': 'N', 'zone': 'A', 'pbg': '803',
+                 'worlds': '0', 'allegiance': 'Va'},
+                '                               - N R ',
+                {'residual': 'G9 V', 'position': '2531', 'name': 'Khese', 'uwp': 'C795448-7', 'trade': 'Ni Pa',
+                 'ix': None, 'ex': None, 'cx': None, 'nobles': '-', 'base': 'N', 'zone': 'R', 'pbg': '803',
                  'worlds': '0', 'allegiance': 'Va'}
             ),
             (
@@ -600,9 +639,18 @@ class testBaseTransformer(baseTest):
                 {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
                  'trade': '00000000000+ 0', 'ix': None, 'ex': None, 'cx': None, 'nobles': '', 'base': '-', 'zone': 'a',
                  'pbg': '000', 'worlds': '0', 'allegiance': '00'},
-                '         - a ',
+                '         - j ',
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '00000000000+ 0', 'ix': None, 'ex': None, 'cx': None, 'nobles': '-', 'base': 'j', 'zone': '',
+                 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
                 {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
                  'trade': '00000000000+ 0', 'ix': None, 'ex': None, 'cx': None, 'nobles': '', 'base': '-', 'zone': 'a',
+                 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '         - AR ',
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '00000000000+ 0', 'ix': None, 'ex': None, 'cx': None, 'nobles': '-', 'base': 'AR', 'zone': '',
                  'pbg': '000', 'worlds': '0', 'allegiance': '00'}
             ),
             (
@@ -612,6 +660,33 @@ class testBaseTransformer(baseTest):
                 '       c -   ',
                 {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
                  'trade': '000000000000000', 'ix': None, 'ex': None, 'cx': None, 'nobles': 'c', 'base': '-', 'zone': '',
+                 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '000000000000000', 'ix': None, 'ex': None, 'cx': None, 'nobles': 'c', 'base': '-', 'zone': '',
+                 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '       cs -   ',
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '000000000000000', 'ix': None, 'ex': None, 'cx': None, 'nobles': '', 'base': 'c', 'zone': '-',
+                 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '000000000000000', 'ix': None, 'ex': None, 'cx': None, 'nobles': 'c', 'base': '-', 'zone': '',
+                 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '       cs ar   ',
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '000000000000000', 'ix': None, 'ex': None, 'cx': None, 'nobles': 'c', 'base': '-', 'zone': '',
+                 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '000000000000000', 'ix': None, 'ex': None, 'cx': None, 'nobles': '', 'base': '-', 'zone': '',
+                 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '       S -   ',
+                {'residual': '', 'position': '0101', 'name': '000000000000000', 'uwp': '???????-?',
+                 'trade': '000000000000000', 'ix': None, 'ex': None, 'cx': None, 'nobles': '', 'base': '', 'zone': '-',
                  'pbg': '000', 'worlds': '0', 'allegiance': '00'}
             ),
             (
@@ -631,7 +706,88 @@ class testBaseTransformer(baseTest):
                 {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
                  'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'BB',
                  'base': 'A', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
-            )
+            ),
+            (
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'A',
+                 'base': 'A', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '  C A       A      ',
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'C',
+                 'base': 'A', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'A',
+                 'base': 'A', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '  BCcDE A             ',
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'BCcDE',
+                 'base': 'A', 'zone': '', 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'A',
+                 'base': 'A', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '  BCDEF A             ',
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'BCDEF',
+                 'base': 'A', 'zone': '', 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'A',
+                 'base': 'A', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '  BCDE A             ',
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'BCDE',
+                 'base': 'A', 'zone': '', 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'A',
+                 'base': 'A', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '  BCDE A  ',
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'BCDE',
+                 'base': 'A', 'zone': '', 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'A',
+                 'base': 'A', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '  BCD A             ',
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'BCD',
+                 'base': 'A', 'zone': '', 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'A',
+                 'base': '*', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '  BCD A             ',
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'A',
+                 'base': '*', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'A',
+                 'base': '-', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '  BCD A  ',
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': '',
+                 'base': 'BCD', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
+            (
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'A',
+                 'base': '-', 'zone': 'A', 'pbg': '000', 'worlds': '0', 'allegiance': '00'},
+                '  BCD XXXX  ',
+                {'residual': 'C0', 'position': '1010', 'name': '000000000000000', 'uwp': 'A000000-0',
+                 'trade': 'Ct00000000000000000', 'ix': '{0}', 'ex': '(000-0)', 'cx': '[0000]', 'nobles': 'BCD',
+                 'base': 'XXXX', 'zone': '', 'pbg': '000', 'worlds': '0', 'allegiance': '00'}
+            ),
         ]
 
         for parsed, raw, expected in cases:
@@ -687,21 +843,78 @@ class testBaseTransformer(baseTest):
                                                  Tree(Token('RULE', 'starname'),
                                                       [Token('__ANON_1', ' 6220]95I3k8??dHT CaA90aC-W ')]),
                                                  Tree(Token('RULE', 'trade'),
-                                                      [Token('TRADECODE', '6220]95I3k8??dHT'), Token('ix', '{0}'),
-                                                       Token('ex', '(000-0)'), Token('TRADECODE', '[00G0]'),
+                                                      [Token('TRADECODE', '6220]95I3k8??dHT'), Token('TRADECODE', 'Ga'),
+                                                       Token('TRADECODE', '{0}'), Token('ex', '(000-0)'),
+                                                       Token('TRADECODE', '[00G0]'),
                                                        Token('TRADECODE', 'BBB')]),
                                                  Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     ')])]),
                 Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '2340')]),
                                                  Tree(Token('RULE', 'starname'),
                                                       [Token('__ANON_1', ' 6220]95I3k8??dHT CaA90aC-W ')]),
                                                  Tree(Token('RULE', 'trade'),
-                                                      [Token('TRADECODE', '6220]95I3k8??dHT'), ]),
+                                                      [Token('TRADECODE', '6220]95I3k8??dHT'), Token('TRADECODE', 'Ga')]),
                                                  Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     '),
                                                                                     Token('ix', '{0}'),
                                                                                     Token('ex', '(000-0)'),
                                                                                     Token('cx', '[00G0]'),
                                                                                     Token('TRADECODE', 'BBB')])]),
-            )
+            ),
+            (
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '2340')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 6220]95I3k8??dHT CaA90aC-W ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', '6220]95I3k8??dHT'), Token('TRADECODE', 'Ga'),
+                                                       Token('TRADECODE', '{0}'), Token('TRADECODE', '(000-0)'),
+                                                       ]),
+                                                 Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     ')])]),
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '2340')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 6220]95I3k8??dHT CaA90aC-W ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', '6220]95I3k8??dHT'),
+                                                       Token('TRADECODE', 'Ga')]),
+                                                 Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     '),
+                                                                                    Token('ix', '{0}'),
+                                                                                    Token('ex', '(000-0)')])]),
+            ),
+            (
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '2340')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 6220]95I3k8??dHT CaA90aC-W ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', '6220]95I3k8??dHT'), Token('TRADECODE', 'Ga'),
+                                                       Token('TRADECODE', '{0}')]),
+                                                 Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     ')])]),
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '2340')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 6220]95I3k8??dHT CaA90aC-W ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', '6220]95I3k8??dHT'),
+                                                       Token('TRADECODE', 'Ga')]),
+                                                 Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     '),
+                                                                                    Token('ix', '{0}')])]),
+            ),
+            (
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '2340')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 6220]95I3k8??dHT CaA90aC-W ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', '6220]95I3k8??dHT'), Token('TRADECODE', 'Ga'),
+                                                       Token('TRADECODE', '{0}'), Token('ex', '(000-0)'),
+                                                       Token('TRADECODE', '[00G0]')]),
+                                                 Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     ')])]),
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '2340')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 6220]95I3k8??dHT CaA90aC-W ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', '6220]95I3k8??dHT'),
+                                                       Token('TRADECODE', 'Ga')]),
+                                                 Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     '),
+                                                                                    Token('ix', '{0}'),
+                                                                                    Token('ex', '(000-0)'),
+                                                                                    Token('cx', '[00G0]')])]),
+            ),
         ]
         for tree, expected in cases:
             with self.subTest(str(tree)):
@@ -711,6 +924,7 @@ class testBaseTransformer(baseTest):
                 self.assertEqual(expected, actual)
 
     def test_preprocess_tree_suspect_empty_trade_code(self) -> None:
+        self.maxDiff = None
         cases = [
             (
                 Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
@@ -740,9 +954,187 @@ class testBaseTransformer(baseTest):
                                                        Tree(Token('RULE', 'base'), [Token('__ANON_7', '- ')]),
                                                        Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'A ')])])]),
             ),
+            (
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', 'De')]),
+                                                 Tree(Token('RULE', 'extensions'),
+                                                      [
+                                                          Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ 0 }')])
+                                                      ]
+                                                      ),
+                                                 Tree(Token('RULE', 'nbz'),
+                                                      [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                       Tree(Token('RULE', 'base'), [Token('__ANON_7', '- ')]),
+                                                       Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'Q ')])])]),
+                Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                                 Tree(Token('RULE', 'starname'),
+                                                      [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                                 Tree(Token('RULE', 'trade'),
+                                                      [Token('TRADECODE', '')]),
+                                                 Tree(Token('RULE', 'extensions'),
+                                                      [
+                                                          Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ 0 }')])
+                                                      ]
+                                                      ),
+                                                 Tree(Token('RULE', 'nbz'),
+                                                      [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', 'De')]),
+                                                       Tree(Token('RULE', 'base'), [Token('__ANON_7', '-')]),
+                                                       Tree(Token('RULE', 'zone'), [Token('__ANON_8', '- ')])])]),
+            ),
+            (
+            Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                             Tree(Token('RULE', 'starname'),
+                                                  [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                             Tree(Token('RULE', 'trade'),
+                                                  [Token('TRADECODE', '(Foob)')]),
+                                             Tree(Token('RULE', 'extensions'),
+                                                  [
+                                                      Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ 0 }')])
+                                                  ]
+                                                  ),
+                                             Tree(Token('RULE', 'nbz'),
+                                                  [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                   Tree(Token('RULE', 'base'), [Token('__ANON_7', '- ')]),
+                                                   Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'Q ')])])]),
+            Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                             Tree(Token('RULE', 'starname'),
+                                                  [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                             Tree(Token('RULE', 'trade'),
+                                                  [Token('TRADECODE', '(Foob)')]),
+                                             Tree(Token('RULE', 'extensions'),
+                                                  [
+                                                      Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ 0 }')])
+                                                  ]
+                                                  ),
+                                             Tree(Token('RULE', 'nbz'),
+                                                  [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                   Tree(Token('RULE', 'base'), [Token('__ANON_7', '- ')]),
+                                                   Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'Q ')])])]),
+        ),
+            (
+            Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                             Tree(Token('RULE', 'starname'),
+                                                  [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                             Tree(Token('RULE', 'trade'),
+                                                  [Token('TRADECODE', 'BCcFf')]),
+                                             Tree(Token('RULE', 'extensions'),
+                                                  [
+                                                      Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ 0 }')])
+                                                  ]
+                                                  ),
+                                             Tree(Token('RULE', 'nbz'),
+                                                  [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                   Tree(Token('RULE', 'base'), [Token('__ANON_7', '- ')]),
+                                                   Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'Q ')])])]),
+            Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                             Tree(Token('RULE', 'starname'),
+                                                  [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                             Tree(Token('RULE', 'trade'),
+                                                  [Token('TRADECODE', '')]),
+                                             Tree(Token('RULE', 'extensions'),
+                                                  [
+                                                      Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ 0 }')])
+                                                  ]
+                                                  ),
+                                             Tree(Token('RULE', 'nbz'),
+                                                  [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', 'BCcFf')]),
+                                                   Tree(Token('RULE', 'base'), [Token('__ANON_7', '-')]),
+                                                   Tree(Token('RULE', 'zone'), [Token('__ANON_8', '- ')])])]),
+        ),
+            (
+            Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                             Tree(Token('RULE', 'starname'),
+                                                  [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                             Tree(Token('RULE', 'trade'),
+                                                  [Token('TRADECODE', 'BCcFf')]),
+                                             Tree(Token('RULE', 'extensions'),
+                                                  [
+                                                      Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ -1 }')])
+                                                  ]
+                                                  ),
+                                             Tree(Token('RULE', 'nbz'),
+                                                  [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                   Tree(Token('RULE', 'base'), [Token('__ANON_7', '- ')]),
+                                                   Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'Q ')])])]),
+            Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                             Tree(Token('RULE', 'starname'),
+                                                  [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                             Tree(Token('RULE', 'trade'),
+                                                  [Token('TRADECODE', 'BCcFf')]),
+                                             Tree(Token('RULE', 'extensions'),
+                                                  [
+                                                      Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ -1 }')])
+                                                  ]
+                                                  ),
+                                             Tree(Token('RULE', 'nbz'),
+                                                  [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                   Tree(Token('RULE', 'base'), [Token('__ANON_7', '- ')]),
+                                                   Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'Q ')])])]),
+        ),
+            (
+            Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                             Tree(Token('RULE', 'starname'),
+                                                  [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                             Tree(Token('RULE', 'trade'),
+                                                  [Token('TRADECODE', 'BCcDFf')]),
+                                             Tree(Token('RULE', 'extensions'),
+                                                  [
+                                                      Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ 1 }')])
+                                                  ]
+                                                  ),
+                                             Tree(Token('RULE', 'nbz'),
+                                                  [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                   Tree(Token('RULE', 'base'), [Token('__ANON_7', '- ')]),
+                                                   Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'Q ')])])]),
+            Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                             Tree(Token('RULE', 'starname'),
+                                                  [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                             Tree(Token('RULE', 'trade'),
+                                                  [Token('TRADECODE', 'BCcDFf')]),
+                                             Tree(Token('RULE', 'extensions'),
+                                                  [
+                                                      Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ 1 }')])
+                                                  ]
+                                                  ),
+                                             Tree(Token('RULE', 'nbz'),
+                                                  [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                   Tree(Token('RULE', 'base'), [Token('__ANON_7', '- ')]),
+                                                   Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'Q ')])])]),
+        ),
+            (
+            Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                             Tree(Token('RULE', 'starname'),
+                                                  [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                             Tree(Token('RULE', 'trade'),
+                                                  [Token('TRADECODE', 'BCcDf')]),
+                                             Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     ')]),
+                                             Tree(Token('RULE', 'nbz'),
+                                                  [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', '-')]),
+                                                   Tree(Token('RULE', 'base'), [Token('__ANON_7', '- ')]),
+                                                   Tree(Token('RULE', 'zone'), [Token('__ANON_8', 'Q ')])])]),
+            Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
+                                             Tree(Token('RULE', 'starname'),
+                                                  [Token('__ANON_1', ' 0                    A000000-0 ')]),
+                                             Tree(Token('RULE', 'trade'),
+                                                  [Token('TRADECODE', '')]),
+                                             Tree(Token('RULE', 'extensions'), [Token('__ANON_2', '     ')]),
+                                             Tree(Token('RULE', 'nbz'),
+                                                  [Tree(Token('RULE', 'nobles'), [Token('__ANON_6', 'BCcDf')]),
+                                                   Tree(Token('RULE', 'base'), [Token('__ANON_7', '-')]),
+                                                   Tree(Token('RULE', 'zone'), [Token('__ANON_8', '- ')])])]),
+        ),
         ]
         for tree, expected in cases:
             with self.subTest(str(tree)):
                 transformer = StarlineTransformer(raw='')
                 actual = transformer.preprocess_tree_suspect_empty_trade_code(tree)
+                self.assertEqual(len(expected.children), len(actual.children))
+                i = 0
+                while i < len(expected.children):
+                    self.assertEqual(str(expected.children[i]), str(actual.children[i]), "Str reps of child " + str(i) + " not equal")
+                    self.assertEqual(expected.children[i], actual.children[i], "Child " + str(i) + " not equal")
+                    i += 1
                 self.assertEqual(expected, actual)
