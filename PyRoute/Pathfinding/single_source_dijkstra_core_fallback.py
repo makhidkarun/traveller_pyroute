@@ -14,6 +14,8 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
         raise ValueError("max_neighbour_labels must be ndarray")
     if not isinstance(distance_labels, np.ndarray):
         raise ValueError("distance_labels must be ndarray")
+    if not 0 < divisor <= 1.0:
+        raise ValueError("divisor must be positive and <= 1.0")
 
     heap = [(distance_labels[seed], seed) for seed in seeds if 0 < len(arcs[seed][0])]
     heapq.heapify(heap)

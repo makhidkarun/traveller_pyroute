@@ -28,6 +28,8 @@ def dijkstra_core(arcs: cython.list[tuple[cnp.ndarray[cython.int], cnp.ndarray[c
         raise ValueError("max_neighbour_labels must be ndarray")
     if not isinstance(distance_labels, cnp.ndarray):
         raise ValueError("distance_labels must be ndarray")
+    if not 0 < divisor <= 1.0:
+        raise ValueError("divisor must be positive and <= 1.0")
 
     neighbours: tuple[cnp.ndarray[cython.int], cnp.ndarray[cython.float]]
     act_wt: cython.float
