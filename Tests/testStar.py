@@ -1768,7 +1768,7 @@ class TestStar(baseTest):
             star.is_well_formed()
         except AssertionError as e:
             msg = str(e)
-        self.assertEqual('Star Foo has empty/bad UWP attribute', msg)
+        self.assertEqual('Star Foo has empty/bad UWP attribute None', msg)
 
     def test_is_well_formed_13(self) -> None:
         star = Star()

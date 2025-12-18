@@ -626,19 +626,12 @@ class Star(object):
 
         budget = int(self.tcs_gwp * 0.03 * Utilities.tax_rate[self.uwpCodes['Government']])
 
-        # if AllyGen.sameAligned('Im', self.alg):
-        #    budget = budget * 0.3
-
         transfer_rate = {'A': 1.0, 'B': 0.95, 'C': 0.9, 'D': 0.85, 'E': 0.8}
 
         if self.uwpCodes['Starport'] in 'ABCDE':
             access = transfer_rate[self.uwpCodes['Starport']]
             access -= (15 - self.tl) * 0.05
             # By the time we reach here, TL < 5 means tcs_gwp is 0, thus budget is zero
-            # if self.tl <= 4:
-            #     access -= 0.05
-            # if self.tl <= 3:
-            #     access -= 0.05
         else:
             access = 0
 
@@ -764,7 +757,7 @@ class Star(object):
                 "Star " + str(self.name) + " social must be None or 6-char string"
 
         assert self.allegiance_base is not None, "Star " + str(self.name) + " has empty base allegiance attribute"
-        assert isinstance(self.uwp, UWP), "Star " + str(self.name) + " has empty/bad UWP attribute"
+        assert isinstance(self.uwp, UWP), "Star " + str(self.name) + " has empty/bad UWP attribute " + str(self.uwp)
         result, msg = self.uwp.is_well_formed()
         assert result, msg
         assert self.star_list_object is not None, "Star " + str(self.name) + " has empty star_list_object attribute"
