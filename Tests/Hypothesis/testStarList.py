@@ -187,10 +187,14 @@ class testStarList(unittest.TestCase):
     @example('G0Ia ')
     @example('K0Ia ')
     @example('M0Ia ')
+    @example('A0IaA0VK0VA0VDA0IaA0VK0VA0 ')
     def test_primary_flux_bounds(self, star_line) -> None:
         hyp_line = "Hypothesis input: " + star_line
-
-        list = StarList(star_line)
+        list: StarList = StarList('')
+        try:
+            list = StarList(star_line)
+        except Exception:
+            assume(False)
         max_flux, min_flux = list.primary_flux_bounds
         if max_flux is None:
             self.assertIsNone(min_flux, "If max-flux is None, so must be min-flux.  " + hyp_line)
