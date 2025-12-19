@@ -3,12 +3,11 @@ Created on Mar 5, 2014
 
 @author: tjoneslo
 """
-import copy
 import functools
 import logging
 import bisect
 import random
-import math
+
 from typing import Tuple, Optional
 from typing_extensions import TypeAlias
 
@@ -17,32 +16,10 @@ from PyRoute.Position.Hex import Hex
 from PyRoute.Allies.AllyGen import AllyGen
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
 from PyRoute.SystemData.Utilities import Utilities
-from collections import OrderedDict
 
 from PyRoute.SystemData.StarList import StarList
 
 HexPos: TypeAlias = Tuple[int, int]
-
-
-class UWPCodes(object):
-    uwpCodes = ['Starport',
-                'Size',
-                'Atmosphere',
-                'Hydrographics',
-                'Population',
-                'Government',
-                'Law Level',
-                'Tech Level',
-                'Pop Code',
-                'Starport Size',
-                'Primary Type',
-                'Importance',
-                'Resources']
-
-    def __init__(self):
-        self.codes = OrderedDict()
-        for uwpCode in UWPCodes.uwpCodes:
-            self.codes[uwpCode] = "X"
 
 
 class Star(object):
@@ -53,7 +30,8 @@ class Star(object):
                 'eti_passenger', 'raw_be', 'im_be', 'col_be', 'star_list_object', 'routes', 'stars', 'is_enqueued',\
                 'is_target', 'is_landmark', '_pax_btn_mod', 'suppress_soph_percent_warning', 'is_redzone', 'hex',\
                 'deep_space_station', '_oldskool', 'tradeIn', 'tradeOver', 'tradeCount', 'passIn', 'passOver',\
-                'starportSize', 'starportBudget', 'starportPop', 'index', 'trade_cost', 'trade_id'
+                'starportSize', 'starportBudget', 'starportPop', 'index', 'trade_cost', 'trade_id', 'eti_cargo_volume',\
+                'eti_worlds', 'eti_pass_volume'
 
     def __init__(self):
         self.worlds = None
@@ -92,6 +70,9 @@ class Star(object):
         self.importance = None
         self.eti_cargo = None
         self.eti_passenger = None
+        self.eti_cargo_volume = None
+        self.eti_worlds = None
+        self.eti_pass_volume = None
         self.raw_be = None
         self.im_be = None
         self.col_be = None
@@ -122,7 +103,6 @@ class Star(object):
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        state = self.__dict__.copy()
         for item in Star.__slots__:
             if item in state:
                 continue
@@ -139,8 +119,6 @@ class Star(object):
     def __deepcopy__(self, memodict: dict = {}):
         state = self.__dict__.copy()
         for item in Star.__slots__:
-            if item in state:
-                continue
             if item.startswith('_'):
                 continue
             state[item] = self[item]
@@ -149,7 +127,7 @@ class Star(object):
         for key in state:
             item = state[key]
             setattr(foo, key, item)
-        foo.hex = copy.deepcopy(self.hex)
+        foo.hex = Hex(self.sector, foo.position)
         foo.calc_hash()
 
         return foo
@@ -193,7 +171,7 @@ class Star(object):
         basecode = str(self.baseCode).upper()
         alg_code = str(self.alg_code) if "" != self.alg_code.strip() else "--"
 
-        result += basecode.ljust(2) + " " + str(self.zone).ljust(1) + " " + popM + belts + ggCount + " "
+        result += basecode.ljust(2) + " " + str(self.zone).ljust(2) + popM + belts + ggCount + " "
         result += str(worlds).ljust(2) + " " + str(alg_code).ljust(4) + " "
         result += str(star_list).ljust(14) + " " + " ".join(self.routes).ljust(41)
 
@@ -355,20 +333,20 @@ class Star(object):
         popCodeM = [0, 10, 13, 17, 22, 28, 36, 47, 60, 78]
 
         if pop_code == 'scaled':
-            self.population = (pow(10, self.popCode) * popCodeM[self.popM]) // 1e7
+            self.population = (pow(10, self.popCode) * popCodeM[self.popM]) // 1e7  # pragma: no mutate
             self.uwpCodes['Pop Code'] = str(popCodeM[self.popM] // 10)
 
         elif pop_code == 'fixed':
-            self.population = (pow(10, self.popCode) * self.popM) // 1e6
+            self.population = (pow(10, self.popCode) * self.popM) // 1e6  # pragma: no mutate
 
         elif pop_code == 'benford':
-            popCodeRange = [0.243529203, 0.442507049, 0.610740422, 0.756470797, 0.885014099, 1]
+            popCodeRange = [0.243529203, 0.442507049, 0.610740422, 0.756470797, 0.885014099, 1]  # pragma: no mutate
 
             if self.popM >= 1 and self.popM <= 6:
                 popM = popCodeM[self.popM]
             else:
-                popM = (bisect.bisect(popCodeRange, random.random()) + 4) * 10
-            self.population = (pow(10, self.popCode) * popM) // 1e7
+                popM = (bisect.bisect(popCodeRange, random.random()) + 4) * 10  # pragma: no mutate
+            self.population = (pow(10, self.popCode) * popM) // 1e7  # pragma: no mutate
             self.uwpCodes['Pop Code'] = str(popM / 10)
 
         self.perCapita = calcGWP[min(self.tl, 19)] if self.population > 0 else 0
@@ -377,7 +355,7 @@ class Star(object):
         self.perCapita *= 1.2 if self.tradeCode.agricultural else 1
         self.perCapita *= 0.8 if self.tradeCode.low_per_capita_gwp else 1
 
-        self.gwp = int((self.population * self.perCapita) // 1000)
+        self.gwp = int((self.population * self.perCapita) // 1000)  # pragma: no mutate
         self.population = int(self.population)
         self.perCapita = int(self.perCapita)
 
@@ -408,24 +386,15 @@ class Star(object):
         if port == 'B':
             self.wtn = (self.wtn * 3 + 11) // 4
         if port == 'C':
-            if self.wtn > 9:
-                self.wtn = (self.wtn + 9) // 2
-            else:
-                self.wtn = (self.wtn * 3 + 9) // 4
+            self.wtn = min((self.wtn + 9) // 2, (self.wtn * 3 + 9) // 4)
         if port == 'D':
-            if self.wtn > 7:
-                self.wtn = (self.wtn + 7) // 2
-            else:
-                self.wtn = (self.wtn * 3 + 7) // 4
+            self.wtn = min((self.wtn + 7) // 2, (self.wtn * 3 + 7) // 4)
         if port == 'E':
-            if self.wtn > 5:
-                self.wtn = (self.wtn + 5) // 2
-            else:
-                self.wtn = (self.wtn * 3 + 5) // 4
+            self.wtn = min((self.wtn + 5) // 2, (self.wtn * 3 + 5) // 4)
         if port == 'X':
             self.wtn = (self.wtn - 5) // 2
 
-        self.wtn = math.trunc(max(0, self.wtn))
+        self.wtn = max(0, self.wtn)
 
     def check_ex(self) -> None:
         if not self.economics:
@@ -459,7 +428,6 @@ class Star(object):
             return
 
         resources = self._ehex_to_int(self.economics[1])
-        labor = self._ehex_to_int(self.economics[2])
         infrastructure = self._ehex_to_int(self.economics[3])
         efficiency = self._ehex_to_int(self.economics[5])
 
@@ -471,19 +439,22 @@ class Star(object):
             nu_resources = self._int_to_ehex(max(0, min(max_resources, resources)))
             self.economics = self.economics[0:1] + nu_resources + self.economics[2:]
 
-        if labor != max(self.popCode - 1, 0):
-            nu_labour = self._int_to_ehex(max(self.popCode - 1, 0))
-            self.economics = self.economics[0:2] + nu_labour + self.economics[3:]
+        max_labor = max(self.popCode - 1, 0)
+        nu_labour = self._int_to_ehex(max_labor)
+        self.economics = self.economics[0:2] + nu_labour + self.economics[3:]
 
+        max_lo_infrastructure = max(self.importance, 0)
+        max_ni_infrastructure = 6 + self.importance
+        max_infrastructure = 12 + self.importance
         nu_infrastructure = None
         if self.tradeCode.barren and infrastructure != 0:
             nu_infrastructure = '0'
-        elif self.tradeCode.low and infrastructure != max(self.importance, 0):
-            nu_infrastructure = self._int_to_ehex(max(self.importance, 0))
-        elif self.tradeCode.nonindustrial and not 0 <= infrastructure <= 6 + self.importance:
-            nu_infrastructure = '0' if 0 > infrastructure else self._int_to_ehex(6 + self.importance)
-        elif not 0 <= infrastructure <= 12 + self.importance:
-            nu_infrastructure = '0' if 0 > infrastructure else self._int_to_ehex(12 + self.importance)
+        elif self.tradeCode.low and infrastructure != max_lo_infrastructure:
+            nu_infrastructure = self._int_to_ehex(max_lo_infrastructure)
+        elif self.tradeCode.nonindustrial and not infrastructure <= max_ni_infrastructure:  # pragma: no mutate
+            nu_infrastructure = self._int_to_ehex(max_ni_infrastructure)
+        elif not infrastructure <= max_infrastructure:  # pragma: no mutate
+            nu_infrastructure = self._int_to_ehex(max_infrastructure)
 
         if nu_infrastructure is not None:
             self.economics = self.economics[0:3] + nu_infrastructure + self.economics[4:]
@@ -512,7 +483,7 @@ class Star(object):
                 format(self, homogeneity, max(1, pop - 5), pop + 5))
 
         acceptance = self._ehex_to_int(self.social[2])  # pop + Ix, min 1
-        pop_plus_imp = min(33, max(1, pop + self.importance))  # Cap out at 33 - converts to ehex as Z
+        pop_plus_imp = min(33, max(1, pop + self.importance))  # Cap out at 33 - converts to ehex as Z  # pragma: no mutate
         if pop == 0 and acceptance != 0:
             self.logger.warning(
                 '{} - CX Calculated acceptance {} should be 0 for barren worlds'.format(self, acceptance))
@@ -543,23 +514,21 @@ class Star(object):
         pop = self.popCode
 
         homogeneity = self._ehex_to_int(self.social[1])
+        min_homogeneity = max(1, pop - 5)
+        max_homogeneity = pop + 5
         nu_homogeneity = None
         if 0 == pop and 0 != homogeneity:
             nu_homogeneity = '0'
-        elif 0 != pop and homogeneity < max(1, pop - 5):
-            nu_homogeneity = self._int_to_ehex(max(1, pop - 5))
-        elif 0 != pop and homogeneity > pop + 5:
-            nu_homogeneity = self._int_to_ehex(pop + 5)
+        elif 0 != pop:
+            if homogeneity < min_homogeneity:  # pragma: no mutate
+                nu_homogeneity = self._int_to_ehex(min_homogeneity)
+            elif homogeneity > max_homogeneity:  # pragma: no mutate
+                nu_homogeneity = self._int_to_ehex(max_homogeneity)
 
         if nu_homogeneity is not None:
             self.social = self.social[0] + nu_homogeneity + self.social[2:]
 
-        acceptance = self._ehex_to_int(self.social[2])
-        nu_acceptance = None
-        if 0 == pop and 0 != acceptance:
-            nu_acceptance = '0'
-        elif 0 != pop and max(1, pop + self.importance) != acceptance:
-            nu_acceptance = self._int_to_ehex(max(1, pop + self.importance))
+        nu_acceptance = '0' if 0 == pop else self._int_to_ehex(max(1, pop + self.importance))
 
         if nu_acceptance is not None:
             self.social = self.social[0:2] + nu_acceptance + self.social[3:]
@@ -568,22 +537,26 @@ class Star(object):
         nu_strangeness = None
         if 0 == pop and 0 != strangeness:
             nu_strangeness = '0'
-        elif 0 != pop and 1 > strangeness:
-            nu_strangeness = self._int_to_ehex(1)
-        elif 0 != pop and 10 < strangeness:
-            nu_strangeness = self._int_to_ehex(10)
+        elif 0 != pop:
+            if 1 > strangeness:  # pragma: no mutate
+                nu_strangeness = self._int_to_ehex(1)
+            elif 10 < strangeness:  # pragma: no mutate
+                nu_strangeness = self._int_to_ehex(10)
 
         if nu_strangeness is not None:
             self.social = self.social[0:3] + nu_strangeness + self.social[4:]
 
         symbols = self._ehex_to_int(self.social[4])
+        min_symbols = max(1, self.tl - 5)
+        max_symbols = self.tl + 5
         nu_symbols = None
         if 0 == pop and symbols != 0:
             nu_symbols = '0'
-        elif 0 != pop and symbols < max(1, self.tl - 5):
-            nu_symbols = self._int_to_ehex(max(1, self.tl - 5))
-        elif 0 != pop and symbols > self.tl + 5:
-            nu_symbols = self._int_to_ehex(self.tl + 5)
+        elif 0 != pop:
+            if symbols < min_symbols:  # pragma: no mutate
+                nu_symbols = self._int_to_ehex(min_symbols)
+            elif symbols > max_symbols:  # pragma: no mutate
+                nu_symbols = self._int_to_ehex(max_symbols)
 
         if nu_symbols is not None:
             self.social = self.social[0:4] + nu_symbols + self.social[5:]
@@ -604,8 +577,8 @@ class Star(object):
         resources = self._ehex_to_int(self.economics[1])
         labor = self._ehex_to_int(self.economics[2])
         if self.economics[3] == '-':
-            infrastructure = self._ehex_to_int(self.economics[3:5])
-            efficiency = float(self.economics[5:7])
+            infrastructure = self._ehex_to_int(self.economics[3:5])  # pragma: no mutate
+            efficiency = float(self.economics[5:7].strip(')'))  # pragma: no mutate
         else:
             infrastructure = self._ehex_to_int(self.economics[3])
             efficiency = float(self.economics[4:6])
@@ -621,13 +594,11 @@ class Star(object):
         infrastructure += 0 if infrastructure < 18 else -1
 
         efficiency = efficiency if efficiency != 0 else 1
-        if efficiency < 0:
-            if ru_calc == 'scaled':
-                efficiency = 1.0 + (efficiency * 0.1)
+        if efficiency < 0 and 'scaled' == ru_calc:  # pragma: no mutate
+            efficiency = 1.0 + (efficiency * 0.1)
             # else ru_calc == 'negative' -> use efficiency as written
-            self.ru = int(round(resources * labor * infrastructure * efficiency))
-        else:
-            self.ru = resources * labor * infrastructure * efficiency
+
+        self.ru = int(round(resources * labor * infrastructure * efficiency))
 
         self.logger.debug(
             "RU = {0} * {1} * {2} * {3} = {4}".format(resources, labor, infrastructure, efficiency, self.ru))
@@ -641,11 +612,11 @@ class Star(object):
             self.tcs_gwp = 0
 
         if self.tradeCode.rich:
-            self.tcs_gwp = self.tcs_gwp * 16 // 10
+            self.tcs_gwp = self.tcs_gwp * 16 // 10  # pragma: no mutate
         if self.tradeCode.industrial:
-            self.tcs_gwp = self.tcs_gwp * 14 // 10
+            self.tcs_gwp = self.tcs_gwp * 14 // 10  # pragma: no mutate
         if self.tradeCode.agricultural:
-            self.tcs_gwp = self.tcs_gwp * 12 // 10
+            self.tcs_gwp = self.tcs_gwp * 12 // 10  # pragma: no mutate
         if self.tradeCode.poor:
             self.tcs_gwp = self.tcs_gwp * 8 // 10
         if self.tradeCode.nonindustrial:
@@ -655,30 +626,22 @@ class Star(object):
 
         budget = int(self.tcs_gwp * 0.03 * Utilities.tax_rate[self.uwpCodes['Government']])
 
-        # if AllyGen.sameAligned('Im', self.alg):
-        #    budget = budget * 0.3
-
         transfer_rate = {'A': 1.0, 'B': 0.95, 'C': 0.9, 'D': 0.85, 'E': 0.8}
 
         if self.uwpCodes['Starport'] in 'ABCDE':
             access = transfer_rate[self.uwpCodes['Starport']]
             access -= (15 - self.tl) * 0.05
-            if self.tl <= 4:
-                access -= 0.05
-            if self.tl <= 3:
-                access -= 0.05
+            # By the time we reach here, TL < 5 means tcs_gwp is 0, thus budget is zero
         else:
             access = 0
 
-        if access <= 0:
-            access = 0
+        access = max(0, access)
 
         self.budget = int(budget * access)
 
     def calculate_importance(self) -> None:
-        imp = 0
-        imp += 1 if self.port in 'AB' else 0
-        imp -= 1 if self.port in 'DEX' else 0
+        imp = 1 if self.port in ['A', 'B'] else 0
+        imp -= 1 if self.port in ['D', 'E', 'X'] else 0
         imp -= 1 if self.tl <= 8 else 0
         imp += 1 if self.tl >= 10 else 0
         imp += 1 if self.tl >= 16 else 0
@@ -691,9 +654,8 @@ class Star(object):
         self.importance = imp
 
     def calculate_eti(self) -> None:
-        eti = 0
-        eti += 1 if self.port in 'AB' else 0
-        eti -= 1 if self.port in 'DEX' else 0
+        eti = 1 if self.port in ['A', 'B'] else 0
+        eti -= 1 if self.port in ['D', 'E', 'X'] else 0
         eti += 1 if self.tl >= 10 else 0
         eti -= 1 if self.tl <= 7 else 0
         eti += 1 if self.baseCode in ['NS', 'NW', 'D', 'X', 'KV', 'RT', 'CK', 'KM'] else 0
@@ -736,7 +698,7 @@ class Star(object):
               ]
 
         pop_code = min(self.popCode - 3, 7)
-        if self.uwpCodes['Atmosphere'] not in '568':
+        if self.uwpCodes['Atmosphere'] not in ['5', '6', '8']:
             pop_code -= 1
         if pop_code >= 0:
             self.raw_be = BE[min(self.tl, 16)][pop_code]
@@ -747,7 +709,7 @@ class Star(object):
 
         if AllyGen.imperial_align(self.alg_code):
             self.im_be = self.raw_be * 0.05
-            if self.tl < 13:
+            if self.tl < 13:  # pragma: no mutate
                 mul = 1 - ((13 - self.tl) / 10.0)
                 self.im_be = self.im_be * mul
         else:
@@ -780,14 +742,13 @@ class Star(object):
             self.logger.debug("{} - routes: {}".format(self, self.routes))
 
     def is_well_formed(self) -> bool:
-        assert hasattr(self, 'sector'), "Star " + str(self.name) + " is missing sector attribute"
-        assert self.sector is not None, "Star " + str(self.name) + " has empty sector attribute"
-        assert self.index is not None, "Star " + str(self.name) + " is missing index attribute"
-        assert self.hex is not None, "Star " + str(self.name) + " is missing hex attribute"
+        from PyRoute.AreaItems.Sector import Sector
+        from PyRoute.SystemData.UWP import UWP
+        assert isinstance(self.sector, Sector), "Star " + str(self.name) + " has empty/bad sector attribute"
+        assert isinstance(self.index, int), "Star " + str(self.name) + " has empty/bad index attribute"
+        assert isinstance(self.hex, Hex), "Star " + str(self.name) + " has empty/bad hex attribute"
         result, msg = self.hex.is_well_formed()
         assert result, msg
-        assert hasattr(self, 'economics'), "Star " + str(self.name) + " is missing economics attribute"
-        assert hasattr(self, 'social'), "Star " + str(self.name) + " is missing social attribute"
         if self.economics is not None:
             assert (isinstance(self.economics, str) and 7 == len(self.economics)),\
                 "Star " + str(self.name) + " economics must be None or 7-char string"
@@ -795,8 +756,8 @@ class Star(object):
             assert (isinstance(self.social, str) and 6 == len(self.social)),\
                 "Star " + str(self.name) + " social must be None or 6-char string"
 
-        assert hasattr(self, 'allegiance_base'), "Star " + str(self.name) + " is missing base allegiance attribute"
         assert self.allegiance_base is not None, "Star " + str(self.name) + " has empty base allegiance attribute"
+        assert isinstance(self.uwp, UWP), "Star " + str(self.name) + " has empty/bad UWP attribute " + str(self.uwp)
         result, msg = self.uwp.is_well_formed()
         assert result, msg
         assert self.star_list_object is not None, "Star " + str(self.name) + " has empty star_list_object attribute"
