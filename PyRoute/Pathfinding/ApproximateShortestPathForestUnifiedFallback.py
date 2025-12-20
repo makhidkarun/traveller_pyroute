@@ -40,7 +40,7 @@ class ApproximateShortestPathForestUnified:
                                                                                    seeds=raw_seeds,
                                                                                    min_cost=min_cost,
                                                                                    divisor=self._divisor)
-            self._distances[:, i], self._max_labels[:, i] = result
+            self._distances[:, i], self._max_labels[:, i], _ = result
 
     def lower_bound(self, source, target) -> float:
         raw = np.abs(self._distances[source, :] - self._distances[target, :])
@@ -141,17 +141,17 @@ class ApproximateShortestPathForestUnified:
         for i in range(self._num_trees):
             if 0 == len(dropspecific[i]):
                 continue
-            self._distances[:, i], _, self._max_labels[:, i] = explicit_shortest_path_dijkstra_distance_graph(
-                                                                self._graph, self._source,
-                                                                distance_labels=self._distances[:, i],
-                                                                seeds=dropspecific[i], divisor=self._divisor,
-                                                                min_cost=min_cost, max_labels=self._max_labels[:, i])
+            self._distances[:, i], _, self._max_labels[:, i], _ = explicit_shortest_path_dijkstra_distance_graph(
+                                                                  self._graph, self._source,
+                                                                  distance_labels=self._distances[:, i],
+                                                                  seeds=dropspecific[i], divisor=self._divisor,
+                                                                  min_cost=min_cost, max_labels=self._max_labels[:, i])
 
     def expand_forest(self, nu_seeds) -> None:
         raw_seeds = nu_seeds if isinstance(nu_seeds, list) else list(nu_seeds.values())
         nu_distances = np.ones((self._graph_len)) * float('+inf')
         nu_distances[raw_seeds] = 0
-        nu_distances, nu_max_labels = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
+        nu_distances, nu_max_labels, _ = implicit_shortest_path_dijkstra_distance_graph(self._graph, self._source,
                                                                 nu_distances,
                                                                 seeds=raw_seeds,
                                                                 divisor=self._divisor)

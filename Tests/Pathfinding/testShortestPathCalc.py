@@ -1,5 +1,6 @@
 import json
 import unittest
+from unittest.mock import patch
 
 from PyRoute.DeltaDebug.DeltaDictionary import SectorDictionary, DeltaDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
@@ -39,7 +40,7 @@ class testShortestPathCalc(baseTest):
         expected_distances[19] = 175
         distance_labels = np.ones(len(graph)) * float('+inf')
         distance_labels[source] = 0.0
-        actual_distances, _ = implicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
+        actual_distances, _, _ = implicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
 
         self.assertEqual(list(expected_distances.values()), list(actual_distances), "Unexpected distances after SPT creation")
 
@@ -103,10 +104,70 @@ class testShortestPathCalc(baseTest):
         expected_parents[34] = 24
         expected_parents[35] = 24
         expected_parents[36] = 24
-        actual_distances, actual_parents, _ = explicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
+        actual_distances, actual_parents, _, _ = explicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
 
         self.assertEqual(list(expected_distances.values()), list(actual_distances), "Unexpected distances after SPT creation")
         self.assertEqual(list(expected_parents), list(actual_parents), "Unexpected parent relations")
+
+    def test_explicit_path_distance_labels_not_ndarray(self) -> None:
+        sourcefile = self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Core.sec')
+
+        graph, source, stars = self._setup_graph(sourcefile)
+        distgraph = DistanceGraph(graph)
+
+        distance_labels = None
+        msg = None
+
+        try:
+            explicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
+        except ValueError as e:
+            msg = str(e)
+        self.assertEqual('distance labels must be ndarray', msg)
+
+    def test_explicit_path_distance_labels_nan(self) -> None:
+        sourcefile = self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Core.sec')
+
+        graph, source, stars = self._setup_graph(sourcefile)
+        distgraph = DistanceGraph(graph)
+
+        distance_labels = np.array([np.nan], dtype=float)
+        msg = None
+
+        try:
+            explicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
+        except ValueError as e:
+            msg = str(e)
+        self.assertEqual('distance labels must not be None', msg)
+
+    def test_explicit_path_distance_labels_negative(self) -> None:
+        sourcefile = self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Core.sec')
+
+        graph, source, stars = self._setup_graph(sourcefile)
+        distgraph = DistanceGraph(graph)
+
+        distance_labels = np.array([-0.1], dtype=float)
+        msg = None
+
+        try:
+            explicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
+        except ValueError as e:
+            msg = str(e)
+        self.assertEqual('All distance labels must be non-negative', msg)
+
+    def test_explicit_path_distance_labels_zero(self) -> None:
+        sourcefile = self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Core.sec')
+
+        graph, source, stars = self._setup_graph(sourcefile)
+        distgraph = DistanceGraph(graph)
+
+        distance_labels = np.array([0], dtype=float)
+        msg = None
+
+        try:
+            explicit_shortest_path_dijkstra_distance_graph(distgraph, source, distance_labels)
+        except ValueError as e:
+            msg = str(e)
+        self.assertEqual('At least one distance label must be nonzero', msg)
 
     def test_masked_gubbins(self) -> None:
         sourcefile = self.unpack_filename('DeltaFiles/Zarushagar-Ibara.sec')
@@ -132,7 +193,23 @@ class testShortestPathCalc(baseTest):
         expected_parents[6] = 0
         self.assertEqual(6, max(hiver), "Unexpected max value in masked array after original max clobbered")
 
-    def _setup_graph(self, sourcefile):
+    def test_implicit_shortest_path_dijkstra_non_empty_min_cost_and_max_labels(self) -> None:
+        sourcefile = self.unpack_filename('DeltaFiles/xroute_routes_pass_1_2/Core.sec')
+
+        graph, source, stars = self._setup_graph(sourcefile)
+        distgraph = DistanceGraph(graph)
+        min_cost = np.array([1, 1, 1, 1])
+        max_labels = np.array([1000, 1000, 1000, 1000])
+        dist_labels = np.array([100, 100, 100, 100])
+
+        with patch('PyRoute.Pathfinding.single_source_dijkstra.explicit_shortest_path_dijkstra_distance_graph',
+                   return_value=(None, None, None, None)) as mock_object:
+            implicit_shortest_path_dijkstra_distance_graph(distgraph, source, dist_labels, min_cost=min_cost, max_labels=max_labels)
+            mock_object.assert_called()
+            self.assertIsInstance(mock_object.call_args[1]['min_cost'], np.ndarray)
+            self.assertIsInstance(mock_object.call_args[1]['max_labels'], np.ndarray)
+
+    def _setup_graph(self, sourcefile) -> tuple:
         sector = SectorDictionary.load_traveller_map_file(sourcefile)
         delta = DeltaDictionary()
         delta[sector.name] = sector

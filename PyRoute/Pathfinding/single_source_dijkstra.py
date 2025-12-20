@@ -11,6 +11,7 @@ the specific input format used in PyRoute.
 """
 import numpy as np
 
+
 try:
     from PyRoute.Pathfinding.single_source_dijkstra_core import dijkstra_core
 except ModuleNotFoundError:
@@ -21,27 +22,35 @@ except AttributeError:
     from PyRoute.Pathfinding.single_source_dijkstra_core_fallback import dijkstra_core
 
 
-def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1, min_cost=None, max_labels=None) -> tuple:
+def implicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1.0, min_cost=None, max_labels=None) -> tuple:
     # return only distance_labels from the explicit version
-    distance_labels, _, max_neighbour_labels = explicit_shortest_path_dijkstra_distance_graph(graph, source,
+    distance_labels, _, max_neighbour_labels, diagnostics = explicit_shortest_path_dijkstra_distance_graph(graph, source,
                                                                                               distance_labels, seeds,
                                                                                               divisor,
                                                                                               min_cost=min_cost,
                                                                                               max_labels=max_labels)
-    return distance_labels, max_neighbour_labels
+    return distance_labels, max_neighbour_labels, diagnostics
 
 
-def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1, min_cost=None, max_labels=None) -> tuple:
+def explicit_shortest_path_dijkstra_distance_graph(graph, source, distance_labels, seeds=None, divisor=1.0, min_cost=None, max_labels=None) -> tuple:
+    if not isinstance(source, int):
+        raise ValueError("source must be integer")
     if not isinstance(distance_labels, np.ndarray):
         raise ValueError("distance labels must be ndarray")
+    if np.isnan(distance_labels).any():
+        raise ValueError("distance labels must not be None")
+    if (distance_labels < 0).any():
+        raise ValueError("All distance labels must be non-negative")
+    if (distance_labels == 0).all():
+        raise ValueError("At least one distance label must be nonzero")
 
     # assumes that distance_labels is already setup
     if seeds is None:
         seeds = {source}
 
     seeds = list(seeds)
-    min_cost = np.zeros(len(graph), dtype=float) if min_cost is None else min_cost
-    max_neighbour_labels = max_labels if max_labels is not None else np.ones(len(graph), dtype=float) * float('+inf')
+    min_cost = np.zeros(len(graph)) if min_cost is None else min_cost
+    max_neighbour_labels = max_labels if max_labels is not None else np.ones(len(graph)) * float('+inf')  # pragma: no mutate
 
     arcs = graph._arcs
 
