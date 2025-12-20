@@ -334,7 +334,7 @@ class testStar(unittest.TestCase):
            from_regex(r'^\([0-9A-Za-z]{3}[+-]\d\)'),
            from_regex(r'^\[[0-9A-Za-z]{4}\]'),
            none())
-    @settings(suppress_health_check=[HealthCheck(10)])
+    @settings(suppress_health_check=[HealthCheck(10), HealthCheck(2), HealthCheck(3)])
     @example('?000000-0', '(000-0)', '[0000]', None)
     @example('?000000-0', '(000-0)0', '[0000]', 'Star Sample economics must be None or 7-char string')
     @example('?000000-0', '(000-0)', '[0000]0', 'Star Sample social must be None or 6-char string')

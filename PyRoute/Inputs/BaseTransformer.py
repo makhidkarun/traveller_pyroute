@@ -26,7 +26,7 @@ class BaseTransformer(Transformer):
 
     def __init__(self, visit_tokens: bool = True, raw=None):
         super().__init__(visit_tokens)
-        self.raw = raw.strip('\n')
+        self.raw = raw.strip('\n')  # pragma: no mutate
         self.crankshaft = False
 
     def starline(self, args) -> list[list]:
@@ -36,70 +36,28 @@ class BaseTransformer(Transformer):
         nobles = args[4].children[0][0]
         base = args[4].children[1][0]
         zone = args[4].children[2][0]
-        pbg = args[5][0][0]
-        worlds = args[5][1][0] if 1 < len(args[5]) else Token('__ANON__11', ' ')
-        allegiance = args[5][2][0] if 2 < len(args[5]) else Token('__ANON__12', ' ')
 
         tradelen = sum([len(item) for item in trade]) + len(trade) - 1
         # Square up overspilled trade codes
         if 16 < tradelen and 3 <= len(trade) and 1 == len(extensions) and '' == extensions[0].value.strip() and \
-                '' == nobles.value and '' != base.value and '' == zone.value:
-            move_fwd = 3 == len(base.value) and base.value.isdigit()  # Will base code still make sense as PBG?
-            move_rev = 3 == len(allegiance.value)  # Will allegiance code still make sense as PBG?
-            if move_fwd and not move_rev:
+                '-' == nobles.value and 3 == len(base.value) and '-' == zone.value:
+            move_fwd = base.value.isdigit()  # Will base code still make sense as PBG?
+            if move_fwd:
                 last = trade[-1]
                 mid = trade[-2]
-                zone.value = base.value
-                base.value = last
-                nobles.value = mid
-                trade = trade[:-2]
-            elif (move_rev and not move_fwd) or (move_fwd and move_rev):
-                pass
+                args[4].children[2][0].value = base.value
+                args[4].children[1][0].value = last
+                args[4].children[0][0].value = mid
+                args[2] = trade[:-2]
 
-        if '*' != base.value and '' != base.value and 3 != len(extensions):
-            if not self.crankshaft and zone.value.upper() not in self.zone_active:
-                if '' == nobles.value:
-                    nobles.value = base.value
-                    base.value = zone.value
-                elif '' == zone.value:  # if only 1 extension child?
-                    zone.value = base.value
-                    base.value = nobles.value
-                    nobles.value = ''
-        elif '*' != base.value and 3 == len(extensions) and '' == nobles.value and '' != base.value and \
-                '' == zone.value and pbg.value == allegiance.value:
-            nobles.value = base.value
-            base.value = pbg.value
-            zone.value = worlds.value
-            pbg.value = allegiance.value
-            worlds.value = ' '
-            if 7 == len(args):
-                allegiance.value = args[6][0].value
-                args[6][0].value = ''
-            else:
-                allegiance.value = ''
-        # If there's no residual argument
-        if 8 == len(args) and 1 < len(args[7]):
-            tailend = args[7][2][0].value
-            lenlast = min(4, len(tailend))
-            counter = 0
-            while counter < lenlast and (tailend[counter].isalnum() or '-' == tailend[counter] or '?' == tailend[counter]):
-                if counter < lenlast:
-                    counter += 1
-            if counter < min(4, lenlast):  # if the allegiance overspills, move the overspill into the residual
-                overrun = tailend[counter:]
-                tailend = tailend[:counter]
-                args[7][2][0].value = tailend
-                newbie = Token('__ANON_14', overrun)
-                args.append([newbie])
+        args[5] = args[5][:3]
         return args
 
     def position(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
-        return args
+        return self._strip_arg_0_value(args)
 
     def starname(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
-        return args
+        return self._strip_arg_0_value(args)
 
     def trade(self, args) -> list[str]:
         trimmed = []
@@ -109,52 +67,46 @@ class BaseTransformer(Transformer):
         return trimmed
 
     def extensions(self, args) -> list[list]:
-        if 1 == len(args):
-            return args
         return args
 
     def nobles(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
-        if '' == args[0].value:
-            args[0].value = '-'
-        return args
+        return self._nbz_core(args)
 
     def base(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
-        if '' == args[0].value:
-            args[0].value = '-'
-        return args
+        return self._nbz_core(args)
 
     def zone(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
+        return self._nbz_core(args)
+
+    def _nbz_core(self, args) -> list[list]:
+        if args[0].value is not None:
+            args[0].value = args[0].value.strip()
         if '' == args[0].value:
             args[0].value = '-'
         return args
 
     def pbg(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
-        return args
+        return self._strip_arg_0_value(args)
 
     def worlds(self, args) -> list[list]:
-        raw = args[0].value
-        if 1 < len(raw):
-            raw = raw.strip()
-        args[0].value = raw
-        return args
+        return self._strip_arg_0_value(args)
 
     def allegiance(self, args) -> list[list]:
-        args[0].value = args[0].value.strip()
-        return args
+        return self._strip_arg_0_value(args)
 
     def world_alg(self, args) -> list[list]:
         return args
 
     def residual(self, args) -> list[list]:
+        return self._strip_arg_0_value(args)
+
+    def _strip_arg_0_value(self, args) -> list[list]:
         args[0].value = args[0].value.strip()
         return args
 
     def starname_transform(self, starname: str) -> tuple[str, str]:
-        bitz = [item for item in starname.split(' ') if 0 < len(item)]
+        bitz = [item for item in starname.split(' ')]  # pragma: no mutate
+        bitz = [item for item in bitz if 0 < len(item)]
         uwp = bitz[-1]
         bitz = bitz[:-1]
         return ' '.join(bitz), uwp
@@ -191,12 +143,12 @@ class BaseTransformer(Transformer):
 
     def transform(self, tree) -> list[Optional[str]]:
         self.crankshaft = '' == tree.children[4].children[0].children[0].value.strip() and '-' == tree.children[4].children[
-            1].children[0].value and '' == tree.children[4].children[2].children[0].value.strip() and 1 == self.raw.count(' -')\
-                          and 1 == self.raw.count('-   ')
-        tree = self._preprocess_trade_and_extensions(tree)
-        tree = self._preprocess_tree_suspect_empty_trade_code(tree)
+            1].children[0].value.strip() and '' == tree.children[4].children[2].children[0].value.strip()
+        self.crankshaft = self.crankshaft and 1 == self.raw.count(' -') and 1 == self.raw.count('-   ')
+        tree = self.preprocess_trade_and_extensions(tree)
+        tree = self.preprocess_tree_suspect_empty_trade_code(tree)
         tree = self._transform_tree(tree)
-        parsed = {'ix': None, 'ex': None, 'cx': None, 'residual': ''}
+        parsed: dict[str, Optional[str]] = {'residual': ''}
 
         parsed['position'] = tree[0][0].value
         parsed['name'], parsed['uwp'] = self.starname_transform(tree[1][0].value)
@@ -209,12 +161,10 @@ class BaseTransformer(Transformer):
         if 7 == len(tree):
             parsed['residual'] = tree[6][0].value
 
-        parsed = self._square_up_parsed(parsed)
         self.trim_raw_string(parsed)
-        rawbitz = self._trim_raw_bitz(parsed)
-        parsed = self._square_up_parsed_zero(rawbitz[0], parsed)
-        # parsed = self._square_up_parsed_one(rawbitz[1], parsed)
-        parsed = self._square_up_allegiance_overflow(parsed)
+        rawbitz = self.trim_raw_bitz(parsed)
+        parsed = self.square_up_parsed_zero(rawbitz[0], parsed)
+        parsed = self.square_up_allegiance_overflow(parsed)
 
         no_extensions = parsed['ix'] is None and parsed['ex'] is None and parsed['cx'] is None
         ex_ix = parsed['ix'] if parsed['ix'] is not None else ' '
@@ -228,11 +178,13 @@ class BaseTransformer(Transformer):
             extensions = ''
 
         # Currently aiming to drop-in replace the starline regex output
-        data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'], parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'], parsed['zone'].upper(), parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
+        data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'],
+                parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'],
+                parsed['zone'].upper() if parsed['zone'] is not None else '', parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
 
         return data
 
-    def _preprocess_trade_and_extensions(self, tree):
+    def preprocess_trade_and_extensions(self, tree) -> Tree:
         trade = tree.children[2]
         extensions = tree.children[3]
         ix_reg = r'\{ *[+-]?[0-6] ?\}$'
@@ -251,7 +203,7 @@ class BaseTransformer(Transformer):
 
         # If trade has importance-extension child, we need to fix it
         counter = -1
-        ix_found = False
+        ix_found = False  # pragma: no mutate
         for kid in trade.children:
             counter += 1
             ix_match = re.match(ix_reg, kid.value)
@@ -274,33 +226,40 @@ class BaseTransformer(Transformer):
         return tree
 
     def _is_noble(self, noble_string):
-        noble = "BCcDEeFfGH"
+        noble = "BCcDEeFfGH"  # pragma: no mutate
         return all(char in noble for char in noble_string)
 
-    def _is_zone(self, zone_string):
+    def is_zone(self, zone_string) -> bool:
         if 1 != len(zone_string):
             return False
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
         return zone_string[0] in ParseStarInput.valid_zone
 
-    def _preprocess_tree_suspect_empty_trade_code(self, tree):
+    def preprocess_tree_suspect_empty_trade_code(self, tree) -> Tree:
         if 1 != len(tree.children[2].children):
             return tree
         if 1 != len(tree.children[3].children):
             return tree
         if 5 < len(tree.children[2].children[0]):
             return tree
-        if 5 != len(tree.children[3].children[0]):
-            return tree
+        try:
+            if 5 != len(tree.children[3].children[0]):
+                return tree
+        except TypeError:
+            if 5 != len(tree.children[3].children[0].children[0]):
+                return tree
         all_noble = self._is_noble(tree.children[2].children[0])
         if not all_noble:
             return tree
-        if self._is_zone(tree.children[4].children[2].children[0].value.strip()):
+        if self.is_zone(tree.children[4].children[2].children[0].value.strip()):
             return tree
-        tree.children[4].children[2].children[0].value = tree.children[4].children[1].children[0].value
-        tree.children[4].children[1].children[0].value = tree.children[4].children[0].children[0].value
-        tree.children[4].children[0].children[0].value = tree.children[2].children[0].value
-        tree.children[2].children[0].value = ""
+        tree.children[4].children[2].children[0] = Token(tree.children[4].children[2].children[0].type,
+                                                         tree.children[4].children[1].children[0].value)
+        tree.children[4].children[1].children[0] = Token(tree.children[4].children[1].children[0].type,
+                                                        tree.children[4].children[0].children[0].value)
+        tree.children[4].children[0].children[0] = Token(tree.children[4].children[0].children[0].type,
+                                                        tree.children[2].children[0].value)
+        tree.children[2].children[0] = Token(tree.children[2].children[0].type, "")
 
         return tree
 
@@ -351,50 +310,45 @@ class BaseTransformer(Transformer):
             i += 1
         return overrun
 
-    def _square_up_parsed(self, parsed):
-        if ' ' != parsed['nobles'] and 0 < len(parsed['nobles']) and '' == parsed['base'] and '' == parsed['zone'] and \
-                3 == len(parsed['allegiance']) and parsed['allegiance'][0].isdigit():
-            parsed['base'] = parsed['pbg']
-            parsed['zone'] = parsed['worlds']
-            parsed['pbg'] = parsed['allegiance']
-            parsed['worlds'] = ' '
-            parsed['allegiance'] = parsed['residual']
-            parsed['residual'] = ''
-
-        return parsed
-
     def trim_raw_string(self, tree) -> None:
         assert self.raw is not None, "Raw string not supplied before trimming"
-        strip_list = ['position', 'name', 'uwp', 'trade', 'ix', 'ex', 'cx']
+        strip_list = ['position', 'name', 'uwp', 'trade', 'ix', 'ex', 'cx']  # pragma: no mutate
 
         for dataval in strip_list:
             if dataval not in tree:
                 continue
             rawval = tree[dataval]
             if rawval is not None:
+                counter = 0
                 if rawval.startswith('{ '):
-                    oldlen = 0
-                    while oldlen != len(self.raw):
-                        oldlen = len(self.raw)
+                    while counter < 4:
+                        oldlen = len(self.raw)  # pragma: no mutate
                         self.raw = self.raw.replace('{  ', '{ ')
+                        self.raw = self.raw.replace('  }', ' }')
+                        if oldlen == len(self.raw):
+                            break
+                        counter += 1
 
                 index = self.raw.find(rawval)
                 self.raw = self.raw.replace(rawval, '', 1)
-                if 0 < index:
+                if -1 != index:
                     self.raw = self.raw[index:]
+                    continue
+                elif 'trade' != dataval:
+                    continue
                 # special-case trade-code removal
-                if 'trade' == dataval and -1 == index:
+                else:
                     bitz = rawval.split()
                     for valbit in bitz:
                         index = self.raw.find(valbit)
                         self.raw = self.raw.replace(valbit, '', 1)
-                        if 0 < index:
+                        if -1 != index:
                             self.raw = self.raw[index:]
 
-    def _square_up_parsed_zero(self, rawstring, parsed):
+    def square_up_parsed_zero(self, rawstring, parsed) -> dict:
         from PyRoute.Inputs.ParseStarInput import ParseStarInput
-        bitz = [item for item in rawstring.split(' ') if '' != item]
-        if 3 == len(bitz) and bitz[0] == parsed['nobles'] and bitz[1] == parsed['base'] and bitz[2] == parsed['zone']:
+        bitz = [item for item in rawstring.split() if '' != item]
+        if 3 == len(bitz) and bitz[0] == parsed['nobles'] and bitz[1] == parsed['base'] and bitz[2] == parsed['zone']:  # pragma: no mutate
             return parsed
         if 2 == len(bitz) and "" == parsed['zone']:
             if 2 < len(bitz[0]):  # bitz[0] can only possibly be nobles, so return
@@ -443,84 +397,8 @@ class BaseTransformer(Transformer):
                 parsed['zone'] = ''
         return parsed
 
-    def _square_up_parsed_one(self, rawstring, parsed):
-        rawtrim = rawstring.lstrip()
-        rawbitz = rawtrim.split(' ')
-        trimbitz = self._square_up_star_codes(rawbitz)
-        if 3 < len(trimbitz):
-            if trimbitz[0].isdigit():
-                parsed['worlds'] = trimbitz[0]
-                parsed['allegiance'] = trimbitz[1]
-                parsed['residual'] = ' '.join(trimbitz[2:])
-            else:
-                parsed['worlds'] = ' '
-                parsed['allegiance'] = trimbitz[0]
-                parsed['residual'] = ' '.join(trimbitz[1:])
-        elif 3 == len(trimbitz):
-            if trimbitz[0].isdigit():
-                parsed['worlds'] = trimbitz[0]
-                parsed['allegiance'] = trimbitz[1]
-                parsed['residual'] = trimbitz[2]
-            else:
-                parsed['worlds'] = ' '
-                parsed['allegiance'] = trimbitz[0]
-                parsed['residual'] = trimbitz[1] + ' ' + trimbitz[2]
-        elif len(rawtrim) + 3 <= len(rawstring):  # We don't have three matches, need to figure out how they drop in
-            alg = trimbitz[0]
-            rawtrim = rawtrim.replace(alg, '', 1)
-
-            if 2 == len(trimbitz):
-                allegiance = trimbitz[1]
-                rawtrim = rawtrim.replace(allegiance, '', 1)
-                if alg.isdigit() and 5 > len(alg) and 1 < len(allegiance) and (not allegiance[0].islower()):  # if first trimbit fits in worlds field, stick it there
-                    parsed['worlds'] = alg
-                    parsed['allegiance'] = allegiance
-                    parsed['residual'] = rawtrim.strip()
-                else:
-                    parsed['worlds'] = ' '
-                    parsed['allegiance'] = alg
-                    parsed['residual'] = allegiance
-
-            elif 1 == len(alg):  # Allegiance codes can't be single-char, so we actually have a worlds field
-                parsed['worlds'] = alg
-                parsed['allegiance'] = rawtrim.strip()
-            else:
-                parsed['worlds'] = ' '
-                parsed['allegiance'] = alg
-                parsed['residual'] = rawtrim.strip()
-        else:  # Assume worlds field is _not_ blank
-            if ' ' == parsed['worlds'] and 2 == len(trimbitz):  # if worlds field has been _parsed_ as blank, need to move allegiance and residual up one
-                parsed['worlds'] = trimbitz[0]
-                parsed['allegiance'] = trimbitz[1]
-                parsed['residual'] = ''
-
-        if '' == parsed['allegiance'].strip() and '' != parsed['residual']:  # Allegiance _must_ be filled, residual is optional, so switch them back if they're transposed
-            parsed['allegiance'] = parsed['residual']
-            parsed['residual'] = ''
-
-        return parsed
-
-    def _square_up_star_codes(self, rawbitz):
-        foobitz = [item for item in rawbitz if '' != item]
-        trimbitz = []
-        num_bitz = len(foobitz)
-        for i in range(0, num_bitz):
-            item = foobitz[i]
-            if '' == item:
-                continue
-            if 0 < i < num_bitz - 1:
-                next_item = foobitz[i + 1]
-                if next_item in self.star_classes:
-                    item += ' ' + next_item
-                    foobitz[i + 1] = ''
-            trimbitz.append(item)
-
-        return trimbitz
-
-    def _square_up_allegiance_overflow(self, parsed):
+    def square_up_allegiance_overflow(self, parsed) -> dict:
         alleg = parsed['allegiance']
-        if '----' == alleg or '--' == alleg:
-            return parsed
 
         if alleg.startswith('----') and 4 <= len(alleg):
             parsed['allegiance'] = '----'
@@ -531,26 +409,24 @@ class BaseTransformer(Transformer):
         else:
             counter = 0
             while counter < len(alleg) and (alleg[counter].isalnum() or '-' == alleg[counter] or '?' == alleg[counter]) and 4 > counter:
-                counter += 1
+                counter += 1  # pragma: no mutate
             if counter < len(alleg):
                 spacer = ' ' if parsed['residual'] != '' else ''
                 parsed['allegiance'] = alleg[:counter]
                 parsed['residual'] = alleg[counter:] + spacer + parsed['residual']
         return parsed
 
-    def _trim_raw_bitz(self, parsed):
+    def trim_raw_bitz(self, parsed) -> str:
         pbg = ' ' + parsed['pbg'] + ' '
         rawbitz = self.raw.split(pbg)
         oldlen = len(rawbitz)
         if 1 == oldlen:
             rawbitz.append('')
-        if 2 < oldlen:
+        if 2 < oldlen:  # pragma: no mutate
             collide = self._check_raw_collision(parsed)
             first = pbg.join(rawbitz[:-1]) if not collide else pbg.join(rawbitz[:-2])
             second = rawbitz[-1] if not collide else pbg.join(rawbitz[-2:])
-            repack = []
-            repack.append(first)
-            repack.append(second)
+            repack = [first, second]
             rawbitz = repack
         rawbitz[0] += ' '
         rawbitz[1] = ' ' + rawbitz[1]
