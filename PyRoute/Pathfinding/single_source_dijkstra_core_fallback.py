@@ -24,7 +24,7 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
     diagnostics = {'nodes_processed': 0, 'nodes_queued': len(heap), 'nodes_exceeded': 0, 'nodes_min_exceeded': 0,
                    'nodes_tailed': 0}
 
-    parents = np.ones(len(arcs)) * -100  # Using -100 to track "not considered during processing"
+    parents = np.ones(len(arcs), dtype=int) * -100  # Using -100 to track "not considered during processing"
     parents[list(seeds)] = -1  # Using -1 to flag "root node of tree"
 
     while heap:
