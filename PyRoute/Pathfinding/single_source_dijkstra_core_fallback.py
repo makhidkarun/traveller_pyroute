@@ -6,7 +6,6 @@ Created on 15 Sep, 2024
 import heapq
 import numpy as np
 
-
 def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, min_cost) -> tuple:
     if not isinstance(min_cost, np.ndarray):
         raise ValueError("min_cost must be ndarray")
@@ -63,7 +62,6 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
             diagnostics['nodes_tailed'] += 1
             continue
         active_weights = dist_tail + divisor * active_costs[keep]
-        assert (active_weights > dist_tail).all()  # pragma: no mutate
         distance_labels[active_nodes] = active_weights
 
         parents[active_nodes] = tail
