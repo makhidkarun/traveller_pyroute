@@ -6,6 +6,7 @@ Created on 15 Sep, 2024
 import heapq
 import numpy as np
 
+
 def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, min_cost) -> tuple:
     if not isinstance(min_cost, np.ndarray):
         raise ValueError("min_cost must be ndarray")
@@ -38,8 +39,7 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
             else:
                 diagnostics['nodes_min_exceeded'] += 1  # pragma: no mutate
             if heap:
-                heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]  # pragma: no mutate
-                        and distance + min_cost[tail] <= max_neighbour_labels[tail]]  # pragma: no mutate
+                heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]  # pragma: no mutate
                 heapq.heapify(heap)
             continue
 
