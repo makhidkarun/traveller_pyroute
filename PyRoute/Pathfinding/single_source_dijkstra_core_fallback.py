@@ -52,9 +52,8 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
         neighbours = arcs[tail]
         active_nodes = neighbours[0]
         active_costs = neighbours[1]
-        active_labels = distance_labels[active_nodes]
         # It's not worth (time wise) being cute and trying to break this up, forcing jumps in and out of numpy
-        keep = active_costs < (active_labels - dist_tail)  # pragma: no mutate
+        keep = active_costs < (distance_labels[active_nodes] - dist_tail)  # pragma: no mutate
         active_nodes = active_nodes[keep]
         num_nodes = len(active_nodes)
 
