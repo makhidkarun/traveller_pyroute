@@ -173,10 +173,8 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=f
                     # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
                     # or is too close to upbound
                     queue = [item for item in queue if item[1] <= upper_limit[item[2]]]
-                    # Finally, dedupe the queue after cleaning all bound-busts out and 2 or more elements are left.
-                    # Empty or single-element sets cannot require deduplication, and are already heaps themselves.
+                    # Empty or single-element lists are already heaps themselves.
                     if 1 < len(queue):
-                        queue = list(set(queue))
                         heapify(queue)
             # heappush(queue, (ncost + 0, ncost, target, curnode))
             heappush(queue, (ncost, ncost, target, curnode))
