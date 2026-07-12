@@ -427,17 +427,13 @@ class TradeCalculation(RouteCalculation):
             common_len = len(common)
             if 0 < common_len:
                 midbound = hist_src[1][src] + hist_targ[1][trg]
-                mindex = np.argmin(midbound)
-                upbound = min(upbound, midbound[mindex])
+                upbound = min(upbound, np.min(midbound))
                 if reheat:
                     adj = self.galaxy.stars._adj
                     reheat_list = set()
-                    reheat_list.add((stardex, common[mindex]))
-                    reheat_list.add((targdex, common[mindex]))
-                    if 1 < common_len:
-                        maxdex = np.argmax(midbound)
-                        reheat_list.add((stardex, common[maxdex]))
-                        reheat_list.add((targdex, common[maxdex]))
+                    for k in range(common_len):
+                        reheat_list.add((stardex, common[k]))
+                        reheat_list.add((targdex, common[k]))
 
                     for pair in reheat_list:
                         edge = adj[pair[0]][pair[1]]
