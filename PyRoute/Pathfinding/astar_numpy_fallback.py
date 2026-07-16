@@ -150,9 +150,9 @@ def astar_path_numpy(G, source, target, bulk_heuristic, upbound=float64max, diag
         active_weights = active_weights[keep]
         augmented_weights = augmented_weights[keep]
 
-        if target in active_nodes:
-            drop = active_nodes == target
-            ncost = active_weights[drop][0]
+        targcost = active_weights[active_nodes == target]
+        if 0 < len(targcost):
+            ncost = targcost[0]
 
             upbound = ncost
             new_upbounds += 1
