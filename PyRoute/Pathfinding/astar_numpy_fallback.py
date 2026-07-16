@@ -158,7 +158,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=f
         augmented_weights = augmented_weights[keep]
 
         if target in active_nodes:
-            num_neighbours = len(active_nodes)
             drop = active_nodes == target
             ncost = active_weights[drop][0]
 
@@ -179,19 +178,19 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=f
             # heappush(queue, (ncost + 0, ncost, target, curnode))
             heappush(queue, (ncost, ncost, target, curnode))
             queue_counter += 1
-            #  If target node is only active node, and is neighbour node of only active queue element, bail out now
-            #  and dodge the now-known-to-be-pointless neighbourhood bookkeeping.
-            if 1 == len(queue) and 1 == len(active_nodes):
+
+            # If target node is only active node, go around.
+            if 1 == len(active_nodes):
                 targ_exhausted += 1
                 continue
+
             # As we have a tighter upper bound, apply it to the neighbours as well - target will be excluded because
-            # its augmented weight is _equal_ to upbound
+            # its augmented weight is _equal_ to new upbound
             keep = augmented_weights < upbound
             active_nodes = active_nodes[keep]
 
-            # if there _was_ one neighbour to process, that was the target, so neighbour list is now empty.
-            # Likewise, if the new upper bound has emptied the neighbour list, go around.
-            if 1 == num_neighbours or 0 == len(active_nodes):
+            # If the new upper bound has emptied the neighbour list, go around.
+            if 0 == len(active_nodes):
                 targ_exhausted += 1
                 continue
 
