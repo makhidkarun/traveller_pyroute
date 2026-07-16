@@ -149,44 +149,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, upbound=float64max, diag
         active_weights = active_weights[keep]
         augmented_weights = augmented_weights[keep]
 
-        targcost = active_weights[active_nodes == target]
-        if 0 < len(targcost):
-            ncost = targcost[0]
-
-            upbound = ncost
-            new_upbounds += 1
-            distances[target] = ncost
-            if 0 < len(queue):
-                queue = [item for item in queue if item[0] < upbound]
-                if 0 < len(queue):
-                    # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
-                    # or is too close to upbound
-                    queue = [item for item in queue if item[1] <= distances[item[2]]]
-                    # Empty or single-element lists are already heaps themselves.
-                    if 1 < len(queue):
-                        heapify(queue)
-            # heappush(queue, (ncost + 0, ncost, target, curnode))
-            heappush(queue, (ncost, ncost, target, curnode))
-            queue_counter += 1
-
-            # If target node is only active node, go around.
-            if 1 == len(active_nodes):
-                targ_exhausted += 1
-                continue
-
-            # As we have a tighter upper bound, apply it to the neighbours as well - target will be excluded because
-            # its augmented weight is _equal_ to new upbound
-            keep = augmented_weights < upbound
-            active_nodes = active_nodes[keep]
-
-            # If the new upper bound has emptied the neighbour list, go around.
-            if 0 == len(active_nodes):
-                targ_exhausted += 1
-                continue
-
-            active_weights = active_weights[keep]
-            augmented_weights = augmented_weights[keep]
-
         # Now unconditionally queue _all_ nodes that are still active, worrying about filtering out the bound-busting
         # neighbours later.
         distances[active_nodes] = active_weights
