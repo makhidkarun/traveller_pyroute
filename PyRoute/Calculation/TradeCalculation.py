@@ -22,7 +22,14 @@ except ImportError:
 except AttributeError:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 from PyRoute.TradeBalance import TradeBalance
-from PyRoute.Pathfinding.TradeCalculationRawRoutesFallback import TradeCalculationRawRoutes
+try:
+    from PyRoute.Pathfinding.TradeCalculationRawRoutes import TradeCalculationRawRoutes
+except ModuleNotFoundError:
+    from PyRoute.Pathfinding.TradeCalculationRawRoutesFallback import TradeCalculationRawRoutes  # type: ignore
+except ImportError:
+    from PyRoute.Pathfinding.TradeCalculationRawRoutesFallback import TradeCalculationRawRoutes  # type: ignore
+except AttributeError:
+    from PyRoute.Pathfinding.TradeCalculationRawRoutesFallback import TradeCalculationRawRoutes  # type: ignore
 try:
     from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
