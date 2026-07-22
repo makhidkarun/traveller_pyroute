@@ -4,7 +4,6 @@ Created on Mar 15, 2014
 @author: tjoneslo
 """
 import functools
-import itertools
 import math
 from typing import Optional
 
@@ -23,6 +22,7 @@ except ImportError:
 except AttributeError:
     from PyRoute.Pathfinding.ApproximateShortestPathForestUnifiedFallback import ApproximateShortestPathForestUnified  # type: ignore
 from PyRoute.TradeBalance import TradeBalance
+from PyRoute.Pathfinding.TradeCalculationRawRoutesFallback import TradeCalculationRawRoutes
 try:
     from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
 except ModuleNotFoundError:
@@ -114,6 +114,7 @@ class TradeCalculation(RouteCalculation):
         # Track inter-allegiance trade imbalances
         self.allegiance_trade_volume_balance = TradeBalance(stat_field="tradeDtonExt", region=galaxy, field="alg",
                                                      star_field="allegiance_base", target_property="code")
+        self.raw_ranges = TradeCalculationRawRoutes(self)
 
     def base_route_filter(self, star, neighbor) -> bool:
         # by the time we've _reached_ here, we're assuming generate_base_routes() has handled the unilateral filtering
@@ -141,56 +142,7 @@ class TradeCalculation(RouteCalculation):
         return max_dist
 
     def _raw_ranges(self):
-        max_route_dist = max(self.btn_range)
-        max_range = self.galaxy.max_jump_range
-        min_btn = self.min_btn
-        min_wtn = self.min_route_wtn
-
-        hiball = [item for item in self.galaxy.ranges if item.wtn >= min_wtn and not item.is_redzone]
-        loball = [item for item in self.galaxy.ranges if item.wtn < min_wtn and not item.is_redzone]
-
-        def two_boost(x: tuple[Star, Star]) -> bool:
-            return (x[0].tradeCode.ag_code_boost and x[1].tradeCode.ag_code_boost
-                    and (x[0].tradeCode.agricultural or x[1].tradeCode.agricultural)) and \
-                   (x[0].tradeCode.in_code_boost and x[1].tradeCode.in_code_boost
-                    and (x[0].tradeCode.industrial or x[1].tradeCode.industrial))
-
-        def one_boost(x: tuple[Star, Star]) -> bool:
-            return (x[0].tradeCode.ag_code_boost and x[1].tradeCode.ag_code_boost
-                    and (x[0].tradeCode.agricultural or x[1].tradeCode.agricultural)) ^ \
-                   (x[0].tradeCode.in_code_boost and x[1].tradeCode.in_code_boost
-                    and (x[0].tradeCode.industrial or x[1].tradeCode.industrial))
-
-        def foo_boost(x: tuple[Star, Star]) -> bool:
-            return (x[0].tradeCode.ag_code_boost and x[1].tradeCode.ag_code_boost
-                    and (x[0].tradeCode.agricultural or x[1].tradeCode.agricultural)) or \
-                   (x[0].tradeCode.in_code_boost and x[1].tradeCode.in_code_boost
-                    and (x[0].tradeCode.industrial or x[1].tradeCode.industrial))
-
-        ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(hiball, 2)
-                  if (dist := star.distance(neighbour)) <= self._max_dist(star.wtn, neighbour.wtn, True)
-                  and self._get_btn_upper_bound(star, neighbour, max_range, min_btn, distance=dist) >= min_btn
-                  ]
-        hi_hi_ranges = [(star, neighbour) for (star, neighbour) in filter(two_boost, ranges)]
-        hi_hi_ranges1 = [(star, neighbour) for (star, neighbour) in filter(one_boost, ranges)
-                         if self._get_btn_upper_bound(star, neighbour, max_range, min_btn, offset=1) >= min_btn
-                         ]
-        hi_hi_ranges2 = [(star, neighbour) for (star, neighbour) in itertools.filterfalse(foo_boost, ranges)
-                         if self._get_btn_upper_bound(star, neighbour, max_range, min_btn, offset=0) >= min_btn
-                         ]
-        lo_lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(loball, 2)
-                        if (star.distance(neighbour)) <= max_range
-                        ]
-        hi_lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.product(hiball, loball)
-                        if (star.distance(neighbour)) <= max_range
-                        ]
-        hi_hi_ranges.extend(lo_lo_ranges)
-        hi_hi_ranges.extend(hi_lo_ranges)
-        hi_hi_ranges.extend(hi_hi_ranges1)
-        hi_hi_ranges.extend(hi_hi_ranges2)
-        self.logger.info("Routes with endpoints more than " + str(max_route_dist) + " pc apart, trimmed")
-
-        return hi_hi_ranges
+        return self.raw_ranges.raw_ranges()
 
     def generate_routes(self) -> None:
         """
