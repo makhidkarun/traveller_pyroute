@@ -9,6 +9,7 @@ import itertools
 
 from PyRoute import Star
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
+from PyRoute.TradeCodes import TradeCodes
 
 
 @cython.cclass
@@ -33,22 +34,28 @@ class TradeCalculationRawRoutes(object):
         loball = [item for item in self.trade.galaxy.ranges if item.wtn < min_wtn and not item.is_redzone]
 
         def two_boost(x: tuple[Star, Star]) -> bool:
-            return (x[0].tradeCode.ag_code_boost and x[1].tradeCode.ag_code_boost
-                    and (x[0].tradeCode.agricultural or x[1].tradeCode.agricultural)) and \
-                   (x[0].tradeCode.in_code_boost and x[1].tradeCode.in_code_boost
-                    and (x[0].tradeCode.industrial or x[1].tradeCode.industrial))
+            zero: TradeCodes = x[0].tradeCode
+            wun: TradeCodes = x[1].tradeCode
+            return (zero.ag_code_boost and wun.ag_code_boost
+                    and (zero.agricultural or wun.agricultural)) and \
+                   (zero.in_code_boost and wun.in_code_boost
+                    and (zero.industrial or wun.industrial))
 
         def one_boost(x: tuple[Star, Star]) -> bool:
-            return (x[0].tradeCode.ag_code_boost and x[1].tradeCode.ag_code_boost
-                    and (x[0].tradeCode.agricultural or x[1].tradeCode.agricultural)) ^ \
-                   (x[0].tradeCode.in_code_boost and x[1].tradeCode.in_code_boost
-                    and (x[0].tradeCode.industrial or x[1].tradeCode.industrial))
+            zero: TradeCodes = x[0].tradeCode
+            wun: TradeCodes = x[1].tradeCode
+            return (zero.ag_code_boost and wun.ag_code_boost
+                    and (zero.agricultural or wun.agricultural)) ^ \
+                   (zero.in_code_boost and wun.in_code_boost
+                    and (zero.industrial or wun.industrial))
 
         def foo_boost(x: tuple[Star, Star]) -> bool:
-            return (x[0].tradeCode.ag_code_boost and x[1].tradeCode.ag_code_boost
-                    and (x[0].tradeCode.agricultural or x[1].tradeCode.agricultural)) or \
-                   (x[0].tradeCode.in_code_boost and x[1].tradeCode.in_code_boost
-                    and (x[0].tradeCode.industrial or x[1].tradeCode.industrial))
+            zero: TradeCodes = x[0].tradeCode
+            wun: TradeCodes = x[1].tradeCode
+            return (zero.ag_code_boost and wun.ag_code_boost
+                    and (zero.agricultural or wun.agricultural)) or \
+                   (zero.in_code_boost and wun.in_code_boost
+                    and (zero.industrial or wun.industrial))
 
         ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(hiball, 2)
                   if (dist := star.distance(neighbour)) <= self.trade._max_dist(star.wtn, neighbour.wtn, True)
