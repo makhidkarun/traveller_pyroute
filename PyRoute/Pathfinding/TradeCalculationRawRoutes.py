@@ -24,6 +24,10 @@ class TradeCalculationRawRoutes(object):
             raise ValueError("Trade must be instance of TradeCalculation or subclass")
         self.trade = trade
 
+    @cython.boundscheck(False)
+    @cython.initializedcheck(False)
+    @cython.wraparound(False)
+    @cython.nonecheck(False)
     def raw_ranges(self) -> list[tuple[Star, Star]]:
         max_route_dist = max(self.trade.btn_range)
         max_range = self.trade.galaxy.max_jump_range
