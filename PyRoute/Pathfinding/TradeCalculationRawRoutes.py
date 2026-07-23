@@ -75,9 +75,7 @@ class TradeCalculationRawRoutes(object):
         lo_lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(loball, 2)
                         if (star.distance(neighbour)) <= max_range
                         ]
-        hi_lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.product(hiball, loball)
-                        if (star.distance(neighbour)) <= max_range
-                        ]
+        hi_lo_ranges = self._hi_lo_ranges(hiball, loball, max_range)
         hi_hi_ranges.extend(lo_lo_ranges)
         hi_hi_ranges.extend(hi_lo_ranges)
         hi_hi_ranges.extend(hi_hi_ranges1)
@@ -106,3 +104,30 @@ class TradeCalculationRawRoutes(object):
         btn += RouteCalculation.get_btn_offset(distance)
         btn = min(btn, RouteCalculation.get_max_btn(star1.wtn, star2.wtn))
         return min_btn if min_btn > btn and distance <= max_range else btn
+
+    @cython.cfunc
+    @cython.infer_types(True)
+    @cython.boundscheck(False)
+    @cython.initializedcheck(False)
+    @cython.nonecheck(False)
+    @cython.wraparound(False)
+    def _hi_lo_ranges(self, hiball: cython.list[Star], loball: cython.list[Star], max_range: cython.int):
+        m: cython.Py_ssize_t = len(hiball)
+        n: cython.Py_ssize_t = len(loball)
+        ranges: cython.list[cython.tuple[Star, Star]] = []
+        i: cython.Py_ssize_t
+        j: cython.Py_ssize_t
+        histar: Star
+        lostar: Star
+        dist: cython.int
+
+        for i in range(m):
+            histar = hiball[i]
+
+            for j in range(n):
+                lostar = hiball[j]
+                dist = histar.distance(lostar)
+                if dist <= max_range:
+                    ranges.append((histar, lostar))
+
+        return ranges
