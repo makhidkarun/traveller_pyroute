@@ -137,12 +137,22 @@ class TradeCalculationRawRoutes(object):
         histar: Star
         lostar: Star
         dist: cython.int
+        q1: cython.int
+        q2: cython.int
+        del_q: cython.int
+        range_sq = max_range * max_range
 
         for i in range(m):
             histar = hiball[i]
+            q1 = histar.hex.q
 
             for j in range(n):
                 lostar = loball[j]
+                q2 = lostar.hex.q
+                del_q = q1 - q2
+                if (del_q * del_q > range_sq):
+                    continue
+
                 dist = histar.distance(lostar)
                 if dist <= max_range:
                     ranges.append((histar, lostar))
