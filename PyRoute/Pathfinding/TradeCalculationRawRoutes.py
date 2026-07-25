@@ -143,6 +143,7 @@ class TradeCalculationRawRoutes(object):
         upper0: cython.int
 
         max_dist_fn = self.trade._max_dist
+        get_upper = self._get_btn_upper_bound
 
         for i in range(n - 1):
             histar = hiball[i]
@@ -153,17 +154,23 @@ class TradeCalculationRawRoutes(object):
             for j in range(i + 1, n):
                 lostar = hiball[j]
                 lo_wtn = lostar.wtn
+                lo_hex = lostar.hex
                 max_dist = max_dist_fn(hi_wtn, lo_wtn, True)
-                del_q = q1 - lostar.hex.q
-                if abs(del_q) > max_dist:
+                del_q = q1 - lo_hex.q
+                if del_q > max_dist or del_q < -max_dist:
                     continue
-                del_r = r1 - lostar.hex.r
-                if abs(del_r) > max_dist:
+                del_r = r1 - lo_hex.r
+                if del_r > max_dist or del_r < -max_dist:
                     continue
-                dist = histar.distance(lostar)
+
+                aq = del_q if del_q >= 0 else -del_q
+                ar = del_r if del_r >= 0 else -del_r
+                ad = del_q + del_r
+                ad = ad if ad >= 0 else -ad
+                dist = (aq + ar + ad) // 2
                 if dist > max_dist:
                     continue
-                upper2 = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, distance=dist)
+                upper2 = get_upper(histar, lostar, max_range, min_btn, distance=dist)
                 if min_btn > upper2:
                     continue
                 if dist <= max_range:
