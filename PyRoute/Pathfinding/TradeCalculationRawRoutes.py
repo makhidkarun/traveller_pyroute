@@ -85,9 +85,7 @@ class TradeCalculationRawRoutes(object):
                          if upper1 >= min_btn
                          ]
         t4 = time.perf_counter()
-        lo_lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(loball, 2)
-                        if (star.distance(neighbour)) <= max_range
-                        ]
+        lo_lo_ranges = self._lo_lo_ranges(loball, max_range)
         t5 = time.perf_counter()
         hi_lo_ranges = self._hi_lo_ranges(hiball, loball, max_range)
         t6 = time.perf_counter()
@@ -139,19 +137,63 @@ class TradeCalculationRawRoutes(object):
         lostar: Star
         dist: cython.int
         q1: cython.int
-        q2: cython.int
         del_q: cython.int
+        r1: cython.int
+        del_r: cython.int
         range_sq = max_range * max_range
 
         for i in range(m):
             histar = hiball[i]
             q1 = histar.hex.q
+            r1 = histar.hex.r
 
             for j in range(n):
                 lostar = loball[j]
-                q2 = lostar.hex.q
-                del_q = q1 - q2
+                del_q = q1 - lostar.hex.q
                 if (del_q * del_q > range_sq):
+                    continue
+                del_r = r1 - lostar.hex.r
+                if (del_r * del_r > range_sq):
+                    continue
+
+                dist = histar.distance(lostar)
+                if dist <= max_range:
+                    ranges.append((histar, lostar))
+
+        return ranges
+
+    @cython.cfunc
+    @cython.infer_types(True)
+    @cython.boundscheck(False)
+    @cython.initializedcheck(False)
+    @cython.nonecheck(False)
+    @cython.wraparound(False)
+    def _lo_lo_ranges(self, loball: cython.list[Star], max_range: cython.int):
+        n: cython.Py_ssize_t = len(loball)
+        ranges: cython.list[cython.tuple[Star, Star]] = []
+        i: cython.Py_ssize_t
+        j: cython.Py_ssize_t
+        histar: Star
+        lostar: Star
+        dist: cython.int
+        q1: cython.int
+        del_q: cython.int
+        r1: cython.int
+        del_r: cython.int
+        range_sq = max_range * max_range
+
+        for i in range(n - 1):
+            histar = loball[i]
+            q1 = histar.hex.q
+            r1 = histar.hex.r
+
+            for j in range(i + 1, n):
+                lostar = loball[j]
+                del_q = q1 - lostar.hex.q
+                if (del_q * del_q > range_sq):
+                    continue
+                del_r = r1 - lostar.hex.r
+                if (del_r * del_r > range_sq):
                     continue
 
                 dist = histar.distance(lostar)
