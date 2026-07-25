@@ -94,7 +94,7 @@ class TradeCalculationRawRoutes(object):
         dist = (aq + ar + ad) // 2
         return dist
 
-    @cython.cfunc
+    @cython.ccall
     @cython.infer_types(True)
     @cython.boundscheck(False)
     @cython.initializedcheck(False)
@@ -156,7 +156,7 @@ class TradeCalculationRawRoutes(object):
 
         return ranges
 
-    @cython.cfunc
+    @cython.ccall
     @cython.infer_types(True)
     @cython.boundscheck(False)
     @cython.initializedcheck(False)
@@ -193,7 +193,7 @@ class TradeCalculationRawRoutes(object):
 
         return nu_ranges
 
-    @cython.cfunc
+    @cython.ccall
     @cython.infer_types(True)
     @cython.boundscheck(False)
     @cython.initializedcheck(False)
@@ -234,7 +234,7 @@ class TradeCalculationRawRoutes(object):
 
         return ranges
 
-    @cython.cfunc
+    @cython.ccall
     @cython.infer_types(True)
     @cython.boundscheck(False)
     @cython.initializedcheck(False)
