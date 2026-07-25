@@ -84,19 +84,20 @@ class TradeCalculationRawRoutes(object):
         hi_hi_ranges2 = [(star, neighbour) for (star, neighbour, dist, upper1, upper0) in itertools.filterfalse(foo_boost, ranges)
                          if upper1 >= min_btn
                          ]
+        t4 = time.perf_counter()
         lo_lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(loball, 2)
                         if (star.distance(neighbour)) <= max_range
                         ]
-        t4 = time.perf_counter()
-        hi_lo_ranges = self._hi_lo_ranges(hiball, loball, max_range)
         t5 = time.perf_counter()
+        hi_lo_ranges = self._hi_lo_ranges(hiball, loball, max_range)
+        t6 = time.perf_counter()
         hi_hi_ranges.extend(lo_lo_ranges)
         hi_hi_ranges.extend(hi_lo_ranges)
         hi_hi_ranges.extend(hi_hi_ranges1)
         hi_hi_ranges.extend(hi_hi_ranges2)
         self.trade.logger.info("Routes with endpoints more than " + str(max_route_dist) + " pc apart, trimmed")
         self.trade.logger.info(
-            f"raw_ranges phases: init {t1 - t0:.6f}s, split {t2 - t1:.6f}s, ranges {t3 - t2:.6f}s, filters {t4 - t3:.6f}s, hi-lo filters {t5 - t4:.6f}s"
+            f"raw_ranges phases: init {t1 - t0:.6f}s, split {t2 - t1:.6f}s, ranges {t3 - t2:.6f}s, filters {t4 - t3:.6f}s, lo-lo filters {t5 - t4:.6f}s, hi-lo filters {t6 - t5:.6f}s"
         )
 
         return hi_hi_ranges
