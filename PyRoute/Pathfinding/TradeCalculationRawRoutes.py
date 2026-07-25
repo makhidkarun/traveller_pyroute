@@ -233,33 +233,34 @@ class TradeCalculationRawRoutes(object):
         n: cython.Py_ssize_t = len(loball)
         ranges: cython.list[cython.tuple[Star, Star]] = []
         i: cython.Py_ssize_t
-        j: cython.Py_ssize_t
         histar: Star
         lostar: Star
-        dist: cython.int
         q1: cython.int
-        del_q: cython.int
+        q2: cython.int
         r1: cython.int
-        del_r: cython.int
-        range_sq = max_range * max_range
+        r2: cython.int
+
+        offsets = TradeCalculationRawRoutes._axial_offsets_within(max_range)
+        lob_map = {(s.hex.q, s.hex.r): s for s in loball}
 
         for i in range(n - 1):
             histar = loball[i]
             q1 = histar.hex.q
             r1 = histar.hex.r
 
-            for j in range(i + 1, n):
-                lostar = loball[j]
-                del_q = q1 - lostar.hex.q
-                if (del_q * del_q > range_sq):
-                    continue
-                del_r = r1 - lostar.hex.r
-                if (del_r * del_r > range_sq):
+            a = (q1, r1)
+            for dq, dr in offsets:
+                q2 = q1 + dq
+                r2 = r1 + dr
+                # Skip self; optional but saves one lookup
+                if dq == 0 and dr == 0:
                     continue
 
-                dist = TradeCalculationRawRoutes._distance(del_q, del_r)
-                if dist <= max_range:
-                    ranges.append((histar, lostar))
+                # Lexicographic uniqueness: only emit when (q1,r1) < (q2,r2)
+                if a < (q2, r2):
+                    lostar = lob_map.get((q2, r2))
+                    if lostar is not None:
+                        ranges.append((histar, lostar))
 
         return ranges
 
