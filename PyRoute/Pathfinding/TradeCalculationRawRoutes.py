@@ -70,12 +70,7 @@ class TradeCalculationRawRoutes(object):
                    (zero.in_code_boost and wun.in_code_boost
                     and (zero.industrial or wun.industrial))
 
-        ranges = [(star, neighbour, dist, upper1, upper0) for (star, neighbour) in itertools.combinations(hiball, 2)
-                  if (dist := star.distance(neighbour)) <= self.trade._max_dist(star.wtn, neighbour.wtn, True)
-                  and (upper2 := self._get_btn_upper_bound(star, neighbour, max_range, min_btn, distance=dist)) >= min_btn
-                  and (upper1 := max(min_btn, upper2 - 1) if dist <= max_range else upper2 - 1)
-                  and (upper0 := max(min_btn, upper2 - 2) if dist <= max_range else upper2 - 2)
-                  ]
+        ranges = self._base_ranges(hiball, max_range, min_btn)
         t3 = time.perf_counter()
         hi_hi_ranges = [(star, neighbour) for (star, neighbour, dist, upper1, upper0) in filter(two_boost, ranges)]
         hi_hi_ranges1 = [(star, neighbour) for (star, neighbour, dist, upper1, upper0) in filter(one_boost, ranges)
@@ -120,6 +115,66 @@ class TradeCalculationRawRoutes(object):
         btn += RouteCalculation.get_btn_offset(distance)
         btn = min(btn, RouteCalculation.get_max_btn(star1.wtn, star2.wtn))
         return min_btn if min_btn > btn and distance <= max_range else btn
+
+    @cython.cfunc
+    @cython.infer_types(True)
+    @cython.boundscheck(False)
+    @cython.initializedcheck(False)
+    @cython.nonecheck(False)
+    @cython.wraparound(False)
+    def _base_ranges(self, hiball: cython.list[Star], max_range: cython.int, min_btn: cython.int):
+        n: cython.Py_ssize_t = len(hiball)
+        ranges: cython.list[cython.tuple[Star, Star, int, int, int]] = []
+        i: cython.Py_ssize_t
+        j: cython.Py_ssize_t
+        histar: Star
+        lostar: Star
+        dist: cython.int
+        q1: cython.int
+        del_q: cython.int
+        r1: cython.int
+        del_r: cython.int
+        hi_wtn: cython.int
+        lo_wtn: cython.int
+        max_dist: cython.int
+        upper2: cython.int
+        upper1: cython.int
+        upper0: cython.int
+
+        max_dist_fn = self.trade._max_dist
+
+        for i in range(n - 1):
+            histar = hiball[i]
+            q1 = histar.hex.q
+            r1 = histar.hex.r
+            hi_wtn = histar.wtn
+
+            for j in range(i + 1, n):
+                lostar = hiball[j]
+                lo_wtn = lostar.wtn
+                max_dist = max_dist_fn(hi_wtn, lo_wtn, True)
+                del_q = q1 - lostar.hex.q
+                if abs(del_q) > max_dist:
+                    continue
+                del_r = r1 - lostar.hex.r
+                if abs(del_r) > max_dist:
+                    continue
+                dist = histar.distance(lostar)
+                if dist > max_dist:
+                    continue
+                upper2 = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, distance=dist)
+                if min_btn > upper2:
+                    continue
+                if dist <= max_range:
+                    upper1 = max(min_btn, upper2 - 1)
+                    upper0 = max(min_btn, upper2 - 2)
+                else:
+                    upper1 = upper2 - 1
+                    upper0 = upper2 - 2
+
+                ranges.append((histar, lostar, dist, upper1, upper0))
+
+        return ranges
 
     @cython.cfunc
     @cython.infer_types(True)
