@@ -46,7 +46,7 @@ class TradeCalculationRawRoutes(object):
         loball = [item for item in self.trade.galaxy.ranges if item.wtn < min_wtn and not item.is_redzone]
         t2 = time.perf_counter()
 
-        def two_boost(x: tuple[Star, Star, int]) -> bool:
+        def two_boost(x: tuple[Star, Star, int, int, int]) -> bool:
             zero: TradeCodes = x[0].tradeCode
             wun: TradeCodes = x[1].tradeCode
             return (zero.ag_code_boost and wun.ag_code_boost
@@ -54,7 +54,7 @@ class TradeCalculationRawRoutes(object):
                    (zero.in_code_boost and wun.in_code_boost
                     and (zero.industrial or wun.industrial))
 
-        def one_boost(x: tuple[Star, Star, int]) -> bool:
+        def one_boost(x: tuple[Star, Star, int, int, int]) -> bool:
             zero: TradeCodes = x[0].tradeCode
             wun: TradeCodes = x[1].tradeCode
             return (zero.ag_code_boost and wun.ag_code_boost
@@ -62,7 +62,7 @@ class TradeCalculationRawRoutes(object):
                    (zero.in_code_boost and wun.in_code_boost
                     and (zero.industrial or wun.industrial))
 
-        def foo_boost(x: tuple[Star, Star, int]) -> bool:
+        def foo_boost(x: tuple[Star, Star, int, int, int]) -> bool:
             zero: TradeCodes = x[0].tradeCode
             wun: TradeCodes = x[1].tradeCode
             return (zero.ag_code_boost and wun.ag_code_boost
@@ -70,17 +70,19 @@ class TradeCalculationRawRoutes(object):
                    (zero.in_code_boost and wun.in_code_boost
                     and (zero.industrial or wun.industrial))
 
-        ranges = [(star, neighbour, dist) for (star, neighbour) in itertools.combinations(hiball, 2)
+        ranges = [(star, neighbour, dist, upper1, upper0) for (star, neighbour) in itertools.combinations(hiball, 2)
                   if (dist := star.distance(neighbour)) <= self.trade._max_dist(star.wtn, neighbour.wtn, True)
-                  and self._get_btn_upper_bound(star, neighbour, max_range, min_btn, distance=dist) >= min_btn
+                  and (upper2 := self._get_btn_upper_bound(star, neighbour, max_range, min_btn, distance=dist)) >= min_btn
+                  and (upper1 := max(min_btn, upper2 - 1) if dist <= max_range else upper2 - 1)
+                  and (upper0 := max(min_btn, upper2 - 2) if dist <= max_range else upper2 - 2)
                   ]
         t3 = time.perf_counter()
-        hi_hi_ranges = [(star, neighbour) for (star, neighbour, dist) in filter(two_boost, ranges)]
-        hi_hi_ranges1 = [(star, neighbour) for (star, neighbour, dist) in filter(one_boost, ranges)
-                         if self._get_btn_upper_bound(star, neighbour, max_range, min_btn, offset=1, distance=dist) >= min_btn
+        hi_hi_ranges = [(star, neighbour) for (star, neighbour, dist, upper1, upper0) in filter(two_boost, ranges)]
+        hi_hi_ranges1 = [(star, neighbour) for (star, neighbour, dist, upper1, upper0) in filter(one_boost, ranges)
+                         if upper1 >= min_btn
                          ]
-        hi_hi_ranges2 = [(star, neighbour) for (star, neighbour, dist) in itertools.filterfalse(foo_boost, ranges)
-                         if self._get_btn_upper_bound(star, neighbour, max_range, min_btn, offset=0, distance=dist) >= min_btn
+        hi_hi_ranges2 = [(star, neighbour) for (star, neighbour, dist, upper1, upper0) in itertools.filterfalse(foo_boost, ranges)
+                         if upper1 >= min_btn
                          ]
         lo_lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(loball, 2)
                         if (star.distance(neighbour)) <= max_range
