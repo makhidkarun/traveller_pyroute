@@ -96,6 +96,7 @@ class TradeCalculationRawRoutes(object):
         return hi_hi_ranges
 
     @staticmethod
+    @cython.returns(cython.int)
     def _get_btn_upper_bound(star1, star2, max_range, min_btn, distance=None, offset: int = 2):
         """
         Return an _upper bound_ on the BTN between star1 and star2.  If the upper bound on BTN
