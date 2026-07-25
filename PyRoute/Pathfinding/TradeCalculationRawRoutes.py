@@ -201,35 +201,24 @@ class TradeCalculationRawRoutes(object):
     @cython.wraparound(False)
     def _hi_lo_ranges(self, hiball: cython.list[Star], loball: cython.list[Star], max_range: cython.int):
         m: cython.Py_ssize_t = len(hiball)
-        n: cython.Py_ssize_t = len(loball)
         ranges: cython.list[cython.tuple[Star, Star]] = []
         i: cython.Py_ssize_t
-        j: cython.Py_ssize_t
         histar: Star
         lostar: Star
-        dist: cython.int
         q1: cython.int
-        del_q: cython.int
         r1: cython.int
-        del_r: cython.int
-        range_sq = max_range * max_range
+
+        offsets = TradeCalculationRawRoutes._axial_offsets_within(max_range)
+        lob_map = {(s.hex.q, s.hex.r): s for s in loball}
 
         for i in range(m):
             histar = hiball[i]
             q1 = histar.hex.q
             r1 = histar.hex.r
 
-            for j in range(n):
-                lostar = loball[j]
-                del_q = q1 - lostar.hex.q
-                if (del_q * del_q > range_sq):
-                    continue
-                del_r = r1 - lostar.hex.r
-                if (del_r * del_r > range_sq):
-                    continue
-
-                dist = TradeCalculationRawRoutes._distance(del_q, del_r)
-                if dist <= max_range:
+            for dq, dr in offsets:
+                lostar = lob_map.get((q1 + dq, r1 + dr))
+                if lostar is not None:
                     ranges.append((histar, lostar))
 
         return ranges
@@ -273,3 +262,14 @@ class TradeCalculationRawRoutes(object):
                     ranges.append((histar, lostar))
 
         return ranges
+
+    def _axial_offsets_within(R: cython.int):
+        offsets: cython.list[cython.tuple[cython.int, cython.int]] = []
+        for dq in range(-R, R + 1):
+            for dr in range(-R, R + 1):
+                dx = dq
+                dz = dr
+                dy = -dx - dz
+                if (abs(dx) + abs(dy) + abs(dz)) // 2 <= R:
+                    offsets.append((dq, dr))
+        return offsets
