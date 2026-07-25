@@ -96,8 +96,9 @@ class TradeCalculationRawRoutes(object):
         return hi_hi_ranges
 
     @staticmethod
+    @cython.cfunc
     @cython.returns(cython.int)
-    def _get_btn_upper_bound(star1, star2, max_range, min_btn, distance=None, offset: int = 2):
+    def _get_btn_upper_bound(star1: Star, star2: Star, max_range: cython.int, min_btn: cython.int, distance: cython.int):
         """
         Return an _upper bound_ on the BTN between star1 and star2.  If the upper bound on BTN
         doesn't meet/beat the minimum BTN, then the _actual_ BTN, which also doesn't meet/beat
@@ -106,15 +107,13 @@ class TradeCalculationRawRoutes(object):
         supplied min_btn.
         """
         # Default assumes BTN is boosted by both agricultural and industrial matches
-        # Offset of 1 assumes BTN is boosted by one match, agricultural xor industrial
-        # Offset of 0 assumes no boost.
-        btn = star1.wtn + star2.wtn + offset + RouteCalculation.get_btn_allies(star1.alg_code, star2.alg_code)
+        wtn1: cython.int = star1.wtn
+        wtn2: cython.int = star2.wtn
 
-        if distance is None:
-            distance = star1.distance(star2)
+        btn: cython.int = wtn1 + wtn2 + 2 + RouteCalculation.get_btn_allies(star1.alg_code, star2.alg_code)
 
         btn += RouteCalculation.get_btn_offset(distance)
-        btn = min(btn, RouteCalculation.get_max_btn(star1.wtn, star2.wtn))
+        btn = min(btn, RouteCalculation.get_max_btn(wtn1, wtn2))
         return min_btn if min_btn > btn and distance <= max_range else btn
 
     @cython.cfunc
