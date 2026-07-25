@@ -83,6 +83,17 @@ class TradeCalculationRawRoutes(object):
         btn = min(btn, RouteCalculation.get_max_btn(wtn1, wtn2))
         return min_btn if min_btn > btn and distance <= max_range else btn
 
+    @staticmethod
+    @cython.cfunc
+    @cython.returns(cython.int)
+    def _distance(del_q: cython.int, del_r: cython.int):
+        aq = del_q if del_q >= 0 else -del_q
+        ar = del_r if del_r >= 0 else -del_r
+        ad = del_q + del_r
+        ad = ad if ad >= 0 else -ad
+        dist = (aq + ar + ad) // 2
+        return dist
+
     @cython.cfunc
     @cython.infer_types(True)
     @cython.boundscheck(False)
@@ -128,11 +139,7 @@ class TradeCalculationRawRoutes(object):
                 if del_r > max_dist or del_r < -max_dist:
                     continue
 
-                aq = del_q if del_q >= 0 else -del_q
-                ar = del_r if del_r >= 0 else -del_r
-                ad = del_q + del_r
-                ad = ad if ad >= 0 else -ad
-                dist = (aq + ar + ad) // 2
+                dist = TradeCalculationRawRoutes._distance(del_q, del_r)
                 if dist > max_dist:
                     continue
                 upper2 = TradeCalculationRawRoutes._get_btn_upper_bound(histar, lostar, max_range, min_btn, dist)
@@ -221,7 +228,7 @@ class TradeCalculationRawRoutes(object):
                 if (del_r * del_r > range_sq):
                     continue
 
-                dist = histar.distance(lostar)
+                dist = TradeCalculationRawRoutes._distance(del_q, del_r)
                 if dist <= max_range:
                     ranges.append((histar, lostar))
 
@@ -261,7 +268,7 @@ class TradeCalculationRawRoutes(object):
                 if (del_r * del_r > range_sq):
                     continue
 
-                dist = histar.distance(lostar)
+                dist = TradeCalculationRawRoutes._distance(del_q, del_r)
                 if dist <= max_range:
                     ranges.append((histar, lostar))
 
