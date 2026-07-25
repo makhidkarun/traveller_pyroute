@@ -8,6 +8,12 @@ import cython
 import itertools
 import time
 
+try:
+    from line_profiler import profile
+except ImportError:
+    def profile(func) -> object:
+        return func
+
 from PyRoute import Star
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.TradeCodes import TradeCodes
@@ -106,7 +112,7 @@ class TradeCalculationRawRoutes(object):
         # Offset of 0 assumes no boost.
         btn = star1.wtn + star2.wtn + offset + RouteCalculation.get_btn_allies(star1.alg_code, star2.alg_code)
 
-        if not distance:
+        if distance is None:
             distance = star1.distance(star2)
 
         btn += RouteCalculation.get_btn_offset(distance)
