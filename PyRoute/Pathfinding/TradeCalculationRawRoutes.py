@@ -4,6 +4,8 @@ Created on Jul 22, 2026
 
 @author: CyberiaResurrection
 """
+import bisect
+
 import cython
 import time
 
@@ -24,6 +26,8 @@ class TradeCalculationRawRoutes(object):
     _allies_dict: cython.dict
     algs: set
     btn_range: cython.list[cython.int]
+    btn_jump_range: cython.list[cython.int]
+    btn_jump_mod: cython.list[cython.int]
     max_range: cython.int
     min_wtn: cython.int
 
@@ -35,6 +39,8 @@ class TradeCalculationRawRoutes(object):
         self._allies_dict: dict = {}
         self.algs = set()
         self.btn_range = trade.btn_range
+        self.btn_jump_range = trade.btn_jump_range
+        self.btn_jump_mod = trade.btn_jump_mod
         self.max_range = self.trade.galaxy.max_jump_range
         self.min_wtn = self.trade.min_wtn
 
@@ -97,7 +103,7 @@ class TradeCalculationRawRoutes(object):
         # btn: cython.int = wtn1 + wtn2 + 2 + RouteCalculation.get_btn_allies(star1.alg_code, star2.alg_code)
         btn: cython.int = wtn1 + wtn2 + 2 + self._get_btn_allies(star1.alg_code, star2.alg_code)
 
-        btn += RouteCalculation.get_btn_offset(distance)
+        btn += self._get_btn_offset(distance)
         btn = min(btn, self._get_max_btn(wtn1, wtn2))
         return min_btn if min_btn > btn and distance <= max_range else btn
 
@@ -315,3 +321,9 @@ class TradeCalculationRawRoutes(object):
         if neighbour_wtn > star_wtn:
             return self._get_max_btn(neighbour_wtn, star_wtn)
         return (neighbour_wtn * 2) + 1
+
+    @cython.cfunc
+    @cython.returns(cython.int)
+    def _get_btn_offset(self, distance: cython.int):
+        jump_index = bisect.bisect_left(self.btn_jump_range, distance)
+        return self.btn_jump_mod[jump_index]
