@@ -23,6 +23,9 @@ class TradeCalculationRawRoutes(object):
     trade: object
     _allies_dict: cython.dict
     algs: set
+    btn_range: cython.list[cython.int]
+    max_range: cython.int
+    min_wtn: cython.int
 
     def __init__(self, trade):
         from PyRoute.Calculation.TradeCalculation import TradeCalculation
@@ -31,6 +34,9 @@ class TradeCalculationRawRoutes(object):
         self.trade = trade
         self._allies_dict: dict = {}
         self.algs = set()
+        self.btn_range = trade.btn_range
+        self.max_range = self.trade.galaxy.max_jump_range
+        self.min_wtn = self.trade.min_wtn
 
     @profile
     @cython.boundscheck(False)
@@ -131,7 +137,7 @@ class TradeCalculationRawRoutes(object):
         upper1: cython.int
         upper0: cython.int
 
-        max_dist_fn = self.trade._max_dist
+        max_dist_fn = self._max_dist
 
         for i in range(n - 1):
             histar = hiball[i]
@@ -291,3 +297,14 @@ class TradeCalculationRawRoutes(object):
     def _get_btn_allies(self, alg_code1: str | None, alg_code2: str | None):
         allies_dex: cython.tuple = (alg_code1, alg_code2)
         return self._allies_dict[allies_dex]
+
+    @cython.ccall
+    @cython.returns(cython.int)
+    def _max_dist(self, star_wtn: cython.int, neighbour_wtn: cython.int, maxjump: cython.bint = False):
+        if neighbour_wtn < star_wtn:
+            return self._max_dist(neighbour_wtn, star_wtn, maxjump)
+        offset = min(max(0, neighbour_wtn - self.min_wtn), 6)
+        max_dist = self.btn_range[offset]
+        if maxjump:
+            return max(max_dist, self.max_range)
+        return max_dist
