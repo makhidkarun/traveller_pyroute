@@ -98,7 +98,7 @@ class TradeCalculationRawRoutes(object):
         btn: cython.int = wtn1 + wtn2 + 2 + self._get_btn_allies(star1.alg_code, star2.alg_code)
 
         btn += RouteCalculation.get_btn_offset(distance)
-        btn = min(btn, RouteCalculation.get_max_btn(wtn1, wtn2))
+        btn = min(btn, self._get_max_btn(wtn1, wtn2))
         return min_btn if min_btn > btn and distance <= max_range else btn
 
     @staticmethod
@@ -308,3 +308,10 @@ class TradeCalculationRawRoutes(object):
         if maxjump:
             return max(max_dist, self.max_range)
         return max_dist
+
+    @cython.cfunc
+    @cython.returns(cython.int)
+    def _get_max_btn(self, star_wtn: cython.int, neighbour_wtn: cython.int):
+        if neighbour_wtn > star_wtn:
+            return self._get_max_btn(neighbour_wtn, star_wtn)
+        return (neighbour_wtn * 2) + 1
