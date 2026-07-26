@@ -4,10 +4,10 @@ Created on Jul 22, 2026
 
 @author: CyberiaResurrection
 """
-import bisect
-
 import cython
+from cython.cimports.numpy import numpy as cnp
 import time
+import numpy as np
 
 try:
     from line_profiler import profile
@@ -26,8 +26,10 @@ class TradeCalculationRawRoutes(object):
     _allies_dict: cython.dict
     algs: set
     btn_range: cython.list[cython.int]
-    btn_jump_range: cython.list[cython.int]
-    btn_jump_mod: cython.list[cython.int]
+    btn_jump_range: cnp.ndarray[cython.int]
+    btn_jump_mod: cnp.ndarray[cython.int]
+    btn_jump_range_view: cython.int[:]
+    btn_jump_mod_view: cython.int[:]
     max_range: cython.int
     min_wtn: cython.int
 
@@ -39,8 +41,10 @@ class TradeCalculationRawRoutes(object):
         self._allies_dict: dict = {}
         self.algs = set()
         self.btn_range = trade.btn_range
-        self.btn_jump_range = trade.btn_jump_range
-        self.btn_jump_mod = trade.btn_jump_mod
+        self.btn_jump_range = np.array(trade.btn_jump_range, dtype=np.int32)
+        self.btn_jump_range_view = self.btn_jump_range
+        self.btn_jump_mod = np.array(trade.btn_jump_mod, dtype=np.int32)
+        self.btn_jump_mod_view = self.btn_jump_mod
         self.max_range = self.trade.galaxy.max_jump_range
         self.min_wtn = self.trade.min_wtn
 
@@ -327,5 +331,24 @@ class TradeCalculationRawRoutes(object):
     @cython.cfunc
     @cython.returns(cython.int)
     def _get_btn_offset(self, distance: cython.int):
-        jump_index = bisect.bisect_left(self.btn_jump_range, distance)
-        return self.btn_jump_mod[jump_index]
+        index: cython.Py_ssize_t = self._lower_bound_int(self.btn_jump_range_view, distance)
+        if index >= self.btn_jump_range_view.shape[0]:
+            index = self.btn_jump_range_view.shape[0] - 1
+
+        return self.btn_jump_mod_view[index]
+
+    @cython.cfunc
+    @cython.returns(cython.Py_ssize_t)
+    @cython.nogil
+    def _lower_bound_int(self, arr: cython.int[:], x: cython.int):
+        lo: cython.Py_ssize_t = 0
+        hi: cython.Py_ssize_t = arr.shape[0]
+        mid: cython.Py_ssize_t
+
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if arr[mid] < x:
+                lo = mid + 1
+            else:
+                hi = mid
+        return lo
