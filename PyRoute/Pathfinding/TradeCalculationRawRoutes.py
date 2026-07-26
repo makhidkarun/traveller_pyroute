@@ -202,6 +202,8 @@ class TradeCalculationRawRoutes(object):
             neighbour = item[1]
             zero = item[0].tradeCode
             wun = item[1].tradeCode
+            upper1 = item[3]
+            upper0 = item[4]
             ag_boost = (zero.ag_code_boost and wun.ag_code_boost
                         and (zero.agricultural or wun.agricultural))
             in_boost = (zero.in_code_boost and wun.in_code_boost
@@ -209,10 +211,10 @@ class TradeCalculationRawRoutes(object):
             if ag_boost and in_boost:  # dual boost is already accounted for in filtering in base_ranges
                 nu_ranges.append((star, neighbour))
             elif ag_boost ^ in_boost:  # exactly one of ag_boost or in_boost
-                if item[3] >= min_btn:
+                if upper1 >= min_btn:
                     nu_ranges.append((star, neighbour))
             else:  # neither ag_boost nor in_boost
-                if item[4] >= min_btn:
+                if upper0 >= min_btn:
                     nu_ranges.append((star, neighbour))
 
         return nu_ranges
