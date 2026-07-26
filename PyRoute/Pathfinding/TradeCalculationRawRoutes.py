@@ -32,6 +32,8 @@ class TradeCalculationRawRoutes(object):
     btn_jump_mod_view: cython.int[:]
     max_range: cython.int
     min_wtn: cython.int
+    pairs_considered: cython.long
+    pairs_kept: cython.long
 
     def __init__(self, trade):
         from PyRoute.Calculation.TradeCalculation import TradeCalculation
@@ -47,6 +49,8 @@ class TradeCalculationRawRoutes(object):
         self.btn_jump_mod_view = self.btn_jump_mod
         self.max_range = self.trade.galaxy.max_jump_range
         self.min_wtn = self.trade.min_wtn
+        self.pairs_considered = 0
+        self.pairs_kept = 0
 
     @profile
     @cython.boundscheck(False)
@@ -87,6 +91,7 @@ class TradeCalculationRawRoutes(object):
         self.trade.logger.info(
             f"raw_ranges phases: init {t1 - t0:.6f}s, split {t2 - t1:.6f}s, ranges {t3 - t2:.6f}s, hi-hi filters {t4 - t3:.6f}s, lo-lo filters {t5 - t4:.6f}s, hi-lo filters {t6 - t5:.6f}s"
         )
+        self.trade.logger.info("Pairs considered: " + str(self.pairs_considered) + ", pairs kept: " + str(self.pairs_kept))
 
         return hi_hi_ranges
 
@@ -170,6 +175,7 @@ class TradeCalculationRawRoutes(object):
                 dist = TradeCalculationRawRoutes._distance(del_q, del_r)
                 if dist > max_dist:
                     continue
+                self.pairs_considered += 1
                 upper2 = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, dist)
                 if min_btn > upper2:
                     continue
@@ -180,6 +186,7 @@ class TradeCalculationRawRoutes(object):
                     upper1 = upper2 - 1
                     upper0 = upper2 - 2
 
+                self.pairs_kept += 1
                 ranges.append((histar, lostar, dist, upper1, upper0))
 
         return ranges
