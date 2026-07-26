@@ -50,6 +50,7 @@ class TradeCalculationRawRoutes(object):
         max_range = self.trade.galaxy.max_jump_range
         min_btn = self.trade.min_btn
         min_wtn = self.trade.min_route_wtn
+        offsets = TradeCalculationRawRoutes._axial_offsets_within(max_range)
         t1 = time.perf_counter()
 
         hiball = [item for item in self.trade.galaxy.ranges if item.wtn >= min_wtn and not item.is_redzone]
@@ -60,15 +61,15 @@ class TradeCalculationRawRoutes(object):
         t3 = time.perf_counter()
         hi_hi_ranges = self._hi_hi_ranges(ranges, min_btn)
         t4 = time.perf_counter()
-        lo_lo_ranges = self._lo_lo_ranges(loball, max_range)
+        lo_lo_ranges = self._lo_lo_ranges(loball, offsets)
         t5 = time.perf_counter()
-        hi_lo_ranges = self._hi_lo_ranges(hiball, loball, max_range)
+        hi_lo_ranges = self._hi_lo_ranges(hiball, loball, offsets)
         t6 = time.perf_counter()
         hi_hi_ranges.extend(lo_lo_ranges)
         hi_hi_ranges.extend(hi_lo_ranges)
         self.trade.logger.info("Routes with endpoints more than " + str(max_route_dist) + " pc apart, trimmed")
         self.trade.logger.info(
-            f"raw_ranges phases: init {t1 - t0:.6f}s, split {t2 - t1:.6f}s, ranges {t3 - t2:.6f}s, filters {t4 - t3:.6f}s, lo-lo filters {t5 - t4:.6f}s, hi-lo filters {t6 - t5:.6f}s"
+            f"raw_ranges phases: init {t1 - t0:.6f}s, split {t2 - t1:.6f}s, ranges {t3 - t2:.6f}s, hi-hi filters {t4 - t3:.6f}s, lo-lo filters {t5 - t4:.6f}s, hi-lo filters {t6 - t5:.6f}s"
         )
 
         return hi_hi_ranges
@@ -210,7 +211,7 @@ class TradeCalculationRawRoutes(object):
     @cython.initializedcheck(False)
     @cython.nonecheck(False)
     @cython.wraparound(False)
-    def _hi_lo_ranges(self, hiball: cython.list[Star], loball: cython.list[Star], max_range: cython.int):
+    def _hi_lo_ranges(self, hiball: cython.list[Star], loball: cython.list[Star], offsets):
         m: cython.Py_ssize_t = len(hiball)
         ranges: cython.list[cython.tuple[Star, Star]] = []
         i: cython.Py_ssize_t
@@ -219,7 +220,6 @@ class TradeCalculationRawRoutes(object):
         q1: cython.int
         r1: cython.int
 
-        offsets = TradeCalculationRawRoutes._axial_offsets_within(max_range)
         lob_map = {(s.hex.q, s.hex.r): s for s in loball}
 
         for i in range(m):
@@ -240,7 +240,7 @@ class TradeCalculationRawRoutes(object):
     @cython.initializedcheck(False)
     @cython.nonecheck(False)
     @cython.wraparound(False)
-    def _lo_lo_ranges(self, loball: cython.list[Star], max_range: cython.int):
+    def _lo_lo_ranges(self, loball: cython.list[Star], offsets):
         n: cython.Py_ssize_t = len(loball)
         ranges: cython.list[cython.tuple[Star, Star]] = []
         i: cython.Py_ssize_t
@@ -251,7 +251,6 @@ class TradeCalculationRawRoutes(object):
         r1: cython.int
         r2: cython.int
 
-        offsets = TradeCalculationRawRoutes._axial_offsets_within(max_range)
         lob_map = {(s.hex.q, s.hex.r): s for s in loball}
 
         for i in range(n - 1):
