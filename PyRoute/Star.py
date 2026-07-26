@@ -61,7 +61,7 @@ class Star(object):
         self.social = None
         self.baseCode = None
         self.zone = None
-        self.alg_code = None
+        self.alg_code: Optional[str] = None
         self.allegiance_base = None
         self.alg_base_code = None
         self.ship_capacity = None

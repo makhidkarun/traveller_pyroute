@@ -21,12 +21,16 @@ from PyRoute.TradeCodes import TradeCodes
 @cython.cclass
 class TradeCalculationRawRoutes(object):
     trade: object
+    _allies_dict: cython.dict
+    algs: set
 
     def __init__(self, trade):
         from PyRoute.Calculation.TradeCalculation import TradeCalculation
         if not isinstance(trade, TradeCalculation):
             raise ValueError("Trade must be instance of TradeCalculation or subclass")
         self.trade = trade
+        self._allies_dict: dict = {}
+        self.algs = set()
 
     @profile
     @cython.boundscheck(False)
@@ -34,6 +38,13 @@ class TradeCalculationRawRoutes(object):
     @cython.wraparound(False)
     @cython.nonecheck(False)
     def raw_ranges(self) -> list[tuple[Star, Star]]:
+        for s in self.trade.galaxy.ranges:
+            self.algs.add(s.alg_code)
+
+        for alg_code1 in self.algs:
+            for alg_code2 in self.algs:
+                self._allies_dict[(alg_code1, alg_code2)] = RouteCalculation.get_btn_allies(alg_code1, alg_code2)
+
         t0 = time.perf_counter()
         max_route_dist = max(self.trade.btn_range)
         max_range = self.trade.galaxy.max_jump_range
@@ -62,10 +73,9 @@ class TradeCalculationRawRoutes(object):
 
         return hi_hi_ranges
 
-    @staticmethod
     @cython.cfunc
     @cython.returns(cython.int)
-    def _get_btn_upper_bound(star1: Star, star2: Star, max_range: cython.int, min_btn: cython.int, distance: cython.int):
+    def _get_btn_upper_bound(self, star1: Star, star2: Star, max_range: cython.int, min_btn: cython.int, distance: cython.int):
         """
         Return an _upper bound_ on the BTN between star1 and star2.  If the upper bound on BTN
         doesn't meet/beat the minimum BTN, then the _actual_ BTN, which also doesn't meet/beat
@@ -77,7 +87,8 @@ class TradeCalculationRawRoutes(object):
         wtn1: cython.int = star1.wtn
         wtn2: cython.int = star2.wtn
 
-        btn: cython.int = wtn1 + wtn2 + 2 + RouteCalculation.get_btn_allies(star1.alg_code, star2.alg_code)
+        # btn: cython.int = wtn1 + wtn2 + 2 + RouteCalculation.get_btn_allies(star1.alg_code, star2.alg_code)
+        btn: cython.int = wtn1 + wtn2 + 2 + self._get_btn_allies(star1.alg_code, star2.alg_code)
 
         btn += RouteCalculation.get_btn_offset(distance)
         btn = min(btn, RouteCalculation.get_max_btn(wtn1, wtn2))
@@ -142,7 +153,7 @@ class TradeCalculationRawRoutes(object):
                 dist = TradeCalculationRawRoutes._distance(del_q, del_r)
                 if dist > max_dist:
                     continue
-                upper2 = TradeCalculationRawRoutes._get_btn_upper_bound(histar, lostar, max_range, min_btn, dist)
+                upper2 = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, dist)
                 if min_btn > upper2:
                     continue
                 if dist <= max_range:
@@ -264,6 +275,7 @@ class TradeCalculationRawRoutes(object):
 
         return ranges
 
+    @staticmethod
     def _axial_offsets_within(R: cython.int):
         offsets: cython.list[cython.tuple[cython.int, cython.int]] = []
         for dq in range(-R, R + 1):
@@ -274,3 +286,9 @@ class TradeCalculationRawRoutes(object):
                 if (abs(dx) + abs(dy) + abs(dz)) // 2 <= R:
                     offsets.append((dq, dr))
         return offsets
+
+    @cython.ccall
+    @cython.returns(cython.int)
+    def _get_btn_allies(self, alg_code1: str | None, alg_code2: str | None):
+        allies_dex: cython.tuple = (alg_code1, alg_code2)
+        return self._allies_dict[allies_dex]
