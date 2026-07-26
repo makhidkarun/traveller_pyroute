@@ -135,7 +135,7 @@ class TradeCalculationRawRoutes(object):
     @cython.wraparound(False)
     def _base_ranges(self, hiball: cython.list[Star], max_range: cython.int, min_btn: cython.int):
         n: cython.Py_ssize_t = len(hiball)
-        ranges: cython.list[cython.tuple[Star, Star, int, int, int]] = []
+        ranges: cython.list[cython.tuple[Star, Star, int, int]] = []
         i: cython.Py_ssize_t
         j: cython.Py_ssize_t
         histar: Star
@@ -187,7 +187,7 @@ class TradeCalculationRawRoutes(object):
                     upper0 = upper2 - 2
 
                 self.pairs_kept += 1
-                ranges.append((histar, lostar, dist, upper1, upper0))
+                ranges.append((histar, lostar, upper1, upper0))
 
         return ranges
 
@@ -198,7 +198,7 @@ class TradeCalculationRawRoutes(object):
     @cython.nonecheck(False)
     @cython.wraparound(False)
     @cython.returns(cython.list[cython.tuple[Star, Star]])
-    def _hi_hi_ranges(self, ranges: cython.list[cython.tuple[Star, Star, int, int, int]], min_btn: cython.int):
+    def _hi_hi_ranges(self, ranges: cython.list[cython.tuple[Star, Star, int, int]], min_btn: cython.int):
         nu_ranges: cython.list[cython.tuple[Star, Star]] = []
         m: cython.Py_ssize_t = len(ranges)
         item: cython.tuple[Star, Star, int, int, int]
@@ -213,8 +213,8 @@ class TradeCalculationRawRoutes(object):
             neighbour = item[1]
             zero = item[0].tradeCode
             wun = item[1].tradeCode
-            upper1 = item[3]
-            upper0 = item[4]
+            upper1 = item[2]
+            upper0 = item[3]
             ag_boost = (zero.ag_code_boost and wun.ag_code_boost
                         and (zero.agricultural or wun.agricultural))
             in_boost = (zero.in_code_boost and wun.in_code_boost
