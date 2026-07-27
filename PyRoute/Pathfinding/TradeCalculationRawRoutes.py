@@ -128,6 +128,14 @@ class TradeCalculationRawRoutes(object):
         btn = min(btn, self._get_max_btn(wtn1, wtn2))
         return min_btn if min_btn > btn and distance <= max_range else btn
 
+    @cython.cfunc
+    @cython.returns(cython.int)
+    def _get_rough_btn_upper_bound(self, wtn1: cython.int, wtn2: cython.int, max_range: cython.int, min_btn: cython.int, distance: cython.int):
+        btn: cython.int = wtn1 + wtn2 + 2
+        btn += self.btn_offset_by_dist_view[distance]
+        btn = min(btn, self._get_max_btn(wtn1, wtn2))
+        return min_btn if min_btn > btn and distance <= max_range else btn
+
     @staticmethod
     @cython.cfunc
     @cython.returns(cython.int)
@@ -186,6 +194,9 @@ class TradeCalculationRawRoutes(object):
 
                 dist = TradeCalculationRawRoutes._distance(del_q, del_r)
                 if dist > max_dist:
+                    continue
+                upper2 = self._get_rough_btn_upper_bound(hi_wtn, lo_wtn, max_range, min_btn, dist)
+                if min_btn > upper2:
                     continue
                 self.pairs_considered += 1
                 upper2 = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, dist)
