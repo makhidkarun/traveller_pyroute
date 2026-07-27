@@ -138,6 +138,7 @@ class TradeCalculationRawRoutes(object):
 
     @staticmethod
     @cython.cfunc
+    @cython.inline
     @cython.returns(cython.int)
     def _distance(del_q: cython.int, del_r: cython.int):
         aq: cython.int = del_q if del_q >= 0 else -del_q
