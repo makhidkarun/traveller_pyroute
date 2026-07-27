@@ -26,10 +26,13 @@ class TradeCalculationRawRoutes(object):
     _allies_dict: cython.dict
     algs: set
     btn_range: cython.list[cython.int]
+    btn_max_range: cython.int
     btn_jump_range: cnp.ndarray[cython.int]
     btn_jump_mod: cnp.ndarray[cython.int]
     btn_jump_range_view: cython.int[:]
     btn_jump_mod_view: cython.int[:]
+    btn_offset_by_dist: cnp.ndarray[cython.int]
+    btn_offset_by_dist_view: cython.int[:]
     max_range: cython.int
     min_wtn: cython.int
     pairs_considered: cython.long
@@ -43,6 +46,7 @@ class TradeCalculationRawRoutes(object):
         self._allies_dict: dict = {}
         self.algs = set()
         self.btn_range = trade.btn_range
+        self.btn_max_range = max(self.btn_range)
         self.btn_jump_range = np.array(trade.btn_jump_range, dtype=np.int32)
         self.btn_jump_range_view = self.btn_jump_range
         self.btn_jump_mod = np.array(trade.btn_jump_mod, dtype=np.int32)
@@ -51,6 +55,7 @@ class TradeCalculationRawRoutes(object):
         self.min_wtn = self.trade.min_wtn
         self.pairs_considered = 0
         self.pairs_kept = 0
+        self._seed_btn_offset_by_dist()
 
     @profile
     @cython.boundscheck(False)
@@ -94,6 +99,13 @@ class TradeCalculationRawRoutes(object):
         self.trade.logger.info("Pairs considered: " + str(self.pairs_considered) + ", pairs kept: " + str(self.pairs_kept))
 
         return hi_hi_ranges
+
+    @cython.cfunc
+    def _seed_btn_offset_by_dist(self):
+        self.btn_offset_by_dist = np.zeros(self.btn_max_range + 1, dtype=np.int32)
+        for i in range(0, self.btn_max_range + 1):
+            self.btn_offset_by_dist[i] = self._get_btn_offset(i)
+        self.btn_offset_by_dist_view = self.btn_offset_by_dist
 
     @cython.cfunc
     @cython.returns(cython.int)
