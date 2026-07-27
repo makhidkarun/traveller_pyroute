@@ -180,22 +180,31 @@ class TradeCalculationRawRoutes(object):
                 max_dist = max_dist_fn(i, j, True)
                 max_dist_array[i][j] = max_dist
         max_dist_array_view: cython.int[:, :] = max_dist_array
+        wtn_array: cnp.ndarray[cython.int] = np.zeros(n, dtype=np.int32)
+        q_array: cnp.ndarray[cython.int] = np.zeros(n, dtype=np.int32)
+        r_array: cnp.ndarray[cython.int] = np.zeros(n, dtype=np.int32)
+        for i in range(n):
+            histar = hiball[i]
+            wtn_array[i] = histar.wtn
+            q_array[i] = histar.hex.q
+            r_array[i] = histar.hex.r
+        wtn_array_view: cython.int[:] = wtn_array
+        q_array_view: cython.int[:] = q_array
+        r_array_view: cython.int[:] = r_array
 
         for i in range(n - 1):
             histar = hiball[i]
-            q1 = histar.hex.q
-            r1 = histar.hex.r
-            hi_wtn = histar.wtn
+            q1 = q_array_view[i]
+            r1 = r_array_view[i]
+            hi_wtn = wtn_array_view[i]
 
             for j in range(i + 1, n):
-                lostar = hiball[j]
-                lo_wtn = lostar.wtn
-                lo_hex = lostar.hex
+                lo_wtn = wtn_array_view[j]
                 max_dist = max_dist_array_view[hi_wtn][lo_wtn]
-                del_q = q1 - lo_hex.q
+                del_q = q1 - q_array_view[j]
                 if del_q > max_dist or del_q < -max_dist:
                     continue
-                del_r = r1 - lo_hex.r
+                del_r = r1 - r_array_view[j]
                 if del_r > max_dist or del_r < -max_dist:
                     continue
 
@@ -205,6 +214,7 @@ class TradeCalculationRawRoutes(object):
                 upper2 = self._get_rough_btn_upper_bound(hi_wtn, lo_wtn, max_range, min_btn, dist)
                 if min_btn > upper2:
                     continue
+                lostar = hiball[j]
                 self.pairs_considered += 1
                 upper2 = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, dist)
                 if min_btn > upper2:
