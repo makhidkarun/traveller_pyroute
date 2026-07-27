@@ -327,7 +327,6 @@ class TradeCalculationRawRoutes(object):
             q1 = histar.hex.q
             r1 = histar.hex.r
 
-            a = (q1, r1)
             for dq, dr in offsets:
                 q2 = q1 + dq
                 r2 = r1 + dr
@@ -336,7 +335,7 @@ class TradeCalculationRawRoutes(object):
                     continue
 
                 # Lexicographic uniqueness: only emit when (q1,r1) < (q2,r2)
-                if a < (q2, r2):
+                if q1 < q2 or (q1 == q2 and r1 < r2):
                     lostar = lob_map.get((q2, r2))
                     if lostar is not None:
                         ranges.append((histar, lostar))
