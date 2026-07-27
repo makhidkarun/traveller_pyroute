@@ -132,11 +132,11 @@ class TradeCalculationRawRoutes(object):
     @cython.cfunc
     @cython.returns(cython.int)
     def _distance(del_q: cython.int, del_r: cython.int):
-        aq = del_q if del_q >= 0 else -del_q
-        ar = del_r if del_r >= 0 else -del_r
-        ad = del_q + del_r
+        aq: cython.int = del_q if del_q >= 0 else -del_q
+        ar: cython.int = del_r if del_r >= 0 else -del_r
+        ad: cython.int = del_q + del_r
         ad = ad if ad >= 0 else -ad
-        dist = (aq + ar + ad) // 2
+        dist: cython.int = (aq + ar + ad) // 2
         return dist
 
     @cython.ccall
