@@ -173,6 +173,12 @@ class TradeCalculationRawRoutes(object):
         upper0: cython.int
 
         max_dist_fn = self._max_dist
+        max_dist_array: cnp.ndarray[cython.int] = np.zeros((16, 16), dtype=np.int32)
+        for i in range(16):
+            for j in range(16):
+                max_dist = max_dist_fn(i, j, True)
+                max_dist_array[i][j] = max_dist
+        max_dist_array_view: cython.int[:, :] = max_dist_array
 
         for i in range(n - 1):
             histar = hiball[i]
@@ -184,7 +190,7 @@ class TradeCalculationRawRoutes(object):
                 lostar = hiball[j]
                 lo_wtn = lostar.wtn
                 lo_hex = lostar.hex
-                max_dist = max_dist_fn(hi_wtn, lo_wtn, True)
+                max_dist = max_dist_array_view[hi_wtn][lo_wtn]
                 del_q = q1 - lo_hex.q
                 if del_q > max_dist or del_q < -max_dist:
                     continue
