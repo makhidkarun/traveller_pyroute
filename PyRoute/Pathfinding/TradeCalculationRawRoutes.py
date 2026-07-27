@@ -191,6 +191,8 @@ class TradeCalculationRawRoutes(object):
         wtn_array_view: cython.int[:] = wtn_array
         q_array_view: cython.int[:] = q_array
         r_array_view: cython.int[:] = r_array
+        pairs_considered: cython.long = 0
+        pairs_kept: cython.long = 0
 
         for i in range(n - 1):
             histar = hiball[i]
@@ -215,7 +217,7 @@ class TradeCalculationRawRoutes(object):
                 if min_btn > upper2:
                     continue
                 lostar = hiball[j]
-                self.pairs_considered += 1
+                pairs_considered += 1
                 upper2 = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, dist)
                 if min_btn > upper2:
                     continue
@@ -226,9 +228,11 @@ class TradeCalculationRawRoutes(object):
                     upper1 = upper2 - 1
                     upper0 = upper2 - 2
 
-                self.pairs_kept += 1
+                pairs_kept += 1
                 ranges.append((histar, lostar, upper1, upper0))
 
+        self.pairs_considered = pairs_considered
+        self.pairs_kept = pairs_kept
         return ranges
 
     @cython.ccall
