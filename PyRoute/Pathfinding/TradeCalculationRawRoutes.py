@@ -175,7 +175,6 @@ class TradeCalculationRawRoutes(object):
         upper1: cython.int
         upper0: cython.int
         zero: TradeCodes
-        wun: TradeCodes
 
         max_dist_fn = self._max_dist
         max_dist_array: cnp.ndarray[cython.int] = np.zeros((16, 16), dtype=np.int32)
@@ -187,17 +186,32 @@ class TradeCalculationRawRoutes(object):
         wtn_array: cnp.ndarray[cython.int] = np.zeros(n, dtype=np.int32)
         q_array: cnp.ndarray[cython.int] = np.zeros(n, dtype=np.int32)
         r_array: cnp.ndarray[cython.int] = np.zeros(n, dtype=np.int32)
+        ag_boost_array: cnp.ndarray[cython.ushort] = np.zeros(n, dtype=np.uint8)
+        ag_array: cnp.ndarray[cython.ushort] = np.zeros(n, dtype=np.uint8)
+        in_boost_array: cnp.ndarray[cython.ushort] = np.zeros(n, dtype=np.uint8)
+        in_array: cnp.ndarray[cython.ushort] = np.zeros(n, dtype=np.uint8)
         for i in range(n):
             histar = hiball[i]
             wtn_array[i] = histar.wtn
             q_array[i] = histar.hex.q
             r_array[i] = histar.hex.r
+            zero = histar.tradeCode
+            ag_boost_array[i] = 1 if zero.ag_code_boost else 0
+            ag_array[i] = 1 if zero.agricultural else 0
+            in_boost_array[i] = 1 if zero.in_code_boost else 0
+            in_array[i] = 1 if zero.industrial else 0
         wtn_array_view: cython.int[:] = wtn_array
         q_array_view: cython.int[:] = q_array
         r_array_view: cython.int[:] = r_array
+        ag_boost_array_view: cython.uchar[:] = ag_boost_array
+        ag_array_view: cython.uchar[:] = ag_array
+        in_boost_array_view: cython.uchar[:] = in_boost_array
+        in_array_view: cython.uchar[:] = in_array
         pairs_primed: cython.long = 0
         pairs_considered: cython.long = 0
         pairs_kept: cython.long = 0
+        ag_boost: cython.bint
+        in_boost: cython.bint
 
         for i in range(n - 1):
             histar = hiball[i]
@@ -235,13 +249,11 @@ class TradeCalculationRawRoutes(object):
                     upper0 = upper2 - 2
 
                 pairs_kept += 1
-                zero = histar.tradeCode
-                wun = lostar.tradeCode
-                ag_boost = (zero.ag_code_boost and wun.ag_code_boost
-                            and (zero.agricultural or wun.agricultural))
-                in_boost = (zero.in_code_boost and wun.in_code_boost
-                            and (zero.industrial or wun.industrial))
-                if ag_boost and in_boost:
+                ag_boost = (ag_boost_array_view[i] & ag_boost_array_view[j]
+                            & (ag_array_view[i] | ag_array_view[j]))
+                in_boost = (in_boost_array_view[i] & in_boost_array_view[j]
+                            & (in_array_view[i] | in_array_view[j]))
+                if ag_boost & in_boost:
                     ranges.append((histar, lostar))
                 elif ag_boost ^ in_boost:
                     if upper1 >= min_btn:
