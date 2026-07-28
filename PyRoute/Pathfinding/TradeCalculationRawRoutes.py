@@ -84,9 +84,8 @@ class TradeCalculationRawRoutes(object):
         loball = [item for item in self.trade.galaxy.ranges if item.wtn < min_wtn and not item.is_redzone]
         t2 = time.perf_counter()
 
-        ranges = self._base_ranges(hiball, max_range, min_btn)
+        hi_hi_ranges = self._base_ranges(hiball, max_range, min_btn)
         t3 = time.perf_counter()
-        hi_hi_ranges = self._hi_hi_ranges(ranges, min_btn)
         t4 = time.perf_counter()
         lo_lo_ranges = self._lo_lo_ranges(loball, offsets)
         t5 = time.perf_counter()
@@ -98,7 +97,7 @@ class TradeCalculationRawRoutes(object):
         self.trade.logger.info(
             f"raw_ranges phases: init {t1 - t0:.6f}s, split {t2 - t1:.6f}s, ranges {t3 - t2:.6f}s, hi-hi filters {t4 - t3:.6f}s, lo-lo filters {t5 - t4:.6f}s, hi-lo filters {t6 - t5:.6f}s"
         )
-        self.trade.logger.info("Pairs spun up:" + str(self.pairs_primed) + ", pairs considered: " + str(self.pairs_considered) + ", pairs kept: " + str(self.pairs_kept))
+        self.trade.logger.info("Pairs spun up: " + str(self.pairs_primed) + ", pairs considered: " + str(self.pairs_considered) + ", pairs kept: " + str(self.pairs_kept))
 
         return hi_hi_ranges
 
@@ -156,9 +155,10 @@ class TradeCalculationRawRoutes(object):
     @cython.initializedcheck(False)
     @cython.nonecheck(False)
     @cython.wraparound(False)
+    @cython.returns(cython.list[cython.tuple[Star, Star]])
     def _base_ranges(self, hiball: cython.list[Star], max_range: cython.int, min_btn: cython.int):
         n: cython.Py_ssize_t = len(hiball)
-        ranges: cython.list[cython.tuple[Star, Star, int, int]] = []
+        ranges: cython.list[cython.tuple[Star, Star]] = []
         i: cython.Py_ssize_t
         j: cython.Py_ssize_t
         histar: Star
@@ -174,6 +174,8 @@ class TradeCalculationRawRoutes(object):
         upper2: cython.int
         upper1: cython.int
         upper0: cython.int
+        zero: TradeCodes
+        wun: TradeCodes
 
         max_dist_fn = self._max_dist
         max_dist_array: cnp.ndarray[cython.int] = np.zeros((16, 16), dtype=np.int32)
@@ -233,51 +235,25 @@ class TradeCalculationRawRoutes(object):
                     upper0 = upper2 - 2
 
                 pairs_kept += 1
-                ranges.append((histar, lostar, upper1, upper0))
+                zero = histar.tradeCode
+                wun = lostar.tradeCode
+                ag_boost = (zero.ag_code_boost and wun.ag_code_boost
+                            and (zero.agricultural or wun.agricultural))
+                in_boost = (zero.in_code_boost and wun.in_code_boost
+                            and (zero.industrial or wun.industrial))
+                if ag_boost and in_boost:
+                    ranges.append((histar, lostar))
+                elif ag_boost ^ in_boost:
+                    if upper1 >= min_btn:
+                        ranges.append((histar, lostar))
+                else:
+                    if upper0 >= min_btn:
+                        ranges.append((histar, lostar))
 
         self.pairs_primed = pairs_primed
         self.pairs_considered = pairs_considered
         self.pairs_kept = pairs_kept
         return ranges
-
-    @cython.ccall
-    @cython.infer_types(True)
-    @cython.boundscheck(False)
-    @cython.initializedcheck(False)
-    @cython.nonecheck(False)
-    @cython.wraparound(False)
-    @cython.returns(cython.list[cython.tuple[Star, Star]])
-    def _hi_hi_ranges(self, ranges: cython.list[cython.tuple[Star, Star, int, int]], min_btn: cython.int):
-        nu_ranges: cython.list[cython.tuple[Star, Star]] = []
-        m: cython.Py_ssize_t = len(ranges)
-        item: cython.tuple[Star, Star, int, int, int]
-        zero: TradeCodes
-        wun: TradeCodes
-        ag_boost: cython.bint
-        in_boost: cython.bint
-
-        for i in range(m):
-            item = ranges[i]
-            star = item[0]
-            neighbour = item[1]
-            zero = item[0].tradeCode
-            wun = item[1].tradeCode
-            upper1 = item[2]
-            upper0 = item[3]
-            ag_boost = (zero.ag_code_boost and wun.ag_code_boost
-                        and (zero.agricultural or wun.agricultural))
-            in_boost = (zero.in_code_boost and wun.in_code_boost
-                        and (zero.industrial or wun.industrial))
-            if ag_boost and in_boost:  # dual boost is already accounted for in filtering in base_ranges
-                nu_ranges.append((star, neighbour))
-            elif ag_boost ^ in_boost:  # exactly one of ag_boost or in_boost
-                if upper1 >= min_btn:
-                    nu_ranges.append((star, neighbour))
-            else:  # neither ag_boost nor in_boost
-                if upper0 >= min_btn:
-                    nu_ranges.append((star, neighbour))
-
-        return nu_ranges
 
     @cython.ccall
     @cython.infer_types(True)
