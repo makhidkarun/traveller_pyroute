@@ -35,6 +35,7 @@ class TradeCalculationRawRoutes(object):
     btn_offset_by_dist_view: cython.int[:]
     max_range: cython.int
     min_wtn: cython.int
+    pairs_primed: cython.long
     pairs_considered: cython.long
     pairs_kept: cython.long
 
@@ -53,6 +54,7 @@ class TradeCalculationRawRoutes(object):
         self.btn_jump_mod_view = self.btn_jump_mod
         self.max_range = self.trade.galaxy.max_jump_range
         self.min_wtn = self.trade.min_wtn
+        self.pairs_primed = 0
         self.pairs_considered = 0
         self.pairs_kept = 0
         self._seed_btn_offset_by_dist()
@@ -96,7 +98,7 @@ class TradeCalculationRawRoutes(object):
         self.trade.logger.info(
             f"raw_ranges phases: init {t1 - t0:.6f}s, split {t2 - t1:.6f}s, ranges {t3 - t2:.6f}s, hi-hi filters {t4 - t3:.6f}s, lo-lo filters {t5 - t4:.6f}s, hi-lo filters {t6 - t5:.6f}s"
         )
-        self.trade.logger.info("Pairs considered: " + str(self.pairs_considered) + ", pairs kept: " + str(self.pairs_kept))
+        self.trade.logger.info("Pairs spun up:" + str(self.pairs_primed) + ", pairs considered: " + str(self.pairs_considered) + ", pairs kept: " + str(self.pairs_kept))
 
         return hi_hi_ranges
 
@@ -191,6 +193,7 @@ class TradeCalculationRawRoutes(object):
         wtn_array_view: cython.int[:] = wtn_array
         q_array_view: cython.int[:] = q_array
         r_array_view: cython.int[:] = r_array
+        pairs_primed: cython.long = 0
         pairs_considered: cython.long = 0
         pairs_kept: cython.long = 0
 
@@ -201,6 +204,7 @@ class TradeCalculationRawRoutes(object):
             hi_wtn = wtn_array_view[i]
 
             for j in range(i + 1, n):
+                pairs_primed += 1
                 lo_wtn = wtn_array_view[j]
                 max_dist = max_dist_array_view[hi_wtn][lo_wtn]
                 del_q = q1 - q_array_view[j]
@@ -231,6 +235,7 @@ class TradeCalculationRawRoutes(object):
                 pairs_kept += 1
                 ranges.append((histar, lostar, upper1, upper0))
 
+        self.pairs_primed = pairs_primed
         self.pairs_considered = pairs_considered
         self.pairs_kept = pairs_kept
         return ranges
