@@ -70,7 +70,7 @@ class TradeCalculationRawRoutes(object):
 
         for alg_code1 in self.algs:
             for alg_code2 in self.algs:
-                self._allies_dict[(alg_code1, alg_code2)] = RouteCalculation.get_btn_allies(alg_code1, alg_code2)
+                self._allies_dict[str(alg_code1) + "/" + str(alg_code2)] = RouteCalculation.get_btn_allies(alg_code1, alg_code2)
 
         t0 = time.perf_counter()
         max_route_dist = max(self.trade.btn_range)
@@ -362,8 +362,7 @@ class TradeCalculationRawRoutes(object):
     @cython.ccall
     @cython.returns(cython.int)
     def _get_btn_allies(self, alg_code1: str | None, alg_code2: str | None):
-        allies_dex: cython.tuple = (alg_code1, alg_code2)
-        return self._allies_dict[allies_dex]
+        return self._allies_dict[str(alg_code1) + "/" + str(alg_code2)]
 
     @cython.ccall
     @cython.returns(cython.int)
