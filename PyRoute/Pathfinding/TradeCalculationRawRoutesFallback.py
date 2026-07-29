@@ -19,6 +19,9 @@ class TradeCalculationRawRoutes(object):
         if not isinstance(trade, TradeCalculation):
             raise ValueError("Trade must be instance of TradeCalculation or subclass")
         self.trade = trade
+        self.pairs_primed: int = 0
+        self.pairs_considered: int = 0
+        self.pairs_kept: int = 0
 
     def raw_ranges(self) -> list[tuple[Star, Star]]:
         t0 = time.perf_counter()
@@ -74,6 +77,8 @@ class TradeCalculationRawRoutes(object):
         self.trade.logger.info(
             f"raw_ranges phases: init {t1 - t0:.6f}s, split {t2 - t1:.6f}s, ranges {t3 - t2:.6f}s, hi-hi filters {t4 - t3:.6f}s, lo-lo filters {t5 - t4:.6f}s, hi-lo filters {t6 - t5:.6f}s"
         )
+        self.trade.logger.info("Pairs spun up: " + str(self.pairs_primed) + ", pairs considered: " + str(
+            self.pairs_considered) + ", pairs kept: " + str(self.pairs_kept))
 
         return hi_hi_ranges
 
@@ -132,23 +137,32 @@ class TradeCalculationRawRoutes(object):
     def _base_ranges(self, hiball: list[Star], max_range: int, min_btn: int):
         n: int = len(hiball)
         ranges: list[tuple[Star, Star, int]] = []
+        pairs_primed: int = 0
+        pairs_considered: int = 0
+        pairs_kept: int = 0
 
         for i in range(n - 1):
             histar: Star = hiball[i]
             hihex: Hex = histar.hex
 
             for j in range(i + 1, n):
+                pairs_primed += 1
                 lostar: Star = hiball[j]
                 lohex: Hex = lostar.hex
                 max_dist: int = self.trade._max_dist(histar.wtn, lostar.wtn, True)
                 dist: int = hihex.distance(lohex)
                 if dist > max_dist:
                     continue
+                pairs_considered += 1
                 upbound = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, distance=dist)
                 if upbound < min_btn:
                     continue
                 ranges.append((histar, lostar, dist))
+                pairs_kept += 1
 
+        self.pairs_primed = pairs_primed
+        self.pairs_considered = pairs_considered
+        self.pairs_kept = pairs_kept
         return ranges
 
     @staticmethod
