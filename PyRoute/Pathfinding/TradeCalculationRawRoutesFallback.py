@@ -61,7 +61,7 @@ class TradeCalculationRawRoutes(object):
         hi_hi_ranges, hi_hi_ranges1, hi_hi_ranges2 = self._hi_hi_ranges(foo_boost, max_range, min_btn, one_boost,
                                                                         ranges, two_boost)
         t4 = time.perf_counter()
-        lo_lo_ranges = self._lo_lo_ranges(loball, max_range)
+        lo_lo_ranges = self._lo_lo_ranges(loball, max_range, offsets)
         t5 = time.perf_counter()
         hi_lo_ranges = self._hi_lo_ranges(hiball, loball, offsets)
         t6 = time.perf_counter()
@@ -93,10 +93,29 @@ class TradeCalculationRawRoutes(object):
 
         return hi_lo_ranges
 
-    def _lo_lo_ranges(self, loball, max_range):
-        lo_lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(loball, 2)
-                        if (star.distance(neighbour)) <= max_range
-                        ]
+    def _lo_lo_ranges(self, loball, max_range, offsets: list[tuple[int, int]]):
+        n: int = len(loball)
+        lob_map = {(s.hex.q, s.hex.r): s for s in loball}
+        lo_lo_ranges: list[tuple[Star, Star]] = []
+
+        for i in range(n - 1):
+            histar: Star = loball[i]
+            q1: int = histar.hex.q
+            r1: int = histar.hex.r
+
+            for dq, dr in offsets:
+                q2: int = q1 + dq
+                r2: int = r1 + dr
+                # Skip self; optional but saves one lookup
+                if dq == 0 and dr == 0:
+                    continue
+
+                # Lexicographic uniqueness: only emit when (q1,r1) < (q2,r2)
+                if q1 < q2 or (q1 == q2 and r1 < r2):
+                    lostar = lob_map.get((q2, r2))
+                    if lostar is not None:
+                        lo_lo_ranges.append((histar, lostar))
+
         return lo_lo_ranges
 
     def _hi_hi_ranges(self, foo_boost, max_range, min_btn, one_boost, ranges, two_boost):
