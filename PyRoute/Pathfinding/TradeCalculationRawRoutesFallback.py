@@ -4,6 +4,7 @@ Created on Jul 22, 2026
 @author: CyberiaResurrection
 """
 import itertools
+import time
 
 from PyRoute import Star
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
@@ -19,13 +20,16 @@ class TradeCalculationRawRoutes(object):
         self.trade = trade
 
     def raw_ranges(self) -> list[tuple[Star, Star]]:
+        t0 = time.perf_counter()
         max_route_dist = max(self.trade.btn_range)
         max_range = self.trade.galaxy.max_jump_range
         min_btn = self.trade.min_btn
         min_wtn = self.trade.min_route_wtn
+        t1 = time.perf_counter()
 
         hiball = [item for item in self.trade.galaxy.ranges if item.wtn >= min_wtn and not item.is_redzone]
         loball = [item for item in self.trade.galaxy.ranges if item.wtn < min_wtn and not item.is_redzone]
+        t2 = time.perf_counter()
 
         def two_boost(x: tuple[Star, Star]) -> bool:
             zero: TradeCodes = x[0].tradeCode
@@ -51,10 +55,39 @@ class TradeCalculationRawRoutes(object):
                    (zero.in_code_boost and wun.in_code_boost
                     and (zero.industrial or wun.industrial))
 
-        ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(hiball, 2)
-                  if (dist := star.distance(neighbour)) <= self.trade._max_dist(star.wtn, neighbour.wtn, True)
-                  and self._get_btn_upper_bound(star, neighbour, max_range, min_btn, distance=dist) >= min_btn
-                  ]
+        ranges = self._base_ranges(hiball, max_range, min_btn)
+        t3 = time.perf_counter()
+        hi_hi_ranges, hi_hi_ranges1, hi_hi_ranges2 = self._hi_hi_ranges(foo_boost, max_range, min_btn, one_boost,
+                                                                        ranges, two_boost)
+        t4 = time.perf_counter()
+        lo_lo_ranges = self._lo_lo_ranges(loball, max_range)
+        t5 = time.perf_counter()
+        hi_lo_ranges = self._hi_lo_ranges(hiball, loball, max_range)
+        t6 = time.perf_counter()
+        hi_hi_ranges.extend(lo_lo_ranges)
+        hi_hi_ranges.extend(hi_lo_ranges)
+        hi_hi_ranges.extend(hi_hi_ranges1)
+        hi_hi_ranges.extend(hi_hi_ranges2)
+        self.trade.logger.info("Routes with endpoints more than " + str(max_route_dist) + " pc apart, trimmed")
+        self.trade.logger.info(
+            f"raw_ranges phases: init {t1 - t0:.6f}s, split {t2 - t1:.6f}s, ranges {t3 - t2:.6f}s, hi-hi filters {t4 - t3:.6f}s, lo-lo filters {t5 - t4:.6f}s, hi-lo filters {t6 - t5:.6f}s"
+        )
+
+        return hi_hi_ranges
+
+    def _hi_lo_ranges(self, hiball, loball, max_range):
+        hi_lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.product(hiball, loball)
+                        if (star.distance(neighbour)) <= max_range
+                        ]
+        return hi_lo_ranges
+
+    def _lo_lo_ranges(self, loball, max_range):
+        lo_lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(loball, 2)
+                        if (star.distance(neighbour)) <= max_range
+                        ]
+        return lo_lo_ranges
+
+    def _hi_hi_ranges(self, foo_boost, max_range, min_btn, one_boost, ranges, two_boost):
         hi_hi_ranges = [(star, neighbour) for (star, neighbour) in filter(two_boost, ranges)]
         hi_hi_ranges1 = [(star, neighbour) for (star, neighbour) in filter(one_boost, ranges)
                          if self._get_btn_upper_bound(star, neighbour, max_range, min_btn, offset=1) >= min_btn
@@ -62,19 +95,14 @@ class TradeCalculationRawRoutes(object):
         hi_hi_ranges2 = [(star, neighbour) for (star, neighbour) in itertools.filterfalse(foo_boost, ranges)
                          if self._get_btn_upper_bound(star, neighbour, max_range, min_btn, offset=0) >= min_btn
                          ]
-        lo_lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(loball, 2)
-                        if (star.distance(neighbour)) <= max_range
-                        ]
-        hi_lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.product(hiball, loball)
-                        if (star.distance(neighbour)) <= max_range
-                        ]
-        hi_hi_ranges.extend(lo_lo_ranges)
-        hi_hi_ranges.extend(hi_lo_ranges)
-        hi_hi_ranges.extend(hi_hi_ranges1)
-        hi_hi_ranges.extend(hi_hi_ranges2)
-        self.trade.logger.info("Routes with endpoints more than " + str(max_route_dist) + " pc apart, trimmed")
+        return hi_hi_ranges, hi_hi_ranges1, hi_hi_ranges2
 
-        return hi_hi_ranges
+    def _base_ranges(self, hiball, max_range, min_btn):
+        ranges = [(star, neighbour) for (star, neighbour) in itertools.combinations(hiball, 2)
+                  if (dist := star.distance(neighbour)) <= self.trade._max_dist(star.wtn, neighbour.wtn, True)
+                  and self._get_btn_upper_bound(star, neighbour, max_range, min_btn, distance=dist) >= min_btn
+                  ]
+        return ranges
 
     @staticmethod
     def _get_btn_upper_bound(star1, star2, max_range, min_btn, distance=None, offset: int = 2):
