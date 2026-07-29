@@ -29,6 +29,7 @@ class TradeCalculationRawRoutes(object):
 
         hiball = [item for item in self.trade.galaxy.ranges if item.wtn >= min_wtn and not item.is_redzone]
         loball = [item for item in self.trade.galaxy.ranges if item.wtn < min_wtn and not item.is_redzone]
+        offsets = TradeCalculationRawRoutes._axial_offsets_within(max_range)
         t2 = time.perf_counter()
 
         def two_boost(x: tuple[Star, Star, int]) -> bool:
@@ -62,7 +63,7 @@ class TradeCalculationRawRoutes(object):
         t4 = time.perf_counter()
         lo_lo_ranges = self._lo_lo_ranges(loball, max_range)
         t5 = time.perf_counter()
-        hi_lo_ranges = self._hi_lo_ranges(hiball, loball, max_range)
+        hi_lo_ranges = self._hi_lo_ranges(hiball, loball, offsets)
         t6 = time.perf_counter()
         hi_hi_ranges.extend(lo_lo_ranges)
         hi_hi_ranges.extend(hi_lo_ranges)
@@ -75,10 +76,21 @@ class TradeCalculationRawRoutes(object):
 
         return hi_hi_ranges
 
-    def _hi_lo_ranges(self, hiball, loball, max_range):
-        hi_lo_ranges = [(star, neighbour) for (star, neighbour) in itertools.product(hiball, loball)
-                        if (star.distance(neighbour)) <= max_range
-                        ]
+    def _hi_lo_ranges(self, hiball, loball, offsets: list[tuple[int, int]]):
+        m: int = len(hiball)
+        lob_map = {(s.hex.q, s.hex.r): s for s in loball}
+        hi_lo_ranges: list[tuple[Star, Star]] = []
+
+        for i in range(m):
+            histar = hiball[i]
+            q1 = histar.hex.q
+            r1 = histar.hex.r
+
+            for dq, dr in offsets:
+                lostar = lob_map.get((q1 + dq, r1 + dr))
+                if lostar is not None:
+                    hi_lo_ranges.append((histar, lostar))
+
         return hi_lo_ranges
 
     def _lo_lo_ranges(self, loball, max_range):
@@ -124,3 +136,15 @@ class TradeCalculationRawRoutes(object):
         btn += RouteCalculation.get_btn_offset(distance)
         btn = min(btn, RouteCalculation.get_max_btn(star1.wtn, star2.wtn))
         return min_btn if min_btn > btn and distance <= max_range else btn
+
+    @staticmethod
+    def _axial_offsets_within(R: int):
+        offsets: list[tuple[int, int]] = []
+        for dq in range(-R, R + 1):
+            for dr in range(-R, R + 1):
+                dx = dq
+                dz = dr
+                dy = -dx - dz
+                if (abs(dx) + abs(dy) + abs(dz)) // 2 <= R:
+                    offsets.append((dq, dr))
+        return offsets
