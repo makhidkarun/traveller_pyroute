@@ -140,6 +140,7 @@ class TradeCalculationRawRoutes(object):
     def _base_ranges(self, hiball: list[Star], max_range: int, min_btn: int):
         n: int = len(hiball)
         ranges: list[tuple[Star, Star, int]] = []
+        ranges_set: set[tuple[Star, Star, int]] = set()
         pairs_primed: int = 0
         pairs_stars_Loaded: int = 0
         pairs_considered: int = 0
@@ -147,45 +148,66 @@ class TradeCalculationRawRoutes(object):
         world_wtn = np.zeros(n, dtype=np.int64)
         q_array = np.zeros(n, dtype=np.int64)
         r_array = np.zeros(n, dtype=np.int64)
+        max_wtn_distances = np.zeros(n, dtype=np.int64)
+        offsets: dict[int, list[tuple[int, int]]] = {}
         for i in range(n):
             histar: Star = hiball[i]
             world_wtn[i] = histar.wtn
             q_array[i] = histar.hex.q
             r_array[i] = histar.hex.r
+            max_dist: int = self.trade._max_dist(world_wtn[i], world_wtn[i], True)
+            max_wtn_distances[i] = max_dist
+            if max_dist not in offsets:
+                offsets[max_dist] = TradeCalculationRawRoutes._axial_offsets_within(max_dist)
 
-        for i in range(n - 1):
+        hib_map = {(s.hex.q, s.hex.r): s for s in hiball}
+
+        for i in range(n):
             histar: Star = hiball[i]
             hihex: Hex = histar.hex
             hi_wtn: int = world_wtn[i]
             q1 = q_array[i]
             r1 = r_array[i]
+            max_wtn_dist = max_wtn_distances[i]
+            offset = offsets[max_wtn_dist]
 
-            for j in range(i + 1, n):
+            for dq, dr in offset:
                 pairs_primed += 1
-                max_dist: int = self.trade._max_dist(hi_wtn, world_wtn[j], True)
-                if abs(q1 - q_array[j]) > max_dist:
+                # Skip self; optional but saves one lookup
+                if dq == 0 and dr == 0:
                     continue
-                if abs(r1 - r_array[j]) > max_dist:
-                    continue
+                # Lexicographic uniqueness: only emit when (q1,r1) < (q2,r2)
+                if True:
+                    lostar: Star = hib_map.get((q1 + dq, r1 + dr))
+                    if lostar is None:
+                        continue
+                    lo_wtn = lostar.wtn
+                    max_dist: int = self.trade._max_dist(hi_wtn, lo_wtn, True)
+                    lohex: Hex = lostar.hex
+                    pairs_stars_Loaded += 1
 
-                lostar: Star = hiball[j]
-                lohex: Hex = lostar.hex
-                pairs_stars_Loaded += 1
-
-                dist: int = hihex.distance(lohex)
-                if dist > max_dist:
-                    continue
-                pairs_considered += 1
-                upbound = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, distance=dist)
-                if upbound < min_btn:
-                    continue
-                ranges.append((histar, lostar, dist))
-                pairs_kept += 1
+                    dist: int = hihex.distance(lohex)
+                    if dist > max_dist:
+                        continue
+                    pairs_considered += 1
+                    upbound = self._get_rough_btn_upper_bound(hi_wtn, lo_wtn, max_range, min_btn, distance=dist)
+                    if upbound < min_btn:
+                        continue
+                    upbound = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, distance=dist)
+                    if upbound < min_btn:
+                        continue
+                    if lostar.name < histar.name:
+                        ranges_set.add((lostar, histar, dist))
+                    else:
+                        ranges_set.add((histar, lostar, dist))
+                    pairs_kept += 1
 
         self.pairs_primed = pairs_primed
         self.pairs_stars_loaded = pairs_stars_Loaded
         self.pairs_considered = pairs_considered
         self.pairs_kept = pairs_kept
+
+        ranges = list(ranges_set)
         return ranges
 
     @staticmethod
@@ -204,6 +226,14 @@ class TradeCalculationRawRoutes(object):
 
         btn += RouteCalculation.get_btn_offset(distance)
         btn = min(btn, RouteCalculation.get_max_btn(star1.wtn, star2.wtn))
+        return min_btn if min_btn > btn and distance <= max_range else btn
+
+    @staticmethod
+    def _get_rough_btn_upper_bound(wtn1: int, wtn2: int, max_range: int, min_btn: int, distance: int):
+        btn = wtn1 + wtn2 + 2
+
+        btn += RouteCalculation.get_btn_offset(distance)
+        btn = min(btn, RouteCalculation.get_max_btn(wtn1, wtn2))
         return min_btn if min_btn > btn and distance <= max_range else btn
 
     @staticmethod
