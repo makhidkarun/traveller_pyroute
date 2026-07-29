@@ -5,6 +5,7 @@ Created on Jul 22, 2026
 """
 import itertools
 import time
+import numpy as np
 
 from Position.Hex import Hex
 from PyRoute import Star
@@ -140,21 +141,30 @@ class TradeCalculationRawRoutes(object):
         pairs_primed: int = 0
         pairs_considered: int = 0
         pairs_kept: int = 0
+        world_wtn = np.zeros(n, dtype=np.int64)
+        q_array = np.zeros(n, dtype=np.int64)
+        r_array = np.zeros(n, dtype=np.int64)
+        for i in range(n):
+            histar: Star = hiball[i]
+            world_wtn[i] = histar.wtn
+            q_array[i] = histar.hex.q
+            r_array[i] = histar.hex.r
 
         for i in range(n - 1):
             histar: Star = hiball[i]
             hihex: Hex = histar.hex
-            q1 = hihex.q
-            r1 = hihex.r
+            hi_wtn: int = world_wtn[i]
+            q1 = q_array[i]
+            r1 = r_array[i]
 
             for j in range(i + 1, n):
                 pairs_primed += 1
                 lostar: Star = hiball[j]
                 lohex: Hex = lostar.hex
-                max_dist: int = self.trade._max_dist(histar.wtn, lostar.wtn, True)
-                if abs(q1 - lohex.q) > max_dist:
+                max_dist: int = self.trade._max_dist(hi_wtn, world_wtn[j], True)
+                if abs(q1 - q_array[j]) > max_dist:
                     continue
-                if abs(r1 - lohex.r) > max_dist:
+                if abs(r1 - r_array[j]) > max_dist:
                     continue
 
                 dist: int = hihex.distance(lohex)
