@@ -189,7 +189,7 @@ class TradeCalculationRawRoutes(object):
         return ranges
 
     @staticmethod
-    def _get_btn_upper_bound(star1: Star, star2: Star, max_range: int, min_btn: int, distance=None, offset: int = 2):
+    def _get_btn_upper_bound(star1: Star, star2: Star, max_range: int, min_btn: int, distance: int, offset: int = 2):
         """
         Return an _upper bound_ on the BTN between star1 and star2.  If the upper bound on BTN
         doesn't meet/beat the minimum BTN, then the _actual_ BTN, which also doesn't meet/beat
@@ -201,9 +201,6 @@ class TradeCalculationRawRoutes(object):
         # Offset of 1 assumes BTN is boosted by one match, agricultural xor industrial
         # Offset of 0 assumes no boost.
         btn = star1.wtn + star2.wtn + offset + RouteCalculation.get_btn_allies(star1.alg_code, star2.alg_code)
-
-        if distance is None:
-            distance = star1.distance(star2)
 
         btn += RouteCalculation.get_btn_offset(distance)
         btn = min(btn, RouteCalculation.get_max_btn(star1.wtn, star2.wtn))
