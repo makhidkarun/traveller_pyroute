@@ -144,12 +144,16 @@ class TradeCalculationRawRoutes(object):
         for i in range(n - 1):
             histar: Star = hiball[i]
             hihex: Hex = histar.hex
+            q1 = hihex.q
 
             for j in range(i + 1, n):
                 pairs_primed += 1
                 lostar: Star = hiball[j]
                 lohex: Hex = lostar.hex
                 max_dist: int = self.trade._max_dist(histar.wtn, lostar.wtn, True)
+                if abs(q1 - lohex.q) > max_dist:
+                    continue
+
                 dist: int = hihex.distance(lohex)
                 if dist > max_dist:
                     continue
