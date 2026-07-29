@@ -21,6 +21,7 @@ class TradeCalculationRawRoutes(object):
             raise ValueError("Trade must be instance of TradeCalculation or subclass")
         self.trade = trade
         self.pairs_primed: int = 0
+        self.pairs_stars_loaded: int = 0
         self.pairs_considered: int = 0
         self.pairs_kept: int = 0
 
@@ -78,8 +79,9 @@ class TradeCalculationRawRoutes(object):
         self.trade.logger.info(
             f"raw_ranges phases: init {t1 - t0:.6f}s, split {t2 - t1:.6f}s, ranges {t3 - t2:.6f}s, hi-hi filters {t4 - t3:.6f}s, lo-lo filters {t5 - t4:.6f}s, hi-lo filters {t6 - t5:.6f}s"
         )
-        self.trade.logger.info("Pairs spun up: " + str(self.pairs_primed) + ", pairs considered: " + str(
-            self.pairs_considered) + ", pairs kept: " + str(self.pairs_kept))
+        self.trade.logger.info("Pairs spun up: " + str(self.pairs_primed) + ", stars loaded: " +
+                               str(self.pairs_stars_loaded) + ", pairs considered: " + str(self.pairs_considered) +
+                               ", pairs kept: " + str(self.pairs_kept))
 
         return hi_hi_ranges
 
@@ -139,6 +141,7 @@ class TradeCalculationRawRoutes(object):
         n: int = len(hiball)
         ranges: list[tuple[Star, Star, int]] = []
         pairs_primed: int = 0
+        pairs_stars_Loaded: int = 0
         pairs_considered: int = 0
         pairs_kept: int = 0
         world_wtn = np.zeros(n, dtype=np.int64)
@@ -161,6 +164,7 @@ class TradeCalculationRawRoutes(object):
                 pairs_primed += 1
                 lostar: Star = hiball[j]
                 lohex: Hex = lostar.hex
+                pairs_stars_Loaded += 1
                 max_dist: int = self.trade._max_dist(hi_wtn, world_wtn[j], True)
                 if abs(q1 - q_array[j]) > max_dist:
                     continue
@@ -178,6 +182,7 @@ class TradeCalculationRawRoutes(object):
                 pairs_kept += 1
 
         self.pairs_primed = pairs_primed
+        self.pairs_stars_loaded = pairs_stars_Loaded
         self.pairs_considered = pairs_considered
         self.pairs_kept = pairs_kept
         return ranges
