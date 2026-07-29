@@ -128,15 +128,28 @@ class TradeCalculationRawRoutes(object):
                          ]
         return hi_hi_ranges, hi_hi_ranges1, hi_hi_ranges2
 
-    def _base_ranges(self, hiball, max_range, min_btn):
-        ranges = [(star, neighbour, dist) for (star, neighbour) in itertools.combinations(hiball, 2)
-                  if (dist := star.distance(neighbour)) <= self.trade._max_dist(star.wtn, neighbour.wtn, True)
-                  and self._get_btn_upper_bound(star, neighbour, max_range, min_btn, distance=dist) >= min_btn
-                  ]
+    def _base_ranges(self, hiball: list[Star], max_range: int, min_btn: int):
+        n: int = len(hiball)
+        ranges: list[tuple[Star, Star, int]] = []
+
+        for i in range(n - 1):
+            histar: Star = hiball[i]
+
+            for j in range(i + 1, n):
+                lostar: Star = hiball[j]
+                max_dist: int = self.trade._max_dist(histar.wtn, lostar.wtn, True)
+                dist: int = histar.distance(lostar)
+                if dist > max_dist:
+                    continue
+                upbound = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, distance=dist)
+                if upbound < min_btn:
+                    continue
+                ranges.append((histar, lostar, dist))
+
         return ranges
 
     @staticmethod
-    def _get_btn_upper_bound(star1, star2, max_range, min_btn, distance=None, offset: int = 2):
+    def _get_btn_upper_bound(star1: Star, star2: Star, max_range: int, min_btn: int, distance=None, offset: int = 2):
         """
         Return an _upper bound_ on the BTN between star1 and star2.  If the upper bound on BTN
         doesn't meet/beat the minimum BTN, then the _actual_ BTN, which also doesn't meet/beat
