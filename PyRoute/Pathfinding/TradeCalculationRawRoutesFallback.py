@@ -6,6 +6,7 @@ Created on Jul 22, 2026
 import itertools
 import time
 
+from Position.Hex import Hex
 from PyRoute import Star
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.TradeCodes import TradeCodes
@@ -134,11 +135,13 @@ class TradeCalculationRawRoutes(object):
 
         for i in range(n - 1):
             histar: Star = hiball[i]
+            hihex: Hex = histar.hex
 
             for j in range(i + 1, n):
                 lostar: Star = hiball[j]
+                lohex: Hex = lostar.hex
                 max_dist: int = self.trade._max_dist(histar.wtn, lostar.wtn, True)
-                dist: int = histar.distance(lostar)
+                dist: int = hihex.distance(lohex)
                 if dist > max_dist:
                     continue
                 upbound = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, distance=dist)
