@@ -3,7 +3,6 @@ Created on Jul 22, 2026
 
 @author: CyberiaResurrection
 """
-import itertools
 import time
 import numpy as np
 
@@ -128,13 +127,20 @@ class TradeCalculationRawRoutes(object):
         return lo_lo_ranges
 
     def _hi_hi_ranges(self, foo_boost, max_range, min_btn, one_boost, ranges, two_boost):
-        hi_hi_ranges = [(star, neighbour) for (star, neighbour, dist) in filter(two_boost, ranges)]
-        hi_hi_ranges1 = [(star, neighbour) for (star, neighbour, dist) in filter(one_boost, ranges)
-                         if self._get_btn_upper_bound(star, neighbour, max_range, min_btn, offset=1, distance=dist) >= min_btn
-                         ]
-        hi_hi_ranges2 = [(star, neighbour) for (star, neighbour, dist) in itertools.filterfalse(foo_boost, ranges)
-                         if self._get_btn_upper_bound(star, neighbour, max_range, min_btn, offset=0, distance=dist) >= min_btn
-                         ]
+        hi_hi_ranges = []
+        hi_hi_ranges1 = []
+        hi_hi_ranges2 = []
+        for item in ranges:
+            if two_boost(item):
+                hi_hi_ranges.append((item[0], item[1]))
+            elif one_boost(item):
+                if self._get_btn_upper_bound(item[0], item[1], max_range, min_btn, offset=1,
+                                             distance=item[2]) >= min_btn:
+                    hi_hi_ranges1.append((item[0], item[1]))
+            elif not foo_boost(item) and self._get_btn_upper_bound(item[0], item[1], max_range, min_btn, offset=0,
+                    distance=item[2]) >= min_btn:
+                hi_hi_ranges2.append((item[0], item[1]))
+
         return hi_hi_ranges, hi_hi_ranges1, hi_hi_ranges2
 
     def _base_ranges(self, hiball: list[Star], max_range: int, min_btn: int):
