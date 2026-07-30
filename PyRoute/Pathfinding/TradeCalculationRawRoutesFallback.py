@@ -159,6 +159,11 @@ class TradeCalculationRawRoutes(object):
             r1 = r_array[i]
             max_wtn_dist = max_wtn_distances[i]
             offset = offsets[max_wtn_dist]
+            hi_trade: TradeCodes = histar.tradeCode
+            hi_ag_boost: bool = hi_trade.ag_code_boost
+            hi_in_boost: bool = hi_trade.ag_code_boost
+            hi_ag: bool = hi_trade.agricultural
+            hi_in: bool = hi_trade.industrial
 
             for dq, dr in offset:
                 pairs_primed += 1
@@ -185,6 +190,14 @@ class TradeCalculationRawRoutes(object):
                     upbound = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, distance=dist)
                     if upbound < min_btn:
                         continue
+
+                    lo_trade: TradeCodes = lostar.tradeCode
+                    lo_ag_boost: bool = lo_trade.ag_code_boost
+                    lo_in_boost: bool = lo_trade.ag_code_boost
+                    lo_ag: bool = lo_trade.agricultural
+                    lo_in: bool = lo_trade.industrial
+                    ag_code_boost: bool = hi_ag_boost and lo_ag_boost and (hi_ag or lo_ag)
+                    in_code_boost: bool = hi_in_boost and lo_in_boost and (hi_in or lo_in)
                     if lostar.name < histar.name:
                         ranges_set.add((lostar, histar, dist))
                     else:
