@@ -61,10 +61,8 @@ class TradeCalculationRawRoutes(object):
                    (zero.in_code_boost and wun.in_code_boost
                     and (zero.industrial or wun.industrial))
 
-        ranges = self._base_ranges(hiball, max_range, min_btn)
+        hi_hi_ranges, hi_hi_ranges1, hi_hi_ranges2 = self._base_ranges(hiball, max_range, min_btn, foo_boost, one_boost, two_boost)
         t3 = time.perf_counter()
-        hi_hi_ranges, hi_hi_ranges1, hi_hi_ranges2 = self._hi_hi_ranges(foo_boost, max_range, min_btn, one_boost,
-                                                                        ranges, two_boost)
         t4 = time.perf_counter()
         lo_lo_ranges = self._lo_lo_ranges(loball, max_range, offsets)
         t5 = time.perf_counter()
@@ -126,26 +124,8 @@ class TradeCalculationRawRoutes(object):
 
         return lo_lo_ranges
 
-    def _hi_hi_ranges(self, foo_boost, max_range, min_btn, one_boost, ranges, two_boost):
-        hi_hi_ranges = []
-        hi_hi_ranges1 = []
-        hi_hi_ranges2 = []
-        for item in ranges:
-            if two_boost(item):
-                hi_hi_ranges.append((item[0], item[1]))
-            elif one_boost(item):
-                if self._get_btn_upper_bound(item[0], item[1], max_range, min_btn, offset=1,
-                                             distance=item[2]) >= min_btn:
-                    hi_hi_ranges1.append((item[0], item[1]))
-            elif not foo_boost(item) and self._get_btn_upper_bound(item[0], item[1], max_range, min_btn, offset=0,
-                    distance=item[2]) >= min_btn:
-                hi_hi_ranges2.append((item[0], item[1]))
-
-        return hi_hi_ranges, hi_hi_ranges1, hi_hi_ranges2
-
-    def _base_ranges(self, hiball: list[Star], max_range: int, min_btn: int):
+    def _base_ranges(self, hiball: list[Star], max_range: int, min_btn: int, foo_boost, one_boost, two_boost):
         n: int = len(hiball)
-        ranges: list[tuple[Star, Star, int]] = []
         ranges_set: set[tuple[Star, Star, int]] = set()
         pairs_primed: int = 0
         pairs_stars_Loaded: int = 0
@@ -167,6 +147,9 @@ class TradeCalculationRawRoutes(object):
                 offsets[max_dist] = TradeCalculationRawRoutes._axial_offsets_within(max_dist)
 
         hib_map = {(s.hex.q, s.hex.r): s for s in hiball}
+        hi_hi_ranges = []
+        hi_hi_ranges1 = []
+        hi_hi_ranges2 = []
 
         for i in range(n):
             histar: Star = hiball[i]
@@ -208,13 +191,24 @@ class TradeCalculationRawRoutes(object):
                         ranges_set.add((histar, lostar, dist))
                     pairs_kept += 1
 
+        for item in ranges_set:
+            if two_boost(item):
+                hi_hi_ranges.append((item[0], item[1]))
+            elif one_boost(item):
+                if self._get_btn_upper_bound(item[0], item[1], max_range, min_btn, offset=1,
+                                             distance=item[2]) >= min_btn:
+                    hi_hi_ranges1.append((item[0], item[1]))
+            elif not foo_boost(item):
+                if self._get_btn_upper_bound(item[0], item[1], max_range, min_btn, offset=0,
+                                             distance=item[2]) >= min_btn:
+                    hi_hi_ranges2.append((item[0], item[1]))
+
         self.pairs_primed = pairs_primed
         self.pairs_stars_loaded = pairs_stars_Loaded
         self.pairs_considered = pairs_considered
         self.pairs_kept = pairs_kept
 
-        ranges = list(ranges_set)
-        return ranges
+        return hi_hi_ranges, hi_hi_ranges1, hi_hi_ranges2
 
     @staticmethod
     def _get_btn_upper_bound(star1: Star, star2: Star, max_range: int, min_btn: int, distance: int, offset: int = 2):
