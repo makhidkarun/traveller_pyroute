@@ -145,55 +145,50 @@ class TradeCalculationRawRoutes(object):
                 # Skip self; optional but saves one lookup
                 if dq == 0 and dr == 0:
                     continue
-                # Lexicographic uniqueness: only emit when (q1,r1) < (q2,r2)
-                if True:
-                    lostar: Star = hib_map.get((q1 + dq, r1 + dr))
-                    if lostar is None:
-                        continue
-                    lo_wtn = lostar.wtn
-                    max_dist: int = self.trade._max_dist(hi_wtn, lo_wtn, True)
-                    lohex: Hex = lostar.hex
-                    pairs_stars_Loaded += 1
+                lostar: Star = hib_map.get((q1 + dq, r1 + dr))
+                if lostar is None:
+                    continue
+                lo_wtn = lostar.wtn
+                lohex: Hex = lostar.hex
+                pairs_stars_Loaded += 1
 
-                    dist: int = hihex.distance(lohex)
-                    if dist > max_dist:
-                        continue
-                    pairs_considered += 1
-                    upbound = self._get_rough_btn_upper_bound(hi_wtn, lo_wtn, max_range, min_btn, distance=dist)
-                    if upbound < min_btn:
-                        continue
-                    upbound = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, distance=dist)
-                    if upbound < min_btn:
-                        continue
-                    base_btn = 0 if dist > max_range else min_btn
-                    upper1 = max(base_btn, upbound - 1)
-                    upper0 = max(base_btn, upbound - 2)
+                dist: int = hihex.distance(lohex)
+                pairs_considered += 1
+                upbound = self._get_rough_btn_upper_bound(hi_wtn, lo_wtn, max_range, min_btn, distance=dist)
+                if upbound < min_btn:
+                    continue
+                upbound = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, distance=dist)
+                if upbound < min_btn:
+                    continue
+                base_btn = 0 if dist > max_range else min_btn
+                upper1 = max(base_btn, upbound - 1)
+                upper0 = max(base_btn, upbound - 2)
 
-                    lo_trade: TradeCodes = lostar.tradeCode
-                    lo_ag_boost: bool = lo_trade.ag_code_boost
-                    lo_in_boost: bool = lo_trade.in_code_boost
-                    lo_ag: bool = lo_trade.agricultural
-                    lo_in: bool = lo_trade.industrial
-                    ag_code_boost: bool = hi_ag_boost and lo_ag_boost and (hi_ag or lo_ag)
-                    in_code_boost: bool = hi_in_boost and lo_in_boost and (hi_in or lo_in)
-                    if ag_code_boost and in_code_boost:
-                        if lostar.name < histar.name:
-                            hi_hi_ranges.add((lostar, histar))
-                        else:
-                            hi_hi_ranges.add((histar, lostar))
-                    elif ag_code_boost ^ in_code_boost:
-                        if upper1 >= min_btn:
-                            if lostar.name < histar.name:
-                                hi_hi_ranges1.add((lostar, histar))
-                            else:
-                                hi_hi_ranges1.add((histar, lostar))
+                lo_trade: TradeCodes = lostar.tradeCode
+                lo_ag_boost: bool = lo_trade.ag_code_boost
+                lo_in_boost: bool = lo_trade.in_code_boost
+                lo_ag: bool = lo_trade.agricultural
+                lo_in: bool = lo_trade.industrial
+                ag_code_boost: bool = hi_ag_boost and lo_ag_boost and (hi_ag or lo_ag)
+                in_code_boost: bool = hi_in_boost and lo_in_boost and (hi_in or lo_in)
+                if ag_code_boost and in_code_boost:
+                    if lostar.name < histar.name:
+                        hi_hi_ranges.add((lostar, histar))
                     else:
-                        if upper0 >= min_btn:
-                            if lostar.name < histar.name:
-                                hi_hi_ranges2.add((lostar, histar))
-                            else:
-                                hi_hi_ranges2.add((histar, lostar))
-                    pairs_kept += 1
+                        hi_hi_ranges.add((histar, lostar))
+                elif ag_code_boost ^ in_code_boost:
+                    if upper1 >= min_btn:
+                        if lostar.name < histar.name:
+                            hi_hi_ranges1.add((lostar, histar))
+                        else:
+                            hi_hi_ranges1.add((histar, lostar))
+                else:
+                    if upper0 >= min_btn:
+                        if lostar.name < histar.name:
+                            hi_hi_ranges2.add((lostar, histar))
+                        else:
+                            hi_hi_ranges2.add((histar, lostar))
+                pairs_kept += 1
 
         self.pairs_primed = pairs_primed
         self.pairs_stars_loaded = pairs_stars_Loaded
