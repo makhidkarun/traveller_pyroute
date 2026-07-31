@@ -136,7 +136,7 @@ class TradeCalculationRawRoutes(object):
             offset = offsets[max_wtn_dist]
             hi_trade: TradeCodes = histar.tradeCode
             hi_ag_boost: bool = hi_trade.ag_code_boost
-            hi_in_boost: bool = hi_trade.ag_code_boost
+            hi_in_boost: bool = hi_trade.in_code_boost
             hi_ag: bool = hi_trade.agricultural
             hi_in: bool = hi_trade.industrial
 
@@ -171,7 +171,7 @@ class TradeCalculationRawRoutes(object):
 
                     lo_trade: TradeCodes = lostar.tradeCode
                     lo_ag_boost: bool = lo_trade.ag_code_boost
-                    lo_in_boost: bool = lo_trade.ag_code_boost
+                    lo_in_boost: bool = lo_trade.in_code_boost
                     lo_ag: bool = lo_trade.agricultural
                     lo_in: bool = lo_trade.industrial
                     ag_code_boost: bool = hi_ag_boost and lo_ag_boost and (hi_ag or lo_ag)
