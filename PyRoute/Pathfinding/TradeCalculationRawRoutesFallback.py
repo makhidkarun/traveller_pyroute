@@ -141,9 +141,9 @@ class TradeCalculationRawRoutes(object):
 
             for dq, dr in offset:
                 pairs_primed += 1
-                lostar: Star = hib_map.get((q1 + dq, r1 + dr))
-                if lostar is None:
+                if (q1 + dq, r1 + dr) not in hib_map:
                     continue
+                lostar: Star = hib_map[(q1 + dq, r1 + dr)]
                 # Skip self
                 if dq == 0 and dr == 0:
                     continue
