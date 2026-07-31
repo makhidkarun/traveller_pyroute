@@ -164,12 +164,8 @@ class TradeCalculationRawRoutes(object):
                 upper0 = max(base_btn, upbound - 2)
 
                 lo_trade: TradeCodes = lostar.tradeCode
-                lo_ag_boost: bool = lo_trade.ag_code_boost
-                lo_in_boost: bool = lo_trade.in_code_boost
-                lo_ag: bool = lo_trade.agricultural
-                lo_in: bool = lo_trade.industrial
-                ag_code_boost: bool = hi_ag_boost and lo_ag_boost and (hi_ag or lo_ag)
-                in_code_boost: bool = hi_in_boost and lo_in_boost and (hi_in or lo_in)
+                ag_code_boost: bool = hi_ag_boost and lo_trade.ag_code_boost and (hi_ag or lo_trade.agricultural)
+                in_code_boost: bool = hi_in_boost and lo_trade.in_code_boost and (hi_in or lo_trade.industrial)
                 if ag_code_boost and in_code_boost:
                     if lostar.name < histar.name:
                         hi_hi_ranges.add((lostar, histar))
