@@ -40,7 +40,7 @@ class TradeCalculationRawRoutes(object):
         offsets = TradeCalculationRawRoutes._axial_offsets_within(max_range)
         t2 = time.perf_counter()
 
-        hi_hi_ranges, hi_hi_ranges1, hi_hi_ranges2 = self._base_ranges(hiball, max_range, min_btn)
+        hi_hi_ranges = self._base_ranges(hiball, max_range, min_btn)
         t3 = time.perf_counter()
         t4 = time.perf_counter()
         lo_lo_ranges = self._lo_lo_ranges(loball, max_range, offsets)
@@ -49,8 +49,6 @@ class TradeCalculationRawRoutes(object):
         t6 = time.perf_counter()
         hi_hi_ranges.extend(lo_lo_ranges)
         hi_hi_ranges.extend(hi_lo_ranges)
-        hi_hi_ranges.extend(hi_hi_ranges1)
-        hi_hi_ranges.extend(hi_hi_ranges2)
         self.trade.logger.info("Routes with endpoints more than " + str(max_route_dist) + " pc apart, trimmed")
         self.trade.logger.info(
             f"raw_ranges phases: init {t1 - t0:.6f}s, split {t2 - t1:.6f}s, ranges {t3 - t2:.6f}s, hi-hi filters {t4 - t3:.6f}s, lo-lo filters {t5 - t4:.6f}s, hi-lo filters {t6 - t5:.6f}s"
@@ -126,8 +124,6 @@ class TradeCalculationRawRoutes(object):
 
         hib_map = {(s.hex.q, s.hex.r): s for s in hiball}
         hi_hi_ranges = set()
-        hi_hi_ranges1 = set()
-        hi_hi_ranges2 = set()
 
         for i in range(n):
             histar: Star = hiball[i]
@@ -182,15 +178,15 @@ class TradeCalculationRawRoutes(object):
                 elif ag_code_boost ^ in_code_boost:
                     if upper1 >= min_btn:
                         if lostar.name < histar.name:
-                            hi_hi_ranges1.add((lostar, histar))
+                            hi_hi_ranges.add((lostar, histar))
                         else:
-                            hi_hi_ranges1.add((histar, lostar))
+                            hi_hi_ranges.add((histar, lostar))
                 else:
                     if upper0 >= min_btn:
                         if lostar.name < histar.name:
-                            hi_hi_ranges2.add((lostar, histar))
+                            hi_hi_ranges.add((lostar, histar))
                         else:
-                            hi_hi_ranges2.add((histar, lostar))
+                            hi_hi_ranges.add((histar, lostar))
                 pairs_kept += 1
 
         self.pairs_primed = pairs_primed
@@ -198,7 +194,7 @@ class TradeCalculationRawRoutes(object):
         self.pairs_considered = pairs_considered
         self.pairs_kept = pairs_kept
 
-        return list(hi_hi_ranges), list(hi_hi_ranges1), list(hi_hi_ranges2)
+        return list(hi_hi_ranges)
 
     @staticmethod
     def _get_btn_upper_bound(star1: Star, star2: Star, max_range: int, min_btn: int, distance: int, offset: int = 2):
