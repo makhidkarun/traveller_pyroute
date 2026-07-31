@@ -165,6 +165,9 @@ class TradeCalculationRawRoutes(object):
                     upbound = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, distance=dist)
                     if upbound < min_btn:
                         continue
+                    base_btn = 0 if dist > max_range else min_btn
+                    upper1 = max(base_btn, upbound - 1)
+                    upper0 = max(base_btn, upbound - 2)
 
                     lo_trade: TradeCodes = lostar.tradeCode
                     lo_ag_boost: bool = lo_trade.ag_code_boost
@@ -179,15 +182,13 @@ class TradeCalculationRawRoutes(object):
                         else:
                             hi_hi_ranges.add((histar, lostar))
                     elif ag_code_boost ^ in_code_boost:
-                        if self._get_btn_upper_bound(histar, lostar, max_range, min_btn, offset=1,
-                                                     distance=dist) >= min_btn:
+                        if upper1 >= min_btn:
                             if lostar.name < histar.name:
                                 hi_hi_ranges1.add((lostar, histar))
                             else:
                                 hi_hi_ranges1.add((histar, lostar))
                     else:
-                        if self._get_btn_upper_bound(histar, lostar, max_range, min_btn, offset=0,
-                                                     distance=dist) >= min_btn:
+                        if upper0 >= min_btn:
                             if lostar.name < histar.name:
                                 hi_hi_ranges2.add((lostar, histar))
                             else:
