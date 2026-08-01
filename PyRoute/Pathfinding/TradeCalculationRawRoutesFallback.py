@@ -9,7 +9,6 @@ from typing import Optional
 
 import numpy as np
 
-from Position.Hex import Hex
 from PyRoute import Star
 from PyRoute.Calculation.RouteCalculation import RouteCalculation
 from PyRoute.TradeCodes import TradeCodes
@@ -130,7 +129,6 @@ class TradeCalculationRawRoutes(object):
 
         for i in range(n):
             histar: Star = hiball[i]
-            hihex: Hex = histar.hex
             hi_wtn: int = world_wtn[i]
             q1 = q_array[i]
             r1 = r_array[i]
@@ -151,10 +149,9 @@ class TradeCalculationRawRoutes(object):
                 if dq == 0 and dr == 0:
                     continue
                 lo_wtn = lostar.wtn
-                lohex: Hex = lostar.hex
                 pairs_stars_Loaded += 1
 
-                dist: int = hihex.distance(lohex)
+                dist = (abs(dq) + abs(dr) + abs(dq + dr)) // 2
                 pairs_considered += 1
                 upbound = self._get_rough_btn_upper_bound(hi_wtn, lo_wtn, max_range, min_btn, distance=dist)
                 if upbound < min_btn:
