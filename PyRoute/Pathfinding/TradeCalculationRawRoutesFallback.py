@@ -152,6 +152,7 @@ class TradeCalculationRawRoutes(object):
             neighbours[i] = lst
 
         hi_hi_ranges = set()
+        hi_hi_ranges_list: list[tuple[int, int]] = []
 
         for i in range(n):
             hi_wtn: int = world_wtn[i]
@@ -182,25 +183,26 @@ class TradeCalculationRawRoutes(object):
                 if ag_code_boost and in_code_boost:
                     pairs_added += 1
                     if j < i:
-                        hi_hi_ranges.add((j, i))
+                        hi_hi_ranges_list.append((j, i))
                     else:
-                        hi_hi_ranges.add((i, j))
+                        hi_hi_ranges_list.append((i, j))
                 elif ag_code_boost ^ in_code_boost:
                     if upper1 >= min_btn:
                         pairs_added += 1
                         if j < i:
-                            hi_hi_ranges.add((j, i))
+                            hi_hi_ranges_list.append((j, i))
                         else:
-                            hi_hi_ranges.add((i, j))
+                            hi_hi_ranges_list.append((i, j))
                 else:
                     if upper0 >= min_btn:
                         pairs_added += 1
                         if j < i:
-                            hi_hi_ranges.add((j, i))
+                            hi_hi_ranges_list.append((j, i))
                         else:
-                            hi_hi_ranges.add((i, j))
+                            hi_hi_ranges_list.append((i, j))
                 pairs_kept += 1
 
+        hi_hi_ranges = set(hi_hi_ranges_list)
         self.pairs_primed = pairs_primed
         self.pairs_stars_loaded = pairs_stars_Loaded
         self.pairs_considered = pairs_considered
