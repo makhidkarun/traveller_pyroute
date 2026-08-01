@@ -115,7 +115,6 @@ class TradeCalculationRawRoutes(object):
         max_wtn_distances = np.zeros(n, dtype=np.int64)
         offsets: dict[int, list[tuple[int, int]]] = {}
         i_map: dict[tuple[int, int], int] = {}
-        hib_map: dict[tuple[int, int], Star] = {}
         ag_boost_array: list[bool] = [False] * n
         ag_array: list[bool] = [False] * n
         in_boost_array: list[bool] = [False] * n
@@ -130,7 +129,6 @@ class TradeCalculationRawRoutes(object):
             if max_dist not in offsets:
                 offsets[max_dist] = TradeCalculationRawRoutes._axial_offsets_within(max_dist)
             i_map[(q_array[i], r_array[i])] = i
-            hib_map[(q_array[i], r_array[i])] = histar
             hi_trade: TradeCodes = histar.tradeCode
             ag_boost_array[i] = hi_trade.ag_code_boost
             ag_array[i] = hi_trade.agricultural
@@ -153,21 +151,22 @@ class TradeCalculationRawRoutes(object):
 
             for dq, dr in offset:
                 pairs_primed += 1
-                if (q1 + dq, r1 + dr) not in hib_map:
+                j = i_map.get((q1 + dq, r1 + dr))
+                if j is None:
                     continue
                 # Skip self
                 if dq == 0 and dr == 0:
                     continue
-                lostar: Star = hib_map[(q1 + dq, r1 + dr)]
-                j = i_map[(q1 + dq, r1 + dr)]
                 lo_wtn = world_wtn[j]
-                pairs_stars_Loaded += 1
 
                 dist = (abs(dq) + abs(dr) + abs(dq + dr)) // 2
                 pairs_considered += 1
                 upbound = self._get_rough_btn_upper_bound(hi_wtn, lo_wtn, max_range, min_btn, distance=dist)
                 if upbound < min_btn:
                     continue
+
+                lostar: Star = hiball[j]
+                pairs_stars_Loaded += 1
                 upbound = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, distance=dist)
                 if upbound < min_btn:
                     continue
