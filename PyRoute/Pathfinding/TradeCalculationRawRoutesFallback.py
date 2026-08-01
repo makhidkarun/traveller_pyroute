@@ -60,6 +60,9 @@ class TradeCalculationRawRoutes(object):
         return hi_hi_ranges
 
     def _hi_lo_ranges(self, hiball, loball, offsets: list[tuple[int, int]]):
+        # Count the shorter of hiball and loball as hiball for this, since the main loop depends on hiball length
+        if len(hiball) > len(loball):
+            hiball, loball = loball, hiball
         m: int = len(hiball)
         lob_map = {(s.hex.q, s.hex.r): s for s in loball}
         hi_lo_ranges: list[tuple[Star, Star]] = []
