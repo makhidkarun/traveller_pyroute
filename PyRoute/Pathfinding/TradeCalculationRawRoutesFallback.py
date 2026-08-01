@@ -140,7 +140,6 @@ class TradeCalculationRawRoutes(object):
         hi_hi_ranges = set()
 
         for i in range(n):
-            histar: Star = hiball[i]
             hi_wtn: int = world_wtn[i]
             q1 = q_array[i]
             r1 = r_array[i]
@@ -166,8 +165,6 @@ class TradeCalculationRawRoutes(object):
                 if upbound < min_btn:
                     continue
 
-                lostar: Star = hiball[j]
-                pairs_stars_Loaded += 1
                 upbound = self._get_btn_upper_bound(hi_wtn, lo_wtn, alg_code_array[i], alg_code_array[j], max_range,
                                                     min_btn, distance=dist)
                 if upbound < min_btn:
@@ -180,21 +177,21 @@ class TradeCalculationRawRoutes(object):
                 in_code_boost: bool = hi_in_boost and in_boost_array[j] and (hi_in or in_array[j])
                 if ag_code_boost and in_code_boost:
                     pairs_added += 1
-                    if lostar.name < histar.name:
+                    if j < i:
                         hi_hi_ranges.add((j, i))
                     else:
                         hi_hi_ranges.add((i, j))
                 elif ag_code_boost ^ in_code_boost:
                     if upper1 >= min_btn:
                         pairs_added += 1
-                        if lostar.name < histar.name:
+                        if j < i:
                             hi_hi_ranges.add((j, i))
                         else:
                             hi_hi_ranges.add((i, j))
                 else:
                     if upper0 >= min_btn:
                         pairs_added += 1
-                        if lostar.name < histar.name:
+                        if j < i:
                             hi_hi_ranges.add((j, i))
                         else:
                             hi_hi_ranges.add((i, j))
