@@ -120,7 +120,7 @@ class TradeCalculationRawRoutes(object):
         in_boost_array: list[bool] = [False] * n
         in_array: list[bool] = [False] * n
         alg_code_array: list[Optional[str]] = [None] * n
-        neighbours: list[list[tuple[int, int]]] = [[]] * n
+        neighbours: list[list[tuple[int, int]]] = [[] for _ in range(n)]
         for i in range(n):
             histar: Star = hiball[i]
             world_wtn[i] = histar.wtn
