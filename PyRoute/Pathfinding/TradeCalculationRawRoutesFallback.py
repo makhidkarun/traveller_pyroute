@@ -119,6 +119,7 @@ class TradeCalculationRawRoutes(object):
         ag_array: list[bool] = [False] * n
         in_boost_array: list[bool] = [False] * n
         in_array: list[bool] = [False] * n
+        alg_code_array: list[Optional[str]] = [None] * n
         for i in range(n):
             histar: Star = hiball[i]
             world_wtn[i] = histar.wtn
@@ -134,6 +135,7 @@ class TradeCalculationRawRoutes(object):
             ag_array[i] = hi_trade.agricultural
             in_boost_array[i] = hi_trade.in_code_boost
             in_array[i] = hi_trade.industrial
+            alg_code_array[i] = histar.alg_code
 
         hi_hi_ranges = set()
 
@@ -166,7 +168,8 @@ class TradeCalculationRawRoutes(object):
 
                 lostar: Star = hiball[j]
                 pairs_stars_Loaded += 1
-                upbound = self._get_btn_upper_bound(histar, lostar, max_range, min_btn, distance=dist)
+                upbound = self._get_btn_upper_bound(hi_wtn, lo_wtn, alg_code_array[i], alg_code_array[j], max_range,
+                                                    min_btn, distance=dist)
                 if upbound < min_btn:
                     continue
                 base_btn = 0 if dist > max_range else min_btn
@@ -206,7 +209,8 @@ class TradeCalculationRawRoutes(object):
         return [(hiball[a], hiball[b]) for (a, b) in hi_hi_ranges]
 
     @staticmethod
-    def _get_btn_upper_bound(star1: Star, star2: Star, max_range: int, min_btn: int, distance: int, offset: int = 2):
+    def _get_btn_upper_bound(wtn1: int, wtn2: int, alg_code1: Optional[str], alg_code2: Optional[str], max_range: int,
+                             min_btn: int, distance: int, offset: int = 2):
         """
         Return an _upper bound_ on the BTN between star1 and star2.  If the upper bound on BTN
         doesn't meet/beat the minimum BTN, then the _actual_ BTN, which also doesn't meet/beat
@@ -217,10 +221,10 @@ class TradeCalculationRawRoutes(object):
         # Default assumes BTN is boosted by both agricultural and industrial matches
         # Offset of 1 assumes BTN is boosted by one match, agricultural xor industrial
         # Offset of 0 assumes no boost.
-        btn = TradeCalculationRawRoutes._get_btn_upper_bound_core(star1.wtn, star2.wtn, star1.alg_code, star2.alg_code) \
+        btn = TradeCalculationRawRoutes._get_btn_upper_bound_core(wtn1, wtn2, alg_code1, alg_code2) \
               + offset + TradeCalculationRawRoutes.btn_offset(distance)
 
-        btn = min(btn, TradeCalculationRawRoutes.max_btn(star1.wtn, star2.wtn))
+        btn = min(btn, TradeCalculationRawRoutes.max_btn(wtn1, wtn2))
         return min_btn if min_btn > btn and distance <= max_range else btn
 
     @staticmethod
