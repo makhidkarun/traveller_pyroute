@@ -120,6 +120,7 @@ class TradeCalculationRawRoutes(object):
         in_boost_array: list[bool] = [False] * n
         in_array: list[bool] = [False] * n
         alg_code_array: list[Optional[str]] = [None] * n
+        neighbours: list[list[tuple[int, int]]] = [[]] * n
         for i in range(n):
             histar: Star = hiball[i]
             world_wtn[i] = histar.wtn
@@ -137,27 +138,30 @@ class TradeCalculationRawRoutes(object):
             in_array[i] = hi_trade.industrial
             alg_code_array[i] = histar.alg_code
 
+        for i in range(n):
+            q1, r1 = q_array[i], r_array[i]
+            offset = offsets[max_wtn_distances[i]]
+            lst = []
+            for dq, dr, dist in offset:
+                # Skip self
+                if dq == 0 and dr == 0:
+                    continue
+                j = i_map.get((q1 + dq, r1 + dr))
+                if j is not None:
+                    lst.append((j, dist))
+            neighbours[i] = lst
+
         hi_hi_ranges = set()
 
         for i in range(n):
             hi_wtn: int = world_wtn[i]
-            q1 = q_array[i]
-            r1 = r_array[i]
-            max_wtn_dist = max_wtn_distances[i]
-            offset = offsets[max_wtn_dist]
             hi_ag_boost: bool = ag_boost_array[i]
             hi_in_boost: bool = in_boost_array[i]
             hi_ag: bool = ag_array[i]
             hi_in: bool = in_array[i]
 
-            for dq, dr, dist in offset:
+            for j, dist in neighbours[i]:
                 pairs_primed += 1
-                j = i_map.get((q1 + dq, r1 + dr))
-                if j is None:
-                    continue
-                # Skip self
-                if dq == 0 and dr == 0:
-                    continue
                 lo_wtn = world_wtn[j]
 
                 pairs_considered += 1
