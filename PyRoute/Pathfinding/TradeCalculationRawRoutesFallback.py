@@ -178,23 +178,23 @@ class TradeCalculationRawRoutes(object):
                 if ag_code_boost and in_code_boost:
                     pairs_added += 1
                     if lostar.name < histar.name:
-                        hi_hi_ranges.add((lostar, histar))
+                        hi_hi_ranges.add((j, i))
                     else:
-                        hi_hi_ranges.add((histar, lostar))
+                        hi_hi_ranges.add((i, j))
                 elif ag_code_boost ^ in_code_boost:
                     if upper1 >= min_btn:
                         pairs_added += 1
                         if lostar.name < histar.name:
-                            hi_hi_ranges.add((lostar, histar))
+                            hi_hi_ranges.add((j, i))
                         else:
-                            hi_hi_ranges.add((histar, lostar))
+                            hi_hi_ranges.add((i, j))
                 else:
                     if upper0 >= min_btn:
                         pairs_added += 1
                         if lostar.name < histar.name:
-                            hi_hi_ranges.add((lostar, histar))
+                            hi_hi_ranges.add((j, i))
                         else:
-                            hi_hi_ranges.add((histar, lostar))
+                            hi_hi_ranges.add((i, j))
                 pairs_kept += 1
 
         self.pairs_primed = pairs_primed
@@ -203,7 +203,7 @@ class TradeCalculationRawRoutes(object):
         self.pairs_kept = pairs_kept
         self.pairs_added = pairs_added
 
-        return list(hi_hi_ranges)
+        return [(hiball[a], hiball[b]) for (a, b) in hi_hi_ranges]
 
     @staticmethod
     def _get_btn_upper_bound(star1: Star, star2: Star, max_range: int, min_btn: int, distance: int, offset: int = 2):
