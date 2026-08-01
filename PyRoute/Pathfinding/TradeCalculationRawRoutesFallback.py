@@ -43,7 +43,7 @@ class TradeCalculationRawRoutes(object):
         hi_hi_ranges = self._base_ranges(hiball, max_range, min_btn)
         t3 = time.perf_counter()
         t4 = time.perf_counter()
-        lo_lo_ranges = self._lo_lo_ranges(loball, max_range, offsets)
+        lo_lo_ranges = self._lo_lo_ranges(loball, offsets)
         t5 = time.perf_counter()
         hi_lo_ranges = self._hi_lo_ranges(hiball, loball, offsets)
         t6 = time.perf_counter()
@@ -76,30 +76,28 @@ class TradeCalculationRawRoutes(object):
 
         return hi_lo_ranges
 
-    def _lo_lo_ranges(self, loball, max_range, offsets: list[tuple[int, int]]):
+    def _lo_lo_ranges(self, loball, offsets: list[tuple[int, int]]):
         n: int = len(loball)
         lob_map = {(s.hex.q, s.hex.r): s for s in loball}
-        lo_lo_ranges: list[tuple[Star, Star]] = []
+        lo_lo_ranges: set[tuple[Star, Star]] = set()
 
-        for i in range(n - 1):
+        for i in range(n):
             histar: Star = loball[i]
             q1: int = histar.hex.q
             r1: int = histar.hex.r
 
             for dq, dr in offsets:
-                q2: int = q1 + dq
-                r2: int = r1 + dr
-                # Skip self; optional but saves one lookup
-                if dq == 0 and dr == 0:
-                    continue
+                lostar: Optional[Star] = lob_map.get((q1 + dq, r1 + dr))
+                if lostar is not None:
+                    # Skip self
+                    if dq == 0 and dr == 0:
+                        continue
+                    if lostar.name < histar.name:
+                        lo_lo_ranges.add((lostar, histar))
+                    else:
+                        lo_lo_ranges.add((histar, lostar))
 
-                # Lexicographic uniqueness: only emit when (q1,r1) < (q2,r2)
-                if q1 < q2 or (q1 == q2 and r1 < r2):
-                    lostar = lob_map.get((q2, r2))
-                    if lostar is not None:
-                        lo_lo_ranges.append((histar, lostar))
-
-        return lo_lo_ranges
+        return list(lo_lo_ranges)
 
     def _base_ranges(self, hiball: list[Star], max_range: int, min_btn: int):
         n: int = len(hiball)
