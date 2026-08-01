@@ -114,6 +114,12 @@ class TradeCalculationRawRoutes(object):
         r_array = np.zeros(n, dtype=np.int64)
         max_wtn_distances = np.zeros(n, dtype=np.int64)
         offsets: dict[int, list[tuple[int, int]]] = {}
+        i_map: dict[tuple[int, int], int] = {}
+        hib_map: dict[tuple[int, int], Star] = {}
+        ag_boost_array: list[bool] = [False] * n
+        ag_array: list[bool] = [False] * n
+        in_boost_array: list[bool] = [False] * n
+        in_array: list[bool] = [False] * n
         for i in range(n):
             histar: Star = hiball[i]
             world_wtn[i] = histar.wtn
@@ -123,8 +129,14 @@ class TradeCalculationRawRoutes(object):
             max_wtn_distances[i] = max_dist
             if max_dist not in offsets:
                 offsets[max_dist] = TradeCalculationRawRoutes._axial_offsets_within(max_dist)
+            i_map[(q_array[i], r_array[i])] = i
+            hib_map[(q_array[i], r_array[i])] = histar
+            hi_trade: TradeCodes = histar.tradeCode
+            ag_boost_array[i] = hi_trade.ag_code_boost
+            ag_array[i] = hi_trade.agricultural
+            in_boost_array[i] = hi_trade.in_code_boost
+            in_array[i] = hi_trade.industrial
 
-        hib_map = {(s.hex.q, s.hex.r): s for s in hiball}
         hi_hi_ranges = set()
 
         for i in range(n):
@@ -134,21 +146,21 @@ class TradeCalculationRawRoutes(object):
             r1 = r_array[i]
             max_wtn_dist = max_wtn_distances[i]
             offset = offsets[max_wtn_dist]
-            hi_trade: TradeCodes = histar.tradeCode
-            hi_ag_boost: bool = hi_trade.ag_code_boost
-            hi_in_boost: bool = hi_trade.in_code_boost
-            hi_ag: bool = hi_trade.agricultural
-            hi_in: bool = hi_trade.industrial
+            hi_ag_boost: bool = ag_boost_array[i]
+            hi_in_boost: bool = in_boost_array[i]
+            hi_ag: bool = ag_array[i]
+            hi_in: bool = in_array[i]
 
             for dq, dr in offset:
                 pairs_primed += 1
                 if (q1 + dq, r1 + dr) not in hib_map:
                     continue
-                lostar: Star = hib_map[(q1 + dq, r1 + dr)]
                 # Skip self
                 if dq == 0 and dr == 0:
                     continue
-                lo_wtn = lostar.wtn
+                lostar: Star = hib_map[(q1 + dq, r1 + dr)]
+                j = i_map[(q1 + dq, r1 + dr)]
+                lo_wtn = world_wtn[j]
                 pairs_stars_Loaded += 1
 
                 dist = (abs(dq) + abs(dr) + abs(dq + dr)) // 2
@@ -163,9 +175,8 @@ class TradeCalculationRawRoutes(object):
                 upper1 = max(base_btn, upbound - 1)
                 upper0 = max(base_btn, upbound - 2)
 
-                lo_trade: TradeCodes = lostar.tradeCode
-                ag_code_boost: bool = hi_ag_boost and lo_trade.ag_code_boost and (hi_ag or lo_trade.agricultural)
-                in_code_boost: bool = hi_in_boost and lo_trade.in_code_boost and (hi_in or lo_trade.industrial)
+                ag_code_boost: bool = hi_ag_boost and ag_boost_array[j] and (hi_ag or ag_array[j])
+                in_code_boost: bool = hi_in_boost and in_boost_array[j] and (hi_in or in_array[j])
                 if ag_code_boost and in_code_boost:
                     pairs_added += 1
                     if lostar.name < histar.name:
