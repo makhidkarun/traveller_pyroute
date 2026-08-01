@@ -26,6 +26,7 @@ class TradeCalculationRawRoutes(object):
         self.pairs_stars_loaded: int = 0
         self.pairs_considered: int = 0
         self.pairs_kept: int = 0
+        self.pairs_added: int = 0
 
     def raw_ranges(self) -> list[tuple[Star, Star]]:
         t0 = time.perf_counter()
@@ -55,7 +56,7 @@ class TradeCalculationRawRoutes(object):
         )
         self.trade.logger.info("Pairs spun up: " + str(self.pairs_primed) + ", stars loaded: " +
                                str(self.pairs_stars_loaded) + ", pairs considered: " + str(self.pairs_considered) +
-                               ", pairs kept: " + str(self.pairs_kept))
+                               ", pairs kept: " + str(self.pairs_kept) + ", pairs added: " + str(self.pairs_added))
 
         return hi_hi_ranges
 
@@ -108,6 +109,7 @@ class TradeCalculationRawRoutes(object):
         pairs_stars_Loaded: int = 0
         pairs_considered: int = 0
         pairs_kept: int = 0
+        pairs_added: int = 0
         world_wtn = np.zeros(n, dtype=np.int64)
         q_array = np.zeros(n, dtype=np.int64)
         r_array = np.zeros(n, dtype=np.int64)
@@ -168,18 +170,21 @@ class TradeCalculationRawRoutes(object):
                 ag_code_boost: bool = hi_ag_boost and lo_trade.ag_code_boost and (hi_ag or lo_trade.agricultural)
                 in_code_boost: bool = hi_in_boost and lo_trade.in_code_boost and (hi_in or lo_trade.industrial)
                 if ag_code_boost and in_code_boost:
+                    pairs_added += 1
                     if lostar.name < histar.name:
                         hi_hi_ranges.add((lostar, histar))
                     else:
                         hi_hi_ranges.add((histar, lostar))
                 elif ag_code_boost ^ in_code_boost:
                     if upper1 >= min_btn:
+                        pairs_added += 1
                         if lostar.name < histar.name:
                             hi_hi_ranges.add((lostar, histar))
                         else:
                             hi_hi_ranges.add((histar, lostar))
                 else:
                     if upper0 >= min_btn:
+                        pairs_added += 1
                         if lostar.name < histar.name:
                             hi_hi_ranges.add((lostar, histar))
                         else:
@@ -190,6 +195,7 @@ class TradeCalculationRawRoutes(object):
         self.pairs_stars_loaded = pairs_stars_Loaded
         self.pairs_considered = pairs_considered
         self.pairs_kept = pairs_kept
+        self.pairs_added = pairs_added
 
         return list(hi_hi_ranges)
 
