@@ -59,7 +59,7 @@ class TradeCalculationRawRoutes(object):
 
         return hi_hi_ranges
 
-    def _hi_lo_ranges(self, hiball, loball, offsets: list[tuple[int, int]]):
+    def _hi_lo_ranges(self, hiball, loball, offsets: list[tuple[int, int, int]]):
         # Count the shorter of hiball and loball as hiball for this, since the main loop depends on hiball length
         if len(hiball) > len(loball):
             hiball, loball = loball, hiball
@@ -72,14 +72,14 @@ class TradeCalculationRawRoutes(object):
             q1 = histar.hex.q
             r1 = histar.hex.r
 
-            for dq, dr in offsets:
+            for dq, dr, _ in offsets:
                 lostar = lob_map.get((q1 + dq, r1 + dr))
                 if lostar is not None:
                     hi_lo_ranges.append((histar, lostar))
 
         return hi_lo_ranges
 
-    def _lo_lo_ranges(self, loball, offsets: list[tuple[int, int]]):
+    def _lo_lo_ranges(self, loball, offsets: list[tuple[int, int, int]]):
         n: int = len(loball)
         lob_map = {(s.hex.q, s.hex.r): s for s in loball}
         lo_lo_ranges: set[tuple[Star, Star]] = set()
@@ -89,7 +89,7 @@ class TradeCalculationRawRoutes(object):
             q1: int = histar.hex.q
             r1: int = histar.hex.r
 
-            for dq, dr in offsets:
+            for dq, dr, _ in offsets:
                 lostar: Optional[Star] = lob_map.get((q1 + dq, r1 + dr))
                 if lostar is not None:
                     # Skip self
@@ -113,7 +113,7 @@ class TradeCalculationRawRoutes(object):
         q_array = np.zeros(n, dtype=np.int64)
         r_array = np.zeros(n, dtype=np.int64)
         max_wtn_distances = np.zeros(n, dtype=np.int64)
-        offsets: dict[int, list[tuple[int, int]]] = {}
+        offsets: dict[int, list[tuple[int, int, int]]] = {}
         i_map: dict[tuple[int, int], int] = {}
         ag_boost_array: list[bool] = [False] * n
         ag_array: list[bool] = [False] * n
@@ -149,7 +149,7 @@ class TradeCalculationRawRoutes(object):
             hi_ag: bool = ag_array[i]
             hi_in: bool = in_array[i]
 
-            for dq, dr in offset:
+            for dq, dr, dist in offset:
                 pairs_primed += 1
                 j = i_map.get((q1 + dq, r1 + dr))
                 if j is None:
@@ -159,7 +159,6 @@ class TradeCalculationRawRoutes(object):
                     continue
                 lo_wtn = world_wtn[j]
 
-                dist = (abs(dq) + abs(dr) + abs(dq + dr)) // 2
                 pairs_considered += 1
                 upbound = self._get_rough_btn_upper_bound(hi_wtn, lo_wtn, max_range, min_btn, distance=dist)
                 if upbound < min_btn:
@@ -247,12 +246,13 @@ class TradeCalculationRawRoutes(object):
 
     @staticmethod
     def _axial_offsets_within(R: int):
-        offsets: list[tuple[int, int]] = []
+        offsets: list[tuple[int, int, int]] = []
         for dq in range(-R, R + 1):
             for dr in range(-R, R + 1):
                 dx = dq
                 dz = dr
                 dy = -dx - dz
                 if (abs(dx) + abs(dy) + abs(dz)) // 2 <= R:
-                    offsets.append((dq, dr))
+                    dist = (abs(dq) + abs(dr) + abs(dq + dr)) // 2
+                    offsets.append((dq, dr, dist))
         return offsets
