@@ -135,6 +135,8 @@ class TradeCalculationRawRoutes(object):
             max_wtn_distances[i] = max_dist
             if max_dist not in offsets:
                 offsets[max_dist] = TradeCalculationRawRoutes._axial_offsets_within(max_dist)
+                offsets[max_dist] = [(dq, dr, dist) for (dq, dr, dist) in offsets[max_dist] if
+                                     not (dq == 0 and dr == 0)]
             i_map[(q_array[i], r_array[i])] = i
             hi_trade: TradeCodes = histar.tradeCode
             ag_boost_array[i] = hi_trade.ag_code_boost
@@ -157,9 +159,6 @@ class TradeCalculationRawRoutes(object):
             q1, r1 = q_array[i], r_array[i]
             offset = offsets[max_wtn_distances[i]]
             for dq, dr, dist in offset:
-                # Skip self
-                if dq == 0 and dr == 0:
-                    continue
                 j = i_map_get((q1 + dq, r1 + dr))
                 if j is None:
                     continue
