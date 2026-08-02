@@ -116,6 +116,7 @@ class TradeCalculationRawRoutes(object):
         r_array = np.zeros(n, dtype=np.int64)
         max_wtn_distances = np.zeros(n, dtype=np.int64)
         offsets: dict[int, list[tuple[int, int, int]]] = {}
+        base_btn: dict[int, int] = {}
         i_map: dict[tuple[int, int], int] = {}
         ag_boost_array: list[bool] = [False] * n
         ag_array: list[bool] = [False] * n
@@ -137,6 +138,7 @@ class TradeCalculationRawRoutes(object):
                 offsets[max_dist] = TradeCalculationRawRoutes._axial_offsets_within(max_dist)
                 offsets[max_dist] = [(dq, dr, dist) for (dq, dr, dist) in offsets[max_dist] if
                                      not (dq == 0 and dr == 0)]
+                base_btn[max_dist] = min_btn if max_range > max_range else 0
             i_map[(q_array[i], r_array[i])] = i
             hi_trade: TradeCodes = histar.tradeCode
             ag_boost_array[i] = hi_trade.ag_code_boost
@@ -158,6 +160,7 @@ class TradeCalculationRawRoutes(object):
 
             q1, r1 = q_array[i], r_array[i]
             offset = offsets[max_wtn_distances[i]]
+            btn_min = base_btn[max_wtn_distances[i]]
             for dq, dr, dist in offset:
                 j = i_map_get((q1 + dq, r1 + dr))
                 if j is None:
@@ -176,9 +179,8 @@ class TradeCalculationRawRoutes(object):
                 pairs_smooth += 1
                 if upbound < min_btn:
                     continue
-                base_btn = 0 if dist > max_range else min_btn
-                upper1 = max(base_btn, upbound - 1)
-                upper0 = max(base_btn, upbound - 2)
+                upper1 = max(btn_min, upbound - 1)
+                upper0 = max(btn_min, upbound - 2)
 
                 ag_code_boost: bool = hi_ag_boost and ag_boost_array[j] and (hi_ag or ag_array[j])
                 in_code_boost: bool = hi_in_boost and in_boost_array[j] and (hi_in or in_array[j])
