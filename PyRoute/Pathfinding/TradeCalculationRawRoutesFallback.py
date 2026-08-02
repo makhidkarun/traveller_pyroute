@@ -26,6 +26,8 @@ class TradeCalculationRawRoutes(object):
         self.pairs_considered: int = 0
         self.pairs_kept: int = 0
         self.pairs_added: int = 0
+        self.pairs_rough: int = 0
+        self.pairs_smooth: int = 0
 
     def raw_ranges(self) -> list[tuple[Star, Star]]:
         t0 = time.perf_counter()
@@ -56,6 +58,7 @@ class TradeCalculationRawRoutes(object):
         self.trade.logger.info("Pairs spun up: " + str(self.pairs_primed) + ", stars loaded: " +
                                str(self.pairs_stars_loaded) + ", pairs considered: " + str(self.pairs_considered) +
                                ", pairs kept: " + str(self.pairs_kept) + ", pairs added: " + str(self.pairs_added))
+        self.trade.logger.info("Pairs passing rough BTN upper bound: " + str(self.pairs_rough) + ", pairs passing smooth BTN upper bound: " + str(self.pairs_smooth))
 
         return hi_hi_ranges
 
@@ -109,6 +112,8 @@ class TradeCalculationRawRoutes(object):
         pairs_considered: int = 0
         pairs_kept: int = 0
         pairs_added: int = 0
+        pairs_rough: int = 0
+        pairs_smooth: int = 0
         world_wtn = np.zeros(n, dtype=np.int64)
         q_array = np.zeros(n, dtype=np.int64)
         r_array = np.zeros(n, dtype=np.int64)
@@ -120,7 +125,7 @@ class TradeCalculationRawRoutes(object):
         in_boost_array: list[bool] = [False] * n
         in_array: list[bool] = [False] * n
         alg_code_array: list[Optional[str]] = [None] * n
-        neighbours: list[list[tuple[int, int]]] = [[] for _ in range(n)]
+
         for i in range(n):
             histar: Star = hiball[i]
             world_wtn[i] = histar.wtn
@@ -138,19 +143,6 @@ class TradeCalculationRawRoutes(object):
             in_array[i] = hi_trade.industrial
             alg_code_array[i] = histar.alg_code
 
-        for i in range(n):
-            q1, r1 = q_array[i], r_array[i]
-            offset = offsets[max_wtn_distances[i]]
-            lst = []
-            for dq, dr, dist in offset:
-                # Skip self
-                if dq == 0 and dr == 0:
-                    continue
-                j = i_map.get((q1 + dq, r1 + dr))
-                if j is not None:
-                    lst.append((j, dist))
-            neighbours[i] = lst
-
         hi_hi_ranges = set()
         hi_hi_ranges_list: list[tuple[int, int]] = []
 
@@ -161,17 +153,28 @@ class TradeCalculationRawRoutes(object):
             hi_ag: bool = ag_array[i]
             hi_in: bool = in_array[i]
 
-            for j, dist in neighbours[i]:
+            q1, r1 = q_array[i], r_array[i]
+            offset = offsets[max_wtn_distances[i]]
+            for dq, dr, dist in offset:
+                # Skip self
+                if dq == 0 and dr == 0:
+                    continue
+                j = i_map.get((q1 + dq, r1 + dr))
+                if j is None:
+                    continue
+
                 pairs_primed += 1
                 lo_wtn = world_wtn[j]
 
                 pairs_considered += 1
                 upbound = self._get_rough_btn_upper_bound(hi_wtn, lo_wtn, max_range, min_btn, distance=dist)
+                pairs_rough += 1
                 if upbound < min_btn:
                     continue
 
                 upbound = self._get_btn_upper_bound(hi_wtn, lo_wtn, alg_code_array[i], alg_code_array[j], max_range,
                                                     min_btn, distance=dist)
+                pairs_smooth += 1
                 if upbound < min_btn:
                     continue
                 base_btn = 0 if dist > max_range else min_btn
@@ -208,6 +211,8 @@ class TradeCalculationRawRoutes(object):
         self.pairs_considered = pairs_considered
         self.pairs_kept = pairs_kept
         self.pairs_added = pairs_added
+        self.pairs_rough = pairs_rough
+        self.pairs_smooth = pairs_smooth
 
         return [(hiball[a], hiball[b]) for (a, b) in hi_hi_ranges]
 
