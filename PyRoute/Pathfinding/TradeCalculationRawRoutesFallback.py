@@ -143,7 +143,6 @@ class TradeCalculationRawRoutes(object):
             in_array[i] = hi_trade.industrial
             alg_code_array[i] = histar.alg_code
 
-        hi_hi_ranges = set()
         hi_hi_ranges_list: list[tuple[int, int]] = []
 
         for i in range(n):
@@ -205,7 +204,14 @@ class TradeCalculationRawRoutes(object):
                             hi_hi_ranges_list.append((i, j))
                 pairs_kept += 1
 
-        hi_hi_ranges = set(hi_hi_ranges_list)
+        hi_hi_ranges_list.sort()
+        w = 1
+        for r in range(1, len(hi_hi_ranges_list)):
+            if hi_hi_ranges_list[r] != hi_hi_ranges_list[w - 1]:
+                hi_hi_ranges_list[w] = hi_hi_ranges_list[r]
+                w += 1
+        hi_hi_ranges = hi_hi_ranges_list[:w]
+
         self.pairs_primed = pairs_primed
         self.pairs_stars_loaded = pairs_stars_Loaded
         self.pairs_considered = pairs_considered
