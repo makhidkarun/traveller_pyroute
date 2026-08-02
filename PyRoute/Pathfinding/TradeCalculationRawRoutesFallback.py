@@ -22,7 +22,6 @@ class TradeCalculationRawRoutes(object):
             raise ValueError("Trade must be instance of TradeCalculation or subclass")
         self.trade = trade
         self.pairs_primed: int = 0
-        self.pairs_stars_loaded: int = 0
         self.pairs_considered: int = 0
         self.pairs_kept: int = 0
         self.pairs_added: int = 0
@@ -55,8 +54,7 @@ class TradeCalculationRawRoutes(object):
         self.trade.logger.info(
             f"raw_ranges phases: init {t1 - t0:.6f}s, split {t2 - t1:.6f}s, ranges {t3 - t2:.6f}s, hi-hi filters {t4 - t3:.6f}s, lo-lo filters {t5 - t4:.6f}s, hi-lo filters {t6 - t5:.6f}s"
         )
-        self.trade.logger.info("Pairs spun up: " + str(self.pairs_primed) + ", stars loaded: " +
-                               str(self.pairs_stars_loaded) + ", pairs considered: " + str(self.pairs_considered) +
+        self.trade.logger.info("Pairs spun up: " + str(self.pairs_primed) + ", pairs considered: " + str(self.pairs_considered) +
                                ", pairs kept: " + str(self.pairs_kept) + ", pairs added: " + str(self.pairs_added))
         self.trade.logger.info("Pairs passing rough BTN upper bound: " + str(self.pairs_rough) + ", pairs passing smooth BTN upper bound: " + str(self.pairs_smooth))
 
@@ -108,7 +106,6 @@ class TradeCalculationRawRoutes(object):
     def _base_ranges(self, hiball: list[Star], max_range: int, min_btn: int):
         n: int = len(hiball)
         pairs_primed: int = 0
-        pairs_stars_Loaded: int = 0
         pairs_considered: int = 0
         pairs_kept: int = 0
         pairs_added: int = 0
@@ -213,7 +210,6 @@ class TradeCalculationRawRoutes(object):
         hi_hi_ranges = hi_hi_ranges_list[:w]
 
         self.pairs_primed = pairs_primed
-        self.pairs_stars_loaded = pairs_stars_Loaded
         self.pairs_considered = pairs_considered
         self.pairs_kept = pairs_kept
         self.pairs_added = pairs_added
