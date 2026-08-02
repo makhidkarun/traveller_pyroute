@@ -123,6 +123,9 @@ class TradeCalculationRawRoutes(object):
         in_array: list[bool] = [False] * n
         alg_code_array: list[Optional[str]] = [None] * n
 
+        get_rough = self._get_rough_btn_upper_bound
+        get_upper = self._get_btn_upper_bound
+
         for i in range(n):
             histar: Star = hiball[i]
             world_wtn[i] = histar.wtn
@@ -141,6 +144,8 @@ class TradeCalculationRawRoutes(object):
             alg_code_array[i] = histar.alg_code
 
         hi_hi_ranges_list: list[tuple[int, int]] = []
+        i_map_get = i_map.get
+        append_pair = hi_hi_ranges_list.append
 
         for i in range(n):
             hi_wtn: int = world_wtn[i]
@@ -155,7 +160,7 @@ class TradeCalculationRawRoutes(object):
                 # Skip self
                 if dq == 0 and dr == 0:
                     continue
-                j = i_map.get((q1 + dq, r1 + dr))
+                j = i_map_get((q1 + dq, r1 + dr))
                 if j is None:
                     continue
 
@@ -163,13 +168,12 @@ class TradeCalculationRawRoutes(object):
                 lo_wtn = world_wtn[j]
 
                 pairs_considered += 1
-                upbound = self._get_rough_btn_upper_bound(hi_wtn, lo_wtn, max_range, min_btn, distance=dist)
+                upbound = get_rough(hi_wtn, lo_wtn, max_range, min_btn, distance=dist)
                 pairs_rough += 1
                 if upbound < min_btn:
                     continue
 
-                upbound = self._get_btn_upper_bound(hi_wtn, lo_wtn, alg_code_array[i], alg_code_array[j], max_range,
-                                                    min_btn, distance=dist)
+                upbound = get_upper(hi_wtn, lo_wtn, alg_code_array[i], alg_code_array[j], max_range, min_btn, distance=dist)
                 pairs_smooth += 1
                 if upbound < min_btn:
                     continue
@@ -182,23 +186,23 @@ class TradeCalculationRawRoutes(object):
                 if ag_code_boost and in_code_boost:
                     pairs_added += 1
                     if j < i:
-                        hi_hi_ranges_list.append((j, i))
+                        append_pair((j, i))
                     else:
-                        hi_hi_ranges_list.append((i, j))
+                        append_pair((i, j))
                 elif ag_code_boost ^ in_code_boost:
                     if upper1 >= min_btn:
                         pairs_added += 1
                         if j < i:
-                            hi_hi_ranges_list.append((j, i))
+                            append_pair((j, i))
                         else:
-                            hi_hi_ranges_list.append((i, j))
+                            append_pair((i, j))
                 else:
                     if upper0 >= min_btn:
                         pairs_added += 1
                         if j < i:
-                            hi_hi_ranges_list.append((j, i))
+                            append_pair((j, i))
                         else:
-                            hi_hi_ranges_list.append((i, j))
+                            append_pair((i, j))
                 pairs_kept += 1
 
         hi_hi_ranges_list.sort()
