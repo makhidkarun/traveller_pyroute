@@ -5,6 +5,7 @@ Created on Jul 22, 2026
 """
 import functools
 import time
+from array import array
 from typing import Optional
 
 import numpy as np
@@ -134,11 +135,6 @@ class TradeCalculationRawRoutes(object):
             r_array[i] = histar.hex.r
             max_dist: int = self.trade._max_dist(world_wtn[i], world_wtn[i], True)
             max_wtn_distances[i] = max_dist
-            if max_dist not in offsets:
-                offsets[max_dist] = TradeCalculationRawRoutes._axial_offsets_within(max_dist)
-                offsets[max_dist] = [(dq, dr, dist) for (dq, dr, dist) in offsets[max_dist] if
-                                     not (dq == 0 and dr == 0)]
-                base_btn[max_dist] = min_btn if max_range > max_range else 0
             i_map[(q_array[i], r_array[i])] = i
             hi_trade: TradeCodes = histar.tradeCode
             ag_boost_array[i] = hi_trade.ag_code_boost
@@ -147,8 +143,27 @@ class TradeCalculationRawRoutes(object):
             in_array[i] = hi_trade.industrial
             alg_code_array[i] = histar.alg_code
 
+        half_offset = max(max_wtn_distances)
+        max_q = max(q_array) + half_offset
+        min_q = min(q_array) - half_offset
+        max_r = max(r_array) + half_offset
+        min_r = min(r_array) - half_offset
+        q_size = (max_q - min_q) + 1
+        r_size = (max_r - min_r) + 1
+        idx_map = array('i', [-1]) * q_size * r_size
+
+        for i in range(n):
+            q = q_array[i] - min_q
+            r = r_array[i] - min_r
+            idx_map[q * r_size + r] = i
+            max_dist = max_wtn_distances[i]
+            if max_dist not in offsets:
+                offsets[max_dist] = TradeCalculationRawRoutes._axial_offsets_within(max_dist, r_size=int(r_size))
+                offsets[max_dist] = [(dq, dr, dist, delta) for (dq, dr, dist, delta) in offsets[max_dist] if
+                                     not (dq == 0 and dr == 0)]
+                base_btn[max_dist] = min_btn if max_range > max_range else 0
+
         hi_hi_ranges_list: list[tuple[int, int]] = []
-        i_map_get = i_map.get
         append_pair = hi_hi_ranges_list.append
 
         for i in range(n):
@@ -158,12 +173,12 @@ class TradeCalculationRawRoutes(object):
             hi_ag: bool = ag_array[i]
             hi_in: bool = in_array[i]
 
-            q1, r1 = q_array[i], r_array[i]
             offset = offsets[max_wtn_distances[i]]
             btn_min = base_btn[max_wtn_distances[i]]
-            for dq, dr, dist in offset:
-                j = i_map_get((q1 + dq, r1 + dr))
-                if j is None:
+            base_idx = (q_array[i] - min_q) * r_size + (r_array[i] - min_r)
+            for _, _, dist, delta in offset:
+                j = idx_map[base_idx + delta]
+                if -1 == j:
                     continue
 
                 pairs_primed += 1
@@ -264,8 +279,9 @@ class TradeCalculationRawRoutes(object):
         return min_btn if min_btn > btn and distance <= max_range else btn
 
     @staticmethod
-    def _axial_offsets_within(R: int):
+    def _axial_offsets_within(R: int, r_size: Optional[int] = None):
         offsets: list[tuple[int, int, int]] = []
+        good_r = isinstance(r_size, int) and 0 < r_size
         for dq in range(-R, R + 1):
             for dr in range(-R, R + 1):
                 dx = dq
@@ -273,5 +289,9 @@ class TradeCalculationRawRoutes(object):
                 dy = -dx - dz
                 if (abs(dx) + abs(dy) + abs(dz)) // 2 <= R:
                     dist = (abs(dq) + abs(dr) + abs(dq + dr)) // 2
-                    offsets.append((dq, dr, dist))
+                    if good_r:
+                        delta = dq * r_size + dr
+                        offsets.append((dq, dr, dist, delta))
+                    else:
+                        offsets.append((dq, dr, dist))
         return offsets
