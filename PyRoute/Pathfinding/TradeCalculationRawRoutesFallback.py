@@ -194,8 +194,6 @@ class TradeCalculationRawRoutes(object):
                 pairs_smooth += 1
                 if upbound < min_btn:
                     continue
-                upper1 = max(btn_min, upbound - 1)
-                upper0 = max(btn_min, upbound - 2)
 
                 ag_code_boost: bool = hi_ag_boost and ag_boost_array[j] and (hi_ag or ag_array[j])
                 in_code_boost: bool = hi_in_boost and in_boost_array[j] and (hi_in or in_array[j])
@@ -206,6 +204,7 @@ class TradeCalculationRawRoutes(object):
                     else:
                         append_pair((i, j))
                 elif ag_code_boost ^ in_code_boost:
+                    upper1 = max(btn_min, upbound - 1)
                     if upper1 >= min_btn:
                         pairs_added += 1
                         if j < i:
@@ -213,6 +212,7 @@ class TradeCalculationRawRoutes(object):
                         else:
                             append_pair((i, j))
                 else:
+                    upper0 = max(btn_min, upbound - 2)
                     if upper0 >= min_btn:
                         pairs_added += 1
                         if j < i:
