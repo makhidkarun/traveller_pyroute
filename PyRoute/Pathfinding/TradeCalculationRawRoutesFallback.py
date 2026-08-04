@@ -26,7 +26,6 @@ class TradeCalculationRawRoutes(object):
         self.pairs_considered: int = 0
         self.pairs_kept: int = 0
         self.pairs_added: int = 0
-        self.pairs_rough: int = 0
         self.pairs_smooth: int = 0
 
     def raw_ranges(self) -> list[tuple[Star, Star]]:
@@ -57,7 +56,7 @@ class TradeCalculationRawRoutes(object):
         )
         self.trade.logger.info("Pairs spun up: " + str(self.pairs_primed) + ", pairs considered: " + str(self.pairs_considered) +
                                ", pairs kept: " + str(self.pairs_kept) + ", pairs added: " + str(self.pairs_added))
-        self.trade.logger.info("Pairs passing rough BTN upper bound: " + str(self.pairs_rough) + ", pairs passing smooth BTN upper bound: " + str(self.pairs_smooth))
+        self.trade.logger.info("Pairs passing smooth BTN upper bound: " + str(self.pairs_smooth))
 
         return hi_hi_ranges
 
@@ -110,7 +109,6 @@ class TradeCalculationRawRoutes(object):
         pairs_considered: int = 0
         pairs_kept: int = 0
         pairs_added: int = 0
-        pairs_rough: int = 0
         pairs_smooth: int = 0
         world_wtn = np.zeros(n, dtype=np.int64)
         q_array = np.zeros(n, dtype=np.int64)
@@ -124,7 +122,6 @@ class TradeCalculationRawRoutes(object):
         in_array = np.zeros(n, dtype=np.uint8)
         alg_code_array: list[Optional[str]] = [None] * n
 
-        get_rough = self._get_rough_btn_upper_bound
         get_upper = self._get_btn_upper_bound
 
         for i in range(n):
@@ -184,15 +181,10 @@ class TradeCalculationRawRoutes(object):
                 lo_wtn = world_wtn[j]
 
                 pairs_considered += 1
-                upbound = get_rough(hi_wtn, lo_wtn, max_range, min_btn, distance=dist)
-                pairs_rough += 1
-                if upbound < min_btn:
-                    continue
-
                 upbound = get_upper(hi_wtn, lo_wtn, hi_alg, alg_code_array[j], max_range, min_btn, distance=dist)
-                pairs_smooth += 1
                 if upbound < min_btn:
                     continue
+                pairs_smooth += 1
 
                 # ag_code_boost: bool = hi_ag_boost and ag_boost_array[j] and (hi_ag or ag_array[j])
                 # Case 1 - hi_ag is true, thus (hi_ag or X) is true no matter X
@@ -244,7 +236,6 @@ class TradeCalculationRawRoutes(object):
         self.pairs_considered = pairs_considered
         self.pairs_kept = pairs_kept
         self.pairs_added = pairs_added
-        self.pairs_rough = pairs_rough
         self.pairs_smooth = pairs_smooth
 
         return [(hiball[a], hiball[b]) for (a, b) in hi_hi_ranges]
@@ -282,12 +273,6 @@ class TradeCalculationRawRoutes(object):
     @functools.cache
     def max_btn(w1: int, w2: int) -> int:
         return RouteCalculation.get_max_btn(w1, w2)
-
-    @staticmethod
-    def _get_rough_btn_upper_bound(wtn1: int, wtn2: int, max_range: int, min_btn: int, distance: int):
-        btn = wtn1 + wtn2 + 2 + TradeCalculationRawRoutes.btn_offset(distance)
-        btn = min(btn, TradeCalculationRawRoutes.max_btn(wtn1, wtn2))
-        return min_btn if min_btn > btn and distance <= max_range else btn
 
     @staticmethod
     def _axial_offsets_within(R: int, r_size: Optional[int] = None):
