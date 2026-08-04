@@ -172,6 +172,7 @@ class TradeCalculationRawRoutes(object):
             hi_in_boost = in_boost_array[i]
             hi_ag = ag_array[i]
             hi_in = in_array[i]
+            hi_alg = alg_code_array[i]
 
             offset = offsets[max_wtn_distances[i]]
             btn_min = base_btn[max_wtn_distances[i]]
@@ -190,7 +191,7 @@ class TradeCalculationRawRoutes(object):
                 if upbound < min_btn:
                     continue
 
-                upbound = get_upper(hi_wtn, lo_wtn, alg_code_array[i], alg_code_array[j], max_range, min_btn, distance=dist)
+                upbound = get_upper(hi_wtn, lo_wtn, hi_alg, alg_code_array[j], max_range, min_btn, distance=dist)
                 pairs_smooth += 1
                 if upbound < min_btn:
                     continue
