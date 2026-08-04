@@ -159,7 +159,7 @@ class TradeCalculationRawRoutes(object):
             max_dist = max_wtn_distances[i]
             if max_dist not in offsets:
                 offsets[max_dist] = TradeCalculationRawRoutes._axial_offsets_within(max_dist, r_size=int(r_size))
-                offsets[max_dist] = [(dq, dr, dist, delta) for (dq, dr, dist, delta) in offsets[max_dist] if
+                offsets[max_dist] = [(dist, delta) for (dq, dr, dist, delta) in offsets[max_dist] if
                                      not (dq == 0 and dr == 0)]
                 base_btn[max_dist] = min_btn if max_range > max_range else 0
 
@@ -177,7 +177,7 @@ class TradeCalculationRawRoutes(object):
             offset = offsets[max_wtn_distances[i]]
             btn_min = base_btn[max_wtn_distances[i]]
             base_idx = (q_array[i] - min_q) * r_size + (r_array[i] - min_r)
-            for _, _, dist, delta in offset:
+            for dist, delta in offset:
                 j = idx_map[base_idx + delta]
                 if -1 == j:
                     continue
