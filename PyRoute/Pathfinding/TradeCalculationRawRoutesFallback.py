@@ -119,10 +119,10 @@ class TradeCalculationRawRoutes(object):
         offsets: dict[int, list[tuple[int, int, int]]] = {}
         base_btn: dict[int, int] = {}
         i_map: dict[tuple[int, int], int] = {}
-        ag_boost_array: list[bool] = [False] * n
-        ag_array: list[bool] = [False] * n
-        in_boost_array: list[bool] = [False] * n
-        in_array: list[bool] = [False] * n
+        ag_boost_array = np.zeros(n, dtype=np.uint8)
+        ag_array = np.zeros(n, dtype=np.uint8)
+        in_boost_array = np.zeros(n, dtype=np.uint8)
+        in_array = np.zeros(n, dtype=np.uint8)
         alg_code_array: list[Optional[str]] = [None] * n
 
         get_rough = self._get_rough_btn_upper_bound
@@ -137,10 +137,10 @@ class TradeCalculationRawRoutes(object):
             max_wtn_distances[i] = max_dist
             i_map[(q_array[i], r_array[i])] = i
             hi_trade: TradeCodes = histar.tradeCode
-            ag_boost_array[i] = hi_trade.ag_code_boost
-            ag_array[i] = hi_trade.agricultural
-            in_boost_array[i] = hi_trade.in_code_boost
-            in_array[i] = hi_trade.industrial
+            ag_boost_array[i] = 1 if hi_trade.ag_code_boost else 0
+            ag_array[i] = 1 if hi_trade.agricultural else 0
+            in_boost_array[i] = 1 if hi_trade.in_code_boost else 0
+            in_array[i] = 1 if hi_trade.industrial else 0
             alg_code_array[i] = histar.alg_code
 
         half_offset = max(max_wtn_distances)
@@ -168,10 +168,10 @@ class TradeCalculationRawRoutes(object):
 
         for i in range(n):
             hi_wtn: int = world_wtn[i]
-            hi_ag_boost: bool = ag_boost_array[i]
-            hi_in_boost: bool = in_boost_array[i]
-            hi_ag: bool = ag_array[i]
-            hi_in: bool = in_array[i]
+            hi_ag_boost = ag_boost_array[i]
+            hi_in_boost = in_boost_array[i]
+            hi_ag = ag_array[i]
+            hi_in = in_array[i]
 
             offset = offsets[max_wtn_distances[i]]
             btn_min = base_btn[max_wtn_distances[i]]
@@ -195,9 +195,21 @@ class TradeCalculationRawRoutes(object):
                 if upbound < min_btn:
                     continue
 
-                ag_code_boost: bool = hi_ag_boost and ag_boost_array[j] and (hi_ag or ag_array[j])
-                in_code_boost: bool = hi_in_boost and in_boost_array[j] and (hi_in or in_array[j])
-                if ag_code_boost and in_code_boost:
+                # ag_code_boost: bool = hi_ag_boost and ag_boost_array[j] and (hi_ag or ag_array[j])
+                # Case 1 - hi_ag is true, thus (hi_ag or X) is true no matter X
+                # Case 2 - hi_ag is false, thus (hi_ag or X) is X
+                if hi_ag == 1:
+                    ag_code_boost: bool = hi_ag_boost & ag_boost_array[j]
+                else:
+                    ag_code_boost: bool = hi_ag_boost & ag_boost_array[j] & ag_array[j]
+                # in_code_boost: bool = hi_in_boost and in_boost_array[j] and (hi_in or in_array[j])
+                # Case 1 - hi_in is true, thus (hi_in or X) is true no matter X
+                # Case 2 - hi_in is false, thus (hi_in or X) is X
+                if hi_in == 1:
+                    in_code_boost: bool = hi_in_boost & in_boost_array[j]
+                else:
+                    in_code_boost: bool = hi_in_boost & in_boost_array[j] & in_array[j]
+                if ag_code_boost & in_code_boost:
                     pairs_added += 1
                     if j < i:
                         append_pair((j, i))
