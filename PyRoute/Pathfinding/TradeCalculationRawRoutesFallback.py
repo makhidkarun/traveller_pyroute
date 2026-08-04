@@ -117,7 +117,6 @@ class TradeCalculationRawRoutes(object):
         r_array = np.zeros(n, dtype=np.int64)
         max_wtn_distances = np.zeros(n, dtype=np.int64)
         offsets: dict[int, list[tuple[int, int, int]]] = {}
-        base_btn: dict[int, int] = {}
         i_map: dict[tuple[int, int], int] = {}
         ag_boost_array = np.zeros(n, dtype=np.uint8)
         ag_array = np.zeros(n, dtype=np.uint8)
@@ -162,7 +161,6 @@ class TradeCalculationRawRoutes(object):
                 offsets[max_dist] = [(dist, delta, btn_minimum) for (dq, dr, dist, delta) in offsets[max_dist] if
                                      (btn_minimum := min_btn if dist <= max_range else 1)
                                      and not (dq == 0 and dr == 0)]
-                base_btn[max_dist] = min_btn if max_range > max_range else 0
 
         hi_hi_ranges_list: list[tuple[int, int]] = []
         append_pair = hi_hi_ranges_list.append
@@ -176,7 +174,6 @@ class TradeCalculationRawRoutes(object):
             hi_alg = alg_code_array[i]
 
             offset = offsets[max_wtn_distances[i]]
-            btn_min = base_btn[max_wtn_distances[i]]
             base_idx = (q_array[i] - min_q) * r_size + (r_array[i] - min_r)
             for dist, delta, btn_minimum in offset:
                 j = idx_map[base_idx + delta]
@@ -218,7 +215,7 @@ class TradeCalculationRawRoutes(object):
                     else:
                         append_pair((i, j))
                 elif ag_code_boost ^ in_code_boost:
-                    upper1 = max(btn_min, upbound - 1)
+                    upper1 = max(btn_minimum, upbound - 1)
                     if upper1 >= min_btn:
                         pairs_added += 1
                         if j < i:
@@ -226,7 +223,7 @@ class TradeCalculationRawRoutes(object):
                         else:
                             append_pair((i, j))
                 else:
-                    upper0 = max(btn_min, upbound - 2)
+                    upper0 = max(btn_minimum, upbound - 2)
                     if upper0 >= min_btn:
                         pairs_added += 1
                         if j < i:
