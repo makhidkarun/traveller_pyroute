@@ -193,36 +193,22 @@ class TradeCalculationRawRoutes(object):
                     continue
                 pairs_smooth += 1
 
-                # ag_code_boost: bool = hi_ag_boost and ag_boost_array[j] and (hi_ag or ag_array[j])
-                # Case 1 - hi_ag is true, thus (hi_ag or X) is true no matter X
-                # Case 2 - hi_ag is false, thus (hi_ag or X) is X
-                if hi_ag == 1:
-                    ag_code_boost: bool = hi_ag_boost & ag_boost_array[j]
-                else:
-                    ag_code_boost: bool = hi_ag_boost & ag_boost_array[j] & ag_array[j]
-                # in_code_boost: bool = hi_in_boost and in_boost_array[j] and (hi_in or in_array[j])
-                # Case 1 - hi_in is true, thus (hi_in or X) is true no matter X
-                # Case 2 - hi_in is false, thus (hi_in or X) is X
-                if hi_in == 1:
-                    in_code_boost: bool = hi_in_boost & in_boost_array[j]
-                else:
-                    in_code_boost: bool = hi_in_boost & in_boost_array[j] & in_array[j]
-                if ag_code_boost & in_code_boost:
+                ag_code_boost: np.uint8 = hi_ag_boost & ag_boost_array[j] & (hi_ag | ag_array[j])
+                in_code_boost: np.uint8 = hi_in_boost & in_boost_array[j] & (hi_in | in_array[j])
+
+                case = (ag_code_boost & in_code_boost) * 2 + (ag_code_boost ^ in_code_boost)
+
+                if 2 == case:
                     pairs_added += 1
                     out_i.append(i)
                     out_j.append(j)
-                elif ag_code_boost ^ in_code_boost:
-                    upper1 = max(btn_minimum, upbound - 1)
-                    if upper1 >= min_btn:
-                        pairs_added += 1
-                        out_i.append(i)
-                        out_j.append(j)
                 else:
-                    upper0 = max(btn_minimum, upbound - 2)
-                    if upper0 >= min_btn:
+                    shift = 2 - case
+                    if max(btn_minimum, upbound - shift) >= min_btn:
                         pairs_added += 1
                         out_i.append(i)
                         out_j.append(j)
+
                 pairs_kept += 1
 
         self.pairs_primed = pairs_primed
