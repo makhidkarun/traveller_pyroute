@@ -184,8 +184,7 @@ class TradeCalculationRawRoutes(object):
                 lo_wtn = world_wtn[j]
 
                 pairs_considered += 1
-                upbound = get_rough(hi_wtn, lo_wtn, max_range, min_btn, dist)
-                if upbound < min_btn:
+                if get_rough(hi_wtn, lo_wtn, max_range, min_btn, dist) < min_btn:
                     continue
                 pairs_rough += 1
 
