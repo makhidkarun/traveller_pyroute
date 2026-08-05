@@ -151,6 +151,8 @@ class TradeCalculationRawRoutes(object):
         q_size = (max_q - min_q) + 1
         r_size = (max_r - min_r) + 1
         idx_map = array('i', [-1]) * q_size * r_size
+        out_i = []
+        out_j = []
 
         for i in range(n):
             q = q_array[i] - min_q
@@ -162,9 +164,6 @@ class TradeCalculationRawRoutes(object):
                 offsets[max_dist] = [(dist, delta, btn_minimum) for (dq, dr, dist, delta) in offsets[max_dist] if
                                      (btn_minimum := min_btn if dist <= max_range else 1)
                                      and not (dq == 0 and dr == 0)]
-
-        hi_hi_ranges_list: list[tuple[int, int]] = []
-        append_pair = hi_hi_ranges_list.append
 
         for i in range(n):
             hi_wtn: int = world_wtn[i]
@@ -211,17 +210,20 @@ class TradeCalculationRawRoutes(object):
                     in_code_boost: bool = hi_in_boost & in_boost_array[j] & in_array[j]
                 if ag_code_boost & in_code_boost:
                     pairs_added += 1
-                    append_pair((i, j))
+                    out_i.append(i)
+                    out_j.append(j)
                 elif ag_code_boost ^ in_code_boost:
                     upper1 = max(btn_minimum, upbound - 1)
                     if upper1 >= min_btn:
                         pairs_added += 1
-                        append_pair((i, j))
+                        out_i.append(i)
+                        out_j.append(j)
                 else:
                     upper0 = max(btn_minimum, upbound - 2)
                     if upper0 >= min_btn:
                         pairs_added += 1
-                        append_pair((i, j))
+                        out_i.append(i)
+                        out_j.append(j)
                 pairs_kept += 1
 
         self.pairs_primed = pairs_primed
@@ -231,7 +233,7 @@ class TradeCalculationRawRoutes(object):
         self.pairs_rough = pairs_rough
         self.pairs_smooth = pairs_smooth
 
-        return [(hiball[a], hiball[b]) for (a, b) in hi_hi_ranges_list]
+        return [(hiball[a], hiball[b]) for a, b in zip(out_i, out_j)]
 
     @staticmethod
     def _get_btn_upper_bound(wtn1: int, wtn2: int, alg_code1: Optional[str], alg_code2: Optional[str], max_range: int,
