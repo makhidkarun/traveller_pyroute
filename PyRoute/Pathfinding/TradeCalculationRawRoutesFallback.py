@@ -39,6 +39,7 @@ class TradeCalculationRawRoutes(object):
 
         hiball = [item for item in self.trade.galaxy.ranges if item.wtn >= min_wtn and not item.is_redzone]
         loball = [item for item in self.trade.galaxy.ranges if item.wtn < min_wtn and not item.is_redzone]
+        hiball.sort(key=lambda x: x.wtn, reverse=True)
         offsets = TradeCalculationRawRoutes._axial_offsets_within(max_range)
         t2 = time.perf_counter()
 
@@ -175,11 +176,14 @@ class TradeCalculationRawRoutes(object):
 
             offset = offsets[max_wtn_distances[i]]
             base_idx = (q_array[i] - min_q) * r_size + (r_array[i] - min_r)
+            trim_offset: list[tuple[int, int, int]] = []
             for dist, delta, btn_minimum in offset:
                 j = idx_map[base_idx + delta]
                 if -1 == j:
                     continue
+                trim_offset.append((j, dist, btn_minimum))
 
+            for j, dist, btn_minimum in trim_offset:
                 pairs_primed += 1
                 lo_wtn = world_wtn[j]
 
@@ -232,6 +236,7 @@ class TradeCalculationRawRoutes(object):
                             append_pair((i, j))
                 pairs_kept += 1
 
+        self.trade.logger.info("Hi hi ranges length pre-sort: " + str(len(hi_hi_ranges_list)))
         hi_hi_ranges_list.sort()
         w = 1
         for r in range(1, len(hi_hi_ranges_list)):
@@ -239,6 +244,7 @@ class TradeCalculationRawRoutes(object):
                 hi_hi_ranges_list[w] = hi_hi_ranges_list[r]
                 w += 1
         hi_hi_ranges = hi_hi_ranges_list[:w]
+        self.trade.logger.info("Hi hi ranges length post-sort: " + str(len(hi_hi_ranges)))
 
         self.pairs_primed = pairs_primed
         self.pairs_considered = pairs_considered
