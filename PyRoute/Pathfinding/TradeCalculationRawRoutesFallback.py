@@ -185,14 +185,14 @@ class TradeCalculationRawRoutes(object):
 
                 pairs_considered += 1
                 upbound = get_rough(hi_wtn, lo_wtn, max_range, min_btn, distance=dist)
-                pairs_rough += 1
                 if upbound < min_btn:
                     continue
+                pairs_rough += 1
 
                 upbound = get_upper(hi_wtn, lo_wtn, hi_alg, alg_code_array[j], max_range, min_btn, distance=dist)
-                pairs_smooth += 1
                 if upbound < min_btn:
                     continue
+                pairs_smooth += 1
 
                 # ag_code_boost: bool = hi_ag_boost and ag_boost_array[j] and (hi_ag or ag_array[j])
                 # Case 1 - hi_ag is true, thus (hi_ag or X) is true no matter X
