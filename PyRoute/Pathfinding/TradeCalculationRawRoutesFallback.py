@@ -179,7 +179,7 @@ class TradeCalculationRawRoutes(object):
             trim_offset: list[tuple[int, int, int]] = []
             for dist, delta, btn_minimum in offset:
                 j = idx_map[base_idx + delta]
-                if -1 == j:
+                if -1 == j or j < i:
                     continue
                 trim_offset.append((j, dist, btn_minimum))
 
@@ -214,37 +214,18 @@ class TradeCalculationRawRoutes(object):
                     in_code_boost: bool = hi_in_boost & in_boost_array[j] & in_array[j]
                 if ag_code_boost & in_code_boost:
                     pairs_added += 1
-                    if j < i:
-                        append_pair((j, i))
-                    else:
-                        append_pair((i, j))
+                    append_pair((i, j))
                 elif ag_code_boost ^ in_code_boost:
                     upper1 = max(btn_minimum, upbound - 1)
                     if upper1 >= min_btn:
                         pairs_added += 1
-                        if j < i:
-                            append_pair((j, i))
-                        else:
-                            append_pair((i, j))
+                        append_pair((i, j))
                 else:
                     upper0 = max(btn_minimum, upbound - 2)
                     if upper0 >= min_btn:
                         pairs_added += 1
-                        if j < i:
-                            append_pair((j, i))
-                        else:
-                            append_pair((i, j))
+                        append_pair((i, j))
                 pairs_kept += 1
-
-        self.trade.logger.info("Hi hi ranges length pre-sort: " + str(len(hi_hi_ranges_list)))
-        hi_hi_ranges_list.sort()
-        w = 1
-        for r in range(1, len(hi_hi_ranges_list)):
-            if hi_hi_ranges_list[r] != hi_hi_ranges_list[w - 1]:
-                hi_hi_ranges_list[w] = hi_hi_ranges_list[r]
-                w += 1
-        hi_hi_ranges = hi_hi_ranges_list[:w]
-        self.trade.logger.info("Hi hi ranges length post-sort: " + str(len(hi_hi_ranges)))
 
         self.pairs_primed = pairs_primed
         self.pairs_considered = pairs_considered
@@ -253,7 +234,7 @@ class TradeCalculationRawRoutes(object):
         self.pairs_rough = pairs_rough
         self.pairs_smooth = pairs_smooth
 
-        return [(hiball[a], hiball[b]) for (a, b) in hi_hi_ranges]
+        return [(hiball[a], hiball[b]) for (a, b) in hi_hi_ranges_list]
 
     @staticmethod
     def _get_btn_upper_bound(wtn1: int, wtn2: int, alg_code1: Optional[str], alg_code2: Optional[str], max_range: int,
