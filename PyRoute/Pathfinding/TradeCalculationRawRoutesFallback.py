@@ -176,14 +176,11 @@ class TradeCalculationRawRoutes(object):
 
             offset = offsets[max_wtn_distances[i]]
             base_idx = (q_array[i] - min_q) * r_size + (r_array[i] - min_r)
-            trim_offset: list[tuple[int, int, int]] = []
             for dist, delta, btn_minimum in offset:
                 j = idx_map[base_idx + delta]
                 if -1 == j or j < i:
                     continue
-                trim_offset.append((j, dist, btn_minimum))
 
-            for j, dist, btn_minimum in trim_offset:
                 pairs_primed += 1
                 lo_wtn = world_wtn[j]
 
