@@ -112,7 +112,7 @@ class testTradeCalculation(baseTest):
                                                                              0, sources=landmarks, use_distances=True)
 
         rawroute, _ = astar_path_numpy(galaxy.trade.star_graph, star_dex, targ_dex,
-                                          galaxy.trade.shortest_path_tree.lower_bound_bulk)
+                                       galaxy.trade.shortest_path_tree.lower_bound_bulk)
 
         expected_rawroute = [2, 12, 11, 5, 6, 4, 9]
         self.assertEqual(expected_rawroute, rawroute, "Unexpected raw route")

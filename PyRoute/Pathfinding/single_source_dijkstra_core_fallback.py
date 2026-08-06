@@ -39,8 +39,7 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
             else:
                 diagnostics['nodes_min_exceeded'] += 1  # pragma: no mutate
             if heap:
-                heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]  # pragma: no mutate
-                        and distance + min_cost[tail] <= max_neighbour_labels[tail]]  # pragma: no mutate
+                heap = [(distance, tail) for (distance, tail) in heap if distance <= distance_labels[tail]]  # pragma: no mutate
                 heapq.heapify(heap)
             continue
 
@@ -53,9 +52,8 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
         neighbours = arcs[tail]
         active_nodes = neighbours[0]
         active_costs = neighbours[1]
-        active_labels = distance_labels[active_nodes]
         # It's not worth (time wise) being cute and trying to break this up, forcing jumps in and out of numpy
-        keep = active_costs < (active_labels - dist_tail)  # pragma: no mutate
+        keep = active_costs < (distance_labels[active_nodes] - dist_tail)  # pragma: no mutate
         active_nodes = active_nodes[keep]
         num_nodes = len(active_nodes)
 
@@ -63,7 +61,6 @@ def dijkstra_core(arcs, distance_labels, divisor, seeds, max_neighbour_labels, m
             diagnostics['nodes_tailed'] += 1
             continue
         active_weights = dist_tail + divisor * active_costs[keep]
-        assert (active_weights > dist_tail).all()  # pragma: no mutate
         distance_labels[active_nodes] = active_weights
 
         parents[active_nodes] = tail

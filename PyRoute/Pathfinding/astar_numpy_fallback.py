@@ -59,7 +59,7 @@ def _calc_branching_factor(nodes_queued, path_len):
     return round(new, 3)
 
 
-def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=float64max, diagnostics=False) -> tuple[list, dict]:
+def astar_path_numpy(G, source, target, bulk_heuristic, upbound=float64max, diagnostics=False) -> tuple[list, dict]:
 
     G_succ = G._arcs  # For speed-up
 
@@ -83,13 +83,6 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=f
     # Traces lowest distance from source node found for each node
     distances = np.ones(len(G)) * floatinf
     distances[source] = 0
-
-    # pre-calc the minimum-cost edge on each node
-    min_cost = np.zeros(len(G)) if min_cost is None else min_cost
-    min_cost[target] = 0
-    up_threshold = upbound - min_cost
-    upper_limit = up_threshold
-    upper_limit[source] = 0
 
     node_counter = 0
     queue_counter = 0
@@ -131,8 +124,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=f
                 continue
 
             # Skip bad paths that were enqueued before finding a better one
-            qcost = distances[curnode]
-            if qcost <= dist:
+            if distances[curnode] <= dist:
                 queue = [item for item in queue if not (item[1] > distances[item[2]])]
                 heapify(queue)
                 continue
@@ -149,7 +141,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=f
 
         # Even if we have the target node as a candidate neighbour, of itself, that's _no_ guarantee that the target
         # as neighbour will give a better upper bound.
-        keep = np.logical_and(augmented_weights < upbound, active_weights <= upper_limit[active_nodes])
+        keep = np.logical_and(augmented_weights < upbound, active_weights <= distances[active_nodes])
         active_nodes = active_nodes[keep]
         if 0 == len(active_nodes):
             g_exhausted += 1
@@ -157,53 +149,9 @@ def astar_path_numpy(G, source, target, bulk_heuristic, min_cost=None, upbound=f
         active_weights = active_weights[keep]
         augmented_weights = augmented_weights[keep]
 
-        if target in active_nodes:
-            num_neighbours = len(active_nodes)
-            drop = active_nodes == target
-            ncost = active_weights[drop][0]
-
-            upbound = ncost
-            new_upbounds += 1
-            distances[target] = ncost
-            up_threshold = upbound - min_cost
-            upper_limit = np.minimum(upper_limit, up_threshold)
-            if 0 < len(queue):
-                queue = [item for item in queue if item[0] < upbound]
-                if 0 < len(queue):
-                    # While we're taking a brush-hook to queue, rip out items whose dist value exceeds enqueued value
-                    # or is too close to upbound
-                    queue = [item for item in queue if item[1] <= upper_limit[item[2]]]
-                    # Finally, dedupe the queue after cleaning all bound-busts out and 2 or more elements are left.
-                    # Empty or single-element sets cannot require deduplication, and are already heaps themselves.
-                    if 1 < len(queue):
-                        queue = list(set(queue))
-                        heapify(queue)
-            # heappush(queue, (ncost + 0, ncost, target, curnode))
-            heappush(queue, (ncost, ncost, target, curnode))
-            queue_counter += 1
-            #  If target node is only active node, and is neighbour node of only active queue element, bail out now
-            #  and dodge the now-known-to-be-pointless neighbourhood bookkeeping.
-            if 1 == len(queue) and 1 == len(active_nodes):
-                targ_exhausted += 1
-                continue
-            # As we have a tighter upper bound, apply it to the neighbours as well - target will be excluded because
-            # its augmented weight is _equal_ to upbound
-            keep = augmented_weights < upbound
-            active_nodes = active_nodes[keep]
-
-            # if there _was_ one neighbour to process, that was the target, so neighbour list is now empty.
-            # Likewise, if the new upper bound has emptied the neighbour list, go around.
-            if 1 == num_neighbours or 0 == len(active_nodes):
-                targ_exhausted += 1
-                continue
-
-            active_weights = active_weights[keep]
-            augmented_weights = augmented_weights[keep]
-
         # Now unconditionally queue _all_ nodes that are still active, worrying about filtering out the bound-busting
         # neighbours later.
         distances[active_nodes] = active_weights
-        upper_limit[active_nodes] = active_weights
         num_nodes = len(active_nodes)
 
         queue_counter += num_nodes
