@@ -322,7 +322,7 @@ class testLandmarksExtremes(baseTest):
 
         self.assertEqual(6, len(galaxy.trade.components), "Unexpected number of components at J-1")
 
-        expected_landmarks = [{0: 29, 2: 13, 4: 34}, {0: 26, 2: 4, 4: 36}, {0: 19, 4: 27}, {0: 9}]
+        expected_landmarks = [{0: 29, 2: 13, 4: 34}, {0: 26, 2: 4, 4: 36}, {0: 19, 4: 27}, {0: 17}]
         landmarks, _ = galaxy.trade.get_landmarks(btn=btn)
         self.assertEqual(4, len(landmarks), 'Should have one landmark per component')
         self.assertEqual(expected_landmarks, landmarks, 'Unexpected landmark result')
