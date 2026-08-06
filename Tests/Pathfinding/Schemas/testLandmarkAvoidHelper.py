@@ -10,7 +10,7 @@ from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Pathfinding.DistanceGraph import DistanceGraph
 from PyRoute.Pathfinding.LandmarkSchemes.LandmarkAvoidHelper import LandmarkAvoidHelper
 from Tests.baseTest import baseTest
-from PyRoute.Pathfinding.single_source_dijkstra import explicit_shortest_path_dijkstra_distance_graph
+from PyRoute.Pathfinding.single_source_dijkstra_core_fallback import dijkstra_core
 
 
 class testLandmarkAvoidHelper(baseTest):
@@ -23,8 +23,10 @@ class testLandmarkAvoidHelper(baseTest):
 
         distance_labels = np.ones(len(graph)) * float('+inf')
         distance_labels[source] = 0
-        actual_distances, actual_parents, _, _ = explicit_shortest_path_dijkstra_distance_graph(distgraph, source,
-                                                                                                distance_labels)
+        max_labels = np.ones((num_stars), dtype=float) * float('+inf')
+        min_cost = distgraph.min_cost(0, True)
+
+        actual_distances, actual_parents, _, _ = dijkstra_core(distgraph._arcs, distance_labels, 1.0, [source], max_labels, min_cost)
         lobound = np.zeros(num_stars, dtype=float)
         expected_weights = actual_distances
         actual_weights = LandmarkAvoidHelper.calc_weights(actual_distances, lobound)
