@@ -41,6 +41,8 @@ class ApproximateShortestPathForestUnified:
     _distances: cython.declare(cnp.ndarray(cython.float, ndim=2), 'readonly')
     _max_labels: cnp.ndarray(cython.float, ndim=2)
     _floatinf: cython.double
+    _scratch_diff: cnp.ndarray(cython.double, ndim=2)
+    _scratch_abs: cnp.ndarray(cython.double, ndim=2)
 
     def __init__(self, source, graph, epsilon, sources=None, use_distances: bool = False):
         seeds, source, num_trees = self._get_sources(graph, source, sources)
@@ -68,6 +70,7 @@ class ApproximateShortestPathForestUnified:
                                                                                    min_cost=min_cost,
                                                                                    divisor=self._divisor)
             self._distances[:, i], self._max_labels[:, i], _ = result
+        self._ensure_scratch()
 
     def lower_bound(self, source, target) -> float:
         raw = np.abs(self._distances[source, :] - self._distances[target, :])
@@ -84,23 +87,28 @@ class ApproximateShortestPathForestUnified:
     @cython.wraparound(False)
     @cython.returns(cnp.ndarray)
     def lower_bound_bulk(self, target_node: cython.int) -> cnp.ndarray:
-        raw: cnp.ndarray(cython.float, ndim=2)
-        overdrive: cnp.ndarray[cython.bint]
-        fastpath: cython.bint = self._mona_lisa_fastpath(target_node)
+        D = self._distances
+        nrows = self._graph_len
 
-        if fastpath:  # Fastpath - all overdrive elements are _finite_, so all rows are retrieved
-            raw = (self._distances - self._distances[target_node, :])
-        else:
-            overdrive = self._mona_lisa_overdrive(target_node)
-            # if we haven't got _any_ active lines, throw hands up and spit back zeros
-            if not overdrive.any():
-                return np.zeros(self._graph_len, dtype=float)
-            actives = self._distances[:, overdrive]
-            target = self._distances[target_node, overdrive]
+        fastpath = self._mona_lisa_fastpath(target_node)
+        trow = D[target_node, :]  # view of shape (ncols,)
 
-            raw = actives - target
+        if fastpath:
+            # scratch_diff = D - trow (broadcast across rows)
+            np.subtract(D, trow, out=self._scratch_diff)
+            # scratch_abs = abs(scratch_diff)
+            np.abs(self._scratch_diff, out=self._scratch_abs)
+            return np.max(self._scratch_abs, axis=1)
 
-        return np.max(np.abs(raw), axis=1)
+        # Slowpath: build overdrive mask and restrict columns
+        # Important: for your sentinel (+inf-only), finite columns are != +inf
+        overdrive = self._mona_lisa_overdrive(target_node)
+        if not overdrive.any():
+            return np.zeros(nrows, dtype=float)
+
+        actives = D[:, overdrive]
+        target = trow[overdrive]  # cheaper than D[target_node, overdrive]
+        return np.max(np.abs(actives - target), axis=1)
 
     def triangle_upbound(self, source: cython.int, target: cython.int) -> float:
         raw: cnp.ndarray[cython.float]
@@ -234,6 +242,7 @@ class ApproximateShortestPathForestUnified:
         self._distances = np.append(self._distances, result, 1)
         self._max_labels = np.append(self._distances, maxresult, 1)
         self._num_trees += 1
+        self._ensure_scratch()
 
     def _get_sources(self, graph, source, sources):
         seeds = None
@@ -286,3 +295,15 @@ class ApproximateShortestPathForestUnified:
     @property
     def sources(self) -> Any:
         return self._sources
+
+    @cython.ccall
+    def _ensure_scratch(self):
+        D = self._distances
+        nrows = self._graph_len
+        ncols = D.shape[1]  # or self._num_trees
+
+        # diff buffer
+        if not hasattr(self, "_scratch_diff") or self._scratch_diff.shape != (nrows, ncols):
+            dt = self._distances.dtype
+            self._scratch_diff = np.empty((nrows, ncols), dtype=dt, order="F")
+            self._scratch_abs = np.empty((nrows, ncols), dtype=dt, order="F")
