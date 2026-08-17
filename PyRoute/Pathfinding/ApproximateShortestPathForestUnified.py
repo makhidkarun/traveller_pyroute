@@ -240,7 +240,7 @@ class ApproximateShortestPathForestUnified:
         maxresult = np.zeros((self._graph_len, 1), dtype=float)
         maxresult[:, 0] = list(nu_max_labels)
         self._distances = np.append(self._distances, result, 1)
-        self._max_labels = np.append(self._distances, maxresult, 1)
+        self._max_labels = np.append(self._max_labels, maxresult, 1)
         self._num_trees += 1
         self._ensure_scratch()
 
