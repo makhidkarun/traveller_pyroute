@@ -61,7 +61,7 @@ class Star(object):
         self.social = None
         self.baseCode = None
         self.zone = None
-        self.alg_code = None
+        self.alg_code: Optional[str] = None
         self.allegiance_base = None
         self.alg_base_code = None
         self.ship_capacity = None
@@ -169,7 +169,7 @@ class Star(object):
         ggCount = str(Utilities.int_to_ehex(self.ggCount))
         worlds = str(self.worlds)
         basecode = str(self.baseCode).upper()
-        alg_code = str(self.alg_code) if "" != self.alg_code.strip() else "--"
+        alg_code = str(self.alg_code) if self.alg_code is not None and "" != self.alg_code.strip() else "--"
 
         result += basecode.ljust(2) + " " + str(self.zone).ljust(2) + popM + belts + ggCount + " "
         result += str(worlds).ljust(2) + " " + str(alg_code).ljust(4) + " "

@@ -6,7 +6,7 @@ from Cython.Build import cythonize
 setup(
     ext_modules=cythonize(
         ['astar_numpy.py', 'single_source_dijkstra_core.py', 'ApproximateShortestPathForestUnified.py',
-         'minmaxheap.pyx'],
+         'minmaxheap.pyx', 'TradeCalculationRawRoutes.py'],
         annotate=False
     ),
     include_dirs=[numpy.get_include()]
