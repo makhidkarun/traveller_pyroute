@@ -40,6 +40,7 @@ class ApproximateShortestPathForestUnified:
     _graph_len: cython.int
     _distances: cython.declare(cnp.ndarray(cython.float, ndim=2), 'readonly')
     _max_labels: cnp.ndarray(cython.float, ndim=2)
+    _floatinf: cython.double
 
     def __init__(self, source, graph, epsilon, sources=None, use_distances: bool = False):
         seeds, source, num_trees = self._get_sources(graph, source, sources)
@@ -52,6 +53,7 @@ class ApproximateShortestPathForestUnified:
         self._seeds = seeds
         self._num_trees = num_trees
         self._graph_len = len(self._graph)
+        self._floatinf = float('+inf')
         self._distances = np.ones((self._graph_len, self._num_trees), dtype=float, order='F') * float('+inf')
         self._max_labels = np.ones((self._graph_len, self._num_trees), dtype=float) * float('+inf')
 
@@ -84,15 +86,14 @@ class ApproximateShortestPathForestUnified:
     def lower_bound_bulk(self, target_node: cython.int) -> cnp.ndarray:
         raw: cnp.ndarray(cython.float, ndim=2)
         overdrive: cnp.ndarray[cython.bint]
-        fastpath: cython.bint
-        anypath: cython.bint
-        overdrive, fastpath, anypath = self._mona_lisa_overdrive(target_node)
+        fastpath: cython.bint = self._mona_lisa_fastpath(target_node)
 
         if fastpath:  # Fastpath - all overdrive elements are _finite_, so all rows are retrieved
             raw = (self._distances - self._distances[target_node, :])
         else:
+            overdrive = self._mona_lisa_overdrive(target_node)
             # if we haven't got _any_ active lines, throw hands up and spit back zeros
-            if not anypath:
+            if not overdrive.any():
                 return np.zeros(self._graph_len, dtype=float)
             actives = self._distances[:, overdrive]
             target = self._distances[target_node, overdrive]
@@ -112,12 +113,24 @@ class ApproximateShortestPathForestUnified:
         return np.min(raw) * (1 + self._epsilon)
 
     #  Gratuitous William Gibson reference is gratuitous.
-    @functools.cache
     @cython.cfunc
-    def _mona_lisa_overdrive(self, target_node: cython.int) -> tuple[cnp.array[cython.bint], cython.bint, cython.bint]:
-        result: cnp.ndarray[cython.bint]
-        result = self._distances[target_node, :] != float('+inf')
-        return result, result.all(), result.any()
+    def _mona_lisa_fastpath(self, target_node: cython.int) -> cython.bint:
+        j: cython.Py_ssize_t
+        ncols: cython.Py_ssize_t = self._distances.shape[1]
+        v: cython.double
+
+        for j in range(ncols):
+            v = self._distances[target_node, j]
+            if v == self._floatinf:
+                return False
+        return True
+
+    #  Gratuitous William Gibson reference is gratuitous.
+    @cython.cfunc
+    def _mona_lisa_overdrive(self, target_node: cython.int) -> cnp.ndarray[cython.bint]:
+        # overdrive columns where target row is finite
+        # finite <=> not +inf
+        return self._distances[target_node, :] != self._floatinf
 
     @cython.ccall
     @cython.infer_types(True)
