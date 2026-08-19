@@ -129,10 +129,11 @@ class ApproximateShortestPathForestUnified:
         j: cython.Py_ssize_t
         ncols: cython.Py_ssize_t = self._num_trees
         v: cython.double
+        floatinf: cython.double = self._floatinf
 
         for j in range(ncols):
             v = self._distances_view[target_node, j]
-            if v == self._floatinf:
+            if v == floatinf:
                 return False
         return True
 
