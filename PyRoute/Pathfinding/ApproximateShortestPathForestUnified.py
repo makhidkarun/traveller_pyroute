@@ -99,7 +99,7 @@ class ApproximateShortestPathForestUnified:
             np.subtract(D, trow, out=self._scratch_diff)
             # scratch_abs = abs(scratch_diff)
             np.abs(self._scratch_diff, out=self._scratch_diff)
-            return np.max(self._scratch_diff, axis=1)
+            return np.maximum.reduce(self._scratch_diff, axis=1)
 
         # Slowpath: build overdrive mask and restrict columns
         # Important: for your sentinel (+inf-only), finite columns are != +inf
@@ -109,7 +109,7 @@ class ApproximateShortestPathForestUnified:
 
         actives = D[:, overdrive]
         target = trow[overdrive]  # cheaper than D[target_node, overdrive]
-        return np.max(np.abs(actives - target), axis=1)
+        return np.maximum.reduce(np.abs(actives - target), axis=1)
 
     def triangle_upbound(self, source: cython.int, target: cython.int) -> float:
         raw: cnp.ndarray[cython.float]
