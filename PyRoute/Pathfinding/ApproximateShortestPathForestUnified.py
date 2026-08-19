@@ -6,7 +6,6 @@ Created on Feb 29, 2024
 """
 import cython
 from cython.cimports.numpy import numpy as cnp
-import functools
 from typing import Any
 
 import numpy as np
