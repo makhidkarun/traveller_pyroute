@@ -43,7 +43,6 @@ class ApproximateShortestPathForestUnified:
     _max_labels: cnp.ndarray(cython.float, ndim=2)
     _floatinf: cython.double
     _scratch_diff: cnp.ndarray(cython.double, ndim=2)
-    _scratch_abs: cnp.ndarray(cython.double, ndim=2)
 
     def __init__(self, source, graph, epsilon, sources=None, use_distances: bool = False):
         seeds, source, num_trees = self._get_sources(graph, source, sources)
@@ -99,8 +98,8 @@ class ApproximateShortestPathForestUnified:
             # scratch_diff = D - trow (broadcast across rows)
             np.subtract(D, trow, out=self._scratch_diff)
             # scratch_abs = abs(scratch_diff)
-            np.abs(self._scratch_diff, out=self._scratch_abs)
-            return np.max(self._scratch_abs, axis=1)
+            np.abs(self._scratch_diff, out=self._scratch_diff)
+            return np.max(self._scratch_diff, axis=1)
 
         # Slowpath: build overdrive mask and restrict columns
         # Important: for your sentinel (+inf-only), finite columns are != +inf
@@ -311,4 +310,3 @@ class ApproximateShortestPathForestUnified:
         if not hasattr(self, "_scratch_diff") or self._scratch_diff.shape != (nrows, ncols):
             dt = self._distances.dtype
             self._scratch_diff = np.empty((nrows, ncols), dtype=dt, order="F")
-            self._scratch_abs = np.empty((nrows, ncols), dtype=dt, order="F")
