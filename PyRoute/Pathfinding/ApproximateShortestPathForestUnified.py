@@ -38,7 +38,8 @@ class ApproximateShortestPathForestUnified:
     _seeds: list
     _num_trees: cython.int
     _graph_len: cython.int
-    _distances: cython.declare(cnp.ndarray(cython.float, ndim=2), 'readonly')
+    _distances: cython.declare(cnp.ndarray(cython.double, ndim=2))
+    _distances_view: cython.double[:, :]
     _max_labels: cnp.ndarray(cython.float, ndim=2)
     _floatinf: cython.double
     _scratch_diff: cnp.ndarray(cython.double, ndim=2)
@@ -57,6 +58,7 @@ class ApproximateShortestPathForestUnified:
         self._graph_len = len(self._graph)
         self._floatinf = float('+inf')
         self._distances = np.ones((self._graph_len, self._num_trees), dtype=float, order='F') * float('+inf')
+        self._distances_view = self._distances
         self._max_labels = np.ones((self._graph_len, self._num_trees), dtype=float) * float('+inf')
 
         min_cost = self._graph._min_cost
@@ -122,13 +124,15 @@ class ApproximateShortestPathForestUnified:
 
     #  Gratuitous William Gibson reference is gratuitous.
     @cython.cfunc
+    @cython.initializedcheck(False)
+    @cython.boundscheck(False)
     def _mona_lisa_fastpath(self, target_node: cython.int) -> cython.bint:
         j: cython.Py_ssize_t
-        ncols: cython.Py_ssize_t = self._distances.shape[1]
+        ncols: cython.Py_ssize_t = self._num_trees
         v: cython.double
 
         for j in range(ncols):
-            v = self._distances[target_node, j]
+            v = self._distances_view[target_node, j]
             if v == self._floatinf:
                 return False
         return True
@@ -240,6 +244,7 @@ class ApproximateShortestPathForestUnified:
         maxresult = np.zeros((self._graph_len, 1), dtype=float)
         maxresult[:, 0] = list(nu_max_labels)
         self._distances = np.append(self._distances, result, 1)
+        self._distances_view = self._distances
         self._max_labels = np.append(self._max_labels, maxresult, 1)
         self._num_trees += 1
         self._ensure_scratch()
