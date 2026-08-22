@@ -13,7 +13,7 @@ sources = [
     "TradeCalculationRawRoutes.py",
 ]
 
-compiler_directives={
+compiler_directives = {
         "language_level": 3,
         "boundscheck": False,
         "wraparound": False,
