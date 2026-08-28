@@ -21,10 +21,21 @@ compiler_directives = {
         "nonecheck": False,
     }
 
+profiling = os.environ.get("CYTHON_TRACE_NOGIL") == "1"
+
+if profiling:
+    compiler_directives.update({
+        "linetrace": True,
+        # linetrace implies profiling support, so profile=True
+        # is not strictly necessary.
+        "profile": True,
+    })
+
 extensions = cythonize(
     sources,
     annotate=True,
-    compiler_directives=compiler_directives
+    compiler_directives=compiler_directives,
+    force=profiling
 )
 
 if sys.platform == "win32":
@@ -41,6 +52,11 @@ for extension in extensions:
     extension.include_dirs.append(numpy.get_include())
     extension.extra_compile_args = list(extension.extra_compile_args or [])
     extension.extra_compile_args.extend(compile_args)
+
+    if profiling:
+        extension.define_macros = list(extension.define_macros or [])
+        extension.define_macros.append(("CYTHON_TRACE", "1"))
+        extension.define_macros.append(("CYTHON_TRACE_NOGIL", "1"))
 
 setup(
     ext_modules=extensions,
