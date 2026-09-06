@@ -185,8 +185,6 @@ def astar_numpy_core(G_succ: cython.list[cython.tuple[cnp.ndarray[cython.int], c
         active_nodes_view = G_succ[curnode][0]
         active_costs_view = G_succ[curnode][1]
 
-        targdex = -1
-
         num_nodes = len(active_nodes_view)
 
         # Now unconditionally queue _all_ nodes that are still active, worrying about filtering out the bound-busting
@@ -195,8 +193,6 @@ def astar_numpy_core(G_succ: cython.list[cython.tuple[cnp.ndarray[cython.int], c
         for i in range(num_nodes):
             act_nod = active_nodes_view[i]
             act_wt = dist + active_costs_view[i]
-            if target == act_nod:
-                targdex = i
             if act_wt > distances_view[act_nod]:
                 continue
             aug_wt = act_wt + potentials_view[act_nod]
@@ -210,10 +206,7 @@ def astar_numpy_core(G_succ: cython.list[cython.tuple[cnp.ndarray[cython.int], c
                 new_upbounds += 1
 
         if 0 == counter:
-            if -1 != targdex:
-                targ_exhausted += 1
-            else:
-                g_exhausted += 1
+            g_exhausted += 1
         else:
             queue_counter += counter
 
