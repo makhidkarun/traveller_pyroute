@@ -141,7 +141,7 @@ def astar_numpy_core(G_succ: cython.list[cython.tuple[cnp.ndarray[cython.int], c
 
     while 0 < queue.size():
         # Pop the smallest item from queue.
-        result = queue.popmin()
+        result: astar_t = queue.popmin()
         dist = result.dist
         curnode = result.curnode
         parent = result.parent

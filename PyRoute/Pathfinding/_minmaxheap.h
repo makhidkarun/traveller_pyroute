@@ -23,23 +23,15 @@ namespace minmaxheap {
         double dist;
         int curnode;
         int parent;
-        bool operator>(astar_t const& other) {
-            if (this->augment > other.augment) {
-                return true;
-            }
-            if (this->augment == other.augment && this->dist > other.dist) {
-                return true;
-            }
-            return false;
+        bool operator>(astar_t const& other) const {
+            if (this->augment > other.augment) { return true; }
+            if (this->augment < other.augment) { return false; }
+            return this->dist > other.dist;
         }
-        bool operator<(astar_t const& other) {
-            if (this->augment < other.augment) {
-                return true;
-            }
-            if (this->augment == other.augment && this->dist < other.dist) {
-                return true;
-            }
-            return false;
+        bool operator<(astar_t const& other) const {
+            if (this->augment < other.augment) { return true; }
+            if (this->augment > other.augment) { return false; }
+            return this->dist < other.dist;
         }
     };
 
