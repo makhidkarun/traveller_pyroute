@@ -160,6 +160,7 @@ namespace minmaxheap {
     template<typename T>
 	T MinMaxHeap<T>::popmin() {
 		const T e {heap[0]};
+		if (heap.size() == 1) { heap.pop_back(); return e; }
 		heap[0] = heap.back();
 		heap.pop_back();
 		trickledown(0);
