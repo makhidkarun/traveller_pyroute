@@ -66,9 +66,9 @@ class testAStarNumpy(baseTest):
 
         exp_route = [0, 8, 9, 15, 24, 36]
         if goodimport:
-            exp_diagnostics = {'branch_factor': 1.524, 'f_exhausted': 0, 'g_exhausted': 7, 'neighbour_bound': 20,
+            exp_diagnostics = {'branch_factor': 1.524, 'f_exhausted': 0, 'g_exhausted': 9, 'neighbour_bound': 20,
                             'new_upbounds': 1, 'nodes_expanded': 23, 'nodes_queued': 22, 'nodes_revisited': 2,
-                            'num_jumps': 5, 'un_exhausted': 11, 'targ_exhausted': 2}
+                            'num_jumps': 5, 'un_exhausted': 11, 'targ_exhausted': 0}
         else:
             exp_diagnostics = {'branch_factor': 1.524, 'f_exhausted': 0, 'g_exhausted': 9, 'neighbour_bound': 20,
                                'new_upbounds': 0, 'nodes_expanded': 23, 'nodes_queued': 22, 'nodes_revisited': 2,

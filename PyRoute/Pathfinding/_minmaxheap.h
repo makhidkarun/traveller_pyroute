@@ -23,23 +23,15 @@ namespace minmaxheap {
         double dist;
         int curnode;
         int parent;
-        bool operator>(astar_t const& other) {
-            if (this->augment > other.augment) {
-                return true;
-            }
-            if (this->augment == other.augment && this->dist > other.dist) {
-                return true;
-            }
-            return false;
+        bool operator>(astar_t const& other) const {
+            if (this->augment > other.augment) { return true; }
+            if (this->augment < other.augment) { return false; }
+            return this->dist > other.dist;
         }
-        bool operator<(astar_t const& other) {
-            if (this->augment < other.augment) {
-                return true;
-            }
-            if (this->augment == other.augment && this->dist < other.dist) {
-                return true;
-            }
-            return false;
+        bool operator<(astar_t const& other) const {
+            if (this->augment < other.augment) { return true; }
+            if (this->augment > other.augment) { return false; }
+            return this->dist < other.dist;
         }
     };
 
@@ -160,6 +152,7 @@ namespace minmaxheap {
     template<typename T>
 	T MinMaxHeap<T>::popmin() {
 		const T e {heap[0]};
+		if (heap.size() == 1) { heap.pop_back(); return e; }
 		heap[0] = heap.back();
 		heap.pop_back();
 		trickledown(0);
