@@ -202,6 +202,11 @@ class testTradeCalculation(baseTest):
                 if start[2]['passenger_btn'] == end[2]['passenger_btn']:
                     self.assertTrue(start[2]['distance'] <= end[2]['distance'],
                                     "Distance not in ascending order\n" + str(start[2]) + "\n" + str(end[2]))
+                    if start[2]['distance'] == end[2]['distance']:
+                        starthash = start[0].__hash__() ^ start[1].__hash__()
+                        endhash = end[0].__hash__() ^ end[1].__hash__()
+                        self.assertTrue(starthash >= endhash, "XOR of endpoint hashes not in descending order\n"
+                                        + str(starthash) + "\n" + str(endhash))
 
             start = end
 
