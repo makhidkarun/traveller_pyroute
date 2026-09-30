@@ -193,6 +193,17 @@ class testTradeCalculation(baseTest):
 
         btn1 = galaxy.trade._get_raw_routes()
         self.assertFalse(0 == len(btn1), "Raw routes should not be empty")
+        start = btn1[0]
+        for end in btn1[1:]:
+            self.assertTrue(start[2]['btn'] >= end[2]['btn'], "Btn not in descending order\n" + str(start[2]) + "\n" + str(end[2]))
+            if start[2]['btn'] == end[2]['btn']:
+                self.assertTrue(start[2]['passenger_btn'] >= end[2]['passenger_btn'],
+                                "Pax btn not in descending order\n" + str(start[2]) + "\n" + str(end[2]))
+                if start[2]['passenger_btn'] == end[2]['passenger_btn']:
+                    self.assertTrue(start[2]['distance'] <= end[2]['distance'],
+                                    "Distance not in ascending order\n" + str(start[2]) + "\n" + str(end[2]))
+
+            start = end
 
         readparms = ReadSectorOptions(sectors=[source2, source1], pop_code=args.pop_code, ru_calc=args.ru_calc,
                                       route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
