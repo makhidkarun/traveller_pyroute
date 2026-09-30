@@ -135,7 +135,9 @@ class TradeCalculation(RouteCalculation):
         btn = self.get_btn(star, neighbor, dist)
         if btn >= self.min_btn:
             passBTN = self.get_passenger_btn(btn, star, neighbor)
-            self.galaxy.ranges.add_edge(star, neighbor, distance=dist, btn=btn, passenger_btn=passBTN)
+            endpoint_hash = star.__hash__() ^ neighbor.__hash__()
+            self.galaxy.ranges.add_edge(star, neighbor, distance=dist, btn=btn, passenger_btn=passBTN,
+                                        endpoint_hash=endpoint_hash)
 
         return None if dist > self.galaxy.max_jump_range else dist
 
@@ -299,7 +301,7 @@ class TradeCalculation(RouteCalculation):
             self.galaxy.ranges.remove_edge(s, n)
         self.logger.info(f"Removed {len(btn_skipped)} non-component routes from ranges graph")
         btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
-        btn.sort(key=lambda tn: (tn[2]['btn'], tn[2]['passenger_btn'], -tn[2]['distance']), reverse=True)
+        btn.sort(key=lambda tn: (tn[2]['btn'], tn[2]['passenger_btn'], -tn[2]['distance'], tn[2]['endpoint_hash']), reverse=True)
         return btn
 
     def get_trade_between(self, star, target) -> None:
