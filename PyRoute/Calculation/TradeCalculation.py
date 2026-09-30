@@ -299,7 +299,7 @@ class TradeCalculation(RouteCalculation):
             self.galaxy.ranges.remove_edge(s, n)
         self.logger.info(f"Removed {len(btn_skipped)} non-component routes from ranges graph")
         btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
-        btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+        btn.sort(key=lambda tn: (tn[2]['btn'], tn[2]['passenger_btn'], -tn[2]['distance']), reverse=True)
         return btn
 
     def get_trade_between(self, star, target) -> None:
