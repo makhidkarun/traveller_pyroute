@@ -541,6 +541,7 @@ class TradeCalculation(RouteCalculation):
             # exhausted = data['count'] >= data['exhaust']
             if reweight and (data['count'] < data['exhaust']):
                 data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
+                data['weight'] = math.floor(10000 * data['weight']) / 10000
                 startdex = start.index
                 enddex = end.index
                 self.star_graph.lighten_edge(startdex, enddex, data['weight'])
