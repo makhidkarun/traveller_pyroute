@@ -174,7 +174,7 @@ class testTradeCalculation(baseTest):
         galaxy.output_path = args.output
         galaxy.generate_routes()
 
-    def test_get_raw_routes_order_sensitivity(self):
+    def test_get_raw_routes_order_sensitivity(self) -> None:
         source1 = self.unpack_filename('DeltaFiles/quadripoint_trade_write/Corridor.sec')
         source2 = self.unpack_filename('DeltaFiles/quadripoint_trade_write/Deneb.sec')
 
