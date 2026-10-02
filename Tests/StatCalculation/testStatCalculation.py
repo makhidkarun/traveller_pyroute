@@ -565,3 +565,68 @@ class testStatCalculation(baseTest):
         self.assertAlmostEqual(10.5, im_stats.TLmean, 1)
         self.assertAlmostEqual(1.9, im_stats.TLstddev, 1)
         self.assertEqual([high_pop_star], im_stats.high_pop_worlds)
+
+    def test_calculate_statistics_minimise_input_for_flaky_passthru_trade_numbers(self) -> None:
+        self.maxDiff = None
+        filename = 'DeltaFiles/flaky_pax_numbers/Zarushagar-Ibara.sec'
+        sourcefile = self.unpack_filename(filename)
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta['Dagudashaag'] = SectorDictionary('Dagudashaag', '')
+        delta['Dagudashaag'].position = '# 0, 0'
+        delta[sector.name] = sector
+
+        galaxy = DeltaGalaxy(15, 4)
+        galaxy.read_sectors(delta, "scaled", "scaled", 10, "trade", 12, 1, False)
+        galaxy.generate_routes()
+        galaxy.trade.calculate_components()
+
+        expected_edges = [
+            (0, 1, {'distance': 3, 'weight': 72, 'trade': 0, 'btn': 15, 'count': 0, 'exhaust': 53, 'xboat': True}),
+            (0, 2, {'distance': 1, 'weight': 26, 'trade': 0, 'btn': 19, 'count': 0, 'exhaust': 54}),
+            (0, 3, {'distance': 3, 'weight': 70, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 53}),
+            (0, 5, {'distance': 3, 'weight': 125, 'trade': 0, 'btn': 15, 'count': 0, 'exhaust': 59}),
+            (1, 2, {'distance': 3, 'weight': 72, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 53}),
+            (1, 3, {'distance': 1, 'weight': 26, 'trade': 0, 'btn': 17, 'count': 0, 'exhaust': 54}),
+            (1, 4, {'distance': 2, 'weight': 48, 'trade': 0, 'btn': 15, 'count': 0, 'exhaust': 53}),
+            (1, 5, {'distance': 3, 'weight': 126, 'trade': 0, 'btn': 14, 'count': 0, 'exhaust': 59}),
+            (2, 3, {'distance': 2, 'weight': 45, 'trade': 0, 'btn': 18, 'count': 0, 'exhaust': 53}),
+            (2, 4, {'distance': 4, 'weight': 127, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 56}),
+            (2, 5, {'distance': 2, 'weight': 100, 'trade': 0, 'btn': 17, 'count': 0, 'exhaust': 60}),
+            (3, 4, {'distance': 2, 'weight': 46, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 53}),
+            (3, 5, {'distance': 2, 'weight': 99, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 60}),
+            (4, 5, {'distance': 4, 'weight': 181, 'trade': 0, 'btn': 14, 'count': 0, 'exhaust': 60})
+        ]
+        foo = list(galaxy.stars.edges(data=True))
+        self.assertEqual(expected_edges, foo, "Unexpected stars edges before pathfinding")
+
+        galaxy.trade.calculate_routes()
+        expected_edges = [
+            (0, 1, {'distance': 3, 'weight': 72, 'trade': 0, 'btn': 15, 'count': 0, 'exhaust': 53, 'xboat': True}),
+            (0, 2, {'distance': 1, 'weight': 17.4025, 'trade': 5200000000, 'btn': 19, 'count': 4, 'exhaust': 54}),
+            (0, 3, {'distance': 3, 'weight': 70, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 53}),
+            (0, 5, {'distance': 3, 'weight': 125, 'trade': 0, 'btn': 15, 'count': 0, 'exhaust': 59}),
+            (1, 2, {'distance': 3, 'weight': 72, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 53}),
+            (1, 3, {'distance': 1, 'weight': 19.225, 'trade': 650000000, 'btn': 17, 'count': 3, 'exhaust': 54}),
+            (1, 4, {'distance': 2, 'weight': 43.4, 'trade': 50000000, 'btn': 15, 'count': 1, 'exhaust': 53}),
+            (1, 5, {'distance': 3, 'weight': 126, 'trade': 0, 'btn': 14, 'count': 0, 'exhaust': 59}),
+            (2, 3, {'distance': 2, 'weight': 27.391, 'trade': 1350000000, 'btn': 18, 'count': 5, 'exhaust': 53}),
+            (2, 4, {'distance': 4, 'weight': 127, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 56}),
+            (2, 5, {'distance': 2, 'weight': 81.38, 'trade': 550000000, 'btn': 17, 'count': 2, 'exhaust': 60}),
+            (3, 4, {'distance': 2, 'weight': 37.64, 'trade': 200000000, 'btn': 16, 'count': 2, 'exhaust': 53}),
+            (3, 5, {'distance': 2, 'weight': 89.3, 'trade': 100000000, 'btn': 16, 'count': 1, 'exhaust': 60}),
+            (4, 5, {'distance': 4, 'weight': 181, 'trade': 0, 'btn': 14, 'count': 0, 'exhaust': 60})
+        ]
+        foo = list(galaxy.stars.edges(data=True))
+        self.assertEqual(expected_edges, foo, "Unexpected stars edges after pathfinding")
+
+        galstat = galaxy.stats
+        act_trade_vol = sum([(item.tradeOver + item.tradeIn) for item in galaxy.star_mapping.values()])
+        in_trade_vol = sum([item.tradeIn for item in galaxy.star_mapping.values()])
+        over_trade_vol = sum([item.tradeOver for item in galaxy.star_mapping.values()])
+        self.assertEqual(133500, galstat.passengers)
+        self.assertEqual(7650000000, galstat.trade)
+        self.assertEqual(7650000000, in_trade_vol, "Unexpected terminal trade volume")
+        self.assertEqual(450000000, over_trade_vol, "Unexpected passthru trade volume")
+        self.assertEqual(8100000000, act_trade_vol, "Unexpected port-level total trade volume")
