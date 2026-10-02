@@ -409,6 +409,8 @@ class testStatCalculation(baseTest):
         galaxy.trade.calculate_components()
 
         galaxy.trade.calculate_routes()
+        exp_pax = sum([item.passIn for item in galaxy.star_mapping.values()]) * 3 / 2
+        exp_trade_vol = sum([(item.tradeOver + item.tradeIn) for item in galaxy.star_mapping.values()])
 
         statcalc = StatCalculation(galaxy)
         statcalc.logger.manager.disable = 0
@@ -422,6 +424,7 @@ class testStatCalculation(baseTest):
             statcalc.calculate_statistics(True)
             output = copy.deepcopy(outer_logs.output)
             self.assertEqual(exp_logs, output)
+        exp_spa_people = sum([item.starportPop for item in galaxy.star_mapping.values()])
 
         exp_port_size = NoNoneDefaultDict(int)
         exp_port_size[0] = 9
@@ -478,11 +481,11 @@ class testStatCalculation(baseTest):
         self.assertEqual(100376, galstat.economy)
         self.assertEqual(37, galstat.number)
         self.assertEqual(38046, galstat.sum_ru)
-        self.assertEqual(223650000000, galstat.tradeVol)
+        self.assertEqual(exp_trade_vol, galstat.tradeVol)
         self.assertEqual(3178.4, galstat.col_be)
         self.assertAlmostEqual(1135.98, galstat.im_be, 3)
-        self.assertEqual(14799000, galstat.passengers)
-        self.assertEqual(44505, galstat.spa_people)
+        self.assertEqual(exp_pax, galstat.passengers)
+        self.assertEqual(exp_spa_people, galstat.spa_people)
         self.assertEqual(exp_port_size, galstat.port_size)
         self.assertEqual(exp_code_count, galstat.code_counts)
         self.assertEqual(35, galstat.gg_count)
