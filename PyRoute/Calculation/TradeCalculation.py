@@ -135,7 +135,9 @@ class TradeCalculation(RouteCalculation):
         btn = self.get_btn(star, neighbor, dist)
         if btn >= self.min_btn:
             passBTN = self.get_passenger_btn(btn, star, neighbor)
-            self.galaxy.ranges.add_edge(star, neighbor, distance=dist, btn=btn, passenger_btn=passBTN)
+            endpoint_hash = star.__hash__() ^ neighbor.__hash__()
+            self.galaxy.ranges.add_edge(star, neighbor, distance=dist, btn=btn, passenger_btn=passBTN,
+                                        endpoint_hash=endpoint_hash)
 
         return None if dist > self.galaxy.max_jump_range else dist
 
@@ -204,14 +206,7 @@ class TradeCalculation(RouteCalculation):
         # to failure.
         self.calculate_components()
 
-        btn_skipped = [(s, n) for (s, n) in self.galaxy.ranges.edges() if s.component != n.component]
-        self.logger.info(f"Found {len(btn_skipped)} non-component routes, removing from ranges graph")
-        for s, n in btn_skipped:
-            self.galaxy.ranges.remove_edge(s, n)
-        self.logger.info(f"Removed {len(btn_skipped)} non-component routes from ranges graph")
-
-        btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
-        btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+        btn = self._get_raw_routes()
         if self.debug_flag:
             self.pathfinding_data = {'nodes_expanded': np.ones(len(btn), dtype=float) * -1,
                                      'nodes_queued': np.ones(len(btn), dtype=float) * -1,
@@ -298,6 +293,16 @@ class TradeCalculation(RouteCalculation):
             self.logger.info('Total f-exhausted nodes {}'.format(total_f_exhausted))
             self.logger.info('Total target-exhausted nodes {}'.format(total_targ_exhausted))
             self.logger.info('Total un-exhausted nodes {}'.format(total_un_exhausted))
+
+    def _get_raw_routes(self):
+        btn_skipped = [(s, n) for (s, n) in self.galaxy.ranges.edges() if s.component != n.component]
+        self.logger.info(f"Found {len(btn_skipped)} non-component routes, removing from ranges graph")
+        for s, n in btn_skipped:
+            self.galaxy.ranges.remove_edge(s, n)
+        self.logger.info(f"Removed {len(btn_skipped)} non-component routes from ranges graph")
+        btn = [(s, n, d) for (s, n, d) in self.galaxy.ranges.edges(data=True)]
+        btn.sort(key=lambda tn: (tn[2]['btn'], tn[2]['passenger_btn'], -tn[2]['distance'], tn[2]['endpoint_hash']), reverse=True)
+        return btn
 
     def get_trade_between(self, star, target) -> None:
         """
@@ -536,6 +541,7 @@ class TradeCalculation(RouteCalculation):
             # exhausted = data['count'] >= data['exhaust']
             if reweight and (data['count'] < data['exhaust']):
                 data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
+                data['weight'] = math.floor(10000 * data['weight']) / 10000
                 startdex = start.index
                 enddex = end.index
                 self.star_graph.lighten_edge(startdex, enddex, data['weight'])

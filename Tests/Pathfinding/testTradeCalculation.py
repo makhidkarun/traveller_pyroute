@@ -173,3 +173,54 @@ class testTradeCalculation(baseTest):
         galaxy.read_sectors(readparms)
         galaxy.output_path = args.output
         galaxy.generate_routes()
+
+    def test_get_raw_routes_order_sensitivity(self) -> None:
+        source1 = self.unpack_filename('DeltaFiles/quadripoint_trade_write/Corridor.sec')
+        source2 = self.unpack_filename('DeltaFiles/quadripoint_trade_write/Deneb.sec')
+
+        args = self._make_args()
+        args.route_btn = 8
+        args.route_reuse = 10
+        readparms = ReadSectorOptions(sectors=[source1, source2], pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                      route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
+                                      mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=False,
+                                      deep_space={}, map_type=args.map_type)
+
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.read_sectors(readparms)
+        galaxy.generate_routes()
+        galaxy.trade.calculate_components()
+
+        btn1 = galaxy.trade._get_raw_routes()
+        self.assertFalse(0 == len(btn1), "Raw routes should not be empty")
+        start = btn1[0]
+        for end in btn1[1:]:
+            self.assertTrue(start[2]['btn'] >= end[2]['btn'], "Btn not in descending order\n" + str(start[2]) + "\n" + str(end[2]))
+            if start[2]['btn'] == end[2]['btn']:
+                self.assertTrue(start[2]['passenger_btn'] >= end[2]['passenger_btn'],
+                                "Pax btn not in descending order\n" + str(start[2]) + "\n" + str(end[2]))
+                if start[2]['passenger_btn'] == end[2]['passenger_btn']:
+                    self.assertTrue(start[2]['distance'] <= end[2]['distance'],
+                                    "Distance not in ascending order\n" + str(start[2]) + "\n" + str(end[2]))
+                    if start[2]['distance'] == end[2]['distance']:
+                        starthash = start[0].__hash__() ^ start[1].__hash__()
+                        endhash = end[0].__hash__() ^ end[1].__hash__()
+                        self.assertTrue(starthash >= endhash, "XOR of endpoint hashes not in descending order\n"
+                                        + str(starthash) + "\n" + str(endhash))
+
+            start = end
+
+        readparms = ReadSectorOptions(sectors=[source2, source1], pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                      route_reuse=args.route_reuse, trade_choice=args.routes, route_btn=args.route_btn,
+                                      mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=False,
+                                      deep_space={}, map_type=args.map_type)
+
+        nugalaxy = Galaxy(min_btn=15, max_jump=4)
+        nugalaxy.read_sectors(readparms)
+        nugalaxy.generate_routes()
+        nugalaxy.trade.calculate_components()
+        btn2 = galaxy.trade._get_raw_routes()
+
+        self.assertNotEqual(galaxy.star_mapping[0], nugalaxy.star_mapping[0])
+
+        self.assertEqual(btn1, btn2)

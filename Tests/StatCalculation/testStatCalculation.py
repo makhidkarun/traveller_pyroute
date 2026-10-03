@@ -409,6 +409,8 @@ class testStatCalculation(baseTest):
         galaxy.trade.calculate_components()
 
         galaxy.trade.calculate_routes()
+        exp_pax = sum([item.passIn for item in galaxy.star_mapping.values()]) * 3 / 2
+        exp_trade_vol = sum([(item.tradeOver + item.tradeIn) for item in galaxy.star_mapping.values()])
 
         statcalc = StatCalculation(galaxy)
         statcalc.logger.manager.disable = 0
@@ -422,6 +424,7 @@ class testStatCalculation(baseTest):
             statcalc.calculate_statistics(True)
             output = copy.deepcopy(outer_logs.output)
             self.assertEqual(exp_logs, output)
+        exp_spa_people = sum([item.starportPop for item in galaxy.star_mapping.values()])
 
         exp_port_size = NoNoneDefaultDict(int)
         exp_port_size[0] = 9
@@ -478,11 +481,11 @@ class testStatCalculation(baseTest):
         self.assertEqual(100376, galstat.economy)
         self.assertEqual(37, galstat.number)
         self.assertEqual(38046, galstat.sum_ru)
-        self.assertEqual(223150000000, galstat.tradeVol)
+        self.assertEqual(exp_trade_vol, galstat.tradeVol)
         self.assertEqual(3178.4, galstat.col_be)
         self.assertAlmostEqual(1135.98, galstat.im_be, 3)
-        self.assertEqual(14796000, galstat.passengers)
-        self.assertEqual(44455, galstat.spa_people)
+        self.assertEqual(exp_pax, galstat.passengers)
+        self.assertEqual(exp_spa_people, galstat.spa_people)
         self.assertEqual(exp_port_size, galstat.port_size)
         self.assertEqual(exp_code_count, galstat.code_counts)
         self.assertEqual(35, galstat.gg_count)
@@ -499,10 +502,10 @@ class testStatCalculation(baseTest):
         self.assertEqual([high_pop_star], galaxy.sectors['Zarushagar'].stats.high_pop_worlds)
         self.assertEqual(galstat.__dict__, galaxy.sectors['Zarushagar'].subsectors['A'].stats.__dict__)
         self.assertEqual([high_pop_star], galaxy.sectors['Zarushagar'].subsectors['A'].stats.high_pop_worlds)
-        expected_starport_budgets = {0: 35.0, 1: 0, 2: 92.0, 3: 102.0, 4: 14.0, 5: 118.0, 6: 20.0, 7: 6.0, 8: 209.0,
-                                     9: 280.0, 10: 0, 11: 219.0, 12: 2, 13: 0, 14: 4.0, 15: 53.0, 16: 0, 17: 1403.0,
-                                     18: 1435.0, 19: 0, 20: 26.0, 21: 0, 22: 93.0, 23: 20.0, 24: 787.0, 25: 0,
-                                     26: 1854.0, 27: 8.0, 28: 0, 29: 0, 30: 0, 31: 1.0, 32: 11.0, 33: 17.0, 34: 1309.0,
+        expected_starport_budgets = {0: 35.0, 1: 0, 2: 91.0, 3: 102.0, 4: 14.0, 5: 118.0, 6: 20.0, 7: 6.0, 8: 209.0,
+                                     9: 281.0, 10: 0, 11: 219.0, 12: 5, 13: 0, 14: 5.0, 15: 53.0, 16: 0, 17: 1410.0,
+                                     18: 1433.0, 19: 0, 20: 26.0, 21: 0, 22: 93.0, 23: 20.0, 24: 781.0, 25: 0,
+                                     26: 1854.0, 27: 8.0, 28: 0, 29: 0, 30: 0, 31: 1.0, 32: 13.0, 33: 13.0, 34: 1309.0,
                                      35: 773.0, 36: 0}
         expected_starport_sizes = {0: 4, 1: 2, 2: 4, 3: 4, 4: 3, 5: 4, 6: 3, 7: 3, 8: 4, 9: 4, 10: 0, 11: 4,
                                    12: 3, 13: 0, 14: 3, 15: 4, 16: 0, 17: 5, 18: 5, 19: 0, 20: 3, 21: 0, 22: 4,
@@ -562,3 +565,97 @@ class testStatCalculation(baseTest):
         self.assertAlmostEqual(10.5, im_stats.TLmean, 1)
         self.assertAlmostEqual(1.9, im_stats.TLstddev, 1)
         self.assertEqual([high_pop_star], im_stats.high_pop_worlds)
+
+    def test_calculate_statistics_minimise_input_for_flaky_passthru_trade_numbers(self) -> None:
+        self.maxDiff = None
+        filename = 'DeltaFiles/flaky_pax_numbers/Zarushagar-Ibara.sec'
+        sourcefile = self.unpack_filename(filename)
+
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta = DeltaDictionary()
+        delta['Dagudashaag'] = SectorDictionary('Dagudashaag', '')
+        delta['Dagudashaag'].position = '# 0, 0'
+        delta[sector.name] = sector
+
+        galaxy = DeltaGalaxy(15, 4)
+        galaxy.read_sectors(delta, "scaled", "scaled", 10, "trade", 12, 1, False)
+        galaxy.generate_routes()
+        galaxy.trade.calculate_components()
+
+        expected_edges = [
+            (0, 1, {'distance': 3, 'weight': 72, 'trade': 0, 'btn': 15, 'count': 0, 'exhaust': 53, 'xboat': True}),
+            (0, 2, {'distance': 1, 'weight': 26, 'trade': 0, 'btn': 19, 'count': 0, 'exhaust': 54}),
+            (0, 3, {'distance': 3, 'weight': 70, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 53}),
+            (0, 5, {'distance': 3, 'weight': 125, 'trade': 0, 'btn': 15, 'count': 0, 'exhaust': 59}),
+            (1, 2, {'distance': 3, 'weight': 72, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 53}),
+            (1, 3, {'distance': 1, 'weight': 26, 'trade': 0, 'btn': 17, 'count': 0, 'exhaust': 54}),
+            (1, 4, {'distance': 2, 'weight': 48, 'trade': 0, 'btn': 15, 'count': 0, 'exhaust': 53}),
+            (1, 5, {'distance': 3, 'weight': 126, 'trade': 0, 'btn': 14, 'count': 0, 'exhaust': 59}),
+            (2, 3, {'distance': 2, 'weight': 45, 'trade': 0, 'btn': 18, 'count': 0, 'exhaust': 53}),
+            (2, 4, {'distance': 4, 'weight': 127, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 56}),
+            (2, 5, {'distance': 2, 'weight': 100, 'trade': 0, 'btn': 17, 'count': 0, 'exhaust': 60}),
+            (3, 4, {'distance': 2, 'weight': 46, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 53}),
+            (3, 5, {'distance': 2, 'weight': 99, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 60}),
+            (4, 5, {'distance': 4, 'weight': 181, 'trade': 0, 'btn': 14, 'count': 0, 'exhaust': 60})
+        ]
+        foo = list(galaxy.stars.edges(data=True))
+        self.assertEqual(expected_edges, foo, "Unexpected stars edges before pathfinding")
+        map = galaxy.star_mapping
+        exp_routes = [
+            (map[0], map[2], {'btn': 19, 'distance': 1, 'endpoint_hash': map[0].__hash__() ^ map[2].__hash__(),
+                              'passenger_btn': 19}),
+            (map[2], map[3], {'btn': 18, 'distance': 2, 'endpoint_hash': map[2].__hash__() ^ map[3].__hash__(),
+                              'passenger_btn': 19}),
+            (map[1], map[3], {'btn': 17, 'distance': 1, 'endpoint_hash': map[1].__hash__() ^ map[3].__hash__(),
+                              'passenger_btn': 18}),
+            (map[2], map[5], {'btn': 17, 'distance': 2, 'endpoint_hash': map[2].__hash__() ^ map[5].__hash__(),
+                              'passenger_btn': 17}),
+            (map[3], map[5], {'btn': 16, 'distance': 2, 'endpoint_hash': map[3].__hash__() ^ map[5].__hash__(),
+                              'passenger_btn': 17}),
+            (map[3], map[4], {'btn': 16, 'distance': 2, 'endpoint_hash': map[3].__hash__() ^ map[4].__hash__(),
+                              'passenger_btn': 17}),
+            (map[0], map[3], {'btn': 16, 'distance': 3, 'endpoint_hash': map[0].__hash__() ^ map[3].__hash__(),
+                              'passenger_btn': 17}),
+            (map[1], map[2], {'btn': 16, 'distance': 3, 'endpoint_hash': map[1].__hash__() ^ map[2].__hash__(),
+                              'passenger_btn': 16}),
+            (map[2], map[4], {'btn': 16, 'distance': 4, 'endpoint_hash': map[2].__hash__() ^ map[4].__hash__(),
+                              'passenger_btn': 16}),
+            (map[1], map[4], {'btn': 15, 'distance': 2, 'endpoint_hash': map[1].__hash__() ^ map[4].__hash__(),
+                              'passenger_btn': 15}),
+            (map[0], map[1], {'btn': 15, 'distance': 3, 'endpoint_hash': map[0].__hash__() ^ map[1].__hash__(),
+                              'passenger_btn': 15}),
+            (map[0], map[5], {'btn': 15, 'distance': 3, 'endpoint_hash': map[0].__hash__() ^ map[5].__hash__(),
+                              'passenger_btn': 15}),
+        ]
+        act_routes = galaxy.trade._get_raw_routes()
+        self.assertEqual(exp_routes, act_routes)
+
+        galaxy.trade.calculate_routes()
+        expected_edges = [
+            (0, 1, {'distance': 3, 'weight': 65.1, 'trade': 50000000, 'btn': 15, 'count': 1, 'exhaust': 53, 'xboat': True}),
+            (0, 2, {'distance': 1, 'weight': 19.225, 'trade': 5150000000, 'btn': 19, 'count': 3, 'exhaust': 54}),
+            (0, 3, {'distance': 3, 'weight': 70, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 53}),
+            (0, 5, {'distance': 3, 'weight': 125, 'trade': 0, 'btn': 15, 'count': 0, 'exhaust': 59}),
+            (1, 2, {'distance': 3, 'weight': 72, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 53}),
+            (1, 3, {'distance': 1, 'weight': 21.25, 'trade': 600000000, 'btn': 17, 'count': 2, 'exhaust': 54}),
+            (1, 4, {'distance': 2, 'weight': 43.4, 'trade': 50000000, 'btn': 15, 'count': 1, 'exhaust': 53}),
+            (1, 5, {'distance': 3, 'weight': 126, 'trade': 0, 'btn': 14, 'count': 0, 'exhaust': 59}),
+            (2, 3, {'distance': 2, 'weight': 30.2123, 'trade': 1300000000, 'btn': 18, 'count': 4, 'exhaust': 53}),
+            (2, 4, {'distance': 4, 'weight': 127, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 56}),
+            (2, 5, {'distance': 2, 'weight': 81.38, 'trade': 550000000, 'btn': 17, 'count': 2, 'exhaust': 60}),
+            (3, 4, {'distance': 2, 'weight': 37.64, 'trade': 200000000, 'btn': 16, 'count': 2, 'exhaust': 53}),
+            (3, 5, {'distance': 2, 'weight': 89.3, 'trade': 100000000, 'btn': 16, 'count': 1, 'exhaust': 60}),
+            (4, 5, {'distance': 4, 'weight': 181, 'trade': 0, 'btn': 14, 'count': 0, 'exhaust': 60})
+        ]
+        foo = list(galaxy.stars.edges(data=True))
+        self.assertEqual(expected_edges, foo, "Unexpected stars edges after pathfinding")
+
+        galstat = galaxy.stats
+        act_trade_vol = sum([(item.tradeOver + item.tradeIn) for item in galaxy.star_mapping.values()])
+        in_trade_vol = sum([item.tradeIn for item in galaxy.star_mapping.values()])
+        over_trade_vol = sum([item.tradeOver for item in galaxy.star_mapping.values()])
+        self.assertEqual(133500, galstat.passengers)
+        self.assertEqual(7650000000, galstat.trade)
+        self.assertEqual(7650000000, in_trade_vol, "Unexpected terminal trade volume")
+        self.assertEqual(350000000, over_trade_vol, "Unexpected passthru trade volume")
+        self.assertEqual(8000000000, act_trade_vol, "Unexpected port-level total trade volume")

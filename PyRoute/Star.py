@@ -7,6 +7,7 @@ import functools
 import logging
 import bisect
 import random
+import hashlib
 
 from typing import Tuple, Optional
 from typing_extensions import TypeAlias
@@ -198,7 +199,11 @@ class Star(object):
 
     def calc_hash(self) -> None:
         self._key = (self.position, self.name, str(self.uwp), self.sector.name)
-        self._hash = hash(self._key)
+        rawhash = hashlib.new('sha256')
+        for item in self._key:
+            nuitem = 'None' if item is None else item
+            rawhash.update(nuitem.encode('utf-8'))
+        self._hash = int(rawhash.hexdigest()[-16:], 16)
 
     def wiki_name(self) -> str:
         # name = u" ".join(w.capitalize() for w in self.name.lower().split())

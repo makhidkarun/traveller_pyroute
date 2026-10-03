@@ -31,6 +31,7 @@ class testStatCalcRegression(baseTest):
         args.min_btn = 15
 
         galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        self.assertEqual(0, galaxy.stats.passengers)
         galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
                             args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
         galaxy.output_path = args.output
@@ -41,6 +42,7 @@ class testStatCalcRegression(baseTest):
         galaxy.trade.calculate_routes()
 
         stats = StatCalculation(galaxy)
+        self.assertEqual(0, galaxy.stats.passengers)
         stats.calculate_statistics(args.ally_match)
         stats.write_statistics(args.ally_count, args.ally_match, args.json_data)
 
@@ -63,10 +65,17 @@ class testStatCalcRegression(baseTest):
 
         galaxy.generate_routes()
         galaxy.trade.calculate_components()
-
+        self.assertEqual(0, galaxy.stats.passengers)
+        self.assertEqual(0, galaxy.stats.tradeVol)
         galaxy.trade.calculate_routes()
+        exp_pax = sum([item.passIn for item in galaxy.star_mapping.values()]) / 2
+        exp_trade_vol = sum([(item.tradeOver + item.tradeIn) for item in galaxy.star_mapping.values()])
 
+        self.assertEqual(exp_pax, galaxy.stats.passengers, "Unexpected pax value after calculate routes")
+        self.assertEqual(0, galaxy.stats.tradeVol)
         stats = StatCalculation(galaxy)
+        self.assertEqual(exp_pax, galaxy.stats.passengers)
+        self.assertEqual(0, galaxy.stats.tradeVol)
         stats.calculate_statistics(args.ally_match)
         stats.write_statistics(args.ally_count, args.ally_match, args.json_data)
 
@@ -78,7 +87,7 @@ class testStatCalcRegression(baseTest):
                     'population': 80481, 'populations': NoNoneDefaultDict(Populations), 'port_size': NoNoneDefaultDict(int),
                     'primary_count': NoNoneDefaultDict(int), 'shipyards': 81, 'spa_people': 23695,
                     'star_count': NoNoneDefaultDict(int), 'stars': 172, 'sum_ru': 121636, 'trade': 143463760000,
-                    'tradeDton': 3272570, 'tradeDtonExt': 0, 'tradeExt': 0, 'tradeVol': 144494460000, 'worlds': 1272,
+                    'tradeDton': 3272570, 'tradeDtonExt': 0, 'tradeExt': 0, 'tradeVol': exp_trade_vol, 'worlds': 1272,
                     '__dict__': {}}
         expected['bases']['Military base'] = 18
         expected['bases']['Naval base'] = 23
