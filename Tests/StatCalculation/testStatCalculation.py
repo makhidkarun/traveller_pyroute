@@ -503,7 +503,7 @@ class testStatCalculation(baseTest):
         self.assertEqual(galstat.__dict__, galaxy.sectors['Zarushagar'].subsectors['A'].stats.__dict__)
         self.assertEqual([high_pop_star], galaxy.sectors['Zarushagar'].subsectors['A'].stats.high_pop_worlds)
         expected_starport_budgets = {0: 35.0, 1: 0, 2: 91.0, 3: 102.0, 4: 14.0, 5: 118.0, 6: 20.0, 7: 6.0, 8: 209.0,
-                                     9: 281.0, 10: 0, 11: 219.0, 12: 5, 13: 0, 14: 5.0, 15: 53.0, 16: 0, 17: 1419.0,
+                                     9: 281.0, 10: 0, 11: 219.0, 12: 5, 13: 0, 14: 5.0, 15: 53.0, 16: 0, 17: 1410.0,
                                      18: 1433.0, 19: 0, 20: 26.0, 21: 0, 22: 93.0, 23: 20.0, 24: 781.0, 25: 0,
                                      26: 1854.0, 27: 8.0, 28: 0, 29: 0, 30: 0, 31: 1.0, 32: 13.0, 33: 13.0, 34: 1309.0,
                                      35: 773.0, 36: 0}
@@ -622,9 +622,9 @@ class testStatCalculation(baseTest):
                               'passenger_btn': 16}),
             (map[1], map[4], {'btn': 15, 'distance': 2, 'endpoint_hash': map[1].__hash__() ^ map[4].__hash__(),
                               'passenger_btn': 15}),
-            (map[0], map[5], {'btn': 15, 'distance': 3, 'endpoint_hash': map[0].__hash__() ^ map[5].__hash__(),
-                              'passenger_btn': 15}),
             (map[0], map[1], {'btn': 15, 'distance': 3, 'endpoint_hash': map[0].__hash__() ^ map[1].__hash__(),
+                              'passenger_btn': 15}),
+            (map[0], map[5], {'btn': 15, 'distance': 3, 'endpoint_hash': map[0].__hash__() ^ map[5].__hash__(),
                               'passenger_btn': 15}),
         ]
         act_routes = galaxy.trade._get_raw_routes()
@@ -632,15 +632,15 @@ class testStatCalculation(baseTest):
 
         galaxy.trade.calculate_routes()
         expected_edges = [
-            (0, 1, {'distance': 3, 'weight': 72, 'trade': 0, 'btn': 15, 'count': 0, 'exhaust': 53, 'xboat': True}),
-            (0, 2, {'distance': 1, 'weight': 17.4025, 'trade': 5200000000, 'btn': 19, 'count': 4, 'exhaust': 54}),
+            (0, 1, {'distance': 3, 'weight': 65.1, 'trade': 50000000, 'btn': 15, 'count': 1, 'exhaust': 53, 'xboat': True}),
+            (0, 2, {'distance': 1, 'weight': 19.225, 'trade': 5150000000, 'btn': 19, 'count': 3, 'exhaust': 54}),
             (0, 3, {'distance': 3, 'weight': 70, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 53}),
             (0, 5, {'distance': 3, 'weight': 125, 'trade': 0, 'btn': 15, 'count': 0, 'exhaust': 59}),
             (1, 2, {'distance': 3, 'weight': 72, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 53}),
-            (1, 3, {'distance': 1, 'weight': 19.225, 'trade': 650000000, 'btn': 17, 'count': 3, 'exhaust': 54}),
+            (1, 3, {'distance': 1, 'weight': 21.25, 'trade': 600000000, 'btn': 17, 'count': 2, 'exhaust': 54}),
             (1, 4, {'distance': 2, 'weight': 43.4, 'trade': 50000000, 'btn': 15, 'count': 1, 'exhaust': 53}),
             (1, 5, {'distance': 3, 'weight': 126, 'trade': 0, 'btn': 14, 'count': 0, 'exhaust': 59}),
-            (2, 3, {'distance': 2, 'weight': 27.391, 'trade': 1350000000, 'btn': 18, 'count': 5, 'exhaust': 53}),
+            (2, 3, {'distance': 2, 'weight': 30.2123, 'trade': 1300000000, 'btn': 18, 'count': 4, 'exhaust': 53}),
             (2, 4, {'distance': 4, 'weight': 127, 'trade': 0, 'btn': 16, 'count': 0, 'exhaust': 56}),
             (2, 5, {'distance': 2, 'weight': 81.38, 'trade': 550000000, 'btn': 17, 'count': 2, 'exhaust': 60}),
             (3, 4, {'distance': 2, 'weight': 37.64, 'trade': 200000000, 'btn': 16, 'count': 2, 'exhaust': 53}),
@@ -657,5 +657,5 @@ class testStatCalculation(baseTest):
         self.assertEqual(133500, galstat.passengers)
         self.assertEqual(7650000000, galstat.trade)
         self.assertEqual(7650000000, in_trade_vol, "Unexpected terminal trade volume")
-        self.assertEqual(450000000, over_trade_vol, "Unexpected passthru trade volume")
-        self.assertEqual(8100000000, act_trade_vol, "Unexpected port-level total trade volume")
+        self.assertEqual(350000000, over_trade_vol, "Unexpected passthru trade volume")
+        self.assertEqual(8000000000, act_trade_vol, "Unexpected port-level total trade volume")

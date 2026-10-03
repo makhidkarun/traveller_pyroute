@@ -203,7 +203,7 @@ class Star(object):
         for item in self._key:
             nuitem = 'None' if item is None else item
             rawhash.update(nuitem.encode('utf-8'))
-        self._hash = int(rawhash.hexdigest(), 16)
+        self._hash = int(rawhash.hexdigest()[-16:], 16)
 
     def wiki_name(self) -> str:
         # name = u" ".join(w.capitalize() for w in self.name.lower().split())
