@@ -600,6 +600,35 @@ class testStatCalculation(baseTest):
         ]
         foo = list(galaxy.stars.edges(data=True))
         self.assertEqual(expected_edges, foo, "Unexpected stars edges before pathfinding")
+        map = galaxy.star_mapping
+        exp_routes = [
+            (map[0], map[2], {'btn': 19, 'distance': 1, 'endpoint_hash': map[0].__hash__() ^ map[2].__hash__(),
+                              'passenger_btn': 19}),
+            (map[2], map[3], {'btn': 18, 'distance': 2, 'endpoint_hash': map[2].__hash__() ^ map[3].__hash__(),
+                              'passenger_btn': 19}),
+            (map[1], map[3], {'btn': 17, 'distance': 1, 'endpoint_hash': map[1].__hash__() ^ map[3].__hash__(),
+                              'passenger_btn': 18}),
+            (map[2], map[5], {'btn': 17, 'distance': 2, 'endpoint_hash': map[2].__hash__() ^ map[5].__hash__(),
+                              'passenger_btn': 17}),
+            (map[3], map[5], {'btn': 16, 'distance': 2, 'endpoint_hash': map[3].__hash__() ^ map[5].__hash__(),
+                              'passenger_btn': 17}),
+            (map[3], map[4], {'btn': 16, 'distance': 2, 'endpoint_hash': map[3].__hash__() ^ map[4].__hash__(),
+                              'passenger_btn': 17}),
+            (map[0], map[3], {'btn': 16, 'distance': 3, 'endpoint_hash': map[0].__hash__() ^ map[3].__hash__(),
+                              'passenger_btn': 17}),
+            (map[1], map[2], {'btn': 16, 'distance': 3, 'endpoint_hash': map[1].__hash__() ^ map[2].__hash__(),
+                              'passenger_btn': 16}),
+            (map[2], map[4], {'btn': 16, 'distance': 4, 'endpoint_hash': map[2].__hash__() ^ map[4].__hash__(),
+                              'passenger_btn': 16}),
+            (map[1], map[4], {'btn': 15, 'distance': 2, 'endpoint_hash': map[1].__hash__() ^ map[4].__hash__(),
+                              'passenger_btn': 15}),
+            (map[0], map[5], {'btn': 15, 'distance': 3, 'endpoint_hash': map[0].__hash__() ^ map[5].__hash__(),
+                              'passenger_btn': 15}),
+            (map[0], map[1], {'btn': 15, 'distance': 3, 'endpoint_hash': map[0].__hash__() ^ map[1].__hash__(),
+                              'passenger_btn': 15}),
+        ]
+        act_routes = galaxy.trade._get_raw_routes()
+        self.assertEqual(exp_routes, act_routes)
 
         galaxy.trade.calculate_routes()
         expected_edges = [
