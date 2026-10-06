@@ -56,7 +56,7 @@ class LandmarksTriaxialExtremes:
             # No point generating landmarks for a singleton component, as it will never be used in pathfinding
             if 2 > comp_size:
                 continue
-            slots = min(self.max_slots, self._size_to_landmarks(comp_size))
+            slots = min(self.max_slots, self._size_to_landmarks(comp_size), comp_size)
 
             stars = [item for item in self.galaxy.star_mapping.values() if component_id == item.component]
             max_r = (max(stars, key=lambda item: item.hex.r)).hex.r
