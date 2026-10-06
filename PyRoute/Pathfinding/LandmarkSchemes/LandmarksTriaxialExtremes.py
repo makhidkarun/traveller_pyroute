@@ -135,6 +135,9 @@ class LandmarksTriaxialExtremes:
                 assert (weights[inf_set] == 0).all(), "Inf-set weights must be zero"  # pragma: no mutate
                 sizes = LandmarkAvoidHelper.calc_sizes(weights, sp_parents, component_landmarks[component_id])
                 nu_landmark = LandmarkAvoidHelper.traverse_sizes(sizes, first_star.index, sp_parents)
+                if nu_landmark is None:
+                    slots = slotcount
+                    break
                 result[slotcount][component_id] = nu_landmark
                 component_landmarks[component_id].add(nu_landmark)
 
@@ -144,6 +147,8 @@ class LandmarksTriaxialExtremes:
 
             assert slots == len(component_landmarks[component_id]),\
                 f"Duplicate landmarks detected on component {component_id} avoid-powered segment"
+
+        result = [item for item in result if 0 < len(item)]
 
         return result, component_landmarks
 
