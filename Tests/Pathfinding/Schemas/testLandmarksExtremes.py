@@ -482,4 +482,6 @@ class testLandmarksExtremes(baseTest):
         btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
 
         btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
-        galaxy.trade.get_landmarks(btn=btn)
+        expected_result = [{0: 10}, {0: 7}, {0: 8}]
+        actual_result, _ = galaxy.trade.get_landmarks(btn=btn)
+        self.assertEqual(expected_result, actual_result)
