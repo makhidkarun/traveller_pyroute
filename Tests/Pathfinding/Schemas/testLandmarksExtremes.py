@@ -459,7 +459,7 @@ class testLandmarksExtremes(baseTest):
         self.assertTrue(isinstance(landmarks, list), 'Landmarks result should be a list')
         self.assertEqual(expected_landmarks, landmarks, 'Unexpected landmark result')
 
-    def test_landmark_generation_blow_up_on_empty_kidvec_in_traverse_sizes(self):
+    def test_landmark_generation_blow_up_on_empty_kidvec_in_traverse_sizes(self) -> None:
         delta = DeltaDictionary()
         sourcefile = [
             self.unpack_filename('DeltaFiles/landmark_generation_blow_up_empty_kidvec/Riftspan Reaches.sec'),

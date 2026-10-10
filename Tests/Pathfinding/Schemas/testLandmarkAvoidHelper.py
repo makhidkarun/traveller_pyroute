@@ -54,9 +54,9 @@ class testLandmarkAvoidHelper(baseTest):
         self.assertEqual(list(expected_sizes), list(actual_sizes), "Unexpected second-pass node sizes")
         self.assertEqual(old_mark, landmarks, "Landmark set unexpectedly altered")
 
-    def test_sizes_empty_kidvec(self):
-        tree = np.array([-1,  0,  0,  0,  0,  1,  2,  1,  6,  6,  8,  8], dtype=np.int64)
-        sizes = np.array([0.0, 0.0, 0.0, 12.81817627,  13.18179321, 120.90908813, 0.0, 0.0, 0.0, 128.18179703, 0.0, 135.36362076], dtype=np.float64)
+    def test_sizes_empty_kidvec(self) -> None:
+        tree = np.array([-1, 0, 0, 0, 0, 1, 2, 1, 6, 6, 8, 8], dtype=np.int64)
+        sizes = np.array([0.0, 0.0, 0.0, 12.81817627, 13.18179321, 120.90908813, 0.0, 0.0, 0.0, 128.18179703, 0.0, 135.36362076], dtype=np.float64)
         rootnode = 0
 
         actual = LandmarkAvoidHelper.traverse_sizes(sizes, rootnode, tree)
