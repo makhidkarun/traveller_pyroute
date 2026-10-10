@@ -51,6 +51,8 @@ class LandmarkAvoidHelper:
         choice = active_nodes[np.argmax(sizes)]
         kidvec = np.where(choice == tree)
         kidsizes = sizes[kidvec]
+        if 0 == len(kidsizes):
+            return None
         maxkid = np.argmax(kidsizes)
         while 0 < len(kidsizes):
             choice = active_nodes[kidvec][maxkid]

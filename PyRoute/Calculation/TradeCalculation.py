@@ -103,6 +103,8 @@ class TradeCalculation(RouteCalculation):
 
         # Count routes that get trimmed by as-found route length
         self.penumbra_routes = 0
+        # Count routes that don't get found
+        self.abort_routes = 0
 
         self.shortest_path_tree = None
         self.shortest_dist_tree = None
@@ -260,6 +262,7 @@ class TradeCalculation(RouteCalculation):
         self.multilateral_balance_trade()
         self.multilateral_balance_pass()
         self.logger.info('processed {} routes at BTN {}'.format(counter, base_btn))
+        self.logger.info('{} aborted routes included out of {}'.format(self.abort_routes, processed))
         self.logger.info('{} penumbra routes included out of {}'.format(self.penumbra_routes, processed))
         if self.debug_flag:
             num_stars = len(self.galaxy.stars)
@@ -343,6 +346,7 @@ class TradeCalculation(RouteCalculation):
                 self.pathfinding_data['neighbourhood_size'][moshdex] = neighbourhood_size
 
         except nx.NetworkXNoPath:
+            self.abort_routes += 1
             return
 
         route = [self.galaxy.star_mapping[item] for item in rawroute]

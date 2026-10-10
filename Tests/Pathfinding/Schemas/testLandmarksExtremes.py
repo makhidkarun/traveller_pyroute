@@ -458,3 +458,30 @@ class testLandmarksExtremes(baseTest):
         landmarks, _ = galaxy.trade.get_landmarks(btn=btn)
         self.assertTrue(isinstance(landmarks, list), 'Landmarks result should be a list')
         self.assertEqual(expected_landmarks, landmarks, 'Unexpected landmark result')
+
+    def test_landmark_generation_blow_up_on_empty_kidvec_in_traverse_sizes(self) -> None:
+        delta = DeltaDictionary()
+        sourcefile = [
+            self.unpack_filename('DeltaFiles/landmark_generation_blow_up_empty_kidvec/Riftspan Reaches.sec'),
+        ]
+
+        for item in sourcefile:
+            sector = SectorDictionary.load_traveller_map_file(item)
+            delta[sector.name] = sector
+
+        args = self._make_args()
+
+        galaxy = DeltaGalaxy(args.btn, 4)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        galaxy.output_path = args.output
+
+        galaxy.generate_routes()
+        galaxy.trade.calculate_components()
+        self.assertEqual(1, len(galaxy.trade.components), "Unexpected number of components")
+        btn = [(s, n, d) for (s, n, d) in galaxy.ranges.edges(data=True) if s.component == n.component]
+
+        btn.sort(key=lambda tn: tn[2]['btn'], reverse=True)
+        expected_result = [{0: 10}, {0: 7}, {0: 8}]
+        actual_result, _ = galaxy.trade.get_landmarks(btn=btn)
+        self.assertEqual(expected_result, actual_result)
