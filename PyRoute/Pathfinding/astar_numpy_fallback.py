@@ -74,7 +74,7 @@ def astar_path_numpy(G, source, target, bulk_heuristic, upbound=float64max, diag
     queue = [(potentials[source], 0, source, None)]
 
     # Maps explored nodes to parent closest to the source.
-    explored = {}
+    explored: dict[int, int] = {}
 
     # Tracks shortest _complete_ path found so far
     floatinf = float('inf')

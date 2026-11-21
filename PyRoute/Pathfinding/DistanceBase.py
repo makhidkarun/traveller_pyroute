@@ -10,6 +10,7 @@ from networkx.classes import Graph
 class DistanceBase:
 
     def __init__(self, graph: Graph):
+        self._arcs = []
         raw_nodes = graph.nodes()
         self._nodes = list(raw_nodes)
         num_nodes = len(self._nodes)
