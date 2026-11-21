@@ -4,7 +4,6 @@ Created on Nov 21, 2026
 @author: CyberiaResurrection
 """
 import logging
-import os
 from unittest.mock import patch
 
 from PyRoute.route import process
@@ -13,7 +12,7 @@ from Tests.Pyfakefs.baseTest import baseTest
 
 class testroute(baseTest):
 
-    def test_no_sectors_loaded(self):
+    def test_no_sectors_loaded(self) -> None:
         fullpath = self.unpack_filename('../../PyRoute/route.py')
 
         self.setUpPyfakefs()
@@ -37,7 +36,7 @@ class testroute(baseTest):
                     break
             self.assertTrue(found, 'Should have logged \'No sector files read in\'')
 
-    def test_sector_file_with_no_data(self):
+    def test_sector_file_with_no_data(self) -> None:
         fullpath = self.unpack_filename('../../PyRoute/route.py')
 
         self.setUpPyfakefs()
@@ -64,7 +63,7 @@ class testroute(baseTest):
                 if '1 sectors read' in line:
                     found = True
                     break
-            self.assertTrue(found, 'Should have logged \`1 sectors read\'')
+            self.assertTrue(found, 'Should have logged \'1 sectors read\'')
             found = False
             for line in logs:
                 if 'CRITICAL:PyRoute:No star data read in' in line:
