@@ -66,6 +66,12 @@ class testroute(baseTest):
                     break
             self.assertTrue(found, 'Should have logged \`1 sectors read\'')
             found = False
+            for line in logs:
+                if 'CRITICAL:PyRoute:No star data read in' in line:
+                    found = True
+                    break
+            self.assertTrue(found, 'Should have logged \'No star data read in\'')
+            found = False
             for line in galaxy_logs:
                 if 'Total number of worlds: 0' in line:
                     found = True

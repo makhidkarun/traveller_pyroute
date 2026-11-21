@@ -142,6 +142,9 @@ def process() -> None:
     if 0 == len(galaxy.sectors):
         logger.critical("No sector files read in.")
         return
+    if 0 == len(galaxy.stars):
+        logger.critical("No star data read in.")
+        return
 
     galaxy.generate_routes()
 
