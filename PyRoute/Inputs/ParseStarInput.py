@@ -21,7 +21,7 @@ from PyRoute.TradeCodes import TradeCodes
 
 
 class ParseStarInput:
-    MAX_STARLINE_LENGTH = 195
+    MAX_STARLINE_LENGTH = 240
 
     regex = r"""
 ^((?:0[1-9]|[1-2]\d|3[0-2])(?:0[1-9]|40|[1-3]\d)) +
