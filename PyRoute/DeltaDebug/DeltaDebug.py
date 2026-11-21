@@ -158,6 +158,10 @@ def process() -> None:
         delta_dict[sector.name] = sector
 
     logger.error("%s sectors read" % len(delta_dict))
+    if 0 == len(delta_dict):
+        raise ValueError("No sector files read in.")
+    if 0 == delta_dict.lines_count:
+        raise ValueError("No star data read in.")
 
     # spin up reducer
     reducer = DeltaReduce(delta_dict, args, args.interestingline, args.interestingtype)
