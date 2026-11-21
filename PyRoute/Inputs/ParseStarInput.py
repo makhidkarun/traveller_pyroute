@@ -21,6 +21,8 @@ from PyRoute.TradeCodes import TradeCodes
 
 
 class ParseStarInput:
+    MAX_STARLINE_LENGTH = 195
+
     regex = r"""
 ^((?:0[1-9]|[1-2]\d|3[0-2])(?:0[1-9]|40|[1-3]\d)) +
 (.{15,}) +
@@ -58,6 +60,8 @@ class ParseStarInput:
 
     @staticmethod
     def parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=False, fix_econ=False):
+        if ParseStarInput.MAX_STARLINE_LENGTH < len(line):
+            return None
         star.sector = sector
         star.logger.debug(line)
         data, is_station = ParseStarInput._unpack_starline(star, line, sector)
