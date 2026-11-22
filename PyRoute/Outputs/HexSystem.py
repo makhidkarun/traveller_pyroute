@@ -30,10 +30,10 @@ class HexSystem(object):
         if isinstance(star_hex, Hex):
             star_col = star_hex.col
             star_row = star_hex.row
-        elif isinstance(star_hex, str):
-            if 4 == len(star_hex) and ('-' not in star_hex or '-' == star_hex[0] or '-' == star_hex[2]):
-                star_col = int(star_hex[0:2])
-                star_row = int(star_hex[2:4])
+        elif isinstance(star_hex, str) \
+            and 4 == len(star_hex) and ('-' not in star_hex or '-' == star_hex[0] or '-' == star_hex[2]):
+            star_col = int(star_hex[0:2])
+            star_row = int(star_hex[2:4])
 
         col = (self.hex_size.x * 3 * star_col) + int(self.hex_size.x * 1.5)
         if star_col & 1:

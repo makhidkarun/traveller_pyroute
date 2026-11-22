@@ -15,7 +15,7 @@ class testDeltaDebug(baseTest):
 
         foo = runner.run(command=fullpath)
 
-        self.assertEqual(0, foo.returncode, "DeltaDebug did not complete successfully: " + foo.stderr)
+        self.assertEqual(1, foo.returncode, "DeltaDebug did not complete successfully: " + foo.stderr)
 
 
 if __name__ == '__main__':

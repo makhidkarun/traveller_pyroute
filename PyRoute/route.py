@@ -139,6 +139,12 @@ def process() -> None:
     #                    fix_pop=args.fix_pop)
 
     logger.info("%s sectors read" % len(galaxy.sectors))
+    if 0 == len(galaxy.sectors):
+        logger.critical("No sector files read in.")
+        return
+    if 0 == len(galaxy.stars):
+        logger.critical("No star data read in.")
+        return
 
     galaxy.generate_routes()
 
