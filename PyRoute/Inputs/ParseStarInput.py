@@ -59,8 +59,9 @@ class ParseStarInput:
     valid_nobles = 'BCcDEeFfGH-'
 
     @staticmethod
-    def parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=False, fix_econ=False):
+    def parse_line_into_star_core(star, line: str, sector, pop_code, ru_calc, fix_pop=False, fix_econ=False):
         if ParseStarInput.MAX_STARLINE_LENGTH < len(line):
+            star.logger.warning("Line too long: " + line[0:50])
             return None
         star.sector = sector
         star.logger.debug(line)
