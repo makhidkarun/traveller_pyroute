@@ -4,7 +4,6 @@ Created on Nov 07, 2024
 @author: CyberiaResurrection
 """
 import re
-from typing import Optional
 
 from lark import Transformer, Token, Tree
 
