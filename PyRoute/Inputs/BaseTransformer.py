@@ -148,7 +148,7 @@ class BaseTransformer(Transformer):
         tree = self.preprocess_trade_and_extensions(tree)
         tree = self.preprocess_tree_suspect_empty_trade_code(tree)
         tree = self._transform_tree(tree)
-        parsed: dict[str, Optional[str]] = {'residual': ''}
+        parsed: dict[str, str] = {'residual': ''}
 
         parsed['position'] = tree[0][0].value
         parsed['name'], parsed['uwp'] = self.starname_transform(tree[1][0].value)
