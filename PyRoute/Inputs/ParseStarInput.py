@@ -21,6 +21,8 @@ from PyRoute.TradeCodes import TradeCodes
 
 
 class ParseStarInput:
+    MAX_STARLINE_LENGTH = 240
+
     regex = r"""
 ^((?:0[1-9]|[1-2]\d|3[0-2])(?:0[1-9]|40|[1-3]\d)) +
 (.{15,}) +
@@ -57,7 +59,10 @@ class ParseStarInput:
     valid_nobles = 'BCcDEeFfGH-'
 
     @staticmethod
-    def parse_line_into_star_core(star, line, sector, pop_code, ru_calc, fix_pop=False, fix_econ=False):
+    def parse_line_into_star_core(star, line: str, sector, pop_code, ru_calc, fix_pop=False, fix_econ=False):
+        if ParseStarInput.MAX_STARLINE_LENGTH < len(line):
+            star.logger.warning("Line too long: " + line[0:50])
+            return None
         star.sector = sector
         star.logger.debug(line)
         data, is_station = ParseStarInput._unpack_starline(star, line, sector)
@@ -69,6 +74,8 @@ class ParseStarInput:
         star.position = data[0].strip()
         star.set_location()
         star.name = data[1].strip()
+        if 25 < len(star.name):
+            star.name = star.name[0:25].strip()
 
         try:
             star.uwp = UWP(data[2].strip())
@@ -194,7 +201,7 @@ class ParseStarInput:
         return star
 
     @staticmethod
-    def _unpack_starline(star, line, sector) -> Union[tuple[list[Optional[str]], bool], tuple[None, None]]:
+    def _unpack_starline(star, line, sector) -> Union[tuple[list[str], bool], tuple[None, None]]:
         is_station = False
         # This was added to stop tests blowing up, and to _ensure_ that deep_space is a dict by time it gets used
         if not isinstance(ParseStarInput.deep_space, dict):

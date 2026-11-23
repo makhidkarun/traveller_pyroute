@@ -4,7 +4,6 @@ Created on Nov 07, 2024
 @author: CyberiaResurrection
 """
 import re
-from typing import Optional
 
 from lark import Transformer, Token, Tree
 
@@ -119,8 +118,8 @@ class BaseTransformer(Transformer):
 
         return ' '.join(codes)
 
-    def extensions_transform(self, extensions) -> tuple[Optional[str], Optional[str], Optional[str]]:
-        data: dict[str, Optional[str]] = {'ix': None, 'ex': None, 'cx': None}
+    def extensions_transform(self, extensions) -> tuple[str, str, str]:
+        data: dict[str, str] = {'ix': '', 'ex': '', 'cx': ''}
         if not isinstance(extensions, str):
             for kid in extensions:
                 if isinstance(kid, Token):
@@ -130,7 +129,7 @@ class BaseTransformer(Transformer):
                     val = str(kid.data)
                     data[val] = kid.children[0].value
                 if isinstance(data[val], str):
-                    data[val] = self.boil_down_double_spaces(data[val])  # type:ignore[arg-type]
+                    data[val] = self.boil_down_double_spaces(data[val])
 
         return data['ix'], data['ex'], data['cx']
 
@@ -141,14 +140,14 @@ class BaseTransformer(Transformer):
             world_alg[1][0].value = '0'
         return world_alg[0][0].value, world_alg[1][0].value, world_alg[2][0].value
 
-    def transform(self, tree) -> list[Optional[str]]:
+    def transform(self, tree) -> list[str]:
         self.crankshaft = '' == tree.children[4].children[0].children[0].value.strip() and '-' == tree.children[4].children[
             1].children[0].value.strip() and '' == tree.children[4].children[2].children[0].value.strip()
         self.crankshaft = self.crankshaft and 1 == self.raw.count(' -') and 1 == self.raw.count('-   ')
         tree = self.preprocess_trade_and_extensions(tree)
         tree = self.preprocess_tree_suspect_empty_trade_code(tree)
         tree = self._transform_tree(tree)
-        parsed: dict[str, Optional[str]] = {'residual': ''}
+        parsed: dict[str, str] = {'residual': ''}
 
         parsed['position'] = tree[0][0].value
         parsed['name'], parsed['uwp'] = self.starname_transform(tree[1][0].value)
@@ -165,22 +164,27 @@ class BaseTransformer(Transformer):
         rawbitz = self.trim_raw_bitz(parsed)
         parsed = self.square_up_parsed_zero(rawbitz[0], parsed)
         parsed = self.square_up_allegiance_overflow(parsed)
+        ix_none = parsed['ix'] is None or '' == parsed['ix']
+        ex_none = parsed['ex'] is None or '' == parsed['ex']
+        cx_none = parsed['cx'] is None or '' == parsed['cx']
+        zone_none = parsed['zone'] is None
 
-        no_extensions = parsed['ix'] is None and parsed['ex'] is None and parsed['cx'] is None
-        ex_ix = parsed['ix'] if parsed['ix'] is not None else ' '
+        no_extensions = ix_none and ex_none and cx_none
+        ex_ix: str = str(parsed['ix']) if not ix_none else ' '
         ex_ix = self.boil_down_double_spaces(ex_ix)
-        extensions = (ex_ix) + ' ' + \
-                     (parsed['ex'] if parsed['ex'] is not None else ' ') + ' ' + \
-                     (parsed['cx'] if parsed['cx'] is not None else ' ')
+        ex_ex: str = str(parsed['ex']) if not ex_none else ' '
+        ex_cx: str = str(parsed['cx']) if not cx_none else ' '
+        extensions = ex_ix + ' ' + ex_ex + ' ' + ex_cx
 
-        spacer = ' ' if no_extensions else None
+        spacer = ' ' if no_extensions else ''
         if no_extensions:
             extensions = ''
 
         # Currently aiming to drop-in replace the starline regex output
         data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'],
                 parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'],
-                parsed['zone'].upper() if parsed['zone'] is not None else '', parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
+                str(parsed['zone']).upper() if not zone_none else '', parsed['pbg'], parsed['worlds'],
+                parsed['allegiance'], parsed['residual']]
 
         return data
 
