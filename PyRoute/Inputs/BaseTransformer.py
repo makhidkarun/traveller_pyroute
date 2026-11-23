@@ -119,8 +119,8 @@ class BaseTransformer(Transformer):
 
         return ' '.join(codes)
 
-    def extensions_transform(self, extensions) -> tuple[str, str, Optional[str]]:
-        data: dict[str, Optional[str]] = {'ix': '', 'ex': '', 'cx': None}
+    def extensions_transform(self, extensions) -> tuple[str, str, str]:
+        data: dict[str, str] = {'ix': '', 'ex': '', 'cx': ''}
         if not isinstance(extensions, str):
             for kid in extensions:
                 if isinstance(kid, Token):
@@ -130,7 +130,7 @@ class BaseTransformer(Transformer):
                     val = str(kid.data)
                     data[val] = kid.children[0].value
                 if isinstance(data[val], str):
-                    data[val] = self.boil_down_double_spaces(data[val])  # type:ignore[arg-type]
+                    data[val] = self.boil_down_double_spaces(data[val])
 
         return data['ix'], data['ex'], data['cx']
 
@@ -167,7 +167,7 @@ class BaseTransformer(Transformer):
         parsed = self.square_up_allegiance_overflow(parsed)
         ix_none = parsed['ix'] is None or '' == parsed['ix']
         ex_none = parsed['ex'] is None or '' == parsed['ex']
-        cx_none = parsed['cx'] is None
+        cx_none = parsed['cx'] is None or '' == parsed['cx']
         zone_none = parsed['zone'] is None
 
         no_extensions = ix_none and ex_none and cx_none

@@ -43,7 +43,7 @@ class testBaseTransformer(baseTest):
         transformer = StarlineTransformer(raw=line)
 
         expected = [
-            '0101', '[0000]000000000', 'A000000-0', '000000000000000000', '', '', '', None, ' ',
+            '0101', '[0000]000000000', 'A000000-0', '000000000000000000', '', '', '', '', ' ',
             ' ', ' ', '', '-', '-', '000', '0', '00', ''
         ]
         transformed = transformer.transform(result)
@@ -80,7 +80,7 @@ class testBaseTransformer(baseTest):
         transformer = StarlineTransformer(raw=line)
 
         expected = [
-            '0101', '[0000]000000000', 'A000000-0', '000000000000000000', '', '', '', None, ' ',
+            '0101', '[0000]000000000', 'A000000-0', '000000000000000000', '', '', '', '', ' ',
             ' ', ' ', '-', '-', '-', '000', '0', '00', ''
         ]
         transformed = transformer.transform(result)
@@ -96,7 +96,7 @@ class testBaseTransformer(baseTest):
         self.assertIsNotNone(result)
 
         transformer = StarlineTransformer(raw=line)
-        expected = ['0101', 'Foobar', 'A000000-0', 'Ba Lo Ni Po De He Va As', '', '', '', None, ' ', ' ', ' ',
+        expected = ['0101', 'Foobar', 'A000000-0', 'Ba Lo Ni Po De He Va As', '', '', '', '', ' ', ' ', ' ',
                     '-', '*', '-', '123', '8', 'ImDd', 'ab']
         transformed = transformer.transform(result)
         self.assertEqual(expected, transformed)
@@ -108,7 +108,7 @@ class testBaseTransformer(baseTest):
         self.assertIsNotNone(result)
 
         transformer = StarlineTransformer(raw=line)
-        expected = ['0101', '000000000000000', '???????-?', '000000000000000', '', '', '', None, ' ', ' ', ' ',
+        expected = ['0101', '000000000000000', '???????-?', '000000000000000', '', '', '', '', ' ', ' ', ' ',
                     'c', '-', '', '000', '0', '00', '']
         transformed = transformer.transform(result)
         self.assertIsNotNone(transformer.crankshaft)
@@ -215,7 +215,7 @@ class testBaseTransformer(baseTest):
                                                        Tree(Token('RULE', 'allegiance'),
                                                             [Token('__ANON_12', '00')])])]),
                 ['0101', '000000000000000', '???????-?', '000000000000000', '{0} (000-0)  ', '{0}', '(000-0)',
-                 None, None, None, None, '-', '-', 'A', '000', '0', '00', '']
+                 '', None, None, None, '-', '-', 'A', '000', '0', '00', '']
             )
         ]
 
@@ -270,9 +270,9 @@ class testBaseTransformer(baseTest):
 
     def test_extensions_transform(self) -> None:
         cases = [
-            (' ', ('', '', None)),
-            ([], ('', '', None)),
-            ([Token('ix', '{  +0  }'), Token('ex', '(000+0)')], ('{ +0 }', '(000+0)', None)),
+            (' ', ('', '', '')),
+            ([], ('', '', '')),
+            ([Token('ix', '{  +0  }'), Token('ex', '(000+0)')], ('{ +0 }', '(000+0)', '')),
             ([Token('cx', '[0000]'), Token('ex', '(000+0)')], ('', '(000+0)', '[0000]')),
             ([Token('ix', '{  +0  }'), Token('cx', '[0000]')], ('{ +0 }', '', '[0000]')),
             ([Tree(Token('RULE', 'ix'), [Token('__ANON_3', '{ -2 }')]),
