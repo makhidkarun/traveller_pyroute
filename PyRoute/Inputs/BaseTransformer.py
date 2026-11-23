@@ -141,7 +141,7 @@ class BaseTransformer(Transformer):
             world_alg[1][0].value = '0'
         return world_alg[0][0].value, world_alg[1][0].value, world_alg[2][0].value
 
-    def transform(self, tree) -> list[Optional[str]]:
+    def transform(self, tree) -> list[str]:
         self.crankshaft = '' == tree.children[4].children[0].children[0].value.strip() and '-' == tree.children[4].children[
             1].children[0].value.strip() and '' == tree.children[4].children[2].children[0].value.strip()
         self.crankshaft = self.crankshaft and 1 == self.raw.count(' -') and 1 == self.raw.count('-   ')
@@ -177,7 +177,7 @@ class BaseTransformer(Transformer):
         ex_cx: str = str(parsed['cx']) if not cx_none else ' '
         extensions = ex_ix + ' ' + ex_ex + ' ' + ex_cx
 
-        spacer = ' ' if no_extensions else None
+        spacer = ' ' if no_extensions else ''
         if no_extensions:
             extensions = ''
 

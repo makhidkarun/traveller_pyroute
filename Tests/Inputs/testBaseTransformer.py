@@ -26,7 +26,7 @@ class testBaseTransformer(baseTest):
 
         expected = [
             '0103', 'Irkigkhan', 'C9C4733-9', 'Fl', '{ 0 } (E69+0) [4726]', '{ 0 }', '(E69+0)', '[4726]',
-            None, None, None, 'B', '-', '-', '123', '8', 'ImDd', 'a M2 V'
+            '', '', '', 'B', '-', '-', '123', '8', 'ImDd', 'a M2 V'
         ]
         transformed = transformer.transform(result)
         self.assertIsNotNone(transformer.crankshaft)
@@ -64,7 +64,7 @@ class testBaseTransformer(baseTest):
         transformer = StarlineTransformer(raw=line)
         expected = [
             '0101', 'Didraga', 'C1008BC-8', 'Na Va Ph Pi Pz', '{ -1 } (D77+2) [B78B]', '{ -1 }', '(D77+2)', '[B78B]',
-            None, None, None, 'BDe', 'S', 'A', '603', '10', 'ImDi', 'K0 V'
+            '', '', '', 'BDe', 'S', 'A', '603', '10', 'ImDi', 'K0 V'
         ]
         transformed = transformer.transform(result)
         self.assertIsNotNone(transformer.crankshaft)
@@ -123,7 +123,7 @@ class testBaseTransformer(baseTest):
 
         transformer = StarlineTransformer(raw=line)
         expected = ['0101', '000000000000000', '?000000-0', '', '{3 } (7TG-1) [2IBt]', '{3 }', '(7TG-1)', '[2IBt]',
-                    None, None, None, 'EHEG', '-', '-', '569', '9', 'C5', '\'']
+                    '', '', '', 'EHEG', '-', '-', '569', '9', 'C5', '\'']
         transformed = transformer.transform(result)
         self.assertIsNotNone(transformer.crankshaft)
         self.assertFalse(transformer.crankshaft)
@@ -155,7 +155,7 @@ class testBaseTransformer(baseTest):
                                                        Tree(Token('RULE', 'worlds'), [Token('__ANON_11', '0')]),
                                                        Tree(Token('RULE', 'allegiance'), [Token('__ANON_12', '00')])])]),
                 ['0101', '000000000000000', '???????-?', '000000000000000', '{0} (000-0) [0000]', '{0}', '(000-0)',
-                 '[0000]', None, None, None, '-', '-', 'A', '000', '0', '00', '']
+                 '[0000]', '', '', '', '-', '-', 'A', '000', '0', '00', '']
             ),
             (
                 Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
@@ -175,7 +175,7 @@ class testBaseTransformer(baseTest):
                                                        Tree(Token('RULE', 'allegiance'),
                                                             [Token('__ANON_12', '00')])])]),
                 ['0101', '000000000000000', '???????-?', '000000000000000', ' (000-0) [0000]', '', '(000-0)',
-                 '[0000]', None, None, None, '-', '-', '', '000', '0', '00', '']
+                 '[0000]', '', '', '', '-', '-', '', '000', '0', '00', '']
             ),
             (
                 Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
@@ -195,7 +195,7 @@ class testBaseTransformer(baseTest):
                                                        Tree(Token('RULE', 'allegiance'),
                                                             [Token('__ANON_12', '00')])])]),
                 ['0101', '000000000000000', '???????-?', '000000000000000', '{0}   [0000]', '{0}', '',
-                 '[0000]', None, None, None, '-', '-', 'A', '000', '0', '00', '']
+                 '[0000]', '', '', '', '-', '-', 'A', '000', '0', '00', '']
             ),
             (
                 Tree(Token('RULE', 'starline'), [Tree(Token('RULE', 'position'), [Token('__ANON_0', '0101')]),
@@ -215,7 +215,7 @@ class testBaseTransformer(baseTest):
                                                        Tree(Token('RULE', 'allegiance'),
                                                             [Token('__ANON_12', '00')])])]),
                 ['0101', '000000000000000', '???????-?', '000000000000000', '{0} (000-0)  ', '{0}', '(000-0)',
-                 '', None, None, None, '-', '-', 'A', '000', '0', '00', '']
+                 '', '', '', '', '-', '-', 'A', '000', '0', '00', '']
             )
         ]
 
