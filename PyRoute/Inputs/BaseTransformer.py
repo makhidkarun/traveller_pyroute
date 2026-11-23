@@ -171,11 +171,11 @@ class BaseTransformer(Transformer):
         zone_none = parsed['zone'] is None
 
         no_extensions = ix_none and ex_none and cx_none
-        ex_ix = parsed['ix'] if not ix_none else ' '
+        ex_ix: str = str(parsed['ix']) if not ix_none else ' '
         ex_ix = self.boil_down_double_spaces(ex_ix)
-        extensions = (ex_ix) + ' ' + \
-                     (parsed['ex'] if not ex_none else ' ') + ' ' + \
-                     (parsed['cx'] if not cx_none else ' ')
+        ex_ex: str = str(parsed['ex']) if not ex_none else ' '
+        ex_cx: str = str(parsed['cx']) if not cx_none else ' '
+        extensions = ex_ix + ' ' + ex_ex + ' ' + ex_cx
 
         spacer = ' ' if no_extensions else None
         if no_extensions:
@@ -184,7 +184,8 @@ class BaseTransformer(Transformer):
         # Currently aiming to drop-in replace the starline regex output
         data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'],
                 parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'],
-                parsed['zone'].upper() if not zone_none else '', parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
+                str(parsed['zone']).upper() if not zone_none else '', parsed['pbg'], parsed['worlds'],
+                parsed['allegiance'], parsed['residual']]
 
         return data
 
