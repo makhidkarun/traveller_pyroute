@@ -75,7 +75,7 @@ class ParseStarInput:
         star.set_location()
         star.name = data[1].strip()
         if 25 < len(star.name):
-            star.name = star.name[0:25]
+            star.name = star.name[0:25].strip()
 
         try:
             star.uwp = UWP(data[2].strip())
