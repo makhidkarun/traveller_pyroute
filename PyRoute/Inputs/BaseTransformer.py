@@ -119,8 +119,8 @@ class BaseTransformer(Transformer):
 
         return ' '.join(codes)
 
-    def extensions_transform(self, extensions) -> tuple[Optional[str], Optional[str], Optional[str]]:
-        data: dict[str, Optional[str]] = {'ix': None, 'ex': None, 'cx': None}
+    def extensions_transform(self, extensions) -> tuple[str, Optional[str], Optional[str]]:
+        data: dict[str, Optional[str]] = {'ix': '', 'ex': None, 'cx': None}
         if not isinstance(extensions, str):
             for kid in extensions:
                 if isinstance(kid, Token):
@@ -165,7 +165,7 @@ class BaseTransformer(Transformer):
         rawbitz = self.trim_raw_bitz(parsed)
         parsed = self.square_up_parsed_zero(rawbitz[0], parsed)
         parsed = self.square_up_allegiance_overflow(parsed)
-        ix_none = parsed['ix'] is None
+        ix_none = parsed['ix'] is None or '' == parsed['ix']
         ex_none = parsed['ex'] is None
         cx_none = parsed['cx'] is None
         zone_none = parsed['zone'] is None
