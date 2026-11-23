@@ -165,13 +165,17 @@ class BaseTransformer(Transformer):
         rawbitz = self.trim_raw_bitz(parsed)
         parsed = self.square_up_parsed_zero(rawbitz[0], parsed)
         parsed = self.square_up_allegiance_overflow(parsed)
+        ix_none = parsed['ix'] is None
+        ex_none = parsed['ex'] is None
+        cx_none = parsed['cx'] is None
+        zone_none = parsed['zone'] is None
 
-        no_extensions = parsed['ix'] is None and parsed['ex'] is None and parsed['cx'] is None
-        ex_ix = parsed['ix'] if parsed['ix'] is not None else ' '
+        no_extensions = ix_none and ex_none and cx_none
+        ex_ix = parsed['ix'] if not ix_none else ' '
         ex_ix = self.boil_down_double_spaces(ex_ix)
         extensions = (ex_ix) + ' ' + \
-                     (parsed['ex'] if parsed['ex'] is not None else ' ') + ' ' + \
-                     (parsed['cx'] if parsed['cx'] is not None else ' ')
+                     (parsed['ex'] if not ex_none else ' ') + ' ' + \
+                     (parsed['cx'] if not cx_none else ' ')
 
         spacer = ' ' if no_extensions else None
         if no_extensions:
@@ -180,7 +184,7 @@ class BaseTransformer(Transformer):
         # Currently aiming to drop-in replace the starline regex output
         data = [parsed['position'], parsed['name'], parsed['uwp'], parsed['trade'], extensions, parsed['ix'],
                 parsed['ex'], parsed['cx'], spacer, spacer, spacer, parsed['nobles'], parsed['base'],
-                parsed['zone'].upper() if parsed['zone'] is not None else '', parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
+                parsed['zone'].upper() if not zone_none else '', parsed['pbg'], parsed['worlds'], parsed['allegiance'], parsed['residual']]
 
         return data
 
