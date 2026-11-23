@@ -201,7 +201,7 @@ class ParseStarInput:
         return star
 
     @staticmethod
-    def _unpack_starline(star, line, sector) -> Union[tuple[list[Optional[str]], bool], tuple[None, None]]:
+    def _unpack_starline(star, line, sector) -> Union[tuple[list[str], bool], tuple[None, None]]:
         is_station = False
         # This was added to stop tests blowing up, and to _ensure_ that deep_space is a dict by time it gets used
         if not isinstance(ParseStarInput.deep_space, dict):
