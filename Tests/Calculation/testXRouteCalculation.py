@@ -1132,6 +1132,7 @@ class testXRouteCalculation(baseTest):
         self.assertEqual(len(route) - 1, len(exp_edges), "Exp_edges should be 1 less element than route")
 
         calc.get_route_between(capital, subcap, XRouteCalculation.calc_trade(25))
+        exp_lobounds = [43.3333, 40.0000, 40.0000, 40.0000, 50.0000, 47.5000, 0]
 
         start = route[0]
         for i in range(1, len(route) - 1):
@@ -1139,4 +1140,7 @@ class testXRouteCalculation(baseTest):
             exp_edge = exp_edges[i - 1]
             raw_edge = calc.star_graph.get_edge(start, end)
             self.assertGreater(exp_edge, raw_edge, "Edge " + str(i - 1) + " not decreased after get_route_between")
+            exp_lobound = exp_lobounds[i - 1]
+            lobound = calc.shortest_path_tree.lower_bound(start, end)
+            self.assertAlmostEqual(exp_lobound, lobound, 4, "Lower bound for edge " + str(i - 1) + " not approx equal")
             start = end
