@@ -18,6 +18,15 @@ from PyRoute.Star import Star
 from PyRoute.TradeCodes import TradeCodes
 from Tests.baseTest import baseTest
 
+try:
+    from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
+except ModuleNotFoundError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+except ImportError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+except AttributeError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+
 
 class testXRouteCalculation(baseTest):
 
@@ -1075,3 +1084,59 @@ class testXRouteCalculation(baseTest):
         with self.assertLogs(logger, 'INFO') as logs:
             calc.routes_pass_3()
             self.assertEqual(exp_logs, logs.output)
+
+    def test_get_route_between(self):
+        sourcefile = [
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_3_1/Core.sec')
+        ]
+
+        args = self._make_args()
+        args.route_btn = 15
+        readparms = ReadSectorOptions(sectors=sourcefile, pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                      route_reuse=args.route_reuse, trade_choice='comm', route_btn=args.route_btn,
+                                      mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=False,
+                                      deep_space={}, map_type=args.map_type)
+
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.read_sectors(readparms)
+
+        calc = XRouteCalculation(galaxy)
+        galaxy.trade = calc
+        logger = calc.logger
+        logger.manager.disable = 10
+
+        calc.generate_routes()
+        self.assertEqual(1, len(calc.capital))
+        self.assertEqual(0, len(calc.secCapitals))
+        self.assertEqual(15, len(calc.subCapitals))
+        calc.calculate_components()
+
+        source = max(galaxy.star_mapping.values(), key=lambda item: item.wtn)
+        calc.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, galaxy.stars, calc.epsilon)
+
+        capital = calc.capital[0]
+        subcap = calc.subCapitals[0]
+
+        bulk = galaxy.heuristic_distance_bulk
+        upbound = calc.shortest_path_tree.triangle_upbound(capital.index, subcap.index) * 1.005
+        route, _ = astar_path_numpy(calc.star_graph, capital.index, subcap.index, bulk, upbound=upbound)
+
+        exp_edges = []
+        start = route[0]
+        for i in range(1, len(route)):
+            end = route[i]
+            raw_edge = calc.star_graph.get_edge(start, end)
+            exp_edges.append(raw_edge)
+
+            start = end
+        self.assertEqual(len(route) - 1, len(exp_edges), "Exp_edges should be 1 less element than route")
+
+        calc.get_route_between(capital, subcap, XRouteCalculation.calc_trade(25))
+
+        start = route[0]
+        for i in range(1, len(route) - 1):
+            end = route[i]
+            exp_edge = exp_edges[i]
+            raw_edge = calc.star_graph.get_edge(start, end)
+            self.assertGreater(exp_edge, raw_edge, "Edge " + str(i) + " not decreased after get_route_between")
+            start = end
