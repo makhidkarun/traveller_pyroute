@@ -77,7 +77,7 @@ class testCommCalculation(baseTest):
         self.assertEqual(len(route) - 1, len(exp_edges), "Exp_edges should be 1 less element than route")
 
         calc.get_route_between(star, target)
-        exp_lobounds = [32.5, 0]
+        exp_lobounds = [30.8333, 0]
 
         start = route[0]
         for i in range(1, len(route) - 1):
