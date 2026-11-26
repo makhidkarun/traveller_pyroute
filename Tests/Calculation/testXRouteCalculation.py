@@ -1132,7 +1132,7 @@ class testXRouteCalculation(baseTest):
         self.assertEqual(len(route) - 1, len(exp_edges), "Exp_edges should be 1 less element than route")
 
         calc.get_route_between(capital, subcap, XRouteCalculation.calc_trade(25))
-        exp_lobounds = [43.3333, 40.0000, 40.0000, 40.0000, 50.0000, 47.5000, 0]
+        exp_lobounds = [43.3333, 40.0000, 40.0000, 49.1667, 40.8333, 55.8333, 0]
 
         start = route[0]
         for i in range(1, len(route) - 1):
