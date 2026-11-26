@@ -1090,7 +1090,7 @@ class testXRouteCalculation(baseTest):
             calc.routes_pass_3()
             self.assertEqual(exp_logs, logs.output)
 
-    def test_get_route_between(self):
+    def test_get_route_between(self) -> None:
         sourcefile = [
             self.unpack_filename('DeltaFiles/xroute_routes_pass_3_1/Core.sec')
         ]

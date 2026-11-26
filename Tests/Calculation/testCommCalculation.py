@@ -4,15 +4,9 @@ Created on Nov 26, 2026
 @author: CyberiaResurrection
 """
 from PyRoute.AreaItems.Galaxy import Galaxy
-from PyRoute.AreaItems.Sector import Sector
 from PyRoute.Calculation.CommCalculation import CommCalculation
 from PyRoute.DataClasses.ReadSectorOptions import ReadSectorOptions
 from PyRoute.Pathfinding.ApproximateShortestPathForestUnified import ApproximateShortestPathForestUnified
-from PyRoute.Position.Hex import Hex
-from PyRoute.SystemData.UWP import UWP
-from PyRoute.SystemData.StarList import StarList
-from PyRoute.Star import Star
-from PyRoute.TradeCodes import TradeCodes
 from Tests.baseTest import baseTest
 
 try:
@@ -30,7 +24,7 @@ class testCommCalculation(baseTest):
     def setUp(self) -> None:
         self.reset_logging()
 
-    def test_get_route_between(self):
+    def test_get_route_between(self) -> None:
         sourcefile = [
             self.unpack_filename('DeltaFiles/Dagudashaag.sec'),
             self.unpack_filename('DeltaFiles/Zarushagar.sec')
