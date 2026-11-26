@@ -1136,7 +1136,7 @@ class testXRouteCalculation(baseTest):
         start = route[0]
         for i in range(1, len(route) - 1):
             end = route[i]
-            exp_edge = exp_edges[i]
+            exp_edge = exp_edges[i - 1]
             raw_edge = calc.star_graph.get_edge(start, end)
-            self.assertGreater(exp_edge, raw_edge, "Edge " + str(i) + " not decreased after get_route_between")
+            self.assertGreater(exp_edge, raw_edge, "Edge " + str(i - 1) + " not decreased after get_route_between")
             start = end
