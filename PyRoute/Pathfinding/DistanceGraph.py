@@ -72,3 +72,8 @@ class DistanceGraph(DistanceBase):
 
         self._min_indirect[self._arcs[u][0]] = np.fmin(self._min_indirect[self._arcs[u][0]], weight)
         self._min_indirect[self._arcs[v][0]] = np.fmin(self._min_indirect[self._arcs[v][0]], weight)
+
+    def get_edge(self, u: int, v: int) -> float:
+        if v not in self._arcs[u][2]:
+            assert False
+        return self._arcs[u][1][self._arcs[u][0] == v]

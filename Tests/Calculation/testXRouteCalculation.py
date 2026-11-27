@@ -18,6 +18,15 @@ from PyRoute.Star import Star
 from PyRoute.TradeCodes import TradeCodes
 from Tests.baseTest import baseTest
 
+try:
+    from PyRoute.Pathfinding.astar_numpy import astar_path_numpy
+except ModuleNotFoundError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+except ImportError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+except AttributeError:
+    from PyRoute.Pathfinding.astar_numpy_fallback import astar_path_numpy
+
 
 class testXRouteCalculation(baseTest):
 
@@ -378,9 +387,11 @@ class testXRouteCalculation(baseTest):
             'INFO:PyRoute.TradeCalculation:XRoute pass 2',
             'INFO:PyRoute.TradeCalculation:[Liasdi (Zarushagar 0928), Unchin (Zarushagar 0522)]',
             'INFO:PyRoute.TradeCalculation:XRoute pass 3',
-            'INFO:PyRoute.TradeCalculation:Important worlds: 10, jump stations: 96',
+            'INFO:PyRoute.TradeCalculation:Important worlds: 16, jump stations: 36',
+            'INFO:PyRoute.TradeCalculation:No route for important world: Depot (Zarushagar 1920)',
+            'INFO:PyRoute.TradeCalculation:No route for important world: Schmidt (Zarushagar 2420)',
             'INFO:PyRoute.TradeCalculation:No route for important world: Aashrikan (Zarushagar 1740)',
-            'INFO:PyRoute.TradeCalculation:Important worlds: 1, jump stations: 105'
+            'INFO:PyRoute.TradeCalculation:Important worlds: 3, jump stations: 49'
         ]
         calc.generate_routes()
         with self.assertLogs(logger, 'INFO') as logs:
@@ -391,7 +402,7 @@ class testXRouteCalculation(baseTest):
         secCapital = calc.secCapitals[0]
         edge = galaxy.ranges[capital][secCapital]
         route = edge['route']
-        exp_weights = [24, 28]
+        exp_weights = [20, 24]
         for i in range(2):
             start = route[i]
             fin = route[i + 1]
@@ -450,25 +461,25 @@ class testXRouteCalculation(baseTest):
             ['Unchin', 'Glomar', 'Liasdi'],
             ['Unchin', 'Siam', 'Iimii', 'Resra', 'Tatsu', 'Mccandliss', 'Kiezupug', 'Lenashuuk', 'Shulasgu', 'Piileir',
              'Vipac', 'Shakhii', 'Medurma'],
-            ['Liasdi', 'Vogasphere', 'Ishag', 'Arneua', 'Stonie', 'Seeplis', 'Citenic', 'Hypaethral', 'Khii', 'Aalimru',
-             'Sabhaash', 'Piileir', 'Vipac', 'Shakhii', 'Medurma']
+            ['Liasdi', 'Glomar', 'Unchin', 'Siam', 'Iimii', 'Resra', 'Tatsu', 'Mccandliss', 'Kiezupug', 'Lenashuuk',
+             'Shulasgu', 'Piileir', 'Vipac', 'Shakhii', 'Medurma']
         ]
         exp_trade = calc.calc_trade(25)
         distance = [8, 46, 50]
-        act_distance = [8, 47, 54]
+        act_distance = [8, 47, 55]
         exp_trade_count = defaultdict(int)
         for line in names:
             for item in line:
                 exp_trade_count[item] += 1
         exp_weight = [
-            [44, 44],
-            [44, 42, 35, 40, 44, 49, 37, 60, 62, 33, 43, 41],
-            [45, 40, 44, 44, 47, 47, 42, 42, 47, 49, 40, 33, 43, 41]
+            [36, 36],
+            [36, 35, 29, 33, 36, 40, 31, 49, 51, 33, 43, 41],
+            [36, 36, 36, 35, 29, 33, 36, 40, 31, 49, 51, 33, 43, 41]
         ]
         exp_count = [
-            [1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2]
+            [2, 2],
+            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
         ]
 
         counter = 0
@@ -478,17 +489,17 @@ class testXRouteCalculation(baseTest):
             self.assertEqual(act_distance[counter], item[2]['actual distance'])
             self.assertEqual(len(item[2]['route']) - 1, item[2]['jumps'])
             for i in range(len(names[counter])):
-                self.assertEqual(names[counter][i], item[2]['route'][i].name)
+                self.assertEqual(names[counter][i], item[2]['route'][i].name, "Counter: " + str(counter) + ", i: " + str(i))
                 if i < len(names[counter]) - 1:
                     first = item[2]['route'][i]
                     second = item[2]['route'][i + 1]
-                    self.assertEqual(exp_trade_count[first.name], first.tradeCount, first.name)
+                    self.assertEqual(exp_trade_count[first.name], first.tradeCount, first.name + ", i: " + str(i) + ", counter: " + str(counter))
                     firstdex = first.index
                     seconddex = second.index
                     edge = galaxy.stars[firstdex][seconddex]
                     self.assertEqual(exp_trade, edge['trade'])
-                    self.assertEqual(exp_weight[counter][i], edge['weight'])
-                    self.assertEqual(exp_count[counter][i], edge['count'], 'Weight - counter ' + str(counter) + ' i ' + str(i))
+                    self.assertEqual(exp_weight[counter][i], edge['weight'], 'Weight - counter: ' + str(counter) + ', i: ' + str(i))
+                    self.assertEqual(exp_count[counter][i], edge['count'], 'Count - counter: ' + str(counter) + ', i: ' + str(i))
 
             counter += 1
 
@@ -920,8 +931,11 @@ class testXRouteCalculation(baseTest):
         galaxy.ranges.add_edge(capital, subcap, route=[])
 
         exp_logs = [
-            'INFO:PyRoute.TradeCalculation:Important worlds: 20, jump stations: 128',
-            'INFO:PyRoute.TradeCalculation:Important worlds: 0, jump stations: 148'
+            'INFO:PyRoute.TradeCalculation:Important worlds: 27, jump stations: 50',
+            'INFO:PyRoute.TradeCalculation:No route for important world: Khuir (Core 2513)',
+            'INFO:PyRoute.TradeCalculation:No route for important world: Dral (Core 0727)',
+            'INFO:PyRoute.TradeCalculation:No route for important world: Dishadshii (Core 2640)',
+            'INFO:PyRoute.TradeCalculation:Important worlds: 3, jump stations: 74'
         ]
         calc.routes_pass_2()
         self.assertEqual(114, galaxy.ranges.number_of_edges())
@@ -930,7 +944,7 @@ class testXRouteCalculation(baseTest):
             calc.routes_pass_3()
             self.assertEqual(exp_logs, logs.output)
 
-        self.assertEqual(232, galaxy.ranges.number_of_edges())
+        self.assertEqual(195, galaxy.ranges.number_of_edges())
 
         trade_21 = calc.calc_trade(21)
         trade_23 = calc.calc_trade(23)
@@ -1075,3 +1089,63 @@ class testXRouteCalculation(baseTest):
         with self.assertLogs(logger, 'INFO') as logs:
             calc.routes_pass_3()
             self.assertEqual(exp_logs, logs.output)
+
+    def test_get_route_between(self) -> None:
+        sourcefile = [
+            self.unpack_filename('DeltaFiles/xroute_routes_pass_3_1/Core.sec')
+        ]
+
+        args = self._make_args()
+        args.route_btn = 15
+        readparms = ReadSectorOptions(sectors=sourcefile, pop_code=args.pop_code, ru_calc=args.ru_calc,
+                                      route_reuse=args.route_reuse, trade_choice='comm', route_btn=args.route_btn,
+                                      mp_threads=args.mp_threads, debug_flag=args.debug_flag, fix_pop=False,
+                                      deep_space={}, map_type=args.map_type)
+
+        galaxy = Galaxy(min_btn=15, max_jump=4)
+        galaxy.read_sectors(readparms)
+
+        calc = XRouteCalculation(galaxy)
+        galaxy.trade = calc
+        logger = calc.logger
+        logger.manager.disable = 10
+
+        calc.generate_routes()
+        self.assertEqual(1, len(calc.capital))
+        self.assertEqual(0, len(calc.secCapitals))
+        self.assertEqual(15, len(calc.subCapitals))
+        calc.calculate_components()
+
+        source = max(galaxy.star_mapping.values(), key=lambda item: item.wtn)
+        calc.shortest_path_tree = ApproximateShortestPathForestUnified(source.index, galaxy.stars, calc.epsilon)
+
+        capital = calc.capital[0]
+        subcap = calc.subCapitals[0]
+
+        bulk = galaxy.heuristic_distance_bulk
+        upbound = calc.shortest_path_tree.triangle_upbound(capital.index, subcap.index) * 1.005
+        route, _ = astar_path_numpy(calc.star_graph, capital.index, subcap.index, bulk, upbound=upbound)
+
+        exp_edges = []
+        start = route[0]
+        for i in range(1, len(route)):
+            end = route[i]
+            raw_edge = calc.star_graph.get_edge(start, end)
+            exp_edges.append(raw_edge)
+
+            start = end
+        self.assertEqual(len(route) - 1, len(exp_edges), "Exp_edges should be 1 less element than route")
+
+        calc.get_route_between(capital, subcap, XRouteCalculation.calc_trade(25))
+        exp_lobounds = [35.8333, 33.3333, 33.3333, 33.3333, 40.8333, 39.1667, 0]
+
+        start = route[0]
+        for i in range(1, len(route) - 1):
+            end = route[i]
+            exp_edge = exp_edges[i - 1]
+            raw_edge = calc.star_graph.get_edge(start, end)
+            self.assertGreater(exp_edge, raw_edge, "Edge " + str(i - 1) + " not decreased after get_route_between")
+            exp_lobound = exp_lobounds[i - 1]
+            lobound = calc.shortest_path_tree.lower_bound(start, end)
+            self.assertAlmostEqual(exp_lobound, lobound, 4, "Lower bound for edge " + str(i - 1) + " not approx equal")
+            start = end

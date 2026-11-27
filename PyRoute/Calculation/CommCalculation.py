@@ -236,6 +236,8 @@ class CommCalculation(RouteCalculation):
                         self.route_reuse)
             else:
                 data['weight'] -= (data['weight'] - data['distance']) / self.route_reuse
+            self.star_graph.lighten_edge(start, end, data['weight'])
+            self.shortest_path_tree.lighten_edge(start, end, data['weight'])
             edges.append((start, end))
             start = end
 
