@@ -23,7 +23,7 @@ requests
 requests_toolbelt
 responses
 ruff >= 0.3.0
-setuptools == 80.10.2
+setuptools == 84.1.0
 types-networkx
 types-reportlab
 types-requests
