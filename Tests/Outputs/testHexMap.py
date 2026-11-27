@@ -8,6 +8,7 @@ import networkx as nx
 import numpy as np
 from pymupdf import pymupdf
 
+from PyRoute.Calculation.XRouteCalculation import XRouteCalculation
 from PyRoute.DeltaDebug.DeltaDictionary import DeltaDictionary, SectorDictionary
 from PyRoute.DeltaDebug.DeltaGalaxy import DeltaGalaxy
 from PyRoute.Inputs.ParseStarInput import ParseStarInput
@@ -536,6 +537,64 @@ class testHexMap(baseTest):
 
         mse = np.mean((array1 - array2) ** 2)
         self.assertTrue(0.1 > mse, "Image difference " + str(mse) + " above threshold for Zarushagar sector")
+
+    def test_verify_xboat_sector_write_pdf(self) -> None:
+        sourcefile = self.unpack_filename('DeltaFiles/Core.sec')
+        srcpdf = self.unpack_filename('OutputFiles/verify_sector_xroute_write/Core Sector.pdf')
+
+        args = self._make_args()
+        args.max_jump = 4
+        args.interestingline = None
+        args.interestingtype = None
+        args.maps = True
+        args.routes = 'xroute'
+        args.subsectors = False
+        args.btn = 15
+        args.borders = 'erode'
+        args.pop_code = 'scaled'
+
+        delta = DeltaDictionary()
+        sector = SectorDictionary.load_traveller_map_file(sourcefile)
+        delta[sector.name] = sector
+
+        galaxy = DeltaGalaxy(args.btn, args.max_jump)
+        galaxy.read_sectors(delta, args.pop_code, args.ru_calc,
+                            args.route_reuse, args.routes, args.route_btn, args.mp_threads, args.debug_flag)
+        galaxy.output_path = args.output
+        galaxy.generate_routes()
+        self.assertTrue(isinstance(galaxy.trade, XRouteCalculation))
+
+        galaxy.set_borders(args.borders, args.ally_match)
+        galaxy.trade.calculate_routes()
+
+        secname = 'Core'
+
+        hexmap = ClassicModePDFSectorMap(galaxy, 'xroute', args.output, "dense")
+
+        targpath = os.path.abspath(args.output + '/Core Sector.pdf')
+        _ = hexmap.write_sector_map(galaxy.sectors[secname])
+
+        src_img = pymupdf.open(srcpdf)
+        src_iter = src_img.pages(0)
+        for page in src_iter:
+            src = page.get_pixmap(dpi=144)
+        srcfile = os.path.abspath(args.output + '/Core Sector original.png')
+        src.save(srcfile)
+        trg_img = pymupdf.open(targpath)
+        trg_iter = trg_img.pages(0)
+        for page in trg_iter:
+            trg = page.get_pixmap(dpi=144)
+        trgfile = os.path.abspath(args.output + '/Core Sector remix.png')
+        trg.save(trgfile)
+
+        image1 = Image.open(srcfile)
+        image2 = Image.open(trgfile)
+
+        array1 = np.array(image1)
+        array2 = np.array(image2)
+
+        mse = np.mean((array1 - array2) ** 2)
+        self.assertTrue(0.1 > mse, "Image difference " + str(mse) + " above threshold for Core sector")
 
     def test_verify_quadripoint_trade_write(self) -> None:
         source1file = self.unpack_filename('DeltaFiles/quadripoint_trade_write/Tuglikki.sec')
